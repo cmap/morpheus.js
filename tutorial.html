@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+	content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+<title>Morpheus - Tutorial</title>
+<script src="js/morpheus.external.min.js"></script>
+<script src="js/morpheus.js"></script>
+<link rel="stylesheet" href="css/morpheus.css">
+<link rel="stylesheet" href="css/morpheus.external.min.css">
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-xs-12">
+				<h4>
+					Tutorial: <a target="_blank"
+						href="http://www.broadinstitute.org/achilles">Project Achilles</a>
+					and the <a target="_blank"
+						href="http://www.broadinstitute.org/ccle/home">Cancer Cell
+						Line Encyclopedia (CCLE)</a> datasets.
+				</h4>
+			</div>
+		</div>
+		<div id="header" class="row">
+			<div class="col-xs-12">
+				<input type="button" class="btn btn-default btn-sm"
+					value="Expand All" name="expand"> <input type="button"
+					class="btn btn-default btn-sm" value="Collapse All" name="collapse">
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-xs-12">
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Open
+					Project Achilles Gene Essentiality Scores</a>
+				<p class="collapse">Open the Project Achilles gene essentiality
+					scores under the preloaded datasets section. By default, values in
+					the heat map are mapped to colors using the minimum and maximum of
+					each row independently.</p>
+
+
+
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Median
+					Absolute Deviation (MAD)</a>
+				<p class="collapse">
+					Click the tools icon
+					<button type="button"
+						class="btn btn-default btn-xs dropdown-toggle">
+						<span class="fa fa-wrench"></span> <span class="fa fa-caret-down"></span>
+					</button>
+					and select "Create Calculated Annotation". <br /> Enter "MAD" for
+					the "Annotation name". <br /> Enter "MAD()" for "Formula" and
+					click "OK". <br /> A new row annotation named "MAD" will appear to
+					the right of the heat map.
+				</p>
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Filter
+					Rows</a>
+				<p class="collapse">
+					Show only the top 500 most variable genes by the median absolute
+					deviation <br /> Click the filter icon
+					<button type="button"
+						class="btn btn-default btn-xs dropdown-toggle">
+						<span class="fa fa-filter"></span> <span class="fa fa-caret-down"></span>
+					</button>
+					. <br />Click the "Add" button and set the field name to "MAD". <br />Click
+					"Switch to top N filter" and enter "500" for "N". Note that 523
+					rows are now shown because of ties in the median absolute
+					deviation.
+				</p>
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Hierarchical
+					Clustering</a>
+				<p class="collapse">
+					Click the tools icon
+					<button type="button"
+						class="btn btn-default btn-xs dropdown-toggle">
+						<span class="fa fa-wrench"></span> <span class="fa fa-caret-down"></span>
+					</button>
+					and select "Hierarchical Clustering". Change "Cluster" to "Rows and
+					columns". Click "OK" to run the analysis. <br /> Do haematopoietic
+					cell lines cluster together? Hover over the primary_site
+					annotations to highlight cell lines from the same primary site. You
+					can dynamically cut the dendrogram by dragging the dashed line at
+					the top of the dendrogram. <br />Hierarchical clustering
+					recursively merges objects based on their pair-wise distance.
+					Objects closest together are merged first, objects furthest apart
+					are merged last. The result is a tree structure, referred to as a
+					dendogram, where the leaf nodes represent the original items and
+					internal (higher) nodes represent the merges that occurred. Click <a
+						target="_black"
+						href="http://www.mathworks.com/help/stats/hierarchical-clustering.html">here</a>
+					for a more detailed description of the hierarchical clustering
+					algorithm and <a target="_blank"
+						href="http://support.minitab.com/en-us/minitab-express/1/help-and-how-to/modeling-statistics/regression/supporting-topics/basics/a-comparison-of-the-pearson-and-spearman-correlation-methods/">here</a>
+					for a comparison of the Pearson and Spearman correlation methods.
+				</p>
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Compress
+					Heat Map</a>
+				<p class="collapse">
+					Click the fit to window icon
+					<button type="button" class="btn btn-default btn-xs">
+						<span class="fa fa-compress"></span>
+					</button>
+					to fit compress the heat map. Click
+					<button type="button" class="btn btn-default btn-xs"
+						title="Reset Zoom" name="resetZoom">100%</button>
+					to return to the normal heat map size.
+				</p>
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Remove
+					Row Filter</a>
+				<p class="collapse">
+					Click the filter icon
+					<button type="button"
+						class="btn btn-default btn-xs dropdown-toggle">
+						<span class="fa fa-filter"></span> <span class="fa fa-caret-down"></span>
+					</button>
+					and delete the median absolute deviation filter to show all rows.
+				</p>
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Remove
+					Dendrograms</a>
+				<p class="collapse">Right-click on the column dendrogram and
+					select "Delete". Do the same for the row dendrogram.</p>
+
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Sort
+					Rows</a>
+				<p class="collapse">
+					Click the MAD row annotation header in the heat map once to sort
+					the heat map in ascending order by the median absolute deviation.
+					Click it again to sort the heat map in descending order. Note that
+					you can shift-click to sort multiple columns simultaneously.
+					Alternatively, you can click
+					<button title="Sort" name="sort" type="button"
+						class="btn btn-default btn-xs">
+						<span class="fa fa-sort-alpha-asc"></span>
+					</button>
+					to open a sort dialog.
+				</p>
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Search
+					Results To Top</a>
+				<p class="collapse">
+					Enter "BRAF" in the row search box. <br /> Click
+					<button type="button" class="btn btn-default btn-xs">
+						<i class="fa fa-level-up"></i>
+					</button>
+					to bring the matches to the top of the heat map.
+				</p>
+
+
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Visual
+					Enrichment</a>
+				<p class="collapse">
+
+					Double-click on BRAF row to sort by dependency score. <br />
+					Search columns for "skin". <br /> Do skin cell lines seem to be
+					more dependent on BRAF than cell lines from other lineages? <br />
+					You can optionally limit your search to within a field by typing
+					the field name followed by a colon ":" and then the term you are
+					looking for.
+
+				</p>
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Nearest
+					Neighbors</a>
+				<p class="collapse">
+					Click the tools icon
+					<button type="button"
+						class="btn btn-default btn-xs dropdown-toggle">
+						<span class="fa fa-wrench"></span> <span class="fa fa-caret-down"></span>
+					</button>
+					and select "Nearest Neighbors". Click "OK" to run the analysis. <br />
+					A new row annotation named "Pearson correlation" will appear. <br />
+					What genes correlate with BRAF?
+				</p>
+
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Scatter
+					Plot Matrix</a>
+				<p class="collapse">
+					Select the first three rows in order to select the top 3 most
+					correlated genes with BRAF and all samples. Click the chart icon
+					<button type="button" class="btn btn-default btn-xs">
+						<span class="fa fa-line-chart"></span>
+					</button>
+					. Change the chart type to "row scatter" to assess the
+					relationships between BRAF, FXR2, and ZNF781 simultaneously.
+				</p>
+
+
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Append
+					Mutations</a>
+				<p class="collapse">
+					Click
+					<button type="button" class="btn btn-default btn-xs">
+						<span class="fa fa-folder-open-o"></span>
+					</button>
+					to bring up the file open window. <br /> Check "Append rows to
+					current dataset" and select the file CCLE Mutations dataset. Change
+					"Current dataset annotation name" and "New dataset annotation name"
+					to "id" to match the ids in the existing dataset with the id in the
+					mutational dataset. Scroll down to see the mutational data.
+				</p>
+
+				<!-- 				<a data-toggle="collapse" -->
+				<!-- 					style="font-size: 1.2em; display: block; font-weight: 800;">Conditional -->
+				<!-- 					Heat Map Color Schemes</a> -->
+				<!-- 				<p class="collapse"> -->
+				<!-- 					Select -->
+				<!-- 					<button type="button" class="btn btn-default btn-xs"> -->
+				<!-- 						<span class="fa fa-cog"></span> -->
+				<!-- 					</button> -->
+				<!-- 					to open the options window. <br /> Change "Color by" to "Source" <br /> -->
+				<!-- 					Change "Color by value" to -->
+				<!-- 					"CCLE_hybrid_capture1650_hg19_NoCommonSNPs_NoNeutralVariants_CDS_2012.05.07" -->
+				<!-- 					<br /> Change "Predefined color schemes" to "MAF". -->
+				<!-- 				</p> -->
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Toggle
+					Mutation Visibility</a>
+				<p class="collapse">
+					Click
+					<button title="Color Key" type="button"
+						class="btn btn-default btn-xs" aria-expanded="false">
+						<span class="fa fa-key"></span>
+					</button>
+					to open the color key. <br /> Click the "Synonymous" check box to
+					visually hide synonymous mutations (note the matrix values are left
+					unchanged).
+				</p>
+
+				<!-- 				<a data-toggle="collapse" -->
+				<!-- 					style="font-size: 1.2em; display: block; font-weight: 800;">Group -->
+				<!-- 					Rows</a> -->
+				<!-- 				<p class="collapse"> -->
+				<!-- 					Click -->
+				<!-- 					<button title="Sort" name="sort" type="button" -->
+				<!-- 						class="btn btn-default btn-xs"> -->
+				<!-- 						<span class="fa fa-sort-alpha-asc"></span> -->
+				<!-- 					</button> -->
+				<!-- 					to open the sort and group by dialog. Sort by "Source". Next, -->
+				<!-- 					select "Source" under the "Group by" field. Grouping adds -->
+				<!-- 					whitespace between different values of the group by fields. -->
+				<!-- 				</p> -->
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Annotate
+					Selection</a>
+				<p class="collapse">
+					Enter "BRAF" in the row search box. <br /> Click
+					<button type="button" class="btn btn-default btn-xs">
+						<i class="fa fa-level-up"></i>
+					</button>
+					to bring the matches to the top of the heat map. Double-click to
+					sort the heat map by the BRAF dependency score. Select the seven
+					cell lines that have a dependency score less than or equal to -2.
+					Right-click and select "Annotate Selection". Enter "BRAF_sensitive"
+					for "Annotation name" and "y" for "Annotation value".
+				</p>
+
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">New
+					Heat Map</a>
+				<p class="collapse">
+					Enter "CCLE" in the row search box to select the CCLE mutation
+					data. <br />Right-click on the columns and select "Clear
+					Selection" to clear the column selection. <br />Click the tools
+					icon
+					<button type="button"
+						class="btn btn-default btn-xs dropdown-toggle">
+						<span class="fa fa-wrench"></span> <span class="fa fa-caret-down"></span>
+					</button>
+					and select "New Heat Map". A new tab will open that contains the
+					selected subset of the heat map.
+				</p>
+
+				<a data-toggle="collapse"
+					style="font-size: 1.2em; display: block; font-weight: 800;">Fisher
+					Exact Test</a>
+				<p class="collapse">
+					Click the tools icon
+					<button type="button"
+						class="btn btn-default btn-xs dropdown-toggle">
+						<span class="fa fa-wrench"></span> <span class="fa fa-caret-down"></span>
+					</button>
+					and select "Marker Selection". Change "Metric" to "Fisher Exact
+					Test". Change "Field" to "BRAF_sensitive". Set "Class a" to
+					"BRAF_sensitive" and "Class b" to "". Set "Grouping value" to "4"
+					to group missense, splice site, frame shift, and nonsense mutations
+					together and no mutation, synonymous, in-frame indels, and other
+					non-synonymous mutations together (Click
+					<button title="Color Key" type="button"
+						class="btn btn-default btn-xs" aria-expanded="false">
+						<span class="fa fa-key"></span>
+					</button>
+					to see the numerical values used to encode mutation type). Click
+					"OK" to run the analysis. <br /> A new row annotation named
+					"Fisher Exact Test" will appear. <br /> What mutations distinguish
+					BRAF sensitive cell lines from the other cell lines?
+				</p>
+			</div>
+		</div>
+		<div class="row"></div>
+		<div class="row"></div>
+		<div class="row"></div>
+		<div class="row"></div>
+		<div class="row"></div>
+		<div class="row"></div>
+	</div>
+	<script type="text/javascript">
+		var links = $(document.body).find('[data-toggle=collapse]');
+		var collapse = $(document.body).find('.collapse');
+		for (var i = 0; i < collapse.length; i++) {
+			var $c = $(collapse[i]);
+			var $l = $(links[i]);
+			$l.html((i + 1) + '. ' + $l.html());
+			$c.attr('id', i);
+			$l.attr('href', '#' + i);
+		}
+		$('#header').find('[name=expand]').on('click', function() {
+			$(document.body).find('.collapse').collapse('show');
+		});
+		$('#header').find('[name=collapse]').on('click', function() {
+			$(document.body).find('.collapse').collapse('hide');
+		});
+	</script>
+	<script>
+		(function(i, s, o, g, r, a, m) {
+			i['GoogleAnalyticsObject'] = r;
+			i[r] = i[r] || function() {
+				(i[r].q = i[r].q || []).push(arguments)
+			}, i[r].l = 1 * new Date();
+			a = s.createElement(o), m = s.getElementsByTagName(o)[0];
+			a.async = 1;
+			a.src = g;
+			m.parentNode.insertBefore(a, m)
+		})(window, document, 'script',
+				'//www.google-analytics.com/analytics.js', 'ga');
+
+		ga('create', 'UA-53973555-1', 'auto');
+		ga('send', 'pageview');
+	</script>
+</body>
+</html>
