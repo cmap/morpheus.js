@@ -10,6 +10,7 @@ morpheus.HelpMenu = function() {
 
 	html.push('<li><a name="linking" href="#">Linking</a></li>');
 	html.push('<li><a name="tutorial" href="#">Tutorial</a></li>');
+	html.push('<li><a name="source" href="#">Source Code</a></li>');
 
 	html.push('</ul>');
 	html.push('</div>');
