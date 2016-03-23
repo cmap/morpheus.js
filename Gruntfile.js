@@ -74,8 +74,7 @@ module.exports = function(grunt) {
 						src : [ 'src/util/util.js', 'src/util/*.js',
 								'src/io/*.js', 'src/matrix/vector_adapter.js',
 								'src/matrix/*.js', 'src/*.js',
-								'src/tools/*.js', 'src/ui/list.js',
-								'src/ui/*.js', 'src/**/*.js' ]
+								'src/tools/*.js', 'src/ui/*.js', 'src/**/*.js' ]
 					}
 				},
 				watch : {
@@ -83,6 +82,9 @@ module.exports = function(grunt) {
 					tasks : [ 'concat:morpheus' ]
 				}
 			});
+
+	// rebuild js and css:
+	// grunt concat:morpheus concat:extJs uglify concat:extJsAll
 	grunt.registerTask('default', 'watch');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-concat');
