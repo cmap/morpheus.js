@@ -2,7 +2,7 @@ morpheus.HelpMenu = function() {
 	var html = [];
 	html.push('<div style="margin-left:2px;" class="btn-group">');
 	html
-			.push('<span data-toggle="dropdown" class="fa fa-lg fa-border fa-question-circle"></span>');
+			.push('<span style="color:#ca0020;" data-toggle="dropdown" class="fa fa-lg fa-border fa-question-circle"></span>');
 	html
 			.push('<ul name="info" class="dropdown-menu dropdown-menu-right" role="menu">');
 	html.push('<li><a name="contact" href="#">Contact</a></li>');
@@ -36,5 +36,11 @@ morpheus.HelpMenu = function() {
 		e.stopPropagation();
 		e.stopImmediatePropagation();
 		window.open(morpheus.Util.URL + 'linking.html');
+	});
+	this.$el.find('[name=source]').on('click', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		window.open('https://github.com/joshua-gould/morpheus.js');
 	});
 };
