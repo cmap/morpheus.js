@@ -464,9 +464,6 @@ morpheus.HeatMapColorScheme.prototype = {
 			this.vector = this.project.getSortedFilteredDataset()
 					.getRowMetadata().getByName(
 							this.separateColorSchemeForRowMetadataField);
-			if (this.vector == null) {
-				this.separateColorSchemeForRowMetadataField = null;
-			}
 		}
 		this.rowValueToColorSupplier = {};
 		_.each(_.keys(json.colorSchemes), function(key) {
@@ -556,7 +553,7 @@ morpheus.HeatMapColorScheme.prototype = {
 		this.currentColorSupplier.isSizeBy();
 	},
 	getColor : function(row, column, val) {
-		if (this.separateColorSchemeForRowMetadataField !== null) {
+		if (this.vector !== undefined) {
 			var tmp = this.vector.getValue(row);
 			if (this.value !== tmp) {
 				this.value = tmp;
