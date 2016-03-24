@@ -2890,53 +2890,56 @@ morpheus.HeatMap.prototype = {
 	},
 	getFitColumnSize : function() {
 		var heatmap = this.heatmap;
-		var columnSizes = heatmap.getColumnPositions();
-		var totalWidth = columnSizes.getItemSize(columnSizes.getLength() - 1)
-				+ columnSizes.getPosition(columnSizes.getLength() - 1);
-		var availableWidth = this.options.width ? this.options.width : this.$el
-				.outerWidth();
+		var availablePixels = this.getAvailableWidth();
 		if (this.rowDendrogram) {
-			availableWidth -= this.rowDendrogram.getUnscaledWidth();
+			availablePixels -= this.rowDendrogram.getUnscaledWidth();
 		}
-		var rowTrackWidth = 45;
+		var trackPixels = 12; // spacer
 		for (var i = 0, length = this.rowTracks.length; i < length; i++) {
 			var track = this.rowTracks[i];
 			if (track.isVisible()) {
-				var size = morpheus.CanvasUtil.getPreferredSize(track);
-				var headerSize = morpheus.CanvasUtil
-						.getPreferredSize(this.rowTrackHeaders[i]);
-				var width = Math.max(headerSize.width, size.width);
-				rowTrackWidth += width;
+				trackPixels += track.getUnscaledWidth();
 			}
 		}
-		availableWidth -= rowTrackWidth;
-		var columnSize = columnSizes.getSize();
-		columnSize = columnSize * (availableWidth / totalWidth);
-		columnSize = Math.min(22, columnSize);
-		return columnSize;
+		for (var i = 0, length = this.columnTracks.length; i < length; i++) {
+			var track = this.columnTracks[i];
+			if (track.isVisible()) { // all column track headers have the
+				// same width
+				trackPixels += this.columnTrackHeaders[i].getUnscaledWidth();
+				break;
+			}
+		}
+
+		availablePixels -= trackPixels;
+		var positions = heatmap.getColumnPositions();
+		var totalCurrent = positions.getItemSize(positions.getLength() - 1)
+				+ positions.getPosition(positions.getLength() - 1);
+		var size = positions.getSize();
+		size = size * (availablePixels / totalCurrent);
+		size = Math.min(22, size);
+		return size;
 	},
 	getFitRowSize : function() {
 		var heatmap = this.heatmap;
-		var rowSizes = heatmap.getRowPositions();
-		var totalHeight = rowSizes.getItemSize(rowSizes.getLength() - 1)
-				+ rowSizes.getPosition(rowSizes.getLength() - 1);
-		var availableHeight = this.getAvailableHeight();
+		var availablePixels = this.getAvailableHeight();
 		if (this.columnDendrogram) {
-			availableHeight -= this.columnDendrogram.getUnscaledHeight();
+			availablePixels -= this.columnDendrogram.getUnscaledHeight();
 		}
-		var columnTrackHeight = 8;
+		var trackPixels = 12;
 		for (var i = 0, length = this.columnTracks.length; i < length; i++) {
 			var track = this.columnTracks[i];
 			if (track.isVisible()) {
-				columnTrackHeight += morpheus.CanvasUtil
-						.getPreferredSize(track).height;
+				trackPixels += track.getUnscaledHeight();
 			}
 		}
-		availableHeight -= columnTrackHeight;
-		var rowSize = rowSizes.getSize();
-		rowSize = rowSize * (availableHeight / totalHeight);
-		rowSize = Math.min(22, rowSize);
-		return rowSize;
+		availablePixels -= trackPixels;
+		var positions = heatmap.getRowPositions();
+		var totalCurrent = positions.getItemSize(positions.getLength() - 1)
+				+ positions.getPosition(positions.getLength() - 1);
+		var size = positions.getSize();
+		size = size * (availablePixels / totalCurrent);
+		size = Math.min(22, size);
+		return size;
 	},
 	fitToWindow : function(repaint) {
 		this.heatmap.getRowPositions().setSize(this.getFitRowSize());
