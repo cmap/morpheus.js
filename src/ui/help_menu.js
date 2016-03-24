@@ -23,12 +23,20 @@ morpheus.HelpMenu = function() {
 		e.stopPropagation();
 		e.stopImmediatePropagation();
 		window.open('mailto:morpheus@broadinstitute.org');
+		morpheus.Util.trackEvent({
+			eventCategory : 'ToolBar',
+			eventAction : 'contact'
+		});
 	});
 	this.$el.find('[name=tutorial]').on('click', function(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		e.stopImmediatePropagation();
 		window.open(morpheus.Util.URL + 'tutorial.html');
+		morpheus.Util.trackEvent({
+			eventCategory : 'ToolBar',
+			eventAction : 'tutorial'
+		});
 
 	});
 
@@ -37,11 +45,19 @@ morpheus.HelpMenu = function() {
 		e.stopPropagation();
 		e.stopImmediatePropagation();
 		window.open(morpheus.Util.URL + 'linking.html');
+		morpheus.Util.trackEvent({
+			eventCategory : 'ToolBar',
+			eventAction : 'linking'
+		});
 	});
 	this.$el.find('[name=source]').on('click', function(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		e.stopImmediatePropagation();
 		window.open('https://github.com/joshua-gould/morpheus.js');
+		morpheus.Util.trackEvent({
+			eventCategory : 'ToolBar',
+			eventAction : 'source'
+		});
 	});
 };
