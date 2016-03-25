@@ -53,8 +53,10 @@ morpheus.DatasetUtil.getDatasetReader = function(ext, options) {
 		if (options && options.regions) {
 			datasetReader.setRegions(options.regions);
 		}
-	} else {
+	} else if (ext === 'txt' || ext === 'tsv' || ext === 'csv') {
 		datasetReader = new morpheus.TxtReader();
+	} else {
+		datasetReader = new morpheus.GctReader();
 	}
 	return datasetReader;
 };
@@ -434,7 +436,6 @@ morpheus.DatasetUtil.getSeriesNames = function(dataset) {
 	});
 	return names;
 };
-
 
 /**
  * Search dataset values.
