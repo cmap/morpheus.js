@@ -163,10 +163,11 @@ morpheus.MetadataUtil.autocomplete = function(model) {
 		var matches = [];
 		var regex = null;
 		var searchModel = model;
-		var token = tokens != null && tokens.length > 0 ? tokens[tokens.length - 1]
-				: null;
+		var token = tokens != null && tokens.length > 0 ? tokens[tokens.selectionStartIndex]
+				: '';
+		token = $.trim(token);
 		try {
-			if (token != null && token !== '') {
+			if (token !== '') {
 				var field = null;
 				var semi = token.indexOf(':');
 				if (semi > 0) { // field search?
@@ -191,7 +192,7 @@ morpheus.MetadataUtil.autocomplete = function(model) {
 				var set = new morpheus.Set();
 				// regex used to determine if a string starts with substring `q`
 
-				regex = new RegExp('^' + token, 'i');
+				regex = new RegExp('^' + morpheus.Util.escapeRegex(token), 'i');
 				// iterate through the pool of strings and for any string that
 				// contains the substring `q`, add it to the `matches` array
 				var max = 10;
@@ -247,11 +248,7 @@ morpheus.MetadataUtil.autocomplete = function(model) {
 					var field = array[1];
 					var val = array[0];
 					matches.push({
-						value : (field.indexOf(' ') > 0 ? ('"' + field + '"')
-								: field)
-								+ ':'
-								+ (val.indexOf(' ') > 0 ? ('"' + val + '"')
-										: val),
+						value : field + ':' + val,
 						label : '<span style="font-weight:300;">' + field
 								+ ':</span>'
 								+ '<span style="font-weight:900;">' + val
@@ -275,11 +272,10 @@ morpheus.MetadataUtil.autocomplete = function(model) {
 					|| dataType === '[string]') {
 				if (regex.test(field)) {
 					matches.push({
-						value : (field.indexOf(' ') > 0 ? ('"' + field + '"')
-								: field)
-								+ ':',
+						value : field + ':',
 						label : '<span style="font-weight:300;">' + field
-								+ ':</span>'
+								+ ':</span>',
+						show : true
 					});
 				}
 			}
@@ -331,8 +327,8 @@ morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS = new morpheus.Set();
 		'pert_mfc_id', 'pert_time', 'pert_time_unit', 'pert_univ_id',
 		'pert_vehicle', 'pool_id', 'rna_plate', 'rna_well', 'count_mean',
 		'count_cv', 'provenance_code' ].forEach(function(name) {
-			morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS.add(name);
-		});
+	morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS.add(name);
+});
 morpheus.MetadataUtil.DEFAULT_FIELDS_TO_SHOW = {
 	'cell_id' : true,
 	'pert_idose' : true,
