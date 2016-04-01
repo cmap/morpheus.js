@@ -12,22 +12,30 @@
 	background: black !important;
 }
 
+.ui-widget {
+	font-family:inherit !important;	
+}
+
 .axis path, .axis line {
 	fill: none;
 	stroke: #000;
 	shape-rendering: crispEdges;
 }
 
-.select2-search-choice {
-	background: white !important;
+.ui-menu-item {
+	background-color:white;	
 }
 
-.select2-search-choice:hover {
-	background: rgb(230, 230, 230) !important;
+.ui-state-focus {
+	background: inherit !important;
+	background-color:#F7F7F7;
+	border: inherit !important;
+	color: inherit !important;
+	font-weight: inherit !important;
 }
 
 .ui-autocomplete {
-	max-height: 200px;
+	max-height: 400px;
 	overflow-y: auto;
 	/* prevent horizontal scrollbar */
 	overflow-x: hidden;
@@ -158,7 +166,7 @@
 	display: block;
 }
 
-.slick-table:not(.slick-stacked) .slick-visible-not-stacked {
+.slick-table:not (.slick-stacked) .slick-visible-not-stacked {
 	display: block;
 }
 
