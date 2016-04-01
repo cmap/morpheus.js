@@ -28,7 +28,7 @@ morpheus.HeatMapTooltipProvider = function(heatMap, rowIndex, columnIndex,
 		for (var i = 0, nseries = dataset.getSeriesCount(); i < nseries; i++) {
 			morpheus.HeatMapTooltipProvider._matrixValueToString(dataset,
 					rowIndex, columnIndex, i, tipText, separator,
-					options.showSeriesNameInTooltip);
+					options.showSeriesNameInTooltip || i > 0);
 		}
 		if (quick) {
 			var quickRowTracks = heatMap.rowTracks.filter(function(t) {
@@ -38,10 +38,11 @@ morpheus.HeatMapTooltipProvider = function(heatMap, rowIndex, columnIndex,
 					quickRowTracks, dataset.getRowMetadata(), rowIndex,
 					tipText, separator);
 
-//			if (quickRowTracks.length > 0) {
-//				tipText
-//						.push('<div style="height:1px;background-color:LightGrey;"></div>');
-//			}
+			// if (quickRowTracks.length > 0) {
+			// tipText
+			// .push('<div
+			// style="height:1px;background-color:LightGrey;"></div>');
+			// }
 			morpheus.HeatMapTooltipProvider._tracksToString(options,
 					heatMap.columnTracks.filter(function(t) {
 						return t.settings.inlineTooltip;
