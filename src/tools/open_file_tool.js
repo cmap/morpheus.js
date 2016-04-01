@@ -194,7 +194,7 @@ morpheus.OpenFileTool.prototype = {
 		}
 		var vector = dataset.getRowMetadata().getByName(metadataName);
 		if (!vector) {
-			throw new Error(metadataName + ' not found.');
+			throw new Error('vector ' + metadataName + ' not found.');
 		}
 		var vectors = [];
 		var idToIndices = morpheus.VectorUtil.createValueToIndicesMap(vector);
@@ -232,7 +232,8 @@ morpheus.OpenFileTool.prototype = {
 			var header = lines[0].split(tab);
 			var fileMatchOnColumnIndex = _.indexOf(header, fileColumnName);
 			if (fileMatchOnColumnIndex === -1) {
-				throw new Error(fileColumnName + ' not found in ' + header);
+				throw new Error(fileColumnName + ' not found in header:'
+						+ header);
 			}
 			var columnIndices = [];
 			var nheaders = header.length;
