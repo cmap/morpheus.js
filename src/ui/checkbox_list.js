@@ -180,6 +180,12 @@ morpheus.CheckBoxList = function(options) {
 
 };
 morpheus.CheckBoxList.prototype = {
+	searchWithPredicates : function(predicates) {
+		this.table.searchWithPredicates(predicates);
+	},
+	autocomplete : function(tokens, cb) {
+		this.table.autocomplete(tokens, cb);
+	},
 	setHeight : function(height) {
 		this.table.setHeight(height);
 	},

@@ -241,72 +241,211 @@ morpheus.Table.prototype = {
 			}
 		}
 	},
+	autocomplete : function(tokens, response) {
+		var matches = [];
+		var token = tokens != null && tokens.length > 0 ? tokens[tokens.selectionStartIndex]
+				: '';
+		token = $.trim(token);
+		var columns = this.columns.filter(function(c) {
+			return c.searchable;
+		});
+
+		var ncolumns = columns.length;
+		var showField = ncolumns > 1;
+		if (token === '') {
+			if (ncolumns <= 1) {
+				return response(matches);
+			}
+			for (var i = 0; i < ncolumns; i++) {
+				var field = columns[i].name;
+				matches.push({
+					value : field + ':',
+					label : '<span style="font-weight:300;">' + field
+							+ ':</span>',
+					show : true
+				});
+				// show column names
+
+			}
+			return response(matches);
+		}
+		var field = null;
+		var semi = token.indexOf(':');
+
+		if (semi > 0) { // field search?
+			if (token.charCodeAt(semi - 1) !== 92) { // \:
+				var possibleField = $.trim(token.substring(0, semi));
+				if (possibleField.length > 0 && possibleField[0] === '"'
+						&& possibleField[token.length - 1] === '"') {
+					possibleField = possibleField.substring(1,
+							possibleField.length - 1);
+				}
+				var columnNameToColumn = new morpheus.Map();
+				var columnNames = columns.map(function(c) {
+					return c.name;
+				});
+				for (var i = 0; i < columnNames.length; i++) {
+					columnNameToColumn.set(columnNames[i], columns[i]);
+				}
+				var c = columnNameToColumn.get(possibleField);
+				if (c !== undefined) {
+					token = $.trim(token.substring(semi + 1));
+					columns = [ c ];
+					ncolumns = 1;
+				}
+			}
+
+		} else if (ncolumns > 1) {
+			for (var j = 0; j < ncolumns; j++) {
+				var field = columns[j].name;
+				matches.push({
+					value : field + ':',
+					label : '<span style="font-weight:300;">' + field
+							+ ':</span>',
+					show : true
+				});
+			}
+		}
+		var set = new morpheus.Set();
+		var regex = new RegExp('^' + morpheus.Util.escapeRegex(token), 'i');
+		var items = this.getItems();
+		var maxSize = matches.length + 10;
+		for (var i = 0, nitems = items.length; i < nitems; i++) {
+			var item = items[i];
+			for (var j = 0; j < ncolumns; j++) {
+				var field = columns[j].name;
+				var value = columns[j].getter(item);
+				if (morpheus.Util.isArray(value)) {
+					var nvalues = value.length;
+					for (var k = 0; k < nvalues; k++) {
+						var val = value[k];
+						if (regex.test(val) && !set.has(val)) {
+							set.add(val);
+							matches
+									.push({
+										value : showField ? (field + ':' + val)
+												: val,
+										label : showField ? ('<span style="font-weight:300;">'
+												+ field
+												+ ':</span>'
+												+ '<span style="font-weight:900;">'
+												+ val + '</span>')
+												: ('<span style="font-weight:900;">'
+														+ val + '</span>')
+									});
+						}
+						if (matches.length === maxSize) {
+							return response(matches);
+						}
+					}
+				} else {
+					if (regex.test(value) && !set.has(value)) {
+						set.add(value);
+						matches
+								.push({
+									value : showField ? (field + ':' + value)
+											: value,
+									label : showField ? ('<span style="font-weight:300;">'
+											+ field
+											+ ':</span>'
+											+ '<span style="font-weight:900;">'
+											+ value + '</span>')
+											: ('<span style="font-weight:900;">'
+													+ value + '</span>')
+								});
+						if (matches.length === maxSize) {
+							return response(matches);
+						}
+					}
+				}
+
+			}
+		}
+		return response(matches);
+
+	},
+	searchWithPredicates : function(predicates) {
+		if (predicates == null || predicates.length === 0) {
+			this.grid.setFilter(null);
+			return;
+		}
+		var columns = this.columns.filter(function(c) {
+			return c.searchable;
+		});
+		var columnNameToColumn = new morpheus.Map();
+		var columnNames = columns.map(function(c) {
+			return c.name;
+		});
+		for (var i = 0; i < columnNames.length; i++) {
+			columnNameToColumn.set(columnNames[i], columns[i]);
+		}
+
+		var filteredPredicates = [];
+		var npredicates = predicates.length;
+		for (var i = 0; i < npredicates; i++) {
+			var predicate = predicates[i];
+			var filterColumnName = predicate.getField();
+			if (filterColumnName != null) {
+				var column = columnNameToColumn.get(filterColumnName);
+				if (column) {
+					predicate.column = column;
+					filteredPredicates.push(predicate);
+				}
+			} else {
+				filteredPredicates.push(predicate);
+			}
+		}
+		predicates = filteredPredicates;
+		npredicates = predicates.length;
+		this.grid
+				.setFilter(function(item) {
+					for (var p = 0; p < npredicates; p++) {
+						var predicate = predicates[p];
+						var searchColumns;
+						if (predicate.column) {
+							searchColumns = [ predicate.column ];
+						} else {
+							searchColumns = columns;
+						}
+						for (var j = 0, ncolumns = searchColumns.length; j < ncolumns; j++) {
+							var value = searchColumns[j].getter(item);
+							if (morpheus.Util.isArray(value)) {
+								var nvalues = value.length;
+								for (var i = 0; i < nvalues; i++) {
+									if (predicate.accept(value[i])) {
+										return true;
+									}
+								}
+							} else {
+								var predicate = predicates[p];
+								if (predicate.accept(value)) {
+									return true;
+								}
+							}
+						}
+
+					}
+
+					return false;
+				});
+
+	},
 	search : function(text) {
 		if (text === '') {
 			this.grid.setFilter(null);
 		} else {
+			var tokens = morpheus.Util.getAutocompleteTokens(text);
 			var columns = this.columns.filter(function(c) {
 				return c.searchable;
 			});
-			var columnNameToColumn = new morpheus.Map();
 			var columnNames = columns.map(function(c) {
 				return c.name;
 			});
-			for (var i = 0; i < columnNames.length; i++) {
-				columnNameToColumn.set(columnNames[i], columns[i]);
-			}
-			var tokens = morpheus.Util.getAutocompleteTokens(text);
 			var predicates = morpheus.Util.createSearchPredicates({
 				tokens : tokens,
 				fields : columnNames
 			});
-			var filteredPredicates = [];
-			for (var i = 0, npredicates = predicates.length; i < npredicates; i++) {
-				var predicate = predicates[i];
-				var filterColumnName = predicate.getField();
-				if (filterColumnName != null) {
-					var column = columnNameToColumn.get(filterColumnName);
-					if (column) {
-						predicate.column = column;
-						filteredPredicates.push(predicate);
-					}
-				} else {
-					filteredPredicates.push(predicate);
-				}
-			}
-			predicates = filteredPredicates;
-
-			this.grid
-					.setFilter(function(item) {
-						for (var p = 0; p < npredicates; p++) {
-							var predicate = predicates[p];
-							var searchColumns;
-							if (predicate.column) {
-								searchColumns = [ predicate.column ];
-							} else {
-								searchColumns = columns;
-							}
-							for (var j = 0, ncolumns = searchColumns.length; j < ncolumns; j++) {
-								var value = searchColumns[j].getter(item);
-								if (morpheus.Util.isArray(value)) {
-									var nvalues = value.length;
-									for (var i = 0; i < nvalues; i++) {
-										if (predicate.accept(value[i])) {
-											return true;
-										}
-									}
-								} else {
-									var predicate = predicates[p];
-									if (predicate.accept(value)) {
-										return true;
-									}
-								}
-							}
-
-						}
-
-						return false;
-					});
+			this.searchWithPredicates(predicates);
 		}
 	},
 	getSelectedRows : function() {
@@ -469,79 +608,16 @@ morpheus.TableSearchUI = function() {
 	$search.on('keyup', _.debounce(function() {
 		_this.table.search($.trim($(this).val()));
 	}, 100));
-	morpheus.Util
-			.autosuggest({
-				$el : $search,
-				suggestWhenEmpty : false,
-				filter : function(terms, response) {
-					var q = $.trim(terms[terms.length - 1]);
-					if (q === '') {
-						response([]);
-						return;
-					}
-					var set = new morpheus.Set();
-					var regex = new RegExp('^' + q, 'i');
-					var columns = _this.table.columns;
-					var ncolumns = columns.length;
-					var items = _this.table.getItems();
-					var matches = [];
-					for (var i = 0, nitems = items.length; i < nitems; i++) {
-						var item = items[i];
-						for (var j = 0; j < ncolumns; j++) {
-							if (columns[j].searchable) {
-								var field = columns[j].name;
-								var showField = field && ncolumns > 1;
-								var value = columns[j].getter(item);
-								if (morpheus.Util.isArray(value)) {
-									var nvalues = value.length;
-									for (var k = 0; k < nvalues; k++) {
-										var val = value[k];
-										if (regex.test(val) && !set.has(val)) {
-											set.add(val);
-											matches
-													.push({
-														value : val,
-														label : showField ? ('<span style="font-weight:300;">'
-																+ field
-																+ ':</span>'
-																+ '<span style="font-weight:900;">'
-																+ val + '</span>')
-																: ('<span style="font-weight:900;">'
-																		+ val + '</span>')
-													});
-										}
-										if (matches.length === 10) {
-											return response(matches);
-										}
-									}
-								} else {
-									if (regex.test(value) && !set.has(value)) {
-										set.add(value);
-										matches
-												.push({
-													value : value,
-													label : showField ? ('<span style="font-weight:300;">'
-															+ field
-															+ ':</span>'
-															+ '<span style="font-weight:900;">'
-															+ value + '</span>')
-															: ('<span style="font-weight:900;">'
-																	+ value + '</span>')
-												});
-										if (matches.length === 10) {
-											return response(matches);
-										}
-									}
-								}
-							}
-						}
-					}
-					return response(matches);
-				},
-				select : function() {
-					_this.table.search($.trim($search.val()));
-				}
-			});
+	morpheus.Util.autosuggest({
+		$el : $search,
+		suggestWhenEmpty : true,
+		filter : function(tokens, response) {
+			_this.table.autocomplete(tokens, response);
+		},
+		select : function() {
+			_this.table.search($.trim($search.val()));
+		}
+	});
 };
 
 morpheus.TableSearchUI.prototype = {
