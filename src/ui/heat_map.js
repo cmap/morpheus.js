@@ -681,6 +681,9 @@ morpheus.HeatMap.prototype = {
 	gapSize : 10,
 	updatingScroll : false,
 	autoDisplay : function(options) {
+		if (options.filename == null) {
+			options.filename = '';
+		}
 		var colorScheme;
 		if (options.extension === 'segtab' || options.extension === 'seg') {
 			colorScheme = {
@@ -733,6 +736,20 @@ morpheus.HeatMap.prototype = {
 					color : 'white'
 				}, {
 					value : 0.5,
+					color : 'red'
+				} ]
+			};
+		} else if (options.filename.toLowerCase().indexOf('copynumber') !== -1) {
+			colorScheme = {
+				type : 'fixed',
+				map : [ {
+					value : -1.5,
+					color : 'blue'
+				}, {
+					value : 0,
+					color : 'white'
+				}, {
+					value : 1.5,
 					color : 'red'
 				} ]
 			};
@@ -1557,8 +1574,8 @@ morpheus.HeatMap.prototype = {
 
 			}
 			if (morpheus.DatasetUtil.getSeriesIndex(this.project
-					.getFullDataset(), 'ccf') !== -1) {
-				this.options.sizeBy = 'ccf';
+					.getFullDataset(), 'allelic_fraction') !== -1) {
+				this.options.sizeBy = 'allelic_fraction';
 			}
 
 		}
@@ -1579,7 +1596,7 @@ morpheus.HeatMap.prototype = {
 				sourcesSet.forEach(function(source) {
 					_this.autoDisplay({
 						extension : morpheus.Util.getExtension(source),
-						filename : source
+						filename : '' + source
 					});
 				});
 			}
