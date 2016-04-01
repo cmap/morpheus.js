@@ -242,11 +242,16 @@ morpheus.SampleDatasets.getCCLEDataset = function(options) {
 				.push({
 					dataset : '//s3.amazonaws.com/appdata.cmap.org/morpheus/CCLE_hybrid_capture1650_hg19_NoCommonSNPs_NoNeutralVariants_CDS_2012.05.07.maf.txt'
 				});
+		// datasets
+		// .push({
+		// dataset :
+		// '//s3.amazonaws.com/appdata.cmap.org/morpheus/1650_HC_plus_RD_muts.maf.txt'
+		// });
 	}
 	if (options.cn) {
 		datasets
 				.push({
-					dataset : '//s3.amazonaws.com/appdata.cmap.org/morpheus/CCLE_copynumber_byGene_2013-12-03.txt'
+					dataset : '//s3.amazonaws.com/appdata.cmap.org/morpheus/CCLE_copynumber_byGene_2013-12-03.gct'
 				});
 	}
 
@@ -281,6 +286,7 @@ morpheus.SampleDatasets.getCCLEDataset = function(options) {
 	var datasetDef = morpheus.DatasetUtil.readDatasetArray({
 		dataset : datasets
 	});
+
 	var annotationDef = morpheus.DatasetUtil.annotate({
 		annotations : columnAnnotations,
 		isColumns : true
@@ -301,6 +307,7 @@ morpheus.SampleDatasets.getCCLEDataset = function(options) {
 	});
 
 	$.when.apply($, [ datasetDef, annotationDef ]).then(function() {
+
 		annotationCallbacks.forEach(function(f) {
 			f(datasetToReturn);
 		});
