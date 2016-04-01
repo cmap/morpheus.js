@@ -259,6 +259,7 @@ morpheus.HeatMapColorSchemeChooser.prototype = {
 		if (this.colorScheme.setCurrentValue) {
 			this.colorScheme.setCurrentValue(this.currentValue);
 		}
+		this.setColorScheme(this.colorScheme);
 	},
 	setColorScheme : function(colorScheme) {
 		this.colorScheme = colorScheme;

@@ -1,27 +1,27 @@
 morpheus.HeatMapOptions = function(controller) {
 	var items = [
-		{
-			name : 'color_by',
-			required : true,
-			type : 'select',
-			options : [ '(None)' ].concat(morpheus.MetadataUtil
+			{
+				name : 'color_by',
+				required : true,
+				type : 'select',
+				options : [ '(None)' ].concat(morpheus.MetadataUtil
 						.getMetadataNames(controller.getProject()
 								.getFullDataset().getRowMetadata())),
-			value : controller.heatmap.getColorScheme()
+				value : controller.heatmap.getColorScheme()
 						.getSeparateColorSchemeForRowMetadataField()
-		}, {
-			name : 'color_by_value',
-			required : true,
-			type : 'select',
-			options : []
-		}, {
-			name : 'load_predefined_scheme',
-			required : true,
-			type : 'select',
-			options : [ {
-				name : '',
-				value : ''
 			}, {
+				name : 'color_by_value',
+				required : true,
+				type : 'select',
+				options : []
+			}, {
+				name : 'load_predefined_scheme',
+				required : true,
+				type : 'select',
+				options : [ {
+					name : '',
+					value : ''
+				}, {
 					name : 'relative',
 					value : 'gene'
 				}, {
@@ -40,10 +40,10 @@ morpheus.HeatMapOptions = function(controller) {
 					name : 'fixed (-90, 90)',
 					value : '100scale1'
 				} ]
-		}, {
-			name : 'save_color_scheme',
-			type : 'button'
-		}, {
+			}, {
+				name : 'save_color_scheme',
+				type : 'button'
+			}, {
 				name : 'load_color_scheme',
 				type : 'file'
 			} ];
@@ -78,28 +78,28 @@ morpheus.HeatMapOptions = function(controller) {
 		});
 	}
 	var displayItems = [
-		{
-			name : 'show_grid',
-			required : true,
-			type : 'checkbox',
-			value : controller.heatmap.isDrawGrid()
-		},
-		{
-			name : 'row_size',
-			required : true,
-			type : 'text',
-			col : 'col-xs-4',
-			value : morpheus.Util.nf(controller.heatmap.getRowPositions()
+			{
+				name : 'show_grid',
+				required : true,
+				type : 'checkbox',
+				value : controller.heatmap.isDrawGrid()
+			},
+			{
+				name : 'row_size',
+				required : true,
+				type : 'text',
+				col : 'col-xs-4',
+				value : morpheus.Util.nf(controller.heatmap.getRowPositions()
 						.getSize())
-		},
-		{
-			name : 'column_size',
-			required : true,
-			type : 'text',
-			col : 'col-xs-4',
-			value : morpheus.Util.nf(controller.heatmap
+			},
+			{
+				name : 'column_size',
+				required : true,
+				type : 'text',
+				col : 'col-xs-4',
+				value : morpheus.Util.nf(controller.heatmap
 						.getColumnPositions().getSize())
-		} ];
+			} ];
 	if (controller.rowDendrogram) {
 		displayItems
 				.push({
@@ -286,6 +286,7 @@ morpheus.HeatMapOptions = function(controller) {
 						controller.project.getFullDataset().getRowMetadata()
 								.getByName(separateSchemesField)).keys()));
 	}
+
 	colorSchemeChooser.setColorScheme(controller.heatmap.getColorScheme());
 	if (separateSchemesField != null) {
 		colorSchemeChooser.setCurrentValue($colorByValue.val());
@@ -363,11 +364,11 @@ morpheus.HeatMapOptions = function(controller) {
 							controller.heatmap.repaint();
 
 						}).fail(function() {
-							morpheus.FormBuilder.showInModal({
-								title : 'Error',
-								html : 'Unable to read saved color scheme.'
-							});
-						});
+					morpheus.FormBuilder.showInModal({
+						title : 'Error',
+						html : 'Unable to read saved color scheme.'
+					});
+				});
 
 			}
 		}
