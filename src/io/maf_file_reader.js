@@ -119,7 +119,7 @@ morpheus.MafFileReader.prototype = {
 			}
 		}
 		var sampleField = morpheus.MafFileReader.getField([
-			'Tumor_Sample_Barcode', 'tumor_name', 'Tumor_Sample_UUID' ],
+				'Tumor_Sample_Barcode', 'tumor_name', 'Tumor_Sample_UUID' ],
 				fieldNameToIndex, {
 					lc : true,
 					remove : true
@@ -128,9 +128,9 @@ morpheus.MafFileReader.prototype = {
 		var sampleIdColumnIndex = sampleField.index;
 		var tumorFractionField = morpheus.MafFileReader.getField([ 'ccf_hat',
 				'tumor_f', 'i_tumor_f' ], fieldNameToIndex, {
-					lc : true,
-					remove : true
-				});
+			lc : true,
+			remove : true
+		});
 		var ccfColumnName;
 		var ccfColumnIndex;
 		if (tumorFractionField !== undefined) {
@@ -178,6 +178,9 @@ morpheus.MafFileReader.prototype = {
 				sampleIdToIndex.set(sample, columnIndex);
 			}
 			var gene = String(tokens[geneSymbolColumn]);
+			if (gene === 'Unknown') {
+				continue;
+			}
 			if (this.geneFilter == null
 					|| this.geneFilter.has(tokens[geneSymbolColumn])) {
 				var rowIndex = geneSymbolToIndex.get(gene);
@@ -257,7 +260,7 @@ morpheus.MafFileReader.prototype = {
 		if (ccfColumnIndex !== undefined) {
 			dataset.addSeries({
 				dataType : 'object',
-				name : 'ccf',
+				name : 'allelic_fraction',
 				array : ccfMatrix
 			});
 		}
