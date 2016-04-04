@@ -35,6 +35,9 @@ morpheus.Table = function(options) {
 	$gridDiv.appendTo(options.$el);
 	var columns = options.columns;
 	this.columns = columns;
+	var visibleColumns = columns.filter(function(c) {
+		return c.visible;
+	});
 	var grid = new morpheus.Grid({
 		gridOptions : {
 			forceFitColumns : true,
@@ -47,7 +50,7 @@ morpheus.Table = function(options) {
 		},
 		$el : $gridDiv,
 		items : options.items,
-		columns : columns
+		columns : visibleColumns
 	});
 	this.grid = grid;
 	if (options.search) {
@@ -56,39 +59,59 @@ morpheus.Table = function(options) {
 		tableSearch.setTable(this);
 		this.tableSearch = tableSearch;
 	}
+	if (visibleColumns.length !== this.columns.length) {
+		var select = [];
+		select
+				.push('<select data-selected-text-format="static" title="Columns..." multiple class="form-control selectpicker show-tick pull-right">');
+		this.columns.forEach(function(c, i) {
+			select.push('<option value="' + i + '"');
+			if (c.visible) {
+				select.push(' selected');
+			}
+			select.push('>');
+			select.push(c.name);
+			select.push('</option>');
+		});
+		select.push('</select>');
+		var $select = $(select.join(''));
+		var $div = $('<div class="pull-right"></div>');
+		$select.appendTo($div);
+		$div.prependTo(options.$el);
+		$select.selectpicker({
+			iconBase : 'fa',
+			tickIcon : 'fa-check',
+			style : 'btn-default btn-sm'
+		});
+		$select.on('change', function() {
+			var selectedItems = $select.val();
+			var selectedItemsSet = new morpheus.Set();
+			selectedItems.forEach(function(item) {
+				selectedItemsSet.add(parseInt(item));
+			});
+			var visibleColumns = [];
+			_this.columns.forEach(function(c, i) {
+				if (selectedItemsSet.has(i)) {
+					visibleColumns.push(c);
+				}
+			});
+			grid.setColumns(visibleColumns);
+			_this.resize();
+			_this.redraw();
+
+		});
+	}
 	var collapsed = false;
+	var lastWidth = -1;
 	var resize = function() {
 		if (!_this.options.responsive) {
 			return;
 		}
-		var gridWidth;
-		// if (widthFound) { // get size from fraction of window width
-		// var width = document.body.clientWidth || $(window).width();
-		// var viewportIndex = -1;
-		// var viewportSize = morpheus.Util.viewPortSize();
-		//
-		// for (var i = viewports.length - 1; i >= 0; i--) {
-		// if (viewportSize === viewports[i]) {
-		// viewportIndex = i;
-		// break;
-		// }
-		// }
-		//
-		// var fraction = 12;
-		//
-		// for (var i = viewportIndex; i >= 0; i--) {
-		// var f = spec[viewports[i]];
-		// if (f) {
-		// fraction = f;
-		// break;
-		// }
-		// }
-		// fraction /= 12;
-		// var gridWidth = parseInt(Math.floor(width * fraction - 30));
-		//
-		// } else {
-		gridWidth = options.$el.width();
-		// }
+
+		var gridWidth = options.$el.width();
+		if (gridWidth === lastWidth) {
+			return;
+		}
+		lastWidth = gridWidth;
 
 		$gridDiv.css('width', gridWidth + 'px');
 		// if (options.responsiveHeight) {
@@ -267,11 +290,16 @@ morpheus.Table.prototype = {
 				// show column names
 
 			}
+			matches
+					.sort(function(a, b) {
+						return (a.value === b.value ? 0
+								: (a.value < b.value ? -1 : 1));
+					});
 			return response(matches);
 		}
 		var field = null;
 		var semi = token.indexOf(':');
-
+		var regex = new RegExp('^' + morpheus.Util.escapeRegex(token), 'i');
 		if (semi > 0) { // field search?
 			if (token.charCodeAt(semi - 1) !== 92) { // \:
 				var possibleField = $.trim(token.substring(0, semi));
@@ -296,14 +324,17 @@ morpheus.Table.prototype = {
 			}
 
 		} else if (ncolumns > 1) {
+			var regex = new RegExp('^' + morpheus.Util.escapeRegex(token), 'i');
 			for (var j = 0; j < ncolumns; j++) {
 				var field = columns[j].name;
-				matches.push({
-					value : field + ':',
-					label : '<span style="font-weight:300;">' + field
-							+ ':</span>',
-					show : true
-				});
+				if (regex.test(field)) {
+					matches.push({
+						value : field + ':',
+						label : '<span style="font-weight:300;">' + field
+								+ ':</span>',
+						show : true
+					});
+				}
 			}
 		}
 		var set = new morpheus.Set();
@@ -550,6 +581,9 @@ morpheus.Table.createOptions = function(options) {
 			renderer : morpheus.Table.defaultRenderer
 		}, c);
 
+		if (column.visible === undefined) {
+			column.visible = true;
+		}
 		if (!column.getter) {
 			column.getter = column.field == null ? function(item) {
 				return item;
