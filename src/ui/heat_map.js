@@ -1633,6 +1633,27 @@ morpheus.HeatMap.prototype = {
 			this.updateDataset();
 		}
 
+		if (this.options.rowSize != null) {
+			if (this.options.rowSize === 'fit') {
+				this.heatmap.getRowPositions().setSize(this.getFitRowSize());
+			} else {
+				this.heatmap.getRowPositions().setSize(this.options.rowSize);
+			}
+
+		}
+		if (this.options.columnSize != null) {
+			if (this.options.columnSize === 'fit') {
+				this.heatmap.getColumnPositions().setSize(
+						this.getFitColumnSize());
+			} else {
+				this.heatmap.getColumnPositions().setSize(
+						this.options.columnSize);
+			}
+		}
+		if (this.options.rowSize != null || this.options.columnSize != null) {
+			this.revalidate();
+		}
+
 		this.options.parent = null;
 		this.$tipFollow = $('<div style="left:-1000px; top:-1000px;" class="morpheus-tip-inline"></div>');
 		this.$tipFollow.appendTo(this.$parent);
