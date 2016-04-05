@@ -23,7 +23,6 @@ morpheus.HClusterGroupBy = function(dataset, groupByFieldNames,
 				var subset = morpheus.DatasetUtil.slicedView(dataset,
 						originalIndicesForGroup, null);
 				var hcl;
-
 				var distanceMatrix = morpheus.HCluster.computeDistanceMatrix(
 						subset, distanceFunction);
 				hcl = new morpheus.HCluster(distanceMatrix, linkageMethod);

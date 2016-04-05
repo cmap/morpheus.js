@@ -209,6 +209,8 @@ morpheus.HeatMapToolBar = function(controller) {
 	}, {
 		tool : new morpheus.CreateAnnotation()
 	}, {
+		tool : new morpheus.SimilarityMatrixTool()
+	}, {
 		tool : new morpheus.TransposeTool()
 	}, {
 		tool : new morpheus.WordCloudTool()

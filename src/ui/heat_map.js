@@ -1580,7 +1580,8 @@ morpheus.HeatMap.prototype = {
 
 		}
 
-		if (this.options.parent && this.options.inheritFromParent) {
+		if (this.options.parent && this.options.inheritFromParent
+				&& !this.options.colorScheme) {
 			heatmap.setColorScheme(this.options.parent.heatmap.getColorScheme()
 					.copy(this.project));
 		} else {
@@ -3260,6 +3261,7 @@ morpheus.HeatMap.prototype = {
 };
 morpheus.HeatMap.copyFromParent = function(project, options) {
 	// TODO persist sort order, grouping, dendrogram
+
 	project.rowColorModel = options.parent.getProject().getRowColorModel()
 			.copy();
 	project.columnColorModel = options.parent.getProject()
@@ -3269,8 +3271,19 @@ morpheus.HeatMap.copyFromParent = function(project, options) {
 			.copy();
 	project.columnShapeModel = options.parent.getProject()
 			.getColumnShapeModel().copy();
+
 	var parentRowTracks = options.parent.rowTracks || [];
 	var parentColumnTracks = options.parent.columnTracks || [];
+	if (options.inheritFromParentOptions.rows) { // row similarity matrix
+		project.columnShapeModel = project.rowShapeModel;
+		project.columnColorModel = project.rowColorModel;
+		parentColumnTracks = parentRowTracks.slice().reverse();
+	}
+	if (options.inheritFromParentOptions.columns) { // column similarity matrix
+		project.rowShapeModel = project.columnShapeModel;
+		project.rowColorModel = project.columnColorModel;
+		parentRowTracks = parentColumnTracks.slice().reverse();
+	}
 	if (options.inheritFromParentOptions.transpose) {
 		var tmp = project.rowShapeModel;
 		project.rowShapeModel = project.columnShapeModel;
@@ -3281,6 +3294,7 @@ morpheus.HeatMap.copyFromParent = function(project, options) {
 		project.columnColorModel = tmp;
 
 		tmp = parentRowTracks.slice().reverse();
+		// swap tracks
 		parentRowTracks = parentColumnTracks.slice().reverse();
 		parentColumnTracks = tmp;
 	}

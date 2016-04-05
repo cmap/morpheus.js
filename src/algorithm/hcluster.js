@@ -175,8 +175,9 @@ morpheus.HCluster.findClosestPair = function(n, distmatrix, r) {
  * 
  * @param dataset
  * @param distanceFunction
- *            The distance function. Use null to assume dataset is already a
- *            distance matrix.
+ *            The distance function. Use 0 to assume dataset is already a
+ *            distance matrix, 1 to assume dataset is already a similarity
+ *            matrix.
  * @return the distance matrix
  */
 morpheus.HCluster.computeDistanceMatrix = function(dataset, distanceFunction) {
@@ -187,10 +188,16 @@ morpheus.HCluster.computeDistanceMatrix = function(dataset, distanceFunction) {
 		matrix[i] = new Float32Array(i);
 	}
 	// assume dataset is already a distance matrix
-	if (distanceFunction == null) {
+	if (distanceFunction === 0) {
 		for (var i = 1; i < n; i++) {
 			for (var j = 0; j < i; j++) {
 				matrix[i][j] = dataset.getValue(i, j);
+			}
+		}
+	} else if (distanceFunction === 1) {
+		for (var i = 1; i < n; i++) {
+			for (var j = 0; j < i; j++) {
+				matrix[i][j] = 1 - dataset.getValue(i, j);
 			}
 		}
 	} else {

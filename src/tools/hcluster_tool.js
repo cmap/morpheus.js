@@ -1,11 +1,13 @@
 morpheus.HClusterTool = function() {
 };
-morpheus.HClusterTool.PRECOMPUTED = 'Matrix values (for a precomputed distance matrix)';
+morpheus.HClusterTool.PRECOMPUTED_DIST = 'Matrix values (for a precomputed distance matrix)';
+morpheus.HClusterTool.PRECOMPUTED_SIM = 'Matrix values (for a precomputed similarity matrix)';
 morpheus.HClusterTool.Functions = [ morpheus.Euclidean, morpheus.Jaccard,
 		new morpheus.OneMinusFunction(morpheus.Cosine),
 		new morpheus.OneMinusFunction(morpheus.Pearson),
 		new morpheus.OneMinusFunction(morpheus.Spearman),
-		morpheus.HClusterTool.PRECOMPUTED ];
+		morpheus.HClusterTool.PRECOMPUTED_DIST,
+		morpheus.HClusterTool.PRECOMPUTED_SIM ];
 morpheus.HClusterTool.Functions.fromString = function(s) {
 	for (var i = 0; i < morpheus.HClusterTool.Functions.length; i++) {
 		if (morpheus.HClusterTool.Functions[i].toString() === s) {
@@ -30,11 +32,14 @@ morpheus.HClusterTool.createLinkageMethod = function(linkageString) {
 };
 
 morpheus.HClusterTool.execute = function(dataset, input) {
+	// note: in worker here
 	var linkageMethod = morpheus.HClusterTool
 			.createLinkageMethod(input.linkage_method);
 	var f = morpheus.HClusterTool.Functions.fromString(input.metric);
-	if ((typeof f) === 'string') {
-		f = null; // precomputed
+	if (f === morpheus.HClusterTool.PRECOMPUTED_DIST) {
+		f = 0;
+	} else if (f === morpheus.HClusterTool.PRECOMPUTED_SIM) {
+		f = 1;
 	}
 	var rows = input.cluster == 'Rows' || input.cluster == 'Rows and columns';
 	var columns = input.cluster == 'Columns'
@@ -158,7 +163,7 @@ morpheus.HClusterTool.prototype = {
 		options.input.selectedRows = selectedRows;
 		options.input.selectedColumns = selectedColumns;
 		var dataset = project.getSortedFilteredDataset();
-	
+
 		if (options.input.background === false) {
 			var result = morpheus.HClusterTool.execute(dataset, options.input);
 			if (result.rowsHcl) {

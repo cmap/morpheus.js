@@ -135,7 +135,7 @@ morpheus.Util.getQueryParams = function(s) {
 };
 morpheus.Util.getScriptPath = function() {
 	var scripts = document.getElementsByTagName('script');
-	for (var i = 0; i < scripts.length; i++) {
+	for (var i = scripts.length - 1; i >= 0; i--) {
 		var src = scripts[i].src;
 		var index = src.lastIndexOf('/');
 		if (index !== -1) {
