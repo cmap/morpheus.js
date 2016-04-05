@@ -998,6 +998,11 @@ morpheus.Util.createSearchPredicates = function(options) {
 
 	tokens
 			.forEach(function(token) {
+				var isNot = false;
+				if (token[0] === '-') { // not predicate
+					token = token.substring(1);
+					isNot = true;
+				}
 				var field = null;
 				var semi = token.indexOf(':');
 				if (semi > 0) { // field search?
@@ -1031,11 +1036,7 @@ morpheus.Util.createSearchPredicates = function(options) {
 						}
 					}
 				}
-				var isNot = false;
-				if (token[0] === '-') { // not predicate
-					token = token.substring(1);
-					isNot = true;
-				}
+
 				var predicate;
 				var rangeIndex = -1;
 				var rangeToken = null;
