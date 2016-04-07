@@ -171,18 +171,25 @@ morpheus.HeatMapToolBar = function(controller) {
 				.push('<button name="options" data-toggle="tooltip" title="Options" type="button" class="btn btn-default btn-xs"><span class="fa fa-cog"></span></button>');
 
 	}
+
 	toolbarHtml.push('<div class="morpheus-button-divider"></div>');
 	if (controller.options.toolbar.saveImage) {
 		toolbarHtml
-				.push('<button name="saveImage" data-toggle="tooltip" title="Save Image (Ctrl+S)" type="button" class="btn btn-default btn-xs"><span class="fa fa-file-image-o"></span></button>');
+				.push('<button name="saveImage" data-toggle="tooltip" title="Save Image ('
+						+ morpheus.Util.COMMAND_KEY
+						+ '+S)" type="button" class="btn btn-default btn-xs"><span class="fa fa-file-image-o"></span></button>');
 	}
 	if (controller.options.toolbar.saveDataset) {
 		toolbarHtml
-				.push('<button name="saveDataset" data-toggle="tooltip" title="Save Dataset (Ctrl+Shift+S)" type="button" class="btn btn-default btn-xs"><span class="fa fa-floppy-o"></span></button>');
+				.push('<button name="saveDataset" data-toggle="tooltip" title="Save Dataset ('
+						+ morpheus.Util.COMMAND_KEY
+						+ '+Shift+S)" type="button" class="btn btn-default btn-xs"><span class="fa fa-floppy-o"></span></button>');
 	}
 	if (controller.options.toolbar.openFile) {
 		toolbarHtml
-				.push('<button name="openFile" data-toggle="tooltip" title="Open File (Ctrl+O)" type="button" class="btn btn-default btn-xs"><span class="fa fa-folder-open-o"></span></button>');
+				.push('<button name="openFile" data-toggle="tooltip" title="Open File ('
+						+ morpheus.Util.COMMAND_KEY
+						+ '+O)" type="button" class="btn btn-default btn-xs"><span class="fa fa-folder-open-o"></span></button>');
 	}
 	toolbarHtml.push('<div class="morpheus-button-divider"></div>');
 	if (controller.options.toolbar.filter) {
@@ -257,15 +264,9 @@ morpheus.HeatMapToolBar = function(controller) {
 		toolbarHtml.push('</ul>');
 		toolbarHtml.push('</div>');
 	}
-	// fixed info
 
-	var tipWidth = 400;
-	if (typeof window !== 'undefined') {
-		tipWidth = window.screen.width - 400;
-	}
 	toolbarHtml
-			.push('<div style="position:relative;display:inline;margin-left:12px;"><div name="tip" class="morpheus-tip" style="width:'
-					+ tipWidth + 'px;min-width:400px;"></div></div>');
+			.push('<div style="position:relative;display:inline;margin-left:12px;"><div name="tip" class="morpheus-tip" style="overflow:hidden;"></div></div>');
 	toolbarHtml.push('</div>');
 	$search.appendTo($el.find('[name=toolbarSearch]'));
 	$(toolbarHtml.join('')).appendTo($toolbarForm);
