@@ -292,8 +292,8 @@ morpheus.HeatMap = function(options) {
 		'-o-user-drag' : 'none',
 		'-o-tap-highlight-color' : 'rgba(0, 0, 0, 0)',
 
-		'overflow-x' : 'auto',
-		'overflow-y' : 'hidden'
+		'overflow-x' : 'visible',
+		'overflow-y' : 'visible'
 	});
 
 	var tab = this.tabManager.add({
@@ -1659,6 +1659,21 @@ morpheus.HeatMap.prototype = {
 			});
 		}
 		if (this.options.rowSize != null && this.options.columnSize != null) {
+			// note that we have to revalidate twice because column sizes are
+			// dependent on row sizes and vice versa
+			if (this.options.columnSize === 'fit') {
+				this.heatmap.getColumnPositions().setSize(
+						this.getFitColumnSize());
+				this.revalidate({
+					paint : false
+				});
+			}
+			if (this.options.rowSize === 'fit') {
+				this.heatmap.getRowPositions().setSize(this.getFitRowSize());
+				this.revalidate({
+					paint : false
+				});
+			}
 			this.paintAll({
 				paintRows : true,
 				paintColumns : true,
@@ -1987,7 +2002,7 @@ morpheus.HeatMap.prototype = {
 												this.project
 														.getHoverColumnIndex());
 							}
-							
+
 							_this.revalidate(reval);
 							event.preventDefault();
 						});
