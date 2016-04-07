@@ -291,8 +291,8 @@ morpheus.HeatMap = function(options) {
 		'-o-user-select' : 'none',
 		'-o-user-drag' : 'none',
 		'-o-tap-highlight-color' : 'rgba(0, 0, 0, 0)',
-		
-		'overflow' : ''
+
+		'overflow' : 'auto'
 	});
 
 	var tab = this.tabManager.add({
@@ -2961,6 +2961,7 @@ morpheus.HeatMap.prototype = {
 	getFitRowSize : function() {
 		var heatmap = this.heatmap;
 		var availablePixels = this.getAvailableHeight();
+
 		if (this.columnDendrogram) {
 			availablePixels -= this.columnDendrogram.getUnscaledHeight();
 		}
@@ -2975,6 +2976,7 @@ morpheus.HeatMap.prototype = {
 		var positions = heatmap.getRowPositions();
 		var totalCurrent = positions.getItemSize(positions.getLength() - 1)
 				+ positions.getPosition(positions.getLength() - 1);
+
 		var size = positions.getSize();
 		size = size * (availablePixels / totalCurrent);
 		size = Math.min(22, size);
