@@ -291,7 +291,7 @@ morpheus.HeatMap = function(options) {
 		'-o-user-select' : 'none',
 		'-o-user-drag' : 'none',
 		'-o-tap-highlight-color' : 'rgba(0, 0, 0, 0)',
-
+		
 		'overflow' : ''
 	});
 
@@ -1539,7 +1539,7 @@ morpheus.HeatMap.prototype = {
 
 		reorderTracks(this.options.rows, false);
 		reorderTracks(this.options.columns, true);
-
+		var colorSchemeSpecified = this.options.colorScheme != null;
 		if (this.options.colorScheme == null) {
 			var ext = '';
 			if (this.options.dataSource) {
@@ -1581,7 +1581,7 @@ morpheus.HeatMap.prototype = {
 		}
 
 		if (this.options.parent && this.options.inheritFromParent
-				&& !this.options.colorScheme) {
+				&& !colorSchemeSpecified) {
 			heatmap.setColorScheme(this.options.parent.heatmap.getColorScheme()
 					.copy(this.project));
 		} else {
@@ -3251,6 +3251,7 @@ morpheus.HeatMap.prototype = {
 		this.$parent.css({
 			height : Math.ceil(totalHeight) + 'px'
 		});
+
 		this.updatingScroll = false;
 		this.trigger('change', {
 			name : 'revalidate',
