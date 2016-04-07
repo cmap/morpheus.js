@@ -2984,7 +2984,7 @@ morpheus.HeatMap.prototype = {
 				+ positions.getPosition(positions.getLength() - 1);
 		var size = positions.getSize();
 		size = size * (availablePixels / totalCurrent);
-		size = Math.min(22, size);
+		size = Math.min(13, size);
 		return size;
 	},
 	getFitRowSize : function() {
@@ -3008,7 +3008,7 @@ morpheus.HeatMap.prototype = {
 
 		var size = positions.getSize();
 		size = size * (availablePixels / totalCurrent);
-		size = Math.min(22, size);
+		size = Math.min(13, size);
 		return size;
 	},
 	fitToWindow : function(repaint) {
