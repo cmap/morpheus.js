@@ -292,7 +292,8 @@ morpheus.HeatMap = function(options) {
 		'-o-user-drag' : 'none',
 		'-o-tap-highlight-color' : 'rgba(0, 0, 0, 0)',
 
-		'overflow' : 'auto'
+		'overflow-x' : 'auto',
+		'overflow-y' : 'hidden'
 	});
 
 	var tab = this.tabManager.add({
@@ -1640,6 +1641,9 @@ morpheus.HeatMap.prototype = {
 			} else {
 				this.heatmap.getRowPositions().setSize(this.options.rowSize);
 			}
+			this.revalidate({
+				paint : false
+			});
 
 		}
 		if (this.options.columnSize != null) {
@@ -1650,9 +1654,17 @@ morpheus.HeatMap.prototype = {
 				this.heatmap.getColumnPositions().setSize(
 						this.options.columnSize);
 			}
+			this.revalidate({
+				paint : false
+			});
 		}
-		if (this.options.rowSize != null || this.options.columnSize != null) {
-			this.revalidate();
+		if (this.options.rowSize != null && this.options.columnSize != null) {
+			this.paintAll({
+				paintRows : true,
+				paintColumns : true,
+				invalidateRows : true,
+				invalidateColumns : true
+			});
 		}
 
 		this.options.parent = null;
@@ -1975,6 +1987,7 @@ morpheus.HeatMap.prototype = {
 												this.project
 														.getHoverColumnIndex());
 							}
+							
 							_this.revalidate(reval);
 							event.preventDefault();
 						});
@@ -2950,6 +2963,7 @@ morpheus.HeatMap.prototype = {
 		}
 
 		availablePixels -= trackPixels;
+
 		var positions = heatmap.getColumnPositions();
 		var totalCurrent = positions.getItemSize(positions.getLength() - 1)
 				+ positions.getPosition(positions.getLength() - 1);
@@ -3020,7 +3034,9 @@ morpheus.HeatMap.prototype = {
 	 * Layout all the components
 	 */
 	revalidate : function(options) {
-		options = options || {};
+		options = $.extend({}, {
+			paint : true
+		}, options);
 		this.updatingScroll = true;
 		var availableHeight = this.getAvailableHeight();
 		var availableWidth = this.getAvailableWidth();
@@ -3244,12 +3260,14 @@ morpheus.HeatMap.prototype = {
 			ypos += this.hscroll.getUnscaledHeight() + 2;
 		}
 		var totalHeight = 2 + ypos + heatMapHeight;
-		this.paintAll({
-			paintRows : true,
-			paintColumns : true,
-			invalidateRows : true,
-			invalidateColumns : true
-		});
+		if (options.paint) {
+			this.paintAll({
+				paintRows : true,
+				paintColumns : true,
+				invalidateRows : true,
+				invalidateColumns : true
+			});
+		}
 		this.$parent.css({
 			height : Math.ceil(totalHeight) + 'px'
 		});
