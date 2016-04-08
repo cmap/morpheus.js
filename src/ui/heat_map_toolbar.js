@@ -271,7 +271,7 @@ morpheus.HeatMapToolBar = function(controller) {
 	$search.appendTo($el.find('[name=toolbarSearch]'));
 	$(toolbarHtml.join('')).appendTo($toolbarForm);
 	$toolbarForm.appendTo($el.find('[name=toolbarButtons]'));
-	$el.prependTo(controller.$el);
+	$el.prependTo(controller.$content);
 	// gapi.hangout.render('hangout-div', {
 	// 'widget_size' : '72',
 	// 'render' : 'createhangout'

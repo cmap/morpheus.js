@@ -352,9 +352,9 @@ morpheus.VectorTrack.prototype = {
 						.isRenderAs(morpheus.VectorTrack.RENDER.BAR))) {
 			if (this.getFullVector().getProperties().has(
 					morpheus.VectorKeys.FIELDS)
-					|| _.isNumber(morpheus.VectorUtil.getFirstNonNull(this
-							.getFullVector()))) {
+					|| morpheus.VectorUtil.getDataType(this.getFullVector()) === 'number') {
 				this.settings.discrete = false;
+				this.settings.highlightMatchingValues = false;
 			}
 			this.settings.discreteAutoDetermined = true;
 		}
@@ -398,24 +398,24 @@ morpheus.VectorTrack.prototype = {
 					var doRequest = function(smile) {
 						$
 								.ajax(
-							{
-								contentType : 'text/plain',
-								context : {
-									smile : smile
-								},
-								data : {
-									'string' : smile,
-									'representation' : 'sdf'
-								},
-								url : 'http://cactus.nci.nih.gov/chemical/structure',
-							}).done(function(text) {
-								_this.moleculeCache[this.smile] = text;
-								if (values.length > 0) {
-									doRequest(values.pop());
-								}
-								_this.invalid = true;
-								_this.repaint();
-							});
+										{
+											contentType : 'text/plain',
+											context : {
+												smile : smile
+											},
+											data : {
+												'string' : smile,
+												'representation' : 'sdf'
+											},
+											url : 'http://cactus.nci.nih.gov/chemical/structure',
+										}).done(function(text) {
+									_this.moleculeCache[this.smile] = text;
+									if (values.length > 0) {
+										doRequest(values.pop());
+									}
+									_this.invalid = true;
+									_this.repaint();
+								});
 					};
 					for (var i = 0; i < 6; i++) {
 						doRequest(values.pop());
@@ -1075,10 +1075,10 @@ morpheus.VectorTrack.prototype = {
 		morpheus.Popup
 				.showPopup(
 						items,
-			{
-				x : e.pageX,
-				y : e.pageY
-			},
+						{
+							x : e.pageX,
+							y : e.pageY
+						},
 						e.target,
 						function(event, item) {
 							var customItem;
@@ -1278,12 +1278,12 @@ morpheus.VectorTrack.prototype = {
 												project
 														.trigger(
 																'trackChanged',
-													{
-														vectors : [ v ],
-														render : existingVector != null ? []
+																{
+																	vectors : [ v ],
+																	render : existingVector != null ? []
 																			: [ morpheus.VectorTrack.RENDER.TEXT ],
-														columns : isColumns
-													});
+																	columns : isColumns
+																});
 											}
 										});
 							} else if (item === DELETE) {
@@ -1358,18 +1358,18 @@ morpheus.VectorTrack.prototype = {
 													project
 															.trigger(
 																	'rowTrackRemoved',
-														{
-															vector : _this
+																	{
+																		vector : _this
 																				.getFullVector()
-														});
+																	});
 												} else {
 													project
 															.trigger(
 																	'columnTrackRemoved',
-														{
-															vector : _this
+																	{
+																		vector : _this
 																				.getFullVector()
-														});
+																	});
 												}
 											}
 										});
@@ -1589,13 +1589,13 @@ morpheus.VectorTrack.prototype = {
 										.getRowColorModel();
 								if (_this.settings.discrete) {
 									colorSchemeChooser = new morpheus.DiscreteColorSchemeChooser(
-										{
-											colorScheme : {
-												scale : colorModel
+											{
+												colorScheme : {
+													scale : colorModel
 															.getDiscreteColorScheme(_this
 																	.getFullVector())
-											}
-										});
+												}
+											});
 									colorSchemeChooser.on('change', function(
 											event) {
 										colorModel.setMappedValue(_this
@@ -1606,9 +1606,9 @@ morpheus.VectorTrack.prototype = {
 									});
 								} else {
 									colorSchemeChooser = new morpheus.HeatMapColorSchemeChooser(
-										{
-											showRelative : false,
-										});
+											{
+												showRelative : false,
+											});
 									colorSchemeChooser
 											.setColorScheme(colorModel
 													.getContinuousColorScheme(_this

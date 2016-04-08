@@ -270,8 +270,8 @@ morpheus.HeatMap = function(options) {
 		}
 		this.tabManager = this.options.parent.tabManager;
 	}
-	this.$el = $('<div></div>');
-	this.$el.css({
+	this.$content = $('<div></div>');
+	this.$content.css({
 		'width' : '100%',
 
 		'user-select' : 'none',
@@ -297,7 +297,7 @@ morpheus.HeatMap = function(options) {
 	});
 
 	var tab = this.tabManager.add({
-		$el : this.$el,
+		$el : this.$content,
 		closeable : true,
 		rename : true,
 		title : this.options.name,
@@ -305,7 +305,7 @@ morpheus.HeatMap = function(options) {
 		focus : true
 	});
 	if (options.$loadingImage) {
-		options.$loadingImage.appendTo(this.$el);
+		options.$loadingImage.appendTo(this.$content);
 	}
 
 	this.tabId = tab.id;
@@ -314,7 +314,6 @@ morpheus.HeatMap = function(options) {
 			: (options.dataset.file ? options.dataset.file : options.dataset);
 	this._togglingInfoWindow = false;
 	this.tooltipMode = 0; // 0=docked, 1=dialog, 2=follow
-	this.el = this.$el[0];
 
 	var promises = [];
 	if (options.promises) {
@@ -373,7 +372,7 @@ morpheus.HeatMap = function(options) {
 
 			};
 			$(window).on('orientationchange resize', resize);
-			_this.$el.on('remove', function() {
+			_this.$content.on('remove', function() {
 				$(window).off('orientationchange resize', resize);
 			});
 		}
@@ -1097,7 +1096,7 @@ morpheus.HeatMap.prototype = {
 		this.whenLoaded = null;
 		this.$parent = $('<div></div>').css('position', 'relative');
 
-		this.$parent.appendTo(this.$el);
+		this.$parent.appendTo(this.$content);
 		this.toolbar = new morpheus.HeatMapToolBar(this);
 		if (this.options.customUrls) {
 			this.setCustomUrls(this.options.customUrls);
