@@ -38,20 +38,20 @@ morpheus.FormBuilder = function(options) {
 					e.stopPropagation();
 				}
 			}).on('dragleave', function(e) {
-				var node = $(e.originalEvent.srcElement).parent().parent().prev();
-				if (node.is('select') && node.hasClass('file-input')) {
-					$(e.originalEvent.srcElement).parent().css('border', '');
-					e.preventDefault();
-					e.stopPropagation();
-				}
-			}).on('drop', function(e) {
-				var node = $(e.originalEvent.srcElement).parent().parent().prev();
-				if (node.is('select') && node.hasClass('file-input')) {
-					$(e.originalEvent.srcElement).parent().css('border', '');
-					var name = node.attr('name');
-					name = name.substring(0, name.length - '_picker'.length);
-					if (e.originalEvent.dataTransfer) {
-						if (e.originalEvent.dataTransfer.files.length) {
+		var node = $(e.originalEvent.srcElement).parent().parent().prev();
+		if (node.is('select') && node.hasClass('file-input')) {
+			$(e.originalEvent.srcElement).parent().css('border', '');
+			e.preventDefault();
+			e.stopPropagation();
+		}
+	}).on('drop', function(e) {
+		var node = $(e.originalEvent.srcElement).parent().parent().prev();
+		if (node.is('select') && node.hasClass('file-input')) {
+			$(e.originalEvent.srcElement).parent().css('border', '');
+			var name = node.attr('name');
+			name = name.substring(0, name.length - '_picker'.length);
+			if (e.originalEvent.dataTransfer) {
+				if (e.originalEvent.dataTransfer.files.length) {
 					e.preventDefault();
 					e.stopPropagation();
 					var files = e.originalEvent.dataTransfer.files;
@@ -70,9 +70,9 @@ morpheus.FormBuilder = function(options) {
 						value : url
 					});
 				}
-					}
-				}
-			});
+			}
+		}
+	});
 	// this.labelColumnDef = '4';
 	// this.fieldColumnDef = '8';
 };
@@ -480,7 +480,7 @@ morpheus.FormBuilder.prototype = {
 					}
 					if (selected) {
 						html.push(' selected');
-					} 
+					}
 					html.push('>');
 					html.push(optionText);
 					html.push('</option>');
@@ -767,13 +767,13 @@ morpheus.FormBuilder.prototype = {
 	},
 	setValue : function(name, value) {
 		var v = this.$form.find('[name=' + name + ']');
-
 		if (v.length === 0) {
 			v = this.$form.find('[name=' + name + '_picker]');
 			if (v.attr('type') === 'file') {
+				v.val(value);
+				v.selectpicker('render');
 				return v.data('files', value);
 			}
-
 		}
 		var type = v.attr('type');
 		var list = v.data('morpheus.checkbox-list');
