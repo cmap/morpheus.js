@@ -198,6 +198,10 @@ morpheus.HeatMap = function(options) {
 						keyboard : true,
 						inlineTooltip : true,
 						$loadingImage : $('<div style="overflow:hidden;text-align:center;"><i class="fa fa-spinner fa-spin fa-3x"></i><span style="padding-left:4px;vertical-align:middle;font-weight:bold;">Loading...</span></div>'),
+						/**
+						 * Whether this heat map tab can be closed
+						 */
+						closeable : true,
 						toolbar : {
 							zoom : true,
 							tools : true,
@@ -298,7 +302,7 @@ morpheus.HeatMap = function(options) {
 
 	var tab = this.tabManager.add({
 		$el : this.$content,
-		closeable : true,
+		closeable : this.options.closeable,
 		rename : true,
 		title : this.options.name,
 		object : this,
