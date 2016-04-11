@@ -555,32 +555,8 @@ morpheus.HeatMapToolBar = function(controller) {
 		});
 	}, 500));
 
-	morpheus.Util.autocomplete(this.$valueTextField, function(term, cb) {
-		var values = new morpheus.Set();
-		morpheus.DatasetUtil.searchValues(project.getSortedFilteredDataset(), $
-				.trim(_this.$valueTextField.val()), function(value, i, j) {
-			values.add(value);
-			if (values.size() === 3) {
-				return false;
-			}
-		});
-
-		cb(values.values().map(function(val) {
-			return {
-				value : val
-			};
-		}));
-
-	}, function() {
-
-	});
-	this.$valueTextField.on('keyup', _.debounce(function(e) {
-		if (e.which === 13) {
-			_this.$valueTextField.autocomplete('close');
-			e.preventDefault();
-		}
+	function searchValues() {
 		var $searchResultsLabel = _this.$el.find('[name=searchResultsValues]');
-
 		var text = $.trim(_this.$valueTextField.val());
 		if (text === '') {
 			$searchResultsLabel.html('');
@@ -595,7 +571,24 @@ morpheus.HeatMapToolBar = function(controller) {
 			$searchResultsLabel.html(viewIndices.size() + ' match'
 					+ (viewIndices.size() === 1 ? '' : 'es'));
 		}
+	}
+	morpheus.Util.autosuggest({
+		$el : this.$valueTextField,
+		filter : function(terms, cb) {
+			morpheus.DatasetUtil.autocompleteValues(
+					project.getSortedFilteredDataset())(terms, cb);
+		},
+		select : function() {
+			searchValues();
+		}
+	});
 
+	this.$valueTextField.on('keyup', _.debounce(function(e) {
+		if (e.which === 13) {
+			_this.$valueTextField.autocomplete('close');
+			e.preventDefault();
+		}
+		searchValues();
 	}, 500));
 
 	$toolbarForm.on('submit', function(e) {

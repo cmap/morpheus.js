@@ -516,6 +516,139 @@ morpheus.DatasetUtil.searchValues = function(dataset, text, cb) {
 	}
 
 };
+
+/**
+ * Search dataset values.
+ */
+morpheus.DatasetUtil.autocompleteValues = function(dataset) {
+	return function(tokens, cb) {
+
+		var token = tokens != null && tokens.length > 0 ? tokens[tokens.selectionStartIndex]
+				: '';
+		token = $.trim(token);
+		var seriesIndices = [];
+		for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+			for (var k = 0, nseries = dataset.getSeriesCount(); k < nseries; k++) {
+				if (dataset.getDataType(i, k) === 'object') {
+					seriesIndices.push([ i, k ]);
+				}
+			}
+		}
+		if (seriesIndices.length === 0) {
+			return cb();
+		}
+		var _val; // first non-null value
+		elementSearch: for (var k = 0, nseries = seriesIndices.length; k < nseries; k++) {
+			var pair = seriesIndices[k];
+			for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+				var element = dataset.getValue(pair[0], j, pair[1]);
+				if (element != null && element.toObject) {
+					_val = element.toObject();
+					break elementSearch;
+				}
+			}
+		}
+		var matches = [];
+		var fields = _val == null ? [] : _.keys(_val);
+		if (token === '') {
+			fields.sort(function(a, b) {
+				return (a === b ? 0 : (a < b ? -1 : 1));
+			});
+			fields.forEach(function(field) {
+				matches.push({
+					value : field + ':',
+					label : '<span style="font-weight:300;">' + field
+							+ ':</span>',
+					show : true
+				});
+			});
+			return cb(matches);
+		}
+
+		var field = null;
+		var semi = token.indexOf(':');
+		if (semi > 0) { // field search?
+			if (token.charCodeAt(semi - 1) !== 92) { // \:
+				var possibleField = $.trim(token.substring(0, semi));
+				if (possibleField.length > 0 && possibleField[0] === '"'
+						&& possibleField[token.length - 1] === '"') {
+					possibleField = possibleField.substring(1,
+							possibleField.length - 1);
+				}
+				var index = fields.indexOf(possibleField);
+				if (index !== -1) {
+					token = $.trim(token.substring(semi + 1));
+					field = possibleField;
+				}
+			}
+
+		}
+
+		var set = new morpheus.Set();
+		// regex used to determine if a string starts with substring `q`
+		var regex = new RegExp('^' + morpheus.Util.escapeRegex(token), 'i');
+		// iterate through the pool of strings and for any string that
+		// contains the substring `q`, add it to the `matches` array
+		var max = 10;
+
+		loop: for (var k = 0, nseries = seriesIndices.length; k < nseries; k++) {
+			var pair = seriesIndices[k];
+			for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+				var element = dataset.getValue(pair[0], j, pair[1]);
+				if (element && element.toObject) {
+					var object = element.toObject();
+					if (field !== null) {
+						var val = object[field];
+						if (val != null) {
+							var id = new morpheus.Identifier([ val, field ]);
+							if (!set.has(id) && regex.test(val)) {
+								set.add(id);
+								if (set.size() === max) {
+									break loop;
+								}
+							}
+						}
+					} else { // search all fields
+						for ( var name in object) {
+							var val = object[name];
+							var id = new morpheus.Identifier([ val, name ]);
+							if (!set.has(id) && regex.test(val)) {
+								set.add(id);
+								if (set.size() === max) {
+									break loop;
+								}
+							}
+						}
+					}
+
+				}
+			}
+		}
+		set.forEach(function(id) {
+			var array = id.getArray();
+			var field = array[1];
+			var val = array[0];
+			matches.push({
+				value : field + ':' + val,
+				label : '<span style="font-weight:300;">' + field + ':</span>'
+						+ '<span style="font-weight:900;">' + val + '</span>'
+			});
+
+		});
+		fields.forEach(function(field) {
+			if (regex.test(field)) {
+				matches.push({
+					value : field + ':',
+					label : '<span style="font-weight:300;">' + field
+							+ ':</span>',
+					show : true
+				});
+			}
+		});
+		cb(matches);
+	};
+
+};
 // morpheus.DatasetUtil.toJSON = function(dataset) {
 // var json = [];
 // json.push('{');
