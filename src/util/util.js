@@ -32,6 +32,9 @@ morpheus.Util.loadTrackingCode = function() {
 	if (typeof window !== 'undefined') {
 		if (morpheus.Util.TRACKING_CODE_LOADED) {
 			return;
+		} else if (typeof ga !== 'undefined') {
+			morpheus.Util.TRACKING_CODE_LOADED = true;
+			return;
 		}
 
 		(function(i, s, o, g, r, a, m) {
