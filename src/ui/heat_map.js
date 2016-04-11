@@ -2769,13 +2769,15 @@ morpheus.HeatMap.prototype = {
 		var totalSize = this.getTotalSize(options);
 		var legendHeight = 0;
 		if (options.legend) {
-			this.heatmap.getColorScheme().getNames() != null ? this.heatmap
-					.getColorScheme().getNames().length * 14 : 40;
+			legendHeight = this.heatmap.getColorScheme().getNames() != null ? this.heatmap
+					.getColorScheme().getNames().length * 14
+					: 40;
 			context.save();
 			context.translate(50, 0);
 			morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
 					this.heatmap.getColorScheme(), 200, true);
 			context.restore();
+
 		}
 		context.save();
 		context.translate(4, legendHeight);
