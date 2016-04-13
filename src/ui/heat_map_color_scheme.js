@@ -427,8 +427,8 @@ morpheus.HeatMapColorScheme.prototype = {
 		var oldColorSupplier = this.currentColorSupplier;
 		var newColorSupplier = stepped ? new morpheus.SteppedColorSupplier()
 				: new morpheus.GradientColorSupplier();
-		newColorSupplier._sizer = oldColorSupplier.getSizer();
-		newColorSupplier._conditions = oldColorSupplier.getConditions();
+		newColorSupplier.sizer = oldColorSupplier.getSizer();
+		newColorSupplier.conditions = oldColorSupplier.getConditions();
 		newColorSupplier.getScalingMode(oldColorSupplier.getScalingMode());
 		newColorSupplier.setMin(oldColorSupplier.getMin());
 		newColorSupplier.setMax(oldColorSupplier.getMax());
@@ -449,8 +449,8 @@ morpheus.HeatMapColorScheme.prototype = {
 		_.each(_.keys(this.rowValueToColorSupplier), function(key) {
 			// save each scheme
 			var val = _this.rowValueToColorSupplier[key];
-			delete val._sizer;
-			delete val._conditions;
+//			delete val.sizer;
+//			delete val.conditions;
 			json.colorSchemes[key] = val;
 
 		});

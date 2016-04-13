@@ -7,8 +7,8 @@ morpheus.AbstractColorSupplier = function() {
 	this.missingColor = '#c0c0c0';
 	this.scalingMode = morpheus.HeatMapColorScheme.ScalingMode.RELATIVE;
 	this.stepped = false;
-	this._sizer = new morpheus.HeatMapSizer();
-	this._conditions = new morpheus.HeatMapConditions();
+	this.sizer = new morpheus.HeatMapSizer();
+	this.conditions = new morpheus.HeatMapConditions();
 };
 morpheus.AbstractColorSupplier.fromJson = function(json) {
 	var cs = json.stepped ? new morpheus.SteppedColorSupplier()
@@ -30,10 +30,10 @@ morpheus.AbstractColorSupplier.fromJson = function(json) {
 morpheus.AbstractColorSupplier.prototype = {
 	discrete : false,
 	getSizer : function() {
-		return this._sizer;
+		return this.sizer;
 	},
 	getConditions : function() {
-		return this._conditions;
+		return this.conditions;
 	},
 	isDiscrete : function() {
 		return this.discrete;
@@ -54,11 +54,11 @@ morpheus.AbstractColorSupplier.prototype = {
 		if (this.names != null) {
 			c.names = this.names.slice(0);
 		}
-		if (this._sizer) {
-			c._sizer = this._sizer.copy();
+		if (this.sizer) {
+			c.sizer = this.sizer.copy();
 		}
-		if (this._conditions) {
-			c._conditions = this._conditions.copy();
+		if (this.conditions) {
+			c.conditions = this.conditions.copy();
 		}
 		c.scalingMode = this.scalingMode;
 		c.min = this.min;
