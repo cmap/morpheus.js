@@ -354,6 +354,7 @@ morpheus.HeatMapToolBar = function(controller) {
 		$filterChooser.find('[value=rows]').prop('checked', true);
 		columnFilterUI.$div.hide();
 		rowFilterUI.$div.show();
+		$filterModal.modal('show');
 		morpheus.Util.trackEvent({
 			eventCategory : 'ToolBar',
 			eventAction : 'rowFilter'
@@ -364,6 +365,7 @@ morpheus.HeatMapToolBar = function(controller) {
 		$filterChooser.find('[value=columns]').prop('checked', true);
 		columnFilterUI.$div.show();
 		rowFilterUI.$div.hide();
+		$filterModal.modal('show');
 		morpheus.Util.trackEvent({
 			eventCategory : 'ToolBar',
 			eventAction : 'columnFilter'
