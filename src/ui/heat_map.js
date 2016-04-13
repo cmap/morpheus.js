@@ -246,20 +246,22 @@ morpheus.HeatMap = function(options) {
 		// if (window.location.hostname.indexOf('clue.io') === -1
 		// && window.location.pathname.indexOf('cancer/software/morpheus') ===
 		// -1) {
-		var $a = $('<a title="Produced with Morpheus" style="font-size:85%;margin-right:2px;margin-top:2px;" href="'
-				+ morpheus.Util.URL
-				+ '" target="_blank"><img style="width:16px;height:16px;" src="'
-				+ morpheus.Util.URL + '/images/icon.svg"></a>');
-		$a.tooltip({
-			placement : 'auto'
-		});
-		// var $img = $a.find('img');
+		if (!morpheus.HelpMenu.ADDED) { // only show once per page
+			morpheus.HelpMenu.ADDED = true; 
+			var $a = $('<a title="Produced with Morpheus" style="font-size:85%;margin-right:2px;margin-top:2px;" href="'
+					+ morpheus.Util.URL
+					+ '" target="_blank"><img style="width:16px;height:16px;" src="'
+					+ morpheus.Util.URL + '/images/icon.svg"></a>');
+			$a.tooltip({
+				placement : 'auto'
+			});
+			// var $img = $a.find('img');
 
-		var $right = $('<div style="margin-right:2px;" class="pull-right"></div>');
-		$a.appendTo($right);
-		new morpheus.HelpMenu().$el.appendTo($right);
-		$right.appendTo(this.tabManager.$nav);
-
+			var $right = $('<div style="margin-right:2px;" class="pull-right"></div>');
+			$a.appendTo($right);
+			new morpheus.HelpMenu().$el.appendTo($right);
+			$right.appendTo(this.tabManager.$nav);
+		}
 		if (!this.options.tabManager) {
 			this.tabManager.$nav.appendTo(this.$el);
 			this.tabManager.$tabContent.appendTo(this.$el);
