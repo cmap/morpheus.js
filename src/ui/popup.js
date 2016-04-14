@@ -32,6 +32,7 @@ morpheus.Popup.init = function() {
 		var $this = $(this);
 		var name = $.trim($this.text());
 		if (name !== 'Copy') {
+			e.preventDefault();
 			morpheus.Popup.popupCallback(e, name);
 			morpheus.Popup.hide();
 		}
