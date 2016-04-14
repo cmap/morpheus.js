@@ -31,6 +31,9 @@ morpheus.HeatMapOptions = function(controller) {
 					name : 'MAF',
 					value : 'MAF'
 				}, {
+					name : 'fixed (-1, -0.5, 0.5, 1)',
+					value : 'wtcs'
+				}, {
 					name : 'fixed (-1.5, -0.1, 0.1, 1.5)',
 					value : 'cn'
 				}, {
@@ -175,6 +178,7 @@ morpheus.HeatMapOptions = function(controller) {
 					controller.heatmap.getColorScheme().getSizer().getMax());
 
 		}
+		// repaint the heat map when color scheme changes
 		controller.heatmap.setInvalid(true);
 		controller.heatmap.repaint();
 		colorSchemeChooser.restoreCurrentValue();
@@ -395,6 +399,26 @@ morpheus.HeatMapOptions = function(controller) {
 												morpheus.HeatMapColorScheme
 														.createColorSupplier(morpheus.HeatMapColorScheme.Predefined
 																.CN()));
+							} else if (val === 'wtcs') {
+								controller.heatmap.getColorScheme()
+										.setColorSupplierForCurrentValue(
+												morpheus.HeatMapColorScheme
+														.createColorSupplier({
+															type : 'fixed',
+															map : [ {
+																value : -1,
+																color : 'blue'
+															}, {
+																value : -0.5,
+																color : 'white'
+															}, {
+																value : 0.5,
+																color : 'white'
+															}, {
+																value : 1,
+																color : 'red'
+															} ]
+														}));
 							} else if (val === 'MAF') {
 								controller.heatmap
 										.getColorScheme()
