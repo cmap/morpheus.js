@@ -140,29 +140,26 @@ morpheus.HeatMapColorSchemeChooser = function(options) {
 	formBuilder.$form.on('change', '[name=missing_color]', function(e) {
 		var color = $(this).val();
 		that.colorScheme.setMissingColor(color);
-		that.fireChanged();
+		that.fireChanged(false);
 	});
 	formBuilder.$form.on('change', '[name=stepped_colors]', function(e) {
 		that.colorScheme.setStepped($(this).prop('checked'));
 		that.fireChanged();
 	});
 	formBuilder.$form.on('keyup', '[name=minimum]', _.debounce(function(e) {
-
 		var val = parseFloat($(this).val());
 		if (!isNaN(val)) {
 			that.colorScheme.setMin(val);
 			that.setSelectedIndex(that.legend.selectedIndex);
-			that.fireChanged();
+			that.fireChanged(false);
 		}
-
 	}, 100));
 	formBuilder.$form.on('keyup', '[name=maximum]', _.debounce(function(e) {
-
 		var val = parseFloat($(this).val());
 		if (!isNaN(val)) {
 			that.colorScheme.setMax(val);
 			that.setSelectedIndex(that.legend.selectedIndex);
-			that.fireChanged();
+			that.fireChanged(false);
 		}
 
 	}, 100));
@@ -290,10 +287,11 @@ morpheus.HeatMapColorSchemeChooser.prototype = {
 				[ this.legend.border,
 						this.legend.getUnscaledWidth() - this.legend.border ]);
 	},
-	fireChanged : function() {
+	fireChanged : function(noreset) {
 		this.trigger('change');
-		// restore currentValue
-		this.setColorScheme(this.colorScheme);
+		if (noreset !== false) {
+			this.setColorScheme(this.colorScheme);
+		}
 	},
 	draw : function() {
 		var colorScheme = this.colorScheme;
