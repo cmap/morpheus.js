@@ -177,19 +177,19 @@ morpheus.HeatMapToolBar = function(controller) {
 		toolbarHtml
 				.push('<button name="saveImage" data-toggle="tooltip" title="Save Image ('
 						+ morpheus.Util.COMMAND_KEY
-						+ '+S)" type="button" class="btn btn-default btn-xs"><span class="fa fa-file-image-o"></span></button>');
+						+ 'S)" type="button" class="btn btn-default btn-xs"><span class="fa fa-file-image-o"></span></button>');
 	}
 	if (controller.options.toolbar.saveDataset) {
 		toolbarHtml
 				.push('<button name="saveDataset" data-toggle="tooltip" title="Save Dataset ('
 						+ morpheus.Util.COMMAND_KEY
-						+ '+Shift+S)" type="button" class="btn btn-default btn-xs"><span class="fa fa-floppy-o"></span></button>');
+						+ 'Shift+S)" type="button" class="btn btn-default btn-xs"><span class="fa fa-floppy-o"></span></button>');
 	}
 	if (controller.options.toolbar.openFile) {
 		toolbarHtml
 				.push('<button name="openFile" data-toggle="tooltip" title="Open File ('
 						+ morpheus.Util.COMMAND_KEY
-						+ '+O)" type="button" class="btn btn-default btn-xs"><span class="fa fa-folder-open-o"></span></button>');
+						+ 'O)" type="button" class="btn btn-default btn-xs"><span class="fa fa-folder-open-o"></span></button>');
 	}
 	toolbarHtml.push('<div class="morpheus-button-divider"></div>');
 	if (controller.options.toolbar.filter) {

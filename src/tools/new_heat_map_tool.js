@@ -2,7 +2,7 @@ morpheus.NewHeatMapTool = function() {
 };
 morpheus.NewHeatMapTool.prototype = {
 	toString : function() {
-		return 'New Heat Map (' + morpheus.Util.COMMAND_KEY + '+X)';
+		return 'New Heat Map (' + morpheus.Util.COMMAND_KEY + 'X)';
 	},
 	// gui : function() {
 	// return [ {

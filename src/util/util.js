@@ -306,7 +306,7 @@ if (typeof navigator !== 'undefined') {
 	morpheus.Util.IS_MAC = navigator.platform.match(/(Mac|iPhone|iPod|iPad)/i) ? true
 			: false;
 }
-morpheus.Util.COMMAND_KEY = morpheus.Util.IS_MAC ? '&#8984;' : 'Ctrl';
+morpheus.Util.COMMAND_KEY = morpheus.Util.IS_MAC ? '&#8984;' : '+Ctrl';
 
 morpheus.Util.hammer = function(el, recognizers) {
 	var hammer = new Hammer(el, {
