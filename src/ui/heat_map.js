@@ -247,7 +247,7 @@ morpheus.HeatMap = function(options) {
 		// && window.location.pathname.indexOf('cancer/software/morpheus') ===
 		// -1) {
 		if (!morpheus.HelpMenu.ADDED) { // only show once per page
-			morpheus.HelpMenu.ADDED = true; 
+			morpheus.HelpMenu.ADDED = true;
 			var $a = $('<a title="Produced with Morpheus" style="font-size:85%;margin-right:2px;margin-top:2px;" href="'
 					+ morpheus.Util.URL
 					+ '" target="_blank"><img style="width:16px;height:16px;" src="'
@@ -1420,6 +1420,30 @@ morpheus.HeatMap.prototype = {
 				nameToOption.set(option.renameTo != null ? option.renameTo
 						: option.field, option);
 			});
+			var displayMetadata = isColumns ? dataset.getColumnMetadata()
+					: dataset.getRowMetadata();
+			// see if default fields found
+			if (!displaySpecified) {
+				if (displayMetadata.getByName('pert_iname')) {
+					var defaultFieldsToShow = new morpheus.Set();
+					[ 'pert_iname', 'moa', 'target', 'description' ]
+							.forEach(function(field) {
+								defaultFieldsToShow.add(field);
+							});
+					for (var i = 0, metadataCount = displayMetadata
+							.getMetadataCount(); i < metadataCount; i++) {
+						var v = displayMetadata.get(i);
+						if (defaultFieldsToShow.has(v.getName())) {
+							nameToOption.set(v.getName(), {
+								display : 'text'
+							});
+						}
+
+					}
+
+					displaySpecified = true;
+				}
+			}
 			var isFirst = true;
 			for (var i = 0, metadataCount = isColumns ? dataset
 					.getColumnMetadata().getMetadataCount() : dataset
@@ -2188,8 +2212,7 @@ morpheus.HeatMap.prototype = {
 			var existingTrack = _this.getTrack(track.name, track.isColumns);
 			if (track.visible && existingTrack != null
 					&& _.keys(existingTrack.renderSettings).length === 0) {
-				existingTrack.settingFromConfig(track.isColumns ? 'Color'
-						: 'Text');
+				existingTrack.settingFromConfig('Text');
 			}
 			_this.setTrackVisible(track.name, track.visible, track.isColumns);
 		});
