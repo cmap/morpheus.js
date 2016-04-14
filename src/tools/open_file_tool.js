@@ -8,6 +8,8 @@ morpheus.OpenFileTool.prototype = {
 	gui : function() {
 		var array = [ {
 			name : 'open_file_action',
+			value : 'open',
+			type : 'bootstrap-select',
 			options : [ {
 				name : 'Annotate columns',
 				value : 'Annotate Columns'
@@ -33,20 +35,21 @@ morpheus.OpenFileTool.prototype = {
 			}, {
 				name : 'Open dendrogram',
 				value : 'Open dendrogram'
-			} ],
-			value : 'open',
-			type : 'bootstrap-select'
-		}, {
-			name : 'file',
-			showLabel : false,
-			placeholder : 'Open your own file',
-			value : '',
-			type : 'file',
-			required : true,
-			help : morpheus.DatasetUtil.DATASET_FILE_FORMATS
+			} ]
 		} ];
+		if (this.options.file == null) {
+			array.push({
+				name : 'file',
+				showLabel : false,
+				placeholder : 'Open your own file',
+				value : '',
+				type : 'file',
+				required : true,
+				help : morpheus.DatasetUtil.DATASET_FILE_FORMATS
+			});
+		}
 		array.options = {
-			ok : false,
+			ok : this.options.file != null,
 			size : 'modal-lg'
 		};
 		return array;
@@ -68,24 +71,28 @@ morpheus.OpenFileTool.prototype = {
 								morpheus.DatasetUtil.ANNOTATION_FILE_FORMATS);
 					}
 				});
-		$('<h4>Use your own file</h4>').insertAfter(
-				form.$form.find('.form-group:first'));
-		var _this = this;
-		var id = _.uniqueId('morpheus');
-		form.$form.append('<h4><a role="button" data-toggle="collapse" href="#'
-				+ id + '" aria-expanded="false" aria-controls="' + id
-				+ '">Or select a preloaded dataset</a></h4>');
-		var $sampleDatasets = $('<div class="collapse" id="' + id
-				+ '" style="overflow:auto;"></div>');
-		form.$form.append($sampleDatasets);
-		var sampleDatasets = new morpheus.SampleDatasets({
-			$el : $sampleDatasets,
-			callback : function(heatMapOptions) {
-				form.setValue('file', heatMapOptions.dataset);
-				_this.ok();
+		if (this.options.file == null) {
+			$('<h4>Use your own file</h4>').insertAfter(
+					form.$form.find('.form-group:first'));
+			var _this = this;
+			var id = _.uniqueId('morpheus');
+			form.$form
+					.append('<h4><a role="button" data-toggle="collapse" href="#'
+							+ id
+							+ '" aria-expanded="false" aria-controls="'
+							+ id + '">Or select a preloaded dataset</a></h4>');
+			var $sampleDatasets = $('<div class="collapse" id="' + id
+					+ '" style="overflow:auto;"></div>');
+			form.$form.append($sampleDatasets);
+			var sampleDatasets = new morpheus.SampleDatasets({
+				$el : $sampleDatasets,
+				callback : function(heatMapOptions) {
+					form.setValue('file', heatMapOptions.dataset);
+					_this.ok();
 
-			}
-		});
+				}
+			});
+		}
 		form.on('change', function(e) {
 			var value = e.value;
 			if (value !== '' && value != null) {
