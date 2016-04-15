@@ -183,14 +183,9 @@ morpheus.GctReader.prototype = {
 			throw new Error('Missing data rows');
 		}
 
-		for (var i = 1, count = dataset.getRowMetadata().getMetadataCount(); i < count; i++) {
-			morpheus.VectorUtil.maybeConvertStringToNumber(dataset
-					.getRowMetadata().get(i));
-		}
-		for (var i = 1, count = dataset.getColumnMetadata().getMetadataCount(); i < count; i++) {
-			morpheus.VectorUtil.maybeConvertStringToNumber(dataset
-					.getColumnMetadata().get(i));
-		}
+		morpheus.MetadataUtil.maybeConvertStrings(dataset.getRowMetadata(), 1);
+		morpheus.MetadataUtil.maybeConvertStrings(dataset.getColumnMetadata(),
+				1);
 		return dataset;
 	}
 };

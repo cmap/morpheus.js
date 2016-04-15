@@ -317,6 +317,8 @@ morpheus.MetadataUtil.indexOf = function(metadataModel, name) {
 	return -1;
 };
 
+morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS = [ 'target', 'moa' ];
+
 morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS = new morpheus.Set();
 [ 'pr_analyte_id', 'pr_gene_title', 'pr_gene_id', 'pr_analyte_num',
 		'pr_bset_id', 'pr_lua_id', 'pr_pool_id', 'pr_is_bing', 'pr_is_inf',
@@ -329,24 +331,19 @@ morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS = new morpheus.Set();
 		'count_cv', 'provenance_code' ].forEach(function(name) {
 	morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS.add(name);
 });
-morpheus.MetadataUtil.DEFAULT_FIELDS_TO_SHOW = {
-	'cell_id' : true,
-	'pert_idose' : true,
-	'pert_itime' : true,
-	'Id' : true,
-	'Name' : true,
-	'ID' : true,
-	'pr_id' : true,
-	'id' : true,
-	'pr_gene_symbol' : true,
-	'pr_is_lm' : true,
-	'is_lm' : true,
-	'pert_id' : true,
-	'pert_iname' : true,
-	'pert_desc' : true,
-	'Description' : true,
-	'gene_space' : true,
-	'pert_type' : true
+
+morpheus.MetadataUtil.maybeConvertStrings = function(metadata,
+		metadataStartIndex) {
+	for (var i = metadataStartIndex, count = metadata.getMetadataCount(); i < count; i++) {
+		morpheus.VectorUtil.maybeConvertStringToNumber(metadata.get(i));
+	}
+	morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS.forEach(function(field) {
+		if (metadata.getByName(field)) {
+			morpheus.VectorUtil.maybeConvertToStringArray(metadata
+					.getByName(field), ',');
+		}
+	});
+
 };
 morpheus.MetadataUtil.copy = function(src, dest) {
 	if (src.getItemCount() != dest.getItemCount()) {

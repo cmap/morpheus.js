@@ -39,6 +39,30 @@ morpheus.VectorUtil.createValueToCountMap = function(vector) {
 	}
 	return map;
 };
+morpheus.VectorUtil.maybeConvertToStringArray = function(vector, delim) {
+	var newValues = [];
+	var regex = new RegExp(delim);
+	var found = false;
+	for (var i = 0, nrows = vector.size(); i < nrows; i++) {
+		var s = vector.getValue(i);
+		if (s != null) {
+			var tokens = s.split(regex);
+			newValues.push(tokens);
+			if (!found && tokens.length > 1) {
+				found = true;
+			}
+		}
+
+	}
+	if (found) {
+		for (var i = 0, nrows = newValues.length; i < nrows; i++) {
+			vector.setValue(i, newValues[i]);
+		}
+	}
+	vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, '[string]');
+	return found;
+};
+
 morpheus.VectorUtil.maybeConvertStringToNumber = function(vector) {
 	var newValues = [];
 
@@ -54,6 +78,7 @@ morpheus.VectorUtil.maybeConvertStringToNumber = function(vector) {
 	for (var i = 0, nrows = newValues.length; i < nrows; i++) {
 		vector.setValue(i, newValues[i]);
 	}
+	vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, 'number');
 	return true;
 };
 morpheus.VectorUtil.createValuesToIndicesMap = function(vectors) {
