@@ -107,7 +107,7 @@ morpheus.ScrollBar.prototype = {
 		} else {
 			context.fillStyle = 'rgb(241,241,241)';
 			context.fillRect(0, 0, width, height);
-			context.fillStyle = !this.thumbMouseOver ? 'rgb(188,188,188)'
+			context.fillStyle = !this.thumbMouseOver ? 'rgb(137,137,137)'
 					: 'rgb(100,100,100)';
 			if (this.isVertical) {
 				context.fillRect(0, this.thumbPos, width, this.thumbExtent);
