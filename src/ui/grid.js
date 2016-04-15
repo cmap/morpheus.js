@@ -310,14 +310,19 @@ morpheus.Grid.prototype = {
 			left : -1000,
 			top : -1000
 		});
-		var $row = $('<div class="slick-table"><div class="ui-widget-content slick-row"><div class="slick-cell selected"></div></div></div>');
+
+		var $row = $('<div class="slick-table">'
+				+ '<div class="ui-state-default slick-header-column slick-header-sortable ui-sortable-handle"></div>'
+				+ '<div class="ui-widget-content slick-row"><div class="slick-cell selected"></div></div>'
+				+ '</div>');
 		var $cell = $row.find('.slick-cell');
+		var $header = $row.find('.slick-header-column');
 		$row.appendTo($d);
 		var gridWidth = this.options.$el.width();
 		var maxWidth = Math.min(parseInt(gridWidth / 2), 400);
 		var getColumnWidth = function(column) {
-			$cell.html(column.name);
-			var w = Math.max($cell.outerWidth(), 4);
+			var w = $header.html(column.name).outerWidth();
+			w = Math.max($cell.outerWidth(), w);
 			if (column.prototypeValue) {
 				$cell.html(column.prototypeValue);
 				w = Math.max($cell.outerWidth(), w);
