@@ -29,10 +29,10 @@ morpheus.Popup.init = function() {
 			'block').css('position', 'static').css('margin-bottom', '5px');
 	morpheus.Popup.$contextMenu.appendTo(morpheus.Popup.$popupDiv);
 	morpheus.Popup.$contextMenu.on('click', 'a', function(e) {
+		e.preventDefault();
 		var $this = $(this);
 		var name = $.trim($this.text());
 		if (name !== 'Copy') {
-			e.preventDefault();
 			morpheus.Popup.popupCallback(e, name);
 			morpheus.Popup.hide();
 		}
