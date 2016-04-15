@@ -38,6 +38,7 @@ morpheus.ScentedSearch = function(model, positions, isVertical, scrollbar,
 	$(scrollbar.canvas).on('mousemove', mouseMove).on('mouseexit', mouseExit);
 };
 
+morpheus.ScentedSearch.LINE_HEIGHT = 3.5;
 morpheus.ScentedSearch.prototype = {
 	mouseMovedIndex : -1,
 	getIndex : function(event) {
@@ -50,7 +51,7 @@ morpheus.ScentedSearch.prototype = {
 		if (indices == null) {
 			return -1;
 		}
-		var tolerance = 1.2;
+		var tolerance = morpheus.ScentedSearch.LINE_HEIGHT;
 		if (this.mouseMovedIndex > 0) {
 			var midVal = this.positions
 					.getPosition(indices[this.mouseMovedIndex])
@@ -109,19 +110,18 @@ morpheus.ScentedSearch.prototype = {
 	draw : function(clip, context) {
 		var width = this.scrollbar.getUnscaledWidth();
 		var height = this.scrollbar.getUnscaledHeight();
-		this.scale = (this.isVertical ? height : width)
+		var availableLength = ((this.isVertical ? height : width))
+				- morpheus.ScentedSearch.LINE_HEIGHT;
+		this.scale = availableLength
 				/ (this.positions.getPosition(this.positions.getLength() - 1) + this.positions
 						.getItemSize(this.positions.getLength() - 1));
-		var innerColor = '#FFDD00';
-		var outerColor = '#CCAA00';
-		context.strokeStyle = outerColor;
-		context.fillStyle = innerColor;
+		context.strokeStyle = 'rgb(106,137,177)';
+		context.fillStyle = 'rgb(182,213,253)';
 		context.lineWidth = 1;
 		this.drawIndices(context, this.searchIndices);
-		this.drawHoverIndices(context);
+		this.drawHoverMatchingValues(context);
 	},
-
-	drawHoverIndices : function(context) {
+	drawHoverMatchingValues : function(context) {
 		var heatmap = this.controller;
 		context.fillStyle = 'black';
 		if (heatmap.mousePositionOptions
@@ -174,9 +174,11 @@ morpheus.ScentedSearch.prototype = {
 					}
 					var pix = positions.getPosition(index) * scale;
 					if (isVertical) {
-						context.fillRect(0, pix, lineLength, 2);
+						context.fillRect(0, pix, lineLength,
+								morpheus.ScentedSearch.LINE_HEIGHT);
 					} else {
-						context.fillRect(pix, 0, 2, lineLength);
+						context.fillRect(pix, 0,
+								morpheus.ScentedSearch.LINE_HEIGHT, lineLength);
 
 					}
 				}
@@ -188,18 +190,25 @@ morpheus.ScentedSearch.prototype = {
 		var scale = this.scale;
 		var lineLength = !this.isVertical ? this.scrollbar.getUnscaledHeight()
 				: this.scrollbar.getUnscaledWidth();
+
 		var isVertical = this.isVertical;
 		var positions = this.positions;
 		for (var i = 0, length = highlightedIndices.length; i < length; i++) {
 			var index = highlightedIndices[i];
 			var pix = positions.getPosition(index) * scale;
 			if (isVertical) {
-				context.fillRect(0, pix, lineLength, 2);
-				context.strokeRect(0, pix, lineLength, 2);
+				context.beginPath();
+				context.rect(0, pix, lineLength,
+						morpheus.ScentedSearch.LINE_HEIGHT);
+				context.fill();
+				context.stroke();
 
 			} else {
-				context.fillRect(pix, 0, 2, lineLength);
-				context.strokeRect(pix, 0, 2, lineLength);
+				context.beginPath();
+				context.rect(pix, 0, morpheus.ScentedSearch.LINE_HEIGHT,
+						lineLength);
+				context.fill();
+				context.stroke();
 			}
 		}
 
