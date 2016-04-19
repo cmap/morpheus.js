@@ -635,16 +635,18 @@ morpheus.DatasetUtil.autocompleteValues = function(dataset) {
 			});
 
 		});
-		fields.forEach(function(field) {
-			if (regex.test(field)) {
-				matches.push({
-					value : field + ':',
-					label : '<span style="font-weight:300;">' + field
-							+ ':</span>',
-					show : true
-				});
-			}
-		});
+		if (field == null) {
+			fields.forEach(function(field) {
+				if (regex.test(field)) {
+					matches.push({
+						value : field + ':',
+						label : '<span style="font-weight:300;">' + field
+								+ ':</span>',
+						show : true
+					});
+				}
+			});
+		}
 		cb(matches);
 	};
 
