@@ -409,7 +409,8 @@ morpheus.HeatMap = function(options) {
 
 					_this.options.dataset = joined;
 					_this._init();
-					if (joined.getRowMetadata().getByName('Source') != null) {
+					if (joined.getRowMetadata().getByName('Source') != null
+							&& !_this.options.colorScheme) {
 						_this.heatmap.getColorScheme()
 								.setSeparateColorSchemeForRowMetadataField(
 										'Source');
