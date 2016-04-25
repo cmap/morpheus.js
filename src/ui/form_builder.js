@@ -47,6 +47,7 @@ morpheus.FormBuilder = function(options) {
 	}).on('drop', function(e) {
 		var node = $(e.originalEvent.srcElement).parent().parent().prev();
 		if (node.is('select') && node.hasClass('file-input')) {
+			var isMultiple = node.data('multiple');
 			$(e.originalEvent.srcElement).parent().css('border', '');
 			var name = node.attr('name');
 			name = name.substring(0, name.length - '_picker'.length);
@@ -55,7 +56,7 @@ morpheus.FormBuilder = function(options) {
 					e.preventDefault();
 					e.stopPropagation();
 					var files = e.originalEvent.dataTransfer.files;
-					that.setValue(name, files[0]);
+					that.setValue(name, isMultiple ? files : files[0]);
 					that.trigger('change', {
 						name : name,
 						value : files[0]
@@ -539,9 +540,13 @@ morpheus.FormBuilder.prototype = {
 		} else if ('custom' === type) {
 			html.push(value);
 		} else if ('file' === type) {
+			var isMultiple = field.multiple;
 			html
-					.push('<select type="file" title="'
-							+ (field.placeholder || 'Choose a file...')
+					.push('<select data-multiple="'
+							+ isMultiple
+							+ '" type="file" title="'
+							+ (field.placeholder || (isMultiple ? 'Choose one or more files...'
+									: 'Choose a file...'))
 							+ '" name="'
 							+ name
 							+ '_picker" data-width="35%" class="file-input selectpicker form-control">');
@@ -586,16 +591,21 @@ morpheus.FormBuilder.prototype = {
 			if (field.url !== false) {
 				html.push('<div>');
 				html
-						.push('<input placeholder="Enter a URL" class="form-control" style="width:50%; display:none;" type="text" name="'
+						.push('<input placeholder="'
+								+ (isMultiple ? 'Enter one or more URLs'
+										: 'Enter a URL')
+								+ '" class="form-control" style="width:50%; display:none;" type="text" name="'
 								+ name + '_text">');
 				html.push('</div>');
 			}
 			html.push('<input style="display:none;" type="file" name="' + name
-					+ '_file">');
+					+ '_file"' + (isMultiple ? ' multiple' : '') + '>');
 			// browse button clicked
 			// select change
 			that.$form
-					.on('change', '[name=' + name + '_picker]',
+					.on(
+							'change',
+							'[name=' + name + '_picker]',
 							function(evt) {
 								var $this = $(this);
 								var val = $this.val();
@@ -603,15 +613,20 @@ morpheus.FormBuilder.prototype = {
 								var showTextInput = val === 'URL';
 								if ('Dropbox' === val) {
 									var options = {
-										success : function(files) {
-											that.setValue(name, files[0].link);
+										success : function(results) {
+											var val = !isMultiple ? results[0].link
+													: results.map(function(
+															result) {
+														return result.link;
+													});
+											that.setValue(name, val);
 											that.trigger('change', {
 												name : name,
-												value : files[0].link
+												value : val
 											});
 										},
 										linkType : 'direct',
-										multiselect : false
+										multiselect : isMultiple
 									};
 									Dropbox.choose(options);
 								} else if ('My Computer' === val) {
@@ -636,7 +651,7 @@ morpheus.FormBuilder.prototype = {
 			// browse file selected
 			that.$form.on('change', '[name=' + name + '_file]', function(evt) {
 				var files = evt.target.files; // FileList object
-				that.setValue(name, files[0]);
+				that.setValue(name, isMultiple ? files : files[0]);
 				that.trigger('change', {
 					name : name,
 					value : files[0]
