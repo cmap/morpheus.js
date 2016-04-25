@@ -270,5 +270,5 @@ morpheus.VectorUtil.getFirstNonNull = function(vector) {
 	return null;
 };
 morpheus.VectorUtil.isNumber = function(vector) {
-	return _.isNumber(morpheus.VectorUtil.getFirstNonNull(vector));
+	return morpheus.VectorUtil.getDataType(vector) === 'number';
 };
