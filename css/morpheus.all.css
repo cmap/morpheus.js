@@ -3546,12 +3546,21 @@ Copyright (c) 2015 Daniel Eden
 	background-color: rgba(255, 255, 255, 0.9);
 	color: black;
 	text-align: left;
+	padding: 1px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	/*border-radius: 6px;*/
+	/*box-shadow: rgba(0, 0, 0, 0.498039) 0px 5px 15px;*/
+	overflow: hidden;
+}
+
+.morpheus-padding-hor {
 	padding-left: 10px;
 	padding-right: 10px;
-	box-shadow: rgba(0, 0, 0, 0.498039) 0px 5px 15px;
-	border: 1px solid rgba(0, 0, 0, 0.2);
-	border-radius: 6px;
-	overflow: hidden;
+}
+
+.morpheus-padding-ver {
+	padding-top: 10px;
+	padding-bottom: 10px;
 }
 
 .morpheus-form-control-inline {
