@@ -3541,7 +3541,6 @@ Copyright (c) 2015 Daniel Eden
 
 .morpheus-tip-inline {
 	font-size: 12px;
-	max-width: 400px;
 	z-index: 10000;
 	position: absolute;
 	background-color: rgba(255, 255, 255, 0.9);

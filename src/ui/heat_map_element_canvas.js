@@ -1,4 +1,4 @@
-morpheus.HeatMapElementCanvas = function(project) {
+morpheus.HeatMapElementCanvas = function (project) {
 	morpheus.AbstractCanvas.call(this, true);
 	this.colorScheme = null;
 	this.project = project;
@@ -7,56 +7,56 @@ morpheus.HeatMapElementCanvas = function(project) {
 	this.columnPositions = new morpheus.Positions();
 	this.rowPositions = new morpheus.Positions();
 	this.lastPosition = {
-		left : -1,
-		right : -1,
-		top : -1,
-		bottom : -1
+		left: -1,
+		right: -1,
+		top: -1,
+		bottom: -1
 	};
-	project.getElementSelectionModel().on('selectionChanged', function() {
+	project.getElementSelectionModel().on('selectionChanged', function () {
 		_this.repaint();
 	});
 };
 morpheus.HeatMapElementCanvas.GRID_COLOR = 'rgb(128,128,128)';
 morpheus.HeatMapElementCanvas.prototype = {
-	drawGrid : true,
-	getColorScheme : function() {
+	drawGrid: true,
+	getColorScheme: function () {
 		return this.colorScheme;
 	},
-	isDrawGrid : function() {
+	isDrawGrid: function () {
 		return this.drawGrid;
 	},
-	setDrawGrid : function(drawGrid) {
+	setDrawGrid: function (drawGrid) {
 		this.drawGrid = drawGrid;
 	},
-	setColorScheme : function(colorScheme) {
+	setColorScheme: function (colorScheme) {
 		this.colorScheme = colorScheme;
 	},
-	setDataset : function(dataset) {
+	setDataset: function (dataset) {
 		this.dataset = dataset;
 		this.columnPositions.setLength(this.dataset.getColumnCount());
 		this.rowPositions.setLength(this.dataset.getRowCount());
 	},
-	getColumnPositions : function() {
+	getColumnPositions: function () {
 		return this.columnPositions;
 	},
-	getRowPositions : function() {
+	getRowPositions: function () {
 		return this.rowPositions;
 	},
-	getPreferredSize : function(context) {
+	getPreferredSize: function (context) {
 		var w = Math.ceil(this.columnPositions.getPosition(this.columnPositions
 				.getLength() - 1)
-				+ this.columnPositions.getItemSize(this.columnPositions
-						.getLength() - 1));
+			+ this.columnPositions.getItemSize(this.columnPositions
+				.getLength() - 1));
 		var h = Math.ceil(this.rowPositions.getPosition(this.rowPositions
 				.getLength() - 1)
-				+ this.rowPositions
-						.getItemSize(this.rowPositions.getLength() - 1));
+			+ this.rowPositions
+			.getItemSize(this.rowPositions.getLength() - 1));
 		return {
-			width : w,
-			height : h
+			width: w,
+			height: h
 		};
 	},
-	prePaint : function(clip, context) {
+	prePaint: function (clip, context) {
 		var lastPosition = this.lastPosition;
 		var columnPositions = this.columnPositions;
 		var rowPositions = this.rowPositions;
@@ -65,8 +65,8 @@ morpheus.HeatMapElementCanvas.prototype = {
 		var top = morpheus.Positions.getTop(clip, rowPositions);
 		var bottom = morpheus.Positions.getBottom(clip, rowPositions);
 		if (this.invalid || left !== lastPosition.left
-				|| right !== lastPosition.right || top !== lastPosition.top
-				|| bottom !== lastPosition.bottom) {
+			|| right !== lastPosition.right || top !== lastPosition.top
+			|| bottom !== lastPosition.bottom) {
 			lastPosition.right = right;
 			lastPosition.left = left;
 			lastPosition.top = top;
@@ -74,7 +74,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 			this.invalid = true;
 		}
 	},
-	postPaint : function(clip, context) {
+	postPaint: function (clip, context) {
 		// draw mouse over stuff
 		morpheus.CanvasUtil.resetTransform(context);
 		var project = this.project;
@@ -83,33 +83,33 @@ morpheus.HeatMapElementCanvas.prototype = {
 		var rowPositions = this.getRowPositions();
 		var columnPositions = this.getColumnPositions();
 		if (project.getHoverColumnIndex() >= 0
-				|| project.getHoverRowIndex() >= 0) {
+			|| project.getHoverRowIndex() >= 0) {
 
 			var height = rowPositions
-					.getItemSize(project.getHoverColumnIndex());
+			.getItemSize(project.getHoverColumnIndex());
 			var width = columnPositions.getItemSize(project
-					.getHoverColumnIndex());
+			.getHoverColumnIndex());
 			var y = (project.getHoverRowIndex() === -1 ? rowPositions
-					.getPosition(rowPositions.getLength() - 1) : rowPositions
-					.getPosition(project.getHoverRowIndex()));
+			.getPosition(rowPositions.getLength() - 1) : rowPositions
+			.getPosition(project.getHoverRowIndex()));
 			var x = (project.getHoverColumnIndex() === -1 ? columnPositions
-					.getPosition(0) : columnPositions.getPosition(project
-					.getHoverColumnIndex()));
+			.getPosition(0) : columnPositions.getPosition(project
+			.getHoverColumnIndex()));
 
 			if (project.getHoverColumnIndex() !== -1) {
 				context.strokeRect(x - clip.x, 0, width, this
-						.getUnscaledHeight());
+				.getUnscaledHeight());
 			}
 			if (project.getHoverRowIndex() !== -1) {
 				context.strokeRect(0, y - clip.y, this.getUnscaledWidth(),
-						height);
+					height);
 			}
 			if (project.getHoverColumnIndex() !== -1
-					&& project.getHoverRowIndex() !== -1) {
+				&& project.getHoverRowIndex() !== -1) {
 				context.strokeStyle = 'black';
 				context.lineWidth = 3;
 				context.strokeRect(x - clip.x + 1.5, y - clip.y + 1.5,
-						width - 1.5, height - 1.5);
+					width - 1.5, height - 1.5);
 			}
 		}
 		var left = morpheus.Positions.getLeft(clip, columnPositions);
@@ -121,20 +121,20 @@ morpheus.HeatMapElementCanvas.prototype = {
 		// context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 		context.translate(-clip.x, -clip.y);
 		var selectedElements = project.getElementSelectionModel()
-				.getViewIndices();
+		.getViewIndices();
 
 		if (selectedElements != null) {
-			selectedElements.forEach(function(id) {
+			selectedElements.forEach(function (id) {
 				var rowIndex = id.getArray()[0];
 				var columnIndex = id.getArray()[1];
 				if (rowIndex >= top && rowIndex < bottom && columnIndex >= left
-						&& columnIndex < right) {
+					&& columnIndex < right) {
 					var rowSize = rowPositions.getItemSize(rowIndex);
 					var py = rowPositions.getPosition(rowIndex);
 					var columnSize = columnPositions.getItemSize(columnIndex);
 					var px = columnPositions.getPosition(columnIndex);
 					context.strokeRect(px + 1.5, py + 1.5, columnSize - 1.5,
-							rowSize - 1.5);
+						rowSize - 1.5);
 
 				}
 			});
@@ -158,23 +158,33 @@ morpheus.HeatMapElementCanvas.prototype = {
 		// emptySelection = emptySelection && selectedColumnElements.size() ==
 		// 0;
 	},
-	setElementDrawCallback : function(elementDrawCallback) {
+	setElementDrawCallback: function (elementDrawCallback) {
 		this._elementDrawCallback = elementDrawCallback;
 	},
-	setDrawCallback : function(drawCallback) {
-		this.drawCallback = drawCallback;
-	},
-	draw : function(clip, context) {
+	draw: function (clip, context) {
 		var columnPositions = this.columnPositions;
 		var rowPositions = this.rowPositions;
 		var left = morpheus.Positions.getLeft(clip, columnPositions);
 		var right = morpheus.Positions.getRight(clip, columnPositions);
 		var top = morpheus.Positions.getTop(clip, rowPositions);
 		var bottom = morpheus.Positions.getBottom(clip, rowPositions);
+		context.translate(-clip.x, -clip.y);
+		this._draw({left: left, right: right, top: top, bottom: bottom, context: context});
+		context.translate(clip.x, clip.y);
+
+	},
+	_draw: function (options) {
+		var left = options.left;
+		var right = options.right;
+		var top = options.top;
+		var bottom = options.bottom;
+		var context = options.context;
 		var dataset = this.dataset;
+		var columnPositions = this.columnPositions;
+		var rowPositions = this.rowPositions;
+
 		// context.fillStyle = 'LightGrey';
 		// context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-		context.translate(-clip.x, -clip.y);
 
 		var colorScheme = this.colorScheme;
 		var drawGrid = this.drawGrid;
@@ -197,19 +207,19 @@ morpheus.HeatMapElementCanvas.prototype = {
 				var columnSize = columnPositions.getItemSize(column);
 				var px = columnPositions.getPosition(column);
 				context.fillStyle = colorScheme.getColor(row, column, dataset
-						.getValue(row, column));
+				.getValue(row, column));
 				if (column === left) { // check if the color scheme for this
 					// row is sizing
 					sizer = colorScheme.getSizer();
 
 					sizeBySeriesName = sizer.getSeriesName();
 					sizeBySeriesIndex = sizeBySeriesName != null ? seriesNameToIndex[sizeBySeriesName]
-							: undefined;
+						: undefined;
 					conditionSeriesIndices = [];
 					conditions = colorScheme.getConditions().getConditions();
 					for (var ci = 0, nconditions = conditions.length; ci < nconditions; ci++) {
 						conditionSeriesIndices
-								.push(seriesNameToIndex[conditions[ci].series]);
+						.push(seriesNameToIndex[conditions[ci].series]);
 					}
 
 				}
@@ -217,7 +227,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 				var cellRowSize = rowSize;
 				if (sizeBySeriesIndex !== undefined) {
 					var sizeByValue = dataset.getValue(row, column,
-							sizeBySeriesIndex);
+						sizeBySeriesIndex);
 					if (!isNaN(sizeByValue)) {
 						var f = sizer.valueToFraction(sizeByValue);
 						var rowDiff = rowSize - rowSize * f;
@@ -230,7 +240,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 					for (var ci = 0, nconditions = conditions.length; ci < nconditions; ci++) {
 						var cond = conditions[ci];
 						var condValue = dataset.getValue(row, column,
-								conditionSeriesIndices[ci]);
+							conditionSeriesIndices[ci]);
 
 						if (!isNaN(condValue) && cond.accept(condValue)) {
 							condition = cond;
@@ -240,17 +250,17 @@ morpheus.HeatMapElementCanvas.prototype = {
 					}
 					if (condition !== null) {
 						context.fillRect(px, py + yoffset, columnSize,
-								cellRowSize);
+							cellRowSize);
 						// x and y are at center
 						var x = px + cellRowSize / 2;
 						var y = py + yoffset + columnSize / 2;
 						context.fillStyle = condition.color;
 						morpheus.CanvasUtil.drawShape(context, condition.shape,
-								x, y, Math.min(columnSize, cellRowSize) / 4);
+							x, y, Math.min(columnSize, cellRowSize) / 4);
 						context.fill();
 					} else {
 						context.fillRect(px, py + yoffset, columnSize,
-								cellRowSize);
+							cellRowSize);
 					}
 				} else {
 					context.fillRect(px, py + yoffset, columnSize, cellRowSize);
@@ -258,7 +268,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 
 				if (elementDrawCallback) {
 					elementDrawCallback(context, dataset, row, column, px, py,
-							columnSize, rowSize);
+						columnSize, rowSize);
 				}
 			}
 		}
@@ -279,22 +289,8 @@ morpheus.HeatMapElementCanvas.prototype = {
 			}
 
 		}
-		if (this.drawCallback) {
-			this.drawCallback({
-				context : context,
-				dataset : dataset,
-				top : top,
-				bottom : bottom,
-				left : left,
-				right : right,
-				rowPositions : rowPositions,
-				columnPositions : columnPositions,
-				project : this.project,
-				clip : clip
-			});
-		}
 		context.lineWidth = 1;
-		context.translate(clip.x, clip.y);
+
 	}
 };
 morpheus.Util.extend(morpheus.HeatMapElementCanvas, morpheus.AbstractCanvas);

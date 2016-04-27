@@ -1,10 +1,11 @@
 morpheus.DatasetUtil = function() {
 };
-morpheus.DatasetUtil.min = function(dataset) {
+morpheus.DatasetUtil.min = function(dataset, seriesIndex) {
+	seriesIndex = seriesIndex || 0;
 	var min = Number.MAX_VALUE;
 	for (var i = 0, rows = dataset.getRowCount(); i < rows; i++) {
 		for (var j = 0, columns = dataset.getColumnCount(); j < columns; j++) {
-			var d = dataset.getValue(i, j);
+			var d = dataset.getValue(i, j, seriesIndex);
 			if (isNaN(d)) {
 				continue;
 			}
@@ -20,11 +21,12 @@ morpheus.DatasetUtil.transposedView = function(dataset) {
 	return dataset instanceof morpheus.TransposedDatasetView ? dataset
 			.getDataset() : new morpheus.TransposedDatasetView(dataset);
 };
-morpheus.DatasetUtil.max = function(dataset) {
+morpheus.DatasetUtil.max = function(dataset, seriesIndex) {
+	seriesIndex = seriesIndex || 0;
 	var max = -Number.MAX_VALUE;
 	for (var i = 0, rows = dataset.getRowCount(); i < rows; i++) {
 		for (var j = 0, columns = dataset.getColumnCount(); j < columns; j++) {
-			var d = dataset.getValue(i, j);
+			var d = dataset.getValue(i, j, seriesIndex);
 			if (isNaN(d)) {
 				continue;
 			}
