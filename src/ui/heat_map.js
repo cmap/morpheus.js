@@ -1716,7 +1716,6 @@ morpheus.HeatMap.prototype = {
 		this.$tipFollow = $('<div style="left:-1000px; top:-1000px;" class="morpheus-tip-inline"></div>');
 		this.$tipFollow.appendTo(this.$parent);
 
-
 		this.$tipInfoWindow = $('<div class="morpheus-tip-dialog"></div>');
 		this.$tipInfoWindow.appendTo(this.$parent);
 
@@ -2154,9 +2153,8 @@ morpheus.HeatMap.prototype = {
 		if (this.options.showSeriesNameInTooltip) {
 			options.showSeriesNameInTooltip = true;
 		}
-		if (options.dataLens) {
+		if (options.heatMapLens) {
 			// don't draw lens if currently visible
-
 			// row lens
 			if (rowIndex >= 0 && (rowIndex >= this.heatmap.lastPosition.bottom || rowIndex < this.heatmap.lastPosition.top)) {
 				var heatMapWidth = this.heatmap.getUnscaledWidth();
@@ -2173,14 +2171,16 @@ morpheus.HeatMap.prototype = {
 						trackWidth += track.getUnscaledWidth();
 					}
 				}
-				var canvasWidth = trackWidth + heatMapWidth + 1;
+				var canvasWidth = trackWidth + heatMapWidth + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
 				canvas.width = canvasWidth * morpheus.CanvasUtil.BACKING_SCALE;
 				canvas.style.width = canvasWidth + 'px';
 				canvas.height = heatMapHeight * morpheus.CanvasUtil.BACKING_SCALE;
 				canvas.style.height = heatMapHeight + 'px';
 				var context = canvas.getContext('2d');
+				context.save();
 				context.translate(-this.heatmap.lastClip.x, -startPix);
-
+				context.rect(this.heatmap.lastClip.x, startPix, this.heatmap.lastClip.width, this.heatmap.lastClip.height);
+				context.clip();
 				this.heatmap._draw({
 					left: this.heatmap.lastPosition.left,
 					right: this.heatmap.lastPosition.right,
@@ -2188,20 +2188,22 @@ morpheus.HeatMap.prototype = {
 					bottom: bottom,
 					context: context
 				});
-				context.translate(heatMapWidth + 1, 0);
+				context.restore();
+				context.translate(heatMapWidth + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS, -startPix);
 				trackWidth = 0;
 				for (var i = 0, ntracks = this.rowTracks.length; i < ntracks; i++) {
 					var track = this.rowTracks[i];
 					if (track.isVisible()) {
 						context.save();
 						context.translate(trackWidth, 0);
+						context.rect(0, startPix, track.getUnscaledWidth(), track.lastClip.height);
+						context.clip();
 						track._draw({
 							start: top,
 							end: bottom,
 							vector: track.getVector(),
 							context: context,
-							availableSpace: track.isColumns ? track.getUnscaledHeight()
-								: track.getUnscaledWidth()
+							availableSpace: track.getUnscaledWidth()
 						});
 						context.restore();
 						trackWidth += track.getUnscaledWidth();
@@ -2215,7 +2217,7 @@ morpheus.HeatMap.prototype = {
 				$(canvas).appendTo($wrapper);
 				var rect = this.$parent[0].getBoundingClientRect();
 				this.$tipFollow.html($wrapper).css({
-					left: parseFloat(this.heatmap.canvas.style.left) - 12,
+					left: parseFloat(this.heatmap.canvas.style.left) - 1,
 					top: options.event.clientY - rect.top
 				});
 				return;
@@ -2237,19 +2239,35 @@ morpheus.HeatMap.prototype = {
 						trackHeight += track.getUnscaledHeight();
 					}
 				}
-				var canvasHeight = trackHeight + heatMapHeight + 1;
+				var canvasHeight = trackHeight + heatMapHeight + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
 				canvas.width = heatMapWidth * morpheus.CanvasUtil.BACKING_SCALE;
 				canvas.style.width = heatMapWidth + 'px';
 				canvas.height = canvasHeight * morpheus.CanvasUtil.BACKING_SCALE;
 				canvas.style.height = canvasHeight + 'px';
 				var context = canvas.getContext('2d');
-				context.translate(-startPix, -this.heatmap.lastClip.y);
+
+				context.translate(-startPix, 0);
+				context.save();
+				context.rect(startPix, trackHeight + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS, this.heatmap.lastClip.width, this.heatmap.lastClip.height + trackHeight + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS);
+				context.clip();
+				context.translate(0, trackHeight + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS - this.heatmap.lastClip.y);
+
+				this.heatmap._draw({
+					top: this.heatmap.lastPosition.top,
+					bottom: this.heatmap.lastPosition.bottom,
+					left: left,
+					right: right,
+					context: context
+				});
+				context.restore();
 				trackHeight = 0;
 				for (var i = 0, ntracks = this.columnTracks.length; i < ntracks; i++) {
 					var track = this.columnTracks[i];
 					if (track.isVisible()) {
 						context.save();
 						context.translate(0, trackHeight);
+						context.rect(startPix, 0, track.lastClip.width, track.getUnscaledHeight());
+						context.clip();
 						track._draw({
 							start: left,
 							end: right,
@@ -2265,23 +2283,16 @@ morpheus.HeatMap.prototype = {
 						trackHeight += track.getUnscaledHeight();
 					}
 				}
-				context.translate(0, trackHeight);
-				this.heatmap._draw({
-					top: this.heatmap.lastPosition.top,
-					bottom: this.heatmap.lastPosition.bottom,
-					left: left,
-					right: right,
-					context: context
-				});
+
 				var $wrapper = $('<div></div>');
 				$wrapper.css({
 					width: canvas.style.width,
-					height: parseFloat(canvas.style.height) + 12
+					height: parseFloat(canvas.style.height)
 				});
 				$(canvas).appendTo($wrapper);
 				var rect = this.$parent[0].getBoundingClientRect();
 				this.$tipFollow.html($wrapper).css({
-					top: parseFloat(this.heatmap.canvas.style.top) - trackHeight - 12,
+					top: parseFloat(this.heatmap.canvas.style.top) - trackHeight - morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS - 1,
 					left: (options.event.clientX - rect.left) - (parseFloat(canvas.style.width) / 2)
 				});
 				return;
@@ -2307,7 +2318,7 @@ morpheus.HeatMap.prototype = {
 		}
 		if (tipFollowText !== '') {
 			this.tipFollowHidden = false;
-			this.$tipFollow.html('<span style="max-width:400px;">' + tipFollowText + '</span>');
+			this.$tipFollow.css('class', 'morpheus-tip-inline morpheus-padding-ver').html('<span style="max-width:400px;">' + tipFollowText + '</span>');
 			this._updateTipFollowPosition(options);
 		} else {
 			this.tipFollowHidden = true;

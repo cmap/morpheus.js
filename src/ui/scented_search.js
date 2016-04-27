@@ -19,7 +19,7 @@ morpheus.ScentedSearch = function (model, positions, isVertical, scrollbar,
 		scrollbar.canvas.style.cursor = index < 0 ? 'default' : 'pointer';
 		var tipOptions = {
 			event: e,
-			dataLens: true
+			heatMapLens: true
 		};
 		if (isVertical) {
 			controller.setToolTip(index >= 0 ? _this.searchIndices[index] : -1,
