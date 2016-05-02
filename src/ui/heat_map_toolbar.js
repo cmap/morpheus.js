@@ -572,7 +572,7 @@ morpheus.HeatMapToolBar = function (controller) {
 	$toolbarForm.on('submit', function (e) {
 		e.preventDefault();
 	});
-	$toolbarForm.on('click', '[name=in]', function (e) {
+	$buttons.on('click', '[name=in]', function (e) {
 		e.preventDefault();
 		controller.zoom(true);
 		morpheus.Util.trackEvent({
@@ -580,7 +580,7 @@ morpheus.HeatMapToolBar = function (controller) {
 			eventAction: 'zoomIn'
 		});
 	});
-	$toolbarForm.on('click', '[name=out]', function (e) {
+	$buttons.on('click', '[name=out]', function (e) {
 		e.preventDefault();
 		controller.zoom(false);
 		morpheus.Util.trackEvent({
@@ -588,7 +588,7 @@ morpheus.HeatMapToolBar = function (controller) {
 			eventAction: 'zoomOut'
 		});
 	});
-	$toolbarForm.on('click', '[name=options]', function (e) {
+	$buttons.on('click', '[name=options]', function (e) {
 		e.preventDefault();
 		controller.showOptions();
 		morpheus.Util.trackEvent({
@@ -596,7 +596,7 @@ morpheus.HeatMapToolBar = function (controller) {
 			eventAction: 'options'
 		});
 	});
-	$toolbarForm.on('click', '[name=sort]', function (e) {
+	$buttons.on('click', '[name=sort]', function (e) {
 		e.preventDefault();
 		new morpheus.SortDialog(project);
 		morpheus.Util.trackEvent({
@@ -604,7 +604,7 @@ morpheus.HeatMapToolBar = function (controller) {
 			eventAction: 'sort'
 		});
 	});
-	$toolbarForm.on('click', '[name=fit]', function (e) {
+	$buttons.on('click', '[name=fit]', function (e) {
 		e.preventDefault();
 		controller.fitToWindow(true);
 		morpheus.Util.trackEvent({
@@ -612,7 +612,7 @@ morpheus.HeatMapToolBar = function (controller) {
 			eventAction: 'fit'
 		});
 	});
-	$toolbarForm.on('click', '[name=resetZoom]', function (e) {
+	$buttons.on('click', '[name=resetZoom]', function (e) {
 		e.preventDefault();
 		controller.resetZoom();
 		morpheus.Util.trackEvent({
