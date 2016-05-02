@@ -19,7 +19,7 @@ morpheus.ScentedSearch = function (model, positions, isVertical, scrollbar,
 		scrollbar.canvas.style.cursor = index < 0 ? 'default' : 'pointer';
 		var tipOptions = {
 			event: e,
-			heatMapLens: true
+			heatMapLens: index >= 0
 		};
 		if (isVertical) {
 			controller.setToolTip(index >= 0 ? _this.searchIndices[index] : -1,
@@ -35,6 +35,7 @@ morpheus.ScentedSearch = function (model, positions, isVertical, scrollbar,
 		// but the canvas cursor has no effect
 		document.body.style.cursor = 'default';
 		scrollbar.canvas.style.cursor = 'default';
+		controller.setToolTip(-1, -1, {event: e});
 	};
 	$(scrollbar.canvas).on('mousemove', mouseMove).on('mouseout', mouseExit);
 };

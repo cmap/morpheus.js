@@ -2316,9 +2316,10 @@ morpheus.HeatMap.prototype = {
 		} else if (this.tooltipMode === 1) {
 			this.$tipInfoWindow.html(tipText);
 		}
+
 		if (tipFollowText !== '') {
 			this.tipFollowHidden = false;
-			this.$tipFollow.css('class', 'morpheus-tip-inline morpheus-padding-ver').html('<span style="max-width:400px;">' + tipFollowText + '</span>');
+			this.$tipFollow.html('<span style="max-width:400px;">' + tipFollowText + '</span>');
 			this._updateTipFollowPosition(options);
 		} else {
 			this.tipFollowHidden = true;

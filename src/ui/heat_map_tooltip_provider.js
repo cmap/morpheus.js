@@ -1,10 +1,10 @@
-morpheus.HeatMapTooltipProvider = function(heatMap, rowIndex, columnIndex,
-		options, separator, quick) {
+morpheus.HeatMapTooltipProvider = function (heatMap, rowIndex, columnIndex,
+											options, separator, quick) {
 	var dataset = heatMap.project.getSortedFilteredDataset();
 	var tipText = [];
 	if (!quick) {
 		if (options.value) { // key value pairs for custom tooltip
-			_.each(options.value, function(pair) {
+			_.each(options.value, function (pair) {
 				if (tipText.length > 0) {
 					tipText.push(separator);
 				}
@@ -27,16 +27,16 @@ morpheus.HeatMapTooltipProvider = function(heatMap, rowIndex, columnIndex,
 	if (rowIndex !== -1 && columnIndex !== -1) {
 		for (var i = 0, nseries = dataset.getSeriesCount(); i < nseries; i++) {
 			morpheus.HeatMapTooltipProvider._matrixValueToString(dataset,
-					rowIndex, columnIndex, i, tipText, separator,
-					options.showSeriesNameInTooltip || i > 0);
+				rowIndex, columnIndex, i, tipText, separator,
+				options.showSeriesNameInTooltip || i > 0);
 		}
 		if (quick) {
-			var quickRowTracks = heatMap.rowTracks.filter(function(t) {
+			var quickRowTracks = heatMap.rowTracks.filter(function (t) {
 				return t.settings.inlineTooltip;
 			});
 			morpheus.HeatMapTooltipProvider._tracksToString(options,
-					quickRowTracks, dataset.getRowMetadata(), rowIndex,
-					tipText, separator);
+				quickRowTracks, dataset.getRowMetadata(), rowIndex,
+				tipText, separator);
 
 			// if (quickRowTracks.length > 0) {
 			// tipText
@@ -44,10 +44,10 @@ morpheus.HeatMapTooltipProvider = function(heatMap, rowIndex, columnIndex,
 			// style="height:1px;background-color:LightGrey;"></div>');
 			// }
 			morpheus.HeatMapTooltipProvider._tracksToString(options,
-					heatMap.columnTracks.filter(function(t) {
-						return t.settings.inlineTooltip;
-					}), dataset.getColumnMetadata(), columnIndex, tipText,
-					separator);
+				heatMap.columnTracks.filter(function (t) {
+					return t.settings.inlineTooltip;
+				}), dataset.getColumnMetadata(), columnIndex, tipText,
+				separator);
 
 		}
 	}
@@ -55,25 +55,25 @@ morpheus.HeatMapTooltipProvider = function(heatMap, rowIndex, columnIndex,
 	if (!quick) {
 		if (rowIndex !== -1) {
 			morpheus.HeatMapTooltipProvider._metadataToString(options,
-					heatMap.rowTracks, dataset.getRowMetadata(), rowIndex,
-					tipText, separator);
+				heatMap.rowTracks, dataset.getRowMetadata(), rowIndex,
+				tipText, separator);
 		}
 		if (columnIndex !== -1) {
 			morpheus.HeatMapTooltipProvider._metadataToString(options,
-					heatMap.columnTracks, dataset.getColumnMetadata(),
-					columnIndex, tipText, separator);
+				heatMap.columnTracks, dataset.getColumnMetadata(),
+				columnIndex, tipText, separator);
 		}
 	} else if (options.name != null) {
 		var metadata = (rowIndex !== -1 ? dataset.getRowMetadata() : dataset
-				.getColumnMetadata());
+		.getColumnMetadata());
 		var vector = metadata.getByName(options.name);
 		var track = heatMap.getTrack(options.name, columnIndex !== -1);
 		var colorByName = track != null ? track.settings.colorByField : null;
 		var additionalVector = colorByName != null ? metadata
-				.getByName(colorByName) : null;
+		.getByName(colorByName) : null;
 		morpheus.HeatMapTooltipProvider.vectorToString(vector,
-				rowIndex !== -1 ? rowIndex : columnIndex, tipText, separator,
-				additionalVector);
+			rowIndex !== -1 ? rowIndex : columnIndex, tipText, separator,
+			additionalVector);
 
 	}
 	var rowNodes = [];
@@ -90,70 +90,86 @@ morpheus.HeatMapTooltipProvider = function(heatMap, rowIndex, columnIndex,
 	if (!quick) {
 		if (heatMap.rowDendrogram) {
 			selectedRowNodes = _
-					.values(heatMap.rowDendrogram.selectedRootNodeIdToNode);
+			.values(heatMap.rowDendrogram.selectedRootNodeIdToNode);
 		}
 		if (heatMap.columnDendrogram) {
 			selectedColumnNodes = _
-					.values(heatMap.columnDendrogram.selectedRootNodeIdToNode);
+			.values(heatMap.columnDendrogram.selectedRootNodeIdToNode);
 		}
 		if (selectedRowNodes.length > 0 && rowNodes.length > 0) {
 			var nodeIds = {};
-			_.each(selectedRowNodes, function(n) {
+			_.each(selectedRowNodes, function (n) {
 				nodeIds[n.id] = true;
 			});
-			rowNodes = _.filter(rowNodes, function(n) {
+			rowNodes = _.filter(rowNodes, function (n) {
 				return nodeIds[n.id] === undefined;
 			});
 		}
 		if (selectedColumnNodes.length > 0 && columnNodes.length > 0) {
 			var nodeIds = {};
-			_.each(selectedColumnNodes, function(n) {
+			_.each(selectedColumnNodes, function (n) {
 				nodeIds[n.id] = true;
 			});
-			columnNodes = _.filter(columnNodes, function(n) {
+			columnNodes = _.filter(columnNodes, function (n) {
 				return nodeIds[n.id] === undefined;
 			});
 		}
 	}
 	morpheus.HeatMapTooltipProvider._nodesToString(tipText, rowNodes, null,
-			separator);
+		separator);
 	morpheus.HeatMapTooltipProvider._nodesToString(tipText, columnNodes, null,
-			separator);
+		separator);
 	if (!quick) {
 		if (selectedRowNodes.length > 0) {
 			morpheus.HeatMapTooltipProvider._nodesToString(tipText,
-					selectedRowNodes, heatMap.rowDendrogram._selectedNodeColor,
-					separator);
+				selectedRowNodes, heatMap.rowDendrogram._selectedNodeColor,
+				separator);
 		}
 		if (selectedColumnNodes.length > 0) {
 			morpheus.HeatMapTooltipProvider._nodesToString(tipText,
-					selectedColumnNodes,
-					heatMap.columnDendrogram._selectedNodeColor, separator);
+				selectedColumnNodes,
+				heatMap.columnDendrogram._selectedNodeColor, separator);
 		}
 	}
 	return tipText.join('');
 };
 
-morpheus.HeatMapTooltipProvider._matrixValueToString = function(dataset,
-		rowIndex, columnIndex, seriesIndex, tipText, separator,
-		showSeriesNameInTooltip) {
+morpheus.HeatMapTooltipProvider._matrixValueToString = function (dataset,
+																 rowIndex, columnIndex, seriesIndex, tipText, separator,
+																 showSeriesNameInTooltip) {
 	var val = dataset.getValue(rowIndex, columnIndex, seriesIndex);
 	if (val != null) {
 		if (val.toObject || !_.isNumber(val)) {
 			var obj = val.toObject ? val.toObject() : val;
 			var keys = _.keys(obj);
-			_.each(keys, function(key) {
-				if (key !== '__v') { // special value key
-					var v = morpheus.Util.formatObject(obj[key]);
-					if (tipText.length > 0) {
-						tipText.push(separator);
-					}
-					tipText.push(key);
-					tipText.push(': <b>');
-					tipText.push(v);
-					tipText.push('</b>');
+			if (keys.length === 0) {
+				var v = morpheus.Util.formatObject(obj);
+				if (tipText.length > 0) {
+					tipText.push(separator);
 				}
-			});
+				if (showSeriesNameInTooltip) {
+					tipText.push(dataset.getName(seriesIndex));
+					tipText.push(': ');
+				}
+				tipText.push('<b>');
+				tipText.push(v);
+				tipText.push('</b>');
+			} else {
+				for (var i = 0, nkeys = keys.length; i < nkeys; i++) {
+					var key = keys[i];
+					if (key !== '__v') { // special value key
+						var v = morpheus.Util.formatObject(obj[key]);
+						if (tipText.length > 0) {
+							tipText.push(separator);
+						}
+						tipText.push(key);
+						tipText.push(': <b>');
+						tipText.push(v);
+						tipText.push('</b>');
+					}
+				}
+			}
+
 		} else {
 			if (tipText.length > 0) {
 				tipText.push(separator);
@@ -170,9 +186,9 @@ morpheus.HeatMapTooltipProvider._matrixValueToString = function(dataset,
 	}
 };
 
-morpheus.HeatMapTooltipProvider.vectorToString = function(vector, index,
-		tipText, separator, additionalVector) {
-	var arrayValueToString = function(arrayFieldName, arrayVal) {
+morpheus.HeatMapTooltipProvider.vectorToString = function (vector, index,
+														   tipText, separator, additionalVector) {
+	var arrayValueToString = function (arrayFieldName, arrayVal) {
 		if (arrayVal != null) {
 			if (arrayFieldName != null) {
 				if (tipText.length > 0) {
@@ -184,7 +200,7 @@ morpheus.HeatMapTooltipProvider.vectorToString = function(vector, index,
 				tipText.push(' ');
 				var obj = arrayVal.toObject();
 				var keys = _.keys(obj);
-				_.each(keys, function(key) {
+				_.each(keys, function (key) {
 					var subVal = obj[key];
 					if (subVal != null && subVal != '') {
 						if (tipText.length > 0) {
@@ -208,27 +224,27 @@ morpheus.HeatMapTooltipProvider.vectorToString = function(vector, index,
 		var primaryVal = vector.getValue(index);
 		if (primaryVal != null && primaryVal != '') {
 			var primaryFields = vector.getProperties().get(
-					morpheus.VectorKeys.FIELDS);
+				morpheus.VectorKeys.FIELDS);
 			if (primaryFields != null) {
 				var visibleFieldIndices = vector.getProperties().get(
-						morpheus.VectorKeys.VISIBLE_FIELDS);
+					morpheus.VectorKeys.VISIBLE_FIELDS);
 				if (visibleFieldIndices === undefined) {
 					visibleFieldIndices = morpheus.Util
-							.seq(primaryFields.length);
+					.seq(primaryFields.length);
 				}
 				var additionalFieldNames = additionalVector != null ? additionalVector
-						.getProperties().get(morpheus.VectorKeys.FIELDS)
-						: null;
+				.getProperties().get(morpheus.VectorKeys.FIELDS)
+					: null;
 				var additionalVal = additionalFieldNames != null ? additionalVector
-						.getValue(index)
-						: null;
+				.getValue(index)
+					: null;
 				if (tipText.length > 0) {
 					tipText.push(separator);
 				}
 				tipText.push(vector.getName());
 				for (var j = 0; j < visibleFieldIndices.length; j++) {
 					arrayValueToString(primaryFields[visibleFieldIndices[j]],
-							primaryVal[visibleFieldIndices[j]]);
+						primaryVal[visibleFieldIndices[j]]);
 				}
 
 				if (additionalVal != null) {
@@ -238,8 +254,8 @@ morpheus.HeatMapTooltipProvider.vectorToString = function(vector, index,
 					tipText.push(additionalVector.getName());
 					for (var j = 0; j < visibleFieldIndices.length; j++) {
 						arrayValueToString(
-								additionalFieldNames[visibleFieldIndices[j]],
-								additionalVal[visibleFieldIndices[j]]);
+							additionalFieldNames[visibleFieldIndices[j]],
+							additionalVal[visibleFieldIndices[j]]);
 					}
 
 				}
@@ -256,17 +272,15 @@ morpheus.HeatMapTooltipProvider.vectorToString = function(vector, index,
 		}
 	}
 };
-morpheus.HeatMapTooltipProvider._tracksToString = function(options, tracks,
-		metadata, index, tipText, separator) {
+morpheus.HeatMapTooltipProvider._tracksToString = function (options, tracks, metadata, index, tipText, separator) {
 	for (var i = 0; i < tracks.length; i++) {
-		var vector = metadata.getByName(tracks[i].name);
-		morpheus.HeatMapTooltipProvider.vectorToString(vector, index, tipText,
-				separator);
+		morpheus.HeatMapTooltipProvider.vectorToString(metadata.getByName(tracks[i].name), index, tipText,
+			separator);
 
 	}
 };
-morpheus.HeatMapTooltipProvider._metadataToString = function(options, tracks,
-		metadata, index, tipText, separator) {
+morpheus.HeatMapTooltipProvider._metadataToString = function (options, tracks,
+															  metadata, index, tipText, separator) {
 	var filtered = [];
 	for (var i = 0, ntracks = tracks.length; i < ntracks; i++) {
 		var track = tracks[i];
@@ -276,19 +290,17 @@ morpheus.HeatMapTooltipProvider._metadataToString = function(options, tracks,
 			} else {
 				filtered.push(track);
 			}
-
 		}
 	}
 
 	// show the vector that we're mousing over 1st
-
 	morpheus.HeatMapTooltipProvider._tracksToString(options, filtered,
-			metadata, index, tipText, separator);
+		metadata, index, tipText, separator);
 
 };
-morpheus.HeatMapTooltipProvider._nodesToString = function(tipText, nodes,
-		color, separator) {
-	var renderField = function(name, value) {
+morpheus.HeatMapTooltipProvider._nodesToString = function (tipText, nodes,
+														   color, separator) {
+	var renderField = function (name, value) {
 		if (value != null) {
 			if (tipText.length > 0) {
 				tipText.push(separator);
@@ -314,9 +326,9 @@ morpheus.HeatMapTooltipProvider._nodesToString = function(tipText, nodes,
 			}
 		}
 	};
-	_.each(nodes, function(node) {
+	_.each(nodes, function (node) {
 		if (node.info) {
-			for ( var name in node.info) {
+			for (var name in node.info) {
 				var value = node.info[name];
 				renderField(name, value);
 			}
