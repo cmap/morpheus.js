@@ -26,7 +26,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml.push('</ul>');
 		searchHtml.push('</div>'); // input-group-btn
 		searchHtml
-		.push('<input type="text" style="border-top:3px solid rgb(127,127,127);width:240px;padding-buttons:25px;" class="form-control input-sm" autocomplete="off" name="searchRows">');
+		.push('<input type="text" style="border-top:3px solid rgb(127,127,127);width:240px;padding-right:25px;" class="form-control input-sm" autocomplete="off" name="searchRows">');
 		searchHtml.push('</div>');
 		searchHtml.push('</div>');
 		searchHtml.push('<div class="form-group">');
@@ -45,7 +45,7 @@ morpheus.HeatMapToolBar = function (controller) {
 	}
 	if (controller.options.toolbar.searchColumns) {
 		searchHtml
-		.push('<div class="form-group" style="margin-buttons:18px;"></div>'); // spacer
+		.push('<div class="form-group" style="margin-right:10px;"></div>'); // spacer
 		// search columns
 		searchHtml.push('<div class="form-group">');
 		searchHtml.push('<div class="input-group input-group-sm">'); // group
@@ -61,7 +61,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml.push('</div>'); // input-group-btn
 
 		searchHtml
-		.push('<input type="text" style="border-buttons:4px solid rgb(127,127,127);width:240px;padding-buttons:25px;" class="form-control input-sm" autocapitalize="off" autocomplete="off" name="searchColumns"></div>');
+		.push('<input type="text" style="border-right:4px solid rgb(127,127,127);width:240px;padding-right:25px;" class="form-control input-sm" autocapitalize="off" autocomplete="off" name="searchColumns"></div>');
 		searchHtml.push('</div>');
 		searchHtml.push('</div>');
 		searchHtml.push('<div class="form-group" style="margin-left:4px;">');
@@ -80,9 +80,9 @@ morpheus.HeatMapToolBar = function (controller) {
 
 	// search values
 	searchHtml
-	.push('<div name="searchValuesDiv" class="form-group" style="margin-left:18px;">');
+	.push('<div name="searchValuesDiv" class="form-group" style="margin-left:10px;">');
 	searchHtml
-	.push('<div class="input-group input-group-sm"><span class="input-group-addon">Values</span><input type="text" style="width:240px;padding-buttons:25px;" class="form-control input-sm" autocapitalize="off" autocomplete="off" name="searchValues"></div>');
+	.push('<div class="input-group input-group-sm"><span class="input-group-addon">Values</span><input type="text" style="width:240px;padding-right:25px;" class="form-control input-sm" autocapitalize="off" autocomplete="off" name="searchValues"></div>');
 	searchHtml.push('</div>');
 	searchHtml.push('<div class="form-group" style="margin-left:4px;">');
 	searchHtml
@@ -91,7 +91,7 @@ morpheus.HeatMapToolBar = function (controller) {
 
 	// row dendrogram
 	searchHtml
-	.push('<div style="display: none;  margin-left:18px;" name="searchRowDendrogramWrapper" class="form-group">');
+	.push('<div style="display: none;  margin-left:10px;" name="searchRowDendrogramWrapper" class="form-group">');
 	searchHtml
 	.push('<div class="input-group input-group-sm"><span class="input-group-addon">Row Dendrogram</span><input type="text" style="width:240px;" class="form-control input-sm" autocapitalize="off" autocomplete="off" name="searchRowDendrogram"></div>');
 	searchHtml
@@ -99,7 +99,7 @@ morpheus.HeatMapToolBar = function (controller) {
 	searchHtml.push('</div>');
 	// column dendrogram
 	searchHtml
-	.push('<div style="display: none; margin-left:18px;" name="searchColumnDendrogramWrapper" class="form-group">');
+	.push('<div style="display: none; margin-left:10px;" name="searchColumnDendrogramWrapper" class="form-group">');
 	searchHtml
 	.push('<div class="input-group input-group-sm"><span class="input-group-addon">Column Dendrogram</span><input type="text" style="width:240px;" class="form-control input-sm" autocapitalize="off" autocomplete="off" name="searchColumnDendrogram"></div>');
 	searchHtml
@@ -108,11 +108,12 @@ morpheus.HeatMapToolBar = function (controller) {
 	// dimensions
 	searchHtml.push('<div class="form-group" name="datasetInfoGroup">');
 	searchHtml
-	.push('<h6 style="display: inline; margin-left:30px;" name="dim"></h6>');
+	.push('<h6 style="display: inline; margin-left:10px;" name="dim"></h6>');
 	searchHtml
-	.push('<h6 style="display: inline; margin-left:30px;" name="selection"></h6>');
+	.push('<h6 style="display: inline; margin-left:10px; background-color:rgb(182,213,253);"' +
+		' name="selection"></h6>');
 	searchHtml.push('</div>');
-	searchHtml.push('<div name="buttons" style="margin-left:18px;" class="form-group"></div>');
+	searchHtml.push('<div name="buttons" style="margin-left:10px;" class="form-group"></div>');
 
 	$(searchHtml.join('')).appendTo($search);
 	if (!controller.options.toolbar.searchValues) {
@@ -880,8 +881,8 @@ morpheus.HeatMapToolBar.prototype = {
 		var d = p.getFullDataset();
 		var f = p.getSortedFilteredDataset();
 		var text = 'showing ' + morpheus.Util.intFormat(f.getRowCount())
-			+ ' of ' + morpheus.Util.intFormat(d.getRowCount()) + ' rows, '
-			+ morpheus.Util.intFormat(f.getColumnCount()) + ' of '
+			+ '/' + morpheus.Util.intFormat(d.getRowCount()) + ' rows, '
+			+ morpheus.Util.intFormat(f.getColumnCount()) + '/'
 			+ morpheus.Util.intFormat(d.getColumnCount()) + ' columns';
 		this.$dimensionsLabel.html(text);
 	},
@@ -893,7 +894,7 @@ morpheus.HeatMapToolBar.prototype = {
 		if (nr !== 1) {
 			text.push('s');
 		}
-		text.push(' selected, ');
+		text.push(', ');
 		text.push(morpheus.Util.intFormat(nc) + ' column');
 		if (nc !== 1) {
 			text.push('s');
