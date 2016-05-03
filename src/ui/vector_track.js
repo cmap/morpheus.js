@@ -826,6 +826,7 @@ morpheus.VectorTrack.prototype = {
 		var DELETE = 'Delete...';
 		var TOOLTIP = 'Show In Tooltip';
 		var HIDE = 'Hide';
+		var HIDE_OTHERS = 'Hide Others';
 		var REMOVE_SHOW_SELECTION_ONLY = 'Show All';
 		var SORT_ASC = 'Sort Ascending';
 		var SORT_DESC = 'Sort Descending';
@@ -1076,6 +1077,11 @@ morpheus.VectorTrack.prototype = {
 		});
 		sectionToItems.Display.push({
 			name: HIDE
+		});
+		sectionToItems.Display.push({
+			name: HIDE_OTHERS,
+			disabled: heatmap.getVisibleTrackNames(this.isColumns).length <= 1
+
 		});
 		sectionToItems.Display.push({
 			separator: true
@@ -1703,6 +1709,17 @@ morpheus.VectorTrack.prototype = {
 					heatmap.setTrackVisible(_this.name, false,
 						_this.isColumns);
 					heatmap.revalidate();
+				} else if (item === HIDE_OTHERS) {
+					var names = heatmap.getVisibleTrackNames(_this.isColumns);
+					for (var i = 0; i < names.length; i++) {
+						if (names[i] !== _this.name) {
+							heatmap.setTrackVisible(names[i], false,
+								_this.isColumns);
+						}
+					}
+
+					heatmap.revalidate();
+
 				} else if (item === DISPLAY_STACKED_BAR) {
 					_this.settings.stackedBar = !_this.settings.stackedBar;
 					_this._update();
