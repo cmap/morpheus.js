@@ -2876,7 +2876,9 @@ morpheus.HeatMap.prototype = {
 			canvas.style.height = bounds.height + 'px';
 			canvas.width = width;
 			canvas.style.width = bounds.width + 'px';
-			this.snapshot(canvas.getContext('2d'));
+			var context = canvas.getContext('2d');
+			morpheus.Util.resetTransform(context);
+			this.snapshot(context);
 			canvas.toBlob(function (blob) {
 				if (blob.size === 0) {
 					throw 'Image is too large.';
