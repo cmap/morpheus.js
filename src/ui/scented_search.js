@@ -13,20 +13,20 @@ morpheus.ScentedSearch = function (model, positions, isVertical, scrollbar,
 	scrollbar.decorator = this;
 	var _this = this;
 	var mouseMove = function (e) {
-		var index = _this.getIndex(e);
-		_this.mouseMovedIndex = index;
-		document.body.style.cursor = index < 0 ? 'default' : 'pointer';
-		scrollbar.canvas.style.cursor = index < 0 ? 'default' : 'pointer';
+		var indices = _this.getSearchIndices(e);
+
+		document.body.style.cursor = indices.length === 0 ? 'default' : 'pointer';
+		scrollbar.canvas.style.cursor = indices.length === 0 ? 'default' : 'pointer';
 		var tipOptions = {
 			event: e,
-			heatMapLens: index >= 0
+			heatMapLens: indices.length >= 0
 		};
 		if (isVertical) {
-			controller.setToolTip(index >= 0 ? _this.searchIndices[index] : -1,
+			controller.setToolTip(indices.length >= 0 ? indices : null,
 				-1, tipOptions);
 		} else {
-			controller.setToolTip(-1, index >= 0 ? _this.searchIndices[index]
-				: -1, tipOptions);
+			controller.setToolTip(-1, indices.length >= 0 ? indices
+				: null, tipOptions);
 		}
 
 	};
@@ -47,6 +47,27 @@ morpheus.ScentedSearch.prototype = {
 		var pix = morpheus.CanvasUtil.getMousePos(event.target, event);
 		var val = pix[this.isVertical ? 'y' : 'x'];
 		return this.getIndexForPix(val);
+	},
+	getSearchIndices: function (event) {
+		var pix = morpheus.CanvasUtil.getMousePos(event.target, event);
+		var val = pix[this.isVertical ? 'y' : 'x'];
+		return this.getSearchIndicesForPix(val);
+	},
+	getSearchIndicesForPix: function (pix) {
+		var indices = this.searchIndices;
+		if (indices == null) {
+			return [];
+		}
+		var scale = this.scale;
+		var tolerance = morpheus.ScentedSearch.LINE_HEIGHT;
+		var matches = [];
+		for (var i = 0, length = indices.length; i < length; i++) {
+			var midVal = this.positions.getPosition(indices[i]) * scale;
+			if (Math.abs(midVal - pix) <= tolerance) {
+				matches.push(indices[i]);
+			}
+		}
+		return matches;
 	},
 	getIndexForPix: function (pix) {
 		var indices = this.searchIndices;

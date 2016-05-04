@@ -1,7 +1,6 @@
 morpheus.HeatMapTooltipProvider = function (heatMap, rowIndex, columnIndex,
-											options, separator, quick) {
+											options, separator, quick, tipText) {
 	var dataset = heatMap.project.getSortedFilteredDataset();
-	var tipText = [];
 	if (!quick) {
 		if (options.value) { // key value pairs for custom tooltip
 			_.each(options.value, function (pair) {
@@ -49,6 +48,21 @@ morpheus.HeatMapTooltipProvider = function (heatMap, rowIndex, columnIndex,
 				}), dataset.getColumnMetadata(), columnIndex, tipText,
 				separator);
 
+		}
+	} else if (quick) {
+		if (rowIndex !== -1) {
+			morpheus.HeatMapTooltipProvider._tracksToString(options,
+				heatMap.rowTracks.filter(function (t) {
+					return t.settings.inlineTooltip;
+				}), dataset.getRowMetadata(), rowIndex, tipText,
+				separator);
+		}
+		if (columnIndex !== -1) {
+			morpheus.HeatMapTooltipProvider._tracksToString(options,
+				heatMap.columnTracks.filter(function (t) {
+					return t.settings.inlineTooltip;
+				}), dataset.getColumnMetadata(), columnIndex, tipText,
+				separator);
 		}
 	}
 
@@ -131,7 +145,7 @@ morpheus.HeatMapTooltipProvider = function (heatMap, rowIndex, columnIndex,
 				heatMap.columnDendrogram._selectedNodeColor, separator);
 		}
 	}
-	return tipText.join('');
+
 };
 
 morpheus.HeatMapTooltipProvider._matrixValueToString = function (dataset,
