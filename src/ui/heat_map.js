@@ -2177,6 +2177,7 @@ morpheus.HeatMap.prototype = {
 				canvas.height = heatMapHeight * morpheus.CanvasUtil.BACKING_SCALE;
 				canvas.style.height = heatMapHeight + 'px';
 				var context = canvas.getContext('2d');
+				morpheus.CanvasUtil.resetTransform(context);
 				context.save();
 				context.translate(-this.heatmap.lastClip.x, -startPix);
 				context.rect(this.heatmap.lastClip.x, startPix, this.heatmap.lastClip.width, this.heatmap.lastClip.height);
