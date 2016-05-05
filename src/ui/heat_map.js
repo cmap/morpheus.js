@@ -2937,16 +2937,12 @@ morpheus.HeatMap.prototype = {
 			saveAs(blob, file, true);
 		} else {
 			var canvas = $('<canvas></canvas>')[0];
-			var backingScale = morpheus.CanvasUtil.BACKING_SCALE;
-			var height = bounds.height * backingScale;
-			var width = bounds.width * backingScale;
+			var height = bounds.height;
+			var width = bounds.width;
 			canvas.height = height;
-			canvas.style.height = bounds.height + 'px';
 			canvas.width = width;
-			canvas.style.width = bounds.width + 'px';
 			var context = canvas.getContext('2d');
-			morpheus.Util.resetTransform(context);
-			this.snapshot(context);
+			this.snapshot(context); 
 			canvas.toBlob(function (blob) {
 				if (blob.size === 0) {
 					throw 'Image is too large.';
