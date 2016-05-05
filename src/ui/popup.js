@@ -1,14 +1,14 @@
 morpheus.Popup = {};
 morpheus.Popup.initted = false;
-morpheus.Popup.init = function() {
+morpheus.Popup.init = function () {
 	if (morpheus.Popup.initted) {
 		return;
 	}
 	var client = new Clipboard('a[name=Copy]', {
-		text : function(trigger) {
+		text: function (trigger) {
 			var event = {
-				clipboardData : {
-					setData : function(dataType, data) {
+				clipboardData: {
+					setData: function (dataType, data) {
 						this.data = data;
 					}
 				}
@@ -23,12 +23,12 @@ morpheus.Popup.init = function() {
 	morpheus.Popup.initted = true;
 	morpheus.Popup.$popupDiv = $(document.createElement('div'));
 	morpheus.Popup.$popupDiv.css('position', 'absolute').css('zIndex', 999)
-			.addClass('dropdown clearfix');
+	.addClass('dropdown clearfix');
 	morpheus.Popup.$contextMenu = $(document.createElement('ul'));
 	morpheus.Popup.$contextMenu.addClass('dropdown-menu').css('display',
-			'block').css('position', 'static').css('margin-bottom', '5px');
+		'block').css('position', 'static').css('margin-bottom', '5px');
 	morpheus.Popup.$contextMenu.appendTo(morpheus.Popup.$popupDiv);
-	morpheus.Popup.$contextMenu.on('click', 'a', function(e) {
+	morpheus.Popup.$contextMenu.on('click', 'a', function (e) {
 		e.preventDefault();
 		var $this = $(this);
 		var name = $.trim($this.text());
@@ -41,14 +41,14 @@ morpheus.Popup.init = function() {
 };
 
 morpheus.Popup.popupInDom = false;
-morpheus.Popup.hidePopupMenu = function(e) {
+morpheus.Popup.hidePopupMenu = function (e) {
 	if (morpheus.Popup.component == e.target) {
 		e.preventDefault();
 		e.stopPropagation();
 	}
 	morpheus.Popup.hide();
 };
-morpheus.Popup.hide = function() {
+morpheus.Popup.hide = function () {
 	morpheus.Popup.$popupDiv.hide();
 	$(document.body).off('mousedown', morpheus.Popup.hidePopupMenu);
 	morpheus.Popup.popupCallback = null;
@@ -56,7 +56,7 @@ morpheus.Popup.hide = function() {
 	// morpheus.Popup.client.unclip();
 };
 
-morpheus.Popup.showPopup = function(menuItems, position, component, callback) {
+morpheus.Popup.showPopup = function (menuItems, position, component, callback) {
 	morpheus.Popup.init();
 	if (morpheus.Popup.component == component) {
 		morpheus.Popup.hide();
@@ -69,7 +69,7 @@ morpheus.Popup.showPopup = function(menuItems, position, component, callback) {
 		var item = menuItems[i];
 		if (item.header) {
 			html.push('<li role="presentation" class="dropdown-header">'
-					+ item.name + '</li>');
+				+ item.name + '</li>');
 		} else if (item.separator) {
 			html.push('<li class="divider"></li>');
 		} else {
@@ -78,10 +78,10 @@ morpheus.Popup.showPopup = function(menuItems, position, component, callback) {
 				html.push('class="disabled"');
 			}
 			html.push('><a name="' + item.name
-					+ '" data-type="popup-item" tabindex="-1" href="#">');
+				+ '" data-type="popup-item" tabindex="-1" href="#">');
 			if (item.checked) {
 				html
-						.push('<span class="dropdown-checkbox fa fa-check"></span>');
+				.push('<span class="dropdown-checkbox fa fa-check"></span>');
 			}
 
 			html.push(item.name);
@@ -98,19 +98,35 @@ morpheus.Popup.showPopup = function(menuItems, position, component, callback) {
 		morpheus.Popup.popupInDom = true;
 		morpheus.Popup.$popupDiv.appendTo($(document.body));
 	}
+	var $body = $(document.body);
+	var $window = $(window);
+	var windowWidth = $window.width();
+	var windowHeight = $window.height();
+	var popupWidth = morpheus.Popup.$popupDiv.width();
+	var popupHeight = morpheus.Popup.$popupDiv.height();
+	var left = position.x;
+	var top = position.y;
+	// default is bottom-right
+	if ((left + popupWidth) >= windowWidth) { // offscreen right
+		left -= popupWidth;
+	}
+	if ((top + popupHeight) >= (windowHeight)) { // offscreen
+		top -= popupHeight;
+	}
+
 	morpheus.Popup.$popupDiv.css({
-		display : 'block',
-		left : position.x,
-		top : position.y
+		display: 'block',
+		left: left,
+		top: top
 	});
 
 	// var copyElements = morpheus.Popup.$popupDiv.find('a[name=Copy]');
 	// morpheus.Popup.client.clip(copyElements);
 	morpheus.Popup.$popupDiv.show();
-	var $body = $(document.body);
+
 	$body.off('mousedown', morpheus.Popup.hidePopupMenu);
-	window.setTimeout(function() {
-		$body.on('mousedown', function(e) {
+	window.setTimeout(function () {
+		$body.on('mousedown', function (e) {
 			var $target = $(e.target);
 			if ($target.data('type') !== 'popup-item') {
 				morpheus.Popup.hidePopupMenu(e);

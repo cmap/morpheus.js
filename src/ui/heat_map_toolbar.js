@@ -639,23 +639,11 @@ morpheus.HeatMapToolBar = function (controller) {
 			e.preventDefault();
 			var $this = $(this);
 			$this.toggleClass('btn-primary');
-			var sortKeys = project.getColumnSortKeys();
-			// clear existing sort keys except dendrogram
-			sortKeys = sortKeys
-			.filter(function (key) {
-				return (key instanceof morpheus.SpecifiedModelSortOrder && key.name === 'dendrogram');
+			_this.setSelectionOnTop({
+				isColumns: true,
+				isOnTop: $this.hasClass('btn-primary'),
+				updateButtonStatus: false
 			});
-			if ($this.hasClass('btn-primary')) {
-				var key = new morpheus.MatchesOnTopSortKey(project,
-					_this.columnSearchResultModelIndices,
-					'matches on top');
-				sortKeys.splice(0, 0, key);
-				controller.scrollLeft(0);
-			}
-			_this.searching = true;
-			project.setColumnSortKeys(sortKeys, true);
-			_this._updateSearchIndices(true);
-			_this.searching = false;
 			morpheus.Util.trackEvent({
 				eventCategory: 'ToolBar',
 				eventAction: 'columnMatchesToTop'
@@ -668,24 +656,11 @@ morpheus.HeatMapToolBar = function (controller) {
 			e.preventDefault();
 			var $this = $(this);
 			$this.toggleClass('btn-primary');
-			var sortKeys = project.getRowSortKeys();
-			// clear existing sort keys except
-			// dendrogram
-			sortKeys = sortKeys
-			.filter(function (key) {
-				return (key instanceof morpheus.SpecifiedModelSortOrder && key.name === 'dendrogram');
+			_this.setSelectionOnTop({
+				isColumns: false,
+				isOnTop: $this.hasClass('btn-primary'),
+				updateButtonStatus: false
 			});
-			if ($this.hasClass('btn-primary')) {
-				var key = new morpheus.MatchesOnTopSortKey(project,
-					_this.rowSearchResultModelIndices,
-					'matches on top');
-				sortKeys.splice(0, 0, key);
-				controller.scrollTop(0);
-			}
-			_this.searching = true;
-			project.setRowSortKeys(sortKeys, true);
-			_this._updateSearchIndices(false);
-			_this.searching = false;
 			morpheus.Util.trackEvent({
 				eventCategory: 'ToolBar',
 				eventAction: 'rowMatchesToTop'
@@ -1071,6 +1046,47 @@ morpheus.HeatMapToolBar.prototype = {
 		}
 		this.updateDimensionsLabel();
 		this.updateSelectionLabel();
+		this.searching = false;
+
+	},
+	isSelectionOnTop: function (isColumns) {
+		var $btn = isColumns ? this.$columnMatchesToTop : this.$rowMatchesToTop;
+		return $btn.hasClass('btn-primary');
+	},
+	setSelectionOnTop: function (options) {
+		if (options.updateButtonStatus) {
+			var $btn = options.isColumns ? this.$columnMatchesToTop : this.$rowMatchesToTop;
+			if (options.isOnTop) {
+				$btn.addClass('btn-primary');
+			} else {
+				$btn.removeClass('btn-primary');
+			}
+		}
+		var project = this.controller.getProject();
+		var sortKeys = options.isColumns ? project.getColumnSortKeys() : project.getRowSortKeys();
+		// clear existing sort keys except dendrogram
+		sortKeys = sortKeys
+		.filter(function (key) {
+			return (key instanceof morpheus.SpecifiedModelSortOrder && key.name === 'dendrogram');
+		});
+		if (options.isOnTop) { // bring to top
+			var key = new morpheus.MatchesOnTopSortKey(project,
+				options.isColumns ? this.columnSearchResultModelIndices : this.rowSearchResultModelIndices,
+				'matches on top');
+			sortKeys.splice(0, 0, key);
+			if (options.isColumns) {
+				this.controller.scrollLeft(0);
+			} else {
+				this.controller.scrollTop(0);
+			}
+		}
+		this.searching = true;
+		if (options.isColumns) {
+			project.setColumnSortKeys(sortKeys, true);
+		} else {
+			project.setRowSortKeys(sortKeys, true);
+		}
+		this._updateSearchIndices(options.isColumns);
 		this.searching = false;
 
 	}

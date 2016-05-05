@@ -78,7 +78,7 @@
 	color: black;
 	text-align: left;
 	padding: 1px;
-	border: 1px solid rgba(0, 0, 0, 0.2);
+	border: 1px solid rgb(0, 0, 0);
 	/*border-radius: 6px;*/
 	/*box-shadow: rgba(0, 0, 0, 0.498039) 0px 5px 15px;*/
 	overflow: hidden;

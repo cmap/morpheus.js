@@ -37,7 +37,49 @@ morpheus.ScentedSearch = function (model, positions, isVertical, scrollbar,
 		scrollbar.canvas.style.cursor = 'default';
 		controller.setToolTip(-1, -1, {event: e});
 	};
-	$(scrollbar.canvas).on('mousemove', mouseMove).on('mouseout', mouseExit);
+	var showPopup = function (e) {
+		e.preventDefault();
+		if (e.stopPropagation) {
+			e.stopPropagation();
+		}
+		if (e.stopImmediatePropagation) {
+			e.stopImmediatePropagation();
+		}
+		morpheus.Popup
+		.showPopup(
+			[
+
+				{
+					name: 'Selection To Top',
+					checked: controller.getToolbar().isSelectionOnTop(!isVertical),
+					disabled: isVertical ? controller.getProject().getRowSelectionModel()
+					.count() === 0 : controller.getProject().getColumnSelectionModel()
+					.count() === 0
+				},
+				{
+					name: 'New Heat Map (' + morpheus.Util.COMMAND_KEY + 'X)'
+				}],
+			{
+				x: e.pageX,
+				y: e.pageY
+			},
+			e.target,
+			function (event, item) {
+				if (item === 'Selection To Top') {
+					controller.getToolbar().setSelectionOnTop({
+						isColumns: !isVertical,
+						isOnTop: !controller.getToolbar().isSelectionOnTop(!isVertical),
+						updateButtonStatus: true
+					});
+				} else {
+					morpheus.HeatMap.showTool(new morpheus.NewHeatMapTool(),
+						controller);
+				}
+			});
+		return false;
+	};
+	$(scrollbar.canvas).on('mousemove.morpheus', mouseMove).on('mouseout.morpheus', mouseExit).on('contextmenu.morpheus', showPopup);
+
 };
 
 morpheus.ScentedSearch.LINE_HEIGHT = 3.5;

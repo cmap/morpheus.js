@@ -179,6 +179,8 @@ morpheus.VectorTrack.prototype = {
 					settings.renderMethod[morpheus.VectorTrack.RENDER.BAR] = true;
 				} else if (method === 'BOX_PLOT') {
 					settings.renderMethod[morpheus.VectorTrack.RENDER.BOX_PLOT] = true;
+				} else if (method === 'TOOLTIP') {
+					settings.inlineTooltip = true;
 				} else {
 					console.log(method + ' not found.');
 				}

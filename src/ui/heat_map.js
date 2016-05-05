@@ -1481,9 +1481,12 @@ morpheus.HeatMap.prototype = {
 				}
 				var add = display !== 'None';
 				if (add) {
-					if (isColumns && display == null) {
-						display = name === 'pert_iname' || name === 'id'
-						|| isFirst ? 'text' : 'color,highlight';
+					if (display == null) {
+						if (name === 'pert_iname' || name === 'id' || isFirst) {
+							display = 'text,tooltip';
+						} else {
+							display = isColumns ? 'color,highlight' : 'text';
+						}
 					}
 					isFirst = false;
 					var track = isColumns ? _this.addColumnTrack(name, display)
