@@ -1,219 +1,216 @@
 /**
- * @param options.$el
- * @param options.items
- * @param options.columns
+ * @param options.$el The jQuery element to render to. Must be in the DOM.
+ * @param options.items An array of items to display in the table
+ * @param options.search Whether to create a search widget
+ * @param options.rowHeader Renderer to call for each row in the table
+ * @param options.rowHeight Table row height
+ * @param height: Height in pixels of table. '564px',
+ * @param options.collapseBreakpoint: 500
+ * @param options.showHeader: true
+ * @param options.select: true
+ * @param options.responsive: true
+ * @param options.fixedWidth: Fixed table with when responsive is false. '320px'
+ * @param options.columns An array of column descriptors. Each column can have the properties:
+ * visible, name, field, renderer
  */
-morpheus.Table = function (options) {
-	options = morpheus.Table.createOptions(options);
-	this.options = options;
-	if (!options.width) {
-		options.width = options.$el.attr('class');
-	}
-	var _this = this;
-	// var viewports = [ 'xs', 'sm', 'md', 'lg' ];
-	// var widthTokens = options.width != null ? options.width.split(' ') : [];
-	// var spec = {};
-	// var widthFound = false;
-	// widthTokens.forEach(function(t) {
-	// if (t.indexOf('col-') === 0) {
-	// var viewport = t.substring(4, 6);
-	// var fraction = parseFloat(t.substring(7));
-	// if (!isNaN(fraction)) {
-	// spec[viewport] = fraction;
-	// widthFound = true;
-	// }
-	// }
-	// });
 
-	var height = options.height;
-	var $gridDiv = $('<div class="slick-table'
-		+ (options.tableClass ? (' ' + options.tableClass) : '')
-		+ '" style="width:' + options.fixedWidth + ';height:' + height
-		+ '"></div>');
+items: [],
 
-	this.$gridDiv = $gridDiv;
-	$gridDiv.appendTo(options.$el);
-	var columns = options.columns;
-	this.columns = columns;
-	var visibleColumns = columns.filter(function (c) {
-		return c.visible;
-	});
-	var grid = new morpheus.Grid({
-		gridOptions: {
-			select: options.select,
-			rowHeight: options.rowHeight,
-			autoEdit: false,
-			editable: false,
-			autoHeight: options.height === 'auto',
-			enableTextSelectionOnCells: true,
-		},
-		$el: $gridDiv,
-		items: options.items,
-		columns: visibleColumns
-	});
-	this.grid = grid;
-	if (options.search) {
-		var tableSearch = new morpheus.TableSearchUI();
-		tableSearch.$el.prependTo(options.$el);
-		tableSearch.setTable(this);
-		this.tableSearch = tableSearch;
-	}
-	if (visibleColumns.length !== this.columns.length) {
-		var select = [];
-		select
-		.push('<select data-selected-text-format="static" title="Columns..." multiple class="form-control selectpicker show-tick pull-right">');
-		this.columns.forEach(function (c, i) {
-			select.push('<option value="' + i + '"');
-			if (c.visible) {
-				select.push(' selected');
-			}
-			select.push('>');
-			select.push(c.name);
-			select.push('</option>');
+	morpheus.Table = function (options) {
+		options = morpheus.Table.createOptions(options);
+		this.options = options;
+		if (!options.width) {
+			options.width = options.$el.attr('class');
+		}
+		var _this = this;
+
+		var height = options.height;
+		var $gridDiv = $('<div class="slick-table'
+			+ (options.tableClass ? (' ' + options.tableClass) : '')
+			+ '" style="width:' + options.fixedWidth + ';height:' + height
+			+ '"></div>');
+
+		this.$gridDiv = $gridDiv;
+		$gridDiv.appendTo(options.$el);
+		var columns = options.columns;
+		this.columns = columns;
+		var visibleColumns = columns.filter(function (c) {
+			return c.visible;
 		});
-		select.push('</select>');
-		var $select = $(select.join(''));
-		var $div = $('<div class="pull-right"></div>');
-		$select.appendTo($div);
-		$div.prependTo(options.$el);
-		$select.selectpicker({
-			iconBase: 'fa',
-			tickIcon: 'fa-check',
-			style: 'btn-default btn-sm'
+		var grid = new morpheus.Grid({
+			gridOptions: {
+				select: options.select,
+				rowHeight: options.rowHeight,
+				autoEdit: false,
+				editable: false,
+				autoHeight: options.height === 'auto',
+				enableTextSelectionOnCells: true,
+			},
+			$el: $gridDiv,
+			items: options.items,
+			columns: visibleColumns
 		});
-		$select.on('change', function () {
-			var selectedItems = $select.val();
-			var selectedItemsSet = new morpheus.Set();
-			selectedItems.forEach(function (item) {
-				selectedItemsSet.add(parseInt(item));
-			});
-			visibleColumns = [];
-			_this.columns.forEach(function (c, i) {
-				if (selectedItemsSet.has(i)) {
-					visibleColumns.push(c);
+		this.grid = grid;
+		if (options.search) {
+			var tableSearch = new morpheus.TableSearchUI();
+			tableSearch.$el.prependTo(options.$el);
+			tableSearch.setTable(this);
+			this.tableSearch = tableSearch;
+		}
+		if (visibleColumns.length !== this.columns.length) {
+			var select = [];
+			select
+			.push('<select data-selected-text-format="static" title="Columns..." multiple class="form-control selectpicker show-tick pull-right">');
+			this.columns.forEach(function (c, i) {
+				select.push('<option value="' + i + '"');
+				if (c.visible) {
+					select.push(' selected');
 				}
+				select.push('>');
+				select.push(c.name);
+				select.push('</option>');
 			});
-			grid.setColumns(visibleColumns);
-			_this.resize();
-			_this.redraw();
+			select.push('</select>');
+			var $select = $(select.join(''));
+			var $div = $('<div class="pull-right"></div>');
+			$select.appendTo($div);
+			$div.prependTo(options.$el);
+			$select.selectpicker({
+				iconBase: 'fa',
+				tickIcon: 'fa-check',
+				style: 'btn-default btn-sm'
+			});
+			$select.on('change', function () {
+				var selectedItems = $select.val();
+				var selectedItemsSet = new morpheus.Set();
+				selectedItems.forEach(function (item) {
+					selectedItemsSet.add(parseInt(item));
+				});
+				visibleColumns = [];
+				_this.columns.forEach(function (c, i) {
+					if (selectedItemsSet.has(i)) {
+						visibleColumns.push(c);
+					}
+				});
+				grid.setColumns(visibleColumns);
+				_this.resize();
+				_this.redraw();
 
-		});
-	}
-	var collapsed = false;
-	var lastWidth = -1;
-	var resize = function () {
-		if (!_this.options.responsive) {
-			return;
+			});
 		}
+		var collapsed = false;
+		var lastWidth = -1;
+		var resize = function () {
+			if (!_this.options.responsive) {
+				return;
+			}
 
-		var gridWidth = options.$el.width();
-		if (gridWidth === lastWidth) {
-			return;
-		}
-		lastWidth = gridWidth;
+			var gridWidth = options.$el.width();
+			if (gridWidth === lastWidth) {
+				return;
+			}
+			lastWidth = gridWidth;
 
-		$gridDiv.css('width', gridWidth + 'px');
-		// if (options.responsiveHeight) {
-		// var verticalPosition = _this.$gridDiv[0].getBoundingClientRect().top
-		// + window.pageYOffset;
-		// $gridDiv.css('height',
-		// (document.body.clientHeight - verticalPosition) + 'px');
-		// }
-		if (!collapsed && gridWidth < options.collapseBreakpoint
-			&& visibleColumns.length > 1) {
-			collapsed = true;
-			$gridDiv.addClass('slick-stacked');
-			_this.grid.grid.getOptions().rowHeight = options.rowHeight
-				* visibleColumns.length;
-			// collapse
-			_this.grid.grid
-			.setColumns([{
-				id: 0,
-				tooltip: function (item, value) {
-					var html = [];
-					for (var i = 0; i < visibleColumns.length; i++) {
-						var text = visibleColumns[i].tooltip(item, visibleColumns[i]
-						.getter(item));
-						if (text != null && text !== '') {
-							html.push(text);
+			$gridDiv.css('width', gridWidth + 'px');
+			// if (options.responsiveHeight) {
+			// var verticalPosition = _this.$gridDiv[0].getBoundingClientRect().top
+			// + window.pageYOffset;
+			// $gridDiv.css('height',
+			// (document.body.clientHeight - verticalPosition) + 'px');
+			// }
+			if (!collapsed && gridWidth < options.collapseBreakpoint
+				&& visibleColumns.length > 1) {
+				collapsed = true;
+				$gridDiv.addClass('slick-stacked');
+
+				_this.grid.grid.getOptions().rowHeight = (options.collapsedRowHeight ? options.collapsedRowHeight : options.rowHeight)
+					* visibleColumns.length;
+				// collapse
+				_this.grid.grid
+				.setColumns([{
+					id: 0,
+					tooltip: function (item, value) {
+						var html = [];
+						for (var i = 0; i < visibleColumns.length; i++) {
+							var text = visibleColumns[i].tooltip(item, visibleColumns[i]
+							.getter(item));
+							if (text != null && text !== '') {
+								html.push(text);
+							}
 						}
-					}
-					return html.join('<br />');
-				},
-				collapsed: true,
-				getter: function (item) {
-					return item;
-				},
-				formatter: function (row, cell, value, columnDef,
-									 dataContext) {
-					var html = [];
-					html
-					.push('<div class="slick-table-wrapper"><div class="slick-cell-wrapper">');
-					if (options.rowHeader) { // e.g. render checkbox
-						html.push(options.rowHeader(dataContext));
-					}
-					for (var i = 0; i < visibleColumns.length; i++) {
-						if (i === 0) {
-							html
-							.push('<div style="font-weight:600;display:'
-								+ (options.rowHeader ? 'inline-block'
-									: 'block') + '">');
-						} else {
-							html.push('<div>');
+						return html.join('<br />');
+					},
+					collapsed: true,
+					getter: function (item) {
+						return item;
+					},
+					formatter: function (row, cell, value, columnDef,
+										 dataContext) {
+						var html = [];
+						html
+						.push('<div class="slick-table-wrapper"><div class="slick-cell-wrapper">');
+						if (options.rowHeader) { // e.g. render checkbox
+							html.push(options.rowHeader(dataContext));
+							html.push('<div style="height:4px;"></div>');
 						}
+						for (var i = 0; i < visibleColumns.length; i++) {
+							if (i > 0) {
+								html.push('<div style="height:4px;"></div>');
+							}
+							var c = visibleColumns[i];
+							html.push(c.name);
+							html.push(':');
+							var s = c.renderer(dataContext, c
+							.getter(dataContext));
+							html.push(s);
 
-						var c = visibleColumns[i];
-						var s = c.renderer(dataContext, c
-						.getter(dataContext));
-						html.push(s);
-						html.push('</div>');
-					}
-					html.push('</div></div>');
-					return html.join('');
-				},
-				sortable: false,
-				name: ''
-			}]);
+						}
+						html.push('</div></div>');
+						return html.join('');
+					},
+					sortable: false,
+					name: ''
+				}]);
+				$gridDiv.find('.slick-header').hide();
+				_this.grid.grid.resizeCanvas();
+				_this.grid.grid.invalidate();
+			} else if (collapsed && gridWidth >= options.collapseBreakpoint) {
+				$gridDiv.removeClass('slick-stacked');
+				collapsed = false;
+				if (options.showHeader) {
+					$gridDiv.find('.slick-header').show();
+				}
+				_this.grid.grid.getOptions().rowHeight = options.rowHeight;
+				_this.grid.grid.setColumns(visibleColumns);
+				_this.grid.grid.resizeCanvas();
+				if (options.select) {
+					_this.grid.grid.setSelectedRows(_this.grid.grid
+					.getSelectedRows());
+				}
+				_this.grid.grid.invalidate();
+			} else {
+				_this.grid.grid.resizeCanvas();
+				_this.grid.grid.invalidate();
+			}
+
+		};
+		if (!options.showHeader) {
 			$gridDiv.find('.slick-header').hide();
-			_this.grid.grid.resizeCanvas();
-			_this.grid.grid.invalidate();
-		} else if (collapsed && gridWidth >= options.collapseBreakpoint) {
-			$gridDiv.removeClass('slick-stacked');
-			collapsed = false;
-			if (options.showHeader) {
-				$gridDiv.find('.slick-header').show();
-			}
-			_this.grid.grid.getOptions().rowHeight = options.rowHeight;
-			_this.grid.grid.setColumns(visibleColumns);
-			_this.grid.grid.resizeCanvas();
-			if (options.select) {
-				_this.grid.grid.setSelectedRows(_this.grid.grid
-				.getSelectedRows());
-			}
-			_this.grid.grid.invalidate();
-		} else {
-			_this.grid.grid.resizeCanvas();
-			_this.grid.grid.invalidate();
+		}
+		if (options.responsive) {
+			$(window).on('resize orientationchange', resize);
+			$gridDiv.on('remove', function () {
+				$(window).off('resize', resize);
+			});
+			resize();
+		}
+		this.resize = resize;
+		if (visibleColumns.length > 1 && options.items != null
+			&& options.items.length > 0) {
+			this.setItems(options.items);
 		}
 
 	};
-	if (!options.showHeader) {
-		$gridDiv.find('.slick-header').hide();
-	}
-	if (options.responsive) {
-		$(window).on('resize orientationchange', resize);
-		$gridDiv.on('remove', function () {
-			$(window).off('resize', resize);
-		});
-		resize();
-	}
-	this.resize = resize;
-	if (visibleColumns.length > 1 && options.items != null
-		&& options.items.length > 0) {
-		this.setItems(options.items);
-	}
-
-};
 
 morpheus.Table.defaultRenderer = function (item, value) {
 	if (_.isNumber(value)) {
@@ -552,7 +549,15 @@ morpheus.Table.createOptions = function (options) {
 				return morpheus.Table.defaultRenderer(dataContext, value);
 			},
 			formatter: function (row, cell, value, columnDef, dataContext) {
-				return '<div class="slick-table-wrapper"><div class="slick-cell-wrapper">' + column.renderer(dataContext, value) + '</div></div>';
+
+				var html = [];
+				html.push('<div class="slick-table-wrapper"><div class="slick-cell-wrapper">');
+				if (options.rowHeader && cell === 0) {
+					html.push(options.rowHeader(dataContext));
+				}
+				html.push(column.renderer(dataContext, value));
+				html.push('</div></div>');
+				return html.join('');
 
 			},
 			comparator: function (a, b) {
@@ -593,14 +598,7 @@ morpheus.Table.createOptions = function (options) {
 				return item[c.field];
 			};
 		}
-		if (options.rowHeader && i === 0) {
-			column.formatter = function (row, cell, value, columnDef,
-										 dataContext) {
-				return '<div class="slick-table-wrapper"><div style="vertical-align: middle;display:' +
-					' table-cell;">' + options.rowHeader(dataContext)
-					+ column.renderer(dataContext, value) + '</div></div>';
-			};
-		}
+
 		columns.push(column);
 	});
 
