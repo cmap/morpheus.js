@@ -326,7 +326,7 @@ morpheus.Grid.prototype = {
 		var maxWidth = Math.min(parseInt(gridWidth / 2), 400);
 		var getColumnWidth = function (column) {
 			var w = $header.html(column.name).outerWidth();
-			w = Math.max($cell.outerWidth(), w);
+
 			if (column.prototypeValue) {
 				$cell.html(column.prototypeValue);
 				w = Math.max($cell.outerWidth(), w);
@@ -342,7 +342,7 @@ morpheus.Grid.prototype = {
 				}
 			}
 			column.width = parseInt(Math.min(maxWidth, w));
-			
+
 		};
 		var totalWidth = 0;
 		for (var i = 0; i < columns.length; i++) {
@@ -361,7 +361,6 @@ morpheus.Grid.prototype = {
 			//columns[columns.length - 1].width -= (totalWidth - gridWidth);
 			// shrink last column
 		}
-
 
 		$d.remove();
 		this.grid.resizeCanvas();
