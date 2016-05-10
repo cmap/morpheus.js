@@ -38,7 +38,7 @@ morpheus.CheckBoxList = function(options) {
 	}
 	var idColumn = options.columns[0];
 	for (var i = 0; i < options.columns.length; i++) {
-		if (options.columns[i].isId) {
+		if (options.columns[i].idColumn) {
 			idColumn = options.columns[i];
 			break;
 		}
@@ -247,6 +247,7 @@ morpheus.CheckBoxList.prototype = {
 	},
 	on : function(evtStr, handler) {
 		this.table.on(evtStr, handler);
+		return this;
 	},
 	off : function(evtStr, handler) {
 		this.table.off(evtStr, handler);
