@@ -301,10 +301,14 @@ morpheus.Grid.prototype = {
 		if (!items || items.length == 0) {
 			return;
 		}
-		if (!columns || columns.length <= 1) {
+		if (!columns || columns.length === 0) {
 			return;
 		}
 		this.columnsAutosized = true;
+		if (columns.length <= 1) {
+			return;
+		}
+
 		var div = document.createElement('div');
 		document.body.appendChild(div);
 		var $d = $(div);
@@ -325,7 +329,7 @@ morpheus.Grid.prototype = {
 		var gridWidth = this.options.$el.width() - 30;
 		var maxWidth = Math.min(parseInt(gridWidth / 2), 400);
 		var getColumnWidth = function (column) {
-			var w = $header.html(column.name).outerWidth();
+			var w = $header.html(column.name).outerWidth() + 12;
 
 			if (column.prototypeValue) {
 				$cell.html(column.prototypeValue);
@@ -337,7 +341,6 @@ morpheus.Grid.prototype = {
 					var $html = $(html);
 					$html.find('.slick-cell-wrapper').attr('class', '');
 					$cell.html($html);
-
 					w = Math.max($cell.outerWidth(), w);
 				}
 			}
