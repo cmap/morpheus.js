@@ -365,8 +365,8 @@ morpheus.SampleDatasets.prototype = {
 		this.callback({
 			name : 'CCLE',
 			rows : [ {
-				field : 'id,tooltip',
-				display : 'text'
+				field : 'id',
+				display : 'text,tooltip'
 			}, {
 				field : 'mutation_summary',
 				display : 'stacked_bar'
