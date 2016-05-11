@@ -61,7 +61,13 @@ morpheus.Table = function (options) {
 		var select = [];
 		select
 		.push('<select data-selected-text-format="static" title="Columns..." multiple class="form-control selectpicker show-tick pull-right">');
-		this.columns.forEach(function (c, i) {
+		// sort column names
+		var sortedColumns = this.columns.slice().sort(function (a, b) {
+			a = a.name.toLowerCase();
+			b = b.name.toLowerCase()
+			return (a === b ? 0 : (a < b ? -1 : 1));
+		});
+		sortedColumns.forEach(function (c, i) {
 			select.push('<option value="' + i + '"');
 			if (c.visible) {
 				select.push(' selected');
@@ -336,13 +342,33 @@ morpheus.Table.prototype = {
 		var set = new morpheus.Set();
 		var regex = new RegExp('^' + morpheus.Util.escapeRegex(token), 'i');
 		var items = this.getItems();
+		var dataTypes = [];
+		// filter numeric columns
+		var filteredColumns = [];
+		columns.forEach(function (c) {
+			var dataType = null;
+			for (var i = 0, nitems = items.length; i < nitems; i++) {
+				var value = c.getter(items[i]);
+				if (value != null) {
+					dataType = morpheus.Util.getDataType(value);
+					break;
+				}
+			}
+			if (dataType === 'string' || dataType === '[string]') {
+				dataTypes.push('string');
+				filteredColumns.push(c);
+			}
+		});
+		columns = filteredColumns;
+		ncolumns = columns.length;
 		var maxSize = matches.length + 10;
 		for (var i = 0, nitems = items.length; i < nitems; i++) {
 			var item = items[i];
 			for (var j = 0; j < ncolumns; j++) {
 				var field = columns[j].name;
 				var value = columns[j].getter(item);
-				if (morpheus.Util.isArray(value)) {
+				var dataType = dataTypes[j];
+				if (dataType === '[string]') {
 					var nvalues = value.length;
 					for (var k = 0; k < nvalues; k++) {
 						var val = value[k];
@@ -625,7 +651,7 @@ morpheus.TableSearchUI = function () {
 	.push('<div class="form-group" style="max-width:525px; width:95%; margin:0px;">');
 
 	html
-	.push('<input name="search" type="text" class="form-control input-sm" placeholder="Search" autocomplete="off"></input>');
+	.push('<input name="search" type="text" class="form-control input-sm" placeholder="Search" autocomplete="off">');
 
 	html.push('<h6 name="searchResults" style="margin:0px;"></h6>');
 	html.push('</div>');
