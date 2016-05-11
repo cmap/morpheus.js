@@ -112,6 +112,7 @@
 	border: none;
 	padding: 0px;
 	background-color: inherit;
+	white-space: normal !important;
 }
 
 .slick-row {
@@ -147,6 +148,10 @@
 
 .slick-striped-table .slick-row.odd {
 	background-color: #fafafa;
+}
+
+.slick-bordered-table .ui-widget-content {
+	border-bottom: 1px solid #eee !important;
 }
 
 .slick-header-column {
@@ -222,4 +227,19 @@
 	margin-left: 4px;
 	margin-top: -3px;
 	float: none;
+}
+
+.slick-cell-wrapper {
+	max-width: 0;
+	overflow: hidden;
+	vertical-align: middle;
+	display: table-cell;
+	text-overflow: ellipsis;
+}
+
+.slick-table-wrapper {
+	display: table;
+	height: 100%;
+	padding-left: 2px;
+	width: 100%;
 }
