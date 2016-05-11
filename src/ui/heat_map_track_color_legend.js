@@ -38,7 +38,7 @@ morpheus.HeatMapTrackColorLegend.prototype = {
 		}
 		return {
 			width : xpix,
-			height : maxYPix > 0 ? (maxYPix + 30) : 0
+			height : maxYPix > 0 ? (maxYPix + 12) : 0
 		};
 	},
 	draw : function(clip, context) {

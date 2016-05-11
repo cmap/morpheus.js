@@ -2950,29 +2950,28 @@ morpheus.HeatMap.prototype = {
 		if (this.isDendrogramVisible(true)) {
 			totalSize.height += this.columnDendrogram.getUnscaledHeight();
 		}
-		var maxHeaderHeight = 0;
-		var maxHeaderWidth = 0;
+		var maxRowHeaderHeight = 0;
 		for (var i = 0, length = this.rowTracks.length; i < length; i++) {
 			var track = this.rowTracks[i];
 			if (track.isVisible()) {
 				var headerSize = this.rowTrackHeaders[i].getPrintSize();
 				totalSize.width += Math.max(headerSize.width, track
 				.getPrintSize().width);
-				maxHeaderHeight = Math.max(maxHeaderHeight, headerSize.height);
+				maxRowHeaderHeight = Math.max(maxRowHeaderHeight, headerSize.height);
 			}
 		}
-		totalSize.height += maxHeaderHeight;
+		var maxColumnHeaderWidth = 0;
+		var columnTrackHeightSum = 0;
 		for (var i = 0, length = this.columnTracks.length; i < length; i++) {
 			var track = this.columnTracks[i];
 			if (track.isVisible()) {
-				totalSize.height += track.getPrintSize().height;
-				maxHeaderWidth = Math.max(maxHeaderWidth,
+				columnTrackHeightSum += track.getPrintSize().height;
+				maxColumnHeaderWidth = Math.max(maxColumnHeaderWidth,
 					this.columnTrackHeaders[i].getPrintSize().width);
 			}
 		}
-		maxHeaderWidth += 10; // spacer between column track header and heat
-		// map
-		totalSize.width += maxHeaderWidth;
+		totalSize.height += Math.max(columnTrackHeightSum, maxRowHeaderHeight) + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
+		totalSize.width += maxColumnHeaderWidth + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
 		// color legend
 		if (options.legend) {
 			var legendHeight = this.heatmap.getColorScheme().getNames() != null ? this.heatmap
@@ -3021,15 +3020,15 @@ morpheus.HeatMap.prototype = {
 		var totalSize = this.getTotalSize(options);
 		var legendHeight = 0;
 		if (options.legend) {
-			legendHeight = this.heatmap.getColorScheme().getNames() != null ? this.heatmap
-			.getColorScheme().getNames().length * 14
-				: 40;
+
 			context.save();
 			context.translate(50, 0);
 			morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
 				this.heatmap.getColorScheme(), 200, true);
 			context.restore();
-
+			legendHeight = this.heatmap.getColorScheme().getNames() != null ? this.heatmap
+			.getColorScheme().getNames().length * 14
+				: 40;
 		}
 		context.save();
 		context.translate(4, legendHeight);
@@ -3046,7 +3045,7 @@ morpheus.HeatMap.prototype = {
 				}), this.getProject().getColumnColorModel());
 		columnTrackLegend.draw({}, context);
 		context.restore();
-		// row color legend
+		// row color legend to the right of column color legend
 		var columnTrackLegendSize = columnTrackLegend.getPreferredSize();
 		context.save();
 		context.translate(4 + columnTrackLegendSize.width, legendHeight);
@@ -3066,22 +3065,25 @@ morpheus.HeatMap.prototype = {
 			columnTrackLegendSize.height);
 		var heatmapY = this.isDendrogramVisible(true) ? this.columnDendrogram
 		.getUnscaledHeight() : 0;
-		if (legendHeight > 0) {
-			heatmapY += legendHeight + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
-		}
+		heatmapY += legendHeight;
 		var columnTrackY = heatmapY;
 		var heatmapX = this.isDendrogramVisible(false) ? this.rowDendrogram
 		.getUnscaledWidth() : 0;
+		var isColumnTrackVisible = false;
 		for (var i = 0, length = this.columnTracks.length; i < length; i++) {
 			var track = this.columnTracks[i];
 			if (track.isVisible()) {
 				var header = this.columnTrackHeaders[i];
 				heatmapX = Math.max(heatmapX, header.getPrintSize().width);
-				var height = track.getPrintSize().height;
-				heatmapY += height;
+				heatmapY += track.getPrintSize().height;
+				isColumnTrackVisible = true;
 			}
 		}
+		if (isColumnTrackVisible) {
+			heatmapY += morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
+		}
 
+		// check if row headers are taller than column tracks
 		for (var i = 0, length = this.rowTracks.length; i < length; i++) {
 			var track = this.rowTracks[i];
 			if (track.isVisible()) {
@@ -3100,19 +3102,6 @@ morpheus.HeatMap.prototype = {
 			context.translate(0, heatmapY);
 			this.rowDendrogram.prePaint(rowDendrogramClip, context);
 			this.rowDendrogram.draw(rowDendrogramClip, context);
-			context.restore();
-		}
-		if (this.isDendrogramVisible(true)) {
-			context.save();
-			context.translate(heatmapX, legendHeight);
-			var columnDendrogramClip = {
-				x: 0,
-				y: 0,
-				width: heatmapPrefSize.width,
-				height: this.columnDendrogram.getUnscaledHeight()
-			};
-			this.columnDendrogram.prePaint(columnDendrogramClip, context);
-			this.columnDendrogram.draw(columnDendrogramClip, context);
 			context.restore();
 		}
 
@@ -3140,7 +3129,7 @@ morpheus.HeatMap.prototype = {
 					width: headerSize.width,
 					height: headerSize.height
 				};
-				context.translate(heatmapX - 10, columnTrackY + trackClip.height);
+				context.translate(heatmapX - 2, columnTrackY + trackClip.height);
 				header.print(headerClip, context);
 				context.restore();
 				columnTrackY += Math.max(headerClip.height, trackClip.height);
