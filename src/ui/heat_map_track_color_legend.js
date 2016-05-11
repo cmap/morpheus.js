@@ -45,17 +45,17 @@ morpheus.HeatMapTrackColorLegend.prototype = {
 		var tracks = this.tracks;
 		var colorModel = this.colorModel;
 		var xpix = 0;
-		// legends are stacked horizontally
+		// legends are placed side by side
 		for (var i = 0; i < tracks.length; i++) {
-
 			var ypix = 0;
 			var vector = tracks[i].getVector();
 			context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
 			context.font = '12px ' + morpheus.CanvasUtil.FONT_NAME;
 			context.textAlign = 'left';
 			// draw name
-			context.fillText(vector.getName(), xpix, ypix);
 			context.textBaseline = 'top';
+			context.fillText(vector.getName(), xpix, ypix);
+
 			context.strokeStyle = 'LightGrey';
 			var maxWidth = 0;
 			var textWidth = context.measureText(vector.getName()).width;
@@ -63,6 +63,7 @@ morpheus.HeatMapTrackColorLegend.prototype = {
 				maxWidth = Math.max(0, textWidth);
 			}
 			ypix += 14;
+
 			var scheme = colorModel.getContinuousColorScheme(vector);
 			if (scheme != null) { // draw continuous color legend
 				context.save();
@@ -92,7 +93,7 @@ morpheus.HeatMapTrackColorLegend.prototype = {
 					}
 				});
 			}
-			xpix += maxWidth + 10 + 14; // space between columns + color chip
+			xpix += maxWidth + 10 + 14; // space between tracks + color chip
 		}
 	}
 };
