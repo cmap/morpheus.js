@@ -329,7 +329,7 @@ morpheus.Grid.prototype = {
 		var gridWidth = this.options.$el.width() - 30;
 		var maxWidth = Math.min(parseInt(gridWidth / 2), 400);
 		var getColumnWidth = function (column) {
-			var w = $header.html(column.name).outerWidth() + 12;
+			var w = $header.html(column.name).outerWidth() + 13; // leave space for sort indicator
 
 			if (column.prototypeValue) {
 				$cell.html(column.prototypeValue);

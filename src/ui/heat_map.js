@@ -1411,7 +1411,6 @@ morpheus.HeatMap.prototype = {
 				: dataset.getRowMetadata();
 			// see if default fields found
 			if (!displaySpecified) {
-
 				var defaultFieldsToShow = new morpheus.Set();
 				['pert_iname', 'moa', 'target', 'description']
 				.forEach(function (field) {
@@ -1424,10 +1423,10 @@ morpheus.HeatMap.prototype = {
 						nameToOption.set(v.getName(), {
 							display: 'text'
 						});
+						displaySpecified = true;
 					}
 
 				}
-				displaySpecified = true;
 
 			}
 			var isFirst = true;
@@ -2979,7 +2978,7 @@ morpheus.HeatMap.prototype = {
 			var legendHeight = this.heatmap.getColorScheme().getNames() != null ? this.heatmap
 			.getColorScheme().getNames().length * 14
 				: 40;
-			totalSize.height += legendHeight;
+			totalSize.height += legendHeight + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
 		}
 		var trackLegendSize = new morpheus.HeatMapTrackColorLegend(
 			_
@@ -3005,8 +3004,8 @@ morpheus.HeatMap.prototype = {
 						.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR));
 				}), this.getProject().getRowColorModel())
 		.getPreferredSize();
-		totalSize.height += trackLegendSize.height;
-		totalSize.width = 10 + Math.max(totalSize.width, trackLegendSize.width);
+		totalSize.height += morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS + trackLegendSize.height;
+		totalSize.width = morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS + Math.max(totalSize.width, trackLegendSize.width);
 		return totalSize;
 	}
 	,
@@ -3067,10 +3066,12 @@ morpheus.HeatMap.prototype = {
 			columnTrackLegendSize.height);
 		var heatmapY = this.isDendrogramVisible(true) ? this.columnDendrogram
 		.getUnscaledHeight() : 0;
-		heatmapY += legendHeight + 10; // 10 pixels after track
+		if (legendHeight > 0) {
+			heatmapY += legendHeight + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
+		}
+		var columnTrackY = heatmapY;
 		var heatmapX = this.isDendrogramVisible(false) ? this.rowDendrogram
 		.getUnscaledWidth() : 0;
-		var totalColumnTrackHeight = 0;
 		for (var i = 0, length = this.columnTracks.length; i < length; i++) {
 			var track = this.columnTracks[i];
 			if (track.isVisible()) {
@@ -3078,10 +3079,9 @@ morpheus.HeatMap.prototype = {
 				heatmapX = Math.max(heatmapX, header.getPrintSize().width);
 				var height = track.getPrintSize().height;
 				heatmapY += height;
-				totalColumnTrackHeight += height;
 			}
 		}
-		heatmapX += 10; // space between column track header and heat map
+
 		for (var i = 0, length = this.rowTracks.length; i < length; i++) {
 			var track = this.rowTracks[i];
 			if (track.isVisible()) {
@@ -3115,14 +3115,12 @@ morpheus.HeatMap.prototype = {
 			this.columnDendrogram.draw(columnDendrogramClip, context);
 			context.restore();
 		}
-		var columnTrackY = heatmapY - 10 - totalColumnTrackHeight;
 
 		for (var i = 0, length = this.columnTracks.length; i < length; i++) {
 			var track = this.columnTracks[i];
 			if (track.isVisible()) {
 				context.save();
-				var tx = heatmapX;
-				context.translate(tx, columnTrackY);
+				context.translate(heatmapX, columnTrackY);
 				var trackClip = {
 					x: 0,
 					y: 0,
@@ -3142,7 +3140,7 @@ morpheus.HeatMap.prototype = {
 					width: headerSize.width,
 					height: headerSize.height
 				};
-				context.translate(tx - 10, columnTrackY + trackClip.height);
+				context.translate(heatmapX - 10, columnTrackY + trackClip.height);
 				header.print(headerClip, context);
 				context.restore();
 				columnTrackY += Math.max(headerClip.height, trackClip.height);
@@ -3157,12 +3155,12 @@ morpheus.HeatMap.prototype = {
 			height: heatmapPrefSize.height
 		}, context);
 		context.restore();
-		var sum = 0;
+		var rowTrackWidthSum = 0;
 		for (var i = 0, length = this.rowTracks.length; i < length; i++) {
 			var track = this.rowTracks[i];
 			if (track.isVisible()) {
 				context.save();
-				var tx = 10 + heatmapX + heatmapPrefSize.width + sum;
+				var tx = morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS + heatmapX + heatmapPrefSize.width + rowTrackWidthSum;
 				var ty = heatmapY;
 				var trackClip = {
 					x: 0,
@@ -3192,7 +3190,7 @@ morpheus.HeatMap.prototype = {
 				context.translate(tx, ty - 4);
 				header.print(headerClip, context);
 				context.restore();
-				sum += Math.max(headerSize.width, trackClip.width);
+				rowTrackWidthSum += Math.max(headerSize.width, trackClip.width);
 			}
 		}
 	}
