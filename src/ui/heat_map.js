@@ -1022,28 +1022,13 @@ morpheus.HeatMap.prototype = {
 		var rowDendrogram = this.options.rowDendrogram;
 		var columnDendrogram = this.options.columnDendrogram;
 		_.each(this.whenLoaded, function (f) {
-			try {
-				f(_this.options.dataset);
-			} catch (x) {
-				if (x.stack) {
-					console.log(x.stack);
-				}
-				console.log('When loaded error.');
-			}
+			f(_this.options.dataset);
 		});
 		if (this.options.datasetReady) {
-			try {
-				var updatedDataset = this.options.datasetReady(dataset);
-				if (updatedDataset) {
-					dataset = updatedDataset;
-				}
-			} catch (x) {
-				console.log('datasetReady error');
-				if (x.stack) {
-					console.log(x.stack);
-				}
+			var updatedDataset = this.options.datasetReady(dataset);
+			if (updatedDataset) {
+				dataset = updatedDataset;
 			}
-
 		}
 
 		this.project = this.options.symmetric ? new morpheus.SymmetricProject(
@@ -1397,10 +1382,10 @@ morpheus.HeatMap.prototype = {
 			this.project, false, heatmap.getColumnPositions());
 		this.hSortByValuesIndicator.appendTo(this.$parent);
 		this.verticalSearchBar = new morpheus.ScentedSearch(this.project
-		.getRowSelectionModel(), heatmap.getRowPositions(), true,
+			.getRowSelectionModel(), heatmap.getRowPositions(), true,
 			this.vscroll, this);
 		this.horizontalSearchBar = new morpheus.ScentedSearch(this.project
-		.getColumnSelectionModel(), heatmap.getColumnPositions(),
+			.getColumnSelectionModel(), heatmap.getColumnPositions(),
 			false, this.hscroll, this);
 		this.rowTracks = [];
 		this.rowTrackHeaders = [];
@@ -1421,37 +1406,34 @@ morpheus.HeatMap.prototype = {
 				nameToOption.set(option.renameTo != null ? option.renameTo
 					: option.field, option);
 			});
+
 			var displayMetadata = isColumns ? dataset.getColumnMetadata()
 				: dataset.getRowMetadata();
 			// see if default fields found
 			if (!displaySpecified) {
-				if (displayMetadata.getByName('pert_iname')) {
-					var defaultFieldsToShow = new morpheus.Set();
-					['pert_iname', 'moa', 'target', 'description']
-					.forEach(function (field) {
-						defaultFieldsToShow.add(field);
-					});
-					for (var i = 0, metadataCount = displayMetadata
-					.getMetadataCount(); i < metadataCount; i++) {
-						var v = displayMetadata.get(i);
-						if (defaultFieldsToShow.has(v.getName())) {
-							nameToOption.set(v.getName(), {
-								display: 'text'
-							});
-						}
 
+				var defaultFieldsToShow = new morpheus.Set();
+				['pert_iname', 'moa', 'target', 'description']
+				.forEach(function (field) {
+					defaultFieldsToShow.add(field);
+				});
+				for (var i = 0, metadataCount = displayMetadata
+				.getMetadataCount(); i < metadataCount; i++) {
+					var v = displayMetadata.get(i);
+					if (defaultFieldsToShow.has(v.getName())) {
+						nameToOption.set(v.getName(), {
+							display: 'text'
+						});
 					}
 
-					displaySpecified = true;
 				}
+				displaySpecified = true;
+
 			}
 			var isFirst = true;
-			for (var i = 0, metadataCount = isColumns ? dataset
-			.getColumnMetadata().getMetadataCount() : dataset
-			.getRowMetadata().getMetadataCount(); i < metadataCount; i++) {
+			for (var i = 0, metadataCount = displayMetadata.getMetadataCount(); i < metadataCount; i++) {
 				var display = displaySpecified ? 'None' : undefined;
-				var v = isColumns ? dataset.getColumnMetadata().get(i)
-					: dataset.getRowMetadata().get(i);
+				var v = displayMetadata.get(i);
 				var name = v.getName();
 				var option = nameToOption.get(name);
 
@@ -2498,7 +2480,7 @@ morpheus.HeatMap.prototype = {
 		header.appendTo(this.$parent);
 		$(header.canvas).css('z-index', '0');
 		track._selection = new morpheus.TrackSelection(track, this.heatmap
-		.getRowPositions(), this.project.getRowSelectionModel(), false,
+			.getRowPositions(), this.project.getRowSelectionModel(), false,
 			this);
 		return track;
 	}
@@ -2534,7 +2516,7 @@ morpheus.HeatMap.prototype = {
 		this.columnTrackHeaders.push(header);
 		header.appendTo(this.$parent);
 		track._selection = new morpheus.TrackSelection(track, this.heatmap
-		.getColumnPositions(), this.project.getColumnSelectionModel(),
+			.getColumnPositions(), this.project.getColumnSelectionModel(),
 			true, this);
 		return track;
 	}
@@ -2942,7 +2924,7 @@ morpheus.HeatMap.prototype = {
 			canvas.height = height;
 			canvas.width = width;
 			var context = canvas.getContext('2d');
-			this.snapshot(context); 
+			this.snapshot(context);
 			canvas.toBlob(function (blob) {
 				if (blob.size === 0) {
 					throw 'Image is too large.';
