@@ -1,6 +1,6 @@
-morpheus.VectorUtil = function() {
+morpheus.VectorUtil = function () {
 };
-morpheus.VectorUtil.createValueToIndicesMap = function(vector) {
+morpheus.VectorUtil.createValueToIndicesMap = function (vector) {
 	if (!vector) {
 		throw 'vector is null';
 	}
@@ -16,7 +16,7 @@ morpheus.VectorUtil.createValueToIndicesMap = function(vector) {
 	}
 	return map;
 };
-morpheus.VectorUtil.createValueToCountMap = function(vector) {
+morpheus.VectorUtil.createValueToCountMap = function (vector) {
 	if (!vector) {
 		throw 'vector is null';
 	}
@@ -39,7 +39,7 @@ morpheus.VectorUtil.createValueToCountMap = function(vector) {
 	}
 	return map;
 };
-morpheus.VectorUtil.maybeConvertToStringArray = function(vector, delim) {
+morpheus.VectorUtil.maybeConvertToStringArray = function (vector, delim) {
 	var newValues = [];
 	var regex = new RegExp(delim);
 	var found = false;
@@ -63,7 +63,7 @@ morpheus.VectorUtil.maybeConvertToStringArray = function(vector, delim) {
 	return found;
 };
 
-morpheus.VectorUtil.maybeConvertStringToNumber = function(vector) {
+morpheus.VectorUtil.maybeConvertStringToNumber = function (vector) {
 	var newValues = [];
 
 	for (var i = 0, nrows = vector.size(); i < nrows; i++) {
@@ -81,7 +81,7 @@ morpheus.VectorUtil.maybeConvertStringToNumber = function(vector) {
 	vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, 'number');
 	return true;
 };
-morpheus.VectorUtil.createValuesToIndicesMap = function(vectors) {
+morpheus.VectorUtil.createValuesToIndicesMap = function (vectors) {
 	var map = new morpheus.Map();
 	var nvectors = vectors.length;
 	if (vectors[0] == null) {
@@ -104,7 +104,7 @@ morpheus.VectorUtil.createValuesToIndicesMap = function(vectors) {
 	}
 	return map;
 };
-morpheus.VectorUtil.createValuesToIndexMap = function(vectors) {
+morpheus.VectorUtil.createValuesToIndexMap = function (vectors) {
 	var map = new morpheus.Map();
 	var nvectors = vectors.length;
 	if (vectors[0] == null) {
@@ -122,10 +122,10 @@ morpheus.VectorUtil.createValuesToIndexMap = function(vectors) {
 	}
 	return map;
 };
-morpheus.VectorUtil.containsMoreThanOneValue = function(vector) {
+morpheus.VectorUtil.containsMoreThanOneValue = function (vector) {
 	return morpheus.VectorUtil.containsMoreThanNValues(vector, 1);
 };
-morpheus.VectorUtil.containsMoreThanNValues = function(vector, n) {
+morpheus.VectorUtil.containsMoreThanNValues = function (vector, n) {
 	var s = new morpheus.Set();
 	for (var j = 0, size = vector.size(); j < size; j++) {
 		var val = vector.getValue(j);
@@ -136,7 +136,7 @@ morpheus.VectorUtil.containsMoreThanNValues = function(vector, n) {
 	}
 	return false;
 };
-morpheus.VectorUtil.createValueToIndexMap = function(vector) {
+morpheus.VectorUtil.createValueToIndexMap = function (vector) {
 	var map = new morpheus.Map();
 	for (var j = 0, size = vector.size(); j < size; j++) {
 		var val = vector.getValue(j);
@@ -144,7 +144,7 @@ morpheus.VectorUtil.createValueToIndexMap = function(vector) {
 	}
 	return map;
 };
-morpheus.VectorUtil.getValues = function(vector, excludeNull) {
+morpheus.VectorUtil.getValues = function (vector, excludeNull) {
 	var set = new morpheus.Set();
 	for (var j = 0, size = vector.size(); j < size; j++) {
 		var val = vector.getValue(j);
@@ -157,14 +157,14 @@ morpheus.VectorUtil.getValues = function(vector, excludeNull) {
 	array.sort(morpheus.SortKey.ASCENDING_COMPARATOR);
 	return array;
 };
-morpheus.VectorUtil.getSet = function(vector) {
+morpheus.VectorUtil.getSet = function (vector) {
 	var set = new morpheus.Set();
 	for (var j = 0, size = vector.size(); j < size; j++) {
 		set.add(vector.getValue(j));
 	}
 	return set;
 };
-morpheus.VectorUtil.createSpanMap = function(vector) {
+morpheus.VectorUtil.createSpanMap = function (vector) {
 	var previous = vector.getValue(0);
 	// find 1st row with different value
 	var startIndexToEndIndex = new morpheus.Map();
@@ -181,7 +181,7 @@ morpheus.VectorUtil.createSpanMap = function(vector) {
 	startIndexToEndIndex.set(start, vector.size());
 	return startIndexToEndIndex;
 };
-morpheus.VectorUtil.toArray = function(vector) {
+morpheus.VectorUtil.toArray = function (vector) {
 	var array = [];
 	for (var i = 0, length = vector.size(); i < length; i++) {
 		var val = vector.getValue(i);
@@ -190,12 +190,12 @@ morpheus.VectorUtil.toArray = function(vector) {
 	return array;
 };
 
-morpheus.VectorUtil.arrayAsVector = function(array, name) {
+morpheus.VectorUtil.arrayAsVector = function (array, name) {
 	var v = new morpheus.Vector(name, array.length);
 	v.array = array;
 	return v;
 };
-morpheus.VectorUtil.toString = function(vector) {
+morpheus.VectorUtil.toString = function (vector) {
 	var array = [];
 	for (var i = 0, length = vector.size(); i < length; i++) {
 		var val = vector.getValue(i);
@@ -204,31 +204,18 @@ morpheus.VectorUtil.toString = function(vector) {
 	return array.join(', ');
 };
 
-morpheus.VectorUtil.getDataType = function(vector) {
+morpheus.VectorUtil.getDataType = function (vector) {
 	var dataType = vector.getProperties().get(morpheus.VectorKeys.DATA_TYPE);
 	if (dataType === undefined) {
 		var firstNonNull = morpheus.VectorUtil.getFirstNonNull(vector);
-		var isArray = morpheus.Util.isArray(firstNonNull);
-		if (isArray && firstNonNull.length > 0) {
-			firstNonNull = firstNonNull[0];
-		}
-		if (_.isString(firstNonNull)) {
-			dataType = 'string';
-		} else if (_.isNumber(firstNonNull)) {
-			dataType = 'number';
-		} else {
-			dataType = 'object';
-		}
-		if (isArray) {
-			dataType = '[' + dataType + ']';
-		}
+		dataType = morpheus.Util.getDataType(firstNonNull);
 		vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, dataType);
 	}
 	return dataType;
 
 };
 
-morpheus.VectorUtil.getMinMax = function(vector) {
+morpheus.VectorUtil.getMinMax = function (vector) {
 	var min = Number.MAX_VALUE;
 	var max = -Number.MAX_VALUE;
 	var fields = vector.getProperties().get(morpheus.VectorKeys.FIELDS);
@@ -256,11 +243,11 @@ morpheus.VectorUtil.getMinMax = function(vector) {
 		}
 	}
 	return {
-		min : min,
-		max : max
+		min: min,
+		max: max
 	};
 };
-morpheus.VectorUtil.getFirstNonNull = function(vector) {
+morpheus.VectorUtil.getFirstNonNull = function (vector) {
 	for (var i = 0, length = vector.size(); i < length; i++) {
 		var val = vector.getValue(i);
 		if (val != null) {
@@ -269,6 +256,6 @@ morpheus.VectorUtil.getFirstNonNull = function(vector) {
 	}
 	return null;
 };
-morpheus.VectorUtil.isNumber = function(vector) {
+morpheus.VectorUtil.isNumber = function (vector) {
 	return morpheus.VectorUtil.getDataType(vector) === 'number';
 };

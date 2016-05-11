@@ -1,34 +1,34 @@
 if (typeof morpheus === 'undefined') {
 	morpheus = {};
 }
-morpheus.Util = function() {
+morpheus.Util = function () {
 };
 
 morpheus.Util.URL = 'https://www.broadinstitute.org/cancer/software/morpheus/';
 morpheus.Util.RIGHT_ARROW = String.fromCharCode(8594);
 /**
  * Add properties in c2 to c1
- * 
+ *
  * @param {Object}
  *            c1 The object that will inherit from obj2
  * @param {Object}
  *            c2 The object that obj1 inherits from
  */
-morpheus.Util.extend = function(c1, c2) {
-	for ( var key in c2.prototype) {
+morpheus.Util.extend = function (c1, c2) {
+	for (var key in c2.prototype) {
 		if (!(key in c1.prototype)) {
 			c1.prototype[key] = c2.prototype[key];
 		}
 	}
 };
 
-morpheus.Util.viewPortSize = function() {
+morpheus.Util.viewPortSize = function () {
 	return window.getComputedStyle(document.body, ':before').content.replace(
-			/"/g, '');
+		/"/g, '');
 };
 
 morpheus.Util.TRACKING_CODE_LOADED = false;
-morpheus.Util.loadTrackingCode = function() {
+morpheus.Util.loadTrackingCode = function () {
 	if (typeof window !== 'undefined') {
 		if (morpheus.Util.TRACKING_CODE_LOADED) {
 			return;
@@ -37,17 +37,17 @@ morpheus.Util.loadTrackingCode = function() {
 			return;
 		}
 
-		(function(i, s, o, g, r, a, m) {
+		(function (i, s, o, g, r, a, m) {
 			i['GoogleAnalyticsObject'] = r;
-			i[r] = i[r] || function() {
-				(i[r].q = i[r].q || []).push(arguments);
-			}, i[r].l = 1 * new Date();
+			i[r] = i[r] || function () {
+					(i[r].q = i[r].q || []).push(arguments);
+				}, i[r].l = 1 * new Date();
 			a = s.createElement(o), m = s.getElementsByTagName(o)[0];
 			a.async = 1;
 			a.src = g;
 			m.parentNode.insertBefore(a, m);
 		})(window, document, 'script',
-				'//www.google-analytics.com/analytics.js', 'ga');
+			'//www.google-analytics.com/analytics.js', 'ga');
 
 		ga('create', 'UA-53973555-1', 'auto', 'morpheus');
 		ga('morpheus.send', 'pageview');
@@ -57,27 +57,45 @@ morpheus.Util.loadTrackingCode = function() {
 
 };
 
-morpheus.Util.trackEvent = function(options) {
+morpheus.Util.trackEvent = function (options) {
 	if (typeof window !== 'undefined') {
 		if (!morpheus.Util.TRACKING_CODE_LOADED) {
 			morpheus.Util.loadTrackingCode();
 		}
 		if (morpheus.Util.TRACKING_CODE_LOADED) {
 			ga('morpheus.send', {
-				hitType : 'event',
-				eventCategory : options.eventCategory,
-				eventAction : options.eventAction,
-				eventLabel : options.eventLabel
+				hitType: 'event',
+				eventCategory: options.eventCategory,
+				eventAction: options.eventAction,
+				eventLabel: options.eventLabel
 			});
 		}
 	}
 
 };
 
+morpheus.Util.getDataType = function (firstNonNull) {
+	var dataType;
+	var isArray = morpheus.Util.isArray(firstNonNull);
+	if (isArray && firstNonNull.length > 0) {
+		firstNonNull = firstNonNull[0];
+	}
+	if (_.isString(firstNonNull)) {
+		dataType = 'string';
+	} else if (_.isNumber(firstNonNull)) {
+		dataType = 'number';
+	} else {
+		dataType = 'object';
+	}
+	if (isArray) {
+		dataType = '[' + dataType + ']';
+	}
+	return dataType;
+};
 /**
  * Trims leading and trailing whitespace from a string.
  */
-morpheus.Util.trim = function(val) {
+morpheus.Util.trim = function (val) {
 	var len = val.length;
 	var st = 0;
 
@@ -93,9 +111,9 @@ morpheus.Util.trim = function(val) {
 /**
  * Checks whether supplied argument is an array
  */
-morpheus.Util.isArray = function(array) {
-	var types = [ Array, Int8Array, Uint8Array, Uint8ClampedArray, Int16Array,
-			Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array, ];
+morpheus.Util.isArray = function (array) {
+	var types = [Array, Int8Array, Uint8Array, Uint8ClampedArray, Int16Array,
+		Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array,];
 	// handle native arrays
 	for (var i = 0, length = types.length; i < length; i++) {
 		if (array instanceof types[i]) {
@@ -104,21 +122,21 @@ morpheus.Util.isArray = function(array) {
 	}
 	return false;
 };
-morpheus.Util.getWindowSearchObject = function() {
+morpheus.Util.getWindowSearchObject = function () {
 	var searchObject = {};
 	var hashObject = {};
 	if (window.location.search.length > 0) {
 		searchObject = morpheus.Util.getQueryParams(window.location.search
-				.substring(1));
+		.substring(1));
 	}
 	if (window.location.hash.length > 0) {
 		hashObject = morpheus.Util.getQueryParams(window.location.hash
-				.substring(1));
+		.substring(1));
 	}
 	return _.extend(hashObject, searchObject);
 };
 
-morpheus.Util.getQueryParams = function(s) {
+morpheus.Util.getQueryParams = function (s) {
 	var params = {};
 	if (!s) {
 		return params;
@@ -127,16 +145,18 @@ morpheus.Util.getQueryParams = function(s) {
 	var keyValuePairs = search.split('&');
 	for (var i = 0; i < keyValuePairs.length; i++) {
 		var pair = keyValuePairs[i].split('=');
-		var array = params[pair[0]];
-		if (array === undefined) {
-			array = [];
-			params[pair[0]] = array;
+		if (pair[1] !== '') {
+			var array = params[pair[0]];
+			if (array === undefined) {
+				array = [];
+				params[pair[0]] = array;
+			}
+			array.push(pair[1]);
 		}
-		array.push(pair[1]);
 	}
 	return params;
 };
-morpheus.Util.getScriptPath = function() {
+morpheus.Util.getScriptPath = function () {
 	var scripts = document.getElementsByTagName('script');
 	for (var i = scripts.length - 1; i >= 0; i--) {
 		var src = scripts[i].src;
@@ -151,23 +171,23 @@ morpheus.Util.getScriptPath = function() {
 	return scripts.length > 0 ? scripts[0].src : '';
 };
 
-morpheus.Util.forceDelete = function(obj) {
+morpheus.Util.forceDelete = function (obj) {
 	try {
-		var _garbageCollector = (function() {
-			var ef = URL.createObjectURL(new Blob([ '' ], {
-				type : 'text/javascript'
+		var _garbageCollector = (function () {
+			var ef = URL.createObjectURL(new Blob([''], {
+				type: 'text/javascript'
 			})), w = new Worker(ef);
 
 			URL.revokeObjectURL(ef);
 			return w;
 		})();
 
-		_garbageCollector.postMessage(obj, [ obj ]);
+		_garbageCollector.postMessage(obj, [obj]);
 	} catch (x) {
 		console.log('Unable to delete');
 	}
 };
-morpheus.Util.getFileName = function(fileOrUrl) {
+morpheus.Util.getFileName = function (fileOrUrl) {
 	var name = fileOrUrl instanceof File ? fileOrUrl.name : fileOrUrl;
 	name = '' + name;
 	var slash = name.lastIndexOf('/');
@@ -191,10 +211,10 @@ morpheus.Util.getFileName = function(fileOrUrl) {
 	}
 	return name;
 };
-morpheus.Util.prefixWithZero = function(value) {
+morpheus.Util.prefixWithZero = function (value) {
 	return value < 10 ? '0' + value : value;
 };
-morpheus.Util.getExtension = function(name) {
+morpheus.Util.getExtension = function (name) {
 	var dotIndex = name.lastIndexOf('.');
 	if (dotIndex > 0) {
 		var suffix = name.substring(dotIndex + 1).toLowerCase();
@@ -205,10 +225,10 @@ morpheus.Util.getExtension = function(name) {
 			var secondDotIndex = newPath.lastIndexOf('.');
 			if (secondDotIndex > 0) {// see if file has another suffix
 				var secondSuffix = newPath.substring(secondDotIndex + 1,
-						newPath.length).toLowerCase();
+					newPath.length).toLowerCase();
 				if (secondSuffix === 'segtab' || secondSuffix === 'seg'
-						|| secondSuffix === 'maf' || secondSuffix === 'gct'
-						|| secondSuffix === 'txt' || secondSuffix === 'gmt') {
+					|| secondSuffix === 'maf' || secondSuffix === 'gct'
+					|| secondSuffix === 'txt' || secondSuffix === 'gmt') {
 					return secondSuffix;
 				}
 			}
@@ -221,12 +241,12 @@ morpheus.Util.getExtension = function(name) {
  * Gets the base file name. For example, if name is 'test.txt' the method
  * returns the string 'test'. If the name is 'test.txt.gz', the method also
  * returns the string 'test'.
- * 
+ *
  * @param name
  *            The file name.
  * @return The base file name.
  */
-morpheus.Util.getBaseFileName = function(name) {
+morpheus.Util.getBaseFileName = function (name) {
 	var dotIndex = name.lastIndexOf('.');
 	if (dotIndex > 0) {
 		var suffix = name.substring(dotIndex + 1, name.length);
@@ -237,7 +257,7 @@ morpheus.Util.getBaseFileName = function(name) {
 	}
 	return name;
 };
-morpheus.Util.seq = function(length) {
+morpheus.Util.seq = function (length) {
 	var array = [];
 	for (var i = 0; i < length; i++) {
 		array.push(i);
@@ -245,7 +265,7 @@ morpheus.Util.seq = function(length) {
 	return array;
 };
 
-morpheus.Util.sequ32 = function(length) {
+morpheus.Util.sequ32 = function (length) {
 	var array = new Uint32Array(length);
 	for (var i = 0; i < length; i++) {
 		array[i] = i;
@@ -257,7 +277,7 @@ morpheus.Util.sequ32 = function(length) {
  * Converts window hash or search to an object that maps keys to an array of
  * values. For example ?foo=bar returns {foo:[bar]}
  */
-morpheus.Util.paramsToObject = function(hash) {
+morpheus.Util.paramsToObject = function (hash) {
 	var search = hash ? window.location.hash : window.location.search;
 	if (search.length <= 1) {
 		return {};
@@ -276,57 +296,57 @@ morpheus.Util.paramsToObject = function(hash) {
 	}
 	return result;
 };
-morpheus.Util.endsWith = function(string, suffix) {
+morpheus.Util.endsWith = function (string, suffix) {
 	return string.length >= suffix.length
-			&& string.substr(string.length - suffix.length) === suffix;
+		&& string.substr(string.length - suffix.length) === suffix;
 };
-morpheus.Util.measureSvgText = function(text, classname) {
+morpheus.Util.measureSvgText = function (text, classname) {
 	if (!text || text.length === 0)
 		return {
-			height : 0,
-			width : 0
+			height: 0,
+			width: 0
 		};
 	var container = d3.select('body').append('svg');
 	if (classname) {
 		container.attr('class', classname);
 	}
 	container.append('text').attr({
-		x : -1000,
-		y : -1000
+		x: -1000,
+		y: -1000
 	}).text(text);
 	var bbox = container.node().getBBox();
 	container.remove();
 	return {
-		height : bbox.height,
-		width : bbox.width
+		height: bbox.height,
+		width: bbox.width
 	};
 };
 morpheus.Util.IS_MAC = false;
 if (typeof navigator !== 'undefined') {
 	morpheus.Util.IS_MAC = navigator.platform.match(/(Mac|iPhone|iPod|iPad)/i) ? true
-			: false;
+		: false;
 }
 morpheus.Util.COMMAND_KEY = morpheus.Util.IS_MAC ? '&#8984;' : 'Ctrl+';
 
-morpheus.Util.hammer = function(el, recognizers) {
+morpheus.Util.hammer = function (el, recognizers) {
 	var hammer = new Hammer(el, {
-		recognizers : []
+		recognizers: []
 	});
 
 	if (_.indexOf(recognizers, 'pan') !== -1) {
 		hammer.add(new Hammer.Pan({
-			threshold : 1,
-			direction : Hammer.DIRECTION_ALL
+			threshold: 1,
+			direction: Hammer.DIRECTION_ALL
 		}));
 	} else if (_.indexOf(recognizers, 'panh') !== -1) {
 		hammer.add(new Hammer.Pan({
-			threshold : 1,
-			direction : Hammer.DIRECTION_HORIZONTAL
+			threshold: 1,
+			direction: Hammer.DIRECTION_HORIZONTAL
 		}));
 	} else if (_.indexOf(recognizers, 'panv') !== -1) {
 		hammer.add(new Hammer.Pan({
-			threshold : 1,
-			direction : Hammer.DIRECTION_VERTICAL
+			threshold: 1,
+			direction: Hammer.DIRECTION_VERTICAL
 		}));
 	}
 	if (_.indexOf(recognizers, 'tap') !== -1) {
@@ -348,8 +368,8 @@ morpheus.Util.hammer = function(el, recognizers) {
 	}
 	if (_.indexOf(recognizers, 'longpress') !== -1) {
 		hammer.add(new Hammer.Press({
-			event : 'longpress',
-			time : 1000
+			event: 'longpress',
+			time: 1000
 		}));
 	}
 	if (_.indexOf(recognizers, 'press') !== -1) {
@@ -362,7 +382,7 @@ morpheus.Util.hammer = function(el, recognizers) {
 	// });
 	return hammer;
 };
-morpheus.Util.autocompleteArrayMatcher = function(q, cb, array, fields, max) {
+morpheus.Util.autocompleteArrayMatcher = function (q, cb, array, fields, max) {
 	var filteredSet = new morpheus.Set();
 	// an array that will be populated with substring matches
 	// regex used to determine if a string starts with substring `q`
@@ -415,123 +435,123 @@ morpheus.Util.autocompleteArrayMatcher = function(q, cb, array, fields, max) {
  * @param {Boolean}
  *            [options.suggestWhenEmpty=true] - Whether to autosuggest terms
  *            when text field is empty.
- * 
+ *
  */
-morpheus.Util.autosuggest = function(options) {
+morpheus.Util.autosuggest = function (options) {
 	var fieldRegExp = /:/g;
 	options = $.extend({}, {
-		multi : true,
-		delay : 500,
-		suggestWhenEmpty : true,
+		multi: true,
+		delay: 500,
+		suggestWhenEmpty: true,
 	}, options);
 	options.$el
-			// don't navigate away from the field on tab when selecting an item
-			.on(
-					'keydown',
-					function(event) {
-						if ((event.keyCode === $.ui.keyCode.TAB)
-								&& $(this).data('ui-autocomplete').menu.active) {
-							event.preventDefault();
-						}
-					})
-			.autocomplete(
+	// don't navigate away from the field on tab when selecting an item
+	.on(
+		'keydown',
+		function (event) {
+			if ((event.keyCode === $.ui.keyCode.TAB)
+				&& $(this).data('ui-autocomplete').menu.active) {
+				event.preventDefault();
+			}
+		})
+	.autocomplete(
+		{
+			minLength: 0,
+			delay: options.delay,
+			source: function (request, response) {
+				// delegate back to autocomplete, but extract the
+				// autocomplete term
+				var terms = morpheus.Util
+				.getAutocompleteTokens(
+					request.term,
 					{
-						minLength : 0,
-						delay : options.delay,
-						source : function(request, response) {
-							// delegate back to autocomplete, but extract the
-							// autocomplete term
-							var terms = morpheus.Util
-									.getAutocompleteTokens(
-											request.term,
-											{
-												trim : false,
-												selectionStart : options.$el[0].selectionStart
-											});
-
-							if (terms.selectionStartIndex === undefined
-									|| terms.selectionStartIndex === -1) {
-								terms.selectionStartIndex = terms.length - 1;
-							}
-							if (options.suggestWhenEmpty || terms.length > 0) {
-								options.filter(terms, response);
-							}
-						},
-						focus : function() {
-							// prevent value inserted on focus
-							return false;
-						},
-						select : function(event, ui) {
-							if (ui.item.skip) {
-								return false;
-							}
-							if (options.multi) {
-								var terms = morpheus.Util
-										.getAutocompleteTokens(
-												this.value,
-												{
-													trim : false,
-													selectionStart : options.$el[0].selectionStart
-												});
-								// quote value if needed
-								var value = (ui.item.value[0] !== '"'
-										&& ui.item.value.indexOf(' ') > 0 ? ('"'
-										+ ui.item.value + '"')
-										: ui.item.value);
-
-								var show = ui.item.show; // || (ui.item.space
-								// &&
-								// options.suggestWhenEmpty);
-
-								// replace the current input
-								if (terms.length === 0) {
-									terms.push(value);
-								} else {
-									terms[terms.selectionStartIndex === -1
-											|| terms.selectionStartIndex === undefined ? terms.length - 1
-											: terms.selectionStartIndex] = value;
-								}
-								// add the selected item
-								this.value = terms.join(' ');
-								if (show) { // did
-									// we
-									// select
-									// just a
-									// field name?
-									setTimeout(function() {
-										options.$el.autocomplete('search',
-												options.$el.val());
-									}, 20);
-
-								}
-								if (options.select) {
-									options.select();
-								}
-								return false;
-							}
-							if (options.select) {
-								options.select();
-							}
-							if (event.which === 13) {
-								event.stopImmediatePropagation();
-							}
-						}
+						trim: false,
+						selectionStart: options.$el[0].selectionStart
 					});
+
+				if (terms.selectionStartIndex === undefined
+					|| terms.selectionStartIndex === -1) {
+					terms.selectionStartIndex = terms.length - 1;
+				}
+				if (options.suggestWhenEmpty || terms.length > 0) {
+					options.filter(terms, response);
+				}
+			},
+			focus: function () {
+				// prevent value inserted on focus
+				return false;
+			},
+			select: function (event, ui) {
+				if (ui.item.skip) {
+					return false;
+				}
+				if (options.multi) {
+					var terms = morpheus.Util
+					.getAutocompleteTokens(
+						this.value,
+						{
+							trim: false,
+							selectionStart: options.$el[0].selectionStart
+						});
+					// quote value if needed
+					var value = (ui.item.value[0] !== '"'
+					&& ui.item.value.indexOf(' ') > 0 ? ('"'
+					+ ui.item.value + '"')
+						: ui.item.value);
+
+					var show = ui.item.show; // || (ui.item.space
+					// &&
+					// options.suggestWhenEmpty);
+
+					// replace the current input
+					if (terms.length === 0) {
+						terms.push(value);
+					} else {
+						terms[terms.selectionStartIndex === -1
+						|| terms.selectionStartIndex === undefined ? terms.length - 1
+							: terms.selectionStartIndex] = value;
+					}
+					// add the selected item
+					this.value = terms.join(' ');
+					if (show) { // did
+						// we
+						// select
+						// just a
+						// field name?
+						setTimeout(function () {
+							options.$el.autocomplete('search',
+								options.$el.val());
+						}, 20);
+
+					}
+					if (options.select) {
+						options.select();
+					}
+					return false;
+				}
+				if (options.select) {
+					options.select();
+				}
+				if (event.which === 13) {
+					event.stopImmediatePropagation();
+				}
+			}
+		});
 
 	// use html for label instead of default text
 	var instance = options.$el.autocomplete('instance');
-	instance._renderItem = function(ul, item) {
+	instance._renderItem = function (ul, item) {
 		return $('<li class="ui-menu-item">').html(
-				item.render ? item.render() : item.label).appendTo(ul);
+			item.render ? item.render() : item.label).appendTo(ul);
 	};
 
 	if (options.suggestWhenEmpty) {
-		options.$el.on('focus', function() {
+		options.$el.on('focus', function () {
 			options.$el.autocomplete('search', options.$el.val());
 		});
 	}
 
-	options.$el.on('keyup', function(e) {
+	options.$el.on('keyup', function (e) {
 		if (e.which === 13) {
 			options.$el.autocomplete('close');
 		} else if (options.suggestWhenEmpty) {
@@ -544,9 +564,9 @@ morpheus.Util.autosuggest = function(options) {
 
 };
 
-morpheus.Util.getAutocompleteTokens = function(text, options) {
+morpheus.Util.getAutocompleteTokens = function (text, options) {
 	options = $.extend({}, {
-		trim : true
+		trim: true
 	}, options);
 	if (options.trim) {
 		text = $.trim(text);
@@ -567,8 +587,8 @@ morpheus.Util.getAutocompleteTokens = function(text, options) {
 		} else {
 			if ((c === ' ' || c === '\t') && !inQuote) {
 				tokens.push({
-					s : currentToken.join(''),
-					inSelectionStart : currentToken.inSelectionStart
+					s: currentToken.join(''),
+					inSelectionStart: currentToken.inSelectionStart
 				});
 				currentToken = []; // start new token
 			} else { // add to current token
@@ -581,14 +601,14 @@ morpheus.Util.getAutocompleteTokens = function(text, options) {
 	}
 
 	tokens.push({
-		s : currentToken.join(''),
-		inSelectionStart : currentToken.inSelectionStart
+		s: currentToken.join(''),
+		inSelectionStart: currentToken.inSelectionStart
 	});
 	// add trailing token
 	if (!options.trim && !inQuote && text[text.length - 1] === ' ') {
 		tokens.push({
-			s : ' ',
-			inSelectionStart : false
+			s: ' ',
+			inSelectionStart: false
 		});
 	}
 	// remove empty tokens
@@ -615,33 +635,33 @@ morpheus.Util.getAutocompleteTokens = function(text, options) {
 /**
  * @deprecated
  */
-morpheus.Util.autocomplete = function($el, filterFunction, selectCb,
-		singleTerm, autoclose) {
+morpheus.Util.autocomplete = function ($el, filterFunction, selectCb,
+									   singleTerm, autoclose) {
 	var fieldRegExp = /:/g;
 	$el
 	// don't navigate away from the field on tab when selecting an item
 	.on(
-			'keydown',
-			function(event) {
-				if ((event.keyCode === $.ui.keyCode.TAB)
-						&& $(this).data('ui-autocomplete').menu.active) {
-					event.preventDefault();
-				}
-			}).autocomplete({
-		minLength : 1,
-		delay : 1200,
-		source : function(request, response) {
+		'keydown',
+		function (event) {
+			if ((event.keyCode === $.ui.keyCode.TAB)
+				&& $(this).data('ui-autocomplete').menu.active) {
+				event.preventDefault();
+			}
+		}).autocomplete({
+		minLength: 1,
+		delay: 1200,
+		source: function (request, response) {
 			// delegate back to autocomplete, but extract the last term
 			var terms = morpheus.Util.getAutocompleteTokens(request.term);
 			if (terms.length > 0) {
 				filterFunction(terms.pop(), response);
 			}
 		},
-		focus : function() {
+		focus: function () {
 			// prevent value inserted on focus
 			return false;
 		},
-		select : function(event, ui) {
+		select: function (event, ui) {
 			if (!singleTerm) {
 				var terms = morpheus.Util.getAutocompleteTokens(this.value);
 				// remove the current input
@@ -669,19 +689,19 @@ morpheus.Util.autocomplete = function($el, filterFunction, selectCb,
 	});
 
 	// use html for label instead of default text
-	$el.autocomplete('instance')._renderItem = function(ul, item) {
+	$el.autocomplete('instance')._renderItem = function (ul, item) {
 		return $('<li>').html(item.label).appendTo(ul);
 	};
 
 	if (autoclose) {
-		$el.on('keyup', function(e) {
+		$el.on('keyup', function (e) {
 			if (e.which === 13) {
 				$el.autocomplete('close');
 			}
 		});
 	}
 };
-morpheus.Util.showDialog = function($el, title, options) {
+morpheus.Util.showDialog = function ($el, title, options) {
 	var $dialog = $('<div></div>');
 	$el.appendTo($dialog);
 	$dialog.appendTo($(document.body));
@@ -689,9 +709,9 @@ morpheus.Util.showDialog = function($el, title, options) {
 		options = {};
 	}
 	$dialog.dialog({
-		width : 670,
-		height : 590,
-		title : title,
+		width: 670,
+		height: 590,
+		title: title,
 		// resizeStop : function(event, ui) {
 		// var w = parseInt($dialog.width());
 		// var h = parseInt($dialog.height());
@@ -700,7 +720,7 @@ morpheus.Util.showDialog = function($el, title, options) {
 		// svg.attr("height", h - 50);
 		// chart.update();
 		// },
-		close : function(event, ui) {
+		close: function (event, ui) {
 			$dialog.remove();
 			if (options.close) {
 				options.close();
@@ -715,15 +735,15 @@ morpheus.Util.showDialog = function($el, title, options) {
  *            If a delim is specified each row, will contain a string separated
  *            by delim. Otherwise each row will contain an array.
  */
-morpheus.Util.sheetToArray = function(sheet, delim) {
+morpheus.Util.sheetToArray = function (sheet, delim) {
 	var r = XLSX.utils.decode_range(sheet['!ref']);
 	var rows = [];
 	for (var R = r.s.r; R <= r.e.r; ++R) {
 		var row = [];
 		for (var C = r.s.c; C <= r.e.c; ++C) {
 			var val = sheet[XLSX.utils.encode_cell({
-				c : C,
-				r : R
+				c: C,
+				r: R
 			})];
 			if (!val) {
 				row.push('');
@@ -736,7 +756,7 @@ morpheus.Util.sheetToArray = function(sheet, delim) {
 	}
 	return rows;
 };
-morpheus.Util.linesToObjects = function(lines) {
+morpheus.Util.linesToObjects = function (lines) {
 	var header = lines[0];
 	var array = [];
 	var nfields = header.length;
@@ -752,29 +772,29 @@ morpheus.Util.linesToObjects = function(lines) {
 	}
 	return array;
 };
-morpheus.Util.xlsxTo2dArray = function(data) {
+morpheus.Util.xlsxTo2dArray = function (data) {
 	var workbook = XLSX.read(data, {
-		type : 'binary',
-		cellFormula : false,
-		cellHTML : false
+		type: 'binary',
+		cellFormula: false,
+		cellHTML: false
 	});
 	var sheetNames = workbook.SheetNames;
 	var worksheet = workbook.Sheets[sheetNames[0]];
 	var lines = morpheus.Util.sheetToArray(worksheet);
 	return lines;
 };
-morpheus.Util.xlsxTo1dArray = function(data) {
+morpheus.Util.xlsxTo1dArray = function (data) {
 	var workbook = XLSX.read(data, {
-		type : 'binary',
-		cellFormula : false,
-		cellHTML : false
+		type: 'binary',
+		cellFormula: false,
+		cellHTML: false
 	});
 	var sheetNames = workbook.SheetNames;
 	var worksheet = workbook.Sheets[sheetNames[0]];
 	var lines = morpheus.Util.sheetToArray(worksheet, '\t');
 	return lines;
 };
-morpheus.Util.hashCode = function(val) {
+morpheus.Util.hashCode = function (val) {
 	var h = 0;
 	if (val.length > 0) {
 		for (var i = 0; i < val.length; i++) {
@@ -786,19 +806,19 @@ morpheus.Util.hashCode = function(val) {
 /**
  * Returns a promise that resolves to a string
  */
-morpheus.Util.getText = function(urlOrFile) {
+morpheus.Util.getText = function (urlOrFile) {
 	var deferred = $.Deferred();
 	if (_.isString(urlOrFile)) {
 		$.ajax({
-			contentType : 'text/plain',
-			url : urlOrFile,
-		}).done(function(text, status, xhr) {
+			contentType: 'text/plain',
+			url: urlOrFile,
+		}).done(function (text, status, xhr) {
 			// var type = xhr.getResponseHeader('Content-Type');
 			deferred.resolve(text);
 		});
 	} else if (urlOrFile instanceof File) {
 		var reader = new FileReader();
-		reader.onload = function(event) {
+		reader.onload = function (event) {
 			deferred.resolve(event.target.result);
 		};
 		reader.readAsText(urlOrFile);
@@ -808,12 +828,12 @@ morpheus.Util.getText = function(urlOrFile) {
 	}
 	return deferred.promise();
 };
-morpheus.Util.createOptions = function(values, none) {
+morpheus.Util.createOptions = function (values, none) {
 	var html = [];
 	if (none) {
 		html.push('<option value="">(None)</option>');
 	}
-	_.each(values, function(val) {
+	_.each(values, function (val) {
 		html.push('<option value="');
 		html.push(val);
 		html.push('">');
@@ -826,11 +846,11 @@ morpheus.Util.createOptions = function(values, none) {
 /**
  * Computes the rank using the given index array. The index array can be
  * obtained from the morpheus.Util.indexSort method. Does not handle ties.
- * 
+ *
  * @param index
  * @return The ranks.
  */
-morpheus.Util.rankIndexArray = function(index) {
+morpheus.Util.rankIndexArray = function (index) {
 	var rank = [];
 	var n = index.length;
 	for (var j = 0; j < n; j++) {
@@ -839,40 +859,40 @@ morpheus.Util.rankIndexArray = function(index) {
 	return rank;
 };
 
-morpheus.Util.indexSort = function(array, ascending) {
+morpheus.Util.indexSort = function (array, ascending) {
 	var pairs = [];
-	array.forEach(function(value, index) {
+	array.forEach(function (value, index) {
 		pairs.push({
-			value : value,
-			index : index
+			value: value,
+			index: index
 		});
 	});
 	return morpheus.Util.indexSortPairs(pairs, ascending);
 };
-morpheus.Util.indexSortPairs = function(array, ascending) {
+morpheus.Util.indexSortPairs = function (array, ascending) {
 	if (ascending) {
-		array.sort(function(a, b) {
+		array.sort(function (a, b) {
 			return (a.value < b.value ? -1 : (a.value === b.value ? 0 : 1));
 		});
 	} else {
-		array.sort(function(a, b) {
+		array.sort(function (a, b) {
 			return (a.value < b.value ? 1 : (a.value === b.value ? 0 : -1));
 		});
 	}
 	var indices = [];
-	array.forEach(function(item) {
+	array.forEach(function (item) {
 		indices.push(item.index);
 	});
 	return indices;
 };
-morpheus.Util.arrayEquals = function(array1, array2, comparator) {
+morpheus.Util.arrayEquals = function (array1, array2, comparator) {
 	if (array1 == array2)
 		return true;
 	if (array1 == null || array2 == null) {
 		return false;
 	}
 	if (!comparator) {
-		comparator = function(a, b) {
+		comparator = function (a, b) {
 			return a === b;
 		};
 	}
@@ -888,35 +908,35 @@ morpheus.Util.arrayEquals = function(array1, array2, comparator) {
 	return true;
 };
 morpheus.Util._intFormat = typeof d3 !== 'undefined' ? d3.format(',i')
-		: function(d) {
-			return '' + Math.round(d);
-		};
-morpheus.Util.intFormat = function(n) {
+	: function (d) {
+	return '' + Math.round(d);
+};
+morpheus.Util.intFormat = function (n) {
 	return morpheus.Util._intFormat(n);
 };
-morpheus.Util._nf = typeof d3 !== 'undefined' ? d3.format('.4f') : function(d) {
+morpheus.Util._nf = typeof d3 !== 'undefined' ? d3.format('.4f') : function (d) {
 	return '' + d;
 };
-morpheus.Util.nf = function(n) {
+morpheus.Util.nf = function (n) {
 	var str = (n < 1 && n > -1 && n.toPrecision !== undefined) ? n
-			.toPrecision(4) : morpheus.Util._nf(n);
+	.toPrecision(4) : morpheus.Util._nf(n);
 	return morpheus.Util.removeTrailingZerosInFraction(str);
 };
-morpheus.Util.createNumberFormat = function(nfractionDigits) {
+morpheus.Util.createNumberFormat = function (nfractionDigits) {
 	var d3Formatter = d3.format('.' + nfractionDigits + 'f');
-	var f = function(value) {
+	var f = function (value) {
 		var str = d3Formatter(value);
 		return morpheus.Util.removeTrailingZerosInFraction(str);
 	};
 	return f;
 };
-morpheus.Util.formatObject = function(value) {
+morpheus.Util.formatObject = function (value) {
 	if (_.isNumber(value)) {
 		return morpheus.Util.nf(value);
 	}
 	return value;
 };
-morpheus.Util.arrayToString = function(array, sep) {
+morpheus.Util.arrayToString = function (array, sep) {
 	var s = [];
 	for (var i = 0, length = array.length; i < length; i++) {
 		s.push(morpheus.Util.formatObject(array[i]));
@@ -925,14 +945,14 @@ morpheus.Util.arrayToString = function(array, sep) {
 
 };
 
-morpheus.Util.wrapNumber = function(value, object) {
+morpheus.Util.wrapNumber = function (value, object) {
 	var n = new Number(value);
-	n.toObject = function() {
+	n.toObject = function () {
 		return object;
 	};
 	return n;
 };
-morpheus.Util.toString = function(value) {
+morpheus.Util.toString = function (value) {
 	if (value == null) {
 		return '';
 	} else if (_.isNumber(value)) {
@@ -946,7 +966,7 @@ morpheus.Util.toString = function(value) {
 	}
 	return '' + value;
 };
-morpheus.Util.removeTrailingZerosInFraction = function(str) {
+morpheus.Util.removeTrailingZerosInFraction = function (str) {
 	var index = str.lastIndexOf('.');
 	if (index !== -1) {
 		var len = str.length;
@@ -965,10 +985,10 @@ morpheus.Util.removeTrailingZerosInFraction = function(str) {
 	}
 	return str;
 };
-morpheus.Util.s = function(n) {
+morpheus.Util.s = function (n) {
 	return n === 1 ? '' : 's';
 };
-morpheus.Util.create2dArray = function(rows, columns) {
+morpheus.Util.create2dArray = function (rows, columns) {
 	var array2d = [];
 	for (var i = 0; i < rows; i++) {
 		var array = [];
@@ -979,14 +999,14 @@ morpheus.Util.create2dArray = function(rows, columns) {
 	}
 	return array2d;
 };
-morpheus.Util.escapeRegex = function(value) {
+morpheus.Util.escapeRegex = function (value) {
 	return value.replace(/[*]/g, '.*')
-			.replace(/[-[\]{}()+?,\\^$|#\s]/g, '\\$&');
+	.replace(/[-[\]{}()+?,\\^$|#\s]/g, '\\$&');
 };
 
-morpheus.Util.createSearchPredicates = function(options) {
+morpheus.Util.createSearchPredicates = function (options) {
 	options = $.extend({}, {
-		validateFieldNames : true
+		validateFieldNames: true
 	}, options);
 	var tokens = options.tokens;
 	if (tokens == null) {
@@ -995,137 +1015,137 @@ morpheus.Util.createSearchPredicates = function(options) {
 	var availableFields = options.fields;
 	var validateFieldNames = options.validateFieldNames;
 	var fieldSearchEnabled = !validateFieldNames
-			|| (availableFields != null && availableFields.length > 0);
+		|| (availableFields != null && availableFields.length > 0);
 
 	var fieldRegExp = /\\:/g;
 	var predicates = [];
 	var defaultIsExactMatch = options.defaultMatchMode === 'exact';
 
 	tokens
-			.forEach(function(token) {
-				var isNot = false;
-				if (token[0] === '-') { // not predicate
-					token = token.substring(1);
-					isNot = true;
-				}
-				var field = null;
-				var semi = token.indexOf(':');
-				if (semi > 0) { // field search?
-					if (!fieldSearchEnabled
-							|| token.charCodeAt(semi - 1) === 92) { // \:
-						token = token.replace(fieldRegExp, ':');
-					} else { // only a field search if field matches
-						// one of available fields
-						var possibleToken = $.trim(token.substring(semi + 1));
-						// check for "field":"val" and "field:val"
-						var possibleField = $.trim(token.substring(0, semi)); // split
-						// on :
-						if (possibleField.length > 0
-								&& possibleField[0] === '"'
-								&& possibleField[possibleField.length - 1] === '"') {
-							possibleField = possibleField.substring(1,
-									possibleField.length - 1);
-						} else if (possibleField.length > 0
-								&& possibleField[0] === '"'
-								&& possibleToken[possibleToken.length - 1] === '"'
-								&& possibleToken[0] !== '"') {
-							possibleField = possibleField.substring(1,
-									possibleField.length);
-							possibleToken = '"' + possibleToken;
-
-						}
-						if (!validateFieldNames
-								|| availableFields.indexOf(possibleField) !== -1) {
-							token = possibleToken;
-							field = possibleField;
-						}
-					}
-				}
-
-				var predicate;
-				var rangeIndex = -1;
-				var rangeToken = null;
-				var rangeIndicators = [ '..', '>=', '>', '<=', '<', '=' ];
-				for (var i = 0; i < rangeIndicators.length; i++) {
-					rangeIndex = token.indexOf(rangeIndicators[i]);
-					if (rangeIndex !== -1) {
-						rangeToken = rangeIndicators[i];
-						break;
-					}
-				}
-
-				if (rangeIndex !== -1) { // range query
-					if (rangeToken === '..') {
-						var start = parseFloat(token.substring(0, rangeIndex));
-						var end = parseFloat(token.substring(rangeIndex + 2));
-						if (!isNaN(start) && !isNaN(end)) {
-							predicate = new morpheus.Util.NumberRangePredicate(
-									field, start, end);
-						}
-					} else if (rangeToken === '>') {
-						var val = parseFloat(token.substring(rangeIndex + 1));
-						if (!isNaN(val)) {
-							predicate = new morpheus.Util.GreaterThanPredicate(
-									field, val);
-						}
-					} else if (rangeToken === '>=') {
-						var val = parseFloat(token.substring(rangeIndex + 2));
-						if (!isNaN(val)) {
-							predicate = new morpheus.Util.GreaterThanOrEqualPredicate(
-									field, val);
-						}
-					} else if (rangeToken === '<') {
-						var val = parseFloat(token.substring(rangeIndex + 1));
-						if (!isNaN(val)) {
-							predicate = new morpheus.Util.LessThanPredicate(
-									field, val);
-						}
-					} else if (rangeToken === '<=') {
-						var val = parseFloat(token.substring(rangeIndex + 2));
-						if (!isNaN(val)) {
-							predicate = new morpheus.Util.LessThanOrEqualPredicate(
-									field, val);
-						}
-					} else if (rangeToken === '=') {
-						var val = parseFloat(token.substring(rangeIndex + 1));
-						if (!isNaN(val)) {
-							predicate = new morpheus.Util.EqualsPredicate(
-									field, val);
-						}
-					} else {
-						predicate = defaultIsExactMatch ? new morpheus.Util.ExactTermPredicate(
-								field, token)
-								: new morpheus.Util.RegexPredicate(field, token);
-					}
-				} else if (token[0] === '"' && token[token.length - 1] === '"') { // exact
-					// match
-					token = token.substring(1, token.length - 1);
-					predicate = new morpheus.Util.ExactTermPredicate(field,
-							token);
-				} else if (token.indexOf('*') !== -1) { // contains
-					predicate = new morpheus.Util.RegexPredicate(field, token);
-				} else {
-					predicate = defaultIsExactMatch ? new morpheus.Util.ExactTermPredicate(
-							field, token)
-							: new morpheus.Util.RegexPredicate(field, token);
+	.forEach(function (token) {
+		var isNot = false;
+		if (token[0] === '-') { // not predicate
+			token = token.substring(1);
+			isNot = true;
+		}
+		var field = null;
+		var semi = token.indexOf(':');
+		if (semi > 0) { // field search?
+			if (!fieldSearchEnabled
+				|| token.charCodeAt(semi - 1) === 92) { // \:
+				token = token.replace(fieldRegExp, ':');
+			} else { // only a field search if field matches
+				// one of available fields
+				var possibleToken = $.trim(token.substring(semi + 1));
+				// check for "field":"val" and "field:val"
+				var possibleField = $.trim(token.substring(0, semi)); // split
+				// on :
+				if (possibleField.length > 0
+					&& possibleField[0] === '"'
+					&& possibleField[possibleField.length - 1] === '"') {
+					possibleField = possibleField.substring(1,
+						possibleField.length - 1);
+				} else if (possibleField.length > 0
+					&& possibleField[0] === '"'
+					&& possibleToken[possibleToken.length - 1] === '"'
+					&& possibleToken[0] !== '"') {
+					possibleField = possibleField.substring(1,
+						possibleField.length);
+					possibleToken = '"' + possibleToken;
 
 				}
-				if (predicate != null) {
-					predicates.push(isNot ? new morpheus.Util.NotPredicate(
-							predicate) : predicate);
+				if (!validateFieldNames
+					|| availableFields.indexOf(possibleField) !== -1) {
+					token = possibleToken;
+					field = possibleField;
 				}
+			}
+		}
 
-			});
+		var predicate;
+		var rangeIndex = -1;
+		var rangeToken = null;
+		var rangeIndicators = ['..', '>=', '>', '<=', '<', '='];
+		for (var i = 0; i < rangeIndicators.length; i++) {
+			rangeIndex = token.indexOf(rangeIndicators[i]);
+			if (rangeIndex !== -1) {
+				rangeToken = rangeIndicators[i];
+				break;
+			}
+		}
+
+		if (rangeIndex !== -1) { // range query
+			if (rangeToken === '..') {
+				var start = parseFloat(token.substring(0, rangeIndex));
+				var end = parseFloat(token.substring(rangeIndex + 2));
+				if (!isNaN(start) && !isNaN(end)) {
+					predicate = new morpheus.Util.NumberRangePredicate(
+						field, start, end);
+				}
+			} else if (rangeToken === '>') {
+				var val = parseFloat(token.substring(rangeIndex + 1));
+				if (!isNaN(val)) {
+					predicate = new morpheus.Util.GreaterThanPredicate(
+						field, val);
+				}
+			} else if (rangeToken === '>=') {
+				var val = parseFloat(token.substring(rangeIndex + 2));
+				if (!isNaN(val)) {
+					predicate = new morpheus.Util.GreaterThanOrEqualPredicate(
+						field, val);
+				}
+			} else if (rangeToken === '<') {
+				var val = parseFloat(token.substring(rangeIndex + 1));
+				if (!isNaN(val)) {
+					predicate = new morpheus.Util.LessThanPredicate(
+						field, val);
+				}
+			} else if (rangeToken === '<=') {
+				var val = parseFloat(token.substring(rangeIndex + 2));
+				if (!isNaN(val)) {
+					predicate = new morpheus.Util.LessThanOrEqualPredicate(
+						field, val);
+				}
+			} else if (rangeToken === '=') {
+				var val = parseFloat(token.substring(rangeIndex + 1));
+				if (!isNaN(val)) {
+					predicate = new morpheus.Util.EqualsPredicate(
+						field, val);
+				}
+			} else {
+				predicate = defaultIsExactMatch ? new morpheus.Util.ExactTermPredicate(
+					field, token)
+					: new morpheus.Util.RegexPredicate(field, token);
+			}
+		} else if (token[0] === '"' && token[token.length - 1] === '"') { // exact
+			// match
+			token = token.substring(1, token.length - 1);
+			predicate = new morpheus.Util.ExactTermPredicate(field,
+				token);
+		} else if (token.indexOf('*') !== -1) { // contains
+			predicate = new morpheus.Util.RegexPredicate(field, token);
+		} else {
+			predicate = defaultIsExactMatch ? new morpheus.Util.ExactTermPredicate(
+				field, token)
+				: new morpheus.Util.RegexPredicate(field, token);
+
+		}
+		if (predicate != null) {
+			predicates.push(isNot ? new morpheus.Util.NotPredicate(
+				predicate) : predicate);
+		}
+
+	});
 	return predicates;
 };
 
-morpheus.Util.createRegExpStringToMatchText = function(text) {
+morpheus.Util.createRegExpStringToMatchText = function (text) {
 	var tokens = morpheus.Util.getAutocompleteTokens(text);
 	if (tokens.length === 0) {
 		return null;
 	}
 	var regex = [];
-	_.each(tokens, function(token) {
+	_.each(tokens, function (token) {
 		if (token[0] === '"' && token[token.length - 1] === '"') {
 			token = token.substring(1, token.length - 1);
 			regex.push('^' + morpheus.Util.escapeRegex(token) + '$'); // exact
@@ -1136,27 +1156,27 @@ morpheus.Util.createRegExpStringToMatchText = function(text) {
 	});
 	return '(' + regex.join('|') + ')';
 };
-morpheus.Util.createRegExpToMatchText = function(text) {
+morpheus.Util.createRegExpToMatchText = function (text) {
 	var s = morpheus.Util.createRegExpStringToMatchText(text);
 	return s == null ? null : new RegExp(s, 'i');
 };
-morpheus.Util.reorderArray = function(array, index) {
+morpheus.Util.reorderArray = function (array, index) {
 	var newArray = [];
 	for (var i = 0; i < index.length; i++) {
 		newArray.push(array[index[i]]);
 	}
 	return newArray;
 };
-morpheus.Util.getSearchString = function() {
+morpheus.Util.getSearchString = function () {
 	var s = window.location.search;
 	return s.length > 1 ? s.substring(1) : '';
 };
 /**
  * Takes an array of strings and splits each string by \t
- * 
+ *
  * @return An array of arrays
  */
-morpheus.Util.splitLines = function(lines) {
+morpheus.Util.splitLines = function (lines) {
 	var tab = new RegExp('\t');
 	var tokens = [];
 	for (var i = 0, nlines = lines.length; i < nlines; i++) {
@@ -1174,7 +1194,7 @@ morpheus.Util.splitLines = function(lines) {
  *            a File or url
  * @return A deferred object that resolves to an array of arrays
  */
-morpheus.Util.readLines = function(fileOrUrl) {
+morpheus.Util.readLines = function (fileOrUrl) {
 	var isFile = fileOrUrl instanceof File;
 	var isString = typeof fileOrUrl === 'string' || fileOrUrl instanceof String;
 	var name = morpheus.Util.getFileName(fileOrUrl);
@@ -1185,7 +1205,7 @@ morpheus.Util.readLines = function(fileOrUrl) {
 			var oReq = new XMLHttpRequest();
 			oReq.open('GET', fileOrUrl, true);
 			oReq.responseType = 'arraybuffer';
-			oReq.onload = function(oEvent) {
+			oReq.onload = function (oEvent) {
 				var arrayBuffer = oReq.response; // Note: not
 				// oReq.responseText
 				if (arrayBuffer) {
@@ -1204,17 +1224,17 @@ morpheus.Util.readLines = function(fileOrUrl) {
 			oReq.send(null);
 		} else {
 			$.ajax({
-				url : fileOrUrl,
-			}).done(function(text, status, xhr) {
+				url: fileOrUrl,
+			}).done(function (text, status, xhr) {
 				deferred.resolve(morpheus.Util.splitOnNewLine(text));
 			});
 		}
 	} else if (isFile) {
 		var reader = new FileReader();
-		reader.onload = function(event) {
+		reader.onload = function (event) {
 			deferred.resolve(ext === 'xlsx' ? morpheus.Util
-					.xlsxTo1dArray(event.target.result) : morpheus.Util
-					.splitOnNewLine(event.target.result));
+			.xlsxTo1dArray(event.target.result) : morpheus.Util
+			.splitOnNewLine(event.target.result));
 		};
 		if (ext === 'xlsx') {
 			reader.readAsBinaryString(fileOrUrl);
@@ -1226,9 +1246,9 @@ morpheus.Util.readLines = function(fileOrUrl) {
 	}
 	return deferred;
 };
-morpheus.Util.createValueToIndices = function(array, field) {
+morpheus.Util.createValueToIndices = function (array, field) {
 	var map = new morpheus.Map();
-	_.each(array, function(item) {
+	_.each(array, function (item) {
 		var key = item[field];
 		var values = map.get(key);
 		if (values === undefined) {
@@ -1243,9 +1263,9 @@ morpheus.Util.createValueToIndices = function(array, field) {
 /**
  * Splits a string by the new line character, trimming whitespace
  */
-morpheus.Util.splitOnNewLine = function(text, commentChar) {
+morpheus.Util.splitOnNewLine = function (text, commentChar) {
 	var commentCharCode = commentChar !== undefined ? commentChar.charCodeAt(0)
-			: undefined;
+		: undefined;
 
 	var lines = text.split(/\n/);
 	if (lines.length === 1) {
@@ -1271,175 +1291,175 @@ morpheus.Util.splitOnNewLine = function(text, commentChar) {
 	return rows;
 };
 
-morpheus.Util.ContainsPredicate = function(field, text) {
+morpheus.Util.ContainsPredicate = function (field, text) {
 	this.field = field;
 	text = text.toLowerCase();
 	this.text = text;
 };
 morpheus.Util.ContainsPredicate.prototype = {
-	accept : function(value) {
+	accept: function (value) {
 		return value.toLowerCase
-				&& value.toLowerCase().indexOf(this.text) !== -1;
+			&& value.toLowerCase().indexOf(this.text) !== -1;
 	},
-	getField : function() {
+	getField: function () {
 		return this.field;
 	},
-	isNumber : function() {
+	isNumber: function () {
 		return false;
 	},
-	toString : function() {
+	toString: function () {
 		return 'ContainsPredicate ' + this.field + ':' + this.text;
 	}
 };
-morpheus.Util.ExactTermPredicate = function(field, term) {
+morpheus.Util.ExactTermPredicate = function (field, term) {
 	this.field = field;
 	term = term.toLowerCase();
 	this.text = term;
 };
 morpheus.Util.ExactTermPredicate.prototype = {
-	accept : function(value) {
+	accept: function (value) {
 		return value.toLowerCase && value.toLowerCase() === this.text;
 	},
-	getField : function() {
+	getField: function () {
 		return this.field;
 	},
-	isNumber : function() {
+	isNumber: function () {
 		return false;
 	},
-	toString : function() {
+	toString: function () {
 		return 'ExactTermPredicate ' + this.field + ':' + this.text;
 	}
 };
-morpheus.Util.RegexPredicate = function(field, text) {
+morpheus.Util.RegexPredicate = function (field, text) {
 	this.field = field;
 	this.text = text;
 	this.regex = new RegExp(morpheus.Util.escapeRegex(text), 'i');
 };
 morpheus.Util.RegexPredicate.prototype = {
-	accept : function(value) {
+	accept: function (value) {
 		return this.regex.test(value);
 	},
-	getField : function() {
+	getField: function () {
 		return this.field;
 	},
-	isNumber : function() {
+	isNumber: function () {
 		return false;
 	},
-	toString : function() {
+	toString: function () {
 		return 'RegexPredicate ' + this.field + ':' + this.regex;
 	}
 };
-morpheus.Util.NumberRangePredicate = function(field, min, max) {
+morpheus.Util.NumberRangePredicate = function (field, min, max) {
 	this.field = field;
 	this.min = min;
 	this.max = max;
 };
 morpheus.Util.NumberRangePredicate.prototype = {
-	accept : function(value) {
+	accept: function (value) {
 		return value >= this.min && value <= this.max;
 	},
-	getField : function() {
+	getField: function () {
 		return this.field;
 	},
-	isNumber : function() {
+	isNumber: function () {
 		return true;
 	},
-	toString : function() {
+	toString: function () {
 		return 'NumberRangePredicate ' + this.field + ':' + this.min + '...'
-				+ this.max;
+			+ this.max;
 	}
 };
 
-morpheus.Util.GreaterThanPredicate = function(field, val) {
+morpheus.Util.GreaterThanPredicate = function (field, val) {
 	this.field = field;
 	this.val = val;
 };
 morpheus.Util.GreaterThanPredicate.prototype = {
-	accept : function(value) {
+	accept: function (value) {
 		return value > this.val;
 	},
-	getField : function() {
+	getField: function () {
 		return this.field;
 	},
-	isNumber : function() {
+	isNumber: function () {
 		return true;
 	}
 };
 
-morpheus.Util.GreaterThanOrEqualPredicate = function(field, val) {
+morpheus.Util.GreaterThanOrEqualPredicate = function (field, val) {
 	this.field = field;
 	this.val = val;
 };
 morpheus.Util.GreaterThanOrEqualPredicate.prototype = {
-	accept : function(value) {
+	accept: function (value) {
 		return value >= this.val;
 	},
-	getField : function() {
+	getField: function () {
 		return this.field;
 	},
-	isNumber : function() {
+	isNumber: function () {
 		return true;
 	}
 };
-morpheus.Util.LessThanPredicate = function(field, val) {
+morpheus.Util.LessThanPredicate = function (field, val) {
 	this.field = field;
 	this.val = val;
 };
 morpheus.Util.LessThanPredicate.prototype = {
-	accept : function(value) {
+	accept: function (value) {
 		return value < this.val;
 	},
-	getField : function() {
+	getField: function () {
 		return this.field;
 	},
-	isNumber : function() {
+	isNumber: function () {
 		return true;
 	}
 };
-morpheus.Util.LessThanOrEqualPredicate = function(field, val) {
+morpheus.Util.LessThanOrEqualPredicate = function (field, val) {
 	this.field = field;
 	this.val = val;
 };
 morpheus.Util.LessThanOrEqualPredicate.prototype = {
-	accept : function(value) {
+	accept: function (value) {
 		return value <= this.val;
 	},
-	getField : function() {
+	getField: function () {
 		return this.field;
 	},
-	isNumber : function() {
+	isNumber: function () {
 		return true;
 	}
 };
-morpheus.Util.EqualsPredicate = function(field, val) {
+morpheus.Util.EqualsPredicate = function (field, val) {
 	this.field = field;
 	this.val = val;
 };
 morpheus.Util.EqualsPredicate.prototype = {
-	accept : function(value) {
+	accept: function (value) {
 		return value === this.val;
 	},
-	getField : function() {
+	getField: function () {
 		return this.field;
 	},
-	isNumber : function() {
+	isNumber: function () {
 		return true;
 	}
 };
-morpheus.Util.NotPredicate = function(p) {
+morpheus.Util.NotPredicate = function (p) {
 	this.p = p;
 };
 morpheus.Util.NotPredicate.prototype = {
-	accept : function(value) {
+	accept: function (value) {
 		return !this.p.accept(value);
 	},
-	getField : function() {
+	getField: function () {
 		return this.p.getField();
 	},
-	isNumber : function() {
+	isNumber: function () {
 		return this.p.isNumber();
 	},
-	toString : function() {
+	toString: function () {
 		return 'NotPredicate ' + this.p;
 	}
 };
