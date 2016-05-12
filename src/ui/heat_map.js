@@ -2925,8 +2925,12 @@ morpheus.HeatMap.prototype = {
 			var context = canvas.getContext('2d');
 			this.snapshot(context);
 			canvas.toBlob(function (blob) {
-				if (blob.size === 0) {
-					throw 'Image is too large.';
+				if (blob == null || blob.size === 0) {
+					morpheus.FormBuilder.showInModal({
+						title: 'Save Image',
+						html: 'Image is too large to save.'
+					});
+					return;
 				}
 
 				saveAs(blob, file, true);
