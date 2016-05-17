@@ -1,4 +1,4 @@
-morpheus.VectorTrackHeader = function(project, name, isColumns, controller) {
+morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
 	morpheus.AbstractCanvas.call(this);
 	this.project = project;
 	this.name = name;
@@ -6,48 +6,50 @@ morpheus.VectorTrackHeader = function(project, name, isColumns, controller) {
 	var canvas = this.canvas;
 	this.controller = controller;
 	var vector = (isColumns ? project.getFullDataset().getColumnMetadata()
-			: project.getFullDataset().getRowMetadata()).getByName(name);
+		: project.getFullDataset().getRowMetadata()).getByName(name);
 	if (vector && vector.getProperties().has(morpheus.VectorKeys.TITLE)) {
 		this.canvas.setAttribute('title', vector.getProperties().get(
-				morpheus.VectorKeys.TITLE));
+			morpheus.VectorKeys.TITLE));
 		$(this.canvas).tooltip();
 	}
 
 	var _this = this;
 
 	this.setBounds({
-		height : this.defaultFontHeight
-				+ morpheus.VectorTrackHeader.FONT_OFFSET
+		height: this.defaultFontHeight
+		+ morpheus.VectorTrackHeader.FONT_OFFSET
 	});
 
 	function getResizeCursor(pos) {
 		if (isColumns) {
-			if (pos.y >= (_this.getUnscaledHeight() - 3)) {
+			if (pos.y < 3 || pos.y >= (_this.getUnscaledHeight() - 3)) {
 				return 'ns-resize';
 			}
 		}
-		if (pos.x >= (_this.getUnscaledWidth() - 3)) {
+		if (pos.x < 3 || pos.x >= (_this.getUnscaledWidth() - 3)) {
 			return 'ew-resize';
 		}
 	}
-	var mouseMove = function(event) {
+
+	var mouseMove = function (event) {
 		if (!morpheus.CanvasUtil.dragging) {
 			var pos = morpheus.CanvasUtil.getMousePos(event.target, event);
 			var cursor = getResizeCursor(pos);
 			canvas.style.cursor = !cursor ? 'default' : cursor;
+			//document.body.style.cursor = !cursor ? 'default' : cursor;
 			_this.isMouseOver = true;
 			_this.repaint();
 		}
 
 	};
-	var mouseExit = function(e) {
+	var mouseExit = function (e) {
 		if (!morpheus.CanvasUtil.dragging) {
 			canvas.style.cursor = 'default';
 		}
 		_this.isMouseOver = false;
 		_this.repaint();
 	};
-	var showPopup = function(e) {
+	var showPopup = function (e) {
 		controller.setSelectedTrack(_this.name, isColumns);
 		var track = controller.getTrack(_this.name, isColumns);
 		if (!track) {
@@ -65,9 +67,9 @@ morpheus.VectorTrackHeader = function(project, name, isColumns, controller) {
 	};
 	this.selectedBackgroundColor = '#c8c8c8';
 	this.backgroundColor = '#f9f9f9';
-	$(this.canvas).css('background-color', this.backgroundColor).on(
-			'mousemove.morpheus', mouseMove).on('mouseout.morpheus', mouseExit)
-			.on('mouseenter.morpheus', mouseMove);
+	$(this.canvas).css({'background-color': this.backgroundColor}).on(
+		'mousemove.morpheus', mouseMove).on('mouseout.morpheus', mouseExit)
+	.on('mouseenter.morpheus', mouseMove);
 
 	$(this.canvas).on('contextmenu.morpheus', showPopup);
 
@@ -84,207 +86,207 @@ morpheus.VectorTrackHeader = function(project, name, isColumns, controller) {
 	// }, 100);
 	// $(canvas).on('mouseout', throttled).on('mousemove', throttled);
 	this.hammer = morpheus.Util
-			.hammer(canvas, [ 'pan', 'tap', 'longpress' ])
-			.on('longpress', function(event) {
+	.hammer(canvas, ['pan', 'tap', 'longpress'])
+	.on('longpress', function (event) {
+		event.preventDefault();
+		controller.setSelectedTrack(_this.name, isColumns);
+		var track = controller.getTrack(_this.name, isColumns);
+		track.showPopup(event.srcEvent, true);
+	})
+	.on(
+		'panend',
+		function (event) {
+			_this.isMouseOver = false;
+			morpheus.CanvasUtil.dragging = false;
+			canvas.style.cursor = 'default';
+			var index = controller.getTrackIndex(_this.name,
+				isColumns);
+			var header = controller.getTrackHeaderByIndex(index,
+				isColumns);
+			var track = controller
+			.getTrackByIndex(index, isColumns);
+			var $canvas = $(track.canvas);
+			$canvas.css('z-index', '0');
+			$(header.canvas).css('z-index', '0');
+			controller.revalidate();
+		})
+	.on(
+		'panstart',
+		function (event) {
+			_this.isMouseOver = false;
+			if (morpheus.CanvasUtil.dragging) {
+				return;
+			}
+			resizeCursor = getResizeCursor(morpheus.CanvasUtil
+			.getMousePos(event.target, event, true));
+			if (resizeCursor) { // make sure start event was on
+				// hotspot
+				morpheus.CanvasUtil.dragging = true;
+				canvas.style.cursor = resizeCursor;
+				dragStartWidth = _this.getUnscaledWidth();
+				dragStartHeight = _this.getUnscaledHeight();
 				event.preventDefault();
+				dragging = false;
+			} else {
+				var index = controller.getTrackIndex(_this.name,
+					isColumns);
+				if (index == -1) {
+					throw _this.name + ' not found';
+				}
+				var header = controller.getTrackHeaderByIndex(
+					index, isColumns);
+				var track = controller.getTrackByIndex(index,
+					isColumns);
 				controller.setSelectedTrack(_this.name, isColumns);
-				var track = controller.getTrack(_this.name, isColumns);
-				track.showPopup(event.srcEvent, true);
-			})
-			.on(
-					'panend',
-					function(event) {
-						_this.isMouseOver = false;
-						morpheus.CanvasUtil.dragging = false;
-						canvas.style.cursor = 'default';
-						var index = controller.getTrackIndex(_this.name,
-								isColumns);
-						var header = controller.getTrackHeaderByIndex(index,
-								isColumns);
-						var track = controller
-								.getTrackByIndex(index, isColumns);
-						var $canvas = $(track.canvas);
-						$canvas.css('z-index', '0');
-						$(header.canvas).css('z-index', '0');
-						controller.revalidate();
-					})
-			.on(
-					'panstart',
-					function(event) {
-						_this.isMouseOver = false;
-						if (morpheus.CanvasUtil.dragging) {
-							return;
-						}
-						resizeCursor = getResizeCursor(morpheus.CanvasUtil
-								.getMousePos(event.target, event, true));
-						if (resizeCursor) { // make sure start event was on
-							// hotspot
-							morpheus.CanvasUtil.dragging = true;
-							canvas.style.cursor = resizeCursor;
-							dragStartWidth = _this.getUnscaledWidth();
-							dragStartHeight = _this.getUnscaledHeight();
-							event.preventDefault();
-							dragging = false;
+				var $canvas = $(track.canvas);
+				dragStartPosition = $canvas.position();
+				$canvas.css('z-index', '100');
+				$(header.canvas).css('z-index', '100');
+				morpheus.CanvasUtil.dragging = true;
+				resizeCursor = undefined;
+				dragging = true;
+			}
+		})
+	.on(
+		'panmove',
+		function (event) {
+			_this.isMouseOver = false;
+			if (resizeCursor) {
+				var width;
+				var height;
+				if (resizeCursor === 'ew-resize') {
+					var dx = event.deltaX;
+					width = Math.max(8, dragStartWidth + dx);
+				}
+
+				if (resizeCursor === 'ns-resize') {
+					var dy = event.deltaY;
+					height = Math.max(8, dragStartHeight + dy);
+				}
+
+				controller.resizeTrack(_this.name, width, height,
+					isColumns);
+			} else if (dragging) { // reorder
+				var index = controller.getTrackIndex(_this.name,
+					isColumns);
+				var header = controller.getTrackHeaderByIndex(
+					index, isColumns);
+				var track = controller.getTrackByIndex(index,
+					isColumns);
+				var ntracks = controller.getNumTracks(isColumns);
+				var delta = isColumns ? event.deltaY : event.deltaX;
+				var newIndex = index + (delta > 0 ? 1 : -1);
+				newIndex = Math.min(Math.max(0, newIndex),
+					ntracks - 1);
+				var prop = isColumns ? 'top' : 'left';
+				var w = isColumns ? 'getUnscaledHeight'
+					: 'getUnscaledWidth';
+				var trackBounds = {};
+				trackBounds[prop] = dragStartPosition[prop] + delta;
+				track.setBounds(trackBounds);
+				header.setBounds(trackBounds);
+				var dragOverTrack = controller.getTrackByIndex(
+					newIndex, isColumns);
+				var dragOverWidth = dragOverTrack[w]();
+				var dragOverLeft = $(dragOverTrack.canvas)
+				.position()[prop];
+				var dragleft = dragStartPosition[prop] + delta;
+				var dragright = dragleft + track[w]();
+				if ((delta > 0 && dragright >= dragOverLeft
+					+ dragOverWidth / 2)
+					|| (delta < 0 && dragleft <= dragOverLeft
+					+ dragOverWidth / 2)) {
+					if (index !== newIndex) {
+						controller.moveTrack(index, newIndex,
+							isColumns);
+						var otherHeader = controller
+						.getTrackHeaderByIndex(index,
+							isColumns);
+						var otherTrack = controller
+						.getTrackByIndex(index, isColumns);
+						var $movedCanvas = $(otherTrack.canvas);
+						var newLeft = $movedCanvas.position()[prop];
+						if (delta < 0) {
+							newLeft += track[w]();
 						} else {
-							var index = controller.getTrackIndex(_this.name,
-									isColumns);
-							if (index == -1) {
-								throw _this.name + ' not found';
-							}
-							var header = controller.getTrackHeaderByIndex(
-									index, isColumns);
-							var track = controller.getTrackByIndex(index,
-									isColumns);
-							controller.setSelectedTrack(_this.name, isColumns);
-							var $canvas = $(track.canvas);
-							dragStartPosition = $canvas.position();
-							$canvas.css('z-index', '100');
-							$(header.canvas).css('z-index', '100');
-							morpheus.CanvasUtil.dragging = true;
-							resizeCursor = undefined;
-							dragging = true;
+							newLeft -= track[w]();
 						}
-					})
-			.on(
-					'panmove',
-					function(event) {
-						_this.isMouseOver = false;
-						if (resizeCursor) {
-							var width;
-							var height;
-							if (resizeCursor === 'ew-resize') {
-								var dx = event.deltaX;
-								width = Math.max(8, dragStartWidth + dx);
-							}
+						var otherBounds = {};
+						otherBounds[prop] = newLeft;
+						otherTrack.setBounds(otherBounds);
+						otherHeader.setBounds(otherBounds);
+					}
+				}
+			}
+		})
+	.on(
+		'tap',
+		function (event) {
+			if (morpheus.Util.IS_MAC && event.srcEvent.ctrlKey) { // right-click
+				return;
+			}
+			_this.isMouseOver = false;
+			controller.setSelectedTrack(_this.name, isColumns);
+			if (isColumns && !controller.options.columnsSortable) {
+				return;
+			}
+			if (!isColumns && !controller.options.rowsSortable) {
+				return;
+			}
 
-							if (resizeCursor === 'ns-resize') {
-								var dy = event.deltaY;
-								height = Math.max(8, dragStartHeight + dy);
-							}
+			var additionalSort = event.srcEvent.shiftKey;
+			var isGroupBy = false; // event.srcEvent.altKey;
 
-							controller.resizeTrack(_this.name, width, height,
-									isColumns);
-						} else if (dragging) { // reorder
-							var index = controller.getTrackIndex(_this.name,
-									isColumns);
-							var header = controller.getTrackHeaderByIndex(
-									index, isColumns);
-							var track = controller.getTrackByIndex(index,
-									isColumns);
-							var ntracks = controller.getNumTracks(isColumns);
-							var delta = isColumns ? event.deltaY : event.deltaX;
-							var newIndex = index + (delta > 0 ? 1 : -1);
-							newIndex = Math.min(Math.max(0, newIndex),
-									ntracks - 1);
-							var prop = isColumns ? 'top' : 'left';
-							var w = isColumns ? 'getUnscaledHeight'
-									: 'getUnscaledWidth';
-							var trackBounds = {};
-							trackBounds[prop] = dragStartPosition[prop] + delta;
-							track.setBounds(trackBounds);
-							header.setBounds(trackBounds);
-							var dragOverTrack = controller.getTrackByIndex(
-									newIndex, isColumns);
-							var dragOverWidth = dragOverTrack[w]();
-							var dragOverLeft = $(dragOverTrack.canvas)
-									.position()[prop];
-							var dragleft = dragStartPosition[prop] + delta;
-							var dragright = dragleft + track[w]();
-							if ((delta > 0 && dragright >= dragOverLeft
-									+ dragOverWidth / 2)
-									|| (delta < 0 && dragleft <= dragOverLeft
-											+ dragOverWidth / 2)) {
-								if (index !== newIndex) {
-									controller.moveTrack(index, newIndex,
-											isColumns);
-									var otherHeader = controller
-											.getTrackHeaderByIndex(index,
-													isColumns);
-									var otherTrack = controller
-											.getTrackByIndex(index, isColumns);
-									var $movedCanvas = $(otherTrack.canvas);
-									var newLeft = $movedCanvas.position()[prop];
-									if (delta < 0) {
-										newLeft += track[w]();
-									} else {
-										newLeft -= track[w]();
-									}
-									var otherBounds = {};
-									otherBounds[prop] = newLeft;
-									otherTrack.setBounds(otherBounds);
-									otherHeader.setBounds(otherBounds);
-								}
-							}
-						}
-					})
-			.on(
-					'tap',
-					function(event) {
-						if (morpheus.Util.IS_MAC && event.srcEvent.ctrlKey) { // right-click
-							return;
-						}
-						_this.isMouseOver = false;
-						controller.setSelectedTrack(_this.name, isColumns);
-						if (isColumns && !controller.options.columnsSortable) {
-							return;
-						}
-						if (!isColumns && !controller.options.rowsSortable) {
-							return;
-						}
+			var existingSortKeyIndex = _this
+			.getSortKeyIndexForColumnName(_this
+			.getSortKeys(), _this.name);
+			var sortOrder;
+			var sortKey;
+			if (existingSortKeyIndex != -1) {
+				sortKey = _this.getSortKeys()[existingSortKeyIndex];
+				if (sortKey.getSortOrder() === morpheus.SortKey.SortOrder.UNSORTED) {
+					sortOrder = morpheus.SortKey.SortOrder.ASCENDING; // 1st
+					// click
+				} else if (sortKey.getSortOrder() === morpheus.SortKey.SortOrder.ASCENDING) {
+					sortOrder = morpheus.SortKey.SortOrder.DESCENDING; // 2nd
+					// click
+				} else {
+					sortOrder = morpheus.SortKey.SortOrder.UNSORTED; // 3rd
+					// click
+				}
 
-						var additionalSort = event.srcEvent.shiftKey;
-						var isGroupBy = false; // event.srcEvent.altKey;
-
-						var existingSortKeyIndex = _this
-								.getSortKeyIndexForColumnName(_this
-										.getSortKeys(), _this.name);
-						var sortOrder;
-						var sortKey;
-						if (existingSortKeyIndex != -1) {
-							sortKey = _this.getSortKeys()[existingSortKeyIndex];
-							if (sortKey.getSortOrder() === morpheus.SortKey.SortOrder.UNSORTED) {
-								sortOrder = morpheus.SortKey.SortOrder.ASCENDING; // 1st
-								// click
-							} else if (sortKey.getSortOrder() === morpheus.SortKey.SortOrder.ASCENDING) {
-								sortOrder = morpheus.SortKey.SortOrder.DESCENDING; // 2nd
-								// click
-							} else {
-								sortOrder = morpheus.SortKey.SortOrder.UNSORTED; // 3rd
-								// click
-							}
-
-						} else {
-							sortKey = new morpheus.SortKey(_this.name,
-									morpheus.SortKey.SortOrder.ASCENDING);
-							sortOrder = morpheus.SortKey.SortOrder.ASCENDING;
-						}
-						if (sortKey != null) {
-							sortKey.setSortOrder(sortOrder);
-							_this.setSortingStatus(_this.getSortKeys(),
-									sortKey, additionalSort, isGroupBy);
-						}
-						// }
-					});
+			} else {
+				sortKey = new morpheus.SortKey(_this.name,
+					morpheus.SortKey.SortOrder.ASCENDING);
+				sortOrder = morpheus.SortKey.SortOrder.ASCENDING;
+			}
+			if (sortKey != null) {
+				sortKey.setSortOrder(sortOrder);
+				_this.setSortingStatus(_this.getSortKeys(),
+					sortKey, additionalSort, isGroupBy);
+			}
+			// }
+		});
 };
 morpheus.VectorTrackHeader.FONT_OFFSET = 2;
 morpheus.VectorTrackHeader.prototype = {
-	selected : false,
-	isMouseOver : false,
-	defaultFontHeight : 11,
-	dispose : function() {
+	selected: false,
+	isMouseOver: false,
+	defaultFontHeight: 11,
+	dispose: function () {
 		morpheus.AbstractCanvas.prototype.dispose.call(this);
 		$(this.canvas)
-				.off(
-						'contextmenu.morpheus mousemove.morpheus mouseout.morpheus mouseenter.morpheus');
+		.off(
+			'contextmenu.morpheus mousemove.morpheus mouseout.morpheus mouseenter.morpheus');
 		this.hammer.destroy();
 	},
-	getPreferredSize : function() {
+	getPreferredSize: function () {
 		var size = this.getPrintSize();
 		size.width += 22;
 
 		if (!this.isColumns) {
 			size.height = this.defaultFontHeight
-					+ morpheus.VectorTrackHeader.FONT_OFFSET;
+				+ morpheus.VectorTrackHeader.FONT_OFFSET;
 		}
 		// var vector = (this.isColumns ? this.project.getFullDataset()
 		// .getColumnMetadata() : this.project.getFullDataset()
@@ -304,33 +306,33 @@ morpheus.VectorTrackHeader.prototype = {
 		// }
 		return size;
 	},
-	getPrintSize : function() {
+	getPrintSize: function () {
 		var context = this.canvas.getContext('2d');
 		context.font = this.defaultFontHeight + 'px '
-				+ morpheus.CanvasUtil.FONT_NAME;
+			+ morpheus.CanvasUtil.FONT_NAME;
 		var width = 4 + context.measureText(this.name).width;
 		return {
-			width : width,
-			height : this.getUnscaledHeight()
+			width: width,
+			height: this.getUnscaledHeight()
 		};
 	},
-	getSortKeys : function() {
+	getSortKeys: function () {
 		return this.isColumns ? this.project.getColumnSortKeys() : this.project
-				.getRowSortKeys();
+		.getRowSortKeys();
 	},
-	setOrder : function(sortKeys) {
+	setOrder: function (sortKeys) {
 		if (this.isColumns) {
 			this.project.setColumnSortKeys(morpheus.SortKey
-					.keepExistingSortKeys(sortKeys, this.project
-							.getColumnSortKeys()), false);
+			.keepExistingSortKeys(sortKeys, this.project
+			.getColumnSortKeys()), false);
 		} else {
 			this.project.setRowSortKeys(morpheus.SortKey.keepExistingSortKeys(
-					sortKeys, this.project.getRowSortKeys()), false);
+				sortKeys, this.project.getRowSortKeys()), false);
 		}
 	},
-	setGroupBy : function(groupBy) {
+	setGroupBy: function (groupBy) {
 		var existingGroupBy = this.isColumns ? this.project.groupColumns
-				: this.project.groupRows;
+			: this.project.groupRows;
 		// see if already exists, if so remove it
 		var index = -1;
 		for (var i = 0, length = existingGroupBy.length; i < length; i++) {
@@ -339,7 +341,7 @@ morpheus.VectorTrackHeader.prototype = {
 				break;
 			}
 		}
-		var newGroupBy = [ groupBy ];
+		var newGroupBy = [groupBy];
 		if (index !== -1) {
 			newGroupBy = existingGroupBy;
 			newGroupBy.splice(index, 1);
@@ -350,31 +352,31 @@ morpheus.VectorTrackHeader.prototype = {
 			this.project.setGroupRows(newGroupBy, true);
 		}
 	},
-	setSelected : function(selected) {
+	setSelected: function (selected) {
 		if (selected != this.selected) {
 			this.selected = selected;
 			$(this.canvas)
-					.css(
+			.css(
 				{
-					'background-color' : this.selected ? this.selectedBackgroundColor
-										: this.backgroundColor
+					'background-color': this.selected ? this.selectedBackgroundColor
+						: this.backgroundColor
 				});
 		}
 	},
-	setSortingStatus : function(sortKeys, sortKey, additionalSort, isGroupBy) {
+	setSortingStatus: function (sortKeys, sortKey, additionalSort, isGroupBy) {
 		if (!isGroupBy) {
 			if (sortKey.getSortOrder() == morpheus.SortKey.SortOrder.UNSORTED
-					&& !additionalSort) {
+				&& !additionalSort) {
 				this.setOrder([]);
 			} else {
 				if (additionalSort && sortKeys.length == 0) {
 					additionalSort = false;
 				}
 				if (!additionalSort) {
-					sortKeys = [ sortKey ];
+					sortKeys = [sortKey];
 				} else {
 					var sortKeyIndex = this.getSortKeyIndexForColumnName(
-							sortKeys, sortKey.toString());
+						sortKeys, sortKey.toString());
 					if (sortKeyIndex === -1) { // new sort column
 						sortKeys.push(sortKey);
 					} else { // change sort order of existing sort column
@@ -394,7 +396,7 @@ morpheus.VectorTrackHeader.prototype = {
 			}
 		}
 	},
-	getSortKeyIndexForColumnName : function(sortKeys, columnName) {
+	getSortKeyIndexForColumnName: function (sortKeys, columnName) {
 		if (sortKeys != null) {
 			for (var i = 0, size = sortKeys.length; i < size; i++) {
 				if (columnName === sortKeys[i].toString()) {
@@ -404,7 +406,7 @@ morpheus.VectorTrackHeader.prototype = {
 		}
 		return -1;
 	},
-	print : function(clip, context) {
+	print: function (clip, context) {
 		if (clip.height <= 6) {
 			return;
 		}
@@ -413,23 +415,23 @@ morpheus.VectorTrackHeader.prototype = {
 			context.textAlign = 'right';
 			context.font = Math.min(this.defaultFontHeight, clip.height
 					- morpheus.VectorTrackHeader.FONT_OFFSET)
-					+ 'px ' + morpheus.CanvasUtil.FONT_NAME;
+				+ 'px ' + morpheus.CanvasUtil.FONT_NAME;
 		} else {
 			context.textAlign = 'left';
 			context.font = (clip.height - morpheus.VectorTrackHeader.FONT_OFFSET)
-					+ 'px ' + morpheus.CanvasUtil.FONT_NAME;
+				+ 'px ' + morpheus.CanvasUtil.FONT_NAME;
 		}
 		context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
 		context.fillText(this.name, 0, 0);
 	},
-	draw : function(clip, context) {
+	draw: function (clip, context) {
 		var sortKeys = this.getSortKeys();
 		var name = this.name;
 		var existingSortKeyIndex = this.getSortKeyIndexForColumnName(sortKeys,
-				name);
+			name);
 		morpheus.CanvasUtil.resetTransform(context);
 		context.clearRect(0, 0, this.getUnscaledWidth(), this
-				.getUnscaledHeight());
+		.getUnscaledHeight());
 
 		if (this.getUnscaledHeight() < 5) {
 			return;
@@ -449,11 +451,11 @@ morpheus.VectorTrackHeader.prototype = {
 			context.textAlign = 'left';
 		}
 		var fontHeight = Math.min(this.defaultFontHeight, this
-				.getUnscaledHeight()
-				- morpheus.VectorTrackHeader.FONT_OFFSET);
+			.getUnscaledHeight()
+			- morpheus.VectorTrackHeader.FONT_OFFSET);
 		var squished = this.controller.getTrack(this.name, this.isColumns).settings.squished;
 		context.font = (squished ? 'Italic ' : '') + fontHeight + 'px '
-				+ morpheus.CanvasUtil.FONT_NAME;
+			+ morpheus.CanvasUtil.FONT_NAME;
 		var textWidth = context.measureText(name).width;
 		var isColumns = this.isColumns;
 		var xpix = this.isColumns ? this.getUnscaledWidth() - 2 : 10;
@@ -466,7 +468,7 @@ morpheus.VectorTrackHeader.prototype = {
 			}
 		}
 		var ypix = this.isColumns ? (this.getUnscaledHeight() / 2)
-				: (this.getUnscaledHeight() - (this.defaultFontHeight + morpheus.VectorTrackHeader.FONT_OFFSET) / 2);
+			: (this.getUnscaledHeight() - (this.defaultFontHeight + morpheus.VectorTrackHeader.FONT_OFFSET) / 2);
 		context.textBaseline = 'middle';
 		if (this.isMouseOver) {
 			context.fillStyle = 'rgb(0,0,0)';
@@ -640,7 +642,7 @@ morpheus.VectorTrackHeader.prototype = {
 				context.textAlign = 'left';
 				context.font = '8px ' + morpheus.CanvasUtil.FONT_NAME;
 				context.fillText('' + (existingSortKeyIndex + 1), x + 4,
-						ypix - 3);
+					ypix - 3);
 			}
 		}
 	}
