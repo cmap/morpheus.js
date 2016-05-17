@@ -1318,7 +1318,7 @@ morpheus.Util.ExactTermPredicate = function (field, term) {
 };
 morpheus.Util.ExactTermPredicate.prototype = {
 	accept: function (value) {
-		return value.toLowerCase && value.toLowerCase() === this.text;
+		return value && value.toLowerCase && value.toLowerCase() === this.text;
 	},
 	getField: function () {
 		return this.field;
