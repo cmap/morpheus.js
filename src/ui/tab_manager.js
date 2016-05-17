@@ -2,16 +2,16 @@
  * @param options.autohideTabBar
  *            Whether to autohide the tab bar when only 1 tab showing
  */
-morpheus.TabManager = function(options) {
+morpheus.TabManager = function (options) {
 	this.options = $.extend({}, {
-		autohideTabBar : false
+		autohideTabBar: false
 	}, options);
 	var _this = this;
 	this.activeTabObject = null;
 	this.activeTabId = null;
 	this.idToTabObject = new morpheus.Map();
 	this.$nav = $('<ul class="nav nav-tabs"></ul>');
-	this.$nav.on('click', 'li > a', function(e) {
+	this.$nav.on('click', 'li > a', function (e) {
 		var tabId = $(this).attr('href');
 		e.preventDefault();
 		if (_this.activeTabId !== tabId) {
@@ -23,14 +23,14 @@ morpheus.TabManager = function(options) {
 
 		var builder = new morpheus.FormBuilder();
 		builder.append({
-			name : 'name',
-			type : 'text',
-			value : $.trim($a.contents().first().text())
+			name: 'name',
+			type: 'text',
+			value: $.trim($a.contents().first().text())
 		});
 		morpheus.FormBuilder.showOkCancel({
-			title : 'Rename Tab',
-			content : builder.$form,
-			okCallback : function() {
+			title: 'Rename Tab',
+			content: builder.$form,
+			okCallback: function () {
 				var name = $.trim(builder.getValue('name'));
 				if (name !== '') {
 					_this.activeTabObject.setName(name);
@@ -40,27 +40,28 @@ morpheus.TabManager = function(options) {
 		});
 		// edit tab name
 	}
+
 	// rename
 
-	this.$nav.on('dblclick', 'li > a', function(e) {
+	this.$nav.on('dblclick', 'li > a', function (e) {
 		e.preventDefault();
 		if ($(this).data('morpheus-rename')) {
 			rename($(this));
 		}
 
 	});
-	this.$nav.on('contextmenu.morpheus', 'li > a', function(e) {
+	this.$nav.on('contextmenu.morpheus', 'li > a', function (e) {
 		e.preventDefault();
 		e.stopPropagation();
 		e.stopImmediatePropagation();
 		var $a = $(this);
 		if ($a.data('morpheus-rename')) {
-			morpheus.Popup.showPopup([ {
-				name : 'Rename'
-			} ], {
-				x : e.pageX,
-				y : e.pageY
-			}, e.target, function(event, item) {
+			morpheus.Popup.showPopup([{
+				name: 'Rename'
+			}], {
+				x: e.pageX,
+				y: e.pageY
+			}, e.target, function (event, item) {
 				rename($a);
 			});
 		}
@@ -68,7 +69,7 @@ morpheus.TabManager = function(options) {
 
 	});
 
-	this.$nav.on('click', 'button', function(e) { // close a tab
+	this.$nav.on('click', 'button', function (e) { // close a tab
 		// remove the link and tab content
 		e.preventDefault();
 		var target = $(this).attr('data-target');
@@ -76,7 +77,7 @@ morpheus.TabManager = function(options) {
 	});
 
 	this.$tabContent = $('<div class="tab-content"></div>');
-	this.$nav.on('shown.bs.tab', 'a[data-toggle="tab"]', function(e) {
+	this.$nav.on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
 		if (_this.adding) {
 			return;
 		}
@@ -85,16 +86,16 @@ morpheus.TabManager = function(options) {
 		_this.activeTabId = $(e.target).attr('href');
 		_this.activeTabObject = _this.idToTabObject.get(_this.activeTabId);
 		_this.trigger('change', {
-			tab : _this.activeTabObject,
-			previous : previous
+			tab: _this.activeTabObject,
+			previous: previous
 		});
 	});
 
 };
 morpheus.TabManager.prototype = {
-	setTabText : function(id, text) {
+	setTabText: function (id, text) {
 		this.$nav.find('a').filter('[href=' + id + ']').contents().first()
-				.replaceWith(text + '&nbsp;');
+		.replaceWith(text + '&nbsp;');
 		this.idToTabObject.get(id).setName(name);
 	},
 	/**
@@ -107,7 +108,7 @@ morpheus.TabManager.prototype = {
 	 * @param task.tabId
 	 *            Tab id for task
 	 */
-	addTask : function(task) {
+	addTask: function (task) {
 		var $a = this.$nav.find('a[href=' + task.tabId + ']');
 		if ($a.length === 0) {
 			throw new Error(task.tabId + ' not found.');
@@ -121,17 +122,17 @@ morpheus.TabManager.prototype = {
 		tasks.push(task);
 		$i.data('tasks', tasks);
 		$a
-				.removeClass('animated flash')
-				.addClass('animated flash')
-				.one(
-						'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend',
-						function() {
-							$(this).removeClass('animated flash');
-						});
+		.removeClass('animated flash')
+		.addClass('animated flash')
+		.one(
+			'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend',
+			function () {
+				$(this).removeClass('animated flash');
+			});
 
 		$i.addClass('fa fa-spinner fa-spin');
 	},
-	removeTask : function(task) {
+	removeTask: function (task) {
 		var $a = this.$nav.find('a[href=' + task.tabId + ']');
 		var $i = $a.find('i');
 		var tasks = $i.data('tasks');
@@ -146,9 +147,9 @@ morpheus.TabManager.prototype = {
 			}
 		}
 		if (index === -1) {
-			throw new Error(task.id + ' not found in ' + tasks.map(function(t) {
-				return t.id;
-			}));
+			throw new Error(task.id + ' not found in ' + tasks.map(function (t) {
+					return t.id;
+				}));
 		}
 		tasks.splice(index, 1);
 		$i.data('tasks', tasks);
@@ -156,18 +157,18 @@ morpheus.TabManager.prototype = {
 			$i.removeClass('fa fa-spinner fa-spin');
 		}
 	},
-	getWidth : function() {
+	getWidth: function () {
 		return this.$nav.outerWidth() || $(window).width();
 	},
-	getActiveTab : function() {
+	getActiveTab: function () {
 		return this.activeTabObject;
 	},
-	getActiveTabId : function() {
+	getActiveTabId: function () {
 		return this.activeTabId;
 	},
 
 	/**
-	 * 
+	 *
 	 * @param options
 	 * @param options.$el
 	 *            the tab element
@@ -182,30 +183,30 @@ morpheus.TabManager.prototype = {
 	 *            triggered when true
 	 * @param options.enabled
 	 *            Whether new tab is enabled
-	 * 
+	 *
 	 */
-	add : function(options) {
+	add: function (options) {
 		this.adding = true;
 		var id = _.uniqueId('tab');
 		this.idToTabObject.set('#' + id, options.object);
 		var li = [];
 		li.push('<li role="presentation">');
 		li.push('<a data-morpheus-rename="' + options.rename
-				+ '" data-toggle="tab" href="#' + id + '">');
+			+ '" data-toggle="tab" href="#' + id + '">');
 		li.push(options.title);
 		li.push('&nbsp;<i style="color:black;"></i>');
 		if (options.closeable) {
 			li
-					.push('&nbsp<button type="button" class="close" aria-label="Close" data-target="#'
-							+ id
-							+ '"><span aria-hidden="true">×</span></button>');
+			.push('&nbsp<button type="button" class="close" aria-label="Close" data-target="#'
+				+ id
+				+ '"><span aria-hidden="true">×</span></button>');
 
 		}
 		li.push('</a></li>');
 		var $link = $(li.join(''));
 		$link.appendTo(this.$nav);
 		var $panel = $('<div tabIndex="-1" style="outline:0;cursor:default;" role="tabpanel" class="tab-pane" id="'
-				+ id + '"></div>');
+			+ id + '"></div>');
 		options.$el.appendTo($panel);
 		$panel.appendTo(this.$tabContent);
 		if (options.enabled === false) {
@@ -222,14 +223,14 @@ morpheus.TabManager.prototype = {
 		this.adding = false;
 		if (this.options.autohideTabBar) {
 			this.$nav.css('display', this.idToTabObject.size() > 1 ? ''
-					: 'none');
+				: 'none');
 		}
 		return {
-			$panel : $panel,
-			id : '#' + id
+			$panel: $panel,
+			id: '#' + id
 		};
 	},
-	remove : function(target) {
+	remove: function (target) {
 		if (target === undefined) {
 			target = this.activeTabId;
 		}
@@ -247,14 +248,17 @@ morpheus.TabManager.prototype = {
 		$a.tab('show');
 		if (this.options.autohideTabBar) {
 			this.$nav.css('display', this.idToTabObject.size() > 1 ? ''
-					: 'none');
+				: 'none');
 		}
+		this.trigger('remove', {
+			tab: target
+		});
 	},
-	setActiveTab : function(id) {
+	setActiveTab: function (id) {
 		if (id === this.activeTabId) {
 			this.trigger('change', {
-				tab : this.activeTabObject,
-				previous : null
+				tab: this.activeTabObject,
+				previous: null
 			});
 		}
 		var $a = this.$nav.find('[href=' + id + ']');
@@ -265,16 +269,16 @@ morpheus.TabManager.prototype = {
 
 	},
 	/**
-	 * 
+	 *
 	 * @param id
 	 *            The tab id
 	 * @param title
 	 *            The title (used to show tooltip)
 	 */
-	setTabTitle : function(id, title) {
+	setTabTitle: function (id, title) {
 		this.$nav.find('a').filter('[href=' + id + ']').attr('title', title);
 	},
-	setTabEnabled : function(id, enabled) {
+	setTabEnabled: function (id, enabled) {
 		var $a = this.$nav.find('a').filter('[href=' + id + ']');
 		if (enabled) {
 			$a.parent().removeClass('disabled');
