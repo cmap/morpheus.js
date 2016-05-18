@@ -1,0 +1,136 @@
+.slick-cell {
+    margin: 0px;
+    border: none;
+    padding: 0px;
+    background-color: inherit;
+    white-space: normal !important;
+}
+
+.slick-row {
+    font-size: 13px;
+    line-height: 100%;
+    padding: 0px;
+    margin: 0px;
+}
+
+.slick-header-column.ui-state-default {
+    height: 20px;
+    line-height: 20px;
+    padding: 0px;
+    background: none;
+    background-color: #f6f7f8;
+}
+
+.slick-header-columns {
+    background-color: white;
+}
+
+.slick-table .ui-widget-content {
+    background: none;
+}
+
+.slick-table-compact .slick-row {
+    font-size: 12px;
+}
+
+.slick-table .slick-row {
+    background-color: white;
+}
+
+.slick-striped-table .slick-row.odd {
+    background-color: #fafafa;
+}
+
+.slick-bordered-table .ui-widget-content {
+    border-bottom: 1px solid #eee !important;
+}
+
+.slick-header-column {
+    color: black;
+    background-color: white;
+    font-weight: bold;
+    border-left: 1px solid black;
+}
+
+.slick-cell, .slick-headerrow-column {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.slick-header {
+    background-color: white;
+    border: none !important;
+}
+
+.slick-cell.selected {
+    background-color: #d9edf7;
+}
+
+.slick-stacked .slick-visible-stacked {
+    display: block;
+}
+
+.slick-table:not (.slick-stacked) .slick-visible-not-stacked {
+    display: block;
+}
+
+.slick-visible-not-stacked {
+    display: none;
+}
+
+.slick-visible-stacked {
+    display: none;
+}
+
+.slick-sort-indicator-desc {
+    background: none;
+}
+
+.slick-sort-indicator-asc {
+    background: none;
+}
+
+.slick-sort-indicator-desc::after {
+    content: "\f0dd";
+    font-family: FontAwesome;
+    margin-right: 3px;
+    margin-left: 4px;
+    margin-top: -3px;
+}
+
+.slick-sort-indicator {
+    float: none !important;
+    margin: 0 !important;
+}
+
+.slick-header-column-sorted {
+    font-style: normal;
+}
+
+.slick-column-name {
+    margin-left: 4px;
+}
+
+.slick-sort-indicator-asc::after {
+    content: "\f0de";
+    font-family: FontAwesome;
+    margin-right: 3px;
+    margin-left: 4px;
+    margin-top: -3px;
+    float: none;
+}
+
+.slick-cell-wrapper {
+    max-width: 0;
+    overflow: hidden;
+    vertical-align: middle;
+    display: table-cell;
+    text-overflow: ellipsis;
+}
+
+.slick-table-wrapper {
+    display: table;
+    height: 100%;
+    padding-left: 2px;
+    width: 100%;
+}

@@ -32,6 +32,7 @@ morpheus.Table = function (options) {
 
 	this.$gridDiv = $gridDiv;
 	$gridDiv.appendTo(options.$el);
+	// all columns (including those that are currently not visible */
 	var columns = options.columns;
 	this.columns = columns;
 	var visibleColumns = columns.filter(function (c) {
@@ -51,16 +52,36 @@ morpheus.Table = function (options) {
 		columns: visibleColumns
 	});
 	this.grid = grid;
+	this.searchFunction = null;
+	var searchFilter = {
+		isEmpty: function () {
+			return _this.searchFunction == null;
+		},
+		init: function () {
+		},
+		accept: function (item) {
+			return _this.searchFunction(item);
+		}
+	};
+	// add empty search filter
+	this.grid
+	.getFilter().add(searchFilter);
+	var $header = $('<div class="slick-table-header"><div name="top"></div><div style="display: inline-block;" name="left" class="pad-bottom-8 pad-top-8"></div><div name="right" class="pull-right pad-bottom-8' +
+		' pad-top-8"></div></div>');
+	this.$header = $header;
+	var $right = $header.find('.pull-right');
 	if (options.search) {
-		var tableSearch = new morpheus.TableSearchUI();
-		tableSearch.$el.prependTo(options.$el);
+		var tableSearch = new morpheus.TableSearchUI({
+			$el: $header.find('[name=top]'),
+			$right: $right
+		});
 		tableSearch.setTable(this);
 		this.tableSearch = tableSearch;
 	}
-	if (visibleColumns.length !== this.columns.length) {
+	if (options.columnPicker && visibleColumns.length !== this.columns.length) {
 		var select = [];
 		select
-		.push('<select data-selected-text-format="static" title="Columns..." multiple class="form-control selectpicker show-tick pull-right">');
+		.push('<select data-width="90px" data-selected-text-format="static" title="Columns..." multiple class="pad-left-4 selectpicker show-tick">');
 		// sort column names
 		var sortedColumns = this.columns.slice().sort(function (a, b) {
 			a = a.name.toLowerCase();
@@ -78,32 +99,49 @@ morpheus.Table = function (options) {
 		});
 		select.push('</select>');
 		var $select = $(select.join(''));
-		var $div = $('<div class="pull-right"></div>');
-		$select.appendTo($div);
-		$div.prependTo(options.$el);
+		$select.appendTo($right);
 		$select.selectpicker({
 			iconBase: 'fa',
 			tickIcon: 'fa-check',
-			style: 'btn-default btn-sm'
+			style: 'btn-default btn-xs'
 		});
 		$select.on('change', function () {
-			var selectedItems = $select.val();
-			var selectedItemsSet = new morpheus.Set();
-			selectedItems.forEach(function (item) {
-				selectedItemsSet.add(parseInt(item));
+			var oldColumns = grid.getColumns().map(function (c) {
+				return c.id;
 			});
+			var selectedColumnIndices = $select.val();
 			visibleColumns = [];
-			_this.columns.forEach(function (c, i) {
-				if (selectedItemsSet.has(i)) {
-					visibleColumns.push(c);
-				}
+			for (var i = 0; i < selectedColumnIndices.length; i++) {
+				visibleColumns.push(sortedColumns[parseInt(selectedColumnIndices[i])]);
+			}
+			var newColumns = visibleColumns.map(function (c) {
+				return c.id;
 			});
+
 			grid.setColumns(visibleColumns);
+
+			if (newColumns.length > oldColumns.length) {
+				var set = new morpheus.Set();
+				for (var i = 0; i < newColumns.length; i++) {
+					set.add(newColumns[i]);
+				}
+				for (var i = 0; i < oldColumns.length; i++) {
+					set.remove(oldColumns[i]);
+				}
+				var added = set.values();
+
+				grid.setSortColumns([{
+					columnId: added[0],
+					sortAsc: true
+				}]);
+			}
+			// if column added, sort by added column
 			_this.resize();
 			_this.redraw();
 
 		});
 	}
+	$header.prependTo(options.$el);
 	var collapsed = false;
 	var lastWidth = -1;
 	var resize = function () {
@@ -180,6 +218,7 @@ morpheus.Table = function (options) {
 			$gridDiv.find('.slick-header').hide();
 			_this.grid.grid.resizeCanvas();
 			_this.grid.grid.invalidate();
+
 		} else if (collapsed && gridWidth >= options.collapseBreakpoint) {
 			$gridDiv.removeClass('slick-stacked');
 			collapsed = false;
@@ -198,6 +237,7 @@ morpheus.Table = function (options) {
 			_this.grid.grid.resizeCanvas();
 			_this.grid.grid.invalidate();
 		}
+		_this.grid.maybeAutoResizeColumns();
 
 	};
 	if (!options.showHeader) {
@@ -215,11 +255,40 @@ morpheus.Table = function (options) {
 		&& options.items.length > 0) {
 		this.setItems(options.items);
 	}
+	if (!$gridDiv.is(':visible')) {
+		// find 1st parent that is not visible
+		var $parent = $gridDiv;
+		var observer = new MutationObserver(function (mutations) {
+			if (window.getComputedStyle($parent[0]).display !== 'none') {
+				observer.disconnect();
+				resize();
+			}
+		});
 
-};
+		while ($parent.length > 0) {
+			if (window.getComputedStyle($parent[0]).display === 'none') {
+				break;
+			}
+			$parent = $parent.parent();
+
+		}
+
+		if ($parent.length > 0) {
+			observer.observe($parent[0], {
+				attributes: true,
+				childList: false,
+				characterData: false
+			});
+		}
+
+	}
+}
+;
 
 morpheus.Table.defaultRenderer = function (item, value) {
-	if (_.isNumber(value)) {
+	if (value == null) {
+		return '';
+	} else if (_.isNumber(value)) {
 		return morpheus.Util.nf(value);
 	} else if (morpheus.Util.isArray(value)) {
 		var s = [];
@@ -237,7 +306,32 @@ morpheus.Table.defaultRenderer = function (item, value) {
 };
 
 morpheus.Table.prototype = {
-
+	toText: function () {
+		var text = [];
+		var items = this.getItems();
+		var columns = this.columns.filter(function (c) {
+			return c.visible;
+		});
+		for (var j = 0; j < columns.length; j++) {
+			if (j > 0) {
+				text.push('\t');
+			}
+			text.push(columns[j].name);
+		}
+		text.push('\n');
+		for (var i = 0; i < items.length; i++) {
+			var item = items[i];
+			for (var j = 0; j < columns.length; j++) {
+				if (j > 0) {
+					text.push('\t');
+				}
+				var value = columns[j].getter(item);
+				text.push(morpheus.Util.toString(value));
+			}
+			text.push('\n');
+		}
+		return text.join('');
+	},
 	setHeight: function (height) {
 		this.options.height = height;
 		if (height === 'auto') {
@@ -258,13 +352,7 @@ morpheus.Table.prototype = {
 
 	},
 	setSearchVisible: function (visible) {
-		if (this.tableSearch) {
-			if (!visible) {
-				this.tableSearch.$el.hide();
-			} else {
-				this.tableSearch.$el.show();
-			}
-		}
+		this.$header.find('[name=search]').css('display', visible ? '' : 'none');
 	},
 	autocomplete: function (tokens, response) {
 		var matches = [];
@@ -272,7 +360,7 @@ morpheus.Table.prototype = {
 			: '';
 		token = $.trim(token);
 		var columns = this.columns.filter(function (c) {
-			return c.searchable && c.visible;
+			return (c.searchable && c.visible) || c.alwaysSearch;
 		});
 
 		var ncolumns = columns.length;
@@ -355,7 +443,7 @@ morpheus.Table.prototype = {
 				}
 			}
 			if (dataType === 'string' || dataType === '[string]') {
-				dataTypes.push('string');
+				dataTypes.push(dataType);
 				filteredColumns.push(c);
 			}
 		});
@@ -369,7 +457,7 @@ morpheus.Table.prototype = {
 				var value = columns[j].getter(item);
 				var dataType = dataTypes[j];
 				if (dataType === '[string]') {
-					var nvalues = value.length;
+					var nvalues = value == null ? 0 : value.length;
 					for (var k = 0; k < nvalues; k++) {
 						var val = value[k];
 						if (regex.test(val) && !set.has(val)) {
@@ -419,11 +507,14 @@ morpheus.Table.prototype = {
 	},
 	searchWithPredicates: function (predicates) {
 		if (predicates == null || predicates.length === 0) {
-			this.grid.setFilter(null);
+			this.searchFunction = null;
+			this.grid
+			.setFilter(this.grid
+			.getFilter());
 			return;
 		}
 		var columns = this.columns.filter(function (c) {
-			return c.searchable && c.visible;
+			return (c.searchable && c.visible) || c.alwaysSearch;
 		});
 		var columnNameToColumn = new morpheus.Map();
 		var columnNames = columns.map(function (c) {
@@ -450,8 +541,7 @@ morpheus.Table.prototype = {
 		}
 		predicates = filteredPredicates;
 		npredicates = predicates.length;
-		this.grid
-		.setFilter(function (item) {
+		var f = function (item) {
 			for (var p = 0; p < npredicates; p++) {
 				var predicate = predicates[p];
 				var searchColumns;
@@ -480,16 +570,22 @@ morpheus.Table.prototype = {
 			}
 
 			return false;
-		});
-
+		};
+		this.searchFunction = f;
+		this.grid
+		.setFilter(this.grid
+		.getFilter());
 	},
 	search: function (text) {
 		if (text === '') {
-			this.grid.setFilter(null);
+			this.searchFunction = null;
+			this.grid
+			.setFilter(this.grid
+			.getFilter());
 		} else {
 			var tokens = morpheus.Util.getAutocompleteTokens(text);
 			var columns = this.columns.filter(function (c) {
-				return c.searchable && c.visible;
+				return (c.searchable && c.visible) || c.alwaysSearch;
 			});
 			var columnNames = columns.map(function (c) {
 				return c.name;
@@ -525,6 +621,9 @@ morpheus.Table.prototype = {
 	setFilter: function (f) {
 		this.grid.setFilter(f);
 	},
+	getFilter: function () {
+		return this.grid.getFilter();
+	},
 	setItems: function (items) {
 		this.grid.setItems(items);
 		this.grid.redraw();
@@ -554,12 +653,13 @@ morpheus.Table.createOptions = function (options) {
 	options = $.extend(true, {}, {
 		items: [],
 		height: '564px',
-		collapseBreakpoint: 500,
+		collapseBreakpoint: 400,
 		showHeader: true,
 		select: true,
 		rowHeader: null,
 		responsive: true,
-		fixedWidth: '320px'
+		fixedWidth: '320px',
+		columnPicker: true
 	}, options);
 
 	if (!options.columns) {
@@ -637,36 +737,29 @@ morpheus.Table.createOptions = function (options) {
 	if (!options.rowHeight) {
 		// options.rowHeight = options.tableClass === 'slick-table-compact' ? 18
 		// 	: 20;
-		options.rowHeight = 20;
+		options.rowHeight = 22;
 	}
 	return options;
 };
 
-morpheus.TableSearchUI = function () {
+morpheus.TableSearchUI = function (options) {
 	var _this = this;
-	var html = [];
-	html.push('<div name="searchDiv">');
-	html.push('<form class="form">');
-	html
-	.push('<div class="form-group" style="max-width:525px; width:95%; margin:0px;">');
-
-	html
-	.push('<input name="search" type="text" class="form-control input-sm" placeholder="Search" autocomplete="off">');
-
-	html.push('<h6 name="searchResults" style="margin:0px;"></h6>');
-	html.push('</div>');
-	html.push('</form>');
-	html.push('</div>');
-	var $el = $(html.join(''));
-	this.$el = $el;
-	$el.find('form').on('submit', function (e) {
+	var $search = $('<input name="search" type="text" class="form-control input-sm"' +
+		' placeholder="Search" autocomplete="off">');
+	$search.appendTo(options.$el);
+	this.$search = $search;
+	this.$searchResults = $('<span class="pad-top-2 tableview-rowcount" name="search"></span>');
+	this.$showAll = $('<div style="display:inline-block;min-width:60px;" name="search" class="pad-left-8 text-button-copy tableview-rowcount">Show' +
+		' all</div>');
+	this.$searchResults.appendTo(options.$right);
+	this.$showAll.appendTo(options.$right);
+	this.$showAll.on('click', function (e) {
 		e.preventDefault();
+		$search.val('');
+		_this.table.search('');
+		_this.table.trigger('showAll', {table: _this.table});
+
 	});
-
-	var $search = $el.find('[name=search]');
-	var $searchResults = $el.find('[name=searchResults]');
-	this.$searchResults = $searchResults;
-
 	$search.on('keyup', _.debounce(function () {
 		_this.table.search($.trim($(this).val()));
 	}, 100));
@@ -684,20 +777,13 @@ morpheus.TableSearchUI = function () {
 
 morpheus.TableSearchUI.prototype = {
 	updateSearchLabel: function () {
-		var filteredCount = this.table.getFilteredItemCount();
-		var text = '';
-		if (filteredCount !== this.table.getAllItemCount()) {
-			text += morpheus.Util.intFormat(filteredCount) + ' match'
-				+ (filteredCount !== 1 ? 'es' : '');
-		}
+		var text = 'Showing: ' + morpheus.Util.intFormat(this.table.getFilteredItemCount()) + ' / ' + morpheus.Util.intFormat(this.table.getAllItemCount());
 		this.$searchResults.html(text);
 	},
 	setTable: function (table) {
 		this.table = table;
 		var _this = this;
-		if (!table.options.responsive) {
-			this.$el.css('width', table.options.fixedWidth);
-		}
+
 		table.on('filter', function () {
 			_this.updateSearchLabel();
 		});
@@ -705,3 +791,4 @@ morpheus.TableSearchUI.prototype = {
 	}
 
 };
+

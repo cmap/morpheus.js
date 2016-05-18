@@ -14,6 +14,7 @@ morpheus.Grid = function (options) {
 		return column.getter(item);
 	}
 
+	this.filter = new morpheus.CombinedGridFilter();
 	var model = {
 		getLength: function () {
 			return _this.viewOrder != null ? _this.viewOrder.length
@@ -115,10 +116,7 @@ morpheus.Grid = function (options) {
 				}
 			}
 			if (column != null) {
-				sortCols.push({
-					sortCol: column,
-					sortAsc: c.sortAsc
-				});
+
 				gridSortColumns.push({
 					columnId: column.id,
 					sortAsc: c.sortAsc
@@ -127,10 +125,7 @@ morpheus.Grid = function (options) {
 				console.log(c.name + ' not found.');
 			}
 		});
-		grid.setSortColumns(gridSortColumns);
-		this.sortCols = sortCols;
-		this._updateMappings();
-		grid.invalidate();
+		this.setSortColumns(gridSortColumns);
 	}
 
 	this.grid.invalidate();
@@ -138,6 +133,23 @@ morpheus.Grid = function (options) {
 };
 morpheus.Grid.prototype = {
 	columnsAutosized: false,
+	setSortColumns: function (gridSortColumns) {
+		this.grid.setSortColumns(gridSortColumns);
+		this.sortCols = [];
+		for (var i = 0; i < gridSortColumns.length; i++) {
+			var column = this.grid.getColumns()[this.grid.getColumnIndex(gridSortColumns[i].columnId)];
+			if (column == null) {
+				throw "Unable to find column " + gridSortColumns[i];
+			}
+			this.sortCols.push({
+				sortCol: column,
+				sortAsc: gridSortColumns[i].sortAsc
+			});
+		}
+
+		this._updateMappings();
+		this.grid.invalidate();
+	},
 	setColumns: function (columns) {
 		this.grid.setColumns(columns);
 		this.grid.resizeCanvas();
@@ -200,10 +212,12 @@ morpheus.Grid.prototype = {
 			this.grid.setSelectedRows([]);
 		}
 		this.setFilter(this.filter);
+		this.maybeAutoResizeColumns();
+	},
+	maybeAutoResizeColumns: function () {
 		if (!this.columnsAutosized) {
 			this.autosizeColumns();
 		}
-
 	},
 	convertModelIndexToView: function (modelIndex) {
 		if (this.modelToView !== null) {
@@ -229,14 +243,16 @@ morpheus.Grid.prototype = {
 		}
 		this.viewOrder = null;
 		if (this.filter != null) {
-			this.viewOrder = [];
-			for (var i = 0, length = this.items.length; i < length; i++) {
-				if (this.filter(this.items[i])) {
-					this.viewOrder.push(i);
+			this.filter.init();
+			if (!this.filter.isEmpty()) {
+				this.viewOrder = [];
+				for (var i = 0, length = this.items.length; i < length; i++) {
+					if (this.filter.accept(this.items[i])) {
+						this.viewOrder.push(i);
+					}
 				}
 			}
 		}
-
 		var cols = this.sortCols;
 		if (cols && cols.length > 0) {
 			if (this.viewOrder == null) {
@@ -247,14 +263,15 @@ morpheus.Grid.prototype = {
 			}
 			var ncols = cols.length;
 			var items = this.items;
+			// nulls always go at end
+
 			this.viewOrder.sort(function (index1, index2) {
 				for (var i = 0; i < ncols; i++) {
 					var getter = cols[i].sortCol.getter;
-					var sign = cols[i].sortAsc ? 1 : -1;
+					var comparator = cols[i].sortAsc ? morpheus.SortKey.ASCENDING_COMPARATOR : morpheus.SortKey.DESCENDING_COMPARATOR;
 					var value1 = getter(items[index1]);
 					var value2 = getter(items[index2]);
-					var comparator = cols[i].sortCol.comparator;
-					var result = comparator(value1, value2) * sign;
+					var result = comparator(value1, value2);
 					if (result !== 0) {
 						return result;
 					}
@@ -295,78 +312,78 @@ morpheus.Grid.prototype = {
 		return this.filter;
 	},
 	autosizeColumns: function () {
-
 		var columns = this.grid.getColumns();
 		var items = this.getItems();
-		if (!items || items.length == 0) {
+
+		if (!items || items.length === 0 || !columns || columns.length === 0) {
 			return;
 		}
-		if (!columns || columns.length === 0) {
+		var gridWidth = this.options.$el.width() - 30;
+		if (gridWidth <= 0) {
 			return;
 		}
 		this.columnsAutosized = true;
-		if (columns.length <= 1) {
-			return;
-		}
+		if (columns.length > -1) {
+			var div = document.createElement('div');
+			document.body.appendChild(div);
+			var $d = $(div);
+			$d.css({
+				position: 'absolute',
+				left: -1000,
+				top: -1000
+			});
 
-		var div = document.createElement('div');
-		document.body.appendChild(div);
-		var $d = $(div);
+			var $row = $('<div class="slick-table">'
+				+ '<div class="ui-state-default slick-header-column slick-header-sortable ui-sortable-handle"></div>'
+				+ '<div class="ui-widget-content slick-row"><div class="slick-cell selected"></div></div>'
+				+ '</div>');
+			var $cell = $row.find('.slick-cell');
+			var $header = $row.find('.slick-header-column');
+			$row.appendTo($d);
 
-		$d.css({
-			position: 'absolute',
-			left: -1000,
-			top: -1000
-		});
+			var maxWidth = Math.min(parseInt(gridWidth / 2), 400);
+			var getColumnWidth = function (column) {
+				var w = $header.html(column.name).outerWidth() + 13; // leave space for sort indicator
 
-		var $row = $('<div class="slick-table">'
-			+ '<div class="ui-state-default slick-header-column slick-header-sortable ui-sortable-handle"></div>'
-			+ '<div class="ui-widget-content slick-row"><div class="slick-cell selected"></div></div>'
-			+ '</div>');
-		var $cell = $row.find('.slick-cell');
-		var $header = $row.find('.slick-header-column');
-		$row.appendTo($d);
-		var gridWidth = this.options.$el.width() - 30;
-		var maxWidth = Math.min(parseInt(gridWidth / 2), 400);
-		var getColumnWidth = function (column) {
-			var w = $header.html(column.name).outerWidth() + 13; // leave space for sort indicator
-
-			if (column.prototypeValue) {
-				$cell.html(column.prototypeValue);
-				w = Math.max($cell.outerWidth(), w);
-			} else {
-				for (var i = 0, nrows = Math.min(items.length, 10); i < nrows; i++) {
-					var html = column.formatter(i, null, column
-					.getter(items[i]), column, items[i]);
-					var $html = $(html);
-					$html.find('.slick-cell-wrapper').attr('class', '');
-					$cell.html($html);
+				if (column.prototypeValue) {
+					$cell.html(column.prototypeValue);
 					w = Math.max($cell.outerWidth(), w);
+				} else {
+					for (var i = 0, nrows = Math.min(items.length, 10); i < nrows; i++) {
+						var html = column.formatter(i, null, column
+						.getter(items[i]), column, items[i]);
+						var $html = $(html);
+						$html.find('.slick-cell-wrapper').attr('class', '');
+						$cell.html($html);
+						w = Math.max($cell.outerWidth(), w);
+					}
 				}
+				column.width = parseInt(Math.min(maxWidth, w));
+
+			};
+			var totalWidth = 0;
+			for (var i = 0; i < columns.length; i++) {
+				getColumnWidth(columns[i]);
+				totalWidth += columns[i].width;
 			}
-			column.width = parseInt(Math.min(maxWidth, w));
 
-		};
-		var totalWidth = 0;
-		for (var i = 0; i < columns.length; i++) {
-			getColumnWidth(columns[i]);
-			totalWidth += columns[i].width;
-		}
-		if (totalWidth < gridWidth) {
-			// grow columns
-			// var delta = parseInt((gridWidth - totalWidth) / columns.length);
-			// for (var i = 0; i < columns.length; i++) {
-			// //columns[i].width += delta;
-			// }
+			if (totalWidth < gridWidth) {
+				// grow columns
+				// var delta = parseInt((gridWidth - totalWidth) / columns.length);
+				// for (var i = 0; i < columns.length; i++) {
+				// //columns[i].width += delta;
+				// }
 
-		} else if (totalWidth > gridWidth) {
-			// shrink
-			//columns[columns.length - 1].width -= (totalWidth - gridWidth);
-			// shrink last column
+			} else if (totalWidth > gridWidth) {
+				// shrink
+				//columns[columns.length - 1].width -= (totalWidth - gridWidth);
+				// shrink last column
+			}
+
+			$d.remove();
+			this.grid.resizeCanvas();
 		}
 
-		$d.remove();
-		this.grid.resizeCanvas();
 	}
 };
 
@@ -523,4 +540,43 @@ morpheus.AutoTooltips2 = function (options) {
 		'destroy': destroy
 	});
 
+};
+
+morpheus.CombinedGridFilter = function () {
+	this.filters = [];
+};
+morpheus.CombinedGridFilter.prototype = {
+	add: function (filter) {
+		this.filters.push(filter);
+	},
+	getFilters: function () {
+		return this.filters;
+	},
+	get: function (index) {
+		return this.filters[index];
+	},
+	set: function (index, f) {
+		this.filters[index] = f;
+	},
+	init: function () {
+		for (var i = 0; i < this.filters.length; i++) {
+			this.filters[i].init();
+		}
+
+		this.activeFilters = this.filters.filter(function (f) {
+			return !f.isEmpty();
+		});
+		this.nActiveFilters = this.activeFilters.length;
+	},
+	accept: function (item) {
+		for (var i = 0; i < this.nActiveFilters; i++) {
+			if (!this.activeFilters[i].accept(item)) {
+				return false;
+			}
+		}
+		return true;
+	},
+	isEmpty: function () {
+		return this.activeFilters.length === 0;
+	}
 };

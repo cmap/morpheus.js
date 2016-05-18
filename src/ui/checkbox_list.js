@@ -3,22 +3,22 @@
  *            options.set set of selected items
  * @see morpheus.Table
  */
-morpheus.CheckBoxList = function(options) {
+morpheus.CheckBoxList = function (options) {
 	var _this = this;
 	var set = options.set || new morpheus.Set();
 	options = $.extend(true, {}, {
-		height : '138px',
-		showHeader : false,
-		select : false,
-		search : true,
-		checkBoxSelectionOnTop : false,
-		rowHeader : function(item) {
+		height: '150px',
+		showHeader: false,
+		select: false,
+		search: true,
+		checkBoxSelectionOnTop: false,
+		rowHeader: function (item) {
 			var header = [];
 			// header
 			// .push('<div style="overflow: hidden;text-overflow: ellipsis;"
 			// class="morpheus-hover">');
 			header.push('<span><input name="toggle" type="checkbox" '
-					+ (set.has(_this.getter(item)) ? ' checked' : '') + '/> ');
+				+ (set.has(_this.getter(item)) ? ' checked' : '') + '/> ');
 			header.push('</span>');
 			// header
 			// .push('<button
@@ -48,42 +48,44 @@ morpheus.CheckBoxList = function(options) {
 	var html = [];
 
 	var table = new morpheus.Table(options);
+	if (options.columns.length === 1) {
+		options.$el.find('.slick-table-header').find('[name=right]').remove();
+	}
 	this.table = table;
 	var html = [];
-	html.push('<div style="font-size:12px;">');
+	html.push('<div style="display:inline;">');
 	html.push('<div style="display:inline;" class="dropdown">');
 	html
-			.push('<button type="button" data-toggle="dropdown" class="btn btn-default btn-xs dropdown-toggle" aria-haspopup="true" aria-expanded="false">');
+	.push('<button type="button" data-toggle="dropdown" class="btn btn-default btn-xs dropdown-toggle" aria-haspopup="true" aria-expanded="false">');
 	html.push('<span class="caret"></span>');
 	html.push('</button>');
 	html.push('<ul style="font-size:12px;" class="dropdown-menu">');
-	html.push('<li><a name="selectAll" href="#">All</a></li>');
-	html.push('<li><a name="selectNone" href="#">None</a></li>');
-	html.push('<li><a name="invertSel" href="#">Invert</a></li>');
+	html.push('<li><a name="selectAll" href="#">Select All</a></li>');
+	html.push('<li><a name="selectNone" href="#">Select None</a></li>');
+	html.push('<li><a name="invertSel" href="#">Invert Selection</a></li>');
 
 	html.push('</ul>');
 	html.push('</div>');
 	html.push('<span name="checkBoxResults" style="padding-left:6px;"></span>');
 	html.push('</div>');
-	var $div = $(html.join(''));
-	var $checkBoxResults = $div.find('[name=checkBoxResults]');
-	table.$gridDiv.before($div);
-
-	var $selectAll = $div.find('[name=selectAll]');
-	var $selectNone = $div.find('[name=selectNone]');
-	$selectAll.on('click', function(e) {
+	var $checkBoxEl = $(html.join(''));
+	table.$header.find('[name=left]').html($checkBoxEl);
+	var $checkBoxResults = $checkBoxEl.find('[name=checkBoxResults]');
+	var $selectAll = $checkBoxEl.find('[name=selectAll]');
+	var $selectNone = $checkBoxEl.find('[name=selectNone]');
+	$selectAll.on('click', function (e) {
 		var items = table.getItems();
 		for (var i = 0, nitems = items.length; i < nitems; i++) {
 			set.add(_this.getter(items[i]));
 		}
 		_this.table.trigger('checkBoxSelectionChanged', {
-			source : _this,
-			set : set
+			source: _this,
+			set: set
 		});
 		e.preventDefault();
 		_this.table.redraw();
 	});
-	$div.find('[name=invertSel]').on('click', function(e) {
+	$checkBoxEl.find('[name=invertSel]').on('click', function (e) {
 		// selected become unselected, unselected become selected
 		var items = table.getItems();
 		for (var i = 0, nitems = items.length; i < nitems; i++) {
@@ -96,20 +98,20 @@ morpheus.CheckBoxList = function(options) {
 
 		}
 		_this.table.trigger('checkBoxSelectionChanged', {
-			source : _this,
-			set : set
+			source: _this,
+			set: set
 		});
 		e.preventDefault();
 		_this.table.redraw();
 	});
-	$selectNone.on('click', function(e) {
+	$selectNone.on('click', function (e) {
 		var items = table.getItems();
 		for (var i = 0, nitems = items.length; i < nitems; i++) {
 			set.remove(_this.getter(items[i]));
 		}
 		_this.table.trigger('checkBoxSelectionChanged', {
-			source : _this,
-			set : set
+			source: _this,
+			set: set
 		});
 
 		e.preventDefault();
@@ -119,10 +121,10 @@ morpheus.CheckBoxList = function(options) {
 	this.set = set;
 	this.table = table;
 	$checkBoxResults.html('selected ' + morpheus.Util.intFormat(set.size())
-			+ ' of ' + morpheus.Util.intFormat(table.getAllItemCount()));
+		+ ' of ' + morpheus.Util.intFormat(table.getAllItemCount()));
 
 	var priorCount = 0;
-	this.table.on('checkBoxSelectionChanged', function() {
+	this.table.on('checkBoxSelectionChanged', function () {
 		// if (options.checkBoxSelectionOnTop) {
 		// var selectedItems = set.values();
 		// selectedItems.sort();
@@ -146,91 +148,91 @@ morpheus.CheckBoxList = function(options) {
 		// priorCount = set.size();
 		// }
 		$checkBoxResults.html('selected ' + morpheus.Util.intFormat(set.size())
-				+ ' of ' + morpheus.Util.intFormat(table.getAllItemCount()));
+			+ ' of ' + morpheus.Util.intFormat(table.getAllItemCount()));
 		_this.table.redraw();
 	});
 
 	table.on('click',
-			function(e) {
-				var $target = $(e.target);
-				var item = table.getItems()[e.row];
-				var value = _this.getter(item);
-				if ($target.is('.morpheus-hover-show')) { // only
-					set.clear();
+		function (e) {
+			var $target = $(e.target);
+			var item = table.getItems()[e.row];
+			var value = _this.getter(item);
+			if ($target.is('.morpheus-hover-show')) { // only
+				set.clear();
+				set.add(value);
+				_this.table.trigger('checkBoxSelectionChanged', {
+					source: _this,
+					set: set
+				});
+			} else if (!options.select
+				|| ($target.is('[type=checkbox]') && $target
+				.attr('name') === 'toggle')) {
+				if (set.has(value)) {
+					set.remove(value);
+				} else {
 					set.add(value);
-					_this.table.trigger('checkBoxSelectionChanged', {
-						source : _this,
-						set : set
-					});
-				} else if (!options.select
-						|| ($target.is('[type=checkbox]') && $target
-								.attr('name') === 'toggle')) {
-					if (set.has(value)) {
-						set.remove(value);
-					} else {
-						set.add(value);
-					}
-					_this.table.trigger('checkBoxSelectionChanged', {
-						source : _this,
-						set : set
-					});
 				}
+				_this.table.trigger('checkBoxSelectionChanged', {
+					source: _this,
+					set: set
+				});
+			}
 
-			});
+		});
 
 };
 morpheus.CheckBoxList.prototype = {
-	searchWithPredicates : function(predicates) {
+	searchWithPredicates: function (predicates) {
 		this.table.searchWithPredicates(predicates);
 	},
-	autocomplete : function(tokens, cb) {
+	autocomplete: function (tokens, cb) {
 		this.table.autocomplete(tokens, cb);
 	},
-	setHeight : function(height) {
+	setHeight: function (height) {
 		this.table.setHeight(height);
 	},
-	resize : function() {
+	resize: function () {
 		this.table.resize();
 	},
-	setSearchVisible : function(visible) {
+	setSearchVisible: function (visible) {
 		this.table.setSearchVisible(visible);
 	},
-	getSelectedRows : function() {
+	getSelectedRows: function () {
 		return this.table.getSelectedRows();
 	},
-	getSelectedItems : function() {
+	getSelectedItems: function () {
 		return this.table.getSelectedItems();
 	},
-	setSelectedRows : function(rows) {
+	setSelectedRows: function (rows) {
 		this.table.setSelectedRows(rows);
 	},
-	getItems : function(items) {
+	getItems: function (items) {
 		return this.table.getItems();
 	},
-	getAllItemCount : function() {
+	getAllItemCount: function () {
 		return this.table.getAllItemCount();
 	},
-	getFilteredItemCount : function() {
+	getFilteredItemCount: function () {
 		return this.table.getFilteredItemCount();
 	},
-	setFilter : function(f) {
+	setFilter: function (f) {
 		this.table.setFilter(f);
 	},
 
-	redraw : function() {
+	redraw: function () {
 		this.table.redraw();
 	},
-	getSelection : function() {
+	getSelection: function () {
 		return this.set;
 	},
-	clearSelection : function(values) {
+	clearSelection: function (values) {
 		this.set.clear();
 		this.table.redraw();
 	},
-	setValue : function(values) {
+	setValue: function (values) {
 		this.setSelectedValues(values);
 	},
-	setSelectedValues : function(values) {
+	setSelectedValues: function (values) {
 		this.set.clear();
 
 		if (morpheus.Util.isArray(values)) {
@@ -242,17 +244,17 @@ morpheus.CheckBoxList.prototype = {
 		}
 		this.table.redraw();
 	},
-	val : function() {
+	val: function () {
 		return this.set.values();
 	},
-	on : function(evtStr, handler) {
+	on: function (evtStr, handler) {
 		this.table.on(evtStr, handler);
 		return this;
 	},
-	off : function(evtStr, handler) {
+	off: function (evtStr, handler) {
 		this.table.off(evtStr, handler);
 	},
-	setItems : function(items) {
+	setItems: function (items) {
 		// remove items in selection that are not in new items
 		var newItems = new morpheus.Set();
 		var getter = this.getter;
@@ -261,21 +263,16 @@ morpheus.CheckBoxList.prototype = {
 
 		}
 		var selection = this.set;
-		selection.forEach(function(val) {
+		selection.forEach(function (val) {
 			if (!newItems.has(val)) {
 				selection.remove(val);
 			}
 		});
 
-		// if (this.table.tableSearch) {
-		// this.table.tableSearch.$el.css('display',
-		// items.length <= 6 ? 'none' : '');
-		// }
-
 		this.table.setItems(items);
 		this.table.trigger('checkBoxSelectionChanged', {
-			source : this,
-			set : selection
+			source: this,
+			set: selection
 		});
 	}
 };

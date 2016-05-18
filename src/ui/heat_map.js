@@ -2949,10 +2949,10 @@ morpheus.HeatMap.prototype = {
 			height: heatmapPrefSize.height
 		};
 		if (this.isDendrogramVisible(false)) { // row dendrogram
-			totalSize.width += this.rowDendrogram.getUnscaledWidth();
+			totalSize.width += this.rowDendrogram.getUnscaledWidth() + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
 		}
 		if (this.isDendrogramVisible(true)) {
-			totalSize.height += this.columnDendrogram.getUnscaledHeight();
+			totalSize.height += this.columnDendrogram.getUnscaledHeight() + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
 		}
 		var maxRowHeaderHeight = 0;
 		for (var i = 0, length = this.rowTracks.length; i < length; i++) {
@@ -3067,12 +3067,13 @@ morpheus.HeatMap.prototype = {
 		context.restore();
 		legendHeight += Math.max(rowTrackLegend.getPreferredSize().height,
 			columnTrackLegendSize.height);
-		var heatmapY = this.isDendrogramVisible(true) ? this.columnDendrogram
-		.getUnscaledHeight() : 0;
+
+		var heatmapY = this.isDendrogramVisible(true) ? (this.columnDendrogram
+		.getUnscaledHeight() + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS) : 0;
 		heatmapY += legendHeight;
 		var columnTrackY = heatmapY;
-		var heatmapX = this.isDendrogramVisible(false) ? this.rowDendrogram
-		.getUnscaledWidth() : 0;
+		var heatmapX = this.isDendrogramVisible(false) ? (this.rowDendrogram
+		.getUnscaledWidth() + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS) : 0;
 		var isColumnTrackVisible = false;
 		for (var i = 0, length = this.columnTracks.length; i < length; i++) {
 			var track = this.columnTracks[i];
@@ -3094,6 +3095,19 @@ morpheus.HeatMap.prototype = {
 				var header = this.rowTrackHeaders[i];
 				heatmapY = Math.max(heatmapY, header.getPrintSize().height);
 			}
+		}
+		if (this.isDendrogramVisible(true)) {
+			var columnDendrogramClip = {
+				x: 0,
+				y: 0,
+				height: this.columnDendrogram.getUnscaledHeight(),
+				width: heatmapPrefSize.width
+			};
+			context.save();
+			context.translate(heatmapX, legendHeight);
+			this.columnDendrogram.prePaint(columnDendrogramClip, context);
+			this.columnDendrogram.draw(columnDendrogramClip, context);
+			context.restore();
 		}
 		if (this.isDendrogramVisible(false)) {
 			var rowDendrogramClip = {
