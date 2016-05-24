@@ -192,7 +192,7 @@ morpheus.Util.getFileName = function (fileOrUrl) {
 	name = '' + name;
 	var slash = name.lastIndexOf('/');
 	if (slash !== -1 && slash < name.length - 1) {
-		// https://s3.amazonaws.com/appdata.cmap.org/icv/dosval/BRD-K45711268_10_UM_24_H/pcl_cell.gct?AWSAccessKeyId=AKIAJZQISWLUKFS3VUKA&Expires=1455761050&Signature=HVle9MvXV3OGRZHOngdm2frqER8%3D
+		// https://s3.amazonaws.com/data.clue.io/icv/dosval/BRD-K45711268_10_UM_24_H/pcl_cell.gct?AWSAccessKeyId=AKIAJZQISWLUKFS3VUKA&Expires=1455761050&Signature=HVle9MvXV3OGRZHOngdm2frqER8%3D
 		name = name.substring(slash + 1); // get stuff after slash
 		var question = name.indexOf('?');
 		if (question !== -1 && name.length > (question + 1)) {

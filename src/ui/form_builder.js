@@ -448,7 +448,7 @@ morpheus.FormBuilder.prototype = {
 			// type = 'bootstrap-select';
 			// }
 			if (type == 'bootstrap-select') {
-				html.push('<select data-selected-text-format="count" name="'
+				html.push('<select data-live-search="' + (field.search ? true : false) + '" data-selected-text-format="count" name="'
 					+ name + '" id="' + id
 					+ '" class="selectpicker form-control"');
 			} else {
