@@ -1,0 +1,1958 @@
+gene	tree	count
+MT-CO1	oxidoreductase|oxidase	1
+ATP5C1	transporter|cation transporter|ATP synthase	2
+HTR4	receptor|G-protein coupled receptor	21
+ALKBH3	oxidoreductase|oxygenase	1
+ALKBH2	oxidoreductase|oxygenase	1
+HTR6	receptor|G-protein coupled receptor	53
+HTR7	receptor|G-protein coupled receptor	50
+AKT2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	10
+AKT3	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	8
+AKT1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	23
+PRKACA	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	10
+GSTK1	transfer/carrier protein	1
+PRKAB2	enzyme modulator|kinase modulator	2
+SDS	lyase|dehydratase	1
+CACNA2D1	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	16
+CACNA2D3	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	6
+CACNA2D2	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	9
+PRKAB1	enzyme modulator|kinase modulator	3
+BCR	enzyme modulator|G-protein modulator|guanyl-nucleotide exchange factor	5
+ACE2	hydrolase|protease|metalloprotease	3
+MTHFD1	oxidoreductase|dehydrogenase	1
+MTHFD2	oxidoreductase|dehydrogenase	1
+AGTR1	receptor|G-protein coupled receptor	16
+MT-CO2	oxidoreductase	1
+AGTR2	receptor|G-protein coupled receptor	5
+MT-CO3	oxidoreductase|oxidase	1
+TSTA3	lyase|dehydratase	1
+SHMT2	transferase|methyltransferase	3
+SHMT1	transferase|methyltransferase	3
+PLA2G6	hydrolase|lipase|phospholipase	1
+PLA2G7	hydrolase|esterase	1
+RDH12	oxidoreductase|dehydrogenase	1
+HLCS	ligase	1
+RDH11	oxidoreductase|dehydrogenase	1
+PDGFD	signaling molecule|growth factor	1
+RDH14	oxidoreductase|dehydrogenase	1
+LTA4H	hydrolase|protease|metalloprotease	3
+RDH13	oxidoreductase|dehydrogenase	1
+HCRT	receptor|G-protein coupled receptor	1
+GSTM4	oxidoreductase|reductase	1
+GSTM3	oxidoreductase|reductase	1
+CREBBP	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	1
+GSTM2	oxidoreductase|reductase	2
+JUN	transcription factor	5
+GSTM1	oxidoreductase|reductase	1
+DHFR	oxidoreductase|reductase	11
+FASN	hydrolase|esterase	9
+FXYD2	transporter|ion channel	2
+PKIA	enzyme modulator|kinase modulator|kinase inhibitor	7
+GSTM5	oxidoreductase|reductase	1
+ACHE	hydrolase|esterase	38
+KCNC1	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNC2	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNC3	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNC4	transporter|ion channel|potassium channel|voltage-gated potassium channel	2
+PRKAG1	enzyme modulator|kinase modulator	1
+PRKAG2	enzyme modulator|kinase modulator	1
+MMP21	hydrolase|protease|metalloprotease	1
+PRKAG3	enzyme modulator|kinase modulator	1
+MMP20	hydrolase|protease|metalloprotease	1
+PANX1	extracellular matrix protein|extracellular matrix structural protein	3
+PANX2	extracellular matrix protein|extracellular matrix structural protein	2
+MMP25	hydrolase|protease|metalloprotease	2
+ATIC	transferase|methyltransferase	1
+MMP24	hydrolase|protease|metalloprotease	1
+MMP27	hydrolase|protease|metalloprotease	1
+MMP26	hydrolase|protease|metalloprotease	1
+SMPD1	hydrolase|phosphodiesterase	3
+MMP28	hydrolase|protease|metalloprotease	1
+TSPO	transporter	12
+JAK2	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	23
+TPSAB1	hydrolase|protease|serine protease	2
+JAK3	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	16
+SLC18A1	transporter|amino acid transporter	4
+PANX3	extracellular matrix protein|extracellular matrix structural protein	2
+SLC18A2	transporter|amino acid transporter	10
+JAK1	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	12
+SLC18A3	transporter|amino acid transporter	1
+MYBPC3	cytoskeletal protein|actin family cytoskeletal protein|actin binding motor protein	1
+KCND1	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+GSTO2	nucleic acid binding|RNA binding protein|translation factor|translation elongation factor	1
+KCND2	transporter|ion channel|potassium channel|voltage-gated potassium channel	4
+GSTO1	nucleic acid binding|RNA binding protein|translation factor|translation elongation factor	1
+KCND3	transporter|ion channel|potassium channel|voltage-gated potassium channel	4
+SPHK2	transferase|kinase|carbohydrate kinase	1
+SPHK1	transferase|kinase|carbohydrate kinase	1
+MMP10	hydrolase|protease|metalloprotease	1
+MMP12	hydrolase|protease|metalloprotease	5
+SLC7A4	transporter|amino acid transporter	2
+MMP11	hydrolase|protease|metalloprotease	1
+MMP14	hydrolase|protease|metalloprotease	3
+MMP13	hydrolase|protease|metalloprotease	6
+MMP16	hydrolase|protease|metalloprotease	2
+SLC7A8	transporter|amino acid transporter	1
+CYP21A2	oxidoreductase|oxygenase	1
+MMP15	hydrolase|protease|metalloprotease	1
+SLC7A9	transporter|amino acid transporter	1
+DPYD	oxidoreductase|dehydrogenase	5
+MMP17	hydrolase|protease|metalloprotease	1
+MMP19	hydrolase|protease|metalloprotease	1
+PPARG	transcription factor|nuclear hormone receptor	36
+PPARA	transcription factor|nuclear hormone receptor	18
+PPARD	transcription factor|nuclear hormone receptor	10
+OAT	transferase|transaminase	2
+GSTP1	oxidoreductase|reductase	4
+KCNA1	transporter|ion channel|potassium channel|voltage-gated potassium channel	7
+ATP5A1	transporter|cation transporter|ATP synthase	3
+KCNA2	transporter|ion channel|potassium channel|voltage-gated potassium channel	2
+ODC1	lyase|decarboxylase	3
+PTAFR	receptor|G-protein coupled receptor	4
+KCNA3	transporter|ion channel|potassium channel|voltage-gated potassium channel	3
+KCNA4	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNA5	transporter|ion channel|potassium channel|voltage-gated potassium channel	13
+KCNA6	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+ABCB11	transporter|ATP-binding cassette (ABC) transporter	5
+KCNA7	transporter|ion channel|potassium channel|voltage-gated potassium channel	5
+SLC7A1	transporter|amino acid transporter	2
+EGFR	transferase|kinase|protein kinase|receptor tyrosine protein kinase	50
+SLC7A2	transporter|amino acid transporter	1
+SLC7A3	transporter|amino acid transporter	2
+ADAM28	extracellular matrix protein|extracellular matrix glycoprotein	3
+NRAS	enzyme modulator|G-protein|small GTPase	1
+SULT1E1	transferase	1
+P4HTM	oxidoreductase|oxygenase	1
+EGLN1	oxidoreductase|hydroxylase	2
+EGLN3	oxidoreductase|hydroxylase	1
+EGLN2	oxidoreductase|hydroxylase	2
+CRBN	hydrolase|protease	3
+PKLR	transferase|kinase|pyruvate kinase	1
+KCNB1	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+CKMT1A	transferase|kinase|amino acid kinase	1
+KCNB2	transporter|ion channel|potassium channel|voltage-gated potassium channel	2
+BBOX1	oxidoreductase|oxygenase	2
+CENPE	cytoskeletal protein|microtubule family cytoskeletal protein|microtubule binding motor protein	1
+APEX1	nucleic acid binding|nuclease|exodeoxyribonuclease	1
+TAOK2	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	1
+PKN2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+PKN1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+SIGLEC1	cell adhesion molecule|immunoglobulin superfamily cell adhesion molecule	1
+CRAT	transferase|acyltransferase	1
+FRK	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	3
+KCNG1	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNG2	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNG3	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNG4	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+REG1A	signaling molecule|growth factor	2
+PLOD3	oxidoreductase|oxygenase	2
+PLOD2	oxidoreductase|oxygenase	1
+PLOD1	oxidoreductase|oxygenase	2
+FADS2	oxidoreductase|dehydrogenase	1
+SLK	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+FNTA	transferase|acyltransferase	4
+ADORA3	receptor|G-protein coupled receptor	28
+FNTB	transferase|acyltransferase	1
+ADORA1	receptor|G-protein coupled receptor	37
+MAP3K9	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	2
+FADS1	oxidoreductase|dehydrogenase	2
+KCNH1	transporter|ion channel|potassium channel|voltage-gated potassium channel	9
+KCNH2	transporter|ion channel|potassium channel|voltage-gated potassium channel	37
+KCNH3	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNH4	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+DGAT2	transferase|acyltransferase	1
+KCNH5	transporter|ion channel|potassium channel|voltage-gated potassium channel	2
+DGAT1	transferase|acyltransferase	5
+KCNH6	transporter|ion channel|potassium channel|voltage-gated potassium channel	6
+KCNH7	transporter|ion channel|potassium channel|voltage-gated potassium channel	6
+KCNH8	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+CDC25C	hydrolase|phosphatase|protein phosphatase	1
+CDC25A	hydrolase|phosphatase|protein phosphatase	2
+CDC25B	hydrolase|phosphatase|protein phosphatase	3
+SMO	receptor|G-protein coupled receptor	10
+LGSN	ligase	1
+SMS	transferase	1
+BLK	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	2
+GRIA1	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	26
+GRIA2	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	25
+KCNE1	transporter|ion channel|potassium channel|voltage-gated potassium channel	2
+GMPS	transferase|glycosyltransferase	1
+LY96	transmembrane receptor regulatory/adaptor protein	1
+GSTT1	nucleic acid binding|RNA binding protein|translation factor|translation elongation factor	1
+CYP2C19	oxidoreductase|oxygenase	12
+HSP90B1	chaperone|Hsp90 family chaperone	2
+NAE1	transfer/carrier protein	2
+GRIA3	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	15
+GRIA4	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	15
+KCNF1	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+HTR1E	receptor|G-protein coupled receptor	35
+AGXT2	transferase|transaminase	3
+HTR1F	receptor|G-protein coupled receptor	29
+HTR1D	receptor|G-protein coupled receptor	56
+HTR1A	receptor|G-protein coupled receptor	113
+HTR1B	receptor|G-protein coupled receptor	60
+ARPC4	cytoskeletal protein|actin family cytoskeletal protein	1
+ARPC5	cytoskeletal protein|actin family cytoskeletal protein	1
+BMX	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	1
+UCKL1	transferase|kinase|nucleotide kinase	1
+IGSF10	hydrolase|phosphatase|protein phosphatase	1
+ARPC2	cytoskeletal protein|actin family cytoskeletal protein|non-motor actin binding protein	1
+ARPC3	cytoskeletal protein|actin family cytoskeletal protein	1
+TBXAS1	oxidoreductase|oxygenase	5
+ACO2	lyase|dehydratase	1
+SHBG	extracellular matrix protein|extracellular matrix glycoprotein	1
+ITGB1	extracellular matrix protein|extracellular matrix glycoprotein	2
+KCNK6	transporter|ion channel|potassium channel|voltage-gated potassium channel	2
+ALAS2	transferase|transaminase	1
+ALAS1	transferase|transaminase	2
+KCNK9	transporter|ion channel|potassium channel|voltage-gated potassium channel	6
+ITGB3	extracellular matrix protein|extracellular matrix glycoprotein	8
+ITGB2	extracellular matrix protein|extracellular matrix glycoprotein	1
+HTR2B	receptor|G-protein coupled receptor	70
+HTR2C	receptor|G-protein coupled receptor	90
+HTR2A	receptor|G-protein coupled receptor	126
+ITGAL	extracellular matrix protein|extracellular matrix glycoprotein	1
+RLBP1	oxidoreductase|dehydrogenase	1
+ALAD	lyase|dehydratase	1
+SPR	oxidoreductase|dehydrogenase	1
+ITGAV	extracellular matrix protein|extracellular matrix glycoprotein	3
+ITGB7	extracellular matrix protein|extracellular matrix glycoprotein	1
+ACP1	hydrolase|phosphatase|protein phosphatase	1
+MBL2	defense/immunity protein	1
+ACTR3	cytoskeletal protein|actin family cytoskeletal protein|actin and actin related protein	1
+SLC36A1	transporter|amino acid transporter	6
+ACTR2	cytoskeletal protein|actin family cytoskeletal protein|actin and actin related protein	1
+GRID2	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	1
+SLC36A2	transporter|amino acid transporter	1
+APAF1	other	1
+GNRHR2	receptor|G-protein coupled receptor	1
+ITGA4	extracellular matrix protein|extracellular matrix glycoprotein	3
+GRID1	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	1
+DHPS	transferase|transaminase	2
+HTR3A	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	61
+HTR3B	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	23
+ADORA2A	receptor|G-protein coupled receptor	32
+PCCA	ligase	1
+RRM2B	oxidoreductase|reductase	4
+ADORA2B	receptor|G-protein coupled receptor	24
+PCCB	ligase	2
+ITGA5	extracellular matrix protein|extracellular matrix glycoprotein	1
+TOP1	nucleic acid binding|DNA binding protein|DNA topoisomerase	13
+AGXT	transferase|transaminase	3
+BCAT1	transferase|transaminase	4
+GAPDH	oxidoreductase|dehydrogenase	1
+BCAT2	transferase|transaminase	3
+PRKAA1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	4
+CANT1	hydrolase|phosphatase|nucleotide phosphatase	1
+PRKAA2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+ROCK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	15
+C1R	hydrolase|protease|serine protease	1
+ROCK2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	7
+SRC	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	18
+SLC5A11	transporter|carbohydrate transporter	1
+MALT1	hydrolase|protease|cysteine protease	1
+CDC42	enzyme modulator|G-protein|small GTPase	1
+SRR	lyase|dehydratase	1
+FYN	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	2
+EIF4E	nucleic acid binding|RNA binding protein|translation factor|translation initiation factor	2
+KCNJ1	transporter|ion channel|potassium channel|voltage-gated potassium channel	8
+KCNJ3	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNJ4	transporter|ion channel|potassium channel|voltage-gated potassium channel	5
+NTRK1	transferase|kinase|protein kinase|receptor tyrosine protein kinase	11
+KCNJ5	transporter|ion channel|potassium channel|voltage-gated potassium channel	3
+NTRK2	transferase|kinase|protein kinase|receptor tyrosine protein kinase	2
+KCNJ6	transporter|ion channel|potassium channel|voltage-gated potassium channel	2
+KCNJ8	transporter|ion channel|potassium channel|voltage-gated potassium channel	13
+HTR5A	receptor|G-protein coupled receptor	22
+HCRTR2	receptor|G-protein coupled receptor	5
+HCRTR1	receptor|G-protein coupled receptor	4
+GSTZ1	nucleic acid binding|RNA binding protein|translation factor|translation elongation factor	1
+NAGK	transferase|kinase|glucosamine kinase	1
+SUCLA2	ligase|Succinyl-CoA Synthetase	1
+SST	signaling molecule|peptide hormone	1
+KCNK1	transporter|ion channel|potassium channel|voltage-gated potassium channel	2
+KCNK2	transporter|ion channel|potassium channel|voltage-gated potassium channel	8
+KCNK3	transporter|ion channel|potassium channel|voltage-gated potassium channel	6
+KCNK4	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+SLC23A2	transporter	1
+SLC23A1	transporter	2
+NUDT1	transferase|phosphorylase	1
+ACTB	cytoskeletal protein|actin family cytoskeletal protein|actin and actin related protein	1
+ICAM1	cell adhesion molecule|immunoglobulin superfamily cell adhesion molecule	2
+ANPEP	hydrolase|protease|metalloprotease	3
+PPAT	transferase	3
+KDR	transferase|kinase|protein kinase|receptor tyrosine protein kinase	52
+TNFSF11	signaling molecule|cytokine|tumor necrosis factor family member	1
+EIF2A	nucleic acid binding|RNA binding protein|translation factor|translation initiation factor	1
+KCNK10	transporter|ion channel|potassium channel|voltage-gated potassium channel	6
+KCNK12	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNK13	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNK15	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+CSNK1D	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+KCNK18	transporter|ion channel|potassium channel|voltage-gated potassium channel	6
+SOAT1	transferase|acyltransferase	2
+SOAT2	transferase|acyltransferase	1
+KCNQ1	transporter|ion channel|potassium channel|voltage-gated potassium channel	11
+KCNQ2	transporter|ion channel|potassium channel|voltage-gated potassium channel	9
+BTK	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	6
+KCNQ3	transporter|ion channel|potassium channel|voltage-gated potassium channel	7
+KCNQ4	transporter|ion channel|potassium channel|voltage-gated potassium channel	6
+KCNQ5	transporter|ion channel|potassium channel|voltage-gated potassium channel	5
+KCTD12	enzyme modulator	5
+TP53	transcription factor	5
+CES1	hydrolase|esterase	11
+KCTD16	enzyme modulator	5
+CETP	defense/immunity protein|antibacterial response protein	4
+AARS2	nucleic acid binding|RNA binding protein	1
+LPAR1	receptor|G-protein coupled receptor	2
+LPAR3	receptor|G-protein coupled receptor	1
+NEU2	hydrolase	2
+SEC14L2	transfer/carrier protein	1
+SEC14L3	transfer/carrier protein	1
+SEC14L4	transfer/carrier protein	1
+NEU1	hydrolase	1
+KCNN1	transporter|ion channel|potassium channel|voltage-gated potassium channel	6
+KCNN2	transporter|ion channel|potassium channel|voltage-gated potassium channel	5
+KCNN3	transporter|ion channel|potassium channel|voltage-gated potassium channel	6
+KCNN4	transporter|ion channel|potassium channel|voltage-gated potassium channel	15
+ATP6V1C1	transporter|cation transporter|ATP synthase	1
+STAT5B	transcription factor	1
+YES1	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	3
+SLC10A1	transporter|cation transporter	4
+PTK6	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	1
+PTK2	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	4
+BST1	lyase|cyclase	1
+CYP26A1	oxidoreductase|oxygenase	1
+POLA1	nucleic acid binding|nuclease|exodeoxyribonuclease	6
+ALDH6A1	oxidoreductase|dehydrogenase	1
+POLA2	nucleic acid binding|DNA binding protein|DNA-directed DNA polymerase	1
+CALY	transmembrane receptor regulatory/adaptor protein	5
+CALR	calcium-binding protein	1
+LDHAL6A	oxidoreductase|dehydrogenase	1
+LDHAL6B	oxidoreductase|dehydrogenase	1
+DDR1	transferase|kinase|protein kinase|receptor tyrosine protein kinase	1
+ACY3	hydrolase|protease|metalloprotease	1
+COX7B	oxidoreductase|oxidase	1
+ACY1	hydrolase|protease|metalloprotease	2
+HIBADH	oxidoreductase|dehydrogenase	1
+GRIK5	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	4
+GRIK3	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	4
+GRIK4	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	4
+GRIK1	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	10
+GRIK2	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	11
+COX7C	oxidoreductase|oxidase	1
+PPP3CA	hydrolase|phosphatase|protein phosphatase	1
+KCNT2	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+GNRHR	receptor|G-protein coupled receptor	5
+RAC2	enzyme modulator|G-protein|small GTPase	1
+RAC3	enzyme modulator|G-protein|small GTPase	1
+PHGDH	oxidoreductase|dehydrogenase	1
+RAC1	enzyme modulator|G-protein|small GTPase	2
+OXGR1	receptor|G-protein coupled receptor	1
+COX8A	oxidoreductase|oxidase	1
+PCYT1B	transferase|nucleotidyltransferase	1
+PCYT1A	transferase|nucleotidyltransferase	1
+SLC32A1	transporter|amino acid transporter	2
+SYK	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	8
+GAA	hydrolase|glucosidase	3
+APRT	transferase|phosphoribosyltransferase	1
+GAK	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+FSHR	extracellular matrix protein	1
+IL1B	signaling molecule|cytokine|interleukin superfamily	7
+KIT	transferase|kinase|protein kinase|receptor tyrosine protein kinase	25
+DDR2	transferase|kinase|protein kinase|receptor tyrosine protein kinase	2
+AHCY	hydrolase	2
+GBA	hydrolase|glycosidase	2
+HSD17B3	oxidoreductase|dehydrogenase	1
+HSD17B4	oxidoreductase|dehydrogenase	2
+NOXO1	oxidoreductase|oxidase	1
+HSD17B6	oxidoreductase|dehydrogenase	1
+COX5B	oxidoreductase|oxidase	1
+HSD17B7	oxidoreductase|dehydrogenase	1
+COX5A	oxidoreductase|oxidase	1
+HSD17B8	oxidoreductase|dehydrogenase	1
+RELA	transcription factor	9
+CYP17A1	oxidoreductase|oxygenase	10
+HSD17B1	oxidoreductase|dehydrogenase	7
+HSD17B2	oxidoreductase|dehydrogenase	1
+CHRNA10	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	7
+XDH	oxidoreductase|oxidase	8
+MAP3K2	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	2
+GABBR2	receptor|G-protein coupled receptor	11
+GABBR1	receptor|G-protein coupled receptor	17
+MAP3K1	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	1
+GAD1	lyase|decarboxylase	2
+GAD2	lyase|decarboxylase	3
+COX6C	oxidoreductase|oxidase	1
+GCK	transferase|kinase|protein kinase|hexokinase	3
+GRIN1	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	46
+VEGFA	signaling molecule|growth factor	6
+KCNS1	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNS2	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNS3	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+NDUFAB1	transfer/carrier protein	1
+NEK11	transferase|kinase|protein kinase	1
+OTC	transferase	2
+AMHR2	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	1
+MSMO1	oxidoreductase|oxidase	1
+PLAT	hydrolase|protease|serine protease	4
+NR3C1	transcription factor|nuclear hormone receptor	62
+COX6A2	oxidoreductase|oxidase	1
+YARS2	ligase|aminoacyl-tRNA synthetase	1
+IGF1R	transferase|kinase|protein kinase|receptor tyrosine protein kinase	13
+NR3C2	transcription factor|nuclear hormone receptor	23
+PLAU	hydrolase|protease|serine protease	1
+ENPP1	hydrolase|phosphatase|nucleotide phosphatase	2
+CASR	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	5
+SDHC	oxidoreductase|dehydrogenase	1
+SDHD	oxidoreductase|dehydrogenase	2
+SDHA	oxidoreductase|oxidase	1
+SDHB	oxidoreductase|dehydrogenase	1
+COX6B1	oxidoreductase|oxidase	1
+SCNN1G	transporter|ion channel	6
+SCNN1D	transporter|ion channel	3
+SCNN1B	transporter|ion channel	6
+SCNN1A	transporter|ion channel	6
+PPIF	isomerase	2
+RAF1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	12
+PPIA	isomerase	2
+DDX6	nucleic acid binding|RNA binding protein|RNA helicase	1
+NNMT	transferase|methyltransferase	1
+NDUFB10	oxidoreductase|reductase	1
+CACNA1B	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	11
+CACNA1A	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	7
+CACNA1D	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	19
+CACNA1C	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	31
+GLYAT	transferase	1
+CACNA1F	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	14
+PLD1	hydrolase|lipase|phospholipase	2
+CACNA1E	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	3
+CACNA1H	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	19
+CACNA1G	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	17
+PLD2	hydrolase|lipase|phospholipase	2
+CACNA1I	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	15
+KCNV1	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNV2	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+CACNA1S	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	18
+YARS	ligase|aminoacyl-tRNA synthetase	1
+MGAM	hydrolase|glucosidase	5
+PDHA2	oxidoreductase|dehydrogenase	1
+PDHA1	oxidoreductase|dehydrogenase	2
+VCAM1	hydrolase|phosphatase|protein phosphatase	1
+RARRES1	transmembrane receptor regulatory/adaptor protein	1
+IGF2R	receptor	1
+GNAS	enzyme modulator|G-protein|heterotrimeric G-protein	2
+UBA3	transfer/carrier protein	1
+ALPL	hydrolase|phosphatase	1
+TCF4	transcription factor|basic helix-loop-helix transcription factor	1
+TAT	transferase|transaminase	3
+PCTP	transfer/carrier protein	1
+GRM1	receptor|G-protein coupled receptor	15
+LTB4R	receptor|G-protein coupled receptor	2
+GHR	receptor|cytokine receptor|type I cytokine receptor	1
+GRM3	receptor|G-protein coupled receptor	7
+GRM2	receptor|G-protein coupled receptor	7
+CA1	lyase|dehydratase	32
+GRM5	receptor|G-protein coupled receptor	20
+GRM4	receptor|G-protein coupled receptor	8
+CA3	lyase|dehydratase	4
+GRM7	receptor|G-protein coupled receptor	5
+CA2	lyase|dehydratase	37
+GRM6	receptor|G-protein coupled receptor	4
+CA4	lyase|dehydratase	25
+GRM8	receptor|G-protein coupled receptor	7
+CA7	lyase|dehydratase	12
+CA6	lyase|dehydratase	12
+CA9	lyase|dehydratase	17
+CA8	lyase|dehydratase	1
+PDPK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	9
+CAD	transferase	1
+CYP4A11	oxidoreductase|oxygenase	1
+MKL1	transcription factor	1
+ACTA1	cytoskeletal protein|actin family cytoskeletal protein|actin and actin related protein	1
+ACOX1	oxidoreductase|oxidase	1
+CAT	oxidoreductase|peroxidase	1
+MAN1B1	chaperone	1
+FBP1	hydrolase|phosphatase|carbohydrate phosphatase	2
+SLC3A1	hydrolase|amylase	1
+NT5C2	hydrolase|phosphatase|nucleotide phosphatase	2
+PSMB10	hydrolase|protease	2
+CRYZ	oxidoreductase|dehydrogenase	1
+CYTH2	membrane traffic protein|membrane trafficking regulatory protein	1
+GNG2	enzyme modulator|G-protein|heterotrimeric G-protein	1
+CNR2	receptor|G-protein coupled receptor	12
+CBS	lyase|dehydratase	2
+CNR1	receptor|G-protein coupled receptor	17
+OXCT1	transferase	2
+SV2A	transporter	1
+MKNK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+MKNK2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+PTK2B	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	3
+OXCT2	transferase	1
+TRDMT1	transferase|methyltransferase	1
+RRM1	oxidoreductase|reductase	9
+RRM2	oxidoreductase|reductase	8
+HSD3B2	lyase|dehydratase	2
+HSD3B1	lyase|dehydratase	2
+WARS2	ligase|aminoacyl-tRNA synthetase	1
+POLE4	nucleic acid binding|DNA binding protein|DNA-directed DNA polymerase	1
+GALE	lyase|dehydratase	1
+POLE2	nucleic acid binding|DNA binding protein|DNA-directed DNA polymerase	1
+POLE3	nucleic acid binding|DNA binding protein|DNA-directed DNA polymerase	1
+ACKR3	hydrolase|phosphatase|protein phosphatase	1
+KRAS	enzyme modulator|G-protein|small GTPase	1
+TEK	transferase|kinase|protein kinase|receptor tyrosine protein kinase	4
+CDA	hydrolase|deaminase	2
+PI4K2B	transferase|kinase	1
+PRSS1	hydrolase|protease|serine protease	4
+EPRS	ligase	1
+GRPR	receptor|G-protein coupled receptor	1
+GLS	hydrolase	1
+GJA1	cell junction protein|gap junction	4
+GJA3	cell junction protein|gap junction	3
+SCN11A	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	18
+GJA5	cell junction protein|gap junction	3
+GJA4	cell junction protein|gap junction	3
+NAMPT	signaling molecule|cytokine	2
+GJA9	cell junction protein|gap junction	3
+GJA8	cell junction protein|gap junction	3
+GAMT	transferase|methyltransferase	2
+PRKCG	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	7
+PRKCI	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	3
+PRKCH	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+PRKCB	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	10
+PRKCE	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	6
+PRKCD	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	7
+PRKCA	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	20
+CEL	hydrolase|esterase	1
+GABRG3	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	26
+TAAR1	receptor|G-protein coupled receptor	4
+GABRG2	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	36
+GANC	hydrolase|glucosidase	1
+GABRG1	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	26
+MTAP	transferase|phosphorylase	1
+SCN10A	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	34
+MAP1A	cytoskeletal protein|microtubule family cytoskeletal protein|non-motor microtubule binding protein	2
+PRKCQ	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	4
+PI4K2A	transferase|kinase	1
+LIPT1	transferase	1
+TPH2	oxidoreductase|hydroxylase	1
+TPH1	oxidoreductase|hydroxylase	4
+PDXDC1	lyase|decarboxylase	1
+PRKDC	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	10
+ADH7	oxidoreductase|dehydrogenase	1
+SDSL	lyase|dehydratase	1
+PRKCZ	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	4
+ADH5	oxidoreductase|dehydrogenase	2
+GJC1	cell junction protein|gap junction	3
+LDHC	oxidoreductase|dehydrogenase	1
+ADH4	oxidoreductase|dehydrogenase	1
+LDHB	oxidoreductase|dehydrogenase	1
+GJC3	cell junction protein|gap junction	3
+LDHA	oxidoreductase|dehydrogenase	2
+GJC2	cell junction protein|gap junction	3
+HMOX1	oxidoreductase|oxygenase	2
+HMOX2	oxidoreductase|oxygenase	1
+FDFT1	transferase|farnesyltransferase	1
+PLK4	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+PLK3	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	3
+DMPK	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+PLK2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	2
+PLK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	8
+NFATC1	transcription factor	1
+GP9	extracellular matrix protein|extracellular matrix glycoprotein	1
+SQLE	oxidoreductase|oxygenase	4
+GJB2	cell junction protein|gap junction	3
+GJB1	cell junction protein|gap junction	3
+GJB4	cell junction protein|gap junction	3
+GJB3	cell junction protein|gap junction	3
+GJB6	cell junction protein|gap junction	3
+PAH	oxidoreductase|oxygenase	6
+GJB5	cell junction protein|gap junction	3
+GJB7	cell junction protein|gap junction	3
+PAM	oxidoreductase|oxygenase	1
+GABRB3	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	30
+GABRB2	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	33
+PYGB	transferase|phosphorylase	1
+CDKN1A	enzyme modulator|kinase modulator|kinase inhibitor	1
+GABRB1	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	29
+RARG	transcription factor|nuclear hormone receptor	11
+ARPC1B	cytoskeletal protein|actin family cytoskeletal protein	1
+GPT	transferase|transaminase	4
+PYGM	transferase|phosphorylase	8
+PYGL	transferase|phosphorylase	6
+CSAD	lyase|decarboxylase	1
+GJE1	cell junction protein|gap junction	3
+AIFM1	oxidoreductase|oxidase	1
+GAST	signaling molecule|peptide hormone	1
+TK2	transferase|kinase|nucleotide kinase	2
+GJD2	cell junction protein|gap junction	3
+HADHA	oxidoreductase|dehydrogenase	1
+KAT2B	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	2
+GJD4	cell junction protein|gap junction	3
+KAT2A	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	1
+TUBB2B	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	3
+GJD3	cell junction protein|gap junction	3
+TUBB2A	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	3
+RARA	transcription factor|nuclear hormone receptor	12
+RARB	transcription factor|nuclear hormone receptor	12
+GARS	ligase|aminoacyl-tRNA synthetase	1
+GART	transferase	1
+MGLL	hydrolase|lipase|phospholipase	1
+NR1I3	transcription factor|nuclear hormone receptor	4
+NR1I2	transcription factor|nuclear hormone receptor	20
+NDUFA4L2	oxidoreductase	1
+ADCY2	lyase|cyclase|guanylate cyclase	2
+ADCY1	lyase|cyclase|guanylate cyclase	3
+ADCY5	lyase|cyclase|guanylate cyclase	2
+ADRBK2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+ADRBK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+ALOX5	oxidoreductase|oxygenase	29
+CKB	transferase|kinase|amino acid kinase	1
+LDLR	extracellular matrix protein|extracellular matrix glycoprotein	1
+GABRA2	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	46
+BCHE	hydrolase|esterase	19
+GABRA1	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	59
+CKM	transferase|kinase|amino acid kinase	1
+GABRA6	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	39
+CSNK1A1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	2
+GABRA5	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	46
+MGMT	transferase|methyltransferase|DNA methyltransferase	4
+TPK1	transferase|kinase|pyrophosphokinase	1
+GABRA4	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	38
+GSS	ligase	3
+NR1H2	transcription factor|nuclear hormone receptor	3
+GABRA3	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	47
+GSR	oxidoreductase|oxidase	6
+MOCOS	transferase|sulfurtransferase	1
+NR1H4	transcription factor|nuclear hormone receptor	8
+GATB	ligase	1
+NR1H3	transcription factor|nuclear hormone receptor	3
+TUBB4B	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	8
+TUBB4A	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	5
+DHRS3	oxidoreductase|dehydrogenase	1
+HIPK3	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+DHRS4	oxidoreductase|dehydrogenase	1
+GNMT	transferase|methyltransferase	2
+GATM	transferase|amidinotransferase	3
+VKORC1L1	oxidoreductase	1
+CSF1	signaling molecule|cytokine	2
+TPMT	transferase|methyltransferase	1
+PROS1	enzyme modulator	2
+RPL10L	nucleic acid binding|RNA binding protein|ribosomal protein	2
+IL5RA	receptor|cytokine receptor|type I cytokine receptor	2
+FGF1	signaling molecule|growth factor	2
+FGF2	signaling molecule|growth factor	2
+TNF	signaling molecule|cytokine|tumor necrosis factor family member	19
+SLC8A1	transporter|cation transporter	5
+PROSC	other	1
+NPEPPS	hydrolase|protease|metalloprotease	1
+CYSLTR1	receptor|G-protein coupled receptor	7
+CYSLTR2	receptor|G-protein coupled receptor	3
+SLCO2B1	transporter	2
+PAPOLA	nucleic acid binding|RNA binding protein|mRNA processing factor|mRNA polyadenylation factor	1
+CSNK1G3	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+MAP2K1	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	18
+USP7	hydrolase|protease|cysteine protease	3
+MAP2K2	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	8
+DIO1	oxidoreductase|peroxidase	1
+USP2	hydrolase|protease|cysteine protease	1
+DYRK1A	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+DYRK1B	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	3
+PGD	oxidoreductase|dehydrogenase	3
+THNSL1	lyase|dehydratase	1
+PGF	signaling molecule|growth factor	1
+MTNR1A	receptor|G-protein coupled receptor	10
+LTB4R2	receptor|G-protein coupled receptor	3
+MTNR1B	receptor|G-protein coupled receptor	11
+PGR	transcription factor|nuclear hormone receptor	32
+TPO	oxidoreductase|peroxidase	3
+CLCA1	transporter|ion channel	1
+DRD1	receptor|G-protein coupled receptor	65
+PI3	enzyme modulator|protease inhibitor|serine protease inhibitor	2
+DRD2	receptor|G-protein coupled receptor	122
+MAP2K7	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	1
+DRD3	receptor|G-protein coupled receptor	71
+DRD4	receptor|G-protein coupled receptor	52
+MAP2K5	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	2
+DRD5	receptor|G-protein coupled receptor	40
+MCL1	signaling molecule	4
+M6PR	receptor	1
+P4HA1	oxidoreductase|oxygenase	3
+P4HA2	oxidoreductase|oxygenase	1
+BCL2	signaling molecule	17
+TPP2	hydrolase|protease|serine protease	1
+RSL24D1	nucleic acid binding|RNA binding protein|ribosomal protein	2
+BCL2L2	signaling molecule	2
+BCL2L1	signaling molecule	4
+AMD1	lyase|decarboxylase	2
+FTCD	hydrolase|deaminase	2
+ADAMTS5	enzyme modulator|protease inhibitor|serine protease inhibitor	1
+THBD	receptor	3
+RNPEP	hydrolase|protease|metalloprotease	1
+IDH3B	oxidoreductase|dehydrogenase	1
+KRTAP5-2	extracellular matrix protein|extracellular matrix structural protein	1
+HMGCS2	transferase	1
+PRKG1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	3
+IDH3A	oxidoreductase|dehydrogenase	1
+SLC13A1	transporter|cation transporter	1
+TRPC7	transporter|ion channel	2
+SLC13A2	transporter|cation transporter	1
+SLC13A3	transporter|cation transporter	1
+TRPC5	transporter|ion channel	10
+TRPC6	transporter|ion channel	4
+GGPS1	transferase|acyltransferase	2
+TRPC3	transporter|ion channel	4
+UGT1A1	transferase|glycosyltransferase	1
+TRPC4	transporter|ion channel	2
+TRPC1	transporter|ion channel	2
+AVPR2	receptor|G-protein coupled receptor	10
+FAAH2	transferase	1
+RPL13A	nucleic acid binding|RNA binding protein|ribosomal protein	2
+LCK	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	18
+CRH	receptor|G-protein coupled receptor	1
+LCT	hydrolase|glycosidase	3
+ALDH9A1	oxidoreductase|dehydrogenase	1
+CATSPER1	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	5
+HDAC4	hydrolase|deacetylase	10
+HDAC5	hydrolase|deacetylase	9
+CATSPER3	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	5
+HDAC2	hydrolase|deacetylase	19
+CATSPER2	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	5
+HDAC3	hydrolase|deacetylase	18
+CATSPER4	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	5
+HDAC1	hydrolase|deacetylase	27
+PLG	hydrolase|protease|serine protease	2
+TTK	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	2
+PDHB	oxidoreductase|dehydrogenase	1
+CYP3A4	oxidoreductase|oxygenase	46
+HDAC8	hydrolase|deacetylase	14
+CYP3A5	oxidoreductase|oxygenase	12
+HDAC9	hydrolase|deacetylase	12
+HDAC6	hydrolase|deacetylase	17
+CYP3A7	oxidoreductase|oxygenase	8
+HDAC7	hydrolase|deacetylase	8
+NFS1	lyase	2
+P2RY6	receptor|G-protein coupled receptor	2
+TTR	transfer/carrier protein	1
+P2RY4	receptor|G-protein coupled receptor	2
+POLR2A	nucleic acid binding|RNA binding protein|DNA-directed RNA polymerase	1
+P2RY2	receptor|G-protein coupled receptor	4
+P2RY1	receptor|G-protein coupled receptor	3
+CSK	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	2
+UGT1A9	transferase|glycosyltransferase	2
+ADSS	ligase	1
+UGT1A6	transferase|glycosyltransferase	1
+TRPA1	transporter|ion channel|voltage-gated ion channel	13
+IDH3G	oxidoreductase|dehydrogenase	1
+SMOX	transferase|methyltransferase|DNA methyltransferase	1
+CYP51A1	oxidoreductase|oxygenase	6
+GFER	oxidoreductase|oxidase	1
+MTOR	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	36
+P2RX7	transporter|ion channel|ligand-gated ion channel	2
+P2RX4	transporter|ion channel|ligand-gated ion channel	1
+PSAT1	transferase|transaminase	2
+CTH	lyase	1
+ZACN	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	1
+MTRR	transferase|methyltransferase	1
+HDAC10	hydrolase|deacetylase	7
+VARS	ligase|aminoacyl-tRNA synthetase	1
+AQP9	transporter	1
+HDAC11	hydrolase|deacetylase	4
+AQP1	transfer/carrier protein	1
+RPS6KA4	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+RPS6KA3	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	2
+RPS6KA6	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	2
+PNP	transferase|phosphorylase	7
+KAT5	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	1
+RPS6KA2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+RPS6KA1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	3
+PDK1	transferase|kinase|protein kinase	4
+CPT1A	transferase|acyltransferase	4
+P3H2	extracellular matrix protein|extracellular matrix glycoprotein	2
+KRT7	cytoskeletal protein|intermediate filament	1
+P3H1	extracellular matrix protein|extracellular matrix glycoprotein	2
+HLA-A	defense/immunity protein|major histocompatibility complex antigen	1
+P3H3	extracellular matrix protein|extracellular matrix glycoprotein	2
+CPT1B	transferase|acyltransferase	1
+MAPK8IP1	enzyme modulator|kinase modulator|kinase activator	1
+AZGP1	defense/immunity protein|major histocompatibility complex antigen	1
+POR	oxidoreductase|oxygenase	2
+SUCLG2	ligase	1
+SIK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+SUCLG1	ligase|Succinyl-CoA Synthetase	1
+NEIL1	lyase|glycosylase	1
+CFTR	transporter|ion channel|anion channel	17
+SLC22A6	transporter|carbohydrate transporter	7
+TXK	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	1
+MTTP	transfer/carrier protein|apolipoprotein	2
+TXN	oxidoreductase	2
+LIAS	transferase|lipoyltransferase	1
+CRHR1	defense/immunity protein|antibacterial response protein	2
+CRHR2	defense/immunity protein|antibacterial response protein	1
+TRPM2	transporter|ion channel	7
+UGCG	transferase|glycosyltransferase	1
+GJA10	cell junction protein|gap junction	3
+TRPM7	transporter|ion channel	3
+TRPM8	transporter|ion channel	4
+TRPM5	transporter|ion channel	2
+TRPM6	transporter|ion channel	1
+TRPM3	transporter|ion channel	7
+TRPM4	transporter|ion channel	6
+PYCR1	oxidoreductase|reductase	1
+PYCR2	oxidoreductase|reductase	1
+TYR	oxidoreductase|oxidase	13
+HAL	lyase|histidase	1
+SLC22A8	transporter|carbohydrate transporter	2
+TOP2A	nucleic acid binding|DNA binding protein|DNA topoisomerase	31
+TOP2B	nucleic acid binding|DNA binding protein|DNA topoisomerase	5
+ORM1	extracellular matrix protein|extracellular matrix glycoprotein	2
+HBB	transfer/carrier protein	1
+ORM2	extracellular matrix protein|extracellular matrix glycoprotein	2
+GABRR3	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	7
+SLC22A12	transporter|carbohydrate transporter	3
+GABRR2	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	7
+GABRR1	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	8
+XPO1	receptor	3
+GSG2	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	1
+HRAS	enzyme modulator|G-protein|small GTPase	1
+SLC22A11	transporter|carbohydrate transporter	1
+CBR1	oxidoreductase|dehydrogenase	1
+PARP3	nucleic acid binding|DNA binding protein	3
+PARP1	nucleic acid binding|DNA binding protein	16
+PARP2	nucleic acid binding|DNA binding protein	6
+TUBB	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	22
+GPBAR1	receptor|G-protein coupled receptor	6
+TYK2	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	4
+RENBP	isomerase|epimerase/racemase	1
+HCK	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	5
+UGDH	oxidoreductase|dehydrogenase	1
+ALDH5A1	oxidoreductase|dehydrogenase	4
+NHP2L1	lyase|glycosylase	2
+TLR9	extracellular matrix protein	2
+TLR8	extracellular matrix protein	2
+TLR7	extracellular matrix protein	6
+TLR4	extracellular matrix protein	5
+PTGER4	receptor|G-protein coupled receptor	5
+ADH1C	oxidoreductase|dehydrogenase	4
+ADH1B	oxidoreductase|dehydrogenase	2
+PTGER1	receptor|G-protein coupled receptor	11
+ADH1A	oxidoreductase|dehydrogenase	2
+HDC	lyase|decarboxylase	2
+PTGER2	receptor|G-protein coupled receptor	6
+PTGER3	receptor|G-protein coupled receptor	8
+TYMS	transferase|methyltransferase	16
+TYMP	transferase|glycosyltransferase	2
+PPP2CA	hydrolase|phosphatase|protein phosphatase	1
+PPP2CB	hydrolase|phosphatase|protein phosphatase	1
+NT5E	hydrolase|phosphatase|nucleotide phosphatase	1
+GABRE	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	26
+GABRD	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	27
+GABRQ	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	26
+GABRP	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	26
+GBF1	enzyme modulator|G-protein modulator|guanyl-nucleotide exchange factor	1
+GSTA5	oxidoreductase|reductase	1
+GSTA4	oxidoreductase|reductase	1
+GSTA3	oxidoreductase|reductase	1
+GSTA2	oxidoreductase|reductase	2
+GSTA1	oxidoreductase|reductase	1
+F2RL1	receptor|G-protein coupled receptor	1
+RAB9A	membrane traffic protein|membrane trafficking regulatory protein	1
+GUCY1B3	lyase|cyclase|guanylate cyclase	9
+GUCY1B2	lyase|cyclase|guanylate cyclase	3
+NDUFA13	oxidoreductase|dehydrogenase	1
+KDM1A	transferase|methyltransferase|DNA methyltransferase	2
+NDUFA11	oxidoreductase|dehydrogenase	1
+NDUFA12	oxidoreductase|dehydrogenase	1
+NDUFA10	transferase|kinase|nucleotide kinase	1
+COMT	transferase|methyltransferase	8
+FPGS	ligase	2
+HADH	oxidoreductase|dehydrogenase	1
+CHRNB2	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	7
+GUCY1A3	lyase|cyclase|guanylate cyclase	9
+CHRNB1	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	1
+GUCY1A2	lyase|cyclase|guanylate cyclase	4
+CHRNB4	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	5
+PHYH	oxidoreductase|oxygenase	1
+CHRNB3	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	2
+KDM2A	transferase|methyltransferase|DNA methyltransferase	1
+LIG1	nucleic acid binding|DNA binding protein	1
+ATP1B3	transporter|cation transporter|ATP synthase	1
+LIG3	nucleic acid binding|DNA binding protein	1
+ATP1B2	transporter|cation transporter|ATP synthase	1
+ATP1B1	transporter|cation transporter|ATP synthase	1
+LPA	hydrolase|protease|serine protease	2
+PNLIP	hydrolase|lipase|phospholipase	2
+CHRNA1	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	9
+CHRNA3	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	11
+CHRNA2	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	22
+CHRNA5	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	2
+CHRNA4	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	18
+CHRNA7	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	22
+CHRNA6	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	6
+CHRNA9	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	4
+LPL	hydrolase|esterase	5
+ALOX12	oxidoreductase|oxygenase	1
+HRH1	receptor|G-protein coupled receptor	107
+HRH3	receptor|G-protein coupled receptor	18
+HRH2	receptor|G-protein coupled receptor	25
+NPC1L1	receptor	1
+HRH4	receptor|G-protein coupled receptor	21
+CYP2J2	oxidoreductase|oxygenase	2
+DARS	ligase|aminoacyl-tRNA synthetase	1
+MGEA5	hydrolase|glycosidase	1
+IDH1	oxidoreductase|dehydrogenase	1
+IDH2	oxidoreductase|dehydrogenase	1
+TRPV2	transporter|ion channel	2
+TRPV3	transporter|ion channel	1
+TRPV1	transporter|ion channel	21
+POU2F2	transcription factor|helix-turn-helix transcription factor|homeobox transcription factor	1
+EIF2S1	nucleic acid binding|RNA binding protein|translation factor|translation initiation factor	1
+SELE	hydrolase|protease|serine protease	3
+SELP	hydrolase|protease|serine protease	5
+SEPSECS	transferase	1
+DAO	oxidoreductase|oxidase	3
+SELL	hydrolase|protease|serine protease	1
+TRPV6	transporter|ion channel	1
+TRPV4	transporter|ion channel	4
+TRPV5	transporter|ion channel	2
+PI4KA	transferase|kinase	1
+PI4KB	transferase|kinase	2
+FGFR4	transferase|kinase|protein kinase|receptor tyrosine protein kinase	6
+FGFR3	transferase|kinase|protein kinase|receptor tyrosine protein kinase	12
+FGFR2	transferase|kinase|protein kinase|receptor tyrosine protein kinase	13
+BMPR1A	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	1
+FGFR1	transferase|kinase|protein kinase|receptor tyrosine protein kinase	21
+GLP1R	defense/immunity protein|antibacterial response protein	2
+KDM5C	transcription factor|zinc finger transcription factor	1
+KDM5D	transcription factor|zinc finger transcription factor	1
+THRB	transcription factor|nuclear hormone receptor	4
+THRA	transcription factor|nuclear hormone receptor	4
+MLNR	receptor|G-protein coupled receptor	6
+DBI	transfer/carrier protein	1
+DBH	oxidoreductase|hydroxylase	4
+HK2	transferase|kinase|protein kinase|hexokinase	1
+CASP8	hydrolase|protease|cysteine protease	1
+CASP3	hydrolase|protease|cysteine protease	7
+TOP1MT	nucleic acid binding|DNA binding protein|DNA topoisomerase	2
+CASP1	hydrolase|protease|cysteine protease	2
+NOS1	oxidoreductase|oxygenase	12
+KDM6A	transcription factor	1
+KDM6B	transcription factor	1
+CYP3A43	oxidoreductase|oxygenase	1
+DCK	transferase|kinase|nucleotide kinase	3
+DCN	signaling molecule|cytokine	1
+DNM1	enzyme modulator|G-protein|small GTPase	2
+DNM2	enzyme modulator|G-protein|small GTPase	1
+ALDH1A3	oxidoreductase|dehydrogenase	2
+MYH2	cytoskeletal protein|actin family cytoskeletal protein|actin binding motor protein	1
+DDAH1	hydrolase	1
+DDAH2	hydrolase	1
+ALDH1A2	oxidoreductase|dehydrogenase	3
+ALDH1A1	oxidoreductase|dehydrogenase	3
+HAGH	hydrolase	1
+LTF	hydrolase|protease|serine protease	3
+DDC	lyase|decarboxylase	6
+PDXK	transferase|kinase	1
+ATP1A4	transporter|ion channel	1
+ATP1A3	transporter|ion channel	1
+PDXP	hydrolase|phosphatase	1
+ATP1A2	transporter|ion channel	1
+ATP1A1	transporter|ion channel	19
+NR2C2	transcription factor|nuclear hormone receptor	3
+MAPK9	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	3
+MAPK8	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	12
+PDE11A	hydrolase|phosphodiesterase	2
+MAPK7	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+MUC2	extracellular matrix protein|extracellular matrix glycoprotein	1
+ALDH1B1	oxidoreductase|dehydrogenase	1
+MAPK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	14
+MAPK3	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	5
+NOS2	oxidoreductase|oxygenase	26
+KDM4E	transcription factor|zinc finger transcription factor	1
+NOS3	oxidoreductase|oxygenase	17
+LIMK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	2
+WEE1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	2
+PDE10A	hydrolase|phosphodiesterase	6
+RPS6KB1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	10
+MT-ND6	oxidoreductase|dehydrogenase	1
+MT-ND4L	oxidoreductase|dehydrogenase	1
+MT-ND4	oxidoreductase|dehydrogenase	1
+MT-ND5	oxidoreductase|dehydrogenase	1
+EHMT2	nucleic acid binding|DNA binding protein	1
+ARAF	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+EHMT1	nucleic acid binding|DNA binding protein	1
+MT-ND2	oxidoreductase|dehydrogenase	1
+MT-ND3	oxidoreductase|dehydrogenase	1
+MT-ND1	oxidoreductase|dehydrogenase	5
+MYLK	hydrolase|phosphatase|protein phosphatase	1
+LIPF	hydrolase|lipase	1
+IL4I1	transferase|methyltransferase|DNA methyltransferase	1
+LIPE	hydrolase|esterase	2
+NSDHL	lyase|dehydratase	1
+CYP2D6	oxidoreductase|oxygenase	15
+PSMD2	enzyme modulator	1
+TRBC1	defense/immunity protein|immunoglobulin receptor superfamily	1
+PSMD1	enzyme modulator	1
+LRAT	transferase|acyltransferase	1
+CSNK2A1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	5
+CSNK2A2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+RNASE3	nucleic acid binding|nuclease|endoribonuclease	1
+RNASE1	nucleic acid binding|nuclease|endoribonuclease	2
+SLC5A6	transporter|carbohydrate transporter	2
+AR	transcription factor|nuclear hormone receptor	43
+SLC5A8	transporter|carbohydrate transporter	5
+PRKAR1A	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+RBP3	enzyme modulator|G-protein modulator	1
+RBP1	enzyme modulator|G-protein modulator	2
+PADI3	hydrolase	1
+PADI2	hydrolase	1
+CYP2E1	oxidoreductase|oxygenase	3
+PADI4	hydrolase	1
+HPD	oxidoreductase|oxygenase	1
+PADI1	hydrolase	1
+IDO1	oxidoreductase|oxygenase	6
+ABCB1	transporter|ATP-binding cassette (ABC) transporter	10
+RETSAT	oxidoreductase|dehydrogenase	1
+DHH	signaling molecule	1
+PADI6	hydrolase	1
+ABCB4	transporter|ATP-binding cassette (ABC) transporter	1
+HPN	hydrolase|protease|serine protease	1
+CLCNKB	transporter|ion channel|anion channel	1
+FPR1	receptor|G-protein coupled receptor	6
+CLCNKA	transporter|ion channel|anion channel	1
+SLC5A1	transporter|carbohydrate transporter	6
+SLC5A2	transporter|carbohydrate transporter	8
+OAZ1	enzyme modulator	1
+SLC5A3	transporter|carbohydrate transporter	1
+OAZ2	enzyme modulator	1
+OAZ3	enzyme modulator	1
+HSD11B1	oxidoreductase|dehydrogenase	11
+CYB5R1	oxidoreductase|reductase	1
+HSD11B2	oxidoreductase|dehydrogenase	4
+GRIN2A	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	35
+CYB5R3	oxidoreductase|reductase	2
+CYP2B6	oxidoreductase|oxygenase	10
+PRKAR2B	enzyme modulator|kinase modulator	1
+KCNMB1	transporter|ion channel|potassium channel|voltage-gated potassium channel	2
+KCNMB2	transporter|ion channel|potassium channel|voltage-gated potassium channel	2
+KCNMB3	transporter|ion channel|potassium channel|voltage-gated potassium channel	2
+KCNMB4	transporter|ion channel|potassium channel|voltage-gated potassium channel	2
+HAO1	oxidoreductase|dehydrogenase	1
+HAO2	oxidoreductase|dehydrogenase	1
+ABCA1	transporter|ATP-binding cassette (ABC) transporter	3
+LYN	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	5
+GPR17	receptor|G-protein coupled receptor	1
+GLYATL2	transferase	1
+GLYATL1	transferase	1
+SRMS	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	1
+GPR12	receptor|G-protein coupled receptor	1
+NR0B1	transcription factor|nuclear hormone receptor	3
+GRIN2C	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	26
+LYZ	hydrolase|glycosidase	3
+GRIN2B	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	39
+GRIN2D	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	26
+COL1A1	defense/immunity protein|antibacterial response protein	1
+CS	transferase	3
+CYP2C8	oxidoreductase|oxygenase	5
+GRIN3B	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	11
+UCK2	transferase|kinase|nucleotide kinase	1
+GRIN3A	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	18
+NOX4	oxidoreductase|oxidase	2
+GPR18	receptor|G-protein coupled receptor	3
+NOX1	oxidoreductase|oxidase	1
+EZH2	nucleic acid binding|DNA binding protein	5
+ARF1	enzyme modulator|G-protein|small GTPase	1
+QPRT	transferase|pyrophosphorylase	1
+GPRC6A	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	6
+IKBKB	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	15
+TUBA1C	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	5
+TUBA1B	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	5
+TUBA1A	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	8
+ARG2	hydrolase	3
+ELOVL4	transferase|acyltransferase	1
+ARG1	hydrolase	2
+GPR35	receptor|G-protein coupled receptor	4
+RIPK2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	4
+SIRT5	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	2
+F2	hydrolase|protease|serine protease	7
+PTGR1	oxidoreductase|dehydrogenase	1
+PTGR2	oxidoreductase|dehydrogenase	1
+SIRT1	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	7
+SIRT2	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	2
+SIRT3	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	1
+F7	hydrolase|protease|serine protease	1
+F9	hydrolase|protease|serine protease	1
+GPRC5A	receptor|G-protein coupled receptor	1
+BDH1	oxidoreductase|dehydrogenase	1
+KCNMA1	transporter|ion channel|potassium channel|voltage-gated potassium channel	11
+ADSSL1	ligase	1
+SLC29A4	transporter	4
+SLC29A1	transporter	5
+DLD	oxidoreductase|oxidase	3
+PTGS2	oxidoreductase|oxygenase	89
+PTGS1	oxidoreductase|oxygenase	78
+GLRA1	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	19
+TUBA3E	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	3
+GLRA2	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	10
+TUBA3D	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	3
+GLRA3	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	8
+PSMB5	hydrolase|protease	2
+TUBA3C	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	5
+PSMB2	hydrolase|protease	2
+BGLAP	calcium-binding protein	2
+PSMB1	hydrolase|protease	3
+DMD	cytoskeletal protein|actin family cytoskeletal protein|non-motor actin binding protein	1
+HARS	ligase|aminoacyl-tRNA synthetase	1
+P2RY12	receptor|G-protein coupled receptor	6
+P2RY13	receptor|G-protein coupled receptor	3
+P2RY10	receptor|G-protein coupled receptor	1
+P2RY11	receptor|G-protein coupled receptor	4
+MDH1	oxidoreductase|dehydrogenase	1
+AADAT	transferase|transaminase	2
+MDH2	oxidoreductase|dehydrogenase	1
+STAT1	transcription factor	1
+USP9X	hydrolase|protease|cysteine protease	1
+GPR55	receptor|G-protein coupled receptor	6
+STAT3	transcription factor	8
+PSMB8	hydrolase|protease	2
+PSMB9	hydrolase|protease	2
+FABP2	transfer/carrier protein	3
+FABP4	transfer/carrier protein	1
+FABP6	transfer/carrier protein	2
+MYLK2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+PECR	oxidoreductase|dehydrogenase	1
+NCF1	oxidoreductase|oxidase	1
+NCF2	oxidoreductase|oxidase	1
+NCF4	enzyme modulator|G-protein modulator|guanyl-nucleotide exchange factor	1
+RORC	transcription factor|nuclear hormone receptor	2
+RORA	transcription factor|nuclear hormone receptor	1
+RORB	transcription factor|nuclear hormone receptor	3
+HNMT	transferase|methyltransferase	1
+STK10	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+HPGDS	transferase	3
+PIM1	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	11
+PIM3	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	2
+PIM2	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	2
+S100A2	calcium-binding protein|intracellular calcium-sensing protein|calmodulin	1
+S100A1	calcium-binding protein|intracellular calcium-sensing protein|calmodulin	1
+PIPOX	oxidoreductase|oxidase	1
+TUBA4A	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	8
+S100A4	calcium-binding protein|intracellular calcium-sensing protein|calmodulin	1
+PFKFB3	hydrolase|phosphatase|carbohydrate phosphatase	1
+GPR84	receptor|G-protein coupled receptor	1
+CYP19A1	oxidoreductase|oxygenase	16
+ACAT2	transferase|acetyltransferase	1
+ACAT1	transferase|acetyltransferase	2
+SLC9A1	transporter|cation transporter	2
+SLCO1B1	transporter	8
+PORCN	transferase|acetyltransferase	3
+SLCO1B3	transporter	6
+SLC38A3	transporter|amino acid transporter	1
+SLC38A5	transporter|amino acid transporter	1
+GOT1	transferase|aminotransferase	3
+SRD5A2	oxidoreductase|dehydrogenase	3
+SRD5A1	oxidoreductase|dehydrogenase	3
+GOT2	transferase|aminotransferase	3
+GPR97	receptor|G-protein coupled receptor	1
+EEF2	nucleic acid binding|RNA binding protein|translation factor|translation initiation factor	1
+NFKB1	transcription factor	6
+NFKB2	transcription factor	3
+PTPRE	hydrolase|phosphatase|protein phosphatase	1
+GGCX	oxidoreductase	4
+STK24	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+SLCO1A2	transporter	2
+MDM2	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	8
+NFE2L2	hydrolase|protease|serine protease	2
+FLT1	transferase|kinase|protein kinase|receptor tyrosine protein kinase	23
+HSP90AB1	chaperone|Hsp90 family chaperone	3
+SLC25A2	nucleic acid binding|RNA binding protein|ribosomal protein	1
+FLT3	transferase|kinase|protein kinase|receptor tyrosine protein kinase	25
+COX4I1	oxidoreductase|oxidase	1
+FLT4	transferase|kinase|protein kinase|receptor tyrosine protein kinase	21
+TSSK1B	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+PIK3CD	transferase|kinase	24
+PIK3CB	transferase|kinase	21
+FOXM1	nucleic acid binding|DNA binding protein	1
+PIK3CG	transferase|kinase	33
+ME1	lyase|decarboxylase	1
+ME3	lyase|decarboxylase	1
+ME2	lyase|decarboxylase	2
+DNM1L	enzyme modulator|G-protein|small GTPase	1
+HSP90AA1	chaperone|Hsp90 family chaperone	17
+SIGMAR1	transmembrane receptor regulatory/adaptor protein	19
+NDUFC2	oxidoreductase	2
+NDUFC1	oxidoreductase|dehydrogenase	1
+SLCO1C1	transporter	2
+SLC25A15	nucleic acid binding|RNA binding protein|ribosomal protein	1
+CYP2A6	oxidoreductase|oxygenase	5
+SLC25A18	nucleic acid binding|RNA binding protein|ribosomal protein	1
+PIK3CA	transferase|kinase	30
+BIRC5	enzyme modulator|protease inhibitor	1
+PIK3C3	transferase|kinase	1
+SLC25A10	nucleic acid binding|RNA binding protein|ribosomal protein	1
+BIRC7	enzyme modulator|protease inhibitor	1
+SLC25A12	nucleic acid binding|RNA binding protein|ribosomal protein	1
+SLC25A5	nucleic acid binding|RNA binding protein|ribosomal protein	1
+MET	transferase|kinase|protein kinase|receptor tyrosine protein kinase	22
+SLC25A4	nucleic acid binding|RNA binding protein|ribosomal protein	2
+BIRC2	enzyme modulator|protease inhibitor	3
+BIRC3	enzyme modulator|protease inhibitor	1
+SLC25A13	nucleic acid binding|RNA binding protein|ribosomal protein	1
+SLC25A6	nucleic acid binding|RNA binding protein|ribosomal protein	1
+SLC47A2	transporter	1
+NDUFB9	oxidoreductase	1
+NDUFB8	oxidoreductase|reductase	1
+NDUFB7	oxidoreductase|dehydrogenase	1
+SLC47A1	transporter	4
+NDUFB6	oxidoreductase|reductase	1
+NDUFB5	oxidoreductase	1
+NDUFB4	oxidoreductase|reductase	1
+NDUFB3	oxidoreductase|reductase	1
+NDUFB2	oxidoreductase|reductase	1
+NDUFB1	oxidoreductase|reductase	1
+FURIN	hydrolase|protease|serine protease	1
+LRP2	extracellular matrix protein|extracellular matrix glycoprotein	1
+HSD17B10	oxidoreductase|dehydrogenase	1
+CKMT2	transferase|kinase|amino acid kinase	1
+GANAB	hydrolase|glucosidase	1
+CCL8	signaling molecule|cytokine|chemokine	2
+CCL7	signaling molecule|cytokine|chemokine	1
+CCL2	signaling molecule|cytokine|chemokine	4
+IARS2	ligase|aminoacyl-tRNA synthetase	1
+FCGR1A	cell adhesion molecule	1
+SH2B3	signaling molecule|membrane-bound signaling molecule	1
+SLC25A22	nucleic acid binding|RNA binding protein|ribosomal protein	1
+NDUFA9	oxidoreductase|dehydrogenase	1
+SLC12A2	transporter|cation transporter	5
+NDUFA8	oxidoreductase|dehydrogenase	1
+PTPN1	hydrolase|phosphatase|protein phosphatase	11
+SLC12A3	transporter|cation transporter	14
+NDUFA7	oxidoreductase|dehydrogenase	1
+SLC12A4	transporter|cation transporter	1
+NDUFA6	oxidoreductase|dehydrogenase	1
+SLC12A5	transporter|cation transporter	1
+MMAA	isomerase|mutase	1
+NDUFA5	oxidoreductase	1
+NDUFA4	oxidoreductase	1
+NDUFA3	oxidoreductase|dehydrogenase	1
+NDUFA2	oxidoreductase	1
+SLC12A1	transporter|cation transporter	12
+NDUFA1	oxidoreductase|dehydrogenase	1
+CTNS	transporter|amino acid transporter	1
+RPL23A	nucleic acid binding|RNA binding protein|ribosomal protein	2
+MERTK	transferase|kinase|protein kinase|receptor tyrosine protein kinase	3
+DHODH	oxidoreductase|dehydrogenase	6
+PC	ligase	1
+TMLHE	oxidoreductase|hydroxylase	2
+PTPN6	hydrolase|phosphatase|protein phosphatase	1
+P4HB	oxidoreductase|oxygenase	1
+PTPN4	hydrolase|phosphatase|protein phosphatase	1
+PTPN2	hydrolase|phosphatase|protein phosphatase	1
+PREP	hydrolase|protease|serine protease	3
+KEAP1	other	1
+TXNDC12	oxidoreductase|reductase	1
+AADACL2	hydrolase|lipase	1
+OGFOD1	transferase	1
+OGFOD2	nucleic acid binding|RNA binding protein	1
+IL12A	signaling molecule|cytokine|interleukin superfamily	1
+EPHB4	transferase|kinase|protein kinase|receptor tyrosine protein kinase	2
+SCN1B	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	2
+SCN1A	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	24
+ACVR1	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	4
+ENTPD3	hydrolase|phosphatase|nucleotide phosphatase	1
+PHYKPL	transferase|transaminase	2
+MIF	signaling molecule|cytokine	3
+ASRGL1	hydrolase|protease	1
+GCAT	transferase	2
+EPHA1	transferase|kinase|protein kinase|receptor tyrosine protein kinase	1
+EPHA2	transferase|kinase|protein kinase|receptor tyrosine protein kinase	3
+L3MBTL1	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	1
+GCDH	oxidoreductase|oxidase	1
+L3MBTL3	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	1
+PIK3R3	enzyme modulator|kinase modulator	1
+PIK3R2	enzyme modulator|kinase modulator	1
+MST1R	transferase|kinase|protein kinase|receptor tyrosine protein kinase	2
+PIK3R1	enzyme modulator|kinase modulator	3
+ATP5B	transporter|cation transporter|ATP synthase	2
+APH1B	enzyme modulator	1
+SI	hydrolase|glucosidase	3
+ATP5D	transporter|cation transporter|ATP synthase	5
+A2M	enzyme modulator|protease inhibitor|serine protease inhibitor	1
+SCN3B	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	2
+SCN3A	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	20
+CCR1	hydrolase|phosphatase|protein phosphatase	1
+CTSA	hydrolase|protease|serine protease	2
+CELA1	hydrolase|protease|serine protease	2
+PAICS	ligase	1
+ATP4B	transporter|cation transporter|ATP synthase	2
+ATP4A	transporter|ion channel	7
+TH	oxidoreductase|hydroxylase	3
+CALM1	calcium-binding protein|intracellular calcium-sensing protein|calmodulin	18
+SCN2A	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	19
+AARS	nucleic acid binding|RNA binding protein	1
+SCN2B	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	2
+PTPRS	hydrolase|phosphatase|protein phosphatase	2
+PTGDR2	receptor|G-protein coupled receptor	9
+AKR1B1	oxidoreductase|reductase	13
+CTSV	hydrolase|protease|cysteine protease	1
+IDE	hydrolase|protease|metalloprotease	1
+KIF11	cytoskeletal protein|microtubule family cytoskeletal protein|microtubule binding motor protein	5
+SLC7A11	transporter|amino acid transporter	5
+CTSS	hydrolase|protease|cysteine protease	1
+SPTLC1	transferase|transaminase	1
+SPTLC2	transferase|transaminase	1
+CTSL	hydrolase|protease|cysteine protease	4
+SPTLC3	transferase|transaminase	1
+CTSK	hydrolase|protease|cysteine protease	4
+HNF4A	transcription factor|nuclear hormone receptor	1
+CTSG	hydrolase|protease|serine protease	2
+ACADM	oxidoreductase|oxidase	1
+CTSF	hydrolase|protease|cysteine protease	1
+CCR5	hydrolase|phosphatase|protein phosphatase	2
+ACADS	oxidoreductase|oxidase	2
+CCR4	hydrolase|phosphatase|protein phosphatase	1
+CTSD	hydrolase|protease|aspartic protease	2
+AASS	oxidoreductase|dehydrogenase	2
+CCR2	hydrolase|phosphatase|protein phosphatase	4
+CTSB	hydrolase|protease|cysteine protease	3
+ACAD8	oxidoreductase|oxidase	1
+NCOA1	transferase|acetyltransferase	3
+VKORC1	oxidoreductase	6
+NCOA2	transcription factor|transcription cofactor	3
+WARS	ligase|aminoacyl-tRNA synthetase	1
+MME	hydrolase|protease|metalloprotease	4
+AKR1A1	oxidoreductase|reductase	3
+HBA1	transfer/carrier protein	2
+NR5A1	transcription factor|nuclear hormone receptor	1
+ANO1	transporter|ion channel|calcium-activated chloride channel	7
+AKR1D1	oxidoreductase|reductase	2
+DOT1L	transferase|methyltransferase	2
+XIAP	enzyme modulator|protease inhibitor	5
+PRKX	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+RXRB	transcription factor|nuclear hormone receptor	8
+PAK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	2
+PGRMC1	signaling molecule	3
+RXRA	transcription factor|nuclear hormone receptor	8
+PAK7	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+PAK6	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+RXRG	transcription factor|nuclear hormone receptor	6
+CD55	hydrolase|protease|serine protease	1
+PAK4	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	2
+AKR1C1	oxidoreductase|reductase	4
+GCGR	defense/immunity protein|antibacterial response protein	2
+AKR1C3	oxidoreductase|reductase	7
+AKR1C2	oxidoreductase|reductase	1
+AKR1C4	oxidoreductase|reductase	1
+ALDH4A1	oxidoreductase|dehydrogenase	1
+FKBP1A	calcium-binding protein	3
+STK17A	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+STK17B	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+RAMP1	receptor	2
+IL17A	signaling molecule|cytokine|interleukin superfamily	2
+ACAA2	transferase|acetyltransferase	1
+TRAC	defense/immunity protein|immunoglobulin receptor superfamily	1
+IHH	signaling molecule	1
+MPL	receptor|cytokine receptor|type I cytokine receptor	1
+MPO	oxidoreductase|peroxidase	5
+NPPB	signaling molecule|peptide hormone	1
+RGS4	enzyme modulator|G-protein modulator	1
+CCND1	enzyme modulator|kinase modulator|kinase activator	2
+SCN9A	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	20
+EP300	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	4
+GGT1	transferase|acyltransferase	1
+RGS8	enzyme modulator|G-protein modulator	1
+PDGFRB	transferase|kinase|protein kinase|receptor tyrosine protein kinase	26
+PDGFRA	transferase|kinase|protein kinase|receptor tyrosine protein kinase	21
+G6PD	oxidoreductase|dehydrogenase	2
+HBE1	transfer/carrier protein	1
+CYBB	oxidoreductase|oxidase	1
+CYBA	oxidoreductase|oxidase	1
+MAT1A	transferase|nucleotidyltransferase	1
+PRLR	receptor|cytokine receptor|type I cytokine receptor	1
+ERN1	transferase|kinase|protein kinase	1
+SCN8A	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	18
+GPD1	oxidoreductase|dehydrogenase	1
+DPEP1	hydrolase|protease|metalloprotease	2
+CALCA	signaling molecule|peptide hormone	3
+NPR1	lyase|cyclase|guanylate cyclase	1
+CHAT	transferase|acyltransferase	1
+SLC1A1	transporter|cation transporter	3
+PROZ	calcium-binding protein|intracellular calcium-sensing protein|calmodulin	1
+SLC1A2	transporter|cation transporter	5
+SLC1A3	transporter|cation transporter	2
+SLC1A4	transporter|cation transporter	1
+PSEN1	hydrolase|protease|aspartic protease	4
+SLC1A6	transporter|cation transporter	2
+ACACB	ligase	4
+SLC1A7	transporter|cation transporter	2
+ACACA	ligase	2
+HCAR2	receptor|G-protein coupled receptor	5
+HCAR3	receptor|G-protein coupled receptor	4
+CCNB1	enzyme modulator|kinase modulator|kinase activator	2
+EBP	isomerase	1
+CALCR	defense/immunity protein|antibacterial response protein	1
+HCAR1	receptor|G-protein coupled receptor	3
+CYP11A1	oxidoreductase|oxygenase	2
+NDUFV3	oxidoreductase	1
+NDUFV2	oxidoreductase|dehydrogenase	1
+TAC1	signaling molecule|peptide hormone|neuropeptide	1
+NDUFV1	oxidoreductase|dehydrogenase	1
+FDPS	transferase|acyltransferase	7
+PRNP	calcium-binding protein|annexin	1
+HBG1	transfer/carrier protein	1
+VDR	transcription factor|nuclear hormone receptor	15
+SLC52A2	receptor|G-protein coupled receptor	2
+CLK4	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	2
+CLK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+QDPR	oxidoreductase|dehydrogenase	1
+IL3	signaling molecule|cytokine|interleukin superfamily	1
+GCLC	ligase	1
+IL6	signaling molecule|cytokine|interleukin superfamily	1
+BMP1	signaling molecule|growth factor	2
+IL5	signaling molecule|cytokine|interleukin superfamily	1
+PROC	calcium-binding protein|intracellular calcium-sensing protein|calmodulin	2
+CPS1	transferase	1
+CYP11B2	oxidoreductase|oxygenase	1
+CYP11B1	oxidoreductase|oxygenase	4
+CYCS	oxidoreductase|oxidase	2
+GCLM	ligase	2
+GSK3B	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	31
+GSK3A	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	7
+ATP2A2	transporter|ion channel	1
+ATP2A1	transporter|ion channel	2
+MTR	lyase|decarboxylase	1
+CHD1	nucleic acid binding|DNA binding protein|DNA helicase	1
+CPT2	transferase|acyltransferase	1
+GPER1	receptor|G-protein coupled receptor	5
+IGLC1	defense/immunity protein|immunoglobulin receptor superfamily	1
+SCN5A	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	40
+MMP7	hydrolase|protease|metalloprotease	1
+MMP1	hydrolase|protease|metalloprotease	4
+MMP2	hydrolase|protease|metalloprotease	9
+MMP3	hydrolase|protease|metalloprotease	4
+DARS2	ligase|aminoacyl-tRNA synthetase	1
+PLA2G4A	hydrolase|lipase|phospholipase	4
+GLRX2	oxidoreductase	1
+SSTR1	receptor|G-protein coupled receptor	2
+MMP8	hydrolase|protease|metalloprotease	4
+SSTR2	receptor|G-protein coupled receptor	2
+MMP9	hydrolase|protease|metalloprotease	7
+MUT	isomerase|mutase	1
+SSTR3	receptor|G-protein coupled receptor	2
+SSTR5	receptor|G-protein coupled receptor	2
+CCNA2	enzyme modulator|kinase modulator|kinase activator	3
+CREB1	transcription factor|basic leucine zipper transcription factor|CREB transcription factor	2
+NDUFS8	oxidoreductase|dehydrogenase	1
+IRF3	transcription factor	1
+NDUFS7	oxidoreductase|dehydrogenase	1
+NDUFS6	oxidoreductase	1
+NDUFS5	oxidoreductase|dehydrogenase	1
+NDUFS4	oxidoreductase|dehydrogenase	1
+NDUFS3	oxidoreductase|dehydrogenase	1
+BLVRB	oxidoreductase|reductase	3
+NDUFS2	oxidoreductase|dehydrogenase	1
+NDUFS1	oxidoreductase|dehydrogenase	1
+SCN4A	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	25
+SCN4B	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	2
+BLVRA	oxidoreductase|dehydrogenase	2
+PLA2G1B	hydrolase|lipase|phospholipase	16
+HMGCR	oxidoreductase|reductase	14
+ACVR1B	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	1
+ATP2C1	transporter|ion channel	5
+CLCN3	transporter|ion channel|voltage-gated anion channel|chloride channel	1
+AURKC	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	9
+CLCN2	transporter|ion channel|anion channel	3
+AURKB	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	21
+CLCN1	transporter|ion channel|anion channel	3
+AURKA	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	22
+INS	signaling molecule|peptide hormone	2
+ACVR1C	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	1
+MAT2A	transferase|nucleotidyltransferase	1
+TNKS2	transferase|nucleotidyltransferase	3
+SCN7A	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	18
+TAS1R2	transporter|ion channel|ligand-gated ion channel|ionotropic glutamate receptor	1
+PLA2G2E	hydrolase|lipase|phospholipase	5
+EGF	extracellular matrix protein|extracellular matrix glycoprotein	1
+PLA2G2A	hydrolase|lipase|phospholipase	6
+MAPK14	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	31
+S100B	calcium-binding protein|intracellular calcium-sensing protein|calmodulin	1
+SOD2	oxidoreductase	2
+MAPK12	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	10
+MAPK13	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+SOD1	oxidoreductase	2
+CLCN7	transporter|ion channel|voltage-gated anion channel|chloride channel	1
+MAPK10	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	3
+MAPK11	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	15
+S100P	calcium-binding protein|intracellular calcium-sensing protein|calmodulin	1
+RPL26L1	nucleic acid binding|RNA binding protein|ribosomal protein	2
+RPL3	nucleic acid binding|RNA binding protein|ribosomal protein	4
+GLDC	oxidoreductase|dehydrogenase	2
+SERPINE1	enzyme modulator|protease inhibitor|serine protease inhibitor	1
+ABAT	transferase|transaminase	9
+STMN4	other	1
+RPL8	nucleic acid binding|RNA binding protein|ribosomal protein	2
+GCSH	transferase|methyltransferase	1
+MYC	transcription factor|basic helix-loop-helix transcription factor	1
+FDXR	oxidoreductase|dehydrogenase	1
+CYP1B1	oxidoreductase|oxygenase	7
+RPL37	nucleic acid binding|RNA binding protein|ribosomal protein	2
+EARS2	ligase	1
+SULT2A1	transferase	1
+RPL23	nucleic acid binding|RNA binding protein|ribosomal protein	2
+DAPK3	transferase|kinase|protein kinase|receptor serine/threonine protein kinase	1
+PASK	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	1
+TRHR	receptor|G-protein coupled receptor	2
+NISCH	enzyme modulator	3
+SULT2B1	transferase	3
+FDX1	oxidoreductase|reductase	1
+TYRO3	transferase|kinase|protein kinase|receptor tyrosine protein kinase	1
+HPRT1	isomerase|mutase	3
+ENPEP	hydrolase|protease|metalloprotease	1
+HIF1A	transcription factor|basic helix-loop-helix transcription factor	6
+PRDX2	oxidoreductase|peroxidase	1
+PRDX5	oxidoreductase|peroxidase	3
+PPP3R2	calcium-binding protein|intracellular calcium-sensing protein|calmodulin	2
+TERT	nucleic acid binding|RNA binding protein|reverse transcriptase	2
+PLCG2	enzyme modulator|G-protein modulator|guanyl-nucleotide exchange factor	1
+PNPO	oxidoreductase|oxidase	2
+S100A13	calcium-binding protein|intracellular calcium-sensing protein|calmodulin	2
+SLC19A3	transporter	1
+S100A12	calcium-binding protein|intracellular calcium-sensing protein|calmodulin	2
+PLCG1	enzyme modulator|G-protein modulator|guanyl-nucleotide exchange factor	1
+ELANE	hydrolase|protease|serine protease	4
+SLC19A1	transporter	1
+SLC19A2	transporter	1
+ACE	hydrolase|protease|metalloprotease	23
+MTHFR	lyase|decarboxylase	1
+BRAF	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	13
+CDC7	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+SLC6A5	transporter|cation transporter	2
+GLUD1	oxidoreductase|dehydrogenase	3
+GLUD2	oxidoreductase|dehydrogenase	2
+SLC6A8	transporter|cation transporter	1
+SLC6A9	transporter|cation transporter	5
+CYP1A2	oxidoreductase|oxygenase	11
+CYP1A1	oxidoreductase|oxygenase	2
+OGDH	oxidoreductase|dehydrogenase	2
+CHRFAM7A	transporter|ion channel|ligand-gated ion channel|GABA receptor	4
+REN	hydrolase|protease|aspartic protease	3
+ADA	hydrolase|deaminase	5
+CDK15	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+RET	transferase|kinase|protein kinase|receptor tyrosine protein kinase	15
+ITK	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	1
+ELN	extracellular matrix protein|extracellular matrix structural protein	1
+ADK	transferase|kinase|nucleotide kinase	3
+SERPINA6	enzyme modulator|protease inhibitor|serine protease inhibitor	12
+SLC6A1	transporter|cation transporter	6
+PFAS	ligase	1
+SLC6A2	transporter|cation transporter	54
+SLC6A3	transporter|cation transporter	40
+SLC6A4	transporter|cation transporter	54
+IMPA1	hydrolase|phosphatase	1
+RFK	transferase|kinase	2
+BRD3	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	5
+SERPINB3	enzyme modulator|protease inhibitor|serine protease inhibitor	2
+BRD2	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	4
+ANXA1	calcium-binding protein|annexin	8
+TNNC1	calcium-binding protein|intracellular calcium-sensing protein|calmodulin	5
+ANXA5	calcium-binding protein|annexin	1
+TNNC2	calcium-binding protein|intracellular calcium-sensing protein|calmodulin	1
+TACR2	receptor|G-protein coupled receptor	4
+TACR3	receptor|G-protein coupled receptor	3
+TACR1	receptor|G-protein coupled receptor	8
+BAAT	transferase|acyltransferase	1
+BACE1	hydrolase|protease|aspartic protease	6
+PLCB3	enzyme modulator|G-protein modulator|guanyl-nucleotide exchange factor	1
+IVD	oxidoreductase|oxidase	1
+PLCB2	enzyme modulator|G-protein modulator|guanyl-nucleotide exchange factor	1
+NPSR1	receptor|G-protein coupled receptor	1
+SERPINC1	enzyme modulator|protease inhibitor|serine protease inhibitor	1
+RPL11	nucleic acid binding|RNA binding protein|ribosomal protein	2
+CHRND	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	1
+CHRNG	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	1
+ASNA1	hydrolase|phosphatase|nucleotide phosphatase	1
+CHRNE	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	1
+RHO	receptor|G-protein coupled receptor	3
+RPL15	nucleic acid binding|RNA binding protein|ribosomal protein	2
+RPS2	nucleic acid binding|RNA binding protein|ribosomal protein	1
+BRD4	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	8
+RPL19	nucleic acid binding|RNA binding protein|ribosomal protein	2
+AOC3	oxidoreductase|oxidase	2
+AOC1	oxidoreductase|oxidase	2
+F10	hydrolase|protease|serine protease	6
+SERPIND1	enzyme modulator|protease inhibitor|serine protease inhibitor	1
+F12	hydrolase|protease|serine protease	1
+GPR143	receptor|G-protein coupled receptor	1
+PLCD1	enzyme modulator|G-protein modulator|guanyl-nucleotide exchange factor	1
+BRDT	nucleic acid binding|DNA binding protein|chromatin/chromatin-binding protein	1
+HSPA1A	chaperone|Hsp70 family chaperone	2
+CHRM2	receptor|G-protein coupled receptor	89
+CHRM3	receptor|G-protein coupled receptor	89
+CHRM1	receptor|G-protein coupled receptor	106
+CHRM4	receptor|G-protein coupled receptor	65
+DGKA	transferase|kinase	2
+CHRM5	receptor|G-protein coupled receptor	49
+ITGA2B	extracellular matrix protein|extracellular matrix glycoprotein	5
+AHR	transcription factor|basic helix-loop-helix transcription factor	9
+EPX	oxidoreductase|peroxidase	1
+TUBB8	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	3
+CDH5	cell adhesion molecule|cadherin	2
+TUBB6	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	3
+CDH2	cell adhesion molecule|cadherin	1
+NAGLU	transferase|kinase|glucosamine kinase	2
+TUBB3	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	5
+TUBB1	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	8
+LHCGR	extracellular matrix protein	1
+SLC15A1	transporter	2
+SLC15A2	transporter	2
+GPT2	transferase|transaminase	4
+F2R	receptor|G-protein coupled receptor	1
+ALPPL2	hydrolase|phosphatase	2
+CACNB1	transporter|ion channel|calcium channel|voltage-gated calcium channel	10
+CACNB2	transporter|ion channel|calcium channel|voltage-gated calcium channel	16
+CACNB3	transporter|ion channel|calcium channel|voltage-gated calcium channel	8
+CACNB4	transporter|ion channel|calcium channel|voltage-gated calcium channel	8
+MELK	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+GAPDHS	oxidoreductase|dehydrogenase	1
+CSF1R	transferase|kinase|protein kinase|receptor tyrosine protein kinase	12
+DNMT1	transferase|methyltransferase|DNA methyltransferase	10
+CALCRL	defense/immunity protein|antibacterial response protein	4
+FECH	lyase|ferrochelatase	2
+GPR119	receptor|G-protein coupled receptor	8
+TNKS	transferase|nucleotidyltransferase	3
+GLO1	lyase|glyoxalase	6
+ASMT	transferase|methyltransferase	1
+ITPR1	transporter|ion channel|ligand-gated ion channel	2
+ITPR2	transporter|ion channel|ligand-gated ion channel	1
+ITPR3	transporter|ion channel|ligand-gated ion channel	1
+TBXA2R	receptor|G-protein coupled receptor	8
+ESD	hydrolase|esterase	1
+ABL1	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	17
+ABL2	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	2
+UGT3A1	transferase|glycosyltransferase	2
+SLC15A3	transporter	1
+SLC15A4	transporter	1
+ESRRA	transcription factor|nuclear hormone receptor	4
+TNK2	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	2
+ESRRB	transcription factor|nuclear hormone receptor	5
+ASNS	ligase	3
+ESRRG	transcription factor|nuclear hormone receptor	7
+CDK9	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	8
+CDK8	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+CDK7	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	8
+CDK6	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	9
+LSM6	nucleic acid binding|RNA binding protein|mRNA processing factor|mRNA splicing factor	1
+CDK5	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	13
+CDK4	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	14
+ALB	transfer/carrier protein	5
+CDK2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	26
+CDK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	22
+SPIRE2	cytoskeletal protein|actin family cytoskeletal protein	1
+DHCR7	oxidoreductase|reductase	1
+IARS	ligase|aminoacyl-tRNA synthetase	1
+EIF4G1	nucleic acid binding|RNA binding protein|translation factor|translation initiation factor	1
+TUBA8	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	2
+ALK	transferase|kinase|protein kinase|receptor tyrosine protein kinase	10
+DAGLA	hydrolase|lipase	2
+GADL1	lyase|decarboxylase	1
+ADRA1D	receptor|G-protein coupled receptor	62
+ADRA1B	receptor|G-protein coupled receptor	72
+NAGPA	signaling molecule|membrane-bound signaling molecule	1
+ADRA1A	receptor|G-protein coupled receptor	116
+TREM1	defense/immunity protein|antibacterial response protein	1
+GM2A	transfer/carrier protein	1
+DNMT3B	transferase|methyltransferase|DNA methyltransferase	3
+CNGA3	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+HIF1AN	transcription factor|basic helix-loop-helix transcription factor	1
+SLC37A4	transporter|cation transporter	1
+GPX2	oxidoreductase|peroxidase	1
+GPX1	oxidoreductase|peroxidase	1
+CHUK	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	6
+GPX4	oxidoreductase|peroxidase	1
+GPX3	oxidoreductase|peroxidase	1
+GPX6	oxidoreductase|peroxidase	1
+DNMT3A	transferase|methyltransferase|DNA methyltransferase	3
+GPX5	oxidoreductase|peroxidase	1
+AMT	oxidoreductase|oxidase	2
+GPX8	oxidoreductase|peroxidase	1
+SORD	oxidoreductase|dehydrogenase	2
+GPX7	oxidoreductase|peroxidase	1
+ADRA2C	receptor|G-protein coupled receptor	63
+NGF	signaling molecule|growth factor|neurotrophic factor	2
+ADRA2B	receptor|G-protein coupled receptor	65
+ADRA2A	receptor|G-protein coupled receptor	83
+ASPH	oxidoreductase|hydroxylase	2
+ANG	nucleic acid binding|nuclease|endoribonuclease	2
+DAGLB	hydrolase|lipase	2
+ASPA	hydrolase|esterase	1
+ACSS2	oxidoreductase|dehydrogenase	2
+GLS2	hydrolase	1
+GLRX	oxidoreductase	1
+CACNG7	transporter|ion channel|calcium channel|voltage-gated calcium channel	3
+CACNG8	transporter|ion channel|calcium channel|voltage-gated calcium channel	3
+CACNG1	transporter|ion channel|calcium channel|voltage-gated calcium channel	8
+ACSS1	oxidoreductase|dehydrogenase	2
+CACNG2	transporter|ion channel|calcium channel|voltage-gated calcium channel	3
+CACNG3	transporter|ion channel|calcium channel|voltage-gated calcium channel	3
+CACNG4	transporter|ion channel|calcium channel|voltage-gated calcium channel	3
+CACNG5	transporter|ion channel|calcium channel|voltage-gated calcium channel	3
+KCNJ10	transporter|ion channel|potassium channel|voltage-gated potassium channel	10
+KCNJ11	transporter|ion channel|potassium channel|voltage-gated potassium channel	17
+CMA1	hydrolase|protease|serine protease	2
+KCNJ12	transporter|ion channel|potassium channel|voltage-gated potassium channel	2
+KCNJ13	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+PLCL1	enzyme modulator|G-protein modulator|guanyl-nucleotide exchange factor	1
+TXNRD1	oxidoreductase|oxidase	4
+KCNJ14	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+KCNJ15	transporter|ion channel|potassium channel|voltage-gated potassium channel	1
+PTPN11	hydrolase|phosphatase|protein phosphatase	1
+CDC42BPA	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+ASS1	ligase	4
+RAD51	nucleic acid binding|DNA binding protein|DNA strand-pairing protein	1
+GLRB	transporter|ion channel|ligand-gated ion channel|acetylcholine receptor	17
+IMPDH1	oxidoreductase|dehydrogenase	11
+IMPDH2	oxidoreductase|dehydrogenase	8
+FOLR3	transporter|ATP-binding cassette (ABC) transporter	1
+CDO1	oxidoreductase|oxygenase	1
+FOLR2	transporter|ATP-binding cassette (ABC) transporter	1
+MMACHC	isomerase|mutase	1
+METAP2	hydrolase|protease|metalloprotease	5
+APP	signaling molecule	7
+FAAH	transferase	10
+OXTR	receptor|G-protein coupled receptor	6
+SLC46A1	transporter|carbohydrate transporter	4
+PKD2L1	transporter|ion channel	4
+EDNRA	receptor|G-protein coupled receptor	11
+EDNRB	receptor|G-protein coupled receptor	5
+CHEK2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	4
+CHEK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	16
+B2M	defense/immunity protein|major histocompatibility complex antigen	1
+GLUL	ligase	2
+PTGDR	receptor|G-protein coupled receptor	7
+MCCC2	ligase	1
+UTS2R	receptor|G-protein coupled receptor	3
+ACSL1	ligase	2
+MCCC1	ligase	1
+SLC6A13	transporter|cation transporter	1
+SLC6A12	transporter|cation transporter	2
+ACSL4	ligase	3
+SLC6A11	transporter|cation transporter	1
+ACSL3	ligase	1
+CHIT1	hydrolase|glycosidase	1
+AFG3L2	hydrolase|protease|metalloprotease	1
+VDAC2	transporter|ion channel|anion channel	1
+ALDH7A1	oxidoreductase|dehydrogenase	1
+PTGES	isomerase	1
+PTGFR	receptor|G-protein coupled receptor	7
+MAOB	transferase|methyltransferase|DNA methyltransferase	30
+PDE1C	hydrolase|phosphodiesterase	4
+MAOA	transferase|methyltransferase|DNA methyltransferase	31
+PDE1B	hydrolase|phosphodiesterase	6
+MGST3	transferase	1
+PDE1A	hydrolase|phosphodiesterase	9
+MGST1	transferase|glutathione transferase	1
+MGST2	transferase	1
+CYP27B1	oxidoreductase|oxygenase	1
+NUAK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+SGPL1	lyase|decarboxylase	1
+NUAK2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+MAP2	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	4
+INPP5D	hydrolase|phosphatase	1
+ASL	lyase	1
+MAP4	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	2
+NTSR2	receptor|G-protein coupled receptor	1
+SRPK2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	3
+INSR	transferase|kinase|protein kinase|receptor tyrosine protein kinase	7
+PDE2A	hydrolase|phosphodiesterase	4
+ACADSB	oxidoreductase|oxidase	2
+ALOX15B	oxidoreductase|oxygenase	1
+PARP15	nucleic acid binding	1
+SRPK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+AKR1B10	oxidoreductase|reductase	1
+PDE3A	hydrolase|phosphodiesterase	16
+ATM	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	5
+ALDH18A1	transferase|kinase|amino acid kinase	1
+ATR	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	6
+ACVRL1	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	2
+RYR1	transporter|ion channel|ligand-gated ion channel	6
+RYR2	transporter|ion channel|ligand-gated ion channel	4
+ERO1LB	oxidoreductase	1
+RDH8	oxidoreductase|dehydrogenase	1
+PPCDC	lyase|decarboxylase	1
+RYR3	transporter|ion channel|ligand-gated ion channel	3
+HINT1	hydrolase|phosphatase|nucleotide phosphatase	1
+CCKAR	receptor|G-protein coupled receptor	5
+NNT	oxidoreductase|dehydrogenase	1
+FFAR4	receptor|G-protein coupled receptor	3
+FFAR3	receptor|G-protein coupled receptor	2
+FFAR2	receptor|G-protein coupled receptor	2
+DLAT	transferase|acyltransferase	1
+FFAR1	receptor|G-protein coupled receptor	8
+AVPR1B	receptor|G-protein coupled receptor	7
+CAMLG	calcium-binding protein|intracellular calcium-sensing protein	2
+INSRR	transferase|kinase|protein kinase|receptor tyrosine protein kinase	1
+AVPR1A	receptor|G-protein coupled receptor	10
+TUBG1	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	1
+UCHL5	hydrolase|protease|cysteine protease	1
+ADRB3	receptor|G-protein coupled receptor	32
+CCKBR	receptor|G-protein coupled receptor	6
+MMP23A	hydrolase|protease|metalloprotease	1
+RDH5	oxidoreductase|dehydrogenase	2
+TFF2	signaling molecule|peptide hormone	1
+SGK3	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+MAPT	cytoskeletal protein|microtubule family cytoskeletal protein|microtubule binding motor protein	2
+SGK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	9
+SGK2	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+OPRD1	receptor|G-protein coupled receptor	31
+CXCR4	hydrolase|phosphatase|protein phosphatase	4
+TUBD1	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	1
+HRSP12	nucleic acid binding|RNA binding protein|translation factor|translation initiation inhibitor	1
+CXCR1	hydrolase|phosphatase|protein phosphatase	4
+CXCR3	hydrolase|phosphatase|protein phosphatase	2
+CXCR2	hydrolase|phosphatase|protein phosphatase	5
+MAP4K5	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	1
+CA12	lyase|dehydratase	28
+CA11	lyase|dehydratase	1
+NQO1	oxidoreductase|dehydrogenase	3
+CA10	lyase|dehydratase	1
+NQO2	oxidoreductase|dehydrogenase	7
+KRT12	cytoskeletal protein|intermediate filament	1
+TUBE1	cytoskeletal protein|microtubule family cytoskeletal protein|tubulin	1
+AXL	transfer/carrier protein	3
+CTNNB1	cell adhesion molecule	3
+CDK5R1	enzyme modulator|kinase modulator|kinase activator	1
+AMY2A	hydrolase|amylase	2
+AMY2B	hydrolase|amylase	2
+CCBL2	transferase|transaminase	2
+NPY2R	receptor|G-protein coupled receptor	2
+CCBL1	transferase|transaminase	2
+EFTUD1	nucleic acid binding|RNA binding protein|translation factor|translation initiation factor	1
+PDE8B	hydrolase|phosphodiesterase	4
+PDE8A	hydrolase|phosphodiesterase	4
+CA14	lyase|dehydratase	18
+CA13	lyase|dehydratase	2
+GHSR	receptor|G-protein coupled receptor	3
+AMY1A	hydrolase|amylase	1
+NPY1R	receptor|G-protein coupled receptor	2
+ALDH3A2	oxidoreductase|dehydrogenase	1
+KCTD8	enzyme modulator	5
+ALDH3A1	oxidoreductase|dehydrogenase	1
+PHOSPHO1	hydrolase	1
+FOLH1	receptor	3
+CMPK1	transferase|kinase|nucleotide kinase	2
+ABCG1	transporter|ATP-binding cassette (ABC) transporter	1
+PDE9A	hydrolase|phosphodiesterase	5
+ABCG2	transporter|ATP-binding cassette (ABC) transporter	1
+ATP6V1A	transporter|cation transporter|ATP synthase	3
+H6PD	oxidoreductase|dehydrogenase	1
+SUCNR1	receptor|G-protein coupled receptor	1
+ADRB1	receptor|G-protein coupled receptor	68
+CSF2RB	receptor|cytokine receptor|type I cytokine receptor	1
+ADRB2	receptor|G-protein coupled receptor	76
+ADIPOR1	receptor	1
+STK4	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+ADIPOR2	receptor	2
+AGER	cell adhesion molecule|immunoglobulin superfamily cell adhesion molecule	1
+COX7A1	oxidoreductase|oxidase	1
+NALCN	transporter|ion channel|voltage-gated ion channel|voltage-gated sodium channel	1
+DPP4	hydrolase|protease|serine protease	11
+ALDH3B2	oxidoreductase|dehydrogenase	1
+MAN2A1	hydrolase|glycosidase	3
+ALDH3B1	oxidoreductase|dehydrogenase	1
+RIPK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+ASIC2	transporter|ion channel	2
+ASIC3	transporter|ion channel	6
+MARK3	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+ASIC1	transporter|ion channel	7
+MARK1	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	2
+SMAD2	transcription factor	1
+HSPA8	chaperone|Hsp70 family chaperone	1
+TGFB1	signaling molecule|growth factor	1
+HSPA5	chaperone|Hsp70 family chaperone	1
+AZIN2	lyase|decarboxylase	2
+ESR1	transcription factor|nuclear hormone receptor	50
+ESR2	transcription factor|nuclear hormone receptor	31
+NFKBIA	hydrolase|lipase|phospholipase	2
+DLG4	transmembrane receptor regulatory/adaptor protein	2
+B4GALT2	transferase|glycosyltransferase	1
+B4GALT3	transferase|glycosyltransferase	1
+B4GALT1	transferase|glycosyltransferase	1
+CXCL8	signaling molecule|cytokine|chemokine	1
+PDE3B	hydrolase|phosphodiesterase	8
+SLC2A1	transporter|carbohydrate transporter	1
+HSPB1	chaperone	1
+SLC2A2	transporter|carbohydrate transporter	2
+SLC2A3	transporter|carbohydrate transporter	1
+SLC2A4	transporter|carbohydrate transporter	1
+PKD2	transporter|ion channel	2
+CXCL2	signaling molecule|cytokine|chemokine	1
+POLB	nucleic acid binding|DNA binding protein|DNA-directed DNA polymerase	1
+ALDH2	oxidoreductase|dehydrogenase	4
+CA5B	lyase|dehydratase	3
+CA5A	lyase|dehydratase	4
+KYNU	hydrolase	2
+BDKRB2	receptor|G-protein coupled receptor	2
+PDE4B	hydrolase|phosphodiesterase	21
+AOX1	oxidoreductase|oxidase	1
+PDE4A	hydrolase|phosphodiesterase	23
+POLE	nucleic acid binding|DNA binding protein|DNA-directed DNA polymerase	4
+HIBCH	isomerase|epimerase/racemase	1
+FGB	signaling molecule	1
+FGA	signaling molecule	1
+ABCC1	transporter|ATP-binding cassette (ABC) transporter	2
+PTGIR	receptor|G-protein coupled receptor	5
+ABCC2	transporter|ATP-binding cassette (ABC) transporter	2
+CAMK1D	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+PTGIS	isomerase	2
+NPY5R	receptor|G-protein coupled receptor	4
+ABCC8	transporter|ATP-binding cassette (ABC) transporter	14
+MRGPRX1	receptor|G-protein coupled receptor	1
+PDE4D	hydrolase|phosphodiesterase	19
+FGG	signaling molecule	1
+PDE4C	hydrolase|phosphodiesterase	15
+ABCC9	transporter|ATP-binding cassette (ABC) transporter	4
+CTPS1	ligase	3
+OPRM1	receptor|G-protein coupled receptor	33
+SENP2	hydrolase|protease	1
+TGFBR1	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	10
+TGFBR2	transferase|kinase|protein kinase|serine/threonine protein kinase receptor	1
+FGR	transferase|kinase|protein kinase|non-receptor tyrosine protein kinase	3
+IFNG	signaling molecule|cytokine|interferon superfamily	4
+EHHADH	oxidoreductase|dehydrogenase	1
+KCNA10	transporter|ion channel|potassium channel|voltage-gated potassium channel	4
+PDE5A	hydrolase|phosphodiesterase	18
+B4GALT4	transferase|glycosyltransferase	1
+HCN4	transporter|ion channel|potassium channel|voltage-gated potassium channel	3
+HCN3	transporter|ion channel|potassium channel|voltage-gated potassium channel	3
+USP14	hydrolase|protease|cysteine protease	3
+HPGD	oxidoreductase|dehydrogenase	2
+PON1	hydrolase|esterase	1
+OPRL1	receptor|G-protein coupled receptor	6
+LTC4S	transferase	1
+ACAN	extracellular matrix protein|extracellular matrix glycoprotein	1
+ERBB3	transferase|kinase|protein kinase|receptor tyrosine protein kinase	3
+ERBB4	transferase|kinase|protein kinase|receptor tyrosine protein kinase	7
+ERBB2	transferase|kinase|protein kinase|receptor tyrosine protein kinase	26
+PDE6D	hydrolase|phosphodiesterase	2
+S1PR1	receptor|G-protein coupled receptor	2
+PDE6C	hydrolase|phosphodiesterase	3
+PDE6B	hydrolase|phosphodiesterase	3
+PDE6A	hydrolase|phosphodiesterase	3
+S1PR2	receptor|G-protein coupled receptor	1
+CDIPT	transferase	1
+S1PR5	receptor|G-protein coupled receptor	1
+CAMK2G	transferase|kinase|protein kinase|non-receptor serine/threonine protein kinase	1
+PDE6H	hydrolase|esterase	4
+PDE6G	hydrolase|esterase	4
+B3GAT1	transferase|glycosyltransferase	1
+OPRK1	receptor|G-protein coupled receptor	38
+POMC	signaling molecule|peptide hormone|neuropeptide	1
+SCD	oxidoreductase|oxidase	2
+ALOX5AP	transferase	1
+BAX	signaling molecule	2
+PDE7B	hydrolase|phosphodiesterase	6
+SCLY	lyase	1
+PDE7A	hydrolase|phosphodiesterase	6
+HCN2	transporter|ion channel|potassium channel|voltage-gated potassium channel	3
+HCN1	transporter|ion channel|potassium channel|voltage-gated potassium channel	3
