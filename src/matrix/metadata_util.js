@@ -1,8 +1,8 @@
-morpheus.MetadataUtil = function() {
+morpheus.MetadataUtil = function () {
 };
 
-morpheus.MetadataUtil.renameFields = function(dataset, options) {
-	_.each(options.rows, function(item) {
+morpheus.MetadataUtil.renameFields = function (dataset, options) {
+	_.each(options.rows, function (item) {
 		if (item.renameTo) {
 			var v = dataset.getRowMetadata().getByName(item.field);
 			if (v) {
@@ -10,7 +10,7 @@ morpheus.MetadataUtil.renameFields = function(dataset, options) {
 			}
 		}
 	});
-	_.each(options.columns, function(item) {
+	_.each(options.columns, function (item) {
 		if (item.renameTo) {
 			var v = dataset.getColumnMetadata().getByName(item.field);
 			if (v) {
@@ -29,15 +29,15 @@ morpheus.MetadataUtil.renameFields = function(dataset, options) {
  *            Whether to search columns
  * @param options.defaultMatchMode
  *            'exact' or 'contains'
- * 
+ *
  */
-morpheus.MetadataUtil.search = function(options) {
+morpheus.MetadataUtil.search = function (options) {
 	var model = options.model;
 	var text = options.text;
 	var isColumns = options.isColumns;
 	text = $.trim(text);
 	if (text === '') {
-		return null;
+		return null; 
 	}
 	var tokens = morpheus.Util.getAutocompleteTokens(text);
 	if (tokens.length == 0) {
@@ -47,9 +47,9 @@ morpheus.MetadataUtil.search = function(options) {
 	var fieldNames = morpheus.MetadataUtil.getMetadataNames(model);
 	fieldNames.push(indexField);
 	var predicates = morpheus.Util.createSearchPredicates({
-		tokens : tokens,
-		fields : fieldNames,
-		defaultMatchMode : options.defaultMatchMode
+		tokens: tokens,
+		fields: fieldNames,
+		defaultMatchMode: options.defaultMatchMode
 	});
 	var vectors = [];
 	var nameToVector = new morpheus.Map();
@@ -57,9 +57,9 @@ morpheus.MetadataUtil.search = function(options) {
 		var v = model.get(j);
 		var dataType = morpheus.VectorUtil.getDataType(v);
 		var wrapper = {
-			vector : v,
-			dataType : dataType,
-			isArray : dataType.indexOf('[') === 0
+			vector: v,
+			dataType: dataType,
+			isArray: dataType.indexOf('[') === 0
 		};
 		nameToVector.set(v.getName(), wrapper);
 		vectors.push(wrapper);
@@ -135,18 +135,18 @@ morpheus.MetadataUtil.search = function(options) {
 	return indices;
 };
 
-morpheus.MetadataUtil.shallowCopy = function(model) {
+morpheus.MetadataUtil.shallowCopy = function (model) {
 	var copy = new morpheus.MetadataModel(model.getItemCount());
 	for (var i = 0; i < model.getMetadataCount(); i++) {
 		var v = model.get(i);
 		// copy properties b/c they can be modified via ui
 		var newVector = new morpheus.VectorAdapter(v);
 		newVector.properties = new morpheus.Map();
-		newVector.getProperties = function() {
+		newVector.getProperties = function () {
 			return this.properties;
 		};
 
-		v.getProperties().forEach(function(val, key) {
+		v.getProperties().forEach(function (val, key) {
 			if (!morpheus.VectorKeys.COPY_IGNORE.has(key)) {
 				newVector.properties.set(key, val);
 			}
@@ -157,14 +157,14 @@ morpheus.MetadataUtil.shallowCopy = function(model) {
 	}
 	return copy;
 };
-morpheus.MetadataUtil.autocomplete = function(model) {
-	return function(tokens, cb) {
+morpheus.MetadataUtil.autocomplete = function (model) {
+	return function (tokens, cb) {
 		// check for term:searchText
 		var matches = [];
 		var regex = null;
 		var searchModel = model;
 		var token = tokens != null && tokens.length > 0 ? tokens[tokens.selectionStartIndex]
-				: '';
+			: '';
 		token = $.trim(token);
 		try {
 			if (token !== '') {
@@ -174,17 +174,17 @@ morpheus.MetadataUtil.autocomplete = function(model) {
 					if (token.charCodeAt(semi - 1) !== 92) { // \:
 						var possibleField = $.trim(token.substring(0, semi));
 						if (possibleField.length > 0
-								&& possibleField[0] === '"'
-								&& possibleField[token.length - 1] === '"') {
+							&& possibleField[0] === '"'
+							&& possibleField[token.length - 1] === '"') {
 							possibleField = possibleField.substring(1,
-									possibleField.length - 1);
+								possibleField.length - 1);
 						}
 						var index = morpheus.MetadataUtil.indexOf(searchModel,
-								possibleField);
+							possibleField);
 						if (index !== -1) {
 							token = $.trim(token.substring(semi + 1));
 							searchModel = new morpheus.MetadataModelColumnView(
-									model, [ index ]);
+								model, [index]);
 						}
 					}
 
@@ -219,8 +219,8 @@ morpheus.MetadataUtil.autocomplete = function(model) {
 						if (val != null) {
 							if (isArray[j]) {
 								for (var k = 0; k < val.length; k++) {
-									var id = new morpheus.Identifier([ val[k],
-											v.getName() ]);
+									var id = new morpheus.Identifier([val[k],
+										v.getName()]);
 									if (!set.has(id) && regex.test(val[k])) {
 										set.add(id);
 										if (set.size() === max) {
@@ -229,8 +229,8 @@ morpheus.MetadataUtil.autocomplete = function(model) {
 									}
 								}
 							} else {
-								var id = new morpheus.Identifier([ val,
-										v.getName() ]);
+								var id = new morpheus.Identifier([val,
+									v.getName()]);
 								if (!set.has(id) && regex.test(val)) {
 									set.add(id);
 									if (set.size() === max) {
@@ -243,16 +243,24 @@ morpheus.MetadataUtil.autocomplete = function(model) {
 					}
 				}
 
-				set.forEach(function(id) {
+				set.forEach(function (id) {
 					var array = id.getArray();
 					var field = array[1];
 					var val = array[0];
+					var quotedField = field;
+					if (quotedField.indexOf(' ') !== -1) {
+						quotedField = '"' + quotedField + '"';
+					}
+					var quotedValue = val;
+					if (quotedValue.indexOf(' ') !== -1) {
+						quotedValue = '"' + quotedValue + '"';
+					}
 					matches.push({
-						value : field + ':' + val,
-						label : '<span style="font-weight:300;">' + field
-								+ ':</span>'
-								+ '<span style="font-weight:900;">' + val
-								+ '</span>'
+						value: quotedField + ':' + quotedValue,
+						label: '<span style="font-weight:300;">' + field
+						+ ':</span>'
+						+ '<span style="font-weight:900;">' + val
+						+ '</span>'
 					});
 
 				});
@@ -269,13 +277,17 @@ morpheus.MetadataUtil.autocomplete = function(model) {
 			var dataType = morpheus.VectorUtil.getDataType(v);
 			var field = v.getName();
 			if (dataType === 'number' || dataType === 'string'
-					|| dataType === '[string]') {
+				|| dataType === '[string]') {
 				if (regex.test(field)) {
+					var quotedField = field;
+					if (quotedField.indexOf(' ') !== -1) {
+						quotedField = '"' + quotedField + '"';
+					}
 					matches.push({
-						value : field + ':',
-						label : '<span style="font-weight:300;">' + field
-								+ ':</span>',
-						show : true
+						value: quotedField + ':',
+						label: '<span style="font-weight:300;">' + field
+						+ ':</span>',
+						show: true
 					});
 				}
 			}
@@ -284,31 +296,31 @@ morpheus.MetadataUtil.autocomplete = function(model) {
 	};
 };
 
-morpheus.MetadataUtil.getMetadataNames = function(metadataModel) {
+morpheus.MetadataUtil.getMetadataNames = function (metadataModel) {
 	var names = [];
 	for (var i = 0, count = metadataModel.getMetadataCount(); i < count; i++) {
 		names.push(metadataModel.get(i).getName(i));
 	}
-	names.sort(function(a, b) {
+	names.sort(function (a, b) {
 		a = a.toLowerCase();
 		b = b.toLowerCase();
 		return (a < b ? -1 : (a === b ? 0 : 1));
 	});
 	return names;
 };
-morpheus.MetadataUtil.getVectors = function(metadataModel, names) {
+morpheus.MetadataUtil.getVectors = function (metadataModel, names) {
 	var vectors = [];
-	names.forEach(function(name) {
+	names.forEach(function (name) {
 		var v = metadataModel.getByName(name);
 		if (!v) {
 			throw name + ' not found. Available fields are '
-					+ morpheus.MetadataUtil.getMetadataNames(metadataModel);
+			+ morpheus.MetadataUtil.getMetadataNames(metadataModel);
 		}
 		vectors.push(v);
 	});
 	return vectors;
 };
-morpheus.MetadataUtil.indexOf = function(metadataModel, name) {
+morpheus.MetadataUtil.indexOf = function (metadataModel, name) {
 	for (var i = 0, length = metadataModel.getMetadataCount(); i < length; i++) {
 		if (name === metadataModel.get(i).getName()) {
 			return i;
@@ -317,38 +329,38 @@ morpheus.MetadataUtil.indexOf = function(metadataModel, name) {
 	return -1;
 };
 
-morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS = [ 'target', 'moa' ];
+morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS = ['target', 'moa'];
 
 morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS = new morpheus.Set();
-[ 'pr_analyte_id', 'pr_gene_title', 'pr_gene_id', 'pr_analyte_num',
-		'pr_bset_id', 'pr_lua_id', 'pr_pool_id', 'pr_is_bing', 'pr_is_inf',
-		'pr_is_lmark', 'qc_slope', 'qc_f_logp', 'qc_iqr', 'bead_batch',
-		'bead_revision', 'bead_set', 'det_mode', 'det_plate', 'det_well',
-		'mfc_plate_dim', 'mfc_plate_id', 'mfc_plate_name', 'mfc_plate_quad',
-		'mfc_plate_well', 'pert_dose_unit', 'pert_id_vendor', 'pert_mfc_desc',
-		'pert_mfc_id', 'pert_time', 'pert_time_unit', 'pert_univ_id',
-		'pert_vehicle', 'pool_id', 'rna_plate', 'rna_well', 'count_mean',
-		'count_cv', 'provenance_code' ].forEach(function(name) {
+['pr_analyte_id', 'pr_gene_title', 'pr_gene_id', 'pr_analyte_num',
+	'pr_bset_id', 'pr_lua_id', 'pr_pool_id', 'pr_is_bing', 'pr_is_inf',
+	'pr_is_lmark', 'qc_slope', 'qc_f_logp', 'qc_iqr', 'bead_batch',
+	'bead_revision', 'bead_set', 'det_mode', 'det_plate', 'det_well',
+	'mfc_plate_dim', 'mfc_plate_id', 'mfc_plate_name', 'mfc_plate_quad',
+	'mfc_plate_well', 'pert_dose_unit', 'pert_id_vendor', 'pert_mfc_desc',
+	'pert_mfc_id', 'pert_time', 'pert_time_unit', 'pert_univ_id',
+	'pert_vehicle', 'pool_id', 'rna_plate', 'rna_well', 'count_mean',
+	'count_cv', 'provenance_code'].forEach(function (name) {
 	morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS.add(name);
 });
 
-morpheus.MetadataUtil.maybeConvertStrings = function(metadata,
-		metadataStartIndex) {
+morpheus.MetadataUtil.maybeConvertStrings = function (metadata,
+													  metadataStartIndex) {
 	for (var i = metadataStartIndex, count = metadata.getMetadataCount(); i < count; i++) {
 		morpheus.VectorUtil.maybeConvertStringToNumber(metadata.get(i));
 	}
-	morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS.forEach(function(field) {
+	morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS.forEach(function (field) {
 		if (metadata.getByName(field)) {
 			morpheus.VectorUtil.maybeConvertToStringArray(metadata
-					.getByName(field), ',');
+			.getByName(field), ',');
 		}
 	});
 
 };
-morpheus.MetadataUtil.copy = function(src, dest) {
+morpheus.MetadataUtil.copy = function (src, dest) {
 	if (src.getItemCount() != dest.getItemCount()) {
 		throw 'Item count not equal in source and destination. '
-				+ src.getItemCount() + ' != ' + dest.getItemCount();
+		+ src.getItemCount() + ' != ' + dest.getItemCount();
 	}
 	var itemCount = src.getItemCount();
 	var metadataColumns = src.getMetadataCount();
@@ -363,21 +375,21 @@ morpheus.MetadataUtil.copy = function(src, dest) {
 		}
 	}
 };
-morpheus.MetadataUtil.addVectorIfNotExists = function(metadataModel, name) {
+morpheus.MetadataUtil.addVectorIfNotExists = function (metadataModel, name) {
 	var v = metadataModel.getByName(name);
 	if (!v) {
 		v = metadataModel.add(name);
 	}
 	return v;
 };
-morpheus.MetadataUtil.getMatchingIndices = function(metadataModel, tokens) {
+morpheus.MetadataUtil.getMatchingIndices = function (metadataModel, tokens) {
 	var indices = {};
 	for (var itemIndex = 0, nitems = metadataModel.getItemCount(); itemIndex < nitems; itemIndex++) {
 		var matches = false;
 		for (var metadataIndex = 0, metadataCount = metadataModel
-				.getMetadataCount(); metadataIndex < metadataCount && !matches; metadataIndex++) {
+		.getMetadataCount(); metadataIndex < metadataCount && !matches; metadataIndex++) {
 			var vector = metadataModel.get(metadataModel
-					.getColumnName(metadataIndex));
+			.getColumnName(metadataIndex));
 			var value = vector.getValue(itemIndex);
 			for (var i = 0, length = tokens.length; i < length; i++) {
 				if (tokens[i] == value) {

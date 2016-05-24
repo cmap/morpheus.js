@@ -493,12 +493,8 @@ morpheus.Util.autosuggest = function (options) {
 							trim: false,
 							selectionStart: options.$el[0].selectionStart
 						});
-					// quote value if needed
-					var value = (ui.item.value[0] !== '"'
-					&& ui.item.value.indexOf(' ') > 0 ? ('"'
-					+ ui.item.value + '"')
-						: ui.item.value);
 
+					var value = ui.item.value;
 					var show = ui.item.show; // || (ui.item.space
 					// &&
 					// options.suggestWhenEmpty);
@@ -598,6 +594,7 @@ morpheus.Util.getAutocompleteTokens = function (text, options) {
 		if (i === options.selectionStart - 1) {
 			currentToken.inSelectionStart = true;
 		}
+
 	}
 
 	tokens.push({
@@ -1054,6 +1051,7 @@ morpheus.Util.createSearchPredicates = function (options) {
 					possibleToken = '"' + possibleToken;
 
 				}
+
 				if (!validateFieldNames
 					|| availableFields.indexOf(possibleField) !== -1) {
 					token = possibleToken;
