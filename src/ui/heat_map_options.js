@@ -189,23 +189,25 @@ morpheus.HeatMapOptions = function (controller) {
 	function createMetadataField(isColumns) {
 		var options = [];
 		var value = {};
+		_.each(controller.getVisibleTrackNames(isColumns), function (name) {
+			value[name] = true;
+		});
+		_.each(morpheus.MetadataUtil.getMetadataNames(isColumns ? controller
+			.getProject().getFullDataset().getColumnMetadata() : controller
+			.getProject().getFullDataset().getRowMetadata()),
+			function (name) {
+				options.push(name);
+			});
 		var field = {
 			type: 'bootstrap-select',
+			search: options.length > 10,
 			name: isColumns ? 'column_annotations' : 'row_annotations',
 			multiple: true,
 			value: value,
 			options: options,
 			toggle: true
 		};
-		_.each(controller.getVisibleTrackNames(isColumns), function (name) {
-			value[name] = true;
-		});
-		_.each(morpheus.MetadataUtil.getMetadataNames(isColumns ? controller
-		.getProject().getFullDataset().getColumnMetadata() : controller
-		.getProject().getFullDataset().getRowMetadata()),
-			function (name) {
-				options.push(name);
-			});
+
 		return field;
 	}
 
