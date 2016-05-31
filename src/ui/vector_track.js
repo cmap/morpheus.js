@@ -354,7 +354,7 @@ morpheus.VectorTrack.prototype = {
 			.isRenderAs(morpheus.VectorTrack.RENDER.BAR))) {
 			if (this.getFullVector().getProperties().has(
 					morpheus.VectorKeys.FIELDS)
-				|| morpheus.VectorUtil.getDataType(this.getFullVector()) === 'number') {
+				|| morpheus.VectorUtil.getDataType(this.getFullVector()) === 'number' || morpheus.VectorUtil.getDataType(this.getFullVector()) === '[number]') {
 				this.settings.discrete = false;
 				this.settings.highlightMatchingValues = false;
 			}
@@ -824,7 +824,7 @@ morpheus.VectorTrack.prototype = {
 		var SHOW_SELECTION_ONLY = 'Show Selection Only';
 		var CLEAR_SELECTION = 'Clear Selection';
 		var HIGHLIGHT_MATCHING_VALUES = 'Highlight Matching Values';
-		var FIELDS = 'Fields...';
+		var FIELDS = 'Choose Fields...';
 		var DELETE = 'Delete...';
 		var TOOLTIP = 'Show In Tooltip';
 		var HIDE = 'Hide';
@@ -837,15 +837,16 @@ morpheus.VectorTrack.prototype = {
 		var SORT_SEL_DESC = 'Sort Heat Map Descending';
 		var SORT_SEL_TOP_N = 'Sort Heat Map Descending/Ascending';
 		var DISPLAY_BAR = 'Show Bar Chart';
-		var DISPLAY_STACKED_BAR = 'Stacked';
+		var DISPLAY_STACKED_BAR = 'Show Stacked Bar Chart';
+		var DISPLAY_BOX_PLOT = 'Show Box Plot';
 		var DISPLAY_COLOR = 'Show Color';
+		var COLOR_BAR_SIZE = 'Color Bar Size...';
 		var DISPLAY_TEXT = 'Show Text';
 		var DISPLAY_SHAPE = 'Show Shape';
 		var DISPLAY_ARC = 'Show Arc';
 		var DISPLAY_TEXT_AND_COLOR = 'Show Colored Text';
 		var DISPLAY_STRUCTURE = 'Show Chemical Structure';
 		var DISPLAY_CONTINUOUS = 'Continuous';
-		var TOGGLE = 'Expand/Collapse';
 		var positions = this.positions;
 		var heatmap = this.heatmap;
 
@@ -955,6 +956,7 @@ morpheus.VectorTrack.prototype = {
 				name: DISPLAY_BAR,
 				checked: this.isRenderAs(morpheus.VectorTrack.RENDER.BAR)
 			});
+
 		}
 		if (isArray) {
 			sectionToItems.Display.push({
@@ -962,18 +964,28 @@ morpheus.VectorTrack.prototype = {
 				checked: this.settings.stackedBar
 			});
 			sectionToItems.Display.push({
+				name: DISPLAY_BOX_PLOT,
+				checked: this.isRenderAs(morpheus.VectorTrack.RENDER.BOX_PLOT)
+			});
+			sectionToItems.Display.push({
 				name: FIELDS,
+			});
+
+		}
+		sectionToItems.Display.push({
+			name: DISPLAY_TEXT,
+			checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)
+		});
+		sectionToItems.Display.push({
+			name: DISPLAY_COLOR,
+			checked: this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
+		});
+		if (this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)) {
+			sectionToItems.Display.push({
+				name: COLOR_BAR_SIZE
 			});
 		}
 		if (!isArray) {
-			sectionToItems.Display.push({
-				name: DISPLAY_COLOR,
-				checked: this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
-			});
-			sectionToItems.Display.push({
-				name: DISPLAY_TEXT,
-				checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)
-			});
 			sectionToItems.Display.push({
 				name: DISPLAY_SHAPE,
 				checked: this.isRenderAs(morpheus.VectorTrack.RENDER.SHAPE)
@@ -984,11 +996,6 @@ morpheus.VectorTrack.prototype = {
 			// });
 
 		}
-		// sectionToItems.Display.push({
-		// name : DISPLAY_TEXT_AND_COLOR,
-		// checked : this
-		// .isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
-		// });
 
 		if (!isArray && !isNumber && !this.isColumns
 			&& name.toLowerCase().indexOf('smile') !== -1) {
@@ -1204,7 +1211,7 @@ morpheus.VectorTrack.prototype = {
 							.set(
 								morpheus.VectorKeys.VISIBLE_FIELDS,
 								visibleFieldIndices);
-							// remove cached box field
+
 							var summaryFunction = fullVector
 							.getProperties()
 							.get(
@@ -1220,7 +1227,7 @@ morpheus.VectorTrack.prototype = {
 							.getFullDataset()
 							.getRowMetadata()
 							.add(_this.name);
-
+							// remove cached box field
 							for (var i = 0; i < updatedVector
 							.size(); i++) {
 								var array = fullVector
@@ -1258,15 +1265,31 @@ morpheus.VectorTrack.prototype = {
 						close: 'Close',
 						html: formBuilder.$form
 					});
-				} else if (item === TOGGLE) {
-					var dataset = project
-					.getSortedFilteredDataset();
-					project.getRowSelectionModel().getViewIndices()
-					.forEach(function (index) {
-						dataset.setState(index, undefined); // FIXME
+				} else if (item === COLOR_BAR_SIZE) {
+					var formBuilder = new morpheus.FormBuilder();
+					formBuilder.append({
+						name: 'size',
+						type: 'text',
+						value: _this.settings.colorBarSize,
+						required: true,
+						col: 'col-xs-2'
 					});
-					project.setFullDataset(
-						project.getFullDataset(), true);
+					formBuilder.find('size').on(
+						'change',
+						function () {
+							var val = parseFloat($(this)
+							.val());
+							if (val > 0) {
+								_this.settings.colorBarSize = val;
+								_this.setInvalid(true);
+								_this.repaint();
+							}
+						});
+					morpheus.FormBuilder.showInModal({
+						title: 'Color Bar Size',
+						close: 'Close',
+						html: formBuilder.$form
+					});
 				} else if (item === ANNOTATE_SELECTION) {
 					var formBuilder = new morpheus.FormBuilder();
 					formBuilder.append({
@@ -1617,7 +1640,7 @@ morpheus.VectorTrack.prototype = {
 
 					chooser.on('change', function (event) {
 						shapeModel.setMappedValue(_this
-						.getFullVector(), event.value,
+							.getFullVector(), event.value,
 							event.shape);
 						_this.setInvalid(true);
 						_this.repaint();
@@ -1643,7 +1666,7 @@ morpheus.VectorTrack.prototype = {
 							});
 						colorSchemeChooser.on('change', function (event) {
 							colorModel.setMappedValue(_this
-							.getFullVector(), event.value,
+								.getFullVector(), event.value,
 								event.color);
 							_this.setInvalid(true);
 							_this.repaint();
@@ -1741,6 +1764,8 @@ morpheus.VectorTrack.prototype = {
 						item = morpheus.VectorTrack.RENDER.SHAPE;
 					} else if (item === DISPLAY_ARC) {
 						item = morpheus.VectorTrack.RENDER.ARC;
+					} else if (item === DISPLAY_BOX_PLOT) {
+						item = morpheus.VectorTrack.RENDER.BOX_PLOT;
 					} else {
 						console.log('Unknown item ' + item);
 					}
@@ -1764,8 +1789,9 @@ morpheus.VectorTrack.prototype = {
 		var settings = this.settings;
 		var canvasSize = isColumns ? this.getUnscaledHeight() : this
 		.getUnscaledWidth();
-		if (settings.colorBarSize > canvasSize) {
-			settings.colorBarSize = canvasSize >= 5 ? (canvasSize - 1)
+		var colorBarSize = settings.colorBarSize;
+		if (colorBarSize > canvasSize) {
+			colorBarSize = canvasSize >= 5 ? (canvasSize - 1)
 				: canvasSize;
 		}
 		var getColor;
@@ -1774,21 +1800,61 @@ morpheus.VectorTrack.prototype = {
 		} else {
 			getColor = _.bind(colorModel.getContinuousMappedValue, colorModel);
 		}
-		for (var i = start; i < end; i++) {
-			var value = vector.getValue(i);
-			var position = positions.getPosition(i);
-			var size = positions.getItemSize(i);
-			var color = getColor(vector, value);
-			context.fillStyle = color;
-			if (isColumns) {
-				context.beginPath();
-				context.rect(position, offset - settings.colorBarSize, size,
-					settings.colorBarSize);
-				context.fill();
-			} else {
-				context.beginPath();
-				context.rect(offset, position, settings.colorBarSize, size);
-				context.fill();
+
+		if (vector.getProperties().get(
+				morpheus.VectorKeys.FIELDS) != null) {
+			var visibleFieldIndices = vector.getProperties().get(
+				morpheus.VectorKeys.VISIBLE_FIELDS);
+			if (visibleFieldIndices == null) {
+				visibleFieldIndices = morpheus.Util.seq(vector.getProperties().get(
+					morpheus.VectorKeys.FIELDS).length);
+			}
+			colorBarSize /= visibleFieldIndices.length;
+			var nvisibleFieldIndices = visibleFieldIndices.length;
+
+			for (var i = start; i < end; i++) {
+				var array = vector.getValue(i);
+				var position = positions.getPosition(i);
+				var size = positions.getItemSize(i);
+				var _offset = offset;
+				if (array != null) {
+					for (var j = 0; j < nvisibleFieldIndices; j++) {
+						var value = array[visibleFieldIndices[j]];
+						var color = getColor(vector, value);
+						context.fillStyle = color;
+						if (isColumns) {
+							context.beginPath();
+							context.rect(position, _offset - colorBarSize, size,
+								colorBarSize);
+							context.fill();
+						} else {
+							context.beginPath();
+							context.rect(_offset, position, colorBarSize, size);
+							context.fill();
+						}
+						_offset += colorBarSize;
+					}
+				}
+
+			}
+
+		} else {
+			for (var i = start; i < end; i++) {
+				var value = vector.getValue(i);
+				var position = positions.getPosition(i);
+				var size = positions.getItemSize(i);
+				var color = getColor(vector, value);
+				context.fillStyle = color;
+				if (isColumns) {
+					context.beginPath();
+					context.rect(position, offset - colorBarSize, size,
+						settings.colorBarSize);
+					context.fill();
+				} else {
+					context.beginPath();
+					context.rect(offset, position, colorBarSize, size);
+					context.fill();
+				}
 			}
 		}
 	},
@@ -1800,8 +1866,9 @@ morpheus.VectorTrack.prototype = {
 		var settings = this.settings;
 		var canvasSize = isColumns ? this.getUnscaledHeight() : this
 		.getUnscaledWidth();
-		if (settings.colorBarSize > canvasSize) {
-			settings.colorBarSize = canvasSize >= 5 ? (canvasSize - 1)
+		var colorBarSize = settings.colorBarSize;
+		if (colorBarSize > canvasSize) {
+			colorBarSize = canvasSize >= 5 ? (canvasSize - 1)
 				: canvasSize;
 		}
 		context.fillStyle = 'black';
@@ -1814,7 +1881,7 @@ morpheus.VectorTrack.prototype = {
 			var value = vector.getValue(i);
 			var position = positions.getPosition(i);
 			var itemSize = positions.getItemSize(i);
-			var minSize = Math.min(settings.colorBarSize, itemSize);
+			var minSize = Math.min(colorBarSize, itemSize);
 			var size2 = minSize / 2;
 			var shape = shapeModel.getMappedValue(vector, value);
 			// x and y are at center
@@ -2025,6 +2092,7 @@ morpheus.VectorTrack.prototype = {
 		.getVector(this.settings.colorByField) : null;
 		var colorModel = isColumns ? this.project.getColumnColorModel()
 			: this.project.getRowColorModel();
+		// TODO cache box values
 		for (var i = start; i < end; i++) {
 			var array = vector.getValue(i);
 			if (array != null) {
