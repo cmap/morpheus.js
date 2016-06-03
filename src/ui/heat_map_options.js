@@ -37,10 +37,10 @@ morpheus.HeatMapOptions = function (controller) {
 				name: 'fixed (-1.5, -0.1, 0.1, 1.5)',
 				value: 'cn'
 			}, {
-				name: 'fixed (-90, -80, 80, 90)',
+				name: 'fixed (-100, -98, -95, 95, 98, 100)',
 				value: '100scale2'
 			}, {
-				name: 'fixed (-90, 90)',
+				name: 'fixed (-100, -98, 98, 100)',
 				value: '100scale1'
 			}]
 		}, {

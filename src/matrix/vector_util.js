@@ -151,7 +151,9 @@ morpheus.VectorUtil.getValues = function (vector, excludeNull) {
 		if (excludeNull && val == null) {
 			continue;
 		}
+
 		set.add(val);
+		
 	}
 	var array = set.values();
 	array.sort(morpheus.SortKey.ASCENDING_COMPARATOR);

@@ -294,7 +294,7 @@ morpheus.OpenFileTool.prototype = {
 					metadataName, fileColumnName);
 			var render = [];
 			for (var i = 0; i < vectors.length; i++) {
-				render.push('color');
+				render.push('text');
 			}
 			controller.getProject().trigger('trackChanged', {
 				vectors : vectors,
