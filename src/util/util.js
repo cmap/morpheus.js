@@ -32,29 +32,24 @@ morpheus.Util.loadTrackingCode = function () {
 	if (typeof window !== 'undefined') {
 		if (morpheus.Util.TRACKING_CODE_LOADED) {
 			return;
-		} else if (typeof ga !== 'undefined') {
+		} else if (typeof ga === 'undefined') {
 			morpheus.Util.TRACKING_CODE_LOADED = true;
-			return;
+			(function (i, s, o, g, r, a, m) {
+				i['GoogleAnalyticsObject'] = r;
+				i[r] = i[r] || function () {
+						(i[r].q = i[r].q || []).push(arguments)
+					}, i[r].l = 1 * new Date();
+				a = s.createElement(o),
+					m = s.getElementsByTagName(o)[0];
+				a.async = 1;
+				a.src = g;
+				m.parentNode.insertBefore(a, m)
+			})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 		}
-
-		(function (i, s, o, g, r, a, m) {
-			i['GoogleAnalyticsObject'] = r;
-			i[r] = i[r] || function () {
-					(i[r].q = i[r].q || []).push(arguments);
-				}, i[r].l = 1 * new Date();
-			a = s.createElement(o), m = s.getElementsByTagName(o)[0];
-			a.async = 1;
-			a.src = g;
-			m.parentNode.insertBefore(a, m);
-		})(window, document, 'script',
-			'//www.google-analytics.com/analytics.js', 'ga');
-
 		ga('create', 'UA-53973555-1', 'auto', 'morpheus');
 		ga('morpheus.send', 'pageview');
 		morpheus.Util.TRACKING_CODE_LOADED = true;
-
 	}
-
 };
 
 morpheus.Util.trackEvent = function (options) {
@@ -485,6 +480,11 @@ morpheus.Util.autosuggest = function (options) {
 				if (ui.item.skip) {
 					return false;
 				}
+
+				if (ui.item.select) {
+					ui.item.select(options.$el);
+					return false;
+				}
 				if (options.multi) {
 					var terms = morpheus.Util
 					.getAutocompleteTokens(
@@ -495,9 +495,7 @@ morpheus.Util.autosuggest = function (options) {
 						});
 
 					var value = ui.item.value;
-					var show = ui.item.show; // || (ui.item.space
-					// &&
-					// options.suggestWhenEmpty);
+					var show = ui.item.show;
 
 					// replace the current input
 					if (terms.length === 0) {
@@ -1003,13 +1001,20 @@ morpheus.Util.escapeRegex = function (value) {
 
 morpheus.Util.createSearchPredicates = function (options) {
 	options = $.extend({}, {
-		validateFieldNames: true
+		validateFieldNames: true,
+		caseSensitive: true
 	}, options);
 	var tokens = options.tokens;
 	if (tokens == null) {
 		return [];
 	}
 	var availableFields = options.fields;
+	if (!options.caseSensitive && availableFields != null) {
+		for (var i = 0; i < availableFields.length; i++) {
+			availableFields[i] = availableFields[i].toLowerCase();
+
+		}
+	}
 	var validateFieldNames = options.validateFieldNames;
 	var fieldSearchEnabled = !validateFieldNames
 		|| (availableFields != null && availableFields.length > 0);
@@ -1053,7 +1058,7 @@ morpheus.Util.createSearchPredicates = function (options) {
 				}
 
 				if (!validateFieldNames
-					|| availableFields.indexOf(possibleField) !== -1) {
+					|| availableFields.indexOf(options.caseSensitive ? possibleField : possibleField.toLowerCase()) !== -1) {
 					token = possibleToken;
 					field = possibleField;
 				}
@@ -1135,7 +1140,8 @@ morpheus.Util.createSearchPredicates = function (options) {
 
 	});
 	return predicates;
-};
+}
+;
 
 morpheus.Util.createRegExpStringToMatchText = function (text) {
 	var tokens = morpheus.Util.getAutocompleteTokens(text);
