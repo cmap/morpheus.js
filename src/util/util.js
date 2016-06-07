@@ -481,10 +481,6 @@ morpheus.Util.autosuggest = function (options) {
 					return false;
 				}
 
-				if (ui.item.select) {
-					ui.item.select(options.$el);
-					return false;
-				}
 				if (options.multi) {
 					var terms = morpheus.Util
 					.getAutocompleteTokens(
@@ -494,7 +490,8 @@ morpheus.Util.autosuggest = function (options) {
 							selectionStart: options.$el[0].selectionStart
 						});
 
-					var value = ui.item.value;
+					var field = event.toElement.dataset.autocomplete;
+					var value = field ? ui.item[field] : ui.item.value;
 					var show = ui.item.show;
 
 					// replace the current input
@@ -535,8 +532,10 @@ morpheus.Util.autosuggest = function (options) {
 	// use html for label instead of default text
 	var instance = options.$el.autocomplete('instance');
 	instance._renderItem = function (ul, item) {
-		return $('<li class="ui-menu-item">').html(
-			item.render ? item.render() : item.label).appendTo(ul);
+		return $('<li class="' + (item.class ? item.class : 'ui-menu-item') + '">').html(item.label).appendTo(ul);
+	};
+	instance._normalize = function (items) {
+		return items;
 	};
 
 	if (options.suggestWhenEmpty) {
