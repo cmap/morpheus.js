@@ -2189,17 +2189,18 @@ morpheus.VectorTrack.prototype = {
 		for (var i = start; i < end; i++) {
 			var array = vector.getValue(i);
 			if (array != null) {
-				var selectedBins = new morpheus.Set();
+				var selectedBinToCount = new morpheus.Map();
 				if (array.modelIndexToBin != null) {
 					for (var j = 0; j < selectedModelIndices.length; j++) {
 						var bin = array.modelIndexToBin
 						.get(selectedModelIndices[j]);
 						if (bin !== undefined) {
-							selectedBins.add(bin);
+							var prior = selectedBinToCount.get(bin) || 0;
+							selectedBinToCount.set(bin, prior + 1);
 						}
 					}
 				}
-
+				
 				var position = positions.getPosition(i);
 				var size = positions.getItemSize(i);
 				var positivePairs = [];
@@ -2243,7 +2244,7 @@ morpheus.VectorTrack.prototype = {
 								- scaledValue), size);
 						context.fill();
 					}
-					if (selectedBins.has(index)) {
+					if (selectedBinToCount.has(index)) {
 						context.beginPath();
 						var ytop = (nextScaledValue + scaledValue) / 2;
 						context.moveTo(position, ytop);
@@ -2277,7 +2278,7 @@ morpheus.VectorTrack.prototype = {
 								- scaledValue), size);
 						context.fill();
 					}
-					if (selectedBins.has(index)) {
+					if (selectedBinToCount.has(index)) {
 						// draw a line at top of bin
 						context.beginPath();
 						var ytop = (nextScaledValue + scaledValue) / 2;
