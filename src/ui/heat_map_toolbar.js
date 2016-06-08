@@ -211,7 +211,7 @@ morpheus.HeatMapToolBar = function (controller) {
 	if (controller.options.toolbar.tools) {
 		toolbarHtml.push('<div class="btn-group">');
 		toolbarHtml
-		.push('<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown"><span title="Tools" data-toggle="tooltip" class="fa fa-wrench"></span> <span class="fa fa-caret-down"></span></button>');
+		.push('<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown"><span title="Tools" data-toggle="tooltip" class="fa fa-wrench"></span> <span class="caret"></span></button>');
 		toolbarHtml.push('<ul name="tools" class="dropdown-menu" role="menu">');
 
 		for (var i = 0; i < tools.length; i++) {
