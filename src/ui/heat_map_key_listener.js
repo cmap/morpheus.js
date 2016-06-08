@@ -1,12 +1,5 @@
 morpheus.HeatMapKeyListener = function(controller) {
 	var keydown = function(e) {
-
-		// if ((e.isImmediatePropagationStopped && e
-		// .isImmediatePropagationStopped())
-		// || (e.isDefaultPrevented && e.isDefaultPrevented())) {
-		// return;
-		// }
-
 		var tagName = e.target.tagName;
 		if (tagName == 'INPUT' || tagName == 'SELECT' || tagName == 'TEXTAREA') {
 			return;
