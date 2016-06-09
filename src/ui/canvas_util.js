@@ -2,17 +2,6 @@ morpheus.CanvasUtil = function() {
 };
 morpheus.CanvasUtil.dragging = false;
 
-morpheus.CanvasUtil.measureScrollbar = function() {
-	var $c = $(
-			'<div style=\'position:absolute; top:-10000px; left:-10000px; width:100px; height:100px; overflow:scroll;\'></div>')
-			.appendTo('body');
-	var dim = {
-		width : $c.width() - $c[0].clientWidth,
-		height : $c.height() - $c[0].clientHeight
-	};
-	$c.remove();
-	return dim;
-};
 morpheus.CanvasUtil.FONT_NAME = '"Helvetica Neue",Helvetica,Arial,sans-serif';
 morpheus.CanvasUtil.FONT_COLOR = 'rgb(34, 34, 34)';
 morpheus.CanvasUtil.getPreferredSize = function(c) {

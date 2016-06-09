@@ -534,18 +534,20 @@ morpheus.ChartTool2.prototype = {
 				text.push(obj);
 			}
 			var trace = {
-				x: x,
-				y: y,
-				name: colorByVector ? colorByVector.getValue(i) : '',
-				tickmode: 'array',
-				marker: {
-					size: size,
-					symbol: 'circle'
-				},
-				text: text,
-				mode: 'markers+lines',
-				type: 'scatter' // scattergl
-			};
+					x: x,
+					y: y,
+					name: colorByVector ? colorByVector.getValue(i) : '',
+					tickmode: 'array',
+					marker: {
+						size: size,
+						symbol: 'circle'
+					},
+					text: text,
+					mode: 'lines' + (options.showPoints ? '+markers' : ''
+					),
+					type: 'scatter' // scattergl
+				}
+				;
 			traces.push(trace);
 		}
 
@@ -755,7 +757,7 @@ morpheus.ChartTool2.prototype = {
 		var config = plotlyDefaults.config;
 		var chartWidth = 400;
 		var chartHeight = 400;
-		var points = this.formBuilder.getValue('show_points');
+		var showPoints = this.formBuilder.getValue('show_points');
 
 		var groupColumnsBy = this.formBuilder.getValue('group_columns_by');
 		var axisLabel = this.formBuilder.getValue('axis_label');
@@ -774,7 +776,7 @@ morpheus.ChartTool2.prototype = {
 			return;
 		}
 		if ((dataset.getRowCount() * dataset.getColumnCount()) > 100000) {
-			points = false;
+			showPoints = false;
 		}
 
 		var grid = [];
@@ -810,6 +812,7 @@ morpheus.ChartTool2.prototype = {
 			}
 			this
 			._createProfile({
+				showPoints: showPoints,
 				isColumnChart: chartType === 'column profile',
 				axisLabelVector: axisLabelVector,
 				colorByVector: colorByVector,
@@ -877,7 +880,7 @@ morpheus.ChartTool2.prototype = {
 						this
 						._createBoxPlot({
 							array: array,
-							points: points,
+							points: showPoints,
 							colorByVector: colorByVector,
 							colorModel: colorModel,
 							colorByGetter: function (item) {
@@ -1127,7 +1130,7 @@ morpheus.ChartTool2.prototype = {
 									}
 								}),
 								array: array,
-								points: points,
+								points: showPoints,
 								sizeByGetter: sizeByGetter,
 								sizeFunction: sizeByScale,
 								colorModel: colorModel,

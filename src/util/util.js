@@ -52,6 +52,17 @@ morpheus.Util.loadTrackingCode = function () {
 	}
 };
 
+morpheus.Util.measureScrollbar = function () {
+	var $c = $(
+		'<div style=\'position:absolute; top:-10000px; left:-10000px; width:100px; height:100px; overflow:scroll;\'></div>')
+	.appendTo('body');
+	var dim = {
+		width: Math.max(0, $c.width() - $c[0].clientWidth),
+		height: $c.height() - $c[0].clientHeight
+	};
+	$c.remove();
+	return dim;
+};
 morpheus.Util.trackEvent = function (options) {
 	if (typeof window !== 'undefined') {
 		if (!morpheus.Util.TRACKING_CODE_LOADED) {
