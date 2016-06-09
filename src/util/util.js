@@ -543,11 +543,18 @@ morpheus.Util.autosuggest = function (options) {
 	// use html for label instead of default text
 	var instance = options.$el.autocomplete('instance');
 	instance._renderItem = function (ul, item) {
-		return $('<li class="' + (item.class ? item.class : 'ui-menu-item') + '">').html(item.label).appendTo(ul);
+		return $('<li class="' + (item.class ? item.class : 'ui-menu-item') + ' search-item">').html(item.label).appendTo(ul);
 	};
 	instance._normalize = function (items) {
 		return items;
 	};
+
+	instance._resizeMenu = function () {
+		var ul = this.menu.element;
+		ul.outerWidth(instance.element.outerWidth());
+	};
+
+	instance.menu.element.addClass("search-menu")
 
 	if (options.suggestWhenEmpty) {
 		options.$el.on('focus', function () {
