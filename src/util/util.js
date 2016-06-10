@@ -501,7 +501,7 @@ morpheus.Util.autosuggest = function (options) {
 							selectionStart: options.$el[0].selectionStart
 						});
 
-					var field = event.toElement.dataset.autocomplete;
+					var field = (event.toElement && event.toElement.dataset) ? event.toElement.dataset.autocomplete : null;
 					var value = field ? ui.item[field] : ui.item.value;
 					var show = ui.item.show;
 
