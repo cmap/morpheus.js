@@ -21,7 +21,7 @@ morpheus.ChartTool2 = function (chartOptions) {
 	this.formBuilder = formBuilder;
 	formBuilder.append({
 		name: 'chart_type',
-		type: 'select',
+		type: 'bootstrap-select',
 		options: ['boxplot', 'row scatter', 'column scatter', 'row profile', 'column profile']
 	});
 	var rowOptions = [];
@@ -105,18 +105,18 @@ morpheus.ChartTool2 = function (chartOptions) {
 	updateOptions();
 	formBuilder.append({
 		name: 'group_columns_by',
-		type: 'select',
+		type: 'bootstrap-select',
 		options: options
 	});
 	formBuilder.append({
 		name: 'group_rows_by',
-		type: 'select',
+		type: 'bootstrap-select',
 		options: options
 	});
 
 	formBuilder.append({
 		name: 'axis_label',
-		type: 'select',
+		type: 'bootstrap-select',
 		options: rowOptions
 	});
 	formBuilder.append({
@@ -127,20 +127,26 @@ morpheus.ChartTool2 = function (chartOptions) {
 
 	formBuilder.append({
 		name: 'color',
-		type: 'select',
+		type: 'bootstrap-select',
 		options: options
 	});
 
 	formBuilder.append({
 		name: 'size',
-		type: 'select',
+		type: 'bootstrap-select',
 		options: numericOptions
+	});
+	formBuilder.append({
+		name: 'tooltip',
+		type: 'bootstrap-select',
+		multiple: true,
+		search: true,
+		options: options.slice(1)
 	});
 
 	function setVisibility() {
 		// 'boxplot', 'row scatter', 'column scatter', 'row profile', 'column profile'
 		var chartType = formBuilder.getValue('chart_type');
-
 		formBuilder.setVisible('group_rows_by', chartType === 'boxplot');
 		formBuilder.setVisible('group_columns_by', chartType === 'boxplot');
 		if (chartType !== 'boxplot') {
@@ -162,9 +168,21 @@ morpheus.ChartTool2 = function (chartOptions) {
 
 	}
 
-	formBuilder.$form.find('select').on('change', function () {
-		setVisibility();
-		_this.draw();
+	this.tooltip = [];
+	formBuilder.$form.find('select').on('change', function (e) {
+		if ($(this).attr('name') === 'tooltip') {
+			var tooltipVal = _this.formBuilder.getValue('tooltip');
+			_this.tooltip = [];
+			if (tooltipVal != null) {
+				tooltipVal.forEach(function (tip) {
+					_this.tooltip.push(morpheus.ChartTool2.getVectorInfo(tip));
+				});
+			}
+		} else {
+			setVisibility();
+			_this.draw();
+		}
+
 	});
 	formBuilder.$form.find('input').on('click', function () {
 		_this.draw();
@@ -400,18 +418,15 @@ morpheus.ChartTool2.prototype = {
 				j: j
 			};
 			obj.toString = function () {
-				var trackNames = _this.getVisibleTrackNames(!isColumnChart);
 				var s = [];
-
-				for (var i = 0; i < trackNames.length; i++) {
-					var v = dataset.getColumnMetadata()
-					.getByName(trackNames[i]);
-					if (v) {
-						morpheus.HeatMapTooltipProvider.vectorToString(v,
+				for (var tipIndex = 0; tipIndex < _this.tooltip.length; tipIndex++) {
+					var tip = _this.tooltip[tipIndex];
+					if (tip.isColumns) {
+						morpheus.HeatMapTooltipProvider.vectorToString(dataset.getColumnMetadata().getByName(tip.field),
 							this.j, s, '<br>');
 					}
-
 				}
+
 				return s.join('');
 
 			};
@@ -489,7 +504,6 @@ morpheus.ChartTool2.prototype = {
 		var traces = [];
 		var ticktext = [];
 		var tickvals = [];
-		console.log(dataset.getRowCount(), dataset.getColumnCount());
 		for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
 			ticktext.push(axisLabelVector != null ? axisLabelVector.getValue(j) : '' + j);
 			tickvals.push(j);
@@ -516,21 +530,22 @@ morpheus.ChartTool2.prototype = {
 					j: j
 				};
 				obj.toString = function () {
-					var trackNames = _this.getVisibleTrackNames(!isColumnChart);
 					var s = [];
-
-					for (var i = 0; i < trackNames.length; i++) {
-						var v = dataset.getColumnMetadata()
-						.getByName(trackNames[i]);
-						if (v) {
-							morpheus.HeatMapTooltipProvider.vectorToString(v,
+					for (var tipIndex = 0; tipIndex < _this.tooltip.length; tipIndex++) {
+						var tip = _this.tooltip[tipIndex];
+						if (tip.isColumns) {
+							morpheus.HeatMapTooltipProvider.vectorToString(dataset.getColumnMetadata().getByName(tip.field),
 								this.j, s, '<br>');
+						} else {
+							morpheus.HeatMapTooltipProvider.vectorToString(dataset.getRowMetadata().getByName(tip.field),
+								this.i, s, '<br>');
 						}
-
 					}
+
 					return s.join('');
 
 				};
+
 				text.push(obj);
 			}
 			var trace = {
@@ -635,7 +650,6 @@ morpheus.ChartTool2.prototype = {
 			var item = array[k];
 			y.push(dataset.getValue(item.row, item.column));
 			if (points) {
-
 				x.push(scale(Math.random()));
 				if (colorByVector) {
 					var colorByValue = colorByGetter(item);
@@ -647,34 +661,22 @@ morpheus.ChartTool2.prototype = {
 					size.push(sizeFunction(sizeByValue));
 				}
 				var obj = {
-					row: item.row,
-					column: item.column
+					i: item.row,
+					j: item.column
 				};
 				obj.toString = function () {
 					var s = [];
-					var trackNames = _this.getVisibleTrackNames(true);
-
-					for (var trackIndex = 0; trackIndex < trackNames.length; trackIndex++) {
-						var v = dataset.getColumnMetadata().getByName(
-							trackNames[trackIndex]);
-						if (v) {
-							morpheus.HeatMapTooltipProvider.vectorToString(v,
-								this.column, s, '<br>');
+					for (var tipIndex = 0; tipIndex < _this.tooltip.length; tipIndex++) {
+						var tip = _this.tooltip[tipIndex];
+						if (tip.isColumns) {
+							morpheus.HeatMapTooltipProvider.vectorToString(dataset.getColumnMetadata().getByName(tip.field),
+								this.j, s, '<br>');
+						} else {
+							morpheus.HeatMapTooltipProvider.vectorToString(dataset.getRowMetadata().getByName(tip.field),
+								this.i, s, '<br>');
 						}
-
 					}
 
-					trackNames = _this.getVisibleTrackNames(false);
-
-					for (var trackIndex = 0; trackIndex < trackNames.length; trackIndex++) {
-						var v = dataset.getRowMetadata().getByName(
-							trackNames[trackIndex]);
-						if (v) {
-							morpheus.HeatMapTooltipProvider.vectorToString(v,
-								this.row, s, '<br>');
-						}
-
-					}
 					return s.join('');
 
 				};
