@@ -621,9 +621,14 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
 			}
 		}
 	}
+	var toolName = tool.toString();
+	var parenIndex = toolName.indexOf('(');
+	if (parenIndex !== -1) {
+		toolName = toolName.substring(0, parenIndex).trim();
+	}
 	morpheus.Util.trackEvent({
 		eventCategory: 'Tool',
-		eventAction: tool.toString()
+		eventAction: toolName
 	});
 };
 morpheus.HeatMap.getSpaces = function (groupByKeys, length, gapSize) {
@@ -863,6 +868,10 @@ morpheus.HeatMap.prototype = {
 			project.setRowSortKeys(sortKeys, true);
 			this.scrollTop(0);
 		}
+		morpheus.Util.trackEvent({
+			eventCategory: 'Tool',
+			eventAction: isColumns ? 'sortRowsBasedOnSelection' : 'sortColumnsBasedOnSelection'
+		});
 
 	},
 	getToolbarElement: function () {

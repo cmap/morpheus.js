@@ -228,6 +228,7 @@ morpheus.ChartTool2 = function (chartOptions) {
 
 morpheus.ChartTool2.getPlotlyDefaults = function () {
 	var layout = {
+		hovermode: 'closest',
 		autosize: false,
 		paper_bgcolor: 'rgb(255,255,255)',
 		plot_bgcolor: 'rgb(229,229,229)',
