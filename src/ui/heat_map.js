@@ -3033,7 +3033,6 @@ morpheus.HeatMap.prototype = {
 		var totalSize = this.getTotalSize(options);
 		var legendHeight = 0;
 		if (options.legend) {
-
 			context.save();
 			context.translate(50, 0);
 			morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
@@ -3143,7 +3142,6 @@ morpheus.HeatMap.prototype = {
 					width: heatmapPrefSize.width,
 					height: track.getPrintSize().height
 				};
-
 				track.print(trackClip, context);
 				context.restore();
 				// draw header
@@ -3154,7 +3152,7 @@ morpheus.HeatMap.prototype = {
 					x: 0,
 					y: 0,
 					width: headerSize.width,
-					height: headerSize.height
+					height: trackClip.height
 				};
 				context.translate(heatmapX - 2, columnTrackY + trackClip.height);
 				header.print(headerClip, context);

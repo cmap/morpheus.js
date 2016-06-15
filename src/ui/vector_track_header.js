@@ -310,10 +310,11 @@ morpheus.VectorTrackHeader.prototype = {
 		var context = this.canvas.getContext('2d');
 		context.font = this.defaultFontHeight + 'px '
 			+ morpheus.CanvasUtil.FONT_NAME;
-		var width = 4 + context.measureText(this.name).width;
+		var textWidth = 4 + context.measureText(this.name).width;
 		return {
-			width: width,
-			height: this.getUnscaledHeight()
+			width: textWidth,
+			height: this.defaultFontHeight
+			+ morpheus.VectorTrackHeader.FONT_OFFSET
 		};
 	},
 	getSortKeys: function () {

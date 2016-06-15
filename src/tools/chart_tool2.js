@@ -229,7 +229,7 @@ morpheus.ChartTool2 = function (chartOptions) {
 morpheus.ChartTool2.getPlotlyDefaults = function () {
 	var layout = {
 		hovermode: 'closest',
-		autosize: false,
+		autosize: true,
 		paper_bgcolor: 'rgb(255,255,255)',
 		plot_bgcolor: 'rgb(229,229,229)',
 		showlegend: false,
@@ -250,8 +250,7 @@ morpheus.ChartTool2.getPlotlyDefaults = function () {
 			showline: false,
 			showticklabels: true,
 			tickcolor: 'rgb(127,127,127)',
-			ticks: 'outside',
-			type: 'linear'
+			ticks: 'outside'
 		},
 		yaxis: {
 			zeroline: false,
@@ -263,8 +262,7 @@ morpheus.ChartTool2.getPlotlyDefaults = function () {
 			showline: false,
 			showticklabels: true,
 			tickcolor: 'rgb(127,127,127)',
-			ticks: 'outside',
-			type: 'linear'
+			ticks: 'outside'
 		}
 	};
 	var config = {

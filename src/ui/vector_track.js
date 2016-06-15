@@ -258,7 +258,6 @@ morpheus.VectorTrack.prototype = {
 		if (this.isRenderAs(morpheus.VectorTrack.RENDER.BAR)) {
 			width += this.settings.barSize;
 		}
-
 		if (this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)) {
 			width += this.settings.colorBarSize;
 		}
@@ -271,7 +270,6 @@ morpheus.VectorTrack.prototype = {
 		if (!forPrint && !this.isRenderAs(morpheus.VectorTrack.RENDER.MOLECULE)) {
 			width = Math.min(300, width);
 		}
-
 		if (this.isRenderAs(morpheus.VectorTrack.RENDER.ARC)) {
 			width += this.settings.arcSize;
 		}
