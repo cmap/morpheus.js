@@ -33,36 +33,22 @@ morpheus.HeatMapTooltipProvider = function (heatMap, rowIndex, columnIndex,
 			var quickRowTracks = heatMap.rowTracks.filter(function (t) {
 				return t.settings.inlineTooltip;
 			});
-			morpheus.HeatMapTooltipProvider._tracksToString(options,
-				quickRowTracks, dataset.getRowMetadata(), rowIndex,
-				tipText, separator);
-
-			// if (quickRowTracks.length > 0) {
-			// tipText
-			// .push('<div
-			// style="height:1px;background-color:LightGrey;"></div>');
-			// }
-			morpheus.HeatMapTooltipProvider._tracksToString(options,
-				heatMap.columnTracks.filter(function (t) {
-					return t.settings.inlineTooltip;
-				}), dataset.getColumnMetadata(), columnIndex, tipText,
-				separator);
+			morpheus.HeatMapTooltipProvider._tracksToString(quickRowTracks, dataset.getRowMetadata(), rowIndex, tipText, separator);
+			morpheus.HeatMapTooltipProvider._tracksToString(heatMap.columnTracks.filter(function (t) {
+				return t.settings.inlineTooltip;
+			}), dataset.getColumnMetadata(), columnIndex, tipText, separator);
 
 		}
 	} else if (quick) {
 		if (rowIndex !== -1) {
-			morpheus.HeatMapTooltipProvider._tracksToString(options,
-				heatMap.rowTracks.filter(function (t) {
-					return t.settings.inlineTooltip;
-				}), dataset.getRowMetadata(), rowIndex, tipText,
-				separator);
+			morpheus.HeatMapTooltipProvider._tracksToString(heatMap.rowTracks.filter(function (t) {
+				return t.settings.inlineTooltip && options.name !== t.getName();
+			}), dataset.getRowMetadata(), rowIndex, tipText, separator);
 		}
 		if (columnIndex !== -1) {
-			morpheus.HeatMapTooltipProvider._tracksToString(options,
-				heatMap.columnTracks.filter(function (t) {
-					return t.settings.inlineTooltip;
-				}), dataset.getColumnMetadata(), columnIndex, tipText,
-				separator);
+			morpheus.HeatMapTooltipProvider._tracksToString(heatMap.columnTracks.filter(function (t) {
+				return t.settings.inlineTooltip && options.name !== t.getName();
+			}), dataset.getColumnMetadata(), columnIndex, tipText, separator);
 		}
 	}
 
@@ -286,7 +272,7 @@ morpheus.HeatMapTooltipProvider.vectorToString = function (vector, index,
 		}
 	}
 };
-morpheus.HeatMapTooltipProvider._tracksToString = function (options, tracks, metadata, index, tipText, separator) {
+morpheus.HeatMapTooltipProvider._tracksToString = function (tracks, metadata, index, tipText, separator) {
 	for (var i = 0; i < tracks.length; i++) {
 		morpheus.HeatMapTooltipProvider.vectorToString(metadata.getByName(tracks[i].name), index, tipText,
 			separator);
@@ -299,7 +285,7 @@ morpheus.HeatMapTooltipProvider._metadataToString = function (options, tracks,
 	for (var i = 0, ntracks = tracks.length; i < ntracks; i++) {
 		var track = tracks[i];
 		if ((track.isVisible() && track.isShowTooltip())) {
-			if (tracks[i].name === options.name) {
+			if (tracks[i].name === options.name) { // show the vector that we're mousing over 1st
 				filtered.splice(0, 0, track);
 			} else {
 				filtered.push(track);
@@ -307,9 +293,7 @@ morpheus.HeatMapTooltipProvider._metadataToString = function (options, tracks,
 		}
 	}
 
-	// show the vector that we're mousing over 1st
-	morpheus.HeatMapTooltipProvider._tracksToString(options, filtered,
-		metadata, index, tipText, separator);
+	morpheus.HeatMapTooltipProvider._tracksToString(filtered, metadata, index, tipText, separator);
 
 };
 morpheus.HeatMapTooltipProvider._nodesToString = function (tipText, nodes,

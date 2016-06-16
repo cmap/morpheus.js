@@ -376,7 +376,7 @@ morpheus.SampleDatasets.prototype = {
 			}],
 			columns: [{
 				field: 'id',
-				display: 'text'
+				display: 'text,tooltip'
 			}, {
 				field: 'mutation_summary',
 				display: 'stacked_bar'
