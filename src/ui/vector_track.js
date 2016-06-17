@@ -791,6 +791,7 @@ morpheus.VectorTrack.prototype = {
 
 		if (!this.settings.squished
 			&& this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)) {
+			context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
 			this.renderText(context, vector, true, start, end, clip, offset,
 				this.isColumns ? fullAvailableSpace : 0);
 			offset += this.settings.maxTextWidth + 2;
@@ -800,6 +801,12 @@ morpheus.VectorTrack.prototype = {
 		if (!this.settings.squished
 			&& this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)) {
 			this.textWidth = availableSpace;
+			context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
+			var dataType = morpheus.VectorUtil.getDataType(vector);
+			if (dataType === 'url') {
+				context.fillStyle = 'blue';
+				this.canvas.style.cursor = 'pointer';
+			}
 			this.renderText(context, vector, false, start, end, clip, offset,
 				this.isColumns ? fullAvailableSpace : 0);
 			offset += this.settings.textWidth + 2;
@@ -864,25 +871,7 @@ morpheus.VectorTrack.prototype = {
 			// name : SORT_DESC
 			// });
 		}
-		if (!isColumns) {
-			var toggle = false;
-			var dataset = project.getSortedFilteredDataset();
-			try {
-				project.getRowSelectionModel().getViewIndices().forEach(
-					function (index) {
-						if (dataset.getState(index) !== -1) {
-							toggle = true;
-							throw 'break';
-						}
-					});
-			} catch (x) { // break out of loop
-			}
-			if (toggle) {
-				sectionToItems.Selection.push({
-					name: TOGGLE
-				});
-			}
-		}
+
 		var customItems = this.heatmap.getPopupItems();
 		if (customItems && customItems.length > 0) {
 			customItems.forEach(function (item) {
@@ -970,20 +959,22 @@ morpheus.VectorTrack.prototype = {
 			});
 
 		}
-		sectionToItems.Display.push({
-			name: DISPLAY_TEXT,
-			checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)
-		});
-		sectionToItems.Display.push({
-			name: DISPLAY_COLOR,
-			checked: this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
-		});
-		if (this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)) {
+		if (dataType !== 'url') {
 			sectionToItems.Display.push({
-				name: COLOR_BAR_SIZE
+				name: DISPLAY_TEXT,
+				checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)
 			});
+			sectionToItems.Display.push({
+				name: DISPLAY_COLOR,
+				checked: this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
+			});
+			if (this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)) {
+				sectionToItems.Display.push({
+					name: COLOR_BAR_SIZE
+				});
+			}
 		}
-		if (!isArray) {
+		if (!isArray && dataType !== 'url') {
 			sectionToItems.Display.push({
 				name: DISPLAY_SHAPE,
 				checked: this.isRenderAs(morpheus.VectorTrack.RENDER.SHAPE)
@@ -1002,20 +993,23 @@ morpheus.VectorTrack.prototype = {
 				checked: this.isRenderAs(morpheus.VectorTrack.RENDER.MOLECULE)
 			});
 		}
+
 		sectionToItems.Display.push({
 			name: TOOLTIP,
 			checked: this.settings.inlineTooltip
 		});
-		if (!isArray) {
+		if (!isArray && dataType !== 'url') {
 			sectionToItems.Display.push({
 				name: HIGHLIGHT_MATCHING_VALUES,
 				checked: this.settings.highlightMatchingValues
 			});
 		}
-		sectionToItems.Display.push({
-			name: 'Squished',
-			checked: this.settings.squished
-		});
+		if (dataType !== 'url') {
+			sectionToItems.Display.push({
+				name: 'Squished',
+				checked: this.settings.squished
+			});
+		}
 		if (this.isRenderAs(morpheus.VectorTrack.RENDER.BAR)
 			|| this.isRenderAs(morpheus.VectorTrack.RENDER.BOX_PLOT)) {
 			sectionToItems.Display.push({
@@ -2198,7 +2192,7 @@ morpheus.VectorTrack.prototype = {
 						}
 					}
 				}
-				
+
 				var position = positions.getPosition(i);
 				var size = positions.getItemSize(i);
 				var positivePairs = [];
@@ -2353,7 +2347,7 @@ morpheus.VectorTrack.prototype = {
 	},
 	renderText: function (context, vector, isColor, start, end, clip, offset,
 						  canvasSize) {
-		context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
+
 		context.textBaseline = 'middle';
 		var positions = this.positions;
 		var isColumns = this.isColumns;
