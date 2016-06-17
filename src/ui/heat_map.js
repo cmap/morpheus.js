@@ -225,6 +225,7 @@ morpheus.HeatMap = function (options) {
 	} else {
 		this.$el = $(options.el);
 	}
+	this.$el.addClass('morpheus');
 	if (!options.landingPage) {
 		options.landingPage = new morpheus.LandingPage();
 		options.landingPage.$el.prependTo(this.$el);
@@ -762,6 +763,23 @@ morpheus.HeatMap.prototype = {
 					color: 'white'
 				}, {
 					value: 1.5,
+					color: 'red'
+				}]
+			};
+		} else if (options.filename.toLowerCase().indexOf('achilles') !== -1) {
+			colorScheme = {
+				type: 'fixed',
+				map: [{
+					value: -3,
+					color: 'blue'
+				}, {
+					value: -1,
+					color: 'white'
+				}, {
+					value: 1,
+					color: 'white'
+				}, {
+					value: 3,
 					color: 'red'
 				}]
 			};
