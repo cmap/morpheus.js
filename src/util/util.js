@@ -554,8 +554,10 @@ morpheus.Util.autosuggest = function (options) {
 		ul.outerWidth(instance.element.outerWidth());
 	};
 
-	instance.menu.element.addClass("search-menu")
-
+	var menu = options.$el.autocomplete('widget');
+	if (menu) {
+		menu.addClass("search-menu")
+	}
 	if (options.suggestWhenEmpty) {
 		options.$el.on('focus', function () {
 			options.$el.autocomplete('search', options.$el.val());
