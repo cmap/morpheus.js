@@ -752,7 +752,7 @@ morpheus.HeatMap.prototype = {
 					color: 'red'
 				}]
 			};
-		} else if (options.filename.toLowerCase().indexOf('copynumber') !== -1) {
+		} else if (options.filename.toLowerCase().indexOf('copynumber') !== -1 || options.filename.toLowerCase().indexOf('copy number') !== -1) {
 			colorScheme = {
 				type: 'fixed',
 				map: [{

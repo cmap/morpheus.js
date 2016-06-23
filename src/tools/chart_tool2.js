@@ -236,7 +236,7 @@ morpheus.ChartTool2.getPlotlyDefaults = function () {
 		margin: {
 			l: 80,
 			r: 0,
-			t: 10,
+			t: 24, // leave space for modebar
 			b: 14,
 			autoexpand: true
 		},
@@ -270,7 +270,7 @@ morpheus.ChartTool2.getPlotlyDefaults = function () {
 		displaylogo: false,
 		staticPlot: false,
 		showHints: true,
-		modeBarButtonsToRemove: ['sendDataToCloud']
+		modeBarButtonsToRemove: ['sendDataToCloud', 'zoomIn2d', 'zoomOut2d', 'hoverCompareCartesian', 'hoverClosestCartesian']
 	};
 	return {
 		layout: layout,
