@@ -31,7 +31,7 @@ morpheus.SampleDatasets = function (options) {
 	exampleHtml
 	.push('<div class="text-muted">TCGA data version 1/11/2015</div><span class="text-muted">Please adhere to <a target="_blank" href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines"> the TCGA publication guidelines</a></u> when using TCGA data in your publications.</span>');
 
-	exampleHtml.push('<div name="tcga"></div>');
+	exampleHtml.push('<div data-name="tcga"></div>');
 	$(exampleHtml.join('')).appendTo($el);
 	$el.find('[name=ccle]').on('click', function (e) {
 		e.preventDefault();
@@ -195,7 +195,7 @@ morpheus.SampleDatasets = function (options) {
 				tcga.push('</tr>');
 			}
 			tcga.push('</table>');
-			$(tcga.join('')).appendTo($el.find('[name=tcga]'));
+			$(tcga.join('')).appendTo($el.find('[data-name=tcga]'));
 		});
 };
 

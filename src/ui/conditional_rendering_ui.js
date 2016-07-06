@@ -2,7 +2,7 @@ morpheus.ConditionalRenderingUI = function(heatmap) {
 	var _this = this;
 	this.heatmap = heatmap;
 	var $div = $('<div class="container-fluid" style="min-width:180px;"></div>');
-	$div.on('click', '[name=add]', function(e) {
+	$div.on('click', '[data-name=add]', function(e) {
 		var $this = $(this);
 		var $row = $this.closest('.morpheus-entry');
 		// add after
@@ -23,7 +23,7 @@ morpheus.ConditionalRenderingUI = function(heatmap) {
 		$row.after(_this.add(condition));
 		e.preventDefault();
 	});
-	$div.on('click', '[name=delete]', function(e) {
+	$div.on('click', '[data-name=delete]', function(e) {
 		var $this = $(this);
 		var $row = $this.closest('.morpheus-entry');
 		var index = $row.index() - 1;
@@ -37,7 +37,8 @@ morpheus.ConditionalRenderingUI = function(heatmap) {
 			.push('<div style="border-bottom:1px solid LightGrey" class="morpheus-entry">');
 	html.push('<div class="row">');
 	html
-			.push('<div class="col-xs-8"><a class="btn btn-default btn-xs" role="button" name="add" href="#">Add</a></div>');
+			.push('<div class="col-xs-8"><a class="btn btn-default btn-xs" role="button"' +
+				' data-name="add" href="#">Add</a></div>');
 
 	html.push('</div>');
 	html.push('</div>');
@@ -97,7 +98,7 @@ morpheus.ConditionalRenderingUI.prototype = {
 		var shapeField = new morpheus.ShapeField([ 'circle', 'square',
 				'diamond', 'triangle-up', 'triangle-down', 'triangle-left',
 				'triangle-right' ]);
-		html.push('<div style="display:inline;" name="shapeHolder">');
+		html.push('<div style="display:inline;" data-name="shapeHolder">');
 		html.push('</div>');
 
 		// color
@@ -113,17 +114,15 @@ morpheus.ConditionalRenderingUI.prototype = {
 				.push('<div style="border-bottom:1px solid LightGrey" class="row">');
 
 		html.push('<div class="col-xs-11">');
-		// html
-		// .push('<a class="btn btn-default btn-xs" role="button" name="add"
-		// href="#">Add</a>');
 		html
-				.push('<a class="btn btn-default btn-xs" role="button" name="delete" href="#">Remove</a>');
+				.push('<a class="btn btn-default btn-xs" role="button" data-name="delete"' +
+					' href="#">Remove</a>');
 		html.push('</div>');
 
 		html.push('</div>'); // row
 		html.push('</div>'); // morpheus-entry
 		var $el = $(html.join(''));
-		shapeField.$el.appendTo($el.find('[name=shapeHolder]'));
+		shapeField.$el.appendTo($el.find('[data-name=shapeHolder]'));
 		var $color = $el.find('[name=color]');
 		var $series = $el.find('[id=cond_series]');
 		var $v1 = $el.find('[name=v1]');

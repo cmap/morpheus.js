@@ -47,7 +47,7 @@ morpheus.FormBuilder = function (options) {
 	}).on('drop', function (e) {
 		var node = $(e.originalEvent.srcElement).parent().parent().prev();
 		if (node.is('select') && node.hasClass('file-input')) {
-			var isMultiple = node.data('multiple');
+			var isMultiple = node.data('multiple'); // multiple files?
 			$(e.originalEvent.srcElement).parent().css('border', '');
 			var name = node.attr('name');
 			name = name.substring(0, name.length - '_picker'.length);
@@ -231,9 +231,6 @@ morpheus.FormBuilder.showOkCancel = function (options) {
 			containment: 'document'
 		});
 	}
-	// $div.on('click', '[name=apply]', function(e) {
-	// options.okCallback();
-	// });
 	return $div;
 };
 
@@ -257,7 +254,7 @@ morpheus.FormBuilder.getValue = function ($element) {
 	if ($element.attr('type') === 'radio') {
 		return $element.filter(':checked').val();
 	}
-	if ($element.attr('type') === 'file') {
+	if ($element.data('type') === 'file') {
 		return $element.data('files');
 	}
 	return $element.attr('type') === 'checkbox' ? $element.prop('checked') ? true
@@ -489,10 +486,10 @@ morpheus.FormBuilder.prototype = {
 			});
 			html.push('</select>');
 			if (field.type == 'bootstrap-select' && field.toggle) {
-				html.push('<p class="help-block"><a name="' + name
-					+ '_all" href="#">All</a>&nbsp;|&nbsp;<a name="' + name
+				html.push('<p class="help-block"><a data-name="' + name
+					+ '_all" href="#">All</a>&nbsp;|&nbsp;<a data-name="' + name
 					+ '_none" href="#">None</a></p>');
-				that.$form.on('click', '[name=' + name + '_all]',
+				that.$form.on('click', '[data-name=' + name + '_all]',
 					function (evt) {
 						evt.preventDefault();
 						var $select = that.$form
@@ -503,7 +500,7 @@ morpheus.FormBuilder.prototype = {
 						}));
 						$select.trigger('change');
 					});
-				that.$form.on('click', '[name=' + name + '_none]',
+				that.$form.on('click', '[data-name=' + name + '_none]',
 					function (evt) {
 						evt.preventDefault();
 						var $select = that.$form
@@ -544,7 +541,7 @@ morpheus.FormBuilder.prototype = {
 			html
 			.push('<select data-multiple="'
 				+ isMultiple
-				+ '" type="file" title="'
+				+ '" data-type="file" title="'
 				+ (field.placeholder || (isMultiple ? 'Choose one or more files...'
 					: 'Choose a file...'))
 				+ '" name="'
@@ -659,7 +656,7 @@ morpheus.FormBuilder.prototype = {
 				that.setValue(name, isMultiple ? files : files[0]);
 				that.trigger('change', {
 					name: name,
-					value: files[0]
+					value: isMultiple ? files : files[0]
 				});
 			});
 		} else {
@@ -689,7 +686,7 @@ morpheus.FormBuilder.prototype = {
 			}
 		}
 		if (help !== undefined) {
-			html.push('<span name="' + name + '_help" class="help-block">');
+			html.push('<span data-name="' + name + '_help" class="help-block">');
 			html.push(help);
 			html.push('</span>');
 		}
@@ -782,17 +779,18 @@ morpheus.FormBuilder.prototype = {
 		return this.$form.find('[name=' + name + ']');
 	},
 	setHelpText: function (name, value) {
-		var v = this.$form.find('[name=' + name + '_help]');
+		var v = this.$form.find('[data-name=' + name + '_help]');
 		v.html(value);
 	},
 	setValue: function (name, value) {
 		var v = this.$form.find('[name=' + name + ']');
 		if (v.length === 0) {
 			v = this.$form.find('[name=' + name + '_picker]');
-			if (v.attr('type') === 'file') {
+			if (v.data('type') === 'file') {
 				v.val(value);
 				v.selectpicker('render');
-				return v.data('files', value);
+				v.data('files', value);
+				return;
 			}
 		}
 		var type = v.attr('type');

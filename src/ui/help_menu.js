@@ -4,13 +4,13 @@ morpheus.HelpMenu = function() {
 	html
 			.push('<span style="color:#ca0020;" data-toggle="dropdown" class="fa fa-lg fa-border fa-question-circle"></span>');
 	html
-			.push('<ul name="info" class="dropdown-menu dropdown-menu-right" role="menu">');
-	html.push('<li><a name="contact" href="#">Contact</a></li>');
+			.push('<ul class="dropdown-menu dropdown-menu-right" role="menu">');
+	html.push('<li><a data-name="contact" href="#">Contact</a></li>');
 	// <li role="presentation" class="divider"></li>
 
-	html.push('<li><a name="linking" href="#">Linking</a></li>');
-	html.push('<li><a name="tutorial" href="#">Tutorial</a></li>');
-	html.push('<li><a name="source" href="#">Source Code</a></li>');
+	html.push('<li><a data-name="linking" href="#">Linking</a></li>');
+	html.push('<li><a data-name="tutorial" href="#">Tutorial</a></li>');
+	html.push('<li><a data-name="source" href="#">Source Code</a></li>');
 
 	html.push('</ul>');
 	html.push('</div>');
@@ -18,7 +18,7 @@ morpheus.HelpMenu = function() {
 	this.$el.find('button').on('click', function(e) {
 		e.stopImmediatePropagation();
 	});
-	this.$el.find('[name=contact]').on('click', function(e) {
+	this.$el.find('[data-name=contact]').on('click', function(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		e.stopImmediatePropagation();
@@ -28,7 +28,7 @@ morpheus.HelpMenu = function() {
 			eventAction : 'contact'
 		});
 	});
-	this.$el.find('[name=tutorial]').on('click', function(e) {
+	this.$el.find('[data-name=tutorial]').on('click', function(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		e.stopImmediatePropagation();
@@ -40,7 +40,7 @@ morpheus.HelpMenu = function() {
 
 	});
 
-	this.$el.find('[name=linking]').on('click', function(e) {
+	this.$el.find('[data-name=linking]').on('click', function(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		e.stopImmediatePropagation();
@@ -50,7 +50,7 @@ morpheus.HelpMenu = function() {
 			eventAction : 'linking'
 		});
 	});
-	this.$el.find('[name=source]').on('click', function(e) {
+	this.$el.find('[data-name=source]').on('click', function(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		e.stopImmediatePropagation();

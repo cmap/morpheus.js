@@ -8,19 +8,19 @@ morpheus.LandingPage = function (pageOptions) {
 	var $el = $('<div class="container" style="display: none;"></div>');
 	this.$el = $el;
 	var html = [];
-	html.push('<div name="help" class="pull-right"></div>');
+	html.push('<div data-name="help" class="pull-right"></div>');
 
 	html
 	.push('<div style="margin-bottom:10px;"><img src="https://www.broadinstitute.org/cancer/software/morpheus/images/icon.svg" alt="logo" /> <span style="font-size:16px;font-family:Roboto,sans-serif;">Morpheus</span></div>');
 
 	html.push('<h4>Open your own file</h4>');
-	html.push('<div name="formRow" class="center-block"></div>');
+	html.push('<div data-name="formRow" class="center-block"></div>');
 	html.push('<h4>Or select a preloaded dataset</h4>');
-	html.push('<div name="exampleRow"></div>');
+	html.push('<div data-name="exampleRow"></div>');
 	html.push('</div>');
 	$(html.join('')).appendTo($el);
 
-	new morpheus.HelpMenu().$el.appendTo($el.find('[name=help]'));
+	new morpheus.HelpMenu().$el.appendTo($el.find('[data-name=help]'));
 	var formBuilder = new morpheus.FormBuilder();
 	formBuilder.append({
 		name: 'file',
@@ -30,9 +30,9 @@ morpheus.LandingPage = function (pageOptions) {
 		required: true,
 		help: morpheus.DatasetUtil.DATASET_FILE_FORMATS
 	});
-	formBuilder.$form.appendTo($el.find('[name=formRow]'));
+	formBuilder.$form.appendTo($el.find('[data-name=formRow]'));
 	this.formBuilder = formBuilder;
-	this.$sampleDatasetsEl = $el.find('[name=exampleRow]');
+	this.$sampleDatasetsEl = $el.find('[data-name=exampleRow]');
 
 };
 
@@ -102,17 +102,26 @@ morpheus.LandingPage.prototype = {
 				}
 			});
 	},
-	open: function (options) {
+	open: function (openOptions) {
 		this.dispose();
-		if (this.heatmap == null) {
-			options.landingPage = this;
-			options.el = this.pageOptions.el;
-			this.heatmap = new morpheus.HeatMap(options);
-		} else {
-			options.inheritFromParent = false;
-			options.parent = this.heatmap;
-			new morpheus.HeatMap(options);
-		}
+		var heatmap;
+		var optionsArray = _.isArray(openOptions) ? openOptions : [openOptions];
+		var _this = this;
+		optionsArray.forEach(function (options) {
+			if (_this.heatmap == null) {
+				options.landingPage = _this;
+				options.el = _this.pageOptions.el;
+
+			} else {
+				options.inheritFromParent = false;
+				options.parent = _this.heatmap;
+			}
+			heatmap = new morpheus.HeatMap(options);
+			if (_this.heatmap == null) {
+				_this.heatmap = heatmap;
+			}
+		});
+
 	},
 	openFile: function (value) {
 		var _this = this;

@@ -20,17 +20,17 @@
  * <code>floor(pos)</code> in the array and let <code>upper</code> be the
  * next element in the array. Return <code>lower + d * (upper - lower)</code></li>
  * </ol>
- * 
+ *
  * @param p Percentile between 0 and 100
  */
-morpheus.Percentile = function(vector, p, isSorted) {
+morpheus.Percentile = function (vector, p, isSorted) {
 	return morpheus.ArrayPercentile(morpheus.RemoveNaN(vector), p, isSorted);
 };
 /**
  * @private
  * @ignore
  */
-morpheus.RemoveNaN = function(values) {
+morpheus.RemoveNaN = function (values) {
 	var array = [];
 	for (var i = 0, size = values.size(); i < size; i++) {
 		var value = values.getValue(i);
@@ -40,19 +40,19 @@ morpheus.RemoveNaN = function(values) {
 	}
 	return array;
 };
-morpheus.Median = function(vector) {
+morpheus.Median = function (vector) {
 	return morpheus.ArrayPercentile(morpheus.RemoveNaN(vector), 50, false);
 };
-morpheus.Median.toString = function() {
+morpheus.Median.toString = function () {
 	return 'Median';
 };
 /**
  * @ignore
  */
-morpheus.ArrayPercentile = function(values, p, isSorted) {
-	
+morpheus.ArrayPercentile = function (values, p, isSorted) {
+
 	if (!isSorted) {
-		values.sort(function(a, b) {
+		values.sort(function (a, b) {
 			return (a < b ? -1 : (a === b ? 0 : 1));
 		});
 	}
@@ -61,8 +61,8 @@ morpheus.ArrayPercentile = function(values, p, isSorted) {
 /**
  * @ignore
  */
-morpheus.MaxPercentiles = function(percentiles) {
-	var f = function(vector) {
+morpheus.MaxPercentiles = function (percentiles) {
+	var f = function (vector) {
 		var values = [];
 		for (var i = 0, size = vector.size(); i < size; i++) {
 			var value = vector.getValue(i);
@@ -73,7 +73,7 @@ morpheus.MaxPercentiles = function(percentiles) {
 		if (values.length === 0) {
 			return NaN;
 		}
-		values.sort(function(a, b) {
+		values.sort(function (a, b) {
 			return (a < b ? -1 : (a === b ? 0 : 1));
 		});
 		var max = 0;
@@ -85,8 +85,8 @@ morpheus.MaxPercentiles = function(percentiles) {
 		}
 		return max;
 	};
-	f.toString = function() {
-		var s = [ 'Maximum of ' ];
+	f.toString = function () {
+		var s = ['Maximum of '];
 		for (var i = 0, length = percentiles.length; i < length; i++) {
 			if (i > 0 && length > 2) {
 				s.push(', ');
@@ -101,7 +101,7 @@ morpheus.MaxPercentiles = function(percentiles) {
 	};
 	return f;
 };
-morpheus.Mean = function(vector) {
+morpheus.Mean = function (vector) {
 	var sum = 0;
 	var count = 0;
 	for (var i = 0, length = vector.size(); i < length; i++) {
@@ -113,10 +113,10 @@ morpheus.Mean = function(vector) {
 	}
 	return count === 0 ? NaN : sum / count;
 };
-morpheus.Mean.toString = function() {
+morpheus.Mean.toString = function () {
 	return 'Mean';
 };
-morpheus.Sum = function(vector) {
+morpheus.Sum = function (vector) {
 	var sum = 0;
 	var found = false;
 	for (var i = 0, length = vector.size(); i < length; i++) {
@@ -128,10 +128,10 @@ morpheus.Sum = function(vector) {
 	}
 	return !found ? NaN : sum;
 };
-morpheus.Sum.toString = function() {
+morpheus.Sum.toString = function () {
 	return 'Sum';
 };
-morpheus.CountNonNaN = function(vector) {
+morpheus.CountNonNaN = function (vector) {
 	var count = 0;
 	for (var i = 0, length = vector.size(); i < length; i++) {
 		var val = vector.getValue(i);
@@ -141,11 +141,11 @@ morpheus.CountNonNaN = function(vector) {
 	}
 	return count;
 };
-morpheus.CountNonNaN.toString = function() {
+morpheus.CountNonNaN.toString = function () {
 	return 'Count non-NaN';
 };
 
-morpheus.Max = function(vector) {
+morpheus.Max = function (vector) {
 	var max = -Number.MAX_VALUE;
 	var found = false;
 	for (var i = 0, length = vector.size(); i < length; i++) {
@@ -157,10 +157,10 @@ morpheus.Max = function(vector) {
 	}
 	return !found ? NaN : max;
 };
-morpheus.Max.toString = function() {
+morpheus.Max.toString = function () {
 	return 'Max';
 };
-morpheus.Min = function(vector) {
+morpheus.Min = function (vector) {
 	var min = Number.MAX_VALUE;
 	var found = false;
 	for (var i = 0, length = vector.size(); i < length; i++) {
@@ -172,10 +172,10 @@ morpheus.Min = function(vector) {
 	}
 	return !found ? NaN : min;
 };
-morpheus.Min.toString = function() {
+morpheus.Min.toString = function () {
 	return 'Min';
 };
-morpheus.Variance = function(list, mean) {
+morpheus.Variance = function (list, mean) {
 	if (mean == undefined) {
 		mean = morpheus.Mean(list);
 	}
@@ -201,21 +201,21 @@ morpheus.Variance = function(list, mean) {
 	return variance;
 };
 var LOG_10 = Math.log(10);
-morpheus.Log10 = function(x) {
+morpheus.Log10 = function (x) {
 	return x <= 0 ? 0 : Math.log(x) / LOG_10;
 };
 var LOG_2 = Math.log(2);
-morpheus.Log2 = function(x) {
+morpheus.Log2 = function (x) {
 	return x <= 0 ? 0 : Math.log(x) / LOG_2;
 };
 
 /**
  * Computes the False Discovery Rate using the BH procedure.
- * 
+ *
  * @param nominalPValues
  *            Array of nominal p-values.
  */
-morpheus.FDR_BH = function(nominalPValues) {
+morpheus.FDR_BH = function (nominalPValues) {
 	var size = nominalPValues.length;
 	var fdr = [];
 	var pValueIndices = morpheus.Util.indexSort(nominalPValues, true);
@@ -248,13 +248,13 @@ morpheus.FDR_BH = function(nominalPValues) {
 	return fdr;
 };
 
-morpheus.FDR_BH.tString = function() {
+morpheus.FDR_BH.tString = function () {
 	return 'FDR(BH)';
 };
-morpheus.Variance.toString = function() {
+morpheus.Variance.toString = function () {
 	return 'Variance';
 };
-morpheus.MAD = function(list, median) {
+morpheus.MAD = function (list, median) {
 	if (median == null) {
 		median = morpheus.Percentile(list, 50);
 	}
@@ -266,33 +266,33 @@ morpheus.MAD = function(list, median) {
 		}
 	}
 	var r = morpheus.Percentile(new morpheus.Vector('', temp.length)
-			.setArray(temp), 50);
+	.setArray(temp), 50);
 	return 1.4826 * r;
-};
-morpheus.MAD.toString = function() {
+}; 
+morpheus.MAD.toString = function () {
 	return 'Median absolute deviation';
 };
-morpheus.CV = function(list) {
+morpheus.CV = function (list) {
 	var mean = morpheus.Mean(list);
 	var stdev = Math.sqrt(morpheus.Variance(list, mean));
 	return stdev / mean;
 };
-morpheus.CV.toString = function() {
+morpheus.CV.toString = function () {
 	return 'Coefficient of variation';
 };
 
-morpheus.BoxPlotItem = function(list) {
+morpheus.BoxPlotItem = function (list) {
 	var values = morpheus.RemoveNaN(list);
-	values.sort(function(a, b) {
+	values.sort(function (a, b) {
 		return (a === b ? 0 : (a < b ? -1 : 1));
 	});
 	if (values.length === 0) {
 		return {
-			median : NaN,
-			q1 : NaN,
-			q3 : NaN,
-			lowerAdjacentValue : NaN,
-			upperAdjacentValue : NaN
+			median: NaN,
+			q1: NaN,
+			q3: NaN,
+			lowerAdjacentValue: NaN,
+			upperAdjacentValue: NaN
 		};
 	}
 	var median = morpheus.ArrayPercentile(values, 50, true);
@@ -312,6 +312,7 @@ morpheus.BoxPlotItem = function(list) {
 	// 1.5*IQR.
 	var upperOutlier = q3 + w * (q3 - q1);
 	var lowerOutlier = q1 - w * (q3 - q1);
+	var sum = 0;
 	for (var i = 0, length = values.length; i < length; i++) {
 		var value = values[i];
 		if (value <= upperOutlier) {
@@ -320,6 +321,7 @@ morpheus.BoxPlotItem = function(list) {
 		if (value >= lowerOutlier) {
 			lowerAdjacentValue = Math.min(lowerAdjacentValue, value);
 		}
+		sum += value;
 		// if (value > upperOutlier) {
 		// upperOutliers.add(new Outlier(i, j, value));
 		// }
@@ -327,6 +329,7 @@ morpheus.BoxPlotItem = function(list) {
 		// lowerOutliers.add(new Outlier(i, j, value));
 		// }
 	}
+	var mean = sum / values.length;
 	if (lowerAdjacentValue > q1) {
 		lowerAdjacentValue = q1;
 	}
@@ -335,12 +338,13 @@ morpheus.BoxPlotItem = function(list) {
 	}
 
 	return {
-		median : median,
-		q1 : q1, // Lower Quartile
-		q3 : q3, // Upper Quartile
-		lowerAdjacentValue : lowerAdjacentValue, // Lower Whisker
-		upperAdjacentValue : upperAdjacentValue
-	// Upper Whisker
+		mean: mean,
+		median: median,
+		q1: q1, // Lower Quartile
+		q3: q3, // Upper Quartile
+		lowerAdjacentValue: lowerAdjacentValue, // Lower Whisker
+		upperAdjacentValue: upperAdjacentValue
+		// Upper Whisker
 	};
 
 };

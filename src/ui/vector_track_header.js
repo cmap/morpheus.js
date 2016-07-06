@@ -22,20 +22,45 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
 
 	function getResizeCursor(pos) {
 		if (isColumns) {
-			if (pos.y < 3 || pos.y >= (_this.getUnscaledHeight() - 3)) {
-				return 'ns-resize';
+			if (pos.y < 3) {
+				return {
+					cursor: 'ns-resize',
+					isPrevious: true
+				};
 			}
-		}
-		if (pos.x < 3 || pos.x >= (_this.getUnscaledWidth() - 3)) {
-			return 'ew-resize';
+			if (pos.y >= (_this.getUnscaledHeight() - 3)) {
+				return {
+					cursor: 'ns-resize',
+					isPrevious: false
+				};
+			}
+			if (pos.x >= (_this.getUnscaledWidth() - 3)) { // change change column width
+				return {
+					isPrevious: false,
+					cursor: 'ew-resize'
+				};
+			}
+		} else {
+			if (pos.x < 3) {
+				return {
+					cursor: 'ew-resize',
+					isPrevious: true
+				};
+			}
+			if (pos.x >= (_this.getUnscaledWidth() - 3)) {
+				return {
+					cursor: 'ew-resize',
+					isPrevious: false
+				};
+			}
 		}
 	}
 
 	var mouseMove = function (event) {
 		if (!morpheus.CanvasUtil.dragging) {
 			var pos = morpheus.CanvasUtil.getMousePos(event.target, event);
-			var cursor = getResizeCursor(pos);
-			canvas.style.cursor = !cursor ? 'default' : cursor;
+			var resizeCursor = getResizeCursor(pos);
+			canvas.style.cursor = resizeCursor == null ? 'default' : resizeCursor.cursor;
 			//document.body.style.cursor = !cursor ? 'default' : cursor;
 			_this.isMouseOver = true;
 			_this.repaint();
@@ -76,8 +101,9 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
 	var resizeCursor;
 	var dragStartWidth = 0;
 	var dragStartHeight = 0;
-	var dragging = false;
+	var reorderingTrack = false;
 	var dragStartPosition;
+	var resizeTrackName;
 	// var throttled = _.throttle(function(event) {
 	//		
 	// if (event.type === 'mouseout') {
@@ -119,14 +145,29 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
 			}
 			resizeCursor = getResizeCursor(morpheus.CanvasUtil
 			.getMousePos(event.target, event, true));
-			if (resizeCursor) { // make sure start event was on
+			if (resizeCursor != null) { // make sure start event was on
 				// hotspot
 				morpheus.CanvasUtil.dragging = true;
-				canvas.style.cursor = resizeCursor;
-				dragStartWidth = _this.getUnscaledWidth();
-				dragStartHeight = _this.getUnscaledHeight();
+				canvas.style.cursor = resizeCursor.cursor;
+				if (resizeCursor.isPrevious) {
+					var index = controller.getTrackIndex(_this.name,
+						isColumns);
+					index--; // FIXME index = -1
+					if (index === -1) {
+						index = 0;
+					}
+					var header = controller.getTrackHeaderByIndex(
+						index, isColumns);
+					dragStartWidth = header.getUnscaledWidth();
+					dragStartHeight = header.getUnscaledHeight();
+					resizeTrackName = header.name;
+				} else {
+					resizeTrackName = null;
+					dragStartWidth = _this.getUnscaledWidth();
+					dragStartHeight = _this.getUnscaledHeight();
+				}
 				event.preventDefault();
-				dragging = false;
+				reorderingTrack = false;
 			} else {
 				var index = controller.getTrackIndex(_this.name,
 					isColumns);
@@ -144,29 +185,29 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
 				$(header.canvas).css('z-index', '100');
 				morpheus.CanvasUtil.dragging = true;
 				resizeCursor = undefined;
-				dragging = true;
+				reorderingTrack = true;
 			}
 		})
 	.on(
 		'panmove',
 		function (event) {
 			_this.isMouseOver = false;
-			if (resizeCursor) {
+			if (resizeCursor != null) {
 				var width;
 				var height;
-				if (resizeCursor === 'ew-resize') {
+				if (resizeCursor.cursor === 'ew-resize') {
 					var dx = event.deltaX;
 					width = Math.max(8, dragStartWidth + dx);
 				}
 
-				if (resizeCursor === 'ns-resize') {
+				if (resizeCursor.cursor === 'ns-resize') {
 					var dy = event.deltaY;
 					height = Math.max(8, dragStartHeight + dy);
 				}
 
-				controller.resizeTrack(_this.name, width, height,
+				controller.resizeTrack(resizeTrackName == null ? _this.name : resizeTrackName, width, height,
 					isColumns);
-			} else if (dragging) { // reorder
+			} else if (reorderingTrack) { // reorder
 				var index = controller.getTrackIndex(_this.name,
 					isColumns);
 				var header = controller.getTrackHeaderByIndex(

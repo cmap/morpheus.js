@@ -22,12 +22,12 @@ morpheus.SortDialog = function(project) {
 		_this.isColumns = isColumns;
 		var $element = _this.build(project, isColumns);
 		$div.empty().html($element);
-		$div.on('click', '[name=delete]', function(e) {
+		$div.on('click', '[data-name=delete]', function(e) {
 			var $this = $(this);
 			e.preventDefault();
 			$this.closest('div.row').remove();
 		});
-		$div.on('click', '[name=add]', function(e) {
+		$div.on('click', '[data-name=add]', function(e) {
 			var $this = $(this);
 			var level = [];
 			var $sibling = $this.closest('div.row');
@@ -165,7 +165,7 @@ morpheus.SortDialog.prototype = {
 				.push('<div style="border-bottom:1px solid LightGrey;margin-bottom:20px;" class="row">');
 		html.push('<form class="form-horizontal" role="form">');
 		html.push('<div class="col-xs-8">');
-		html.push('<a name="add" href="#">Add sort level</a>');
+		html.push('<a data-name="add" href="#">Add sort level</a>');
 		html.push('</div>');
 		html.push('</form>');
 		html.push('</div>');
@@ -206,10 +206,10 @@ morpheus.SortDialog.prototype = {
 						+ '>Descending</label></div>');
 		html.push('</div>');
 		html.push('<div class="col-xs-1">');
-		html.push('<a name="delete" class="pull-right">Delete</a>');
+		html.push('<a data-name="delete" class="pull-right">Delete</a>');
 		html.push('</div>');
 		html.push('<div class="col-xs-8">');
-		html.push('<a name="add" href="#">Add sort level</a>');
+		html.push('<a data-name="add" href="#">Add sort level</a>');
 		html.push('</div>');
 		html.push('</form>');
 		html.push('</div>');

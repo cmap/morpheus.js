@@ -84,6 +84,12 @@ morpheus.SortKey.DESCENDING_COMPARATOR = function (a, b) {
 	if (bNaN) {
 		return -1;
 	}
+	if (a.toLowerCase) {
+		a = a.toLowerCase();
+	}
+	if (b.toLowerCase) {
+		b = b.toLowerCase();
+	}
 	return (a === b ? 0 : (a < b ? 1 : -1));
 };
 

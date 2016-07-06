@@ -1,5 +1,5 @@
-morpheus.HeatMapKeyListener = function(controller) {
-	var keydown = function(e) {
+morpheus.HeatMapKeyListener = function (controller) {
+	var keydown = function (e) {
 		var tagName = e.target.tagName;
 		if (tagName == 'INPUT' || tagName == 'SELECT' || tagName == 'TEXTAREA') {
 			return;
@@ -14,12 +14,12 @@ morpheus.HeatMapKeyListener = function(controller) {
 			if (active !== -1) {
 				found = true;
 				var selectionModel = active === 0 ? controller.getProject()
-						.getRowSelectionModel() : controller.getProject()
-						.getColumnSelectionModel();
+				.getRowSelectionModel() : controller.getProject()
+				.getColumnSelectionModel();
 				var count = active === 0 ? controller.getProject()
-						.getSortedFilteredDataset().getRowCount() : controller
-						.getProject().getSortedFilteredDataset()
-						.getColumnCount();
+				.getSortedFilteredDataset().getRowCount() : controller
+				.getProject().getSortedFilteredDataset()
+				.getColumnCount();
 				var indices = new morpheus.Set();
 				for (var i = 0; i < count; i++) {
 					indices.add(i);
@@ -51,7 +51,7 @@ morpheus.HeatMapKeyListener = function(controller) {
 			// } else {
 			var pos = controller.scrollTop();
 			controller.scrollTop(pos + controller.heatmap.getUnscaledHeight()
-					- 2);
+				- 2);
 			// }
 			found = true;
 		} else if (e.which === 33) { // page up
@@ -62,7 +62,7 @@ morpheus.HeatMapKeyListener = function(controller) {
 			// } else {
 			var pos = controller.scrollTop();
 			controller.scrollTop(pos - controller.heatmap.getUnscaledHeight()
-					+ 2);
+				+ 2);
 			// }
 			found = true;
 		} else if (e.which === 38) { // up arrow
@@ -75,7 +75,7 @@ morpheus.HeatMapKeyListener = function(controller) {
 		} else if (e.which === 40) {// down arrow
 			if (commandKey) { // to bottom
 				controller
-						.scrollTop(controller.heatmap.getPreferredSize().height);
+				.scrollTop(controller.heatmap.getPreferredSize().height);
 			} else {
 				controller.scrollTop(controller.scrollTop() + 8);
 			}
@@ -90,7 +90,7 @@ morpheus.HeatMapKeyListener = function(controller) {
 		} else if (e.which === 39) {// right arrow
 			if (commandKey) { // to right
 				controller
-						.scrollLeft(controller.heatmap.getPreferredSize().width);
+				.scrollLeft(controller.heatmap.getPreferredSize().width);
 			} else {
 				controller.scrollLeft(controller.scrollLeft() + 8);
 			}
@@ -99,24 +99,24 @@ morpheus.HeatMapKeyListener = function(controller) {
 			if (e.which === 83) {
 				if (shiftKey) {
 					morpheus.HeatMap.showTool(new morpheus.SaveDatasetTool(),
-							controller);
+						controller);
 				} else {
 					morpheus.HeatMap.showTool(new morpheus.SaveImageTool(),
-							controller);
+						controller);
 				}
 				found = true;
 			} else if (e.which === 79) {
 				morpheus.HeatMap.showTool(new morpheus.OpenFileTool(),
-						controller);
+					controller);
 				found = true;
 			} else if (e.which === 70) { // search columns or rows
 				controller.getToolbarElement().find(
-						e.shiftKey ? '[name=searchColumns]'
-								: '[name=searchRows]').focus();
+					e.shiftKey ? '[data-name=searchColumns]'
+						: '[data-name=searchRows]').focus();
 				found = true;
 			} else if (e.which === 88) { // ctrl-X
 				morpheus.HeatMap.showTool(new morpheus.NewHeatMapTool(),
-						controller);
+					controller);
 				found = true;
 			}
 		}
@@ -129,47 +129,47 @@ morpheus.HeatMapKeyListener = function(controller) {
 	};
 	var $keyelement = controller.$content;
 	$keyelement.on('keydown', keydown);
-	$keyelement.on('dragover.morpheus dragenter.morpheus', function(e) {
+	$keyelement.on('dragover.morpheus dragenter.morpheus', function (e) {
 		e.preventDefault();
 		e.stopPropagation();
 	}).on(
-			'drop.morpheus',
-			function(e) {
-				if (e.originalEvent.dataTransfer
-						&& e.originalEvent.dataTransfer.files.length) {
-					e.preventDefault();
-					e.stopPropagation();
-					var files = e.originalEvent.dataTransfer.files;
-					morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
-						file : files[0]
-					}), controller);
-				}
-			});
+		'drop.morpheus',
+		function (e) {
+			if (e.originalEvent.dataTransfer
+				&& e.originalEvent.dataTransfer.files.length) {
+				e.preventDefault();
+				e.stopPropagation();
+				var files = e.originalEvent.dataTransfer.files;
+				morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
+					file: files[0]
+				}), controller);
+			}
+		});
 	$keyelement.on('paste.morpheus',
-			function(e) {
-				var tagName = e.target.tagName;
-				if (tagName == 'INPUT' || tagName == 'SELECT'
-						|| tagName == 'TEXTAREA') {
-					return;
-				}
-				var text = e.originalEvent.clipboardData.getData('text/plain');
-				if (text != null && text.length > 0) {
-					e.preventDefault();
-					e.stopPropagation();
-					var blob = new Blob([ text ]);
-					var url = window.URL.createObjectURL(blob);
-					morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
-						file : url
-					}), controller);
-				}
-			});
-	$keyelement.on('mousewheel', function(e) {
+		function (e) {
+			var tagName = e.target.tagName;
+			if (tagName == 'INPUT' || tagName == 'SELECT'
+				|| tagName == 'TEXTAREA') {
+				return;
+			}
+			var text = e.originalEvent.clipboardData.getData('text/plain');
+			if (text != null && text.length > 0) {
+				e.preventDefault();
+				e.stopPropagation();
+				var blob = new Blob([text]);
+				var url = window.URL.createObjectURL(blob);
+				morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
+					file: url
+				}), controller);
+			}
+		});
+	$keyelement.on('mousewheel', function (e) {
 		var scrolly = e.deltaY * e.deltaFactor;
 		var scrollx = e.deltaX * e.deltaFactor;
 		if (e.altKey) {
 			controller.zoom(scrolly > 0, {
-				rows : true,
-				columns : true
+				rows: true,
+				columns: true
 			});
 		} else {
 			if (scrolly !== 0) {

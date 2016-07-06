@@ -251,14 +251,14 @@ morpheus.HeatMap = function (options) {
 			morpheus.HelpMenu.ADDED = true;
 			var $a = $('<a title="Produced with Morpheus" style="font-size:85%;margin-right:2px;margin-top:2px;" href="'
 				+ morpheus.Util.URL
-				+ '" target="_blank"><img style="width:16px;height:16px;" src="'
+				+ '" target="_blank"><img alt="Morpheus Icon" style="width:16px;height:16px;" src="'
 				+ morpheus.Util.URL + '/images/icon.svg"></a>');
 			$a.tooltip({
 				placement: 'auto'
 			});
 			// var $img = $a.find('img');
 
-			var $right = $('<div style="margin-right:2px;" class="pull-right"></div>');
+			var $right = $('<li style="margin-right:2px;" class="pull-right"></li>');
 			$a.appendTo($right);
 			new morpheus.HelpMenu().$el.appendTo($right);
 			$right.appendTo(this.tabManager.$nav);
@@ -435,6 +435,7 @@ morpheus.HeatMap = function (options) {
 							.createColorSupplier(option.colorScheme));
 
 					} else {
+
 						try {
 							_this
 							.autoDisplay({
@@ -785,7 +786,7 @@ morpheus.HeatMap.prototype = {
 			};
 		}
 
-		if (colorScheme && options.filename) {
+		if (colorScheme && options.filename && this.heatmap.getColorScheme()) {
 			this.heatmap.getColorScheme().setCurrentValue(options.filename);
 			this.heatmap.getColorScheme().setColorSupplierForCurrentValue(
 				morpheus.HeatMapColorScheme
@@ -1594,6 +1595,7 @@ morpheus.HeatMap.prototype = {
 			}
 
 			var colorScheme = this.autoDisplay({
+				filename: morpheus.Util.getBaseFileName(morpheus.Util.getFileName(this.options.dataset)),
 				extension: ext
 			});
 			if (colorScheme == null) {
@@ -2756,7 +2758,6 @@ morpheus.HeatMap.prototype = {
 					this.columnTrackHeaders[i].setPrefWidth(width);
 				}
 				// set width for all tracks
-
 			}
 		}
 		this.revalidate();

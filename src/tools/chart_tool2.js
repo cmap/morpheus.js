@@ -11,8 +11,8 @@ morpheus.ChartTool2 = function (chartOptions) {
 	var project = this.project;
 	this.$el = $('<div class="container-fluid">'
 		+ '<div class="row">'
-		+ '<div name="configPane" class="col-xs-2"></div>'
-		+ '<div class="col-xs-10"><div style="position:relative;" name="chartDiv"></div></div>'
+		+ '<div data-name="configPane" class="col-xs-2"></div>'
+		+ '<div class="col-xs-10"><div style="position:relative;" data-name="chartDiv"></div></div>'
 		+ '</div></div>');
 
 	var formBuilder = new morpheus.FormBuilder({
@@ -204,9 +204,9 @@ morpheus.ChartTool2 = function (chartOptions) {
 	project.getColumnSelectionModel().on('selectionChanged.chart', draw);
 	project.getRowSelectionModel().on('selectionChanged.chart', draw);
 	project.on('trackChanged.chart', trackChanged);
-	this.$chart = this.$el.find('[name=chartDiv]');
+	this.$chart = this.$el.find('[data-name=chartDiv]');
 	var $dialog = $('<div style="background:white;" title="Chart"></div>');
-	var $configPane = this.$el.find('[name=configPane]');
+	var $configPane = this.$el.find('[data-name=configPane]');
 	formBuilder.$form.appendTo($configPane);
 	this.$el.appendTo($dialog);
 	$dialog.dialog({

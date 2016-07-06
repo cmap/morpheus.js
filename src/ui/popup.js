@@ -4,7 +4,7 @@ morpheus.Popup.init = function () {
 	if (morpheus.Popup.initted) {
 		return;
 	}
-	var client = new Clipboard('a[name=Copy]', {
+	var client = new Clipboard('a[data-name=Copy]', {
 		text: function (trigger) {
 			var event = {
 				clipboardData: {
@@ -77,7 +77,7 @@ morpheus.Popup.showPopup = function (menuItems, position, component, callback) {
 			if (item.disabled) {
 				html.push('class="disabled"');
 			}
-			html.push('><a name="' + item.name
+			html.push('><a data=name="' + item.name
 				+ '" data-type="popup-item" tabindex="-1" href="#">');
 			if (item.checked) {
 				html
@@ -120,8 +120,6 @@ morpheus.Popup.showPopup = function (menuItems, position, component, callback) {
 		top: top
 	});
 
-	// var copyElements = morpheus.Popup.$popupDiv.find('a[name=Copy]');
-	// morpheus.Popup.client.clip(copyElements);
 	morpheus.Popup.$popupDiv.show();
 
 	$body.off('mousedown', morpheus.Popup.hidePopupMenu);

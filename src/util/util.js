@@ -151,7 +151,7 @@ morpheus.Util.getQueryParams = function (s) {
 	var keyValuePairs = search.split('&');
 	for (var i = 0; i < keyValuePairs.length; i++) {
 		var pair = keyValuePairs[i].split('=');
-		if (pair[1] !== '') {
+		if (pair[1] != null && pair[1] !== '') {
 			var array = params[pair[0]];
 			if (array === undefined) {
 				array = [];
@@ -194,24 +194,26 @@ morpheus.Util.forceDelete = function (obj) {
 	}
 };
 morpheus.Util.getFileName = function (fileOrUrl) {
-	var name = fileOrUrl instanceof File ? fileOrUrl.name : fileOrUrl;
-	name = '' + name;
+	if (fileOrUrl instanceof File) {
+		return fileOrUrl.name;
+	}
+	var name = '' + fileOrUrl;
 	var slash = name.lastIndexOf('/');
 	if (slash !== -1 && slash < name.length - 1) {
 		// https://s3.amazonaws.com/data.clue.io/icv/dosval/BRD-K45711268_10_UM_24_H/pcl_cell.gct?AWSAccessKeyId=AKIAJZQISWLUKFS3VUKA&Expires=1455761050&Signature=HVle9MvXV3OGRZHOngdm2frqER8%3D
 		name = name.substring(slash + 1); // get stuff after slash
-		var question = name.indexOf('?');
-		if (question !== -1 && name.length > (question + 1)) {
-			name = name.substring(0, question);
-			var params = name.substring(question + 1);
-			var keyValuePairs = decodeURIComponent(params).split('&');
-			// check for parameters in name
-			for (var i = 0; i < keyValuePairs.length; i++) {
-				var pair = keyValuePairs[i].split('=');
-				if (pair[0] === 'file' || pair[0] === 'name') {
-					name = pair[1];
-					break;
-				}
+	}
+	var question = name.indexOf('?');
+	if (question !== -1) {
+		var params = name.substring(question + 1);
+		var keyValuePairs = decodeURIComponent(params).split('&');
+
+		// check for parameters in name
+		for (var i = 0; i < keyValuePairs.length; i++) {
+			var pair = keyValuePairs[i].split('=');
+			if (pair[0] === 'file' || pair[0] === 'name') {
+				name = pair[1];
+				break;
 			}
 		}
 	}
@@ -1227,6 +1229,7 @@ morpheus.Util.readLines = function (fileOrUrl) {
 		if (ext === 'xlsx') {
 			var oReq = new XMLHttpRequest();
 			oReq.open('GET', fileOrUrl, true);
+			$.ajaxPrefilter({url: fileOrUrl}, {}, oReq);
 			oReq.responseType = 'arraybuffer';
 			oReq.onload = function (oEvent) {
 				var arrayBuffer = oReq.response; // Note: not

@@ -31,9 +31,10 @@ morpheus.HeatMapColorSchemeLegend = function(controller, $keyContent) {
 		totalHeight += controller.options.$key.height();
 
 	}
-	var $edit = $('<div style="padding-left:4px; display:inline;"><a name="options" href="#">Edit</a></div>');
+	var $edit = $('<div style="padding-left:4px; display:inline;"><a data-name="options"' +
+		' href="#">Edit</a></div>');
 
-	$edit.find('[name=options]').on('click', function(e) {
+	$edit.find('[data-name=options]').on('click', function(e) {
 		e.preventDefault();
 		controller.showOptions();
 		morpheus.Util.trackEvent({

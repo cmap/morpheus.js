@@ -23,9 +23,9 @@ morpheus.ShapeChooser = function(options) {
 		col : 'col-xs-2',
 		name : 'selected_shape',
 		type : 'custom',
-		value : '<div name="shape"></div>'
+		value : '<div data-name="shape"></div>'
 	});
-	shapeField.$el.appendTo(formBuilder.find('shape'));
+	shapeField.$el.appendTo(formBuilder.$form.find('[data-name=shape]'));
 
 	var $valuePicker = formBuilder.$form.find('[name=valuePicker]');
 	var selectedVal = $valuePicker.val();

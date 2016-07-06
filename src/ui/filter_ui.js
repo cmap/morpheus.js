@@ -16,7 +16,7 @@ morpheus.FilterUI = function(project, isColumns) {
 		e.preventDefault();
 	});
 
-	$div.on('click', '[name=add]', function(e) {
+	$div.on('click', '[data-name=add]', function(e) {
 		var $this = $(this);
 		var $row = $this.closest('.morpheus-entry');
 		// add after
@@ -27,7 +27,7 @@ morpheus.FilterUI = function(project, isColumns) {
 		$row.after(_this.add(newFilter));
 		e.preventDefault();
 	});
-	$div.on('click', '[name=delete]', function(e) {
+	$div.on('click', '[data-name=delete]', function(e) {
 		var $this = $(this);
 		var $row = $this.closest('.morpheus-entry');
 		var index = $row.index() - 1;
@@ -91,10 +91,10 @@ morpheus.FilterUI.rangeFilter = function(project, name, isColumns, $ui, filter) 
 			.push('<label>>= </label> <input style="max-width:200px;" class="form-control input-sm" name="min" type="text" />');
 	html
 			.push('<label> and <= </label> <input style="max-width:200px;" class="form-control input-sm" name="max" type="text" />');
-	html.push('<br /><a name="switch" href="#">Switch to top filter</a>');
+	html.push('<br /><a data-name="switch" href="#">Switch to top filter</a>');
 	var $form = $(html.join(''));
 	$form.appendTo($ui);
-	$ui.find('[name=switch]')
+	$ui.find('[data-name=switch]')
 			.on(
 					'click',
 					function(e) {
@@ -154,12 +154,12 @@ morpheus.FilterUI.topFilter = function(project, name, isColumns, $ui, filter) {
 			.push('<select style="width:auto;" class="form-control input-sm" name="direction"><option value="Top">Top</option><option value="Bottom">Bottom</option><option value="TopBottom">Top/Bottom</option></select>');
 	html
 			.push(' <label>N </label> <input style="max-width:200px;" class="form-control input-sm" name="n" type="text" />');
-	html.push('<br /><a name="switch" href="#">Switch to range filter</a>');
+	html.push('<br /><a data-name="switch" href="#">Switch to range filter</a>');
 	var $form = $(html.join(''));
 	$form.appendTo($ui);
 	var $n = $ui.find('[name=n]');
 	var $direction = $ui.find('[name=direction]');
-	$ui.find('[name=switch]')
+	$ui.find('[data-name=switch]')
 			.on(
 					'click',
 					function(e) {
@@ -244,11 +244,11 @@ morpheus.FilterUI.prototype = {
 			// add filter to end
 			var $add = $(this.add(filter));
 			$add.appendTo(this.$div);
-			$ui = $add.find('[name=ui]');
+			$ui = $add.find('[data-name=ui]');
 		} else { // existing $div
 			var $row = $div.closest('.morpheus-entry');
 			index = $row.index() - 1;
-			$ui = $row.find('[name=ui]');
+			$ui = $row.find('[data-name=ui]');
 		}
 
 		$ui.empty();
@@ -316,7 +316,8 @@ morpheus.FilterUI.prototype = {
 		html.push('</div>');
 		html.push('<div class="row">');
 		html
-				.push('<div class="col-xs-8"><a class="btn btn-default btn-xs" role="button" name="add" href="#">Add</a></div>');
+				.push('<div class="col-xs-8"><a class="btn btn-default btn-xs" role="button"' +
+					' data-name="add" href="#">Add</a></div>');
 
 		html.push('</div>');
 		html.push('</div>');
@@ -353,7 +354,7 @@ morpheus.FilterUI.prototype = {
 		html.push('</div>');
 		html.push('<div class="row">');
 		// filter ui
-		html.push('<div name="ui" class="col-xs-12"></div>');
+		html.push('<div data-name="ui" class="col-xs-12"></div>');
 		html.push('</div>');
 
 		// end filter ui
@@ -363,11 +364,10 @@ morpheus.FilterUI.prototype = {
 				.push('<div style="padding-bottom:6px; border-bottom:1px solid #eee" class="row">');
 
 		html.push('<div class="col-xs-11">');
-		// html
-		// .push('<a class="btn btn-default btn-xs" role="button" name="add"
-		// href="#">Add</a>');
+
 		html
-				.push('<a class="btn btn-default btn-xs" role="button" name="delete" href="#">Remove</a>');
+				.push('<a class="btn btn-default btn-xs" role="button" data-name="delete"' +
+					' href="#">Remove</a>');
 		html.push('</div>');
 
 		html.push('</div>'); // row
