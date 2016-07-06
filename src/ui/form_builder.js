@@ -625,9 +625,11 @@ morpheus.FormBuilder.prototype = {
 							multiselect: isMultiple
 						};
 						Dropbox.choose(options);
+						that.$form.find('[name=' + name + '_picker]').selectpicker('val', '');
 					} else if ('My Computer' === val) {
 						that.$form.find('[name=' + name + '_file]')
 						.click();
+						that.$form.find('[name=' + name + '_picker]').selectpicker('val', '');
 					}
 					that.$form.find('[name=' + name + '_text]')
 					.css('display',
@@ -652,6 +654,7 @@ morpheus.FormBuilder.prototype = {
 			});
 			// browse file selected
 			that.$form.on('change', '[name=' + name + '_file]', function (evt) {
+
 				var files = evt.target.files; // FileList object
 				that.setValue(name, isMultiple ? files : files[0]);
 				that.trigger('change', {
