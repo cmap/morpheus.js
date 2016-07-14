@@ -220,11 +220,12 @@ morpheus.TabManager.prototype = {
 			this.activeTabObject = options.object;
 			$panel.focus();
 		}
-		this.adding = false;
+
 		if (this.options.autohideTabBar) {
 			this.$nav.css('display', this.idToTabObject.size() > 1 ? ''
 				: 'none');
 		}
+		this.adding = false;
 		return {
 			$panel: $panel,
 			id: '#' + id
