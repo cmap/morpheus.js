@@ -251,7 +251,8 @@ morpheus.HeatMap = function (options) {
 		// -1) {
 		if (!morpheus.HelpMenu.ADDED) { // only show once per page
 			morpheus.HelpMenu.ADDED = true;
-			var $a = $('<a title="Produced with Morpheus" style="font-size:85%;margin-right:2px;margin-top:2px;" href="'
+			var $a = $('<a title="Produced with Morpheus"' +
+				' style="display:inline;font-size:85%;margin-right:2px;margin-top:2px;" href="'
 				+ morpheus.Util.URL
 				+ '" target="_blank"><img alt="Morpheus Icon" style="width:16px;height:16px;" src="'
 				+ morpheus.Util.URL + '/images/icon.svg"></a>');
