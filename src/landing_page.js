@@ -108,11 +108,12 @@ morpheus.LandingPage.prototype = {
 		var optionsArray = _.isArray(openOptions) ? openOptions : [openOptions];
 		var _this = this;
 		optionsArray.forEach(function (options) {
-			if (_this.heatmap == null) {
+			if (_this.heatmap == null) { // first tab
 				options.landingPage = _this;
 				options.el = _this.pageOptions.el;
 
-			} else {
+			} else { // more tabs
+				options.focus = false;
 				options.inheritFromParent = false;
 				options.parent = _this.heatmap;
 			}
