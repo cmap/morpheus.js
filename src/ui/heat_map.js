@@ -180,6 +180,8 @@ morpheus.HeatMap = function (options) {
 			width: undefined, // set the available width for the
 			// heat map. If not
 			// set, it will be determined automatically
+			/** Whether to focus this tab */
+			focus: true,
 			inheritFromParent: true,
 			inheritFromParentOptions: {
 				transpose: false
@@ -309,7 +311,7 @@ morpheus.HeatMap = function (options) {
 		rename: true,
 		title: this.options.name,
 		object: this,
-		focus: true
+		focus: this.options.focus
 	});
 	if (options.$loadingImage) {
 		options.$loadingImage.appendTo(this.$content);
@@ -388,7 +390,9 @@ morpheus.HeatMap = function (options) {
 			options.loadedCallback(_this);
 		}
 
-		_this.tabManager.setActiveTab(tab.id);
+		if (_this.options.focus) {
+			_this.tabManager.setActiveTab(tab.id);
+		}
 		_this.$el.trigger('heatMapLoaded', _this);
 	};
 	if (morpheus.Util.isArray(options.dataset)) {
