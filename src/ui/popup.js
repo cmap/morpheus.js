@@ -77,7 +77,7 @@ morpheus.Popup.showPopup = function (menuItems, position, component, callback) {
 			if (item.disabled) {
 				html.push('class="disabled"');
 			}
-			html.push('><a data=name="' + item.name
+			html.push('><a data-name="' + item.name
 				+ '" data-type="popup-item" tabindex="-1" href="#">');
 			if (item.checked) {
 				html
