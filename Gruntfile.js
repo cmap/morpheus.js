@@ -66,7 +66,7 @@ module.exports = function (grunt) {
 					'js/hopscotch.min.js', 'js/typed.min.js',
 					'js/jquery.event.drag-2.2.js',
 					'js/clipboard.min.js', 'js/slick.min.js',
-					'js/js.cookie.js', 'js/d3.layout.cloud.js']
+					'js/js.cookie.js', 'js/d3.layout.cloud.js', 'js/papaparse.min.js']
 			},
 			morpheus: {
 				nonull: true,

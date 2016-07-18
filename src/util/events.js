@@ -1,19 +1,19 @@
 // code taken from KineticJS
-morpheus.Events = function() {
+morpheus.Events = function () {
 };
 morpheus.Events.prototype = {
 	/**
 	 * Pass in a string of events delimmited by a space to bind multiple events
 	 * at once such as 'mousedown mouseup mousemove'. Include a namespace to
 	 * bind an event by name such as 'click.foobar'.
-	 * 
+	 *
 	 * @param {String}
 	 *            evtStr e.g. 'click', 'mousedown touchstart', 'mousedown.foo
 	 *            touchstart.foo'
 	 * @param {Function}
 	 *            handler The handler function is passed an event object
 	 */
-	on : function(evtStr, handler) {
+	on: function (evtStr, handler) {
 		if (!handler) {
 			throw Error('Handler not specified');
 		}
@@ -35,19 +35,28 @@ morpheus.Events.prototype = {
 				this.eventListeners[baseEvent] = [];
 			}
 			this.eventListeners[baseEvent].push({
-				name : name,
-				handler : handler
+				name: name,
+				handler: handler
 			});
 		}
 		return this;
 	},
+	getListeners: function () {
+		if (!this.eventListeners) {
+			this.eventListeners = {};
+		}
+		return this.eventListeners;
+	},
+	setListeners: function (eventListeners) {
+		this.eventListeners = eventListeners;
+	},
 	/**
 	 * Fire an event.
-	 * 
+	 *
 	 * @param eventType
 	 * @param evt
 	 */
-	trigger : function(eventType, evt) {
+	trigger: function (eventType, evt) {
 		if (!this.eventListeners) {
 			this.eventListeners = {};
 		}
@@ -62,7 +71,7 @@ morpheus.Events.prototype = {
 		if (events) {
 			var len = events.length;
 			for (var i = 0; i < len; i++) {
-				events[i].handler.apply(this, [ evt ]);
+				events[i].handler.apply(this, [evt]);
 			}
 		}
 		return this;
@@ -73,11 +82,11 @@ morpheus.Events.prototype = {
 	 * mouseup mousemove'. include a namespace to remove an event binding by
 	 * name such as 'click.foobar'. If you only give a name like '.foobar', all
 	 * events in that namespace will be removed.
-	 * 
+	 *
 	 * @param {String}
 	 *            evtStr e.g. 'click', 'mousedown.foo touchstart', '.foobar'
 	 */
-	off : function(evtStr, handler) {
+	off: function (evtStr, handler) {
 		if (!this.eventListeners) {
 			this.eventListeners = {};
 		}
@@ -105,14 +114,14 @@ morpheus.Events.prototype = {
 		}
 		return this;
 	},
-	_off : function(type, name, handler) {
+	_off: function (type, name, handler) {
 		var evtListeners = this.eventListeners[type], i, evtName;
 		for (i = 0; i < evtListeners.length; i++) {
 			evtName = evtListeners[i].name;
 			// check if an event name is not specified, or if one is specified,
 			// it matches the current event name
 			if ((!name || evtName === name)
-					&& (handler == null || handler == evtListeners[i].handler)) {
+				&& (handler == null || handler == evtListeners[i].handler)) {
 				evtListeners.splice(i, 1);
 				if (evtListeners.length === 0) {
 					delete this.eventListeners[type];
@@ -121,5 +130,5 @@ morpheus.Events.prototype = {
 				i--;
 			}
 		}
-	},
+	}
 };
