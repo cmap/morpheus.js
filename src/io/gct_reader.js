@@ -7,6 +7,16 @@ morpheus.GctReader.prototype = {
 		return 'gct';
 	},
 	read: function (fileOrUrl, callback) {
+		if (fileOrUrl instanceof File) {
+			this._readChunking(fileOrUrl, callback, false);
+		} else {
+			this._readChunking(fileOrUrl, callback, true);
+		}
+	},
+	_readChunking: function (fileOrUrl, callback, tryNoChunkIfError) {
+		var _this = this;
+		// Papa.LocalChunkSize = 10485760 * 10; // 100 MB
+		// Papa.RemoteChunkSize = 10485760 * 10; // 100 MB
 		var lineNumber = 0;
 		var version;
 		var numRowAnnotations = 1; // in addition to row id
@@ -155,7 +165,11 @@ morpheus.GctReader.prototype = {
 				callback(null, dataset);
 			},
 			error: function (err) {
-				callback(err);
+				if (tryNoChunkIfError) {
+					_this._readNoChunking(fileOrUrl, callback);
+				} else {
+					callback(err);
+				}
 			},
 			download: !(fileOrUrl instanceof File),
 			skipEmptyLines: false,
@@ -418,7 +432,7 @@ morpheus.GctReader.prototype = {
 		}
 
 	},
-	_read: function (fileOrUrl, callback) {
+	_readNoChunking: function (fileOrUrl, callback) {
 		var _this = this;
 		var name = morpheus.Util.getBaseFileName(morpheus.Util
 		.getFileName(fileOrUrl));
