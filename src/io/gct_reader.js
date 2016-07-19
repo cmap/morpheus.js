@@ -10,12 +10,7 @@ morpheus.GctReader.prototype = {
 		if (fileOrUrl instanceof File) {
 			this._readChunking(fileOrUrl, callback, false);
 		} else {
-			try {
-				this._readChunking(fileOrUrl, callback, true);
-			} catch (x) {
-				this._readNoChunking(fileOrUrl, callback, false);
-			}
-
+			this._readNoChunking(fileOrUrl, callback);
 		}
 	},
 	_readChunking: function (fileOrUrl, callback, tryNoChunkIfError) {
