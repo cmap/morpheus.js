@@ -100,7 +100,7 @@ morpheus.GctReader.prototype = {
 						var index = j + numRowAnnotations + 1;
 						var columnName = index < columnNamesArray.length ? columnNamesArray[index]
 							: null;
-						columnMetadata[0].push(String(columnName));
+						columnMetadata[0].push(morpheus.Util.copyString(columnName));
 					}
 
 					for (var j = 0; j < numRowAnnotations; j++) {
@@ -119,7 +119,7 @@ morpheus.GctReader.prototype = {
 						columnMetadata.push(v);
 						columnMetadataNames.push(metadataName);
 						for (var j = 0; j < ncols; j++) {
-							v.push(String(tokens[j + dataColumnStart]));
+							v.push(morpheus.Util.copyString(tokens[j + dataColumnStart]));
 						}
 					} else { // data lines
 						if (tokens[0] !== '') {
@@ -130,7 +130,7 @@ morpheus.GctReader.prototype = {
 							for (var rowAnnotationIndex = 0; rowAnnotationIndex <= numRowAnnotations; rowAnnotationIndex++) {
 								var rowMetadataValue = tokens[rowAnnotationIndex];
 								rowMetadata[rowAnnotationIndex].push(
-									String(rowMetadataValue));
+									morpheus.Util.copyString(rowMetadataValue));
 
 							}
 
@@ -256,7 +256,7 @@ morpheus.GctReader.prototype = {
 				var index = j + numRowAnnotations + 1;
 				var columnName = index < columnNamesArray.length ? columnNamesArray[index]
 					: null;
-				columnMetadata[0].push(String(columnName));
+				columnMetadata[0].push(morpheus.Util.copyString(columnName));
 			}
 
 			for (var j = 0; j < numRowAnnotations; j++) {
@@ -278,7 +278,7 @@ morpheus.GctReader.prototype = {
 					columnMetadata.push(v);
 					columnMetadataNames.push(metadataName);
 					for (var j = 0; j < ncols; j++) {
-						v.push(String(tokens[j + dataColumnStart]));
+						v.push(morpheus.Util.copyString(tokens[j + dataColumnStart]));
 					}
 				}
 			}
@@ -296,7 +296,7 @@ morpheus.GctReader.prototype = {
 					for (var rowAnnotationIndex = 0; rowAnnotationIndex < numRowAnnotationsPlusOne; rowAnnotationIndex++) {
 						var rowMetadataValue = tokens[rowAnnotationIndex];
 						rowMetadata[rowAnnotationIndex].push(
-							String(rowMetadataValue));
+							morpheus.Util.copyString(rowMetadataValue));
 
 					}
 
@@ -339,13 +339,13 @@ morpheus.GctReader.prototype = {
 					var index = j + numRowAnnotations + 1;
 					var columnName = index < columnNamesArray.length ? columnNamesArray[index]
 						: null;
-					columnIds.setValue(j, String(columnName));
+					columnIds.setValue(j, morpheus.Util.copyString(columnName));
 				}
 
 			} else {
 				for (var j = 0; j < ncols; j++) {
 					var columnName = columnNamesArray[j + numRowAnnotations + 1];
-					columnIds.setValue(j, String(columnName));
+					columnIds.setValue(j, morpheus.Util.copyString(columnName));
 				}
 			}
 
@@ -373,7 +373,7 @@ morpheus.GctReader.prototype = {
 					var metadataName = tokens[0];
 					var v = dataset.getColumnMetadata().add(metadataName);
 					for (var j = 0; j < ncols; j++) {
-						v.setValue(j, String(tokens[j + dataColumnStart]));
+						v.setValue(j, morpheus.Util.copyString(tokens[j + dataColumnStart]));
 					}
 				}
 			}
@@ -388,19 +388,19 @@ morpheus.GctReader.prototype = {
 				}
 				var tokens = s.split(tab);
 				if (version === 2) {
-					rowAnnotationVectors[0].setValue(rowIndex, String(tokens[0]));
+					rowAnnotationVectors[0].setValue(rowIndex, morpheus.Util.copyString(tokens[0]));
 					var desc = tokens[1];
 					if (!nonEmptyDescriptionFound) {
 						nonEmptyDescriptionFound = desc !== '';
 					}
-					rowAnnotationVectors[1].setValue(rowIndex, String(desc));
+					rowAnnotationVectors[1].setValue(rowIndex, morpheus.Util.copyString(desc));
 				} else {
 					// we iterate to numRowAnnotations + 1 to include id row
 					// metadata field
 					for (var rowAnnotationIndex = 0; rowAnnotationIndex < numRowAnnotationsPlusOne; rowAnnotationIndex++) {
 						var rowMetadataValue = tokens[rowAnnotationIndex];
 						rowAnnotationVectors[rowAnnotationIndex].setValue(rowIndex,
-							String(rowMetadataValue));
+							morpheus.Util.copyString(rowMetadataValue));
 
 					}
 				}

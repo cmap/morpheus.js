@@ -142,6 +142,13 @@ morpheus.Util.getWindowSearchObject = function () {
 	return _.extend(hashObject, searchObject);
 };
 
+morpheus.Util.copyString = function (s) {
+	var copy = '';
+	for (var i = 0, end = s.length; i < end; i++) {
+		copy += s[i];
+	}
+	return copy;
+};
 morpheus.Util.getQueryParams = function (s) {
 	var params = {};
 	if (!s) {
@@ -198,11 +205,7 @@ morpheus.Util.getFileName = function (fileOrUrl) {
 		return fileOrUrl.name;
 	}
 	var name = '' + fileOrUrl;
-	var slash = name.lastIndexOf('/');
-	if (slash !== -1 && slash < name.length - 1) {
-		// https://s3.amazonaws.com/data.clue.io/icv/dosval/BRD-K45711268_10_UM_24_H/pcl_cell.gct?AWSAccessKeyId=AKIAJZQISWLUKFS3VUKA&Expires=1455761050&Signature=HVle9MvXV3OGRZHOngdm2frqER8%3D
-		name = name.substring(slash + 1); // get stuff after slash
-	}
+
 	var question = name.indexOf('?');
 	if (question !== -1) {
 		var params = name.substring(question + 1);
@@ -215,6 +218,12 @@ morpheus.Util.getFileName = function (fileOrUrl) {
 				name = pair[1];
 				break;
 			}
+		}
+	} else {
+		var slash = name.lastIndexOf('/');
+		if (slash !== -1 && slash < name.length - 1) {
+			// https://s3.amazonaws.com/data.clue.io/icv/dosval/BRD-K45711268_10_UM_24_H/pcl_cell.gct?AWSAccessKeyId=AKIAJZQISWLUKFS3VUKA&Expires=1455761050&Signature=HVle9MvXV3OGRZHOngdm2frqER8%3D
+			name = name.substring(slash + 1); // get stuff after slash
 		}
 	}
 	return name;
