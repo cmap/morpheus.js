@@ -76,6 +76,9 @@ morpheus.GctReader.prototype = {
 					dataColumnStart = numRowAnnotations + 1;
 				} else if (lineNumber === 2) {
 					columnNamesArray = result.data[0];
+					for (var i = 0; i < columnNamesArray.length; i++) {
+						columnNamesArray[i] = morpheus.Util.copyString(columnNamesArray[i]);
+					}
 					if (ncols === -1) {
 						ncols = columnNamesArray.length - numRowAnnotations - 1;
 					}
@@ -114,7 +117,7 @@ morpheus.GctReader.prototype = {
 				} else { // lines >=3
 					var tokens = result.data[0];
 					if (lineNumber < dataMatrixLineNumberStart) {
-						var metadataName = tokens[0];
+						var metadataName = morpheus.Util.copyString(tokens[0]);
 						var v = [];
 						columnMetadata.push(v);
 						columnMetadataNames.push(metadataName);
