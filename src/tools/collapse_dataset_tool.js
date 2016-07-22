@@ -57,13 +57,13 @@ morpheus.CollapseDatasetTool.prototype = {
 		var dataset = project.getFullDataset();
 		var rows = options.input.collapse == 'Rows';
 		if (!rows) {
-			dataset = morpheus.DatasetUtil.transposedView(dataset);
+			dataset = new morpheus.TransposedDatasetView(dataset);
 		}
 		var allFields = morpheus.MetadataUtil.getMetadataNames(dataset
 		.getRowMetadata());
 		dataset = morpheus.CollapseDataset(dataset, collapseToFields, f, true);
 		if (!rows) {
-			dataset = dataset.getDataset();
+			dataset = new morpheus.TransposedDatasetView(dataset);
 		}
 		var set = new morpheus.Map();
 		_.each(allFields, function (field) {

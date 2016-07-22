@@ -168,9 +168,19 @@ morpheus.HeatMapElementCanvas.prototype = {
 		var right = morpheus.Positions.getRight(clip, columnPositions);
 		var top = morpheus.Positions.getTop(clip, rowPositions);
 		var bottom = morpheus.Positions.getBottom(clip, rowPositions);
-		context.translate(-clip.x, -clip.y);
-		this._draw({left: left, right: right, top: top, bottom: bottom, context: context});
-		context.translate(clip.x, clip.y);
+		if (this.dataset.getRowCount() === 0 || this.dataset.getColumnCount() === 0) {
+			return context.fillText("No data", 0, 0);
+		} else {
+			context.translate(-clip.x, -clip.y);
+			this._draw({
+				left: left,
+				right: right,
+				top: top,
+				bottom: bottom,
+				context: context
+			});
+			context.translate(clip.x, clip.y);
+		}
 
 	},
 	_draw: function (options) {
@@ -180,6 +190,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 		var bottom = options.bottom;
 		var context = options.context;
 		var dataset = this.dataset;
+
 		var columnPositions = this.columnPositions;
 		var rowPositions = this.rowPositions;
 
