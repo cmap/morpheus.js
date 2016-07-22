@@ -52,8 +52,8 @@ morpheus.HeatMapElementCanvas.prototype = {
 			+ this.rowPositions
 			.getItemSize(this.rowPositions.getLength() - 1));
 		return {
-			width: w,
-			height: h
+			width: Math.max(12, w),
+			height: Math.max(12, h)
 		};
 	},
 	prePaint: function (clip, context) {
@@ -169,7 +169,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 		var top = morpheus.Positions.getTop(clip, rowPositions);
 		var bottom = morpheus.Positions.getBottom(clip, rowPositions);
 		if (this.dataset.getRowCount() === 0 || this.dataset.getColumnCount() === 0) {
-			return context.fillText("No data", 0, 0);
+			return context.fillText('No data', 0, 6);
 		} else {
 			context.translate(-clip.x, -clip.y);
 			this._draw({

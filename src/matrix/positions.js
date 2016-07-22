@@ -1,16 +1,16 @@
-morpheus.Positions = function() {
+morpheus.Positions = function () {
 	this.spaces = undefined;
-	this.defaultPositionFunction = function(index) {
+	this.defaultPositionFunction = function (index) {
 		return (this.size * index);
 	};
-	this.squishedPositionFunction = function(index) {
+	this.squishedPositionFunction = function (index) {
 		return this.positions[index];
 	};
 	this.positionFunction = this.defaultPositionFunction;
 	this.squishedIndices = {};
 	this.isSquished = false;
 };
-morpheus.Positions.getBottom = function(rect, rowPositions) {
+morpheus.Positions.getBottom = function (rect, rowPositions) {
 	var bottom = rowPositions.getLength();
 	if (rect != null) {
 		bottom = 1 + rowPositions.getIndex(rect.y + rect.height, false);
@@ -19,7 +19,7 @@ morpheus.Positions.getBottom = function(rect, rowPositions) {
 	}
 	return bottom;
 };
-morpheus.Positions.getTop = function(rect, rowPositions) {
+morpheus.Positions.getTop = function (rect, rowPositions) {
 	var top = 0;
 	if (rect != null) {
 		top = rowPositions.getIndex(rect.y, false) - 1;
@@ -28,7 +28,7 @@ morpheus.Positions.getTop = function(rect, rowPositions) {
 	}
 	return top;
 };
-morpheus.Positions.getLeft = function(rect, columnPositions) {
+morpheus.Positions.getLeft = function (rect, columnPositions) {
 	var left = 0;
 	if (rect != null) {
 		left = columnPositions.getIndex(rect.x, false) - 1;
@@ -37,7 +37,7 @@ morpheus.Positions.getLeft = function(rect, columnPositions) {
 	}
 	return left;
 };
-morpheus.Positions.getRight = function(rect, columnPositions) {
+morpheus.Positions.getRight = function (rect, columnPositions) {
 	var right = columnPositions.getLength();
 	if (rect != null) {
 		right = 1 + columnPositions.getIndex(rect.x + rect.width, false);
@@ -46,11 +46,11 @@ morpheus.Positions.getRight = function(rect, columnPositions) {
 	return right;
 };
 morpheus.Positions.prototype = {
-	length : 0,
-	size : 13,
-	squishFactor : 0.1,
-	compress : true,
-	copy : function() {
+	length: 0,
+	size: 13,
+	squishFactor: 0.1,
+	compress: true,
+	copy: function () {
 		var copy = new morpheus.Positions();
 		if (this.spaces) {
 			copy.spaces = this.spaces.slice();
@@ -66,40 +66,43 @@ morpheus.Positions.prototype = {
 		}
 		return copy;
 	},
-	getIndex : function(position, exact) {
+	getIndex: function (position, exact) {
+		if (this.getLength() === 0) {
+			return -1;
+		}
 		if (exact) {
 			return this.binaryExactSearch(position);
 		} else {
 			return this.binaryInExactSearch(position);
 		}
 	},
-	getLength : function() {
+	getLength: function () {
 		return this.length;
 	},
-	getPosition : function(index) {
+	getPosition: function (index) {
 		return this.positionFunction(index)
-				+ (this.spaces !== undefined ? this.spaces[index] : 0);
+			+ (this.spaces !== undefined ? this.spaces[index] : 0);
 	},
-	getItemSize : function(index) {
+	getItemSize: function (index) {
 		return this.squishedIndices[index] === true ? this.size
-				* this.squishFactor : this.size;
+		* this.squishFactor : this.size;
 	},
-	getSize : function() {
+	getSize: function () {
 		return this.size;
 	},
-	setSpaces : function(spaces) {
+	setSpaces: function (spaces) {
 		this.spaces = spaces;
 	},
-	setLength : function(length) {
+	setLength: function (length) {
 		this.length = length;
 	},
-	setSize : function(size) {
+	setSize: function (size) {
 		this.size = size;
 		if (this.isSquished) {
 			this.setSquishedIndices(this.squishedIndices);
 		}
 	},
-	setSquishedIndices : function(squishedIndices) {
+	setSquishedIndices: function (squishedIndices) {
 		if (squishedIndices != null) {
 			var compress = this.compress;
 			this.squishedIndices = squishedIndices;
@@ -130,7 +133,7 @@ morpheus.Positions.prototype = {
 			this.positionFunction = this.defaultPositionFunction;
 		}
 	},
-	setSquishFactor : function(f) {
+	setSquishFactor: function (f) {
 		if (this.squishFactor !== f) {
 			this.squishFactor = f;
 			if (this.isSquished) {
@@ -138,10 +141,10 @@ morpheus.Positions.prototype = {
 			}
 		}
 	},
-	getSquishFactor : function() {
+	getSquishFactor: function () {
 		return this.squishFactor;
 	},
-	binaryExactSearch : function(position) {
+	binaryExactSearch: function (position) {
 		var low = 0;
 		var high = this.length - 1;
 		while (low <= high) {
@@ -163,7 +166,7 @@ morpheus.Positions.prototype = {
 		return -1;
 		// key not found
 	},
-	binaryInExactSearch : function(position) {
+	binaryInExactSearch: function (position) {
 		var low = 0;
 		var high = this.getLength() - 1;
 		var maxIndex = this.getLength() - 1;
@@ -175,7 +178,7 @@ morpheus.Positions.prototype = {
 			var midVal = this.getPosition(mid);
 			var size = this.getItemSize(mid);
 			var nextStart = maxIndex === mid ? midVal + size : this
-					.getPosition(mid + 1);
+			.getPosition(mid + 1);
 			if (midVal <= position && position < nextStart) {
 				return mid;
 			}
