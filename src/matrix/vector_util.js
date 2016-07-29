@@ -39,6 +39,26 @@ morpheus.VectorUtil.createValueToCountMap = function (vector) {
 	}
 	return map;
 };
+
+morpheus.VectorUtil.createValuesToCountMap = function (vectors) {
+	var map = new morpheus.Map();
+	var nvectors = vectors.length;
+	if (vectors[0] == null) {
+		throw 'no vectors found';
+	}
+	for (var i = 0, nitems = vectors[0].size(); i < nitems; i++) {
+		var array = [];
+		for (var j = 0; j < nvectors; j++) {
+			var vector = vectors[j];
+			var val = vector.getValue(i);
+			array.push(val);
+		}
+		var key = new morpheus.Identifier(array);
+		var count = map.get(key) || 0;
+		map.set(key, count + 1);
+	}
+	return map;
+};
 morpheus.VectorUtil.maybeConvertToStringArray = function (vector, delim) {
 	var newValues = [];
 	var regex = new RegExp(delim);
@@ -153,7 +173,7 @@ morpheus.VectorUtil.getValues = function (vector, excludeNull) {
 		}
 
 		set.add(val);
-		
+
 	}
 	var array = set.values();
 	array.sort(morpheus.SortKey.ASCENDING_COMPARATOR);
