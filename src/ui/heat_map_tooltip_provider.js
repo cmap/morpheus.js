@@ -158,7 +158,13 @@ morpheus.HeatMapTooltipProvider._matrixValueToString = function (dataset,
 				for (var i = 0, nkeys = keys.length; i < nkeys; i++) {
 					var key = keys[i];
 					if (key !== '__v') { // special value key
-						var v = morpheus.Util.formatObject(obj[key]);
+						var objVal = obj[key];
+						var v;
+						if (morpheus.Util.isArray(objVal)) {
+							v = morpheus.Util.arrayToString(objVal, ', ');
+						} else {
+							v = morpheus.Util.formatObject(objVal);
+						}
 						if (tipText.length > 0) {
 							tipText.push(separator);
 						}
