@@ -72,6 +72,7 @@ morpheus.JoinedDataset = function(dataset1, dataset2, dataset1Field,
 	}
 	this.dataset1 = dataset1;
 	this.dataset2 = dataset2;
+	// TODO put series in same order
 	var maxSeriesCount = Math.max(this.dataset1.getSeriesCount(), this.dataset2
 			.getSeriesCount());
 	for (var i = this.dataset1.getSeriesCount(); i < maxSeriesCount; i++) {
