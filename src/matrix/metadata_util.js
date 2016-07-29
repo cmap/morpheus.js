@@ -289,7 +289,8 @@ morpheus.MetadataUtil.autocomplete = function (model) {
 					matches.push({
 						value: quotedField + ':',
 						label: '<span style="font-weight:300;">' + (regexMatch == null ? field : field.replace(regexMatch, '<b>$1</b>'))
-						+ ':</span>',
+						+ ':</span>' + (dataType === 'number' ? ('<span' +
+						' style="font-weight:300;font-size:85%;">min..max</span>') : ''),
 						show: true
 					});
 				}
