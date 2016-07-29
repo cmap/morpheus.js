@@ -207,7 +207,6 @@ morpheus.Util.getFileName = function (fileOrUrl) {
 		return fileOrUrl.name;
 	}
 	var name = '' + fileOrUrl;
-
 	var question = name.indexOf('?');
 	if (question !== -1) {
 		var params = name.substring(question + 1);
@@ -223,9 +222,14 @@ morpheus.Util.getFileName = function (fileOrUrl) {
 		}
 	} else {
 		var slash = name.lastIndexOf('/');
-		if (slash !== -1 && slash < name.length - 1) {
-			// https://s3.amazonaws.com/data.clue.io/icv/dosval/BRD-K45711268_10_UM_24_H/pcl_cell.gct?AWSAccessKeyId=AKIAJZQISWLUKFS3VUKA&Expires=1455761050&Signature=HVle9MvXV3OGRZHOngdm2frqER8%3D
+		if (slash === name.length - 1) {
+			name = name.substring(0, name.length - 1);
+			slash = name.lastIndexOf('/');
+		}
+		if (slash !== -1) {
 			name = name.substring(slash + 1); // get stuff after slash
+			// https://s3.amazonaws.com/data.clue.io/icv/dosval/BRD-K45711268_10_UM_24_H/pcl_cell.gct?AWSAccessKeyId=AKIAJZQISWLUKFS3VUKA&Expires=1455761050&Signature=HVle9MvXV3OGRZHOngdm2frqER8%3D
+
 		}
 	}
 	return name;
@@ -1297,6 +1301,9 @@ morpheus.Util.createValueToIndices = function (array, field) {
 	return map;
 };
 
+morpheus.Util.createLoadingEl = function () {
+	return $('<div style="overflow:hidden;text-align:center;"><i class="fa fa-spinner fa-spin fa-3x"></i><span style="padding-left:4px;vertical-align:middle;font-weight:bold;">Loading...</span></div>');
+};
 /**
  * Splits a string by the new line character, trimming whitespace
  */

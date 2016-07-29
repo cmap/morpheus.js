@@ -199,7 +199,7 @@ morpheus.HeatMap = function (options) {
 			symmetric: false,
 			keyboard: true,
 			inlineTooltip: true,
-			$loadingImage: $('<div style="overflow:hidden;text-align:center;"><i class="fa fa-spinner fa-spin fa-3x"></i><span style="padding-left:4px;vertical-align:middle;font-weight:bold;">Loading...</span></div>'),
+			$loadingImage: morpheus.Util.createLoadingEl(),
 			/**
 			 * Whether this heat map tab can be closed
 			 */
@@ -232,7 +232,7 @@ morpheus.HeatMap = function (options) {
 		options.landingPage = new morpheus.LandingPage();
 		options.landingPage.$el.prependTo(this.$el);
 	}
-	if (!this.options.name) {
+	if (this.options.name == null) {
 		this.options.name = morpheus.Util
 		.getBaseFileName(morpheus.Util
 		.getFileName(this.options.dataset.file ? this.options.dataset.file
