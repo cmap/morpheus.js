@@ -37,7 +37,7 @@ morpheus.MetadataUtil.search = function (options) {
 	var isColumns = options.isColumns;
 	text = $.trim(text);
 	if (text === '') {
-		return null; 
+		return null;
 	}
 	var tokens = morpheus.Util.getAutocompleteTokens(text);
 	if (tokens.length == 0) {
@@ -162,6 +162,7 @@ morpheus.MetadataUtil.autocomplete = function (model) {
 		// check for term:searchText
 		var matches = [];
 		var regex = null;
+		var regexMatch = null;
 		var searchModel = model;
 		var token = tokens != null && tokens.length > 0 ? tokens[tokens.selectionStartIndex]
 			: '';
@@ -192,7 +193,8 @@ morpheus.MetadataUtil.autocomplete = function (model) {
 				var set = new morpheus.Set();
 				// regex used to determine if a string starts with substring `q`
 
-				regex = new RegExp('^' + morpheus.Util.escapeRegex(token), 'i');
+				regex = new RegExp(morpheus.Util.escapeRegex(token), 'i');
+				regexMatch = new RegExp('(' + morpheus.Util.escapeRegex(token) + ')', 'i');
 				// iterate through the pool of strings and for any string that
 				// contains the substring `q`, add it to the `matches` array
 				var max = 10;
@@ -259,7 +261,7 @@ morpheus.MetadataUtil.autocomplete = function (model) {
 						value: quotedField + ':' + quotedValue,
 						label: '<span style="font-weight:300;">' + field
 						+ ':</span>'
-						+ '<span style="font-weight:900;">' + val
+						+ '<span>' + val.replace(regexMatch, '<b>$1</b>')
 						+ '</span>'
 					});
 
@@ -272,6 +274,7 @@ morpheus.MetadataUtil.autocomplete = function (model) {
 		if (regex == null) {
 			regex = new RegExp('.*', 'i');
 		}
+
 		for (var j = 0; j < searchModel.getMetadataCount(); j++) {
 			var v = searchModel.get(j);
 			var dataType = morpheus.VectorUtil.getDataType(v);
@@ -285,7 +288,7 @@ morpheus.MetadataUtil.autocomplete = function (model) {
 					}
 					matches.push({
 						value: quotedField + ':',
-						label: '<span style="font-weight:300;">' + field
+						label: '<span style="font-weight:300;">' + (regexMatch == null ? field : field.replace(regexMatch, '<b>$1</b>'))
 						+ ':</span>',
 						show: true
 					});
