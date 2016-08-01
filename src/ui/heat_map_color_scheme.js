@@ -261,6 +261,9 @@ morpheus.HeatMapConditions.prototype = {
 	insert: function (index, c) {
 		this.conditions.splice(index, 0, c);
 	},
+	add: function (c) {
+		this.conditions.push(c);
+	},
 	getConditions: function () {
 		return this.conditions;
 	},
