@@ -1029,13 +1029,13 @@ morpheus.HeatMap.prototype = {
 					columnIndex)));
 				rowTracks.forEach(function (track) {
 					tipText.push('\t');
-					tipText.push(morpheus.Util.formatObject(dataset
+					tipText.push(morpheus.Util.toString(dataset
 					.getRowMetadata().getByName(track.name).getValue(
 						rowIndex)));
 				});
 				columnTracks.forEach(function (track) {
 					tipText.push('\t');
-					tipText.push(morpheus.Util.formatObject(dataset
+					tipText.push(morpheus.Util.toString(dataset
 					.getColumnMetadata().getByName(track.name)
 					.getValue(columnIndex)));
 				});

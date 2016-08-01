@@ -961,20 +961,6 @@ morpheus.Util.createNumberFormat = function (nfractionDigits) {
 	};
 	return f;
 };
-morpheus.Util.formatObject = function (value) {
-	if (_.isNumber(value)) {
-		return morpheus.Util.nf(value);
-	}
-	return value;
-};
-morpheus.Util.arrayToString = function (array, sep) {
-	var s = [];
-	for (var i = 0, length = array.length; i < length; i++) {
-		s.push(morpheus.Util.formatObject(array[i]));
-	}
-	return s.join(sep);
-
-};
 
 morpheus.Util.wrapNumber = function (value, object) {
 	var n = new Number(value);
@@ -989,13 +975,24 @@ morpheus.Util.toString = function (value) {
 	} else if (_.isNumber(value)) {
 		return morpheus.Util.nf(value);
 	} else if (morpheus.Util.isArray(value)) {
-		var s = [];
-		for (var i = 0, length = value.length; i < length; i++) {
-			s.push(morpheus.Util.formatObject(value[i]));
-		}
-		return s.join(', ');
+		return morpheus.Util.arrayToString(value, ', ');
 	}
 	return '' + value;
+};
+
+morpheus.Util.arrayToString = function (value, sep) {
+	var s = [];
+	for (var i = 0, length = value.length; i < length; i++) {
+		var val_i = value[i];
+		if (_.isNumber(val_i)) {
+			s.push(morpheus.Util.nf(val_i[i]));
+		} else {
+			s.push('' + val_i);
+		}
+
+	}
+	return s.join(sep);
+
 };
 morpheus.Util.removeTrailingZerosInFraction = function (str) {
 	var index = str.lastIndexOf('.');

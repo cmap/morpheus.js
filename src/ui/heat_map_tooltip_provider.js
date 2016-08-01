@@ -143,7 +143,7 @@ morpheus.HeatMapTooltipProvider._matrixValueToString = function (dataset,
 			var obj = val.toObject ? val.toObject() : val;
 			var keys = _.keys(obj);
 			if (keys.length === 0) {
-				var v = morpheus.Util.formatObject(obj);
+				var v = morpheus.Util.toString(obj);
 				if (tipText.length > 0) {
 					tipText.push(separator);
 				}
@@ -163,7 +163,7 @@ morpheus.HeatMapTooltipProvider._matrixValueToString = function (dataset,
 						if (morpheus.Util.isArray(objVal)) {
 							v = morpheus.Util.arrayToString(objVal, ', ');
 						} else {
-							v = morpheus.Util.formatObject(objVal);
+							v = morpheus.Util.toString(objVal);
 						}
 						if (tipText.length > 0) {
 							tipText.push(separator);
@@ -214,13 +214,13 @@ morpheus.HeatMapTooltipProvider.vectorToString = function (vector, index,
 						}
 						tipText.push(key);
 						tipText.push(': <b>');
-						tipText.push(morpheus.Util.formatObject(subVal));
+						tipText.push(morpheus.Util.toString(subVal));
 						tipText.push('</b>');
 					}
 				});
 			} else {
 				tipText.push(': <b>');
-				tipText.push(morpheus.Util.formatObject(arrayVal));
+				tipText.push(morpheus.Util.toString(arrayVal));
 				tipText.push('</b>');
 			}
 
@@ -271,7 +271,7 @@ morpheus.HeatMapTooltipProvider.vectorToString = function (vector, index,
 				}
 				tipText.push(vector.getName());
 				tipText.push(': <b>');
-				tipText.push(morpheus.Util.formatObject(primaryVal));
+				tipText.push(morpheus.Util.toString(primaryVal));
 				tipText.push('</b>');
 			}
 
@@ -319,10 +319,10 @@ morpheus.HeatMapTooltipProvider._nodesToString = function (tipText, nodes,
 					if (i > 0) {
 						tipText.push(', ');
 					}
-					tipText.push(morpheus.Util.formatObject(value[i]));
+					tipText.push(morpheus.Util.toString(value[i]));
 				}
 			} else {
-				tipText.push(morpheus.Util.formatObject(value));
+				tipText.push(morpheus.Util.toString(value));
 			}
 			tipText.push('</b>');
 			if (color) {
