@@ -2,13 +2,19 @@ morpheus.MatchesOnTopSortKey = function (project, modelIndices, name) {
 	var modelHighlight = {};
 	var p = project;
 	var viewIndices = [];
-	for (var i = 0, length = modelIndices.length; i < length; i++) {
-		modelHighlight[modelIndices[i]] = true;
+	for (var i = 0, j = modelIndices.length, length = modelIndices.length; i < length; i++, j--) {
+		modelHighlight[modelIndices[i]] = j;
 		viewIndices.push(i);
 	}
 	this.comparator = function (i1, i2) {
-		var a = modelHighlight[i1] === undefined ? 0 : 1;
-		var b = modelHighlight[i2] == undefined ? 0 : 1;
+		var a = modelHighlight[i1];
+		if (a === undefined) {
+			a = 0;
+		}
+		var b = modelHighlight[i2];
+		if (b === undefined) {
+			b = 0;
+		}
 		return (a > b ? -1 : (a === b ? 0 : 1));
 	};
 	this.indices = viewIndices;
