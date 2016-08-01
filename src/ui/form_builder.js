@@ -169,6 +169,72 @@ morpheus.FormBuilder.promptForDataset = function (cb) {
 	});
 };
 
+morpheus.FormBuilder.showMessageModal = function (options) {
+	var $div = morpheus.FormBuilder
+	._showInModal({
+		z: options.z,
+		title: options.title,
+		html: options.html,
+		footer: ('<button type="button" class="btn btn-default"' +
+		' data-dismiss="modal">OK</button>'),
+		backdrop: options.backdrop,
+		size: options.size
+	});
+	$div.find('button').focus();
+	return $div;
+
+	// if (options.draggable) {
+	// $div.draggable({
+	// handle : $div.find(".modal-header")
+	// });
+	// }
+};
+
+morpheus.FormBuilder._showInModal = function (options) {
+	var html = [];
+	options = $.extend({}, {
+		size: ''
+	}, options);
+	html.push('<div class="modal" role="dialog" aria-hidden="false"');
+	if (options.z) {
+		html.push(' style="z-index: ' + options.z + ' !important;"');
+	}
+	html.push('>');
+	html.push('<div class="modal-dialog ' + options.size + '">');
+	html.push('<div class="modal-content">');
+	html.push(' <div class="modal-header">');
+	html
+	.push('  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>');
+	if (options.title != null) {
+		html.push('<h4 class="modal-title">' + options.title + '</h4>');
+	}
+	html.push('</div>');
+	html.push('<div class="modal-body">');
+	html.push('</div>');
+	if (options.footer) {
+		html.push('<div class="modal-footer">');
+		html.push(options.footer);
+	}
+	html.push('</div>');
+	html.push('</div>');
+	html.push('</div>');
+	html.push('</div>');
+	var $div = $(html.join(''));
+	$div.on('mousewheel', function (e) {
+		e.stopPropagation();
+	});
+	$div.find('.modal-body').html(options.html);
+	$div.prependTo($(document.body));
+	$div.modal({
+		backdrop: options.backdrop === true ? true : false,
+	}).on('hidden.bs.modal', function (e) {
+		$div.remove();
+		if (options.onClose) {
+			options.onClose();
+		}
+	});
+	return $div;
+};
 morpheus.FormBuilder.showInModal = function (options) {
 	var $div = morpheus.FormBuilder
 	._showInModal({
@@ -262,51 +328,6 @@ morpheus.FormBuilder.getValue = function ($element) {
 		: $element.val();
 };
 
-morpheus.FormBuilder._showInModal = function (options) {
-	var html = [];
-	options = $.extend({}, {
-		size: ''
-	}, options);
-	html.push('<div class="modal" role="dialog" aria-hidden="false"');
-	if (options.z) {
-		html.push(' style="z-index: ' + options.z + ' !important;"');
-	}
-	html.push('>');
-	html.push('<div class="modal-dialog ' + options.size + '">');
-	html.push('<div class="modal-content">');
-	html.push(' <div class="modal-header">');
-	html
-	.push('  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>');
-	if (options.title != null) {
-		html.push('<h4 class="modal-title">' + options.title + '</h4>');
-	}
-	html.push('</div>');
-	html.push('<div class="modal-body">');
-	html.push('</div>');
-	if (options.footer) {
-		html.push('<div class="modal-footer">');
-		html.push(options.footer);
-	}
-	html.push('</div>');
-	html.push('</div>');
-	html.push('</div>');
-	html.push('</div>');
-	var $div = $(html.join(''));
-	$div.on('mousewheel', function (e) {
-		e.stopPropagation();
-	});
-	$div.find('.modal-body').html(options.html);
-	$div.prependTo($(document.body));
-	$div.modal({
-		backdrop: options.backdrop === true ? true : false,
-	}).on('hidden.bs.modal', function (e) {
-		$div.remove();
-		if (options.onClose) {
-			options.onClose();
-		}
-	});
-	return $div;
-};
 // morpheus.FormBuilder._showInModal = function(title, stuff, footer,
 // hiddenCallback) {
 // var html = [];
