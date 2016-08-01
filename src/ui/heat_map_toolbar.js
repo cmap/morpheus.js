@@ -400,7 +400,7 @@ morpheus.HeatMapToolBar = function (controller) {
 	$el.find('[name=chart]').on(
 		'click',
 		function () {
-			new morpheus.ChartTool2({
+			new morpheus.ChartTool({
 				project: controller.getProject(),
 				getVisibleTrackNames: _.bind(
 					controller.getVisibleTrackNames, controller)

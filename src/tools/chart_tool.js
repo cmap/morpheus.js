@@ -4,7 +4,7 @@
  * @param chartOptions.getVisibleTrackNames
  *            {Function}
  */
-morpheus.ChartTool2 = function (chartOptions) {
+morpheus.ChartTool = function (chartOptions) {
 	var _this = this;
 	this.getVisibleTrackNames = chartOptions.getVisibleTrackNames;
 	this.project = chartOptions.project;
@@ -22,7 +22,8 @@ morpheus.ChartTool2 = function (chartOptions) {
 	formBuilder.append({
 		name: 'chart_type',
 		type: 'bootstrap-select',
-		options: ['boxplot', 'row scatter', 'column scatter', 'row profile', 'column profile']
+		options: ['boxplot', 'row scatter matrix', 'column scatter matrix', 'row profile', 'column' +
+		' profile']
 	});
 	var rowOptions = [];
 	var columnOptions = [];
@@ -145,19 +146,18 @@ morpheus.ChartTool2 = function (chartOptions) {
 	});
 
 	function setVisibility() {
-		// 'boxplot', 'row scatter', 'column scatter', 'row profile', 'column profile'
 		var chartType = formBuilder.getValue('chart_type');
 		formBuilder.setVisible('group_rows_by', chartType === 'boxplot');
 		formBuilder.setVisible('group_columns_by', chartType === 'boxplot');
 		if (chartType !== 'boxplot') {
 			formBuilder.setOptions('axis_label',
-				(chartType === 'row scatter' || chartType === 'column profile') ? rowOptions : columnOptions,
+				(chartType === 'row scatter matrix' || chartType === 'column profile') ? rowOptions : columnOptions,
 				true);
 			formBuilder.setOptions('color',
-				(chartType === 'row scatter' || chartType === 'column profile') ? columnOptions : rowOptions,
+				(chartType === 'row scatter matrix' || chartType === 'column profile') ? columnOptions : rowOptions,
 				true);
 			formBuilder.setOptions('size',
-				(chartType === 'row scatter' || chartType === 'row profile') ? numericColumnOptions
+				(chartType === 'row scatter matrix' || chartType === 'row profile') ? numericColumnOptions
 					: numericRowOptions, true);
 
 		} else {
@@ -175,7 +175,7 @@ morpheus.ChartTool2 = function (chartOptions) {
 			_this.tooltip = [];
 			if (tooltipVal != null) {
 				tooltipVal.forEach(function (tip) {
-					_this.tooltip.push(morpheus.ChartTool2.getVectorInfo(tip));
+					_this.tooltip.push(morpheus.ChartTool.getVectorInfo(tip));
 				});
 			}
 		} else {
@@ -188,8 +188,6 @@ morpheus.ChartTool2 = function (chartOptions) {
 		_this.draw();
 	});
 	setVisibility();
-	// chart types: boxplot, scatter
-	// add: tooltip, color, size, allow boxplot and scatter of attributes?
 
 	var draw = function () {
 		_.debounce(_this.draw(), 100);
@@ -226,7 +224,7 @@ morpheus.ChartTool2 = function (chartOptions) {
 	this.draw();
 };
 
-morpheus.ChartTool2.getPlotlyDefaults = function () {
+morpheus.ChartTool.getPlotlyDefaults = function () {
 	var layout = {
 		hovermode: 'closest',
 		autosize: true,
@@ -278,7 +276,7 @@ morpheus.ChartTool2.getPlotlyDefaults = function () {
 	};
 };
 
-morpheus.ChartTool2.getVectorInfo = function (value) {
+morpheus.ChartTool.getVectorInfo = function (value) {
 	var field = value.substring(0, value.length - 2);
 	var isColumns = value.substring(value.length - 2) === '_c';
 	return {
@@ -286,7 +284,7 @@ morpheus.ChartTool2.getVectorInfo = function (value) {
 		isColumns: isColumns
 	};
 };
-morpheus.ChartTool2.prototype = {
+morpheus.ChartTool.prototype = {
 	annotate: function (options) {
 		var _this = this;
 		var formBuilder = new morpheus.FormBuilder();
@@ -753,7 +751,7 @@ morpheus.ChartTool2.prototype = {
 	draw: function () {
 		var _this = this;
 		this.$chart.empty();
-		var plotlyDefaults = morpheus.ChartTool2.getPlotlyDefaults();
+		var plotlyDefaults = morpheus.ChartTool.getPlotlyDefaults();
 		var layout = plotlyDefaults.layout;
 		var config = plotlyDefaults.config;
 		var chartWidth = 400;
@@ -785,11 +783,11 @@ morpheus.ChartTool2.prototype = {
 		var columnIds = [undefined];
 		var items = [];
 		var heatmap = this.heatmap;
-		var colorByInfo = morpheus.ChartTool2.getVectorInfo(colorBy);
-		var sizeByInfo = morpheus.ChartTool2.getVectorInfo(sizeBy);
+		var colorByInfo = morpheus.ChartTool.getVectorInfo(colorBy);
+		var sizeByInfo = morpheus.ChartTool.getVectorInfo(sizeBy);
 		var colorModel = !colorByInfo.isColumns ? this.project.getRowColorModel()
 			: this.project.getColumnColorModel();
-		var axisLabelInfo = morpheus.ChartTool2.getVectorInfo(axisLabel);
+		var axisLabelInfo = morpheus.ChartTool.getVectorInfo(axisLabel);
 		var axisLabelVector = axisLabelInfo.isColumns ? dataset.getColumnMetadata().getByName(axisLabelInfo.field) : dataset.getRowMetadata().getByName(
 			axisLabelInfo.field);
 		var sizeByVector = sizeByInfo.isColumns ? dataset.getColumnMetadata().getByName(sizeByInfo.field) : dataset.getRowMetadata().getByName(
@@ -840,8 +838,8 @@ morpheus.ChartTool2.prototype = {
 					})
 			});
 		}
-		if (chartType === 'row scatter' || chartType === 'column scatter') {
-			var transpose = chartType === 'column scatter';
+		if (chartType === 'row scatter matrix' || chartType === 'column scatter matrix') {
+			var transpose = chartType === 'column scatter matrix';
 
 			if (transpose) {
 				dataset = new morpheus.TransposedDatasetView(dataset);
@@ -970,7 +968,7 @@ morpheus.ChartTool2.prototype = {
 					});
 				}
 			}
-			var colorByInfo = morpheus.ChartTool2.getVectorInfo(colorBy);
+			var colorByInfo = morpheus.ChartTool.getVectorInfo(colorBy);
 			var colorByVector = colorByInfo.isColumns ? dataset.getColumnMetadata()
 			.getByName(colorByInfo.field) : dataset.getRowMetadata()
 			.getByName(colorByInfo.field);
@@ -999,7 +997,7 @@ morpheus.ChartTool2.prototype = {
 			if (groupColumnsBy || groupRowsBy) {
 				var rowIdToArray = new morpheus.Map();
 				if (groupRowsBy) {
-					var groupRowsByInfo = morpheus.ChartTool2
+					var groupRowsByInfo = morpheus.ChartTool
 					.getVectorInfo(groupRowsBy);
 					var vector = groupRowsByInfo.isColumns ? dataset
 					.getColumnMetadata().getByName(groupRowsByInfo.field)
