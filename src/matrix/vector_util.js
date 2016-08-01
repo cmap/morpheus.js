@@ -1,21 +1,55 @@
 morpheus.VectorUtil = function () {
 };
-morpheus.VectorUtil.createValueToIndicesMap = function (vector) {
-	if (!vector) {
-		throw 'vector is null';
-	}
+
+morpheus.VectorUtil.createValueToIndexMap = function (vector, splitArrayValues) {
 	var map = new morpheus.Map();
+	var isArray = splitArrayValues && morpheus.VectorUtil.getDataType(vector)[0] === '[';
 	for (var j = 0, size = vector.size(); j < size; j++) {
 		var val = vector.getValue(j);
-		var list = map.get(val);
-		if (list === undefined) {
-			list = [];
-			map.set(val, list);
+		if (isArray) {
+			if (val != null) {
+				for (var k = 0; k < val.length; k++) {
+					map.set(val[k], j);
+				}
+			}
+		} else {
+			map.set(val, j);
 		}
-		list.push(j);
 	}
 	return map;
 };
+
+morpheus.VectorUtil.createValueToIndicesMap = function (vector, splitArrayValues) {
+	if (!vector) {
+		throw 'vector is null';
+	}
+	var isArray = splitArrayValues && morpheus.VectorUtil.getDataType(vector)[0] === '[';
+	var map = new morpheus.Map();
+	for (var j = 0, size = vector.size(); j < size; j++) {
+		var val = vector.getValue(j);
+		if (isArray) {
+			if (val != null) {
+				for (var k = 0; k < val.length; k++) {
+					var list = map.get(val[k]);
+					if (list === undefined) {
+						list = [];
+						map.set(val[k], list);
+					}
+					list.push(j);
+				}
+			}
+		} else {
+			var list = map.get(val);
+			if (list === undefined) {
+				list = [];
+				map.set(val, list);
+			}
+			list.push(j);
+		}
+	}
+	return map;
+};
+
 morpheus.VectorUtil.createValueToCountMap = function (vector) {
 	if (!vector) {
 		throw 'vector is null';
@@ -40,6 +74,48 @@ morpheus.VectorUtil.createValueToCountMap = function (vector) {
 	return map;
 };
 
+morpheus.VectorUtil.createValuesToIndicesMap = function (vectors) {
+	var map = new morpheus.Map();
+	var nvectors = vectors.length;
+	if (vectors[0] == null) {
+		throw 'no vectors found';
+	}
+	for (var i = 0, nitems = vectors[0].size(); i < nitems; i++) {
+		var array = [];
+		for (var j = 0; j < nvectors; j++) {
+			var vector = vectors[j];
+			var val = vector.getValue(i);
+			array.push(val);
+		}
+		var key = new morpheus.Identifier(array);
+		var list = map.get(key);
+		if (list === undefined) {
+			list = [];
+			map.set(key, list);
+		}
+		list.push(i);
+	}
+	return map;
+};
+morpheus.VectorUtil.createValuesToIndexMap = function (vectors) {
+	var map = new morpheus.Map();
+	var nvectors = vectors.length;
+	if (vectors[0] == null) {
+		throw 'no vectors found';
+	}
+	for (var i = 0, nitems = vectors[0].size(); i < nitems; i++) {
+		var array = [];
+		for (var j = 0; j < nvectors; j++) {
+			var vector = vectors[j];
+			var val = vector.getValue(i);
+			array.push(val);
+		}
+		var key = new morpheus.Identifier(array);
+		map.set(key, i);
+	}
+	return map;
+};
+
 morpheus.VectorUtil.createValuesToCountMap = function (vectors) {
 	var map = new morpheus.Map();
 	var nvectors = vectors.length;
@@ -58,6 +134,46 @@ morpheus.VectorUtil.createValuesToCountMap = function (vectors) {
 		map.set(key, count + 1);
 	}
 	return map;
+};
+
+/**
+ *
+ * @param vector
+ * @param excludeNull
+ * @returns A sorted array of unique values contained in the vector. Note that array values are
+ * not split.
+ */
+morpheus.VectorUtil.getValues = function (vector, excludeNull) {
+	var set = new morpheus.Set();
+	for (var j = 0, size = vector.size(); j < size; j++) {
+		var val = vector.getValue(j);
+		if (excludeNull && val == null) {
+			continue;
+		}
+		set.add(val);
+	}
+	var array = set.values();
+	array.sort(morpheus.SortKey.ASCENDING_COMPARATOR);
+	return array;
+};
+
+morpheus.VectorUtil.getSet = function (vector, splitArrayValues) {
+	var set = new morpheus.Set();
+	var isArray = splitArrayValues && morpheus.VectorUtil.getDataType(vector)[0] === '[';
+	for (var j = 0, size = vector.size(); j < size; j++) {
+		var value = vector.getValue(j);
+		if (isArray) {
+			if (value != null) {
+				for (var k = 0, nvalues = value.length; k < nvalues; k++) {
+					set.add(value[k]);
+				}
+			}
+		} else {
+			set.add(value);
+		}
+
+	}
+	return set;
 };
 morpheus.VectorUtil.maybeConvertToStringArray = function (vector, delim) {
 	var newValues = [];
@@ -101,47 +217,6 @@ morpheus.VectorUtil.maybeConvertStringToNumber = function (vector) {
 	vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, 'number');
 	return true;
 };
-morpheus.VectorUtil.createValuesToIndicesMap = function (vectors) {
-	var map = new morpheus.Map();
-	var nvectors = vectors.length;
-	if (vectors[0] == null) {
-		throw 'no vectors found';
-	}
-	for (var i = 0, nitems = vectors[0].size(); i < nitems; i++) {
-		var array = [];
-		for (var j = 0; j < nvectors; j++) {
-			var vector = vectors[j];
-			var val = vector.getValue(i);
-			array.push(val);
-		}
-		var key = new morpheus.Identifier(array);
-		var list = map.get(key);
-		if (list === undefined) {
-			list = [];
-			map.set(key, list);
-		}
-		list.push(i);
-	}
-	return map;
-};
-morpheus.VectorUtil.createValuesToIndexMap = function (vectors) {
-	var map = new morpheus.Map();
-	var nvectors = vectors.length;
-	if (vectors[0] == null) {
-		throw 'no vectors found';
-	}
-	for (var i = 0, nitems = vectors[0].size(); i < nitems; i++) {
-		var array = [];
-		for (var j = 0; j < nvectors; j++) {
-			var vector = vectors[j];
-			var val = vector.getValue(i);
-			array.push(val);
-		}
-		var key = new morpheus.Identifier(array);
-		map.set(key, i);
-	}
-	return map;
-};
 morpheus.VectorUtil.containsMoreThanOneValue = function (vector) {
 	return morpheus.VectorUtil.containsMoreThanNValues(vector, 1);
 };
@@ -156,36 +231,7 @@ morpheus.VectorUtil.containsMoreThanNValues = function (vector, n) {
 	}
 	return false;
 };
-morpheus.VectorUtil.createValueToIndexMap = function (vector) {
-	var map = new morpheus.Map();
-	for (var j = 0, size = vector.size(); j < size; j++) {
-		var val = vector.getValue(j);
-		map.set(val, j);
-	}
-	return map;
-};
-morpheus.VectorUtil.getValues = function (vector, excludeNull) {
-	var set = new morpheus.Set();
-	for (var j = 0, size = vector.size(); j < size; j++) {
-		var val = vector.getValue(j);
-		if (excludeNull && val == null) {
-			continue;
-		}
 
-		set.add(val);
-
-	}
-	var array = set.values();
-	array.sort(morpheus.SortKey.ASCENDING_COMPARATOR);
-	return array;
-};
-morpheus.VectorUtil.getSet = function (vector) {
-	var set = new morpheus.Set();
-	for (var j = 0, size = vector.size(); j < size; j++) {
-		set.add(vector.getValue(j));
-	}
-	return set;
-};
 morpheus.VectorUtil.createSpanMap = function (vector) {
 	var previous = vector.getValue(0);
 	// find 1st row with different value
