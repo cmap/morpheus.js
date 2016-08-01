@@ -744,7 +744,7 @@ morpheus.HeatMap.prototype = {
 		} else if (options.extension === 'gmt') {
 			colorScheme = morpheus.HeatMapColorScheme.Predefined.BINARY();
 		} else if (options.filename === 'all_lesions.conf_99'
-			|| options.filename === 'all_data_by_genes.txt') {
+			|| options.filename === 'all_data_by_genes.txt' || options.filename.toLowerCase().indexOf('gistic') !== -1) {
 			colorScheme = {
 				type: 'fixed',
 				map: [{
