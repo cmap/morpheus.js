@@ -44,38 +44,37 @@ morpheus.HeatMapKeyListener = function (controller) {
 			controller.scrollTop(0);
 			found = true;
 		} else if (e.which === 34) { // page down
-			// if (shiftKey) {
-			// var pos = controller.scrollLeft();
-			// controller.scrollLeft(pos
-			// + controller.heatmap.getUnscaledWidth() - 2);
-			// } else {
 			var pos = controller.scrollTop();
 			controller.scrollTop(pos + controller.heatmap.getUnscaledHeight()
 				- 2);
-			// }
 			found = true;
 		} else if (e.which === 33) { // page up
-			// if (shiftKey) {
-			// var pos = controller.scrollLeft();
-			// controller.scrollLeft(pos
-			// - controller.heatmap.getUnscaledWidth() + 2);
-			// } else {
 			var pos = controller.scrollTop();
 			controller.scrollTop(pos - controller.heatmap.getUnscaledHeight()
 				+ 2);
-			// }
+
 			found = true;
 		} else if (e.which === 38) { // up arrow
 			if (commandKey) { // to top
-				controller.scrollTop(0);
+				var active = controller.getActiveComponent();
+				if (active !== -1) {
+					controller.sortBasedOnSelection(morpheus.SortKey.SortOrder.ASCENDING,
+						active !== 0, e && e.shiftKey);
+				}
+
 			} else {
 				controller.scrollTop(controller.scrollTop() - 8);
 			}
 			found = true;
 		} else if (e.which === 40) {// down arrow
 			if (commandKey) { // to bottom
-				controller
-				.scrollTop(controller.heatmap.getPreferredSize().height);
+				// controller
+				// .scrollTop(controller.heatmap.getPreferredSize().height);
+				var active = controller.getActiveComponent();
+				if (active !== -1) {
+					controller.sortBasedOnSelection(morpheus.SortKey.SortOrder.DESCENDING,
+						active !== 0, e && e.shiftKey);
+				}
 			} else {
 				controller.scrollTop(controller.scrollTop() + 8);
 			}
