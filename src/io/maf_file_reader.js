@@ -135,6 +135,9 @@ morpheus.MafFileReader.prototype = {
 				lc: true,
 				remove: true
 			});
+		if (sampleField == null) {
+			throw new Error('Sample id column not found.');
+		}
 		var sampleColumnName = sampleField.name;
 		var sampleIdColumnIndex = sampleField.index;
 		var tumorFractionField = morpheus.MafFileReader.getField(['ccf_hat',
@@ -157,6 +160,9 @@ morpheus.MafFileReader.prototype = {
 		var proteinChangeColumn = fieldNameToIndex['Protein_Change'
 		.toLowerCase()];
 		var geneSymbolColumn = fieldNameToIndex['Hugo_Symbol'.toLowerCase()];
+		if (geneSymbolColumn == null) {
+			throw new Error('Gene symbol column not found.');
+		}
 		var variantColumnIndex = headerToIndex['Variant_Classification'
 		.toLowerCase()];
 		if (variantColumnIndex === undefined) {
