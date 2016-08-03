@@ -182,6 +182,9 @@ morpheus.VectorUtil.maybeConvertToStringArray = function (vector, delim) {
 	for (var i = 0, nrows = vector.size(); i < nrows; i++) {
 		var s = vector.getValue(i);
 		if (s != null) {
+			if (!s.split) {
+				return false;
+			}
 			var tokens = s.split(regex);
 			newValues.push(tokens);
 			if (!found && tokens.length > 1) {
