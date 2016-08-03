@@ -97,26 +97,7 @@ morpheus.DatasetUtil.readDatasetArray = function (options) {
 	.apply($, promises)
 	.then(
 		function () {
-			var joined;
-			if (loadedDatasets.length > 1) {
-				joined = new morpheus.JoinedDataset(
-					loadedDatasets[0], loadedDatasets[1], 'id',
-					'id');
-				for (var i = 2; i < loadedDatasets.length; i++) {
-					joined = new morpheus.JoinedDataset(joined,
-						loadedDatasets[i], 'id', 'id');
-				}
-			} else {
-				// add Source
-				joined = loadedDatasets[0];
-				var sourceVector = joined.getRowMetadata().add(
-					'Source');
-				var name = joined.getName();
-				for (var i = 0, nrows = sourceVector.size(); i < nrows; i++) {
-					sourceVector.setValue(i, name);
-				}
-			}
-			retDef.resolve(joined);
+			retDef.resolve(morpheus.DatasetUtil.join(loadedDatasets, 'id'));
 		});
 	return retDef;
 };
@@ -710,6 +691,37 @@ morpheus.DatasetUtil.fill = function (dataset, value, seriesIndex) {
 	}
 };
 
+morpheus.DatasetUtil.join = function (datasets, field) {
+	if (datasets.length === 1) {
+		datasets[0].getRowMetadata().add('Source').setValue(0, datasets[0].getName());
+		return datasets[0];
+	}
+	var ids = new morpheus.Set();
+	for (var i = 0; i < datasets.length; i++) {
+		var idVector = datasets[i].getColumnMetadata().getByName(field);
+		for (var j = 0, size = idVector.size(); j < size; j++) {
+			ids.add(idVector.getValue(j));
+		}
+	}
+	var dummyDataset = new morpheus.Dataset({
+		rows: 0,
+		columns: ids.size()
+	});
+	var dummyIdVector = dummyDataset.getColumnMetadata().add(field);
+	var counter = 0;
+	ids.forEach(function (id) {
+		dummyIdVector.setValue(counter++, id);
+	});
+
+	var dataset = new morpheus.JoinedDataset(
+		dummyDataset, datasets[0], field,
+		field);
+	for (var i = 1; i < datasets.length; i++) {
+		dataset = new morpheus.JoinedDataset(dataset,
+			datasets[i], field, field);
+	}
+	return dataset;
+};
 morpheus.DatasetUtil.shallowCopy = function (dataset) {
 	// make a shallow copy of the dataset, metadata is immutable via the UI
 	var rowMetadataModel = morpheus.MetadataUtil.shallowCopy(dataset
