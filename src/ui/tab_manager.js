@@ -10,7 +10,7 @@ morpheus.TabManager = function (options) {
 	this.activeTabObject = null;
 	this.activeTabId = null;
 	this.idToTabObject = new morpheus.Map();
-	this.$nav = $('<ul class="nav nav-tabs"></ul>');
+	this.$nav = $('<ul class="nav nav-tabs compact"></ul>');
 	this.$nav.on('click', 'li > a', function (e) {
 		var tabId = $(this).attr('href');
 		e.preventDefault();
@@ -254,6 +254,16 @@ morpheus.TabManager.prototype = {
 		this.trigger('remove', {
 			tab: target
 		});
+	},
+	setOptions: function (options) {
+		this.options = options;
+		if (this.options.autohideTabBar) {
+			this.$nav.css('display', this.idToTabObject.size() > 1 ? ''
+				: 'none');
+		}
+	},
+	getOptions: function () {
+		return this.options;
 	},
 	setActiveTab: function (id) {
 		if (id === this.activeTabId) {

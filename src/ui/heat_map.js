@@ -261,7 +261,8 @@ morpheus.HeatMap = function (options) {
 			});
 			// var $img = $a.find('img');
 
-			var $right = $('<li style="margin-right:2px;" class="pull-right"></li>');
+			var $right = $('<li data-name="help" style="margin-right:2px;"' +
+				' class="pull-right"></li>');
 			$a.appendTo($right);
 			new morpheus.HelpMenu().$el.appendTo($right);
 			$right.appendTo(this.tabManager.$nav);
@@ -393,6 +394,7 @@ morpheus.HeatMap = function (options) {
 
 		if (_this.options.focus) {
 			_this.tabManager.setActiveTab(tab.id);
+			$(_this.heatmap.canvas).focus();
 		}
 		_this.$el.trigger('heatMapLoaded', _this);
 	};
@@ -480,6 +482,7 @@ morpheus.HeatMap = function (options) {
 				message.push(err.message);
 
 			}
+
 			morpheus.FormBuilder.showInModal({
 				title: 'Error',
 				html: message.join('')
@@ -2294,6 +2297,7 @@ morpheus.HeatMap.prototype = {
 						if (this.options.inlineTooltip) {
 							this.tooltipProvider(this, inline[hoverIndex], -1,
 								options, '<br />', true, tipFollowText);
+
 						}
 					}
 					this._setTipText(tipText, tipFollowText, options);
@@ -2414,8 +2418,16 @@ morpheus.HeatMap.prototype = {
 		if (this.options.inlineTooltip) {
 			this.tooltipProvider(this, rowIndex, columnIndex,
 				options, '<br />', true, tipFollowText);
+
+			if (this.options.tooltip && rowIndex !== -1 && columnIndex !== -1) {
+				tipFollowText.push('<div data-name="tip"></div>');
+
+			}
 		}
 		this._setTipText(tipText, tipFollowText, options);
+		if (this.options.tooltip && rowIndex !== -1 && columnIndex !== -1) {
+			this.options.tooltip(this, rowIndex, columnIndex, this.$tipFollow.find('[data-name=tip]'));
+		}
 
 	}
 	,
@@ -2446,7 +2458,7 @@ morpheus.HeatMap.prototype = {
 		_.each(tracks, function (track) {
 			var existingTrack = _this.getTrack(track.name, track.isColumns);
 			if (track.visible && existingTrack != null
-				&& _.keys(existingTrack.renderSettings).length === 0) {
+				&& _.keys(existingTrack.settings).length === 0) {
 				existingTrack.settingFromConfig('Text');
 			}
 			_this.setTrackVisible(track.name, track.visible, track.isColumns);
@@ -2914,6 +2926,9 @@ morpheus.HeatMap.prototype = {
 		this.hscroll.setValue(pos, true);
 	}
 	,
+	isSelectedTrackColumns: function () {
+		return this.selectedTrackIsColumns;
+	},
 	setSelectedTrack: function (name, isColumns) {
 		if (name !== this.selectedTrackName
 			|| isColumns !== this.selectedTrackIsColumns) {

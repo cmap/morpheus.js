@@ -1,15 +1,18 @@
 morpheus.HeatMapKeyListener = function (controller) {
 	var keydown = function (e) {
 		var tagName = e.target.tagName;
-		if (tagName == 'INPUT' || tagName == 'SELECT' || tagName == 'TEXTAREA') {
-			return;
-		}
 		var found = false;
 		var commandKey = morpheus.Util.IS_MAC ? e.metaKey : e.ctrlKey;
 		var altKey = e.altKey;
 		var shiftKey = e.shiftKey;
+		if (commandKey && shiftKey && e.which === 70) { // ctrl-shift-f
+			controller.getToolbar().toggleMenu();
+			found = true;
+		}
 
-		if (commandKey && e.which === 65) { // select all
+		if (tagName == 'INPUT' || tagName == 'SELECT' || tagName == 'TEXTAREA') {
+			; // skip
+		} else if (commandKey && e.which === 65) { // select all
 			var active = controller.getActiveComponent();
 			if (active !== -1) {
 				found = true;

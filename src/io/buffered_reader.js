@@ -88,6 +88,7 @@ morpheus.BufferedReader.getArrayBuffer = function (fileOrUrl, callback) {
 		};
 
 		oReq.send(null);
+		return oReq;
 	} else {
 		var reader = new FileReader();
 		reader.onload = function (event) {
@@ -97,5 +98,6 @@ morpheus.BufferedReader.getArrayBuffer = function (fileOrUrl, callback) {
 			callback(event);
 		};
 		reader.readAsArrayBuffer(fileOrUrl);
+		return reader;
 	}
 };
