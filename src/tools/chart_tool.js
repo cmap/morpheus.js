@@ -208,6 +208,7 @@ morpheus.ChartTool = function (chartOptions) {
 	formBuilder.$form.appendTo($configPane);
 	this.$el.appendTo($dialog);
 	$dialog.dialog({
+		dialogClass: 'morpheus',
 		close: function (event, ui) {
 			project.off('trackChanged.chart', trackChanged);
 			project.getRowSelectionModel().off('selectionChanged.chart', draw);
