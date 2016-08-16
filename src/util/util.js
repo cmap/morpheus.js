@@ -238,6 +238,7 @@ morpheus.Util.prefixWithZero = function (value) {
 	return value < 10 ? '0' + value : value;
 };
 morpheus.Util.getExtension = function (name) {
+	name = '' + name;
 	var dotIndex = name.lastIndexOf('.');
 	if (dotIndex > 0) {
 		var suffix = name.substring(dotIndex + 1).toLowerCase();
