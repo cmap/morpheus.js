@@ -3610,6 +3610,10 @@ Copyright (c) 2015 Daniel Eden
     background: black !important;
 }
 
+.ui-dialog .ui-dialog-title {
+    color:white;
+}
+
 .ui-widget {
     font-family: unset;
 }

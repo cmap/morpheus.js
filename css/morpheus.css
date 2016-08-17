@@ -4,6 +4,10 @@
     background: black !important;
 }
 
+.ui-dialog .ui-dialog-title {
+    color:white;
+}
+
 .ui-widget {
     font-family: unset;
 }
