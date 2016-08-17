@@ -1664,25 +1664,11 @@ morpheus.HeatMap.prototype = {
 			this.options.uiReady(this);
 		}
 		if (this.options.tabOpened) {
-			try {
-				this.options.tabOpened(this);
-			} catch (x) {
-				console.log('Error in tabOpened');
-				if (x.stack) {
-					console.log(x.stack);
-				}
-			}
+			this.options.tabOpened(this);
 			this.updateDataset();
 		}
 		if (this.options.renderReady) {
-			try {
-				this.options.renderReady(this);
-			} catch (x) {
-				console.log('Error in renderReady');
-				if (x.stack) {
-					console.log(x.stack);
-				}
-			}
+			this.options.renderReady(this);
 			this.updateDataset();
 		}
 
