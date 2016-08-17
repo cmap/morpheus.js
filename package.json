@@ -33,6 +33,7 @@
     "grunt-contrib-jshint": "~1.0.0",
     "grunt-contrib-uglify": "~1.0.1",
     "grunt-contrib-watch": "~1.0.0",
-    "serve-static": "^1.10.2"
+    "serve-static": "^1.10.2",
+    "protobufjs": "~3.7"
   }
 }
