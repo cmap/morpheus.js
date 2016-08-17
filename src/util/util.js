@@ -986,7 +986,7 @@ morpheus.Util.arrayToString = function (value, sep) {
 	for (var i = 0, length = value.length; i < length; i++) {
 		var val_i = value[i];
 		if (_.isNumber(val_i)) {
-			s.push(morpheus.Util.nf(val_i[i]));
+			s.push(morpheus.Util.nf(val_i));
 		} else {
 			s.push('' + val_i);
 		}
