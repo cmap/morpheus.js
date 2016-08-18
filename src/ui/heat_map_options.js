@@ -323,7 +323,7 @@ morpheus.HeatMapOptions = function (controller) {
 		'keyup',
 		_.debounce(function (e) {
 			updatingSizer = true;
-			colorSchemeChooser.colorScheme.getSizer().setMax(
+			colorSchemeChooser.colorScheme.getSizer().setMin(
 				parseFloat($(this).val()));
 			colorSchemeChooser.fireChanged(true);
 			updatingSizer = false;
