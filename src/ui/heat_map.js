@@ -1627,7 +1627,11 @@ morpheus.HeatMap.prototype = {
 			}
 			if (morpheus.DatasetUtil.getSeriesIndex(this.project
 				.getFullDataset(), 'allelic_fraction') !== -1) {
-				this.options.sizeBy = 'allelic_fraction';
+				this.options.sizeBy = {
+					seriesName: 'allelic_fraction',
+					min: 0,
+					max: 1
+				};
 			}
 
 		}
@@ -1657,7 +1661,11 @@ morpheus.HeatMap.prototype = {
 
 		if (this.options.sizeBy) {
 			heatmap.getColorScheme().getSizer().setSeriesName(
-				this.options.sizeBy);
+				this.options.sizeBy.seriesName);
+			heatmap.getColorScheme().getSizer().setMin(
+				this.options.sizeBy.min);
+			heatmap.getColorScheme().getSizer().setMax(
+				this.options.sizeBy.max);
 		}
 		this.updateDataset();
 		if (this.options.uiReady) {

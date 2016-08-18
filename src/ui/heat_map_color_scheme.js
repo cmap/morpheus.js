@@ -278,48 +278,7 @@ morpheus.HeatMapConditions.prototype = {
 		return c;
 	}
 };
-morpheus.HeatMapSizer = function () {
-	this._seriesName = null;
-	this._sizeByScale = d3.scale.linear().domain([this._min, this._max])
-	.range([0, 1]).clamp(true);
-};
-morpheus.HeatMapSizer.prototype = {
-	_min: 0,
-	_max: 1,
-	copy: function () {
-		var sizer = new morpheus.HeatMapSizer();
-		sizer._seriesName = this._seriesName;
-		sizer._min = this._mini;
-		sizer._max = this._max;
-		sizer._sizeByScale = this._sizeByScale.copy();
-		return sizer;
-	},
-	valueToFraction: function (value) {
-		return this._sizeByScale(value);
-	},
-	setMin: function (min) {
-		this._min = min;
-		this._sizeByScale = d3.scale.linear().domain([this._min, this._max])
-		.range([0, 1]).clamp(true);
-	},
-	setMax: function (max) {
-		this._max = max;
-		this._sizeByScale = d3.scale.linear().domain([this._min, this._max])
-		.range([0, 1]).clamp(true);
-	},
-	getMin: function () {
-		return this._min;
-	},
-	getMax: function () {
-		return this._max;
-	},
-	getSeriesName: function () {
-		return this._seriesName;
-	},
-	setSeriesName: function (name) {
-		this._seriesName = name;
-	}
-};
+
 morpheus.HeatMapColorScheme.createColorSupplier = function (options) {
 	var type = options.type;
 	var stepped = options.stepped;
@@ -452,10 +411,7 @@ morpheus.HeatMapColorScheme.prototype = {
 		_.each(_.keys(this.rowValueToColorSupplier), function (key) {
 			// save each scheme
 			var val = _this.rowValueToColorSupplier[key];
-			// delete val.sizer;
-			// delete val.conditions;
 			json.colorSchemes[key] = val;
-
 		});
 
 		return JSON.stringify(json);

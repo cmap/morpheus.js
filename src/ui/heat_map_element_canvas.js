@@ -211,6 +211,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 		var conditions;
 		var conditionSeriesIndices;
 		context.lineWidth = 0.1;
+		var minSize = 2;
 		for (var row = top; row < bottom; row++) {
 			var rowSize = rowPositions.getItemSize(row);
 			var py = rowPositions.getPosition(row);
@@ -222,7 +223,6 @@ morpheus.HeatMapElementCanvas.prototype = {
 				if (column === left) { // check if the color scheme for this
 					// row is sizing
 					sizer = colorScheme.getSizer();
-
 					sizeBySeriesName = sizer.getSeriesName();
 					sizeBySeriesIndex = sizeBySeriesName != null ? seriesNameToIndex[sizeBySeriesName]
 						: undefined;
@@ -235,15 +235,17 @@ morpheus.HeatMapElementCanvas.prototype = {
 
 				}
 				var yoffset = 0;
+				var xoffset = 0;
 				var cellRowSize = rowSize;
+				var cellColumnSize = columnSize;
 				if (sizeBySeriesIndex !== undefined) {
 					var sizeByValue = dataset.getValue(row, column,
 						sizeBySeriesIndex);
 					if (!isNaN(sizeByValue)) {
 						var f = sizer.valueToFraction(sizeByValue);
-						var rowDiff = rowSize - rowSize * f;
-						yoffset = rowDiff;
-						cellRowSize -= rowDiff;
+						cellRowSize = Math.min(rowSize, Math.max(minSize, cellRowSize * f));
+						yoffset = rowSize - cellRowSize;
+
 					}
 				}
 				if (conditions.length > 0) {
@@ -260,21 +262,21 @@ morpheus.HeatMapElementCanvas.prototype = {
 
 					}
 					if (condition !== null) {
-						context.fillRect(px, py + yoffset, columnSize,
+						context.fillRect(px + xoffset, py + yoffset, cellColumnSize,
 							cellRowSize);
 						// x and y are at center
-						var x = px + cellRowSize / 2;
-						var y = py + yoffset + columnSize / 2;
+						var x = px + xoffset + cellRowSize / 2;
+						var y = py + yoffset + cellColumnSize / 2;
 						context.fillStyle = condition.color;
 						morpheus.CanvasUtil.drawShape(context, condition.shape,
-							x, y, Math.min(columnSize, cellRowSize) / 4);
+							x, y, Math.min(cellColumnSize, cellRowSize) / 4);
 						context.fill();
 					} else {
-						context.fillRect(px, py + yoffset, columnSize,
+						context.fillRect(px + xoffset, py + yoffset, cellColumnSize,
 							cellRowSize);
 					}
 				} else {
-					context.fillRect(px, py + yoffset, columnSize, cellRowSize);
+					context.fillRect(px + xoffset, py + yoffset, cellColumnSize, cellRowSize);
 				}
 
 				if (elementDrawCallback) {
