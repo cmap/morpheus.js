@@ -298,7 +298,6 @@ morpheus.HeatMapOptions = function (controller) {
 			.getByName(separateSchemesField)).keys()));
 	}
 
-	colorSchemeChooser.setColorScheme(controller.heatmap.getColorScheme());
 	if (separateSchemesField != null) {
 		colorSchemeChooser.setCurrentValue($colorByValue.val());
 	}
@@ -572,6 +571,9 @@ morpheus.HeatMapOptions = function (controller) {
 		+ '" role="tab" data-toggle="tab">Display</a></li>' + '</ul>');
 	$ul.appendTo($div);
 	$tab.appendTo($div);
+	// set current scheme
+	colorSchemeChooser.setColorScheme(controller.heatmap.getColorScheme());
+	colorSchemeChooser.trigger('change');
 	$ul.find('[role=tab]:eq(1)').tab('show');
 	morpheus.FormBuilder.showInModal({
 		title: 'Options',
