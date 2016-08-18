@@ -412,11 +412,11 @@ morpheus.DatasetUtil.getSeriesNames = function (dataset) {
 	for (var i = 0, nseries = dataset.getSeriesCount(); i < nseries; i++) {
 		names.push(dataset.getName(i));
 	}
-	names.sort(function (a, b) {
-		a = a.toLowerCase();
-		b = b.toLowerCase();
-		return (a < b ? -1 : (a === b ? 0 : 1));
-	});
+	// names.sort(function (a, b) {
+	// 	a = a.toLowerCase();
+	// 	b = b.toLowerCase();
+	// 	return (a < b ? -1 : (a === b ? 0 : 1));
+	// });
 	return names;
 };
 
@@ -696,6 +696,7 @@ morpheus.DatasetUtil.join = function (datasets, field) {
 		datasets[0].getRowMetadata().add('Source').setValue(0, datasets[0].getName());
 		return datasets[0];
 	}
+	// take union of all ids
 	var ids = new morpheus.Set();
 	for (var i = 0; i < datasets.length; i++) {
 		var idVector = datasets[i].getColumnMetadata().getByName(field);
@@ -705,7 +706,8 @@ morpheus.DatasetUtil.join = function (datasets, field) {
 	}
 	var dummyDataset = new morpheus.Dataset({
 		rows: 0,
-		columns: ids.size()
+		columns: ids.size(),
+		name: datasets[0].getName()
 	});
 	var dummyIdVector = dummyDataset.getColumnMetadata().add(field);
 	var counter = 0;
