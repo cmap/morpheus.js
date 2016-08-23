@@ -204,15 +204,20 @@ morpheus.VectorUtil.maybeConvertToStringArray = function (vector, delim) {
 
 morpheus.VectorUtil.maybeConvertStringToNumber = function (vector) {
 	var newValues = [];
-
+	var found = false;
 	for (var i = 0, nrows = vector.size(); i < nrows; i++) {
 		var s = vector.getValue(i);
 		if (s != null && s !== '' && s !== 'NA' && s !== 'NaN') {
 			if (!$.isNumeric(s)) {
 				return false;
+			} else {
+				found = true;
 			}
 		}
 		newValues.push(parseFloat(s));
+	}
+	if (!found) {
+		return false;
 	}
 	for (var i = 0, nrows = newValues.length; i < nrows; i++) {
 		vector.setValue(i, newValues[i]);
