@@ -1,12 +1,12 @@
-morpheus.Map = function() {
+morpheus.Map = function () {
 	this.map = {}; // object string -> key, value
 	// the key field is stored to get the original key object back
 	this.n = 0;
 };
 morpheus.Map.prototype = {
-	toString : function() {
+	toString: function () {
 		var s = [];
-		this.forEach(function(value, key) {
+		this.forEach(function (value, key) {
 			if (s.length > 0) {
 				s.push(', ');
 			}
@@ -16,24 +16,24 @@ morpheus.Map.prototype = {
 		});
 		return s.join('');
 	},
-	keys : function() {
+	keys: function () {
 		var keys = [];
-		for ( var key in this.map) {
+		for (var key in this.map) {
 			var pair = this.map[key];
 			keys.push(pair.key);
 		}
 		return keys;
 	},
-	size : function() {
+	size: function () {
 		return this.n;
 	},
-	equals : function(m) {
+	equals: function (m) {
 		if (m.size() !== this.size()) {
 			return false;
 		}
 		var ret = true;
 		try {
-			this.forEach(function(value, key) {
+			this.forEach(function (value, key) {
 				if (value !== m.get(key)) {
 					ret = false;
 					throw 'break'; // break out of loop
@@ -43,13 +43,13 @@ morpheus.Map.prototype = {
 		}
 		return ret;
 	},
-	setAll : function(map) {
+	setAll: function (map) {
 		var _this = this;
-		map.forEach(function(value, key) {
+		map.forEach(function (value, key) {
 			_this.set(key, value);
 		});
 	},
-	set : function(key, value) {
+	set: function (key, value) {
 		var skey = '\0' + key;
 		var previous = this.map[skey];
 		if (previous === undefined) { // only increment size when this is a
@@ -57,34 +57,44 @@ morpheus.Map.prototype = {
 			this.n++;
 		}
 		this.map[skey] = {
-			key : key,
-			value : value
+			key: key,
+			value: value
 		};
 	},
-	forEach : function(callback) {
-		for ( var key in this.map) {
+	forEach: function (callback) {
+		for (var key in this.map) {
 			var pair = this.map[key];
 			callback(pair.value, pair.key);
 		}
 	},
-	values : function() {
+	entries: function () {
+		var array = [];
+		this.forEach(function (value, key) {
+			array.push({
+				value: value,
+				key: key
+			});
+		});
+		return array;
+	},
+	values: function () {
 		var values = [];
-		for ( var key in this.map) {
+		for (var key in this.map) {
 			var pair = this.map[key];
 			values.push(pair.value);
 		}
 		return values;
 	},
-	get : function(key) {
+	get: function (key) {
 		var skey = '\0' + key;
 		var pair = this.map[skey];
 		return pair !== undefined ? pair.value : undefined;
 	},
-	clear : function() {
+	clear: function () {
 		this.map = {};
 		this.n = 0;
 	},
-	remove : function(key) {
+	remove: function (key) {
 		var skey = '\0' + key;
 		var pair = this.map[skey];
 		if (pair !== undefined) {
@@ -93,7 +103,7 @@ morpheus.Map.prototype = {
 			return pair.value;
 		}
 	},
-	has : function(key) {
+	has: function (key) {
 		var skey = '\0' + key;
 		return this.map[skey] !== undefined;
 	}
