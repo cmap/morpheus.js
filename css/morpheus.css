@@ -12,20 +12,6 @@
     font-family: unset;
 }
 
-.ui-state-hover,
-.ui-widget-content .ui-state-hover,
-.ui-widget-header .ui-state-hover,
-.ui-state-focus,
-.ui-widget-content .ui-state-focus,
-.ui-widget-header .ui-state-focus {
-    border: 1px solid #cccccc;
-    background: #337ab7;
-    color: white;
-}
-
-.ui-menu-item {
-    background-color: white;
-}
 
 .ui-autocomplete {
     max-height: 400px;

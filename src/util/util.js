@@ -501,10 +501,10 @@ morpheus.Util.autosuggest = function (options) {
 					options.filter(terms, response);
 				}
 			},
-			focus: function () {
-				// prevent value inserted on focus
-				return false;
-			},
+			// focus: function () {
+			// 	return false;
+			// 	// prevent value inserted on focus
+			// },
 			select: function (event, ui) {
 				if (ui.item.skip) {
 					return false;
