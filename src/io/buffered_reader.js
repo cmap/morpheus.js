@@ -45,10 +45,10 @@ morpheus.BufferedReader.prototype = {
 		}
 		this.index = index;
 		if (start === end && index === bufferLength) { // eof
-			return String(this.decoder(this.buffer, start, bufferLength));
+			return this.decoder(this.buffer, start, bufferLength);
 		}
 
-		return String(this.decoder(this.buffer, start, end));
+		return this.decoder(this.buffer, start, end);
 
 	}
 };
