@@ -13,12 +13,15 @@ morpheus.HeatMapToolBar = function (controller) {
 		e.preventDefault();
 	});
 	// search rows
+
+	// Quote search term for exact match. Narrow search with field: modifier. Exclude matches using - modifier. Use min..max to perform a range search."
+
 	if (controller.options.toolbar.searchRows) {
 		searchHtml.push('<div class="form-group">');
 		searchHtml.push('<div class="input-group">');
 		searchHtml.push('<div class="input-group-btn">');
 		searchHtml
-		.push('<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span data-toggle="tooltip" title="Search rows. Quote search term for exact match. Narrow search with field: modifier. Exclude matches using - modifier. Use min..max to perform a range search.">Rows</span> <span class="caret"></span></button>');
+		.push('<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Rows</span> <span class="caret"></span></button>');
 		searchHtml.push('<ul data-name="rowSearchOptions" class="dropdown-menu">');
 		searchHtml.push('<li><a data-name="exact" href="#">Exact Match</a></li>');
 		searchHtml
@@ -51,7 +54,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml.push('<div class="input-group">'); // group
 		searchHtml.push('<div class="input-group-btn">');
 		searchHtml
-		.push('<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span data-toggle="tooltip" title="Search columns. Quote search term for exact match. Narrow search with field: modifier. Exclude matches using - modifier. Use min..max to perform a range search.">Columns</span> <span class="caret"></span></button>');
+		.push('<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Columns</span> <span class="caret"></span></button>');
 		searchHtml
 		.push('<ul data-name="columnSearchOptions" class="dropdown-menu">');
 		searchHtml.push('<li><a data-name="exact" href="#">Exact Match</a></li>');
