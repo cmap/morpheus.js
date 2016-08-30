@@ -606,7 +606,7 @@ morpheus.Util.getAutocompleteTokens = function (text, options) {
 		return [];
 	}
 	var inQuote = false;
-	var inSelectionStart = false;
+	var inParen = false;
 	var tokens = [];
 	var currentToken = [];
 
@@ -615,8 +615,11 @@ morpheus.Util.getAutocompleteTokens = function (text, options) {
 		if (c === '"') {
 			inQuote = !inQuote;
 			currentToken.push(c);
+		} else if (c === '(' || c === ')') {
+			inParen = c === '(';
+			currentToken.push(c);
 		} else {
-			if ((c === ' ' || c === '\t') && !inQuote) {
+			if ((c === ' ' || c === '\t') && !inQuote && !inParen) {
 				tokens.push({
 					s: currentToken.join(''),
 					inSelectionStart: currentToken.inSelectionStart
@@ -1046,7 +1049,6 @@ morpheus.Util.createSearchPredicates = function (options) {
 	if (!options.caseSensitive && availableFields != null) {
 		for (var i = 0; i < availableFields.length; i++) {
 			availableFields[i] = availableFields[i].toLowerCase();
-
 		}
 	}
 	var validateFieldNames = options.validateFieldNames;
@@ -1145,20 +1147,24 @@ morpheus.Util.createSearchPredicates = function (options) {
 				}
 			} else if (rangeToken === '=') {
 				var val = parseFloat(token.substring(rangeIndex + 1));
-				if (!isNaN(val)) {
-					predicate = new morpheus.Util.EqualsPredicate(
-						field, val);
-				}
+				predicate = new morpheus.Util.EqualsPredicate(
+					field, val);
 			} else {
-				predicate = defaultIsExactMatch ? new morpheus.Util.ExactTermPredicate(
-					field, token)
-					: new morpheus.Util.RegexPredicate(field, token);
+				console.log('Unknown range token:' + rangeToken);
 			}
 		} else if (token[0] === '"' && token[token.length - 1] === '"') { // exact
-			// match
 			token = token.substring(1, token.length - 1);
 			predicate = new morpheus.Util.ExactTermPredicate(field,
 				token);
+		} else if (token[0] === '(' && token[token.length - 1] === ')') { // exact terms
+			token = token.substring(1, token.length - 1);
+			var values = morpheus.Util.getAutocompleteTokens(token);
+			if (values.length > 0) {
+				predicate = new morpheus.Util.ExactTermsPredicate(field,
+					values.map(function (val) {
+						return val.toLowerCase();
+					}));
+			}
 		} else if (token.indexOf('*') !== -1) { // contains
 			predicate = new morpheus.Util.RegexPredicate(field, token);
 		} else {
@@ -1346,6 +1352,9 @@ morpheus.Util.ContainsPredicate.prototype = {
 	getField: function () {
 		return this.field;
 	},
+	getText: function () {
+		return this.text;
+	},
 	isNumber: function () {
 		return false;
 	},
@@ -1353,6 +1362,31 @@ morpheus.Util.ContainsPredicate.prototype = {
 		return 'ContainsPredicate ' + this.field + ':' + this.text;
 	}
 };
+morpheus.Util.ExactTermsPredicate = function (field, values) {
+	this.field = field;
+	this.values = new morpheus.Set();
+	for (var i = 0, nvalues = values.length; i < nvalues; i++) {
+		this.values.add(values[i]);
+	}
+};
+morpheus.Util.ExactTermsPredicate.prototype = {
+	accept: function (value) {
+		return this.values.has((value != null && value.toLowerCase ? value.toLowerCase() : value));
+	},
+	getField: function () {
+		return this.field;
+	},
+	getValues: function () {
+		return this.values;
+	},
+	isNumber: function () {
+		return false;
+	},
+	toString: function () {
+		return 'ExactTermsPredicate ' + this.field + ':' + this.text;
+	}
+};
+
 morpheus.Util.ExactTermPredicate = function (field, term) {
 	this.field = field;
 	term = term.toLowerCase();
@@ -1364,6 +1398,9 @@ morpheus.Util.ExactTermPredicate.prototype = {
 	},
 	getField: function () {
 		return this.field;
+	},
+	getText: function () {
+		return this.text;
 	},
 	isNumber: function () {
 		return false;
@@ -1383,6 +1420,9 @@ morpheus.Util.RegexPredicate.prototype = {
 	},
 	getField: function () {
 		return this.field;
+	},
+	getText: function () {
+		return this.text;
 	},
 	isNumber: function () {
 		return false;

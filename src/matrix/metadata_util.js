@@ -68,6 +68,25 @@ morpheus.MetadataUtil.search = function (options) {
 	// TODO only search numeric fields for range searches
 	var indices = [];
 	var npredicates = predicates.length;
+	for (var p = 0; p < npredicates; p++) {
+		var predicate = predicates[p];
+		var filterColumnName = predicate.getField();
+		if (filterColumnName != null && !predicate.isNumber()) {
+			var wrapper = nameToVector.get(filterColumnName);
+			if (wrapper.dataType === 'number' || wrapper.dataType === '[number]') {
+				if (predicate.getText) {
+					predicates[p] = new morpheus.Util.EqualsPredicate(filterColumnName, parseFloat(predicate.getText()));
+				} else if (predicate.getValues) {
+					var values = [];
+					predicate.getValues().forEach(function (val) {
+						values.push(parseFloat(val));
+					});
+					predicate[p] = new morpheus.Util.ExactTermsPredicate(filterColumnName, values);
+				}
+			}
+		}
+
+	}
 	var nfields = vectors.length;
 	for (var i = 0, nitems = model.getItemCount(); i < nitems; i++) {
 		var matches = false;
@@ -106,6 +125,7 @@ morpheus.MetadataUtil.search = function (options) {
 				}
 
 			} else { // try all fields
+
 				for (var j = 0; j < nfields; j++) {
 					var wrapper = vectors[j];
 					var value = wrapper.vector.getValue(i);
@@ -290,7 +310,8 @@ morpheus.MetadataUtil.autocomplete = function (model) {
 						value: quotedField + ':',
 						label: '<span style="font-weight:300;">' + (regexMatch == null ? field : field.replace(regexMatch, '<b>$1</b>'))
 						+ ':</span>' + (dataType === 'number' ? ('<span' +
-						' style="font-weight:300;font-size:85%;">min..max</span>') : ''),
+						' style="font-weight:300;font-size:85%;">.., >, <, >=, <=,' +
+						' =</span>') : ''),
 						show: true
 					});
 				}
