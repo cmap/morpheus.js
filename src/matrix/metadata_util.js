@@ -22,7 +22,9 @@ morpheus.MetadataUtil.renameFields = function (dataset, options) {
 
 /**
  * @param options.model
- *            Metadata model
+ *            Metadata model of currently visible tracks
+ * @param options.fullModel
+ *            Metadata model of all metadata tracks
  * @param options.text
  *            Search text
  * @param options.isColumns
@@ -33,6 +35,10 @@ morpheus.MetadataUtil.renameFields = function (dataset, options) {
  */
 morpheus.MetadataUtil.search = function (options) {
 	var model = options.model;
+	var fullModel = options.fullModel;
+	if (!fullModel) {
+		fullModel = model;
+	}
 	var text = options.text;
 	var isColumns = options.isColumns;
 	text = $.trim(text);
@@ -44,7 +50,7 @@ morpheus.MetadataUtil.search = function (options) {
 		return null;
 	}
 	var indexField = isColumns ? 'COLUMN' : 'ROW';
-	var fieldNames = morpheus.MetadataUtil.getMetadataNames(model);
+	var fieldNames = morpheus.MetadataUtil.getMetadataNames(fullModel);
 	fieldNames.push(indexField);
 	var predicates = morpheus.Util.createSearchPredicates({
 		tokens: tokens,
@@ -53,8 +59,8 @@ morpheus.MetadataUtil.search = function (options) {
 	});
 	var vectors = [];
 	var nameToVector = new morpheus.Map();
-	for (var j = 0; j < model.getMetadataCount(); j++) {
-		var v = model.get(j);
+	for (var j = 0; j < fullModel.getMetadataCount(); j++) {
+		var v = fullModel.get(j);
 		var dataType = morpheus.VectorUtil.getDataType(v);
 		var wrapper = {
 			vector: v,
@@ -62,7 +68,9 @@ morpheus.MetadataUtil.search = function (options) {
 			isArray: dataType.indexOf('[') === 0
 		};
 		nameToVector.set(v.getName(), wrapper);
-		vectors.push(wrapper);
+		if (model.getByName(v.getName()) != null) {
+			vectors.push(wrapper);
+		}
 
 	}
 	// TODO only search numeric fields for range searches

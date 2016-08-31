@@ -961,11 +961,13 @@ morpheus.HeatMapToolBar.prototype = {
 		controller.getVisibleTrackNames(!isRows).forEach(function (name) {
 			visibleIndices.push(morpheus.MetadataUtil.indexOf(metadata, name));
 		});
+		var fullModel = metadata;
 		metadata = new morpheus.MetadataModelColumnView(metadata,
 			visibleIndices);
 
 		var searchResultViewIndices = morpheus.MetadataUtil.search({
 			model: metadata,
+			fullModel: fullModel,
 			text: searchText,
 			isColumns: !isRows,
 			defaultMatchMode: isRows ? this.defaultRowMatchMode
