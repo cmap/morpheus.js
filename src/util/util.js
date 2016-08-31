@@ -526,6 +526,8 @@ morpheus.Util.autosuggest = function (options) {
 					// replace the current input
 					if (terms.length === 0) {
 						terms.push(value);
+					} else if (ui.item.clear) {
+						terms = [value];
 					} else {
 						terms[terms.selectionStartIndex === -1
 						|| terms.selectionStartIndex === undefined ? terms.length - 1
