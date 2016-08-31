@@ -444,16 +444,10 @@ morpheus.GctReader.prototype = {
 			if (err) {
 				callback(err);
 			} else {
-				try {
-					callback(null, _this._read(name,
-						new morpheus.BufferedReader(new Uint8Array(
-							arrayBuffer))));
-				} catch (x) {
-					if (x.stack) {
-						console.log(x.stack);
-					}
-					callback(x);
-				}
+				callback(null, _this._read(name,
+					new morpheus.BufferedReader(new Uint8Array(
+						arrayBuffer))));
+
 			}
 		});
 
