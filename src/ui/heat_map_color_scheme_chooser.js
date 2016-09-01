@@ -3,10 +3,10 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
 	this.$div = $('<div></div>');
 	this.currentValue = null;
 	this.legend = new morpheus.LegendWithStops();
-	this.colorScheme = new morpheus.HeatMapColorScheme(new morpheus.Project(new morpheus.Dataset({
-		rows: 0,
-		columns: 0
-	})));
+	this.colorScheme = options.colorScheme || new morpheus.HeatMapColorScheme(new morpheus.Project(new morpheus.Dataset({
+			rows: 0,
+			columns: 0
+		})));
 	this.legend.on('added', function (e) {
 		var fractions = that.colorScheme.getFractions();
 		fractions.push(e.fraction);

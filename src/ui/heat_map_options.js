@@ -158,7 +158,9 @@ morpheus.HeatMapOptions = function (controller) {
 		displayFormBuilder.append(item);
 	});
 	var colorSchemeChooser = new morpheus.HeatMapColorSchemeChooser({
-		showRelative: true
+		showRelative: true,
+		colorScheme: controller.heatmap
+		.getColorScheme()
 	});
 	var updatingSizer = false;
 	colorSchemeChooser.on('change', function () {
@@ -481,6 +483,7 @@ morpheus.HeatMapOptions = function (controller) {
 			if (colorByField == '(None)') {
 				colorByField = null;
 			}
+			var colorByValue = null;
 			controller.heatmap.getColorScheme()
 			.setSeparateColorSchemeForRowMetadataField(
 				colorByField);
@@ -495,8 +498,11 @@ morpheus.HeatMapOptions = function (controller) {
 					.getByName(
 						colorByField))
 				.keys()));
+				colorByValue = $colorByValue.val();
+			} else {
+				$colorByValue.html('');
 			}
-			var colorByValue = $colorByValue.val();
+
 			controller.heatmap.getColorScheme().setCurrentValue(
 				colorByValue);
 			colorSchemeChooser.setCurrentValue(colorByValue);
