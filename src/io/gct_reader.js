@@ -184,7 +184,7 @@ morpheus.GctReader.prototype = {
 	},
 	_read: function (datasetName, reader) {
 		var tab = /\t/;
-		var versionLine = $.trim(reader.readLine());
+		var versionLine = morpheus.Util.copyString($.trim(reader.readLine()));
 		if (versionLine === '') {
 			throw new Error('Missing version line');
 		}
@@ -196,7 +196,7 @@ morpheus.GctReader.prototype = {
 		} else {
 			console.log('Unknown version: assuming version 2');
 		}
-		var dimensionsLine = reader.readLine();
+		var dimensionsLine = morpheus.Util.copyString(reader.readLine());
 		if (dimensionsLine == null) {
 			throw new Error('No dimensions specified');
 		}
@@ -224,7 +224,7 @@ morpheus.GctReader.prototype = {
 					'Number of rows and columns must be greater than 0.');
 			}
 		}
-		var columnNamesLine = reader.readLine();
+		var columnNamesLine = morpheus.Util.copyString(reader.readLine());
 		if (columnNamesLine == null) {
 			throw new Error('No column annotations');
 		}
@@ -433,7 +433,6 @@ morpheus.GctReader.prototype = {
 				1);
 			return dataset;
 		}
-
 	},
 	_readNoChunking: function (fileOrUrl, callback) {
 		var _this = this;
@@ -447,7 +446,6 @@ morpheus.GctReader.prototype = {
 				callback(null, _this._read(name,
 					new morpheus.BufferedReader(new Uint8Array(
 						arrayBuffer))));
-
 			}
 		});
 
