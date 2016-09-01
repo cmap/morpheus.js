@@ -63,23 +63,19 @@ morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
 	return datasetReader;
 };
 
-morpheus.DatasetUtil.readDatasetArray = function (options) {
+morpheus.DatasetUtil.readDatasetArray = function (datasets) {
 	var retDef = $.Deferred();
 	var loadedDatasets = [];
 	var promises = [];
-	_.each(options.dataset, function (option, i) {
-		var p = option.dataset.file ? morpheus.DatasetUtil.read(
-			option.dataset.file, option.dataset.options)
-			: morpheus.DatasetUtil.read(option.dataset);
+	_.each(datasets, function (url, i) {
+		var p = morpheus.DatasetUtil.read(url);
 		p.index = i;
 		p.done(function (dataset) {
 			loadedDatasets[this.index] = dataset;
 		});
 		p.fail(function (err) {
-			var message = ['Error opening '
-			+ (option.dataset.file ? morpheus.Util
-			.getFileName(option.dataset.file) : morpheus.Util
-			.getFileName(option.dataset)) + '.'];
+			var message = ['Error opening ' + morpheus.Util
+			.getFileName(url) + '.'];
 			if (err.message) {
 				message.push('<br />Cause: ');
 				message.push(err.message);
@@ -692,6 +688,9 @@ morpheus.DatasetUtil.fill = function (dataset, value, seriesIndex) {
 };
 
 morpheus.DatasetUtil.join = function (datasets, field) {
+	if (datasets.length === 0) {
+		throw 'No datasets';
+	}
 	if (datasets.length === 1) {
 		datasets[0].getRowMetadata().add('Source').setValue(0, datasets[0].getName());
 		return datasets[0];

@@ -239,9 +239,7 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
 	var datasets = [];
 	if (options.sig_genes) {
 		datasets
-		.push({
-			dataset: 'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_hybrid_capture1650_hg19_NoCommonSNPs_NoNeutralVariants_CDS_2012.05.07.maf.txt'
-		});
+		.push('https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_hybrid_capture1650_hg19_NoCommonSNPs_NoNeutralVariants_CDS_2012.05.07.maf.txt');
 		// datasets
 		// .push({
 		// dataset :
@@ -250,22 +248,16 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
 	}
 	if (options.cn) {
 		datasets
-		.push({
-			dataset: 'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_copynumber_byGene_2013-12-03.gct'
-		});
+		.push('https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_copynumber_byGene_2013-12-03.gct');
 	}
 
 	if (options.mrna) {
 		datasets
-		.push({
-			dataset: 'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_Expression_Entrez_2012-09-29.txt'
-		});
+		.push('https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_Expression_Entrez_2012-09-29.txt');
 	}
 	if (options.ach) {
 		datasets
-		.push({
-			dataset: 'https://s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct'
-		});
+		.push('https://s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct');
 	}
 	var columnAnnotations = [{
 		file: 'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_Sample_Info.txt',
@@ -283,9 +275,7 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
 
 	}
 	var returnDeferred = $.Deferred();
-	var datasetDef = morpheus.DatasetUtil.readDatasetArray({
-		dataset: datasets
-	});
+	var datasetDef = morpheus.DatasetUtil.readDatasetArray(datasets);
 
 	var annotationDef = morpheus.DatasetUtil.annotate({
 		annotations: columnAnnotations,
