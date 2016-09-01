@@ -12,9 +12,6 @@ morpheus.HeatMapToolBar = function (controller) {
 	$search.on('submit', function (e) {
 		e.preventDefault();
 	});
-	// search rows
-
-	// Quote search term for exact match. Narrow search with field: modifier. Exclude matches using - modifier. Use min..max to perform a range search."
 
 	if (controller.options.toolbar.searchRows) {
 		searchHtml.push('<div class="form-group">');
@@ -23,9 +20,15 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml
 		.push('<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Rows</span> <span class="caret"></span></button>');
 		searchHtml.push('<ul data-name="rowSearchOptions" class="dropdown-menu">');
-		searchHtml.push('<li><a data-name="exact" href="#">Exact Match</a></li>');
+		searchHtml.push('<li><a data-name="exact" href="#"><span data-type="toggle"></span>Exact' +
+			' Match</a></li>');
 		searchHtml
-		.push('<li class="active"><a data-name="contains" href="#">Contains</a></li>');
+		.push('<li><a data-name="contains" href="#"><span data-type="toggle"' +
+			' class="dropdown-checkbox fa fa-check"></span>Contains</a></li>');
+		searchHtml
+		.push('<li role="separator" class="divider"></li>');
+		searchHtml
+		.push('<li><a data-name="searchHelp" href="#">Help</a></li>');
 		searchHtml.push('</ul>');
 		searchHtml.push('</div>'); // input-group-btn
 		searchHtml
@@ -57,9 +60,15 @@ morpheus.HeatMapToolBar = function (controller) {
 		.push('<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Columns</span> <span class="caret"></span></button>');
 		searchHtml
 		.push('<ul data-name="columnSearchOptions" class="dropdown-menu">');
-		searchHtml.push('<li><a data-name="exact" href="#">Exact Match</a></li>');
+		searchHtml.push('<li><a data-name="exact" href="#"><span data-type="toggle"></span>Exact Match</a></a></li>');
 		searchHtml
-		.push('<li class="active"><a data-name="contains" href="#">Contains</a></li>');
+		.push('<li><a data-name="contains" href="#"><span data-type="toggle"' +
+			' class="dropdown-checkbox fa' +
+			' fa-check"></span>Contains</a></a></li>');
+		searchHtml
+		.push('<li role="separator" class="divider"></li>');
+		searchHtml
+		.push('<li><a data-name="searchHelp" href="#">Help</a></li>');
 		searchHtml.push('</ul>');
 		searchHtml.push('</div>'); // input-group-btn
 
@@ -274,9 +283,13 @@ morpheus.HeatMapToolBar = function (controller) {
 	$rowSearchOptions.on('click', 'li > a', function (e) {
 		e.preventDefault();
 		_this.defaultRowMatchMode = $(this).attr('data-name');
-		$rowSearchOptions.find('li').removeClass('active');
-		$(this).parent('li').addClass('active');
 		_this.search(true);
+		var $span = $(this).find('span');
+		if ($span.data('type') === 'toggle') {
+			$rowSearchOptions.find('[data-type=toggle]').removeClass('dropdown-checkbox fa' +
+				' fa-check');
+			$span.addClass('dropdown-checkbox fa fa-check');
+		}
 		morpheus.Util.trackEvent({
 			eventCategory: 'ToolBar',
 			eventAction: 'rowSearchMatchMode'
@@ -286,9 +299,13 @@ morpheus.HeatMapToolBar = function (controller) {
 	$columnSearchOptions.on('click', 'li > a', function (e) {
 		e.preventDefault();
 		_this.defaultColumnMatchMode = $(this).attr('data-name');
-		$columnSearchOptions.find('li').removeClass('active');
-		$(this).parent('li').addClass('active');
 		_this.search(false);
+		var $span = $(this).find('span');
+		if ($span.data('type') === 'toggle') {
+			$columnSearchOptions.find('[data-type=toggle]').removeClass('dropdown-checkbox fa' +
+				' fa-check');
+			$span.addClass('dropdown-checkbox fa fa-check');
+		}
 		morpheus.Util.trackEvent({
 			eventCategory: 'ToolBar',
 			eventAction: 'columnSearchMatchMode'
@@ -428,6 +445,48 @@ morpheus.HeatMapToolBar = function (controller) {
 				eventAction: 'tutorial'
 			});
 		});
+
+	var searchHelpHtml = [];
+	searchHelpHtml.push('<h4>Symbols</h4>');
+	searchHelpHtml.push('<table class="table table-bordered">');
+	searchHelpHtml.push('<tr><th>Term</th><th>Description</th></tr>');
+	searchHelpHtml.push('<tr><td><code><strong>*</strong></code></td><td>Quote a search term for an' +
+		' exact' +
+		' match. <br' +
+		' />Example: <code><strong>"root beer"</strong></code></td></tr>');
+
+	searchHelpHtml.push('<tr><td><code><strong>-</strong></code></td><td>Exclude matches using -' +
+		' modifier.</td></tr>');
+	searchHelpHtml.push('<tr><td><code><strong>..</strong></code></td><td>Separate numbers by two' +
+		' periods' +
+		' without spaces to' +
+		' see numbers that fall within a range.. <br' +
+		' />Example: <code><strong>1..10</strong></code></td></tr>');
+	searchHelpHtml.push('<tr><td><code><strong><= < > >= =</strong></code></td><td>Perform a' +
+		' numeric' +
+		' search.' +
+		' <br' +
+		' />Example: <code><strong>>4</strong></code></td></tr>');
+	searchHelpHtml.push('</table>');
+	searchHelpHtml.push('<h4>Search fields</h4>');
+	searchHelpHtml.push('<p>You can restrict your search to any field by typing the field name followed by a colon ":" and then the term you are looking for. For example, to search for matches containing "beer" in the beverage field, you can enter:' +
+		' <code><strong>beverage:beer</strong></code>');
+	searchHelpHtml.push('Note that searches only include metadata fields that are displayed. You' +
+		' can search a hidden field by performing a field search.');
+
+	// searchHelpHtml.push('<br />Note: The field is only valid for the term that it directly' +
+	// 	' precedes.');
+	searchHelpHtml.push('<p>You can search for an exact list of values by enclosing the list of' +
+		' values in parentheses. For example: <code><strong>pet:(cat dog)</strong></code>' +
+		' searches finds all pets that are either cats or dogs.</p>');
+	var $searchHelp = $(searchHelpHtml.join(''));
+	$el.find('[data-name=searchHelp]').on('click', function (e) {
+		e.preventDefault();
+		morpheus.FormBuilder.showInModal({
+			title: 'Search Help',
+			html: $searchHelp
+		});
+	});
 
 	this.$previousColumnMatch = $el.find('[name=previousColumnMatch]');
 	this.$nextColumnMatch = $el.find('[name=nextColumnMatch]');
