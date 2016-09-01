@@ -1842,6 +1842,7 @@ morpheus.HeatMap.prototype = {
 					}
 				}
 				_this.verticalSearchBar.update();
+				_this.heatmap.updateRowSelectionCache();
 				_this.paintAll({
 					paintRows: true,
 					paintColumns: false,
@@ -1853,6 +1854,7 @@ morpheus.HeatMap.prototype = {
 			function () {
 
 				_this.horizontalSearchBar.update();
+				_this.heatmap.updateColumnSelectionCache();
 				_this.paintAll({
 					paintRows: false,
 					paintColumns: true,
@@ -2600,6 +2602,7 @@ morpheus.HeatMap.prototype = {
 		var dataset = this.project.getSortedFilteredDataset();
 		this.verticalSearchBar.update();
 		this.horizontalSearchBar.update();
+
 		this.heatmap.setDataset(dataset);
 		this.heatmap.getRowPositions().spaces = morpheus.HeatMap
 		.createGroupBySpaces(dataset, this.project.getGroupRows(),
