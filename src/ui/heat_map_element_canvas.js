@@ -133,7 +133,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 		var top = morpheus.Positions.getTop(clip, rowPositions);
 		var bottom = morpheus.Positions.getBottom(clip, rowPositions);
 		context.strokeStyle = 'rgb(0,0,0)';
-		context.lineWidth = 3;
+		context.lineWidth = 2;
 		// context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 		context.translate(-clip.x, -clip.y);
 		var selectedElements = project.getElementSelectionModel()
