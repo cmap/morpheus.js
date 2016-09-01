@@ -24,18 +24,17 @@ morpheus.BufferedReader.prototype = {
 		var index = this.index;
 		var bufferLength = this.bufferLength;
 		if (index >= bufferLength) {
-
 			return null;
 		}
 		var buffer = this.buffer;
 		var start = index;
 		var end = start;
+		// dos: \r\n, old mac:\r
 		for (; index < bufferLength; index++) {
 			var c = buffer[index];
 			if (c === 10 || c === 13) { // \n or \r
 				end = index;
-				if ((index !== bufferLength - 1)
-					&& (buffer[index + 1] === 10 || buffer[index + 1] === 13)) { // skip
+				if ((index !== bufferLength - 1) && buffer[index + 1] === 10) { // skip
 					// ahead
 					index++;
 				}
