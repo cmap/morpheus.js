@@ -7,16 +7,33 @@ morpheus.GctReader.prototype = {
 		return 'gct';
 	},
 	read: function (fileOrUrl, callback) {
+		var _this = this;
 		if (fileOrUrl instanceof File) {
 			this._readChunking(fileOrUrl, callback, false);
 		} else {
-			this._readNoChunking(fileOrUrl, callback);
+			// XXX only do byte range requests from S3
+			if (fileOrUrl.indexOf('s3.amazonaws.com') !== -1) {
+				$.ajax({
+					url: fileOrUrl,
+					method: 'HEAD'
+				}).done(function (data, textStatus, jqXHR) {
+					if ('gzip' === jqXHR.getResponseHeader('Content-Encoding')) {
+						_this._readNoChunking(fileOrUrl, callback);
+					} else {
+						_this._readChunking(fileOrUrl, callback, false);
+					}
+				}).fail(function () {
+					_this._readNoChunking(fileOrUrl, callback);
+				});
+			} else {
+				_this._readNoChunking(fileOrUrl, callback);
+			}
 		}
 	},
 	_readChunking: function (fileOrUrl, callback, tryNoChunkIfError) {
 		var _this = this;
 		// Papa.LocalChunkSize = 10485760 * 10; // 100 MB
-		// Papa.RemoteChunkSize = 10485760 * 10; // 100 MB
+		//Papa.RemoteChunkSize = 10485760 / 2; // 10485760 = 10MB
 		var lineNumber = 0;
 		var version;
 		var numRowAnnotations = 1; // in addition to row id
@@ -44,6 +61,7 @@ morpheus.GctReader.prototype = {
 			worker: false,
 			comments: false,
 			step: function (result) {
+
 				if (lineNumber === 0) {
 					var text = result.data[0][0].trim();
 					if ('#1.2' === text) {
@@ -383,7 +401,6 @@ morpheus.GctReader.prototype = {
 
 			var nonEmptyDescriptionFound = false;
 			var numRowAnnotationsPlusOne = numRowAnnotations + 1;
-
 			for (var rowIndex = 0, nrows = dataset.getRowCount(); rowIndex < nrows; rowIndex++) {
 				var s = reader.readLine();
 				if (s === null) {
@@ -448,6 +465,14 @@ morpheus.GctReader.prototype = {
 						arrayBuffer))));
 			}
 		});
+		// $.ajax({
+		// 	url: fileOrUrl,
+		// 	dataType: 'text'
+		// }).done(function (text) {
+		// 	callback(null, _this.read(name, new morpheus.StringReader(text)));
+		// }).fail(function (err) {
+		// 	callback(err);
+		// });
 
 	}
 };

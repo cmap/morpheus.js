@@ -468,6 +468,60 @@ morpheus.Util.autosuggest = function (options) {
 		delay: 500,
 		suggestWhenEmpty: true,
 	}, options);
+
+	function _select(event, ui) {
+		if (ui.item.skip) {
+			return false;
+		}
+		if (options.multi) {
+			var terms = morpheus.Util
+			.getAutocompleteTokens(
+				options.$el[0].value,
+				{
+					trim: false,
+					selectionStart: options.$el[0].selectionStart
+				});
+
+			var field = (event.toElement && event.toElement.dataset) ? event.toElement.dataset.autocomplete : null;
+			var value = field ? ui.item[field] : ui.item.value;
+			var show = ui.item.show;
+
+			// replace the current input
+			if (terms.length === 0) {
+				terms.push(value);
+			} else if (ui.item.clear) {
+				terms = [value];
+			} else {
+				terms[terms.selectionStartIndex === -1
+				|| terms.selectionStartIndex === undefined ? terms.length - 1
+					: terms.selectionStartIndex] = value;
+			}
+			// add the selected item
+			options.$el[0].value = terms.join(' ');
+			if (show) { // did
+				// we
+				// select
+				// just a
+				// field name?
+				setTimeout(function () {
+					options.$el.autocomplete('search',
+						options.$el.val());
+				}, 20);
+
+			}
+			if (options.select) {
+				options.select();
+			}
+			return false;
+		}
+		if (options.select) {
+			options.select();
+		}
+		if (event.which === 13) {
+			event.stopImmediatePropagation();
+		}
+	}
+
 	options.$el
 	// don't navigate away from the field on tab when selecting an item
 	.on(
@@ -501,62 +555,11 @@ morpheus.Util.autosuggest = function (options) {
 					options.filter(terms, response);
 				}
 			},
-			// focus: function () {
-			// 	return false;
-			// 	// prevent value inserted on focus
-			// },
+			focus: function (event, ui) {
+				return _select(event, ui);
+			},
 			select: function (event, ui) {
-				if (ui.item.skip) {
-					return false;
-				}
-
-				if (options.multi) {
-					var terms = morpheus.Util
-					.getAutocompleteTokens(
-						this.value,
-						{
-							trim: false,
-							selectionStart: options.$el[0].selectionStart
-						});
-
-					var field = (event.toElement && event.toElement.dataset) ? event.toElement.dataset.autocomplete : null;
-					var value = field ? ui.item[field] : ui.item.value;
-					var show = ui.item.show;
-
-					// replace the current input
-					if (terms.length === 0) {
-						terms.push(value);
-					} else if (ui.item.clear) {
-						terms = [value];
-					} else {
-						terms[terms.selectionStartIndex === -1
-						|| terms.selectionStartIndex === undefined ? terms.length - 1
-							: terms.selectionStartIndex] = value;
-					}
-					// add the selected item
-					this.value = terms.join(' ');
-					if (show) { // did
-						// we
-						// select
-						// just a
-						// field name?
-						setTimeout(function () {
-							options.$el.autocomplete('search',
-								options.$el.val());
-						}, 20);
-
-					}
-					if (options.select) {
-						options.select();
-					}
-					return false;
-				}
-				if (options.select) {
-					options.select();
-				}
-				if (event.which === 13) {
-					event.stopImmediatePropagation();
-				}
+				return _select(event, ui);
 			}
 		});
 

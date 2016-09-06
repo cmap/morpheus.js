@@ -81,9 +81,8 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
 	});
 	if (options.showRelative) {
 		items = items.concat({
-			name: 'color_scheme',
-			type: 'radio',
-			options: ['fixed', 'relative'],
+			name: 'relative_color_scheme',
+			type: 'checkbox',
 			help: 'A relative color scheme uses the minimum and maximum values in each row' +
 			' to convert values to colors'
 		});
@@ -171,14 +170,13 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
 	formBuilder.$form
 	.on(
 		'change',
-		'[name=color_scheme]',
+		'[name=relative_color_scheme]',
 		_
 		.throttle(
 			function (e) {
 				that.legend.selectedIndex = -1;
 				// FIXME set fixed min and max
-				var val = $(this).val();
-				var scalingMode = val === 'relative' ? morpheus.HeatMapColorScheme.ScalingMode.RELATIVE
+				var scalingMode = $(this).prop('checked') ? morpheus.HeatMapColorScheme.ScalingMode.RELATIVE
 					: morpheus.HeatMapColorScheme.ScalingMode.FIXED;
 				that.colorScheme
 				.setScalingMode(scalingMode);
@@ -249,7 +247,7 @@ morpheus.HeatMapColorSchemeChooser.prototype = {
 		this.off('change');
 		this.legend.destroy();
 		this.formBuilder.$form.off('keyup', 'input');
-		this.formBuilder.$form.off('change', '[name=color_scheme]');
+		this.formBuilder.$form.off('change', '[name=relative_color_scheme]');
 	},
 	restoreCurrentValue: function () {
 		if (this.colorScheme.setCurrentValue) {
@@ -271,9 +269,9 @@ morpheus.HeatMapColorSchemeChooser.prototype = {
 		}
 		this.formBuilder
 		.setValue(
-			'color_scheme',
-			colorScheme.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE ? 'relative'
-				: 'fixed');
+			'relative_color_scheme',
+			colorScheme.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE ? true
+				: false);
 		this.formBuilder.$form
 		.find('[name=minimum],[name=maximum]')
 		.prop(
