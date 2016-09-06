@@ -469,7 +469,7 @@ morpheus.Util.autosuggest = function (options) {
 		suggestWhenEmpty: true,
 	}, options);
 
-	function _select(event, ui) {
+	function _select(event, ui, isKey) {
 		if (ui.item.skip) {
 			return false;
 		}
@@ -498,7 +498,7 @@ morpheus.Util.autosuggest = function (options) {
 			}
 			// add the selected item
 			options.$el[0].value = terms.join(' ');
-			if (show) { // did
+			if (show && !isKey) { // did
 				// we
 				// select
 				// just a
@@ -509,15 +509,15 @@ morpheus.Util.autosuggest = function (options) {
 				}, 20);
 
 			}
-			if (options.select) {
+			if (!isKey && options.select) {
 				options.select();
 			}
 			return false;
 		}
-		if (options.select) {
+		if (!isKey && options.select) {
 			options.select();
 		}
-		if (event.which === 13) {
+		if (!isKey && event.which === 13) {
 			event.stopImmediatePropagation();
 		}
 	}
@@ -556,22 +556,30 @@ morpheus.Util.autosuggest = function (options) {
 				}
 			},
 			focus: function (event, ui) {
-				return false; //_select(event, ui);
+				var original = event.originalEvent;
+				while (original.originalEvent != null) {
+					original = original.originalEvent;
+				}
+				if (original && /^key/.test(original.type)) {
+					return _select(event, ui, true);
+				}
+				return false;
 			},
 			select: function (event, ui) {
-				return _select(event, ui);
+				return _select(event, ui, false);
 			}
 		});
 
 	// use html for label instead of default text
 	var instance = options.$el.autocomplete('instance');
 	instance._renderItem = function (ul, item) {
-		return $('<li class="' + (item.class ? item.class : 'ui-menu-item') + ' search-item">').html(item.label).appendTo(ul);
+		return $('<li class="ui-menu-item' + (item.class ? (' ' + item.class) : '') + 'search-item">')
+		.append($("<div>").html(item.label))
+		.appendTo(ul);
 	};
 	instance._normalize = function (items) {
 		return items;
 	};
-
 	instance._resizeMenu = function () {
 		var ul = this.menu.element;
 		ul.outerWidth(instance.element.outerWidth());
