@@ -83,7 +83,9 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
 		items = items.concat({
 			name: 'color_scheme',
 			type: 'radio',
-			options: ['fixed', 'relative']
+			options: ['fixed', 'relative'],
+			help: 'A relative color scheme uses the minimum and maximum values in each row' +
+			' to convert values to colors'
 		});
 	}
 	items = items.concat({
