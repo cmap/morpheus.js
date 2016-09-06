@@ -556,7 +556,7 @@ morpheus.Util.autosuggest = function (options) {
 				}
 			},
 			focus: function (event, ui) {
-				return _select(event, ui);
+				return false; //_select(event, ui);
 			},
 			select: function (event, ui) {
 				return _select(event, ui);
