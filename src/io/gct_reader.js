@@ -184,7 +184,7 @@ morpheus.GctReader.prototype = {
 	},
 	_read: function (datasetName, reader) {
 		var tab = /\t/;
-		var versionLine = morpheus.Util.copyString($.trim(reader.readLine()));
+		var versionLine = morpheus.Util.copyString(reader.readLine().trim());
 		if (versionLine === '') {
 			throw new Error('Missing version line');
 		}
