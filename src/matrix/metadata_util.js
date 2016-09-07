@@ -195,109 +195,108 @@ morpheus.MetadataUtil.autocomplete = function (model) {
 		var token = tokens != null && tokens.length > 0 ? tokens[tokens.selectionStartIndex]
 			: '';
 		token = $.trim(token);
-		try {
-			if (token !== '') {
-				var field = null;
-				var semi = token.indexOf(':');
-				if (semi > 0) { // field search?
-					if (token.charCodeAt(semi - 1) !== 92) { // \:
-						var possibleField = $.trim(token.substring(0, semi));
-						if (possibleField.length > 0
-							&& possibleField[0] === '"'
-							&& possibleField[token.length - 1] === '"') {
-							possibleField = possibleField.substring(1,
-								possibleField.length - 1);
-						}
-						var index = morpheus.MetadataUtil.indexOf(searchModel,
-							possibleField);
-						if (index !== -1) {
-							token = $.trim(token.substring(semi + 1));
-							searchModel = new morpheus.MetadataModelColumnView(
-								model, [index]);
-						}
+		var fieldSearchFieldName = null;
+		if (token !== '') {
+
+			var semi = token.indexOf(':');
+			if (semi > 0) { // field search?
+				if (token.charCodeAt(semi - 1) !== 92) { // \:
+					var possibleField = $.trim(token.substring(0, semi));
+					if (possibleField.length > 0
+						&& possibleField[0] === '"'
+						&& possibleField[token.length - 1] === '"') {
+						possibleField = possibleField.substring(1,
+							possibleField.length - 1);
 					}
-
-				}
-				var set = new morpheus.Set();
-				// regex used to determine if a string starts with substring `q`
-
-				regex = new RegExp(morpheus.Util.escapeRegex(token), 'i');
-				regexMatch = new RegExp('(' + morpheus.Util.escapeRegex(token) + ')', 'i');
-				// iterate through the pool of strings and for any string that
-				// contains the substring `q`, add it to the `matches` array
-				var max = 10;
-
-				var vectors = [];
-				var isArray = [];
-				for (var j = 0; j < searchModel.getMetadataCount(); j++) {
-					var v = searchModel.get(j);
-					var dataType = morpheus.VectorUtil.getDataType(v);
-					if (dataType === 'string' || dataType === '[string]') { // skip
-						// numeric
-						// fields
-						vectors.push(v);
-						isArray.push(dataType === '[string]');
+					var index = morpheus.MetadataUtil.indexOf(searchModel,
+						possibleField);
+					if (index !== -1) {
+						fieldSearchFieldName = possibleField;
+						token = $.trim(token.substring(semi + 1));
+						searchModel = new morpheus.MetadataModelColumnView(
+							model, [index]);
 					}
 				}
 
-				var nfields = vectors.length;
+			}
+			var set = new morpheus.Set();
+			// regex used to determine if a string starts with substring `q`
 
-				loop: for (var i = 0, nitems = searchModel.getItemCount(); i < nitems; i++) {
-					for (var j = 0; j < nfields; j++) {
-						var v = vectors[j];
-						var val = v.getValue(i);
-						if (val != null) {
-							if (isArray[j]) {
-								for (var k = 0; k < val.length; k++) {
-									var id = new morpheus.Identifier([val[k],
-										v.getName()]);
-									if (!set.has(id) && regex.test(val[k])) {
-										set.add(id);
-										if (set.size() === max) {
-											break loop;
-										}
-									}
-								}
-							} else {
-								var id = new morpheus.Identifier([val,
+			regex = new RegExp(morpheus.Util.escapeRegex(token), 'i');
+			regexMatch = new RegExp('(' + morpheus.Util.escapeRegex(token) + ')', 'i');
+			// iterate through the pool of strings and for any string that
+			// contains the substring `q`, add it to the `matches` array
+			var max = 10;
+
+			var vectors = [];
+			var isArray = [];
+			for (var j = 0; j < searchModel.getMetadataCount(); j++) {
+				var v = searchModel.get(j);
+				var dataType = morpheus.VectorUtil.getDataType(v);
+				if (dataType === 'string' || dataType === '[string]') { // skip
+					// numeric
+					// fields
+					vectors.push(v);
+					isArray.push(dataType === '[string]');
+				}
+			}
+
+			var nfields = vectors.length;
+
+			loop: for (var i = 0, nitems = searchModel.getItemCount(); i < nitems; i++) {
+				for (var j = 0; j < nfields; j++) {
+					var v = vectors[j];
+					var val = v.getValue(i);
+					if (val != null) {
+						if (isArray[j]) {
+							for (var k = 0; k < val.length; k++) {
+								var id = new morpheus.Identifier([val[k],
 									v.getName()]);
-								if (!set.has(id) && regex.test(val)) {
+								if (!set.has(id) && regex.test(val[k])) {
 									set.add(id);
 									if (set.size() === max) {
 										break loop;
 									}
 								}
 							}
+						} else {
+							var id = new morpheus.Identifier([val,
+								v.getName()]);
+							if (!set.has(id) && regex.test(val)) {
+								set.add(id);
+								if (set.size() === max) {
+									break loop;
+								}
+							}
 						}
-
 					}
+
 				}
-
-				set.forEach(function (id) {
-					var array = id.getArray();
-					var field = array[1];
-					var val = array[0];
-					var quotedField = field;
-					if (quotedField.indexOf(' ') !== -1) {
-						quotedField = '"' + quotedField + '"';
-					}
-					var quotedValue = val;
-					if (quotedValue.indexOf(' ') !== -1) {
-						quotedValue = '"' + quotedValue + '"';
-					}
-					matches.push({
-						value: quotedField + ':' + quotedValue,
-						label: '<span style="font-weight:300;">' + field
-						+ ':</span>'
-						+ '<span>' + val.replace(regexMatch, '<b>$1</b>')
-						+ '</span>'
-					});
-
-				});
 			}
-		} catch (x) {
 
+			set.forEach(function (id) {
+				var array = id.getArray();
+				var field = array[1];
+				var val = array[0];
+				var quotedField = field;
+				if (quotedField.indexOf(' ') !== -1) {
+					quotedField = '"' + quotedField + '"';
+				}
+				var quotedValue = val;
+				if (quotedValue.indexOf(' ') !== -1) {
+					quotedValue = '"' + quotedValue + '"';
+				}
+				matches.push({
+					value: quotedField + ':' + quotedValue,
+					label: '<span style="font-weight:300;">' + field
+					+ ':</span>'
+					+ '<span>' + val.replace(regexMatch, '<b>$1</b>')
+					+ '</span>'
+				});
+
+			});
 		}
+
 		// field names
 		if (regex == null) {
 			regex = new RegExp('.*', 'i');
@@ -309,7 +308,7 @@ morpheus.MetadataUtil.autocomplete = function (model) {
 			var field = v.getName();
 			if (dataType === 'number' || dataType === 'string'
 				|| dataType === '[string]') {
-				if (regex.test(field)) {
+				if (regex.test(field) && field !== fieldSearchFieldName) {
 					var quotedField = field;
 					if (quotedField.indexOf(' ') !== -1) {
 						quotedField = '"' + quotedField + '"';
