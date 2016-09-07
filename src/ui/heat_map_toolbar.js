@@ -4,7 +4,7 @@ morpheus.HeatMapToolBar = function (controller) {
 	this.columnSearchResultModelIndices = [];
 	var _this = this;
 	var $el = $('<div style="white-space:nowrap;" class="hidden-print container-fluid">'
-		+ '<div class="row"><div class="col-xs-12"><div data-name="lineOneColumn"></div></div></div>'
+		+ '<div class="row"><div style="padding-left:0px;" class="col-xs-12"><div data-name="lineOneColumn"></div></div></div>'
 		+ '<div class="row"><div class="col-xs-12"><div data-name="lineTwoColumn" style="border-bottom: 1px solid #e7e7e7;margin-bottom:10px;"></div></div></div>'
 		+ '</div>');
 	var searchHtml = [];
@@ -18,7 +18,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml.push('<div class="input-group">');
 		searchHtml.push('<div class="input-group-btn">');
 		searchHtml
-		.push('<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Rows</span> <span class="caret"></span></button>');
+		.push('<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Rows</span> <span class="caret"></span></button>');
 		searchHtml.push('<ul data-name="rowSearchOptions" class="dropdown-menu">');
 		searchHtml.push('<li><a data-name="exact" href="#"><span data-type="toggle"></span>Exact' +
 			' Match</a></li>');
@@ -40,11 +40,11 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml
 		.push('<span data-name="searchResultsRows"></span>');
 		searchHtml
-		.push('<button name="previousRowMatch" type="button" class="btn btn-default btn-xs" data-toggle="tooltip" title="Previous"><i class="fa fa-chevron-up"></i></button>');
+		.push('<button name="previousRowMatch" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Previous"><i class="fa fa-chevron-up"></i></button>');
 		searchHtml
-		.push('<button name="nextRowMatch" type="button" class="btn btn-default btn-xs" data-toggle="tooltip" title="Next"><i class="fa fa-chevron-down"></i></button>');
+		.push('<button name="nextRowMatch" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Next"><i class="fa fa-chevron-down"></i></button>');
 		searchHtml
-		.push('<button name="rowMatchesToTop" type="button" class="btn btn-default btn-xs" data-toggle="tooltip" title="Matches To Top"><i class="fa fa-level-up"></i></button>');
+		.push('<button name="rowMatchesToTop" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Matches To Top"><i class="fa fa-level-up"></i></button>');
 		searchHtml.push('</span>');
 		searchHtml.push('</div>');
 
@@ -57,7 +57,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml.push('<div class="input-group">'); // group
 		searchHtml.push('<div class="input-group-btn">');
 		searchHtml
-		.push('<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Columns</span> <span class="caret"></span></button>');
+		.push('<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Columns</span> <span class="caret"></span></button>');
 		searchHtml
 		.push('<ul data-name="columnSearchOptions" class="dropdown-menu">');
 		searchHtml.push('<li><a data-name="exact" href="#"><span data-type="toggle"></span>Exact Match</a></a></li>');
@@ -81,11 +81,11 @@ morpheus.HeatMapToolBar = function (controller) {
 		.push('<span data-name="searchResultsColumns"></span>');
 		searchHtml.push('<span data-name="columnSearchDiv" style="display:none;">');
 		searchHtml
-		.push('<button name="previousColumnMatch" type="button" class="btn btn-default btn-xs" data-toggle="tooltip" title="Previous"><i class="fa fa-chevron-up"></i></button>');
+		.push('<button name="previousColumnMatch" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Previous"><i class="fa fa-chevron-up"></i></button>');
 		searchHtml
-		.push('<button name="nextColumnMatch" type="button" class="btn btn-default btn-xs" data-toggle="tooltip" title="Next"><i class="fa fa-chevron-down"></i></button>');
+		.push('<button name="nextColumnMatch" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Next"><i class="fa fa-chevron-down"></i></button>');
 		searchHtml
-		.push('<button name="columnMatchesToTop" type="button" class="btn btn-default btn-xs" data-toggle="tooltip" title="Matches To Top"><i class="fa fa-level-up"></i></button>');
+		.push('<button name="columnMatchesToTop" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Matches To Top"><i class="fa fa-level-up"></i></button>');
 		searchHtml.push('</span>');
 		searchHtml.push('</div>');
 	}
@@ -144,22 +144,22 @@ morpheus.HeatMapToolBar = function (controller) {
 	// zoom
 	if (controller.options.toolbar.zoom) {
 		toolbarHtml
-		.push('<button type="button" class="btn btn-default btn-xs" data-toggle="tooltip" title="Zoom Out (-)" name="out"><span class="fa fa-minus"></span></button>');
+		.push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Zoom Out (-)" name="out"><span class="fa fa-minus"></span></button>');
 		toolbarHtml
-		.push('<button type="button" class="btn btn-default btn-xs" data-toggle="tooltip" title="Zoom In (+)" name="in"><span class="fa fa-plus"></span></button>');
+		.push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Zoom In (+)" name="in"><span class="fa fa-plus"></span></button>');
 		toolbarHtml
-		.push('<button type="button" class="btn btn-default btn-xs" data-toggle="tooltip" title="Fit To Window" name="fit"><span class="fa fa-compress"></span></button>');
+		.push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Fit To Window" name="fit"><span class="fa fa-compress"></span></button>');
 		toolbarHtml
-		.push('<button type="button" class="btn btn-default btn-xs" data-toggle="tooltip" title="Reset Zoom" name="resetZoom">100%</button>');
+		.push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Reset Zoom" name="resetZoom">100%</button>');
 	}
 	toolbarHtml.push('<div class="morpheus-button-divider"></div>');
 	if (controller.options.toolbar.sort) {
 		toolbarHtml
-		.push('<button data-toggle="tooltip" title="Sort" name="sort" type="button" class="btn btn-default btn-xs"><span class="fa fa-sort-alpha-asc"></span></button>');
+		.push('<button data-toggle="tooltip" title="Sort" name="sort" type="button" class="btn btn-default btn-xxs"><span class="fa fa-sort-alpha-asc"></span></button>');
 	}
 	if (controller.options.toolbar.options) {
 		toolbarHtml
-		.push('<button name="options" data-toggle="tooltip" title="Options" type="button" class="btn btn-default btn-xs"><span class="fa fa-cog"></span></button>');
+		.push('<button name="options" data-toggle="tooltip" title="Options" type="button" class="btn btn-default btn-xxs"><span class="fa fa-cog"></span></button>');
 
 	}
 
@@ -168,28 +168,28 @@ morpheus.HeatMapToolBar = function (controller) {
 		toolbarHtml
 		.push('<button name="saveImage" data-toggle="tooltip" title="Save Image ('
 			+ morpheus.Util.COMMAND_KEY
-			+ 'S)" type="button" class="btn btn-default btn-xs"><span class="fa fa-file-image-o"></span></button>');
+			+ 'S)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-file-image-o"></span></button>');
 	}
 	if (controller.options.toolbar.saveDataset) {
 		toolbarHtml
 		.push('<button name="saveDataset" data-toggle="tooltip" title="Save Dataset ('
 			+ morpheus.Util.COMMAND_KEY
-			+ 'Shift+S)" type="button" class="btn btn-default btn-xs"><span class="fa fa-floppy-o"></span></button>');
+			+ 'Shift+S)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-floppy-o"></span></button>');
 	}
 	if (controller.options.toolbar.openFile) {
 		toolbarHtml
 		.push('<button name="openFile" data-toggle="tooltip" title="Open File ('
 			+ morpheus.Util.COMMAND_KEY
-			+ 'O)" type="button" class="btn btn-default btn-xs"><span class="fa fa-folder-open-o"></span></button>');
+			+ 'O)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-folder-open-o"></span></button>');
 	}
 	toolbarHtml.push('<div class="morpheus-button-divider"></div>');
 	if (controller.options.toolbar.filter) {
 		toolbarHtml
-		.push('<button name="filterButton" data-toggle="tooltip" title="Filter" type="button" class="btn btn-default btn-xs"><span class="fa fa-filter"></span></button>');
+		.push('<button name="filterButton" data-toggle="tooltip" title="Filter" type="button" class="btn btn-default btn-xxs"><span class="fa fa-filter"></span></button>');
 	}
 	if (typeof Plotly !== 'undefined') {
 		toolbarHtml
-		.push('<button name="chart" data-toggle="tooltip" title="Chart" type="button" class="btn btn-default btn-xs"><span class="fa fa-line-chart"></span></button>');
+		.push('<button name="chart" data-toggle="tooltip" title="Chart" type="button" class="btn btn-default btn-xxs"><span class="fa fa-line-chart"></span></button>');
 
 	}
 	var tools = [{
@@ -225,7 +225,7 @@ morpheus.HeatMapToolBar = function (controller) {
 	if (controller.options.toolbar.tools) {
 		toolbarHtml.push('<div class="btn-group">');
 		toolbarHtml
-		.push('<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown"><span title="Tools" data-toggle="tooltip" class="fa fa-wrench"></span> <span class="caret"></span></button>');
+		.push('<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown"><span title="Tools" data-toggle="tooltip" class="fa fa-wrench"></span> <span class="caret"></span></button>');
 		toolbarHtml.push('<ul data-name="tools" class="dropdown-menu" role="menu">');
 
 		for (var i = 0; i < tools.length; i++) {
@@ -248,7 +248,7 @@ morpheus.HeatMapToolBar = function (controller) {
 	if (controller.options.toolbar.colorKey) {
 		toolbarHtml.push('<div class="btn-group">');
 		toolbarHtml
-		.push('<button type="button" class="btn btn-default btn-xs" data-toggle="dropdown"><span title="Color Key" data-toggle="tooltip" class="fa fa-key"></span></button>');
+		.push('<button type="button" class="btn btn-default btn-xxs" data-toggle="dropdown"><span title="Color Key" data-toggle="tooltip" class="fa fa-key"></span></button>');
 		toolbarHtml.push('<ul data-name="key" class="dropdown-menu" role="menu">');
 		toolbarHtml.push('<li data-name="keyContent"></li>');
 		toolbarHtml.push('</ul>');

@@ -96,4 +96,9 @@
     font-size: 13px;
 }
 
-
+.btn-xxs {
+    padding: 1px 4px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+}
