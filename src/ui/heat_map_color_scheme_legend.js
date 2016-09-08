@@ -9,8 +9,9 @@ morpheus.HeatMapColorSchemeLegend = function(controller, $keyContent) {
 			.forEach(function(value) {
 				if (value != null || ntracks === 1) {
 					if (value != 'null') { // values are stored as string
-						var $label = $('<span style="overflow:hidden;text-overflow: ellipsis;width:250px;max-width:250px;">'
-								+ value + '</span>');
+						var $label = $('<div style="overflow:hidden;text-overflow:' +
+							' ellipsis;width:250px;max-width:250px;">'
+								+ value + '</div>');
 						$keyContent.append($label);
 						totalHeight += $label.height();
 					}
