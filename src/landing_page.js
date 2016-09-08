@@ -11,14 +11,30 @@ morpheus.LandingPage = function (pageOptions) {
 	html.push('<div data-name="help" class="pull-right"></div>');
 
 	html
-	.push('<div style="margin-bottom:10px;"><img src="https://www.broadinstitute.org/cancer/software/morpheus/images/icon.svg" alt="logo" /> <span style="font-size:16px;font-family:Roboto,sans-serif;">Morpheus</span></div>');
+	.push('<div style="margin-bottom:10px;"><img src="https://www.broadinstitute.org/cancer/software/morpheus/images/icon.svg" alt="logo" /> <span data-name="brand" style="vertical-align: middle;font-size:24px;font-family:Roboto,sans-serif;">');
+	html.push('<span>M</span>');
+	html.push('<span>o</span>');
+	html.push('<span>r</span>');
+	html.push('<span>p</span>');
+	html.push('<span>h</span>');
+	html.push('<span>e</span>');
+	html.push('<span>u</span>');
+	html.push('<span>s</span>');
+	html.push('</span>');
+	html.push('</div>');
 
 	html.push('<h4>Open your own file</h4>');
 	html.push('<div data-name="formRow" class="center-block"></div>');
 	html.push('<h4>Or select a preloaded dataset</h4>');
 	html.push('<div data-name="exampleRow"></div>');
 	html.push('</div>');
-	$(html.join('')).appendTo($el);
+	var $html = $(html.join(''));
+	var colorScale = d3.scale.linear().domain([0, 4, 7]).range(['#ca0020', 'black', '#0571b0']).clamp(true);
+	var brands = $html.find('[data-name="brand"] > span');
+	for (var i = 0; i < brands.length; i++) {
+		brands[i].style.color = colorScale(i);
+	}
+	$html.appendTo($el);
 
 	new morpheus.HelpMenu().$el.appendTo($el.find('[data-name=help]'));
 	var formBuilder = new morpheus.FormBuilder();
