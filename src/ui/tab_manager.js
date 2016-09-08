@@ -73,7 +73,9 @@ morpheus.TabManager = function (options) {
 		// remove the link and tab content
 		e.preventDefault();
 		var target = $(this).attr('data-target');
-		_this.remove(target);
+		if (target != null) {
+			_this.remove(target);
+		}
 	});
 
 	this.$tabContent = $('<div class="tab-content"></div>');

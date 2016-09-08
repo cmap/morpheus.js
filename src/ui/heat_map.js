@@ -248,23 +248,23 @@ morpheus.HeatMap = function (options) {
 
 		if (!morpheus.HelpMenu.ADDED) { // only show once per page
 			morpheus.HelpMenu.ADDED = true;
-			var $a = $('<a data-name="ignore" title="Produced with Morpheus"' +
-				' style="display:inline;font-size:85%;margin-right:2px;margin-top:2px;" href="'
-				+ morpheus.Util.URL
-				+ '" target="_blank"><img alt="Morpheus Icon" style="width:16px;height:16px;" src="'
-				+ morpheus.Util.URL + 'images/icon.svg"></a>');
-			$a.tooltip({
-				placement: 'auto'
-			}).on('click', function (e) {
-				// prevent handling by navbar click handler
-				e.stopImmediatePropagation();
-				e.stopPropagation();
-			});
+			// var $a = $('<a data-name="ignore" title="Produced with Morpheus"' +
+			// 	' style="display:inline;font-size:85%;margin-right:2px;margin-top:2px;" href="'
+			// 	+ morpheus.Util.URL
+			// 	+ '" target="_blank"><img alt="Morpheus Icon" style="width:16px;height:16px;" src="'
+			// 	+ morpheus.Util.URL + 'images/icon.svg"></a>');
+			// $a.tooltip({
+			// 	placement: 'auto'
+			// }).on('click', function (e) {
+			// 	// prevent handling by navbar click handler
+			// 	e.stopImmediatePropagation();
+			// 	e.stopPropagation();
+			// });
 			// var $img = $a.find('img');
 
 			var $right = $('<li data-name="help" style="margin-right:2px;"' +
 				' class="pull-right"></li>');
-			$a.appendTo($right);
+			// $a.appendTo($right);
 			new morpheus.HelpMenu().$el.appendTo($right);
 			$right.appendTo(this.tabManager.$nav);
 		}

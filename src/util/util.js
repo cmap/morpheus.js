@@ -469,6 +469,8 @@ morpheus.Util.autosuggest = function (options) {
 		suggestWhenEmpty: true,
 	}, options);
 
+	var searching = false;
+
 	function _select(event, ui, isKey) {
 		if (ui.item.skip) {
 			return false;
@@ -498,15 +500,19 @@ morpheus.Util.autosuggest = function (options) {
 			}
 			// add the selected item
 			options.$el[0].value = terms.join(' ');
-			if (show && !isKey) { // did
+			if ((show && !isKey) || (isKey && event.which === 13)) { // did
 				// we
 				// select
 				// just a
 				// field name?
+				searching = true;
 				setTimeout(function () {
 					options.$el.autocomplete('search',
 						options.$el.val());
 				}, 20);
+				setTimeout(function () {
+					searching = false;
+				}, 100);
 
 			}
 			if (!isKey && options.select) {
@@ -561,7 +567,7 @@ morpheus.Util.autosuggest = function (options) {
 					original = original.originalEvent;
 				}
 				if (original && /^key/.test(original.type)) {
-					return _select(event, ui, true);
+					return _select(original, ui, true);
 				}
 				return false;
 			},
@@ -596,8 +602,9 @@ morpheus.Util.autosuggest = function (options) {
 	}
 
 	options.$el.on('keyup', function (e) {
-		if (e.which === 13) {
+		if (e.which === 13 && !searching) {
 			options.$el.autocomplete('close');
+
 		} else if (options.suggestWhenEmpty) {
 			if (options.$el.val() === '') {
 				options.$el.autocomplete('search', '');
