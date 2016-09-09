@@ -13,6 +13,7 @@ morpheus.Project = function(dataset) {
 	this.columnSelectionModel = new morpheus.SelectionModel(this, true);
 	this.rowSelectionModel = new morpheus.SelectionModel(this, false);
 	this.elementSelectionModel = new morpheus.ElementSelectionModel(this);
+
 	morpheus.Project._recomputeCalculatedFields(this.originalDataset);
 	morpheus.Project
 			._recomputeCalculatedFields(new morpheus.TransposedDatasetView(
@@ -99,6 +100,8 @@ morpheus.Project.prototype = {
 		this.columnSelectionModel.clear();
 		this.rowSelectionModel.clear();
 		this.elementSelectionModel.clear();
+		this.setESSession(dataset);
+
 		if (notify) {
 			this.trigger(morpheus.Project.Events.DATASET_CHANGED);
 		}

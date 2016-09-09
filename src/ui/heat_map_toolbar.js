@@ -249,70 +249,23 @@ morpheus.HeatMapToolBar = function (controller) {
 
 	toolbarHtml.push('<div class="morpheus-button-divider"></div>');
 
-	toolbarHtml.push('<button type="button" class="btn btn-default btn-xs" data-toggle="tooltip" title="Test" name="test">Test</button>');
+	toolbarHtml.push('<button type="button" class="btn btn-default btn-xs" data-toggle="tooltip" title="PCAPlot" name="pca">PCA</button>');
+	toolbarHtml.push('<div class="morpheus-button-divider"></div>');/*
+	toolbarHtml.push('<button type="button" class="btn btn-default btn-xs" data-toggle="tooltip" title="create ExpressionSet" name="es">ES</button>');
+*/
 
-	$buttons.on('click', '[name=test]', function (e) {
+	$buttons.on('click', '[name=pca]', function () {
 		console.log("test button clicked");
-		var project = controller.getProject();
-		var dataset = project.getFullDataset();
-		var matrix = dataset.seriesArrays[0];
-		console.log(dataset);
+		controller.getProject().getFullDataset().setESSession();
+		new morpheus.PcaPlotTool({project : controller.getProject()});
 
-		var rows = dataset.rows;
-		var columns = dataset.columns;
-		var array = [];
-		for (var i = 0; i < rows; i++) {
-			for (var j = 0; j < columns; j++) {
-				array.push(matrix[i][j]);
-			}
-		}
-
-
-		ProtoBuf = dcodeIO.ProtoBuf;
-		var builder = ProtoBuf.loadProtoFile("./message.proto"),
-			rexp = builder.build("rexp"),
-			REXP = rexp.REXP;
-
-		var msgMatrix2 = new REXP({
-			rclass : REXP.RClass.LIST,
-			rexpValue : [{
-				rclass: REXP.RClass.REAL,
-				realValue: array,
-				attrName: "dim",
-				attrValue: {
-					rclass: REXP.RClass.INTEGER,
-					intValue: [rows, columns]
-				}
-			},
-				{
-					rclass : REXP.RClass.REAL,
-					realValue : 1
-				}, {
-					rclass : REXP.RClass.REAL,
-					realValue : 2
-				}],
-			attrName : "names",
-			attrValue : {
-				rclass : REXP.RClass.STRING,
-				stringValue : [{
-					strval : "es"
-				},
-					{
-						strval : "c1"
-					}, {
-						strval : "c2"
-					}]
-			}
-		});
-		var res = morpheus.ocpu.call(msgMatrix2, {
-			library : "testproject",
-			fun : "pcaPlot",
-			host : "localhost:5721"
-		});
-		if (res != -1) {
-			alert(res);
-		}
 	});
+
+	/*$buttons.on('click', '[name=es]', function () {
+		console.log("es button clicked");
+		var session = controller.getProject().getFullDataset().getESSession();
+	});*/
+
 
 	var $lineOneColumn = $el.find('[data-name=lineOneColumn]');
 	$search.appendTo($lineOneColumn);

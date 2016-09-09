@@ -805,3 +805,128 @@ morpheus.DatasetUtil.getNonEmptyRows = function (dataset) {
 	}
 	return rowsToKeep;
 };
+morpheus.DatasetUtil.getContentArray = function (dataset) {
+	var array = [];
+	var nr = dataset.rows;
+	var nc = dataset.columns;
+
+	for (var i = 0; i < nr; i++) {
+		for (var j = 0; j < nc; j++) {
+			array.push(dataset.getValue(i, j));
+		}
+	}
+	return array;
+};
+morpheus.DatasetUtil.getMetadataArray = function (dataset) {
+	var pDataArray = [];
+	var participantID = [];
+	var labelDescription = [];
+	console.log(dataset);
+	var columnMeta = dataset.getColumnMetadata();
+	var features = columnMeta.getMetadataCount();
+	var participants = dataset.getColumnCount();
+	var vecPartID;
+
+	if (columnMeta.getByName("participant_id") != null) {
+		vecPartID = columnMeta.getByName("participant_id");
+	}
+	else {
+		vecPartID = columnMeta.getByName("id");
+	}
+	for (var i = 0; i < participants; i++) {
+		participantID.push({
+			strval: vecPartID.getValue(i),
+			isNA: false
+		});
+	}
+	for (var j = 0; j < features; j++) {
+		var vecJ = columnMeta.get(j);
+		if (vecJ.getName() == "participant_id" || vecJ.getName() == "id") {
+			continue;
+		}
+		for (var l = 0; l < participants; l++) {
+			pDataArray.push({
+				strval : vecJ.getValue(l).toString(),
+				isNA : false
+			});
+		}
+		labelDescription.push({
+			strval : vecJ.getName(),
+			isNA : false
+		});
+	}
+
+	var rowMeta = dataset.getRowMetadata();
+	var rowNames = [];
+	var rowNamesVec = rowMeta.getByName("id");
+	for (j = 0; j < dataset.getRowCount(); j++) {
+		rowNames.push({
+			strval : rowNamesVec.getValue(j),
+			isNA : false
+		})
+	}
+	return {pdata : pDataArray, participants : participantID, labels : labelDescription, rownames : rowNames};
+};
+morpheus.DatasetUtil.toProtoMessage = function (dataset) {
+	var array = morpheus.DatasetUtil.getContentArray(dataset);
+	var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
+
+	var messageJSON = {
+		rclass : "LIST",
+		rexpValue : [{
+			rclass : "REAL",
+			realValue : array,
+			attrName : "dim",
+			attrValue : {
+				rclass : "INTEGER",
+				intValue : [dataset.getColumnCount(), dataset.getRowCount()]
+			}
+		}, {
+			rclass : "STRING",
+			stringValue : meta.pdata,
+			attrName : "dim",
+			attrValue : {
+				rclass : "INTEGER",
+				intValue : [dataset.getColumnCount(), meta.pdata.length/dataset.getColumnCount()]
+			}
+		}, {
+			rclass : "STRING",
+			stringValue : meta.labels
+		}, {
+			rclass : "STRING",
+			stringValue : meta.participants
+		}, {
+			rclass : "STRING",
+			stringValue : meta.rownames
+		}],
+		attrName : "names",
+		attrValue : {
+			rclass : "STRING",
+			stringValue : [{
+				strval : "data",
+				isNA : false
+			}, {
+				strval : "pData",
+				isNA : false
+			}, {
+				strval : "labelDescription",
+				isNA : false
+			}, {
+				strval : "colNames",
+				isNA : false
+			}, {
+				strval : "rowNames",
+				isNA : false
+			}]
+		}
+	};
+
+	ProtoBuf = dcodeIO.ProtoBuf;
+	var builder = ProtoBuf.protoFromFile("./message.proto"),
+		rexp = builder.build("rexp"),
+		REXP = rexp.REXP;
+
+	/*var blob = new Blob([new Uint8Array((new REXP(messageJSON)).toArrayBuffer())], {type: "application/octet-stream"});
+	saveAs(blob, "test1.bin");*/
+	return new REXP(messageJSON);
+};

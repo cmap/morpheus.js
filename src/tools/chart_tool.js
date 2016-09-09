@@ -312,7 +312,7 @@ morpheus.ChartTool.prototype = {
 			okCallback: function () {
 				var dataset = options.dataset;
 				var eventData = options.eventData;
-				var array = options.array;
+				var array = options.array;2
 				var value = formBuilder.getValue('annotation_value');
 				var annotationName = formBuilder
 				.getValue('annotation_name');

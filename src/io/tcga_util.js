@@ -334,6 +334,7 @@ morpheus.TcgaUtil.getDataset = function (options) {
 					f(datasetToReturn);
 				});
 			}
+			datasetToReturn.setESSession();
 			returnDeferred.resolve(datasetToReturn);
 		});
 	return returnDeferred;
