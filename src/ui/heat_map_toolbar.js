@@ -3,9 +3,11 @@ morpheus.HeatMapToolBar = function (controller) {
 	this.rowSearchResultModelIndices = [];
 	this.columnSearchResultModelIndices = [];
 	var _this = this;
-	var $el = $('<div style="white-space:nowrap;" class="hidden-print container-fluid">'
-		+ '<div class="row"><div style="padding-left:0px;" class="col-xs-12"><div data-name="lineOneColumn"></div></div></div>'
-		+ '<div class="row"><div class="col-xs-12"><div data-name="lineTwoColumn" style="border-bottom: 1px solid #e7e7e7;margin-bottom:10px;"></div></div></div>'
+	var $el = $('<div class="hidden-print container-fluid">'
+		+ '<div class="row"><div style="padding-left:0px;padding-right:0px;"' +
+		' class="col-xs-12"><div' +
+		' data-name="lineOneColumn"></div></div></div>'
+		+ '<div class="row"><div class="col-xs-12"><div data-name="lineTwoColumn" style="white-space:nowrap; border-bottom: 1px solid #e7e7e7;margin-bottom:10px;"></div></div></div>'
 		+ '</div>');
 	var searchHtml = [];
 	var $search = $('<form name="searchForm" class="form form-inline form-compact" role="search"></form>');
