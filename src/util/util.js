@@ -580,11 +580,11 @@ morpheus.Util.autosuggest = function (options) {
 	var instance = options.$el.autocomplete('instance');
 	instance._renderItem = function (ul, item) {
 		if (item.value == null) { // category
-			return $('<li class="ui-menu-item' + (item.class ? (' ' + item.class) : '') + ' search-category">')
+			return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-category">')
 			.append($("<div>").html(item.label))
 			.appendTo(ul);
 		}
-		return $('<li class="ui-menu-item' + (item.class ? (' ' + item.class) : '') + ' search-item">')
+		return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-item">')
 		.append($("<div>").html(item.label))
 		.appendTo(ul);
 	};
