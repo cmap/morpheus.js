@@ -576,10 +576,15 @@ morpheus.Util.autosuggest = function (options) {
 			}
 		});
 
-	// use html for label instead of default text
+	// use html for label instead of default text, class for categories vs. items
 	var instance = options.$el.autocomplete('instance');
 	instance._renderItem = function (ul, item) {
-		return $('<li class="ui-menu-item' + (item.class ? (' ' + item.class) : '') + 'search-item">')
+		if (item.value == null) { // category
+			return $('<li class="ui-menu-item' + (item.class ? (' ' + item.class) : '') + ' search-category">')
+			.append($("<div>").html(item.label))
+			.appendTo(ul);
+		}
+		return $('<li class="ui-menu-item' + (item.class ? (' ' + item.class) : '') + ' search-item">')
 		.append($("<div>").html(item.label))
 		.appendTo(ul);
 	};
@@ -592,6 +597,7 @@ morpheus.Util.autosuggest = function (options) {
 	};
 
 	var menu = options.$el.autocomplete('widget');
+	menu.menu("option", "items", "> :not(.search-category)");
 	if (menu) {
 		menu.addClass("search-menu")
 	}
