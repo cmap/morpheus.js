@@ -315,7 +315,6 @@ morpheus.PcaPlotTool.prototype = {
                 emptyToAll : false
             });
             _this.dataset = dataset;
-
             var expressionSet = project.getFullDataset().getESSession();
 
             var columnIndices = dataset.columnIndices;

@@ -460,7 +460,6 @@ morpheus.HeatMap = function (options) {
 
 					}
 				});
-
 			heatMapLoaded();
 		});
 	} else {
@@ -703,6 +702,11 @@ morpheus.HeatMap.prototype = {
 	gapSize: 10,
 	updatingScroll: false,
 	autoDisplay: function (options) {
+		if (!this.loadingSession && this.project.getFullDataset().getESSession() == null) {
+			this.loadingSession = true;
+			console.log("es session");
+			morpheus.DatasetUtil.toESSession(this.project.getFullDataset());
+		}
 		if (options.filename == null) {
 			options.filename = '';
 		}

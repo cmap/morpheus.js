@@ -149,6 +149,8 @@ if(!window.jQuery) {
     settings.type = settings.type || "POST";
     settings.data = settings.data || {};
     settings.dataType = settings.dataType || "text";
+    settings.async = true;
+    console.log(settings);
     //ajax call
     var jqxhr = $.ajax(settings).done(function(){
       var loc = jqxhr.getResponseHeader('Location') || console.log("Location response header missing.");

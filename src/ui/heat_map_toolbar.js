@@ -256,7 +256,6 @@ morpheus.HeatMapToolBar = function (controller) {
 
 	$buttons.on('click', '[name=pca]', function () {
 		console.log("test button clicked");
-		controller.getProject().getFullDataset().setESSession();
 		new morpheus.PcaPlotTool({project : controller.getProject()});
 
 	});

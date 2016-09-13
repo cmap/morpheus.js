@@ -100,7 +100,6 @@ morpheus.Project.prototype = {
 		this.columnSelectionModel.clear();
 		this.rowSelectionModel.clear();
 		this.elementSelectionModel.clear();
-		this.setESSession(dataset);
 
 		if (notify) {
 			this.trigger(morpheus.Project.Events.DATASET_CHANGED);

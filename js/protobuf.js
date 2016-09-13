@@ -367,7 +367,8 @@
                     }
             } else {
                 var xhr = Util.XHR();
-                xhr.open('GET', path, callback ? true : false);
+                //xhr.open('GET', path, callback ? true : false);
+                xhr.open('GET', path, true);
                 // xhr.setRequestHeader('User-Agent', 'XMLHTTP/1.0');
                 xhr.setRequestHeader('Accept', 'text/plain');
                 if (typeof xhr.overrideMimeType === 'function') xhr.overrideMimeType('text/plain');

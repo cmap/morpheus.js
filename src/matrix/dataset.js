@@ -161,24 +161,8 @@ morpheus.Dataset.prototype = {
 				: morpheus.Dataset.createArray(options));
 		return this.seriesNames.length - 1;
 	},
-	setESSession : function () {
-		var _this = this;
-		if (this.esSession != null) {
-			return this.esSession;
-		}
-		else {
-			var protoMessage = morpheus.DatasetUtil.toProtoMessage(this);
-
-
-			var req = ocpu.call("createES", protoMessage, function (session) {
-				console.log(session);
-				_this.esSession = session;
-			}, true);
-
-			req.fail(function () {
-				alert("failed to create ExpressionSet of dataset");
-			})
-		}
+	setESSession : function (session) {
+		this.esSession = session;
 	},
 	getESSession : function () {
 		return this.esSession;

@@ -867,7 +867,7 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 	}
 	return {pdata : pDataArray, participants : participantID, labels : labelDescription, rownames : rowNames};
 };
-morpheus.DatasetUtil.toProtoMessage = function (dataset) {
+morpheus.DatasetUtil.toESSession = function (dataset) {
 	var array = morpheus.DatasetUtil.getContentArray(dataset);
 	var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
 
@@ -921,12 +921,29 @@ morpheus.DatasetUtil.toProtoMessage = function (dataset) {
 		}
 	};
 
+	console.log(messageJSON);
 	ProtoBuf = dcodeIO.ProtoBuf;
-	var builder = ProtoBuf.protoFromFile("./message.proto"),
-		rexp = builder.build("rexp"),
-		REXP = rexp.REXP;
+	ProtoBuf.protoFromFile("./message.proto", function (error, success) {
+			if (error) {
+				alert(error);
+				return;
+			}
+			console.log(error, success);
+			var builder = success,
+				rexp = builder.build("rexp"),
+				REXP = rexp.REXP;
+
+			var proto = new REXP(messageJSON);
+			var req = ocpu.call("createES", proto, function (session) {
+				console.log(session);
+				dataset.setESSession(session);
+			}, true);
+
+			req.fail(function () {
+				alert(req.responseText);
+			});
+		});
 
 	/*var blob = new Blob([new Uint8Array((new REXP(messageJSON)).toArrayBuffer())], {type: "application/octet-stream"});
 	saveAs(blob, "test1.bin");*/
-	return new REXP(messageJSON);
 };
