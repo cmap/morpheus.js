@@ -4,7 +4,7 @@ morpheus.Popup.init = function () {
 	if (morpheus.Popup.initted) {
 		return;
 	}
-	var client = new Clipboard('a[data-name=Copy]', {
+	var client = new Clipboard('a.copy', {
 		text: function (trigger) {
 			var event = {
 				clipboardData: {
@@ -13,10 +13,15 @@ morpheus.Popup.init = function () {
 					}
 				}
 			};
-			morpheus.Popup.popupCallback(event, 'Copy');
+			morpheus.Popup.popupCallback(event, $(trigger).data('name'));
 			morpheus.Popup.hide();
 			return event.clipboardData.data;
 		}
+	});
+	client.on('error', function (e) {
+		console.log('Copy error');
+		console.error('Action:', e.action);
+		console.error('Trigger:', e.trigger);
 	});
 
 	morpheus.Popup.client = client;
@@ -31,9 +36,8 @@ morpheus.Popup.init = function () {
 	morpheus.Popup.$contextMenu.on('click', 'a', function (e) {
 		e.preventDefault();
 		var $this = $(this);
-		var name = $.trim($this.text());
-		if (name !== 'Copy') {
-			morpheus.Popup.popupCallback(e, name);
+		if (!$this.hasClass('copy')) {
+			morpheus.Popup.popupCallback(e, $this.data('name'));
 			morpheus.Popup.hide();
 		}
 
@@ -78,7 +82,11 @@ morpheus.Popup.showPopup = function (menuItems, position, component, callback) {
 				html.push('class="disabled"');
 			}
 			html.push('><a data-name="' + item.name
-				+ '" data-type="popup-item" tabindex="-1" href="#">');
+				+ '" data-type="popup-item" tabindex="-1" href="#"');
+			if (item.class) {
+				html.push(' class="' + item.class + '"');
+			}
+			html.push('>');
 			if (item.checked) {
 				html
 				.push('<span class="dropdown-checkbox fa fa-check"></span>');

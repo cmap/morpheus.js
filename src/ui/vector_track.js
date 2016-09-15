@@ -887,7 +887,8 @@ morpheus.VectorTrack.prototype = {
 		}
 
 		sectionToItems.Selection.push({
-			name: 'Copy'
+			name: 'Copy',
+			class: 'copy'
 		});
 		sectionToItems.Selection.push({
 			separator: true

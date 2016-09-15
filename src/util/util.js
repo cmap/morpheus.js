@@ -156,7 +156,7 @@ morpheus.Util.getQueryParams = function (s) {
 	if (!s) {
 		return params;
 	}
-	var search = unescape(s);
+	var search = decodeURIComponent(s);
 	var keyValuePairs = search.split('&');
 	for (var i = 0; i < keyValuePairs.length; i++) {
 		var pair = keyValuePairs[i].split('=');
@@ -306,7 +306,7 @@ morpheus.Util.paramsToObject = function (hash) {
 	if (search.length <= 1) {
 		return {};
 	}
-	search = unescape(search);
+	search = decodeURIComponent(search);
 	var keyValuePairs = search.substring(1).split('&');
 	var result = {};
 	for (var i = 0, length = keyValuePairs.length; i < length; i++) {
@@ -466,6 +466,7 @@ morpheus.Util.autosuggest = function (options) {
 	options = $.extend({}, {
 		multi: true,
 		delay: 500,
+		minLength: 0,
 		suggestWhenEmpty: true,
 	}, options);
 
@@ -540,7 +541,7 @@ morpheus.Util.autosuggest = function (options) {
 		})
 	.autocomplete(
 		{
-			minLength: 0,
+			minLength: options.minLength,
 			delay: options.delay,
 			source: function (request, response) {
 				// delegate back to autocomplete, but extract the

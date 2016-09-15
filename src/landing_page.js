@@ -29,11 +29,9 @@ morpheus.LandingPage = function (pageOptions) {
 	html.push('<div data-name="exampleRow"></div>');
 	html.push('</div>');
 	var $html = $(html.join(''));
-	var colorScale = d3.scale.linear().domain([0, 4, 7]).range(['#ca0020', 'black', '#0571b0']).clamp(true);
+	var colorScale = d3.scale.linear().domain([0, 4, 7]).range(['#ca0020', '#999999', '#0571b0']).clamp(true);
 	var brands = $html.find('[data-name="brand"] > span');
-	for (var i = 0; i < brands.length; i++) {
-		brands[i].style.color = colorScale(i);
-	}
+
 	$html.appendTo($el);
 
 	new morpheus.HelpMenu().$el.appendTo($el.find('[data-name=help]'));
@@ -49,7 +47,19 @@ morpheus.LandingPage = function (pageOptions) {
 	formBuilder.$form.appendTo($el.find('[data-name=formRow]'));
 	this.formBuilder = formBuilder;
 	this.$sampleDatasetsEl = $el.find('[data-name=exampleRow]');
+	var index = 0;
+	var step = function () {
+		brands[index].style.color = colorScale(index);
+		index++;
+		if (index < brands.length) {
+			setTimeout(step, 200);
+		}
+	}
+	setTimeout(step, 300);
 
+	// for (var i = 0; i < brands.length; i++) {
+	// 	brands[i].style.color = colorScale(i);
+	// }
 };
 
 morpheus.LandingPage.prototype = {

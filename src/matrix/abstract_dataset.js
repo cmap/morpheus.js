@@ -153,7 +153,7 @@ morpheus.AbstractDataset.prototype = {
 	 * @return the series data type (e.g. object, Float32, Int8)
 	 */
 	getDataType: function (rowIndex, seriesIndex) {
-		return this.seriesDataTypes[seriesIndex];
+		return this.seriesDataTypes[seriesIndex || 0];
 	},
 	toString: function () {
 		return this.getName();

@@ -1218,13 +1218,14 @@ morpheus.HeatMap.prototype = {
 					[
 
 						{
-							name: 'Copy',
+							name: 'Copy Selection',
 							disabled: _this.project
 							.getElementSelectionModel()
-							.count() === 0
+							.count() === 0,
+							class: 'copy'
 						},
 						{
-							name: 'Save Image (Ctrl-S)'
+							name: 'Save Image (' + morpheus.Util.COMMAND_KEY + 'S)'
 						},
 						{
 							separator: true
@@ -1241,12 +1242,12 @@ morpheus.HeatMap.prototype = {
 					function (event, item) {
 						if (item === 'Show Inline Tooltip') {
 							_this.options.inlineTooltip = !_this.options.inlineTooltip;
-						} else if (item === 'Save Image (Ctrl-S)') {
+						} else if (item === ('Save Image (' + morpheus.Util.COMMAND_KEY + 'S)')) {
 							morpheus.HeatMap
 							.showTool(
 								new morpheus.SaveImageTool(),
 								_this);
-						} else if ('Copy') {
+						} else if (item === 'Copy Selection') {
 							var text = _this
 							.getSelectedElementsText();
 							if (text !== '') {
@@ -1255,6 +1256,8 @@ morpheus.HeatMap.prototype = {
 									'text/plain',
 									text);
 							}
+						} else {
+							console.log(item + ' unknown.');
 						}
 					});
 
