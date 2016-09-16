@@ -1225,6 +1225,10 @@ morpheus.HeatMap.prototype = {
 							class: 'copy'
 						},
 						{
+							name: 'Copy Image',
+							class: 'copy'
+						},
+						{
 							name: 'Save Image (' + morpheus.Util.COMMAND_KEY + 'S)'
 						},
 						{
@@ -1256,6 +1260,28 @@ morpheus.HeatMap.prototype = {
 									'text/plain',
 									text);
 							}
+						} else if (item === 'Copy Image') {
+							var bounds = _this.getTotalSize();
+							var height = bounds.height;
+							var width = bounds.width;
+							var canvas = $('<canvas></canvas>')[0];
+							canvas.height = height;
+							canvas.width = width;
+							var context = canvas.getContext('2d');
+							_this.snapshot(context);
+							var url = canvas.toDataURL();
+							// canvas.toBlob(function (blob) {
+							// 	url = URL.createObjectURL(blob);
+							// 	event.clipboardData
+							// 	.setData(
+							// 		'text/html',
+							// 		'<img src="' + url + '">');
+							// });
+							event.clipboardData
+							.setData(
+								'text/html',
+								'<img src="' + url + '">');
+
 						} else {
 							console.log(item + ' unknown.');
 						}
@@ -1874,6 +1900,7 @@ morpheus.HeatMap.prototype = {
 					var text = e.originalEvent.clipboardData
 					.getData('text/plain');
 					if (text != null && text.length > 0) {
+						// open a file from clipboard
 						var blob = new Blob([text]);
 						var url = window.URL.createObjectURL(blob);
 						e.preventDefault();
@@ -1893,20 +1920,36 @@ morpheus.HeatMap.prototype = {
 		.on(
 			'copy.morpheus',
 			function (ev) {
+
 				if (_this.isActiveComponent()) {
 					var activeComponent = _this
 					.getActiveComponent();
 					var project = _this.project;
 
-					if (activeComponent === 2) {
-						var text = _this.getSelectedElementsText();
-						if (text !== '') {
-							ev.originalEvent.clipboardData.setData(
-								'text/plain', text);
-							ev.preventDefault();
-							ev.stopImmediatePropagation();
-							return;
-						}
+					if (activeComponent === 'heatMap') {
+						// copy selected text or image
+						// var text = _this.getSelectedElementsText();
+						// if (text !== '') {
+						// 	ev.originalEvent.clipboardData.setData(
+						// 		'text/plain', text);
+						// 	return;
+						// }
+						var bounds = _this.getTotalSize();
+						var height = bounds.height;
+						var width = bounds.width;
+						var canvas = $('<canvas></canvas>')[0];
+						canvas.height = height;
+						canvas.width = width;
+						var context = canvas.getContext('2d');
+						_this.snapshot(context);
+						var url = canvas.toDataURL();
+						ev.originalEvent.clipboardData
+						.setData(
+							'text/html',
+							'<img src="' + url + '">');
+						ev.preventDefault();
+						ev.stopImmediatePropagation();
+						return;
 					}
 					// copy all selected rows and columns
 					var dataset = project.getSelectedDataset({
@@ -2722,24 +2765,29 @@ morpheus.HeatMap.prototype = {
 		return this.$tabPanel[0].contains(active);
 	}
 	,
+	/**
+	 *
+	 * @return {string} 'rowTrack' if row track is active, 'columnTrack' if column track is active,
+	 * 'heatMap' if heat map is active.
+	 */
 	getActiveComponent: function () {
 		var active = document.activeElement;
 		if (active.tagName === 'CANVAS') {
 			for (var i = 0, ntracks = this.columnTracks.length; i < ntracks; i++) {
 				if (this.columnTracks[i].canvas === active) {
-					return 1;
+					return 'columnTrack';
 				}
 			}
 			for (var i = 0, ntracks = this.rowTracks.length; i < ntracks; i++) {
 				if (this.rowTracks[i].canvas === active) {
-					return 0;
+					return 'rowTrack';
 				}
 			}
 			if (this.heatmap.canvas === active) {
-				return 2;
+				return 'heatMap'
 			}
 		}
-		return -1;
+		return '';
 	}
 	,
 	getVisibleTrackNames: function (isColumns) {

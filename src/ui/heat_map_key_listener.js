@@ -14,12 +14,12 @@ morpheus.HeatMapKeyListener = function (controller) {
 			; // skip
 		} else if (commandKey && e.which === 65) { // select all
 			var active = controller.getActiveComponent();
-			if (active !== -1) {
+			if (active === 'rowTrack' || active === 'columnTrack') {
 				found = true;
-				var selectionModel = active === 0 ? controller.getProject()
+				var selectionModel = active === 'rowTrack' ? controller.getProject()
 				.getRowSelectionModel() : controller.getProject()
 				.getColumnSelectionModel();
-				var count = active === 0 ? controller.getProject()
+				var count = active === 'rowTrack' ? controller.getProject()
 				.getSortedFilteredDataset().getRowCount() : controller
 				.getProject().getSortedFilteredDataset()
 				.getColumnCount();
@@ -59,25 +59,15 @@ morpheus.HeatMapKeyListener = function (controller) {
 			found = true;
 		} else if (e.which === 38) { // up arrow
 			if (commandKey) { // to top
-				var active = controller.getActiveComponent();
-				if (active !== -1) {
-					controller.sortBasedOnSelection(morpheus.SortKey.SortOrder.ASCENDING,
-						active !== 0, e && e.shiftKey);
-				}
-
+				controller.scrollTop(0);
 			} else {
 				controller.scrollTop(controller.scrollTop() - 8);
 			}
 			found = true;
 		} else if (e.which === 40) {// down arrow
 			if (commandKey) { // to bottom
-				// controller
-				// .scrollTop(controller.heatmap.getPreferredSize().height);
-				var active = controller.getActiveComponent();
-				if (active !== -1) {
-					controller.sortBasedOnSelection(morpheus.SortKey.SortOrder.DESCENDING,
-						active !== 0, e && e.shiftKey);
-				}
+				controller
+				.scrollTop(controller.heatmap.getPreferredSize().height);
 			} else {
 				controller.scrollTop(controller.scrollTop() + 8);
 			}
