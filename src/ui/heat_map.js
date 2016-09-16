@@ -1212,24 +1212,27 @@ morpheus.HeatMap.prototype = {
 		.on(
 			'contextmenu',
 			function (e) {
-
+				var items = [];
 				morpheus.Popup
 				.showPopup(
 					[
 
-						{
-							name: 'Copy Selection',
-							disabled: _this.project
-							.getElementSelectionModel()
-							.count() === 0,
-							class: 'copy'
-						},
 						{
 							name: 'Copy Image',
 							class: 'copy'
 						},
 						{
 							name: 'Save Image (' + morpheus.Util.COMMAND_KEY + 'S)'
+						},
+						{
+							separator: true
+						},
+						{
+							name: 'Copy Selection',
+							disabled: _this.project
+							.getElementSelectionModel()
+							.count() === 0,
+							class: 'copy'
 						},
 						{
 							separator: true
