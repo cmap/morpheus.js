@@ -3688,6 +3688,7 @@ morpheus.HeatMap.copyFromParent = function (project, options) {
 		project.rowColorModel = project.columnColorModel;
 		parentRowTracks = parentColumnTracks.slice().reverse();
 	}
+
 	if (options.inheritFromParentOptions.transpose) {
 		var tmp = project.rowShapeModel;
 		project.rowShapeModel = project.columnShapeModel;

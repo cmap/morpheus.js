@@ -212,9 +212,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		tool: new morpheus.SimilarityMatrixTool()
 	}, {
 		tool: new morpheus.TransposeTool()
-	}, {
-		tool: new morpheus.WordCloudTool()
-	}]; // DevAPI, {
+	}, {tool: new morpheus.TsneTool()}]; // DevAPI, {
 	this.getToolByName = function (name) {
 		for (var i = 0; i < tools.length; i++) {
 			if (tools[i] && tools[i].tool.toString

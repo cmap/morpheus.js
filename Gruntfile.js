@@ -74,7 +74,7 @@ module.exports = function (grunt) {
 				src: ['src/util/util.js', 'src/util/*.js',
 					'src/io/*.js', 'src/matrix/vector_adapter.js',
 					'src/matrix/*.js', 'src/*.js',
-					'src/tools/*.js', 'src/ui/*.js', 'src/**/*.js']
+					'src/tools/*.js', 'src/ui/*.js', 'src/**/*.js', 'js/tsne.js']
 			}
 		},
 		watch: {
