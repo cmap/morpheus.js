@@ -171,15 +171,18 @@ morpheus.Util.getQueryParams = function (s) {
 	}
 	return params;
 };
-morpheus.Util.getScriptPath = function () {
+morpheus.Util.getScriptPath = function (name) {
+	if (!name) {
+		name = 'morpheus-latest.min.js';
+	}
 	var scripts = document.getElementsByTagName('script');
 	for (var i = scripts.length - 1; i >= 0; i--) {
 		var src = scripts[i].src;
 		var index = src.lastIndexOf('/');
 		if (index !== -1) {
-			src = src.substring(index);
+			src = src.substring(index + 1);
 		}
-		if (src.indexOf('morpheus') !== -1 && src.indexOf('external') === -1) {
+		if (src === name) {
 			return scripts[i].src;
 		}
 	}
