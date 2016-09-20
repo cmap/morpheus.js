@@ -199,7 +199,9 @@ morpheus.TabManager.prototype = {
 		li.push('&nbsp;<i style="color:black;"></i>');
 		if (options.closeable) {
 			li
-			.push('&nbsp<button type="button" class="close" aria-label="Close" data-target="#'
+			.push('&nbsp<button style="font-size: 18px;" type="button" class="close"' +
+				' aria-label="Close"' +
+				' data-target="#'
 				+ id
 				+ '"><span aria-hidden="true">×</span></button>');
 
