@@ -11,7 +11,7 @@ morpheus.LandingPage = function (pageOptions) {
 	html.push('<div data-name="help" class="pull-right"></div>');
 
 	html
-	.push('<div style="margin-bottom:10px;"><img src="https://www.broadinstitute.org/cancer/software/morpheus/images/icon.svg" alt="logo" /> <span data-name="brand" style="vertical-align: middle;font-size:24px;font-family:Roboto,sans-serif;">');
+	.push('<div style="margin-bottom:10px;"><img src="https://software.broadinstitute.org/morpheus/images/icon.svg" alt="logo" /> <span data-name="brand" style="vertical-align: middle;font-size:24px;font-family:Roboto,sans-serif;">');
 	html.push('<span>M</span>');
 	html.push('<span>o</span>');
 	html.push('<span>r</span>');
