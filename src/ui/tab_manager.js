@@ -96,7 +96,7 @@ morpheus.TabManager = function (options) {
 };
 morpheus.TabManager.prototype = {
 	setTabText: function (id, text) {
-		this.$nav.find('a').filter('[href=' + id + ']').contents().first()
+		this.$nav.find('a').filter('[href="' + id + '"]').contents().first()
 		.replaceWith(text + '&nbsp;');
 		this.idToTabObject.get(id).setName(name);
 	},
@@ -111,7 +111,7 @@ morpheus.TabManager.prototype = {
 	 *            Tab id for task
 	 */
 	addTask: function (task) {
-		var $a = this.$nav.find('a[href=' + task.tabId + ']');
+		var $a = this.$nav.find('a[href="' + task.tabId + '"]');
 		if ($a.length === 0) {
 			throw new Error(task.tabId + ' not found.');
 		}
@@ -135,7 +135,7 @@ morpheus.TabManager.prototype = {
 		$i.addClass('fa fa-spinner fa-spin');
 	},
 	removeTask: function (task) {
-		var $a = this.$nav.find('a[href=' + task.tabId + ']');
+		var $a = this.$nav.find('a[href="' + task.tabId + '"]');
 		var $i = $a.find('i');
 		var tasks = $i.data('tasks');
 		if (!tasks) {
@@ -240,7 +240,7 @@ morpheus.TabManager.prototype = {
 			target = this.activeTabId;
 		}
 		this.idToTabObject.remove(target);
-		this.$nav.find('[href=' + target + ']').parent().remove();
+		this.$nav.find('[href="' + target + '"]').parent().remove();
 		this.$tabContent.find(target).remove();
 		var $a = this.$nav.find('a[data-toggle="tab"]:last');
 		if ($a.length === 0) {
@@ -276,7 +276,7 @@ morpheus.TabManager.prototype = {
 				previous: null
 			});
 		}
-		var $a = this.$nav.find('[href=' + id + ']');
+		var $a = this.$nav.find('[href="' + id + '"]');
 		// make sure it's enabled
 		$a.parent().removeClass('disabled');
 		$a.removeClass('btn disabled');
@@ -291,10 +291,10 @@ morpheus.TabManager.prototype = {
 	 *            The title (used to show tooltip)
 	 */
 	setTabTitle: function (id, title) {
-		this.$nav.find('a').filter('[href=' + id + ']').attr('title', title);
+		this.$nav.find('a').filter('[href="' + id + '"]').attr('title', title);
 	},
 	setTabEnabled: function (id, enabled) {
-		var $a = this.$nav.find('a').filter('[href=' + id + ']');
+		var $a = this.$nav.find('a').filter('[href="' + id + '"]');
 		if (enabled) {
 			$a.parent().removeClass('disabled');
 			$a.removeClass('btn disabled');
