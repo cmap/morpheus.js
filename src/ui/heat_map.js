@@ -1904,8 +1904,8 @@ morpheus.HeatMap.prototype = {
 					.getData('text/plain');
 					if (text != null && text.length > 0) {
 						// open a file from clipboard
-						var blob = new Blob([text]);
-						var url = window.URL.createObjectURL(blob);
+						var blob = new Blob([text], {type: 'text/plain'});
+						var url = URL.createObjectURL(blob);
 						e.preventDefault();
 						e.stopPropagation();
 						morpheus.HeatMap.showTool(

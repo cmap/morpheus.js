@@ -167,8 +167,12 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 	var isFile = fileOrUrl instanceof File;
 	var isString = _.isString(fileOrUrl);
 	var ext = options && options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
-	var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
-
+	var datasetReader;
+	if (ext === '' && fileOrUrl.toString().indexOf('blob:') === 0) {
+		datasetReader = new morpheus.TxtReader();
+	} else {
+		datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
+	}
 	if (isString || isFile) { // URL or file
 		var deferred = $.Deferred();
 		// override toString so can determine file name
