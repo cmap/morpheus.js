@@ -1,14 +1,14 @@
 var CACHE_NAME = 'morpheus';
 var CACHED_FILES = [
-	'css/morpheus-latest.min.css',
-	'fonts/FontAwesome.otf',
-	'fonts/fontawesome-webfont.eot',
-	'fonts/fontawesome-webfont.svg',
-	'fonts/fontawesome-webfont.ttf',
-	'fonts/fontawesome-webfont.woff',
-	'fonts/fontawesome-webfont.woff2',
-	'js/morpheus-external-latest.min.js',
-	'js/morpheus-latest.min.js',
+	'/css/morpheus-latest.min.css',
+	'/fonts/FontAwesome.otf',
+	'/fonts/fontawesome-webfont.eot',
+	'/fonts/fontawesome-webfont.svg',
+	'/fonts/fontawesome-webfont.ttf',
+	'/fonts/fontawesome-webfont.woff',
+	'/fonts/fontawesome-webfont.woff2',
+	'/js/morpheus-external-latest.min.js',
+	'/js/morpheus-latest.min.js',
 	'/',
 	'/index.html'
 ];
