@@ -20,21 +20,6 @@ self.addEventListener('install', function (event) {
 	);
 });
 
-self.addEventListener('activate', function (event) {
-	event.waitUntil(
-		caches.keys().then(function (cacheNames) {
-			return Promise.all(
-				cacheNames.map(function (cacheName) {
-					if (CACHED_FILES.indexOf(cacheName) === -1) {
-						console.log('Deleting out of date cache:', cacheName);
-						return caches.delete(cacheName);
-					}
-				})
-			);
-		})
-	);
-});
-
 self.addEventListener('fetch', function (event) {
 	event.respondWith(
 		caches.open(CACHE_NAME).then(function (cache) {
