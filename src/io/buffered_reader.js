@@ -55,21 +55,25 @@ morpheus.BufferedReader.prototype = {
 morpheus.BufferedReader.getArrayBuffer = function (fileOrUrl, callback) {
 	var isString = typeof fileOrUrl === 'string' || fileOrUrl instanceof String;
 	if (isString) { // URL
+		// if ('fetch' in window) {
+		// 	fetch(fileOrUrl).then(function (response) {
+		// 		if (response.ok) {
+		// 			response.arrayBuffer().then(function (buf) {
+		// 				callback(null, buf);
+		// 			});
+		// 		} else {
+		// 			callback('Network error');
+		// 		}
+		// 	}).catch(function (error) {
+		// 		callback(error.message);
+		// 	});
+		// } else {
 		var oReq = new XMLHttpRequest();
 		oReq.open('GET', fileOrUrl, true);
 		oReq.responseType = 'arraybuffer';
 		oReq.onload = function (oEvent) {
 			callback(null, oReq.response);
 		};
-
-		// oReq.onprogress = function(oEvent) {
-		// if (oEvent.lengthComputable) {
-		// var percentComplete = oEvent.loaded / oEvent.total;
-		// console.log(percentComplete + '%')
-		// } else {
-		// console.log(oEvent.loaded + ' loaded')
-		// }
-		// };
 
 		oReq.onerror = function (oEvent) {
 			callback(oEvent);
@@ -88,6 +92,7 @@ morpheus.BufferedReader.getArrayBuffer = function (fileOrUrl, callback) {
 
 		oReq.send(null);
 		return oReq;
+		// }
 	} else {
 		var reader = new FileReader();
 		reader.onload = function (event) {

@@ -4,7 +4,8 @@ morpheus.HelpMenu = function () {
 	html.push('<button type="button" class="btn btn-default btn-xs' +
 		' dropdown-toggle"' +
 		' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">');
-	html.push('<img width="16" height="16" src="' + morpheus.Util.URL + 'images/icon.svg">');
+	html.push('<svg width="16px" height="16px"><g><rect x="0" y="0" width="16" height="7"' +
+		' style="fill:#ca0020;stroke:none"/><rect x="0" y="9" width="16" height="7" style="fill:#0571b0;stroke:none"/></g></svg>');
 	html.push(' <span class="caret"></span>');
 	html.push('</button>');
 	html
