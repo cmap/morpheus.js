@@ -1,16 +1,16 @@
 var CACHE_NAME = 'morpheus';
 var CACHED_FILES = [
-	'/css/morpheus-latest.min.css',
-	'/fonts/FontAwesome.otf',
-	'/fonts/fontawesome-webfont.eot',
-	'/fonts/fontawesome-webfont.svg',
-	'/fonts/fontawesome-webfont.ttf',
-	'/fonts/fontawesome-webfont.woff',
-	'/fonts/fontawesome-webfont.woff2',
-	'/js/morpheus-external-latest.min.js',
-	'/js/morpheus-latest.min.js',
-	'/',
-	'/index.html'
+	'/morpheus/css/morpheus-latest.min.css',
+	'/morpheus/fonts/FontAwesome.otf',
+	'/morpheus/fonts/fontawesome-webfont.eot',
+	'/morpheus/fonts/fontawesome-webfont.svg',
+	'/morpheus/fonts/fontawesome-webfont.ttf',
+	'/morpheus/fonts/fontawesome-webfont.woff',
+	'/morpheus/fonts/fontawesome-webfont.woff2',
+	'/morpheus/js/morpheus-external-latest.min.js',
+	'/morpheus/js/morpheus-latest.min.js',
+	'/morpheus/',
+	'/morpheus/index.html'
 ];
 self.addEventListener('install', function (event) {
 	event.waitUntil(
