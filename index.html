@@ -11,11 +11,11 @@
     <link rel="stylesheet" href="css/morpheus-latest.min.css">
     <script type="text/javascript" src="js/morpheus-external-latest.min.js"></script>
     <script src="js/morpheus-latest.min.js"></script>
-    <script async="true" src="js/jsme/jsme.nocache.js"></script>
+    <script async src="js/jsme/jsme.nocache.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Roboto"
           rel="stylesheet" type="text/css">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <script async="true" type="text/javascript"
+    <script async type="text/javascript"
             src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs"
             data-app-key="6xq3zgeoago5fhw"></script>
 </head>
@@ -72,6 +72,9 @@
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker
         .register('sw.js');
+    }
+    if (navigator.onLine) {
+
     }
 </script>
 </body>
