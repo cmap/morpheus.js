@@ -47,42 +47,61 @@ morpheus.HeatMapKeyListener = function (controller) {
 			controller.scrollTop(0);
 			found = true;
 		} else if (e.which === 34) { // page down
-			var pos = controller.scrollTop();
-			controller.scrollTop(pos + controller.heatmap.getUnscaledHeight()
-				- 2);
+			if (commandKey) { // to bottom
+				controller
+				.scrollTop(controller.heatmap.getPreferredSize().height);
+			} else {
+				var pos = controller.scrollTop();
+				controller.scrollTop(pos + controller.heatmap.getUnscaledHeight()
+					- 2);
+			}
 			found = true;
 		} else if (e.which === 33) { // page up
-			var pos = controller.scrollTop();
-			controller.scrollTop(pos - controller.heatmap.getUnscaledHeight()
-				+ 2);
-
+			if (commandKey) { // to top
+				controller
+				.scrollTop(0);
+			} else {
+				var pos = controller.scrollTop();
+				controller.scrollTop(pos - controller.heatmap.getUnscaledHeight()
+					+ 2);
+			}
 			found = true;
 		} else if (e.which === 38) { // up arrow
-			if (commandKey) { // to top
-				controller.scrollTop(0);
+			if (commandKey) { // shrink rows
+				controller.zoom(false, {
+					columns: false,
+					rows: true
+				});
 			} else {
 				controller.scrollTop(controller.scrollTop() - 8);
 			}
 			found = true;
 		} else if (e.which === 40) {// down arrow
-			if (commandKey) { // to bottom
-				controller
-				.scrollTop(controller.heatmap.getPreferredSize().height);
+			if (commandKey) { // grow rows
+				controller.zoom(true, {
+					columns: false,
+					rows: true
+				});
 			} else {
 				controller.scrollTop(controller.scrollTop() + 8);
 			}
 			found = true;
 		} else if (e.which === 37) {// left arrow
-			if (commandKey) { // to left
-				controller.scrollLeft(0);
+			if (commandKey) { // shrink columns
+				controller.zoom(false, {
+					columns: true,
+					rows: false
+				});
 			} else {
 				controller.scrollLeft(controller.scrollLeft() - 8);
 			}
 			found = true;
 		} else if (e.which === 39) {// right arrow
-			if (commandKey) { // to right
-				controller
-				.scrollLeft(controller.heatmap.getPreferredSize().width);
+			if (commandKey) { // grow columns
+				controller.zoom(true, {
+					columns: true,
+					rows: false
+				});
 			} else {
 				controller.scrollLeft(controller.scrollLeft() + 8);
 			}
