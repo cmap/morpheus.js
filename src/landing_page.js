@@ -25,7 +25,8 @@ morpheus.LandingPage = function (pageOptions) {
 
 	html.push('<h4>Open your own file</h4>');
 	html.push('<div data-name="formRow" class="center-block"></div>');
-	html.push('<div data-name="exampleRow"><h4>Or select a preloaded dataset</h4></div>');
+	html.push('<div style="display: none;" data-name="preloadedDataset"><h4>Or select a preloaded' +
+		' dataset</h4></div>');
 	html.push('</div>');
 	var $html = $(html.join(''));
 	var colorScale = d3.scale.linear().domain([0, 4, 7]).range(['#ca0020', '#999999', '#0571b0']).clamp(true);
@@ -43,7 +44,7 @@ morpheus.LandingPage = function (pageOptions) {
 	});
 	formBuilder.$form.appendTo($el.find('[data-name=formRow]'));
 	this.formBuilder = formBuilder;
-	this.$sampleDatasetsEl = $el.find('[data-name=exampleRow]');
+	this.$sampleDatasetsEl = $el.find('[data-name=preloadedDataset]');
 	var index = 0;
 	var step = function () {
 		brands[index].style.color = colorScale(index);

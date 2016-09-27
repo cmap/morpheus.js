@@ -65,9 +65,7 @@ morpheus.SampleDatasets = function (options) {
 	.done(
 		function (text) {
 			var exampleHtml = [];
-
 			exampleHtml.push('<table class="table table-condensed">');
-
 			exampleHtml
 			.push('<td>Cancer Cell Line Encyclopedia (CCLE), Project Achilles</td>');
 			exampleHtml
