@@ -29,7 +29,7 @@ morpheus.Util.viewPortSize = function () {
 
 morpheus.Util.TRACKING_CODE_LOADED = false;
 morpheus.Util.loadTrackingCode = function () {
-	if (typeof window !== 'undefined') {
+	if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && navigator.onLine) {
 		if (morpheus.Util.TRACKING_CODE_LOADED) {
 			return;
 		} else if (typeof ga === 'undefined') {

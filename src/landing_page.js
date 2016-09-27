@@ -11,7 +11,7 @@ morpheus.LandingPage = function (pageOptions) {
 	html.push('<div data-name="help" class="pull-right"></div>');
 
 	html
-	.push('<div style="margin-bottom:10px;"><svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg> <div data-name="brand" style="display:inline-block; vertical-align: top;font-size:24px;font-family:Roboto,sans-serif;">');
+	.push('<div style="margin-bottom:10px;"><svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg> <div data-name="brand" style="display:inline-block; vertical-align: top;font-size:24px;font-family:sans-serif;">');
 	html.push('<span>M</span>');
 	html.push('<span>o</span>');
 	html.push('<span>r</span>');
@@ -25,15 +25,12 @@ morpheus.LandingPage = function (pageOptions) {
 
 	html.push('<h4>Open your own file</h4>');
 	html.push('<div data-name="formRow" class="center-block"></div>');
-	html.push('<h4>Or select a preloaded dataset</h4>');
-	html.push('<div data-name="exampleRow"></div>');
+	html.push('<div data-name="exampleRow"><h4>Or select a preloaded dataset</h4></div>');
 	html.push('</div>');
 	var $html = $(html.join(''));
 	var colorScale = d3.scale.linear().domain([0, 4, 7]).range(['#ca0020', '#999999', '#0571b0']).clamp(true);
 	var brands = $html.find('[data-name="brand"] > span');
-
 	$html.appendTo($el);
-
 	new morpheus.HelpMenu().$el.appendTo($el.find('[data-name=help]'));
 	var formBuilder = new morpheus.FormBuilder();
 	formBuilder.append({
@@ -76,7 +73,7 @@ morpheus.LandingPage.prototype = {
 	},
 	show: function () {
 		var _this = this;
-		if (!this.sampleDatasets) {
+		if (navigator.onLine && !this.sampleDatasets) {
 			this.sampleDatasets = new morpheus.SampleDatasets({
 				$el: this.$sampleDatasetsEl,
 				callback: function (heatMapOptions) {

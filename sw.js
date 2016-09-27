@@ -1,16 +1,17 @@
 var CACHE_NAME = 'morpheus';
 var CACHED_FILES = [
-	'/morpheus/css/morpheus-latest.min.css',
-	'/morpheus/fonts/FontAwesome.otf',
-	'/morpheus/fonts/fontawesome-webfont.eot',
-	'/morpheus/fonts/fontawesome-webfont.svg',
-	'/morpheus/fonts/fontawesome-webfont.ttf',
-	'/morpheus/fonts/fontawesome-webfont.woff',
-	'/morpheus/fonts/fontawesome-webfont.woff2',
-	'/morpheus/js/morpheus-external-latest.min.js',
-	'/morpheus/js/morpheus-latest.min.js',
-	'/morpheus/',
-	'/morpheus/index.html'
+	'css/morpheus-latest.min.css',
+	'fonts/FontAwesome.otf',
+	'fonts/fontawesome-webfont.eot',
+	'fonts/fontawesome-webfont.svg',
+	'fonts/fontawesome-webfont.ttf',
+	'fonts/fontawesome-webfont.woff',
+	'fonts/fontawesome-webfont.woff2',
+	'js/morpheus-external-latest.min.js',
+	'js/morpheus-latest.min.js',
+	'/',
+	'index.html',
+	'favicon.ico'
 ];
 self.addEventListener('install', function (event) {
 	event.waitUntil(
@@ -32,10 +33,11 @@ self.addEventListener('fetch', function (event) {
 					}).catch(function () {
 						return cachedResponse;
 					})
+				} else {
+					return fetch(event.request).then(function (response) {
+						return response;
+					});
 				}
-				return fetch(event.request).then(function (response) {
-					return response;
-				});
 			}).catch(function (error) {
 				// This catch() will handle exceptions that arise from the match() or fetch() operations.
 				// Note that a HTTP error response (e.g. 404) will NOT trigger an exception.

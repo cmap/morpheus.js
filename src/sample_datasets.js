@@ -5,34 +5,7 @@ morpheus.SampleDatasets = function (options) {
 	var _this = this;
 	var $el = options.$el;
 	this.callback = options.callback;
-	var exampleHtml = [];
 
-	exampleHtml.push('<table class="table table-condensed">');
-
-	exampleHtml
-	.push('<td>Cancer Cell Line Encyclopedia (CCLE), Project Achilles</td>');
-	exampleHtml
-	.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="mrna"> Gene Expression</td>');
-
-	exampleHtml
-	.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="cn"> Copy Number By Gene</td>');
-
-	exampleHtml
-	.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="sig_genes"> Mutations</td>');
-
-	exampleHtml
-	.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="ach"> Gene essentiality</td>');
-
-	exampleHtml
-	.push('<td><button disabled type="button" class="btn btn-default" name="ccle">'
-		+ options.openText + '</button></td>');
-	exampleHtml.push('</tr></table>');
-
-	exampleHtml
-	.push('<div class="text-muted">TCGA data version 1/11/2015</div><span class="text-muted">Please adhere to <a target="_blank" href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines"> the TCGA publication guidelines</a></u> when using TCGA data in your publications.</span>');
-
-	exampleHtml.push('<div data-name="tcga"></div>');
-	$(exampleHtml.join('')).appendTo($el);
 	$el.find('[name=ccle]').on('click', function (e) {
 		e.preventDefault();
 		var $this = $(this);
@@ -91,6 +64,35 @@ morpheus.SampleDatasets = function (options) {
 		'https://s3.amazonaws.com/data.clue.io/morpheus/tcga/tcga_index.txt')
 	.done(
 		function (text) {
+			var exampleHtml = [];
+
+			exampleHtml.push('<table class="table table-condensed">');
+
+			exampleHtml
+			.push('<td>Cancer Cell Line Encyclopedia (CCLE), Project Achilles</td>');
+			exampleHtml
+			.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="mrna"> Gene Expression</td>');
+
+			exampleHtml
+			.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="cn"> Copy Number By Gene</td>');
+
+			exampleHtml
+			.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="sig_genes"> Mutations</td>');
+
+			exampleHtml
+			.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="ach"> Gene essentiality</td>');
+
+			exampleHtml
+			.push('<td><button disabled type="button" class="btn btn-default" name="ccle">'
+				+ options.openText + '</button></td>');
+			exampleHtml.push('</tr></table>');
+
+			exampleHtml
+			.push('<div class="text-muted">TCGA data version 1/11/2015</div><span class="text-muted">Please adhere to <a target="_blank" href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines"> the TCGA publication guidelines</a></u> when using TCGA data in your publications.</span>');
+
+			exampleHtml.push('<div data-name="tcga"></div>');
+			$(exampleHtml.join('')).appendTo($el);
+			$el.show();
 			var lines = text.split('\n');
 			var diseases = [];
 			for (var i = 0; i < lines.length; i++) {
