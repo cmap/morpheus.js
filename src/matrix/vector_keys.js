@@ -12,6 +12,9 @@ morpheus.VectorKeys.HEADER_SUMMARY = 'morpheus.headerSummary';
 /** Key indicating to show header summary */
 morpheus.VectorKeys.SHOW_HEADER_SUMMARY = 'morpheus.showHeaderSummary';
 
+// render the selection in a stacked bar
+morpheus.VectorKeys.STACKED_BAR_SELECT = 'stacked.bar.selection';
+
 morpheus.VectorKeys.TITLE = 'morpheus.title';
 /** Function to compute vector value */
 morpheus.VectorKeys.FUNCTION = 'morpheus.function';

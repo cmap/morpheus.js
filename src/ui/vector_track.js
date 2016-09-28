@@ -520,7 +520,6 @@ morpheus.VectorTrack.prototype = {
 		}
 
 	},
-
 	drawSelection: function (options) {
 		var project = this.project;
 		var positions = this.positions;
@@ -2179,6 +2178,7 @@ morpheus.VectorTrack.prototype = {
 		.toModelIndices();
 		context.strokeStyle = 'black';
 		context.lineWidth = 2;
+		var renderSelection = vector.getProperties().get(morpheus.VectorKeys.STACKED_BAR_SELECT);
 		for (var i = start; i < end; i++) {
 			var array = vector.getValue(i);
 			if (array != null) {
@@ -2192,6 +2192,9 @@ morpheus.VectorTrack.prototype = {
 							selectedBinToCount.set(bin, prior + 1);
 						}
 					}
+				} else if (renderSelection) {
+
+
 				}
 
 				var position = positions.getPosition(i);

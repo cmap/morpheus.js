@@ -143,13 +143,13 @@ morpheus.Util.getWindowSearchObject = function () {
 };
 
 morpheus.Util.copyString = function (s) {
+	return (' ' + s).substr(1);
 	//return (' ' + s).slice(1);
-	// return (' ' + s).substr(1);
-	var copy = [];
-	for (var i = 0, end = s.length; i < end; i++) {
-		copy.push(s[i]);
-	}
-	return copy.join('');
+	// var copy = [];
+	// for (var i = 0, end = s.length; i < end; i++) {
+	// 	copy.push(s[i]);
+	// }
+	// return copy.join('');
 };
 morpheus.Util.getQueryParams = function (s) {
 	var params = {};

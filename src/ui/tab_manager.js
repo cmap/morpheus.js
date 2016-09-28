@@ -85,7 +85,7 @@ morpheus.TabManager = function (options) {
 		}
 		// triggered when clicking tab
 		var previous = _this.activeTabObject;
-		_this.activeTabId = $(e.target).attr('href');
+		_this.activeTabId = $(e.target).attr('href').substring(1); // remove #
 		_this.activeTabObject = _this.idToTabObject.get(_this.activeTabId);
 		_this.trigger('change', {
 			tab: _this.activeTabObject,
@@ -190,7 +190,7 @@ morpheus.TabManager.prototype = {
 	add: function (options) {
 		this.adding = true;
 		var id = _.uniqueId('tab');
-		this.idToTabObject.set('#' + id, options.object);
+		this.idToTabObject.set(id, options.object);
 		var li = [];
 		li.push('<li role="presentation">');
 		li.push('<a data-morpheus-rename="' + options.rename
@@ -220,7 +220,7 @@ morpheus.TabManager.prototype = {
 		if (options.focus) {
 			// update active tab, but don't fire event
 			this.$nav.find('a[data-toggle="tab"]:last').tab('show');
-			this.activeTabId = '#' + id;
+			this.activeTabId = id;
 			this.activeTabObject = options.object;
 			$panel.focus();
 		}
@@ -232,7 +232,7 @@ morpheus.TabManager.prototype = {
 		this.adding = false;
 		return {
 			$panel: $panel,
-			id: '#' + id
+			id: id
 		};
 	},
 	remove: function (target) {

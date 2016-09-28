@@ -131,13 +131,13 @@ morpheus.OpenFileTool.prototype = {
 							isAnnotateColumns, lines);
 				});
 			} else if (morpheus.Util.endsWith(fileName, '.gmt')) {
-				morpheus.BufferedReader.getArrayBuffer(fileOrUrl, function(err,
+				morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function(err,
 						buf) {
 					if (err) {
 						throw new Error('Unable to read ' + fileOrUrl);
 					}
 					var sets = new morpheus.GmtReader()
-							.read(new morpheus.BufferedReader(new Uint8Array(
+							.read(new morpheus.ArrayBufferReader(new Uint8Array(
 									buf)));
 					that.prompt(null, dataset, controller, isAnnotateColumns,
 							sets);

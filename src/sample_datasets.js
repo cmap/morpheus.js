@@ -5,9 +5,7 @@ morpheus.SampleDatasets = function (options) {
 	var _this = this;
 	var $el = options.$el;
 	this.callback = options.callback;
-
-	$el.find('[name=ccle]').on('click', function (e) {
-		e.preventDefault();
+	$el.on('click', '[name=ccle]', function (e) {
 		var $this = $(this);
 		var obj = {};
 		$this.parents('tr').find('input:checked').each(function (i, c) {
@@ -15,7 +13,7 @@ morpheus.SampleDatasets = function (options) {
 		});
 
 		_this.openCCLE(obj);
-
+		e.preventDefault();
 	});
 
 	$el.on('click', '[name=tcgaLink]', function (e) {
