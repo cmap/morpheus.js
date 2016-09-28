@@ -21,7 +21,7 @@ morpheus.MetadataModel.prototype = {
 	 * 
 	 * @param name
 	 *            The vector name to be inserted into this meta data instance.
-	 * @return the added vector.
+	 * @return {morpheus.Vector} the added vector.
 	 */
 	add : function(name) {
 		var index = morpheus.MetadataUtil.indexOf(this, name);

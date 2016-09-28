@@ -72,7 +72,7 @@ morpheus.TabManager = function (options) {
 	this.$nav.on('click', 'button', function (e) { // close a tab
 		// remove the link and tab content
 		e.preventDefault();
-		var target = $(this).attr('data-target');
+		var target = $(this).attr('data-target').substring(1); // remove #
 		if (target != null) {
 			_this.remove(target);
 		}

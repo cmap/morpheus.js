@@ -189,8 +189,12 @@ morpheus.HeatMap = function (options) {
 			structureUrlProvider: undefined,
 			promises: undefined, // additional promises to wait
 			// for
+			// not inherited
 			renderReady: undefined,
+			// not inherited
 			datasetReady: undefined,
+			// inherited
+			tabOpened: undefined,
 			loadedCallback: undefined,
 			name: undefined,
 			rowsSortable: true,
@@ -1701,13 +1705,13 @@ morpheus.HeatMap.prototype = {
 				this.options.sizeBy.max);
 		}
 		this.updateDataset();
-		if (this.options.uiReady) {
-			this.options.uiReady(this);
-		}
+
+		// tabOpened is inherited by child heat maps
 		if (this.options.tabOpened) {
 			this.options.tabOpened(this);
 			this.updateDataset();
 		}
+		// renderReady is only called once for the parent heat map
 		if (this.options.renderReady) {
 			this.options.renderReady(this);
 			this.updateDataset();
@@ -2577,12 +2581,7 @@ morpheus.HeatMap.prototype = {
 	}
 	,
 	addTrack: function (name, isColumns, renderSettings) {
-		if (isColumns) {
-			this.addColumnTrack(name, renderSettings);
-		} else {
-			this.addRowTrack(name, renderSettings);
-		}
-
+		return isColumns ? this.addColumnTrack(name, renderSettings) : this.addRowTrack(name, renderSettings);
 	}
 	,
 	addColumnTrack: function (name, renderSettings) {

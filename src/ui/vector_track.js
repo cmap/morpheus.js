@@ -2173,7 +2173,11 @@ morpheus.VectorTrack.prototype = {
 		context.strokeStyle = 'black';
 		context.lineWidth = 2;
 		for (var i = start; i < end; i++) {
+
 			var array = vector.getValue(i);
+			if (vector.getName() === 'test') {
+				console.log(array);
+			}
 			if (array != null) {
 
 				var position = positions.getPosition(i);
