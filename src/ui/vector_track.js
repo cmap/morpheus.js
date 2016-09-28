@@ -2171,31 +2171,11 @@ morpheus.VectorTrack.prototype = {
 		var settings = this.settings;
 		var colorModel = isColumns ? this.project.getColumnColorModel()
 			: this.project.getRowColorModel();
-
-		var selectionModel = isColumns ? this.project.getRowSelectionModel()
-			: null;
-		var selectedModelIndices = selectionModel == null ? [] : selectionModel
-		.toModelIndices();
 		context.strokeStyle = 'black';
 		context.lineWidth = 2;
-		var renderSelection = vector.getProperties().get(morpheus.VectorKeys.STACKED_BAR_SELECT);
 		for (var i = start; i < end; i++) {
 			var array = vector.getValue(i);
 			if (array != null) {
-				var selectedBinToCount = new morpheus.Map();
-				if (array.modelIndexToBin != null) {
-					for (var j = 0; j < selectedModelIndices.length; j++) {
-						var bin = array.modelIndexToBin
-						.get(selectedModelIndices[j]);
-						if (bin !== undefined) {
-							var prior = selectedBinToCount.get(bin) || 0;
-							selectedBinToCount.set(bin, prior + 1);
-						}
-					}
-				} else if (renderSelection) {
-
-
-				}
 
 				var position = positions.getPosition(i);
 				var size = positions.getItemSize(i);
@@ -2240,14 +2220,6 @@ morpheus.VectorTrack.prototype = {
 								- scaledValue), size);
 						context.fill();
 					}
-					if (selectedBinToCount.has(index)) {
-						context.beginPath();
-						var ytop = (nextScaledValue + scaledValue) / 2;
-						context.moveTo(position, ytop);
-						context.lineTo(position + size, ytop);
-						context.stroke();
-
-					}
 				}
 				var negativeIndices = morpheus.Util.indexSortPairs(
 					negativePairs, true); // draw smaller (more negative)
@@ -2274,14 +2246,7 @@ morpheus.VectorTrack.prototype = {
 								- scaledValue), size);
 						context.fill();
 					}
-					if (selectedBinToCount.has(index)) {
-						// draw a line at top of bin
-						context.beginPath();
-						var ytop = (nextScaledValue + scaledValue) / 2;
-						context.moveTo(position, ytop);
-						context.lineTo(position + size, ytop);
-						context.stroke();
-					}
+
 				}
 			}
 		}
