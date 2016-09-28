@@ -111,7 +111,7 @@ morpheus.TabManager.prototype = {
 	 *            Tab id for task
 	 */
 	addTask: function (task) {
-		var $a = this.$nav.find('a[data-link=' + task.tabId + ']');
+		var $a = this.$nav.find('[data-link=' + task.tabId + ']');
 		if ($a.length === 0) {
 			throw new Error(task.tabId + ' not found.');
 		}
@@ -135,7 +135,7 @@ morpheus.TabManager.prototype = {
 		$i.addClass('fa fa-spinner fa-spin');
 	},
 	removeTask: function (task) {
-		var $a = this.$nav.find('a[data-link=' + task.tabId + ']');
+		var $a = this.$nav.find('[data-link=' + task.tabId + ']');
 		var $i = $a.find('i');
 		var tasks = $i.data('tasks');
 		if (!tasks) {
