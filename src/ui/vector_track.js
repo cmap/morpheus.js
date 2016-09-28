@@ -2165,7 +2165,6 @@ morpheus.VectorTrack.prototype = {
 								availableSpace) {
 		var isColumns = this.isColumns;
 		var positions = this.positions;
-
 		var scale = this.createChartScale(availableSpace);
 		var midPix = scale(this.settings.mid);
 		var settings = this.settings;
