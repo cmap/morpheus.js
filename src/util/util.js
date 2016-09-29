@@ -943,11 +943,11 @@ morpheus.Util.indexSort = function (array, ascending) {
 morpheus.Util.indexSortPairs = function (array, ascending) {
 	if (ascending) {
 		array.sort(function (a, b) {
-			return (a.value < b.value ? -1 : (a.value === b.value ? 0 : 1));
+			return (a.value < b.value ? -1 : (a.value === b.value ? (a.index < b.index ? -1 : 1) : 1));
 		});
 	} else {
 		array.sort(function (a, b) {
-			return (a.value < b.value ? 1 : (a.value === b.value ? 0 : -1));
+			return (a.value < b.value ? 1 : (a.value === b.value ? (a.index < b.index ? 1 : -1) : -1));
 		});
 	}
 	var indices = [];

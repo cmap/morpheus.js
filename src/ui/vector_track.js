@@ -2173,13 +2173,8 @@ morpheus.VectorTrack.prototype = {
 		context.strokeStyle = 'black';
 		context.lineWidth = 2;
 		for (var i = start; i < end; i++) {
-
 			var array = vector.getValue(i);
-			if (vector.getName() === 'test') {
-				console.log(array);
-			}
 			if (array != null) {
-
 				var position = positions.getPosition(i);
 				var size = positions.getItemSize(i);
 				var positivePairs = [];
@@ -2199,8 +2194,16 @@ morpheus.VectorTrack.prototype = {
 					}
 				}
 
+				// array.sort(function (a, b) {
+				// 	return (a.value < b.value ? 1 : (a.value === b.value ? 0 : -1));
+				// });
+				// var positiveIndices = [];
+				// positivePairs.forEach(function (item) {
+				// 	positiveIndices.push(item.index);
+				// });
+				//
 				var positiveIndices = morpheus.Util.indexSortPairs(
-					positivePairs, false); // draw bigger values 1st
+					positivePairs, false);
 				for (var j = 0, length = positiveIndices.length; j < length; j++) {
 					var index = positiveIndices[j];
 					var value = array[index];
