@@ -13,7 +13,7 @@ morpheus.ColumnDendrogram.prototype = {
 	isDragHotSpot : function(p) {
 		return Math.abs(this.scale(this.cutHeight) - p.y) <= 2;
 	},
-	preDraw : function(context, clip) {
+	drawCutSlider : function(context, clip) {
 		if (context.setLineDash) {
 			context.setLineDash([ 5 ]);
 		}

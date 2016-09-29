@@ -366,7 +366,7 @@ morpheus.HeatMap = function (options) {
 		var rowDendrogramDeferred = morpheus.Util
 		.getText(options.rowDendrogram);
 		rowDendrogramDeferred.done(function (text) {
-			_this.options.rowDendrogram = morpheus.AbstractDendrogram
+			_this.options.rowDendrogram = morpheus.DendrogramUtil
 			.parseNewick(text);
 		});
 		promises.push(rowDendrogramDeferred);
@@ -376,7 +376,7 @@ morpheus.HeatMap = function (options) {
 		var columnDendrogramDeferred = morpheus.Util
 		.getText(options.columnDendrogram);
 		columnDendrogramDeferred.done(function (text) {
-			_this.options.columnDendrogram = morpheus.AbstractDendrogram
+			_this.options.columnDendrogram = morpheus.DendrogramUtil
 			.parseNewick(text);
 		});
 		promises.push(columnDendrogramDeferred);

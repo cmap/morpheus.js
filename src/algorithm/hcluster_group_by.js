@@ -32,7 +32,7 @@ morpheus.HClusterGroupBy = function(dataset, groupByFieldNames,
 					reorderedIndices.push(originalIndex);
 				}
 
-				morpheus.AbstractDendrogram.dfs(hcl.tree.rootNode, function(
+				morpheus.DendrogramUtil.dfs(hcl.tree.rootNode, function(
 						node) {
 					node.index += offset;
 					node.minIndex += offset;

@@ -1,24 +1,24 @@
-morpheus.HCluster = function(distmatrix, linkageAlgorithm) {
+morpheus.HCluster = function (distmatrix, linkageAlgorithm) {
 	var nelements = distmatrix.length;
 	var nNodes = nelements - 1;
 	if (nNodes === -1) {
 
 		var root = {
-			id : 0,
-			height : 0,
-			index : 0,
-			minIndex : 0,
-			maxIndex : 0,
-			depth : 0
+			id: 0,
+			height: 0,
+			index: 0,
+			minIndex: 0,
+			maxIndex: 0,
+			depth: 0
 		};
 
 		this.tree = {
-			maxHeight : 0,
-			rootNode : root,
-			leafNodes : [],
-			nLeafNodes : 0
+			maxHeight: 0,
+			rootNode: root,
+			leafNodes: [],
+			nLeafNodes: 0
 		};
-		this.reorderedIndices = [ 0 ];
+		this.reorderedIndices = [0];
 		return;
 	}
 	// tree array contains array of int left, int right, float distance;
@@ -49,7 +49,7 @@ morpheus.HCluster = function(distmatrix, linkageAlgorithm) {
 			counts1 = nodecounts[index1];
 			ID1 = nodeID[index1];
 			tree[i].distance = Math
-					.max(tree[i].distance, tree[index1].distance);
+			.max(tree[i].distance, tree[index1].distance);
 		} else {
 			order1 = order[min1];
 			counts1 = 1;
@@ -61,7 +61,7 @@ morpheus.HCluster = function(distmatrix, linkageAlgorithm) {
 			counts2 = nodecounts[index2];
 			ID2 = nodeID[index2];
 			tree[i].distance = Math
-					.max(tree[i].distance, tree[index2].distance);
+			.max(tree[i].distance, tree[index2].distance);
 		} else {
 			order2 = order[min2];
 			counts2 = 1;
@@ -71,10 +71,10 @@ morpheus.HCluster = function(distmatrix, linkageAlgorithm) {
 		rightIds[i] = ID2;
 		nodecounts[i] = counts1 + counts2;
 		nodeorder[i] = (counts1 * order1 + counts2 * order2)
-				/ (counts1 + counts2);
+			/ (counts1 + counts2);
 	}
 	var reorderedIndices = morpheus.HCluster.treeSort(nNodes, order, nodeorder,
-			nodecounts, tree);
+		nodecounts, tree);
 	var idToIndex = {};
 	for (var i = 0, length = reorderedIndices.length; i < length; i++) {
 		var index = reorderedIndices[i];
@@ -88,7 +88,7 @@ morpheus.HCluster = function(distmatrix, linkageAlgorithm) {
 		var lnode = nodeIdToNode[leftId];
 		if (lnode === undefined) {
 			lnode = {
-				id : leftId
+				id: leftId
 			};
 			var index = idToIndex[leftId];
 			lnode.index = index;
@@ -100,7 +100,7 @@ morpheus.HCluster = function(distmatrix, linkageAlgorithm) {
 		var rnode = nodeIdToNode[rightId];
 		if (rnode === undefined) {
 			rnode = {
-				id : rightId
+				id: rightId
 			};
 			var index = idToIndex[rightId];
 			rnode.index = index;
@@ -109,11 +109,12 @@ morpheus.HCluster = function(distmatrix, linkageAlgorithm) {
 			nodeIdToNode[rnode.id] = rnode;
 		}
 		node = {
-			id : id,
-			children : [ lnode, rnode ],
-			height : tree[i].distance,
-			index : (rnode.index + lnode.index) / 2.0
+			id: id,
+			children: lnode.index < rnode.index ? [lnode, rnode] : [rnode, lnode],
+			height: tree[i].distance,
+			index: (rnode.index + lnode.index) / 2.0
 		};
+
 		node.minIndex = Math.min(rnode.minIndex, lnode.minIndex);
 		node.maxIndex = Math.max(rnode.maxIndex, lnode.maxIndex);
 		lnode.parent = node;
@@ -128,13 +129,13 @@ morpheus.HCluster = function(distmatrix, linkageAlgorithm) {
 		leafNodes.push(leaf);
 	}
 
-	morpheus.AbstractDendrogram.setNodeDepths(node);
+	morpheus.DendrogramUtil.setNodeDepths(node);
 
 	this.tree = {
-		maxHeight : node.height,
-		rootNode : node,
-		leafNodes : leafNodes,
-		nLeafNodes : leafNodes.length
+		maxHeight: node.height,
+		rootNode: node,
+		leafNodes: leafNodes,
+		nLeafNodes: leafNodes.length
 	};
 };
 /*
@@ -149,7 +150,7 @@ morpheus.HCluster = function(distmatrix, linkageAlgorithm) {
  * 
  * @return The first and second indices of the pair with the shortest distance.
  */
-morpheus.HCluster.findClosestPair = function(n, distmatrix, r) {
+morpheus.HCluster.findClosestPair = function (n, distmatrix, r) {
 	var i, j;
 	var temp;
 	var distance = distmatrix[1][0];
@@ -172,7 +173,7 @@ morpheus.HCluster.findClosestPair = function(n, distmatrix, r) {
 /**
  * Creates a ragged array with the number of rows equal to the number of rows in
  * the dataset. Each row in the array has n columns where n is the row index.
- * 
+ *
  * @param dataset
  * @param distanceFunction
  *            The distance function. Use 0 to assume dataset is already a
@@ -180,7 +181,7 @@ morpheus.HCluster.findClosestPair = function(n, distmatrix, r) {
  *            matrix.
  * @return the distance matrix
  */
-morpheus.HCluster.computeDistanceMatrix = function(dataset, distanceFunction) {
+morpheus.HCluster.computeDistanceMatrix = function (dataset, distanceFunction) {
 	/* Set up the ragged array */
 	var matrix = [];
 	var n = dataset.getRowCount();
@@ -214,8 +215,8 @@ morpheus.HCluster.computeDistanceMatrix = function(dataset, distanceFunction) {
 
 	return matrix;
 };
-morpheus.HCluster.treeSort = function(nNodes, order, nodeorder, nodecounts,
-		tree) {
+morpheus.HCluster.treeSort = function (nNodes, order, nodeorder, nodecounts,
+									   tree) {
 	var nElements = nNodes + 1;
 	var i;
 	var neworder = []; // nElements;

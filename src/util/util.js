@@ -186,6 +186,12 @@ morpheus.Util.getScriptPath = function (name) {
 			return scripts[i].src;
 		}
 	}
+
+	// not found
+	if (name === 'morpheus-latest.min.js') {
+		return morpheus.Util.getScriptPath('morpheus.js');
+	}
+	// return 1st script
 	return scripts.length > 0 ? scripts[0].src : '';
 };
 

@@ -958,7 +958,7 @@ morpheus.HeatMapToolBar.prototype = {
 			: this.controller.rowDendrogram;
 		var $searchResults = isColumns ? this.$searchResultsColumnDendrogram
 			: this.$searchResultsRowDendrogram;
-		var matches = morpheus.AbstractDendrogram.search(
+		var matches = morpheus.DendrogramUtil.search(
 			dendrogram.tree.rootNode, text);
 		if (matches === -1) {
 			$searchResults.html('');
@@ -980,7 +980,7 @@ morpheus.HeatMapToolBar.prototype = {
 			positions.setSize(isColumns ? this.controller.getFitColumnSize()
 				: this.controller.getFitRowSize());
 		} else {
-			morpheus.AbstractDendrogram.squishNonSearchedNodes(this.controller,
+			morpheus.DendrogramUtil.squishNonSearchedNodes(this.controller,
 				isColumns);
 		}
 		this.controller.updateDataset(); // need to update spaces for group

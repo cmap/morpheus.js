@@ -27,7 +27,7 @@ morpheus.Popup.init = function () {
 	morpheus.Popup.client = client;
 	morpheus.Popup.initted = true;
 	morpheus.Popup.$popupDiv = $(document.createElement('div'));
-	morpheus.Popup.$popupDiv.css('position', 'absolute').css('zIndex', 999)
+	morpheus.Popup.$popupDiv.css('position', 'absolute').css('zIndex', 10001)
 	.addClass('dropdown clearfix');
 	morpheus.Popup.$contextMenu = $(document.createElement('ul'));
 	morpheus.Popup.$contextMenu.addClass('dropdown-menu').css('display',
