@@ -13,7 +13,7 @@ morpheus.RowDendrogram.prototype = {
 	isDragHotSpot: function (p) {
 		return Math.abs(this.scale(this.cutHeight) - p.x) <= 2;
 	},
-	drawCutSlider: function (context, clip) {
+	drawCutSlider: function (clip, context) {
 		if (context.setLineDash) {
 			context.setLineDash([5]);
 		}
