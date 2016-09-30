@@ -88,7 +88,9 @@ morpheus.SampleDatasets = function (options) {
 
 			exampleHtml.push('<div data-name="tcga"></div>');
 			$(exampleHtml.join('')).appendTo($el);
-			$el.show();
+			if (options.show) {
+				$el.show();
+			}
 			var lines = text.split('\n');
 			var diseases = [];
 			for (var i = 0; i < lines.length; i++) {

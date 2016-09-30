@@ -78,6 +78,7 @@ morpheus.LandingPage.prototype = {
 		if (navigator.onLine && !this.sampleDatasets) {
 			this.sampleDatasets = new morpheus.SampleDatasets({
 				$el: this.$sampleDatasetsEl,
+				show: true,
 				callback: function (heatMapOptions) {
 					_this.open(heatMapOptions);
 				}
