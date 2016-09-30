@@ -6,6 +6,9 @@
 morpheus.HeatMap = function (options) {
 	morpheus.Util.loadTrackingCode();
 	var _this = this;
+	// don't extend
+	var parent = options.parent;
+	options.parent = null;
 	options = $
 	.extend(
 		true,
@@ -223,7 +226,7 @@ morpheus.HeatMap = function (options) {
 				searchValues: false
 			}
 		}, options);
-
+	options.parent = parent;
 	this.options = options;
 	this.tooltipProvider = morpheus.HeatMapTooltipProvider;
 	if (!options.el) {
@@ -1086,6 +1089,7 @@ morpheus.HeatMap.prototype = {
 			.getColumnCount()));
 		if (this.options.inheritFromParent && this.options.parent != null) {
 			morpheus.HeatMap.copyFromParent(this.project, this.options);
+
 		}
 
 		var createFiltersFromOptions = function (filters, isColumns) {
@@ -1672,7 +1676,9 @@ morpheus.HeatMap.prototype = {
 			}
 
 		}
-
+		if (this.options.parent && this.options.inheritFromParent) {
+			this.heatmap.setPropertiesFromParent(this.options.parent.heatmap);
+		}
 		if (this.options.parent && this.options.inheritFromParent
 			&& !colorSchemeSpecified) {
 			heatmap.setColorScheme(this.options.parent.heatmap.getColorScheme()
@@ -3081,6 +3087,7 @@ morpheus.HeatMap.prototype = {
 			.getColorScheme().getNames().length * 14
 				: 40;
 			totalSize.height += legendHeight + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
+			totalSize.width = Math.max(totalSize.width, 280);
 		}
 		var trackLegendSize = new morpheus.HeatMapTrackColorLegend(
 			_

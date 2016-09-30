@@ -17,10 +17,17 @@ morpheus.HeatMapElementCanvas = function (project) {
 	project.getElementSelectionModel().on('selectionChanged', function (e) {
 		_this.repaint();
 	});
+	this.gridColor = morpheus.HeatMapElementCanvas.GRID_COLOR;
+	this.gridThickness = 0.1;
 };
 morpheus.HeatMapElementCanvas.GRID_COLOR = 'rgb(128,128,128)';
 morpheus.HeatMapElementCanvas.prototype = {
 	drawGrid: true,
+	setPropertiesFromParent: function (parentHeatMapElementCanvas) {
+		this.drawGrid = parentHeatMapElementCanvas.drawGrid;
+		this.gridThickness = parentHeatMapElementCanvas.gridThickness;
+		this.gridColor = parentHeatMapElementCanvas.gridColor;
+	},
 	updateRowSelectionCache: function (repaint) {
 		this.selectedRowElements = morpheus.HeatMapElementCanvas.getSelectedSpans(this.project.getRowSelectionModel().getViewIndices());
 		if (repaint) {
@@ -32,6 +39,18 @@ morpheus.HeatMapElementCanvas.prototype = {
 		if (repaint) {
 			this.repaint();
 		}
+	},
+	setGridColor: function (gridColor) {
+		this.gridColor = gridColor;
+	},
+	getGridColor: function () {
+		return this.gridColor;
+	},
+	setGridThickness: function (gridThickness) {
+		this.gridThickness = gridThickness;
+	},
+	getGridThickness: function () {
+		return this.gridThickness;
 	},
 	getColorScheme: function () {
 		return this.colorScheme;
@@ -312,8 +331,8 @@ morpheus.HeatMapElementCanvas.prototype = {
 			}
 		}
 		if (drawGrid) {
-			context.strokeStyle = morpheus.HeatMapElementCanvas.GRID_COLOR;
-			context.lineWidth = 0.1;
+			context.strokeStyle = this.gridColor;
+			context.lineWidth = this.gridThickness;
 			for (var row = top; row < bottom; row++) {
 				var rowSize = rowPositions.getItemSize(row);
 				var py = rowPositions.getPosition(row);
