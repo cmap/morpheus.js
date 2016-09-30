@@ -385,6 +385,13 @@ morpheus.HeatMapColorScheme.prototype = {
 	setFractions: function (options) {
 		this.currentColorSupplier.setFractions(options);
 	},
+	setTransformValues: function (options) {
+		this.currentColorSupplier.setTransformValues(options);
+		this.cachedRowStats.cachedRow = -1;
+	},
+	getTransformValues: function () {
+		return this.currentColorSupplier.getTransformValues();
+	},
 	setStepped: function (stepped) {
 		var oldColorSupplier = this.currentColorSupplier;
 		var newColorSupplier = stepped ? new morpheus.SteppedColorSupplier()
@@ -519,12 +526,15 @@ morpheus.HeatMapColorScheme.prototype = {
 			}
 		}
 		if (this.currentColorSupplier.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE) {
-			if (this.cachedRowStats.maybeUpdate(row)) {
+			if (this.cachedRowStats.maybeUpdateRelative(row)) {
 				this.currentColorSupplier
 				.setMin(this.cachedRowStats.rowCachedMin);
 				this.currentColorSupplier
 				.setMax(this.cachedRowStats.rowCachedMax);
 			}
+		} else if (this.currentColorSupplier.getTransformValues() && this.cachedRowStats.cachedRow !== row) {
+			this.cachedRowStats.cacheTransformValues(row, this.currentColorSupplier.getTransformValues());
+			val = (val - this.cachedRowStats.rowCachedMean) / this.cachedRowStats.rowCachedStandardDeviation;
 		}
 		return this.currentColorSupplier.getColor(row, column, val);
 	}
@@ -534,9 +544,18 @@ morpheus.RowStats = function (dataset) {
 	this.cachedRow = -1;
 	this.rowCachedMax = 0;
 	this.rowCachedMin = 0;
+	this.rowCachedStandardDeviation = -1;
+	this.rowCachedMean = -1;
 };
 morpheus.RowStats.prototype = {
-	maybeUpdate: function (row) {
+	cacheTransformValues: function (row, transform) {
+		var meanFunction = transform === morpheus.AbstractColorSupplier.Z_SCORE ? morpheus.Mean : morpheus.Median;
+		var stdevFunction = transform === morpheus.AbstractColorSupplier.Z_SCORE ? morpheus.StandardDeviation : morpheus.MAD;
+		this.datasetRowView.setIndex(row);
+		this.rowCachedMean = meanFunction(this.datasetRowView);
+		this.rowCachedStandardDeviation = stdevFunction(this.datasetRowView, this.rowCachedMean);
+	},
+	maybeUpdateRelative: function (row) {
 		if (this.cachedRow !== row) {
 			this.cachedRow = row;
 			this.datasetRowView.setIndex(row);

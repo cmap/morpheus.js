@@ -88,6 +88,21 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
 		});
 	}
 	items = items.concat({
+		name: 'transform_values',
+		type: 'select',
+		value: 0,
+		options: [{
+			name: 'None',
+			value: 0
+		}, {
+			name: 'Subtract row mean, divide by row standard deviation',
+			value: morpheus.AbstractColorSupplier.Z_SCORE
+		}, {
+			name: 'Subtract row median, divide by row median absolute deviation',
+			value: morpheus.AbstractColorSupplier.ROBUST_Z_SCORE
+		}]
+	});
+	items = items.concat({
 		name: 'missing_color',
 		type: 'color',
 		col: 'col-xs-2'
@@ -124,6 +139,10 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
 	});
 	formBuilder.$form.find('[name=delete]').on('click', function (e) {
 		that.deleteSelectedStop();
+	});
+	formBuilder.$form.find('[name=transform_values]').on('change', function (e) {
+		that.colorScheme.setTransformValues(parseInt(formBuilder.getValue('transform_values')));
+		that.fireChanged();
 	});
 	formBuilder.$form.on('keyup', '[name=selected_value]', _.debounce(function (e) {
 		var val = parseFloat($(this).val());
@@ -272,6 +291,9 @@ morpheus.HeatMapColorSchemeChooser.prototype = {
 			'relative_color_scheme',
 			colorScheme.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE ? true
 				: false);
+		this.formBuilder.setValue('transform_values', colorScheme.getTransformValues());
+		this.formBuilder.setEnabled('transform_values', colorScheme.getScalingMode() !== morpheus.HeatMapColorScheme.ScalingMode.RELATIVE);
+
 		this.formBuilder.$form
 		.find('[name=minimum],[name=maximum]')
 		.prop(
