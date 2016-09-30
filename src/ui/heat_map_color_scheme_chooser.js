@@ -86,22 +86,23 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
 			help: 'A relative color scheme uses the minimum and maximum values in each row' +
 			' to convert values to colors'
 		});
+		items = items.concat({
+			name: 'transform_values',
+			type: 'select',
+			value: 0,
+			options: [{
+				name: 'None',
+				value: 0
+			}, {
+				name: 'Subtract row mean, divide by row standard deviation',
+				value: morpheus.AbstractColorSupplier.Z_SCORE
+			}, {
+				name: 'Subtract row median, divide by row median absolute deviation',
+				value: morpheus.AbstractColorSupplier.ROBUST_Z_SCORE
+			}]
+		});
 	}
-	items = items.concat({
-		name: 'transform_values',
-		type: 'select',
-		value: 0,
-		options: [{
-			name: 'None',
-			value: 0
-		}, {
-			name: 'Subtract row mean, divide by row standard deviation',
-			value: morpheus.AbstractColorSupplier.Z_SCORE
-		}, {
-			name: 'Subtract row median, divide by row median absolute deviation',
-			value: morpheus.AbstractColorSupplier.ROBUST_Z_SCORE
-		}]
-	});
+
 	items = items.concat({
 		name: 'missing_color',
 		type: 'color',
