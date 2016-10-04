@@ -478,7 +478,7 @@ morpheus.HeatMapToolBar = function (controller) {
 	// 	' precedes.');
 	searchHelpHtml.push('<p>You can search for an exact list of values by enclosing the list of' +
 		' values in parentheses. For example: <code><strong>pet:(cat dog)</strong></code>' +
-		' searches finds all pets that are either cats or dogs.</p>');
+		' searches all pets that are either cats or dogs.</p>');
 	var $searchHelp = $(searchHelpHtml.join(''));
 	$el.find('[data-name=searchHelp]').on('click', function (e) {
 		e.preventDefault();
