@@ -113,7 +113,9 @@ morpheus.TabManager.prototype = {
 	addTask: function (task) {
 		var $a = this.$nav.find('[data-link=' + task.tabId + ']');
 		if ($a.length === 0) {
-			throw new Error(task.tabId + ' not found.');
+			console.log(task.tabId + ' not found.');
+			return;
+
 		}
 		var $i = $a.find('i');
 		var tasks = $i.data('tasks');
@@ -148,15 +150,12 @@ morpheus.TabManager.prototype = {
 				break;
 			}
 		}
-		if (index === -1) {
-			throw new Error(task.id + ' not found in ' + tasks.map(function (t) {
-					return t.id;
-				}));
-		}
-		tasks.splice(index, 1);
-		$i.data('tasks', tasks);
-		if (tasks.length === 0) {
-			$i.removeClass('fa fa-spinner fa-spin');
+		if (index !== -1) {
+			tasks.splice(index, 1);
+			$i.data('tasks', tasks);
+			if (tasks.length === 0) {
+				$i.removeClass('fa fa-spinner fa-spin');
+			}
 		}
 	},
 	getWidth: function () {
