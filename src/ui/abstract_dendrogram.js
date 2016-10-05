@@ -96,6 +96,9 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
 						name: 'Flip',
 						disabled: selectedNode == null
 					}, {
+						name: 'Branch Color',
+						disabled: selectedNode == null
+					}, {
 						separator: true
 					},
 						{
@@ -152,8 +155,34 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
 								controller.revalidate();
 							}
 
-						}
-						else if (item === 'Annotate...') {
+						} else if (item === 'Branch Color') {
+							if (selectedNode != null) {
+								var formBuilder = new morpheus.FormBuilder();
+								formBuilder.append({
+									name: 'color',
+									type: 'color',
+									value: selectedNode.color,
+									required: true,
+									col: 'col-xs-2'
+								});
+								formBuilder.find('color').on(
+									'change',
+									function () {
+										var color = $(this).val();
+										morpheus.DendrogramUtil.dfs(selectedNode, function (n) {
+											n.color = color;
+											return true;
+										});
+										_this.setSelectedNode(null);
+									});
+								morpheus.FormBuilder.showInModal({
+									title: 'Color',
+									close: 'Close',
+									html: formBuilder.$form
+								});
+
+							}
+						} else if (item === 'Annotate...') {
 							morpheus.HeatMap
 							.showTool(
 								new morpheus.AnnotateDendrogramTool(
@@ -346,11 +375,19 @@ morpheus.AbstractDendrogram.prototype = {
 		if (this.selectedNodeIds[node.id]) {
 			return this._selectedNodeColor;
 		}
+		if (node.color !== undefined) {
+			return node.color;
+		}
 		// if (node.search) {
 		// return this._searchHighlightColor;
 		// }
 		return this.defaultStroke;
 	},
+	/**
+	 *
+	 * @param node
+	 * @return The color, if any, to draw a circle for a node in the dendrogram
+	 */
 	getNodeFill: function (node) {
 		if (this.selectedRootNodeIdToNode[node.id]) {
 			return this._selectedNodeColor;
@@ -361,6 +398,7 @@ morpheus.AbstractDendrogram.prototype = {
 		if (node.info !== undefined) {
 			return this._overviewHighlightColor;
 		}
+
 	},
 	resetCutHeight: function () {
 		this.positions.setSquishedIndices(null);
