@@ -222,7 +222,7 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
 		.hammer(this.canvas, ['pan', 'tap'])
 		.on(
 			'tap',
-			function (event) {
+			this.tap = function (event) {
 				if (!morpheus.CanvasUtil.dragging) {
 					var position = morpheus.CanvasUtil
 					.getMousePosWithScroll(event.target,
@@ -243,14 +243,14 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
 						event.srcEvent.shiftKey || commandKey);
 				}
 			})
-		.on('panend', function (event) {
+		.on('panend', this.panend = function (event) {
 			morpheus.CanvasUtil.dragging = false;
 			_this.canvas.style.cursor = 'default';
 			_this.cutTreeHotSpot = true;
 		})
 		.on(
 			'panstart',
-			function (event) {
+			this.panstart = function (event) {
 				var position = morpheus.CanvasUtil
 				.getMousePosWithScroll(event.target, event,
 					_this.lastClip.x, _this.lastClip.y,
@@ -268,7 +268,7 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
 			})
 		.on(
 			'panmove',
-			function (event) {
+			this.panmove = function (event) {
 				if (_this.cutTreeHotSpot) {
 					var cutHeight;
 					if (_this.type === morpheus.AbstractDendrogram.Type.COLUMN) {
@@ -484,17 +484,14 @@ morpheus.AbstractDendrogram.prototype = {
 		}
 	},
 	dispose: function () {
-		var $c = $(this.canvas);
-		$c
-		.off('mousemove.morpheus mouseout.morpheus mouseenter.morpheus contextmenu.morpheus');
-		$c.remove();
+		morpheus.AbstractCanvas.prototype.dispose.call(this);
 		this.$label.remove();
 		this.$squishedLabel.remove();
+		this.hammer.off('panend', this.panend).off('panstart',
+			this.panstart).off('panmove', this.panmove).off('tap', this.tap);
 		this.hammer.destroy();
-		this.canvas = null;
 		this.$label = null;
 		this.$squishedLabel = null;
-		this.hammer = null;
 	},
 	isCut: function () {
 		return this.cutHeight < this.tree.maxHeight;

@@ -113,7 +113,7 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
 	// $(canvas).on('mouseout', throttled).on('mousemove', throttled);
 	this.hammer = morpheus.Util
 	.hammer(canvas, ['pan', 'tap', 'longpress'])
-	.on('longpress', function (event) {
+	.on('longpress', this.longpress = function (event) {
 		event.preventDefault();
 		controller.setSelectedTrack(_this.name, isColumns);
 		var track = controller.getTrack(_this.name, isColumns);
@@ -121,7 +121,7 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
 	})
 	.on(
 		'panend',
-		function (event) {
+		this.panend = function (event) {
 			_this.isMouseOver = false;
 			morpheus.CanvasUtil.dragging = false;
 			canvas.style.cursor = 'default';
@@ -138,7 +138,7 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
 		})
 	.on(
 		'panstart',
-		function (event) {
+		this.panstart = function (event) {
 			_this.isMouseOver = false;
 			if (morpheus.CanvasUtil.dragging) {
 				return;
@@ -190,7 +190,7 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
 		})
 	.on(
 		'panmove',
-		function (event) {
+		this.panmove = function (event) {
 			_this.isMouseOver = false;
 			if (resizeCursor != null) {
 				var width;
@@ -262,7 +262,7 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
 		})
 	.on(
 		'tap',
-		function (event) {
+		this.tap = function (event) {
 			if (morpheus.Util.IS_MAC && event.srcEvent.ctrlKey) { // right-click
 				return;
 			}
@@ -316,9 +316,8 @@ morpheus.VectorTrackHeader.prototype = {
 	defaultFontHeight: 11,
 	dispose: function () {
 		morpheus.AbstractCanvas.prototype.dispose.call(this);
-		$(this.canvas)
-		.off(
-			'contextmenu.morpheus mousemove.morpheus mouseout.morpheus mouseenter.morpheus');
+		this.hammer.off('longpress', this.longpress).off('panend', this.panend).off('panstart',
+			this.panstart).off('panmove', this.panmove).off('tap', this.tap);
 		this.hammer.destroy();
 	},
 	getPreferredSize: function () {

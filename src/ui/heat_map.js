@@ -2038,7 +2038,7 @@ morpheus.HeatMap.prototype = {
 		var dragStartScrollLeft;
 		this.hammer = morpheus.Util
 		.hammer(_this.heatmap.canvas, ['pan', 'pinch', 'tap'])
-		.on('panmove', function (event) {
+		.on('panmove', this.panmove = function (event) {
 			_this.updatingScroll = true;
 			var rows = false;
 			var columns = false;
@@ -2061,13 +2061,13 @@ morpheus.HeatMap.prototype = {
 			});
 			event.preventDefault();
 		})
-		.on('panstart', function (event) {
+		.on('panstart', this.panstart = function (event) {
 			dragStartScrollTop = _this.scrollTop();
 			dragStartScrollLeft = _this.scrollLeft();
 		})
 		.on(
 			'tap',
-			function (event) {
+			this.tap = function (event) {
 				var commandKey = morpheus.Util.IS_MAC ? event.srcEvent.metaKey
 					: event.srcEvent.ctrlKey;
 				if (morpheus.Util.IS_MAC && event.srcEvent.ctrlKey) { // right-click
@@ -2090,7 +2090,7 @@ morpheus.HeatMap.prototype = {
 			})
 		.on(
 			'pinch',
-			function (event) {
+			this.pinch = function (event) {
 				var scale = event.scale;
 				_this.heatmap.getRowPositions().setSize(13 * scale);
 				_this.heatmap.getColumnPositions().setSize(
@@ -2639,7 +2639,6 @@ morpheus.HeatMap.prototype = {
 		var track = tracks[index];
 		var header = headers[index];
 		track.dispose();
-		track._selection.dispose();
 		header.dispose();
 		tracks.splice(index, 1);
 		headers.splice(index, 1);
@@ -2796,7 +2795,35 @@ morpheus.HeatMap.prototype = {
 		return '';
 	},
 	onRemove: function () {
-		this.$parent.remove();
+		this.project.off();
+		this.$content.remove();
+		this.$tipInfoWindow.dialog('destroy');
+		this.rowTrackHeaders.forEach(function (header) {
+			header.dispose();
+		});
+		this.columnTrackHeaders.forEach(function (header) {
+			header.dispose();
+		});
+		this.rowTracks.forEach(function (track) {
+			track.dispose();
+		});
+		this.columnTracks.forEach(function (track) {
+			track.dispose();
+		});
+		if (this.rowDendrogram) {
+			this.rowDendrogram.dispose();
+		}
+		if (this.columnDendrogram) {
+			this.columnDendrogram.dispose();
+		}
+		this.beforeColumnTrackDivider.dispose();
+		this.afterRowDendrogramDivider.dispose();
+		this.afterVerticalScrollBarDivider.dispose();
+		this.hscroll.dispose();
+		this.vscroll.dispose();
+		this.hammer.off('panmove', this.panmove).off('panstart', this.panstart).off('tap',
+			this.tap).off('pinch', this.pinch);
+		this.hammer.destroy();
 		$(window)
 		.off('paste.morpheus', this.pasteListener)
 		.off('beforecopy.morpheus', this.beforeCopyListener)

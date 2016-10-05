@@ -210,8 +210,8 @@ morpheus.VectorTrack.prototype = {
 	},
 	dispose: function () {
 		morpheus.AbstractCanvas.prototype.dispose.call(this);
-		$(this.canvas).off(
-			'contextmenu.morpheus mousemove.morpheus mouseout.morpheus');
+		$(this.canvas).off();
+		this._selection.dispose();
 		this.project.off(this.events, this.updateSpanMapFunction);
 	},
 	getName: function () {
