@@ -2810,10 +2810,10 @@ morpheus.HeatMap.prototype = {
 		this.columnTracks.forEach(function (track) {
 			track.dispose();
 		});
-		if (this.rowDendrogram) {
+		if (this.rowDendrogram != null) {
 			this.rowDendrogram.dispose();
 		}
-		if (this.columnDendrogram) {
+		if (this.columnDendrogram != null) {
 			this.columnDendrogram.dispose();
 		}
 		this.beforeColumnTrackDivider.dispose();
