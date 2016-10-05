@@ -55,13 +55,27 @@ morpheus.LandingPage = function (pageOptions) {
 		}
 	}
 	setTimeout(step, 300);
-
+	this.tabManager = new morpheus.TabManager({landingPage: this});
+	this.tabManager.$nav.appendTo($(this.pageOptions.el));
+	this.tabManager.$tabContent.appendTo($(this.pageOptions.el));
 	// for (var i = 0; i < brands.length; i++) {
 	// 	brands[i].style.color = colorScale(i);
 	// }
 };
 
 morpheus.LandingPage.prototype = {
+	open: function (openOptions) {
+		this.dispose();
+		var optionsArray = _.isArray(openOptions) ? openOptions : [openOptions];
+		var _this = this;
+		for (var i = 0; i < optionsArray.length; i++) {
+			var options = optionsArray[i];
+			options.tabManager = _this.tabManager;
+			options.focus = i === 0;
+			new morpheus.HeatMap(options);
+		}
+
+	},
 	dispose: function () {
 		this.formBuilder.setValue('file', '');
 		this.$el.hide();
@@ -127,28 +141,6 @@ morpheus.LandingPage.prototype = {
 					_this.openFile(url);
 				}
 			});
-	},
-	open: function (openOptions) {
-		this.dispose();
-		var heatmap;
-		var optionsArray = _.isArray(openOptions) ? openOptions : [openOptions];
-		var _this = this;
-		optionsArray.forEach(function (options) {
-			if (_this.heatmap == null) { // first tab
-				options.landingPage = _this;
-				options.el = _this.pageOptions.el;
-
-			} else { // more tabs
-				options.focus = false;
-				options.inheritFromParent = false;
-				options.parent = _this.heatmap;
-			}
-			heatmap = new morpheus.HeatMap(options);
-			if (_this.heatmap == null) {
-				_this.heatmap = heatmap;
-			}
-		});
-
 	},
 	openFile: function (value) {
 		var _this = this;

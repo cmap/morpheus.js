@@ -1,6 +1,7 @@
 /**
  * @param options.autohideTabBar
  *            Whether to autohide the tab bar when only 1 tab showing
+ * @param options.landingPage Landing page to show when all tabs are closed
  */
 morpheus.TabManager = function (options) {
 	this.options = $.extend({}, {
@@ -170,7 +171,7 @@ morpheus.TabManager.prototype = {
 
 	/**
 	 *
-	 * @param options
+	 * @param options.object The object that stores the tab content state and has a setName method.
 	 * @param options.$el
 	 *            the tab element
 	 * @param options.title
@@ -238,7 +239,8 @@ morpheus.TabManager.prototype = {
 		if (target === undefined) {
 			target = this.activeTabId;
 		}
-		this.idToTabObject.remove(target);
+		var obj = this.idToTabObject.remove(target);
+		this.activeTabObject = null;
 		this.$nav.find('[data-link=' + target + ']').parent().remove();
 		this.$tabContent.find(target).remove();
 		var $a = this.$nav.find('a[data-toggle="tab"]:last');
@@ -253,6 +255,9 @@ morpheus.TabManager.prototype = {
 		if (this.options.autohideTabBar) {
 			this.$nav.css('display', this.idToTabObject.size() > 1 ? ''
 				: 'none');
+		}
+		if (obj.onRemove) {
+			obj.onRemove();
 		}
 		this.trigger('remove', {
 			tab: target

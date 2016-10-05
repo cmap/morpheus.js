@@ -384,16 +384,12 @@ morpheus.HeatMap = function (options) {
 		});
 		promises.push(columnDendrogramDeferred);
 	}
+	this.resizeListener = function () {
+		_this.revalidate();
+	};
 	var heatMapLoaded = function () {
 		if (typeof window !== 'undefined') {
-			var resize = function () {
-				_this.revalidate();
-
-			};
-			$(window).on('orientationchange resize', resize);
-			_this.$content.on('remove', function () {
-				$(window).off('orientationchange resize', resize);
-			});
+			$(window).on('orientationchange.morpheus resize.morpheus', this.resizeListener);
 		}
 		_this.revalidate();
 		if (options.loadedCallback) {
@@ -1770,7 +1766,7 @@ morpheus.HeatMap.prototype = {
 			});
 		}
 
-		this.options.parent = null;
+		this.options.parent = null; // avoid memory leak
 		this.$tipFollow = $('<div style="left:-1000px; top:-1000px;" class="morpheus-tip-inline"></div>');
 		this.$tipFollow.appendTo(this.$parent);
 
@@ -1905,134 +1901,136 @@ morpheus.HeatMap.prototype = {
 				});
 			});
 
-		$(window)
-		.on(
-			'paste.morpheus',
-			function (e) {
-				if (_this.isActiveComponent()) {
-					var text = e.originalEvent.clipboardData
-					.getData('text/plain');
-					if (text != null && text.length > 0) {
-						// open a file from clipboard
-						var blob = new Blob([text], {type: 'text/plain'});
-						var url = URL.createObjectURL(blob);
-						e.preventDefault();
-						e.stopPropagation();
-						morpheus.HeatMap.showTool(
-							new morpheus.OpenFileTool({
-								file: url
-							}), _this);
-					}
+		this.pasteListener = function (e) {
+			if (_this.isActiveComponent()) {
+				var text = e.originalEvent.clipboardData
+				.getData('text/plain');
+				if (text != null && text.length > 0) {
+					// open a file from clipboard
+					var blob = new Blob([text], {type: 'text/plain'});
+					var url = URL.createObjectURL(blob);
+					e.preventDefault();
+					e.stopPropagation();
+					morpheus.HeatMap.showTool(
+						new morpheus.OpenFileTool({
+							file: url
+						}), _this);
 				}
-			})
-		.on('beforecopy.morpheus', function (e) {
+			}
+		};
+		this.beforeCopyListener = function (e) {
 			if (_this.isActiveComponent()) {
 				e.preventDefault();
 			}
-		})
-		.on(
-			'copy.morpheus',
-			function (ev) {
 
-				if (_this.isActiveComponent()) {
-					var activeComponent = _this
-					.getActiveComponent();
-					var project = _this.project;
+		};
+		this.copyListener = function (ev) {
+			if (_this.isActiveComponent()) {
+				var activeComponent = _this
+				.getActiveComponent();
+				var project = _this.project;
 
-					if (activeComponent === 'heatMap') {
-						// copy selected text or image
-						// var text = _this.getSelectedElementsText();
-						// if (text !== '') {
-						// 	ev.originalEvent.clipboardData.setData(
-						// 		'text/plain', text);
-						// 	return;
-						// }
-						var bounds = _this.getTotalSize();
-						var height = bounds.height;
-						var width = bounds.width;
-						var canvas = $('<canvas></canvas>')[0];
-						canvas.height = height;
-						canvas.width = width;
-						var context = canvas.getContext('2d');
-						_this.snapshot(context);
-						var url = canvas.toDataURL();
-						ev.originalEvent.clipboardData
-						.setData(
-							'text/html',
-							'<img src="' + url + '">');
-						ev.preventDefault();
-						ev.stopImmediatePropagation();
-						return;
-					}
-					// copy all selected rows and columns
-					var dataset = project.getSelectedDataset({
-						emptyToAll: false
-					});
-					var columnMetadata = dataset
-					.getColumnMetadata();
-					var rowMetadata = dataset.getRowMetadata();
-					// only copy visible tracks
-					var visibleColumnFields = _this
-					.getVisibleTrackNames(true);
-					var columnFieldIndices = [];
-					_.each(visibleColumnFields, function (name) {
-						var index = morpheus.MetadataUtil.indexOf(
-							columnMetadata, name);
-						if (index !== -1) {
-							columnFieldIndices.push(index);
-						}
-					});
-					columnMetadata = new morpheus.MetadataModelColumnView(
-						columnMetadata, columnFieldIndices);
-					var rowMetadata = dataset.getRowMetadata();
-					// only copy visible tracks
-					var visibleRowFields = _this
-					.getVisibleTrackNames(false);
-					var rowFieldIndices = [];
-					_.each(visibleRowFields, function (name) {
-						var index = morpheus.MetadataUtil.indexOf(
-							rowMetadata, name);
-						if (index !== -1) {
-							rowFieldIndices.push(index);
-						}
-					});
-					rowMetadata = new morpheus.MetadataModelColumnView(
-						rowMetadata, rowFieldIndices);
-					var text = [];
-					var rowsSelected = dataset.getRowCount() > 0;
-					var columnsSelected = dataset.getColumnCount() > 0;
-					if (rowsSelected && columnsSelected) { // copy
-						// as
-						// gct
-						// 1.3
-						text = new morpheus.GctWriter()
-						.write(dataset);
-					} else {
-						var text = [];
-						var model = rowsSelected ? rowMetadata
-							: columnMetadata;
-						for (var i = 0, count = model
-						.getItemCount(); i < count; i++) {
-							for (var j = 0, nfields = model
-							.getMetadataCount(); j < nfields; j++) {
-								var v = model.get(j);
-								if (j > 0) {
-									text.push('\t');
-								}
-								text.push(morpheus.Util.toString(v
-								.getValue(i)));
-							}
-							text.push('\n');
-						}
-						text = text.join('');
-					}
-					ev.originalEvent.clipboardData.setData(
-						'text/plain', text);
+				if (activeComponent === 'heatMap') {
+					// copy selected text or image
+					// var text = _this.getSelectedElementsText();
+					// if (text !== '') {
+					// 	ev.originalEvent.clipboardData.setData(
+					// 		'text/plain', text);
+					// 	return;
+					// }
+					var bounds = _this.getTotalSize();
+					var height = bounds.height;
+					var width = bounds.width;
+					var canvas = $('<canvas></canvas>')[0];
+					canvas.height = height;
+					canvas.width = width;
+					var context = canvas.getContext('2d');
+					_this.snapshot(context);
+					var url = canvas.toDataURL();
+					ev.originalEvent.clipboardData
+					.setData(
+						'text/html',
+						'<img src="' + url + '">');
 					ev.preventDefault();
 					ev.stopImmediatePropagation();
-
+					return;
 				}
-			});
+				// copy all selected rows and columns
+				var dataset = project.getSelectedDataset({
+					emptyToAll: false
+				});
+				var columnMetadata = dataset
+				.getColumnMetadata();
+				var rowMetadata = dataset.getRowMetadata();
+				// only copy visible tracks
+				var visibleColumnFields = _this
+				.getVisibleTrackNames(true);
+				var columnFieldIndices = [];
+				_.each(visibleColumnFields, function (name) {
+					var index = morpheus.MetadataUtil.indexOf(
+						columnMetadata, name);
+					if (index !== -1) {
+						columnFieldIndices.push(index);
+					}
+				});
+				columnMetadata = new morpheus.MetadataModelColumnView(
+					columnMetadata, columnFieldIndices);
+				var rowMetadata = dataset.getRowMetadata();
+				// only copy visible tracks
+				var visibleRowFields = _this
+				.getVisibleTrackNames(false);
+				var rowFieldIndices = [];
+				_.each(visibleRowFields, function (name) {
+					var index = morpheus.MetadataUtil.indexOf(
+						rowMetadata, name);
+					if (index !== -1) {
+						rowFieldIndices.push(index);
+					}
+				});
+				rowMetadata = new morpheus.MetadataModelColumnView(
+					rowMetadata, rowFieldIndices);
+				var text = [];
+				var rowsSelected = dataset.getRowCount() > 0;
+				var columnsSelected = dataset.getColumnCount() > 0;
+				if (rowsSelected && columnsSelected) { // copy
+					// as
+					// gct
+					// 1.3
+					text = new morpheus.GctWriter()
+					.write(dataset);
+				} else {
+					var text = [];
+					var model = rowsSelected ? rowMetadata
+						: columnMetadata;
+					for (var i = 0, count = model
+					.getItemCount(); i < count; i++) {
+						for (var j = 0, nfields = model
+						.getMetadataCount(); j < nfields; j++) {
+							var v = model.get(j);
+							if (j > 0) {
+								text.push('\t');
+							}
+							text.push(morpheus.Util.toString(v
+							.getValue(i)));
+						}
+						text.push('\n');
+					}
+					text = text.join('');
+				}
+				ev.originalEvent.clipboardData.setData(
+					'text/plain', text);
+				ev.preventDefault();
+				ev.stopImmediatePropagation();
+
+			}
+		};
+
+		if (typeof window !== 'undefined') {
+			$(window)
+			.on('paste.morpheus', this.pasteListener)
+			.on('beforecopy.morpheus', this.beforeCopyListener)
+			.on('copy.morpheus', this.copyListener);
+		}
 		if (this.options.keyboard) {
 			new morpheus.HeatMapKeyListener(this);
 		}
@@ -2796,6 +2794,13 @@ morpheus.HeatMap.prototype = {
 			}
 		}
 		return '';
+	},
+	onRemove: function () {
+		this.$parent.remove();
+		$(window)
+		.off('paste.morpheus', this.pasteListener)
+		.off('beforecopy.morpheus', this.beforeCopyListener)
+		.off('copy.morpheus', this.copyListener).off('orientationchange.morpheus resize.morpheus', this.resizeListener);
 	}
 	,
 	getVisibleTrackNames: function (isColumns) {
