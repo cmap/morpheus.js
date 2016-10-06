@@ -293,9 +293,21 @@ morpheus.OpenFileTool.prototype = {
 			var fileColumnName = options.input.file_field_name;
 			var vectors = _this.annotate(lines, dataset, isColumns, sets,
 				metadataName, fileColumnName);
+
+			var nameToIndex = new morpheus.Map();
 			var render = [];
 			for (var i = 0; i < vectors.length; i++) {
-				render.push('text');
+				render.push(isColumns ? 'color' : 'text');
+				nameToIndex.set(vectors[i].getName(), i);
+			}
+			if (lines.colors) {
+				var colorModel = isColumns ? controller.getProject().getColumnColorModel() : controller.getProject().getRowColorModel();
+				lines.colors.forEach(function (item) {
+					var index = nameToIndex.get(item.header);
+					var vector = vectors[index];
+					render[index] = 'color';
+					colorModel.setMappedValue(vector, item.value, item.color);
+				});
 			}
 			controller.getProject().trigger('trackChanged', {
 				vectors: vectors,

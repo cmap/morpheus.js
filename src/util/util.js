@@ -809,6 +809,16 @@ morpheus.Util.showDialog = function ($el, title, options) {
 morpheus.Util.sheetToArray = function (sheet, delim) {
 	var r = XLSX.utils.decode_range(sheet['!ref']);
 	var rows = [];
+	var colors = [];
+	var header = [];
+	for (var C = r.s.c; C <= r.e.c; ++C) {
+		var val = sheet[XLSX.utils.encode_cell({
+			c: C,
+			r: r.s.r
+		})];
+		var txt = String(XLSX.utils.format_cell(val));
+		header.push(txt);
+	}
 	for (var R = r.s.r; R <= r.e.r; ++R) {
 		var row = [];
 		for (var C = r.s.c; C <= r.e.c; ++C) {
@@ -820,11 +830,22 @@ morpheus.Util.sheetToArray = function (sheet, delim) {
 				row.push('');
 				continue;
 			}
+
 			var txt = String(XLSX.utils.format_cell(val));
+			if (val.s != null) {
+				var color = '#' + val.s.fgColor.rgb;
+				colors.push({
+					header: header[row.length],
+					color: color,
+					value: txt
+				});
+			}
 			row.push(txt);
 		}
 		rows.push(delim ? row.join(delim) : row);
 	}
+
+	rows.colors = colors;
 	return rows;
 };
 morpheus.Util.linesToObjects = function (lines) {
@@ -847,7 +868,8 @@ morpheus.Util.xlsxTo2dArray = function (data) {
 	var workbook = XLSX.read(data, {
 		type: 'binary',
 		cellFormula: false,
-		cellHTML: false
+		cellHTML: false,
+		cellStyles: true
 	});
 	var sheetNames = workbook.SheetNames;
 	var worksheet = workbook.Sheets[sheetNames[0]];
@@ -858,12 +880,12 @@ morpheus.Util.xlsxTo1dArray = function (data) {
 	var workbook = XLSX.read(data, {
 		type: 'binary',
 		cellFormula: false,
-		cellHTML: false
+		cellHTML: false,
+		cellStyles: true
 	});
 	var sheetNames = workbook.SheetNames;
 	var worksheet = workbook.Sheets[sheetNames[0]];
-	var lines = morpheus.Util.sheetToArray(worksheet, '\t');
-	return lines;
+	return morpheus.Util.sheetToArray(worksheet, '\t');
 };
 morpheus.Util.hashCode = function (val) {
 	var h = 0;
