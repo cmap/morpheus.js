@@ -1,5 +1,5 @@
 morpheus.HeatMapColorSchemeChooser = function (options) {
-	var that = this;
+	var _this = this;
 	this.$div = $('<div></div>');
 	this.currentValue = null;
 	this.legend = new morpheus.LegendWithStops();
@@ -8,43 +8,41 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
 			columns: 0
 		})));
 	this.legend.on('added', function (e) {
-		var fractions = that.colorScheme.getFractions();
+		var fractions = _this.colorScheme.getFractions();
 		fractions.push(e.fraction);
-		var colors = that.colorScheme.getColors();
+		var colors = _this.colorScheme.getColors();
 		colors.push('black');
-		that.colorScheme.setFractions({
+		_this.colorScheme.setFractions({
 			fractions: fractions,
 			colors: colors
 		});
-		that.setSelectedIndex(_.indexOf(fractions, e.fraction));
-		that.fireChanged();
+		var newIndex = _this.getFractionIndex(e.fraction, 'black');
+		_this.setSelectedIndex(newIndex);
+		_this.fireChanged();
 	}).on('selectedIndex', function (e) {
-		that.setSelectedIndex(e.selectedIndex);
+		_this.setSelectedIndex(e.selectedIndex);
 	}).on('delete', function (index) {
-		that.deleteSelectedStop();
+		_this.deleteSelectedStop();
 	}).on(
 		'moved',
 		function (e) {
 			var fraction = e.fraction;
-			var fractions = that.colorScheme.getFractions();
-			fractions[that.legend.selectedIndex] = fraction;
-			that.colorScheme.setFractions({
+			var fractions = _this.colorScheme.getFractions();
+			fractions[_this.legend.selectedIndex] = fraction;
+			var color = _this.colorScheme.getColors()[_this.legend.selectedIndex];
+			_this.colorScheme.setFractions({
 				fractions: fractions,
-				colors: that.colorScheme.getColors()
+				colors: _this.colorScheme.getColors()
 			});
-			var newIndex = that.colorScheme.getFractions()
-			.indexOf(fraction);
-			if (newIndex !== -1) {
-				that.legend.selectedIndex = newIndex;
-			}
+			_this.legend.selectedIndex = _this.getFractionIndex(e.fraction, color);
 			var fractionToValue = d3.scale.linear().domain([0, 1])
 			.range(
-				[that.colorScheme.getMin(),
-					that.colorScheme.getMax()])
+				[_this.colorScheme.getMin(),
+					_this.colorScheme.getMax()])
 			.clamp(true);
-			that.formBuilder.setValue('selected_value',
-				fractionToValue(fractions[that.legend.selectedIndex]));
-			that.fireChanged();
+			_this.formBuilder.setValue('selected_value',
+				fractionToValue(fractions[_this.legend.selectedIndex]));
+			_this.fireChanged();
 		});
 	var $row = $('<div></div>');
 	$row.css('height', '50px').css('width', '300px').css('margin-left', 'auto')
@@ -118,72 +116,83 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
 	_.each(items, function (item) {
 		formBuilder.append(item);
 	});
+	this.getFractionIndex = function (fraction, color) {
+		var fractions = _this.colorScheme.getFractions();
+		var colors = _this.colorScheme.getColors();
+		for (var i = 0, len = fractions.length; i < len; i++) {
+			if (fractions[i] === fraction && colors[i] === color) {
+				return i;
+			}
+		}
+		return -1;
+	};
 	this.$div.append(formBuilder.$form);
 	formBuilder.$form.find('[name^=selected],[name=delete]').prop('disabled',
 		true);
 	formBuilder.$form.find('[name=add]').on('click', function (e) {
-		var fractions = that.colorScheme.getFractions();
+		var fractions = _this.colorScheme.getFractions();
 		var val = 0.5;
 		while (val >= 0 && _.indexOf(fractions, val) !== -1) {
 			val -= 0.1;
 		}
 		val = Math.max(0, val);
 		fractions.push(val);
-		var colors = that.colorScheme.getColors();
+		var colors = _this.colorScheme.getColors();
 		colors.push('black');
-		that.colorScheme.setFractions({
+		_this.colorScheme.setFractions({
 			fractions: fractions,
 			colors: colors
 		});
-		that.setSelectedIndex(_.indexOf(fractions, val));
-		that.fireChanged();
+		var newIndex = _this.getFractionIndex(e.fraction, 'black');
+		_this.setSelectedIndex(newIndex);
+		_this.fireChanged();
 	});
 	formBuilder.$form.find('[name=delete]').on('click', function (e) {
-		that.deleteSelectedStop();
+		_this.deleteSelectedStop();
 	});
 	formBuilder.$form.find('[name=transform_values]').on('change', function (e) {
-		that.colorScheme.setTransformValues(parseInt(formBuilder.getValue('transform_values')));
-		that.fireChanged();
+		_this.colorScheme.setTransformValues(parseInt(formBuilder.getValue('transform_values')));
+		_this.fireChanged();
 	});
 	formBuilder.$form.on('keyup', '[name=selected_value]', _.debounce(function (e) {
 		var val = parseFloat($(this).val());
 		if (!isNaN(val)) {
-			that.setSelectedValue(val);
-			that.fireChanged();
+			_this.setSelectedValue(val);
+			_this.fireChanged();
 		}
 	}, 100));
 	formBuilder.$form.on('change', '[name=selected_color]', function (e) {
-		var colors = that.colorScheme.getColors();
-		colors[that.legend.selectedIndex] = $(this).val();
-		that.colorScheme.setFractions({
-			fractions: that.colorScheme.getFractions(),
+		var colors = _this.colorScheme.getColors();
+		colors[_this.legend.selectedIndex] = $(this).val();
+		_this.colorScheme.setFractions({
+			fractions: _this.colorScheme.getFractions(),
 			colors: colors
 		});
-		that.fireChanged();
+		_this.fireChanged();
 	});
 	formBuilder.$form.on('change', '[name=missing_color]', function (e) {
 		var color = $(this).val();
-		that.colorScheme.setMissingColor(color);
-		that.fireChanged(false);
+		_this.colorScheme.setMissingColor(color);
+		_this.fireChanged(false);
 	});
 	formBuilder.$form.on('change', '[name=stepped_colors]', function (e) {
-		that.colorScheme.setStepped($(this).prop('checked'));
-		that.fireChanged();
+		_this.colorScheme.setStepped($(this).prop('checked'));
+		_this.fireChanged();
 	});
 	formBuilder.$form.on('keyup', '[name=minimum]', _.debounce(function (e) {
 		var val = parseFloat($(this).val());
 		if (!isNaN(val)) {
-			that.colorScheme.setMin(val);
-			that.setSelectedIndex(that.legend.selectedIndex);
-			that.fireChanged(false);
+			_this.colorScheme.setMin(val);
+			_this.setSelectedIndex(_this.legend.selectedIndex);
+			_this.fireChanged(false);
 		}
 	}, 100));
 	formBuilder.$form.on('keyup', '[name=maximum]', _.debounce(function (e) {
 		var val = parseFloat($(this).val());
 		if (!isNaN(val)) {
-			that.colorScheme.setMax(val);
-			that.setSelectedIndex(that.legend.selectedIndex);
-			that.fireChanged(false);
+			_this.colorScheme.setMax(val);
+			_this.setSelectedIndex(_this.legend.selectedIndex);
+			_this.fireChanged(false);
 		}
 
 	}, 100));
@@ -194,14 +203,14 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
 		_
 		.throttle(
 			function (e) {
-				that.legend.selectedIndex = -1;
+				_this.legend.selectedIndex = -1;
 				// FIXME set fixed min and max
 				var scalingMode = $(this).prop('checked') ? morpheus.HeatMapColorScheme.ScalingMode.RELATIVE
 					: morpheus.HeatMapColorScheme.ScalingMode.FIXED;
-				that.colorScheme
+				_this.colorScheme
 				.setScalingMode(scalingMode);
-				that.setColorScheme(that.colorScheme);
-				that.fireChanged();
+				_this.setColorScheme(_this.colorScheme);
+				_this.fireChanged();
 			}, 100));
 	this.formBuilder = formBuilder;
 	// selection: delete, color, value
@@ -227,11 +236,14 @@ morpheus.HeatMapColorSchemeChooser.prototype = {
 			[this.colorScheme.getMin(), this.colorScheme.getMax()])
 		.range([0, 1]).clamp(true);
 		var fractions = this.colorScheme.getFractions();
-		fractions[this.legend.selectedIndex] = valueToFraction(val);
+		var fraction = valueToFraction(val);
+		fractions[this.legend.selectedIndex] = fraction;
+		var color = this.colorScheme.getColors()[this.legend.selectedIndex];
 		this.colorScheme.setFractions({
 			fractions: fractions,
 			colors: this.colorScheme.getColors()
 		});
+		this.legend.selectedIndex = this.getFractionIndex(fraction, color);
 	},
 	setSelectedIndex: function (index) {
 		var fractions = this.colorScheme.getFractions();

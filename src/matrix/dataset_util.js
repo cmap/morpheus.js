@@ -189,11 +189,10 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 				+ 'datasetReader.read(e.data.fileOrUrl, function(err,dataset) {'
 				+ '	self.postMessage(dataset);' + '	});' + '}']);
 
-			// Obtain a blob URL reference to our worker 'file'.
+
 			var blobURL = window.URL.createObjectURL(blob);
-			var worker = new Worker(blobURL); // blobURL);
+			var worker = new Worker(blobURL);
 			worker.addEventListener('message', function (e) {
-				// wrap in dataset object
 				deferred.resolve(morpheus.Dataset.fromJson(e.data));
 				window.URL.revokeObjectURL(blobURL);
 			}, false);
@@ -211,7 +210,6 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 				} else {
 					deferred.resolve(dataset);
 				}
-
 			});
 
 		}

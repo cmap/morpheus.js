@@ -103,6 +103,7 @@ morpheus.TxtReader.prototype = {
 		}
 		var rowIdVector = dataset.getRowMetadata().add('id');
 		rowIdVector.array = arrayOfRowArrays[0];
+		// add additional row metadata
 		for (var i = 1; i < dataColumnStart; i++) {
 			var v = dataset.getRowMetadata().add(header[i]);
 			v.array = arrayOfRowArrays[i];
