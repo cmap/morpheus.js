@@ -39,7 +39,7 @@ morpheus.TxtReader.prototype = {
 			// numeric column
 			testLine = morpheus.Util.trim(reader.readLine());
 			var tokens = testLine.split(tab);
-			for (var i = 0; i < tokens.length; i++) {
+			for (var i = 1; i < tokens.length; i++) {
 				var token = tokens[i];
 				if (token === '' || token === 'NA' || token === 'NaN' || $.isNumeric(token)) {
 					dataColumnStart = i;
@@ -50,7 +50,6 @@ morpheus.TxtReader.prototype = {
 			if (dataColumnStart == null) {
 				dataColumnStart = 1;
 			}
-
 		}
 
 		var ncols = header.length - dataColumnStart;
