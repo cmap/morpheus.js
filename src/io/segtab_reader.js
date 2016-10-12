@@ -199,13 +199,13 @@ morpheus.SegTabReader.prototype = {
 		var _this = this;
 		var name = morpheus.Util.getBaseFileName(morpheus.Util
 				.getFileName(fileOrUrl));
-		morpheus.BufferedReader.getArrayBuffer(fileOrUrl, function(err,
+		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function(err,
 				arrayBuffer) {
 			if (err) {
 				callback(err);
 			} else {
 				// try {
-				callback(null, _this._read(name, new morpheus.BufferedReader(
+				callback(null, _this._read(name, new morpheus.ArrayBufferReader(
 						new Uint8Array(arrayBuffer))));
 				// } catch (err) {
 				// callback(err);

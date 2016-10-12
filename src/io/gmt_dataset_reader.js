@@ -7,7 +7,7 @@ morpheus.GmtDatasetReader.prototype = {
 	read : function(fileOrUrl, callback) {
 		var name = morpheus.Util.getBaseFileName(morpheus.Util
 				.getFileName(fileOrUrl));
-		morpheus.BufferedReader.getArrayBuffer(fileOrUrl, function(err,
+		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function(err,
 				arrayBuffer) {
 			if (err) {
 				callback(err);
@@ -15,7 +15,7 @@ morpheus.GmtDatasetReader.prototype = {
 				try {
 					callback(null, morpheus.DatasetUtil.geneSetsToDataset(name,
 							new morpheus.GmtReader()
-									.read(new morpheus.BufferedReader(
+									.read(new morpheus.ArrayBufferReader(
 											new Uint8Array(arrayBuffer)))));
 				} catch (x) {
 					callback(x);

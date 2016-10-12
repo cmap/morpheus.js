@@ -23,14 +23,13 @@ morpheus.ShapeField = function(shapes) {
 	var $el = $(html.join(''));
 	var $header = $el.find('[data-name=selection]');
 	$el.on('click', 'li > a', function(e) {
-		var shape = $(this).attr('name');
+		var shape = $(this).data('name');
 		setShapeValue(shape);
 		_this.trigger('change', {
 			shape : shape
 		});
 	});
 	var setShapeValue = function(val) {
-		$header.data('name', val);
 		if (val === 'none') {
 			$header.html('(None)');
 		} else {

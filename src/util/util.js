@@ -4,7 +4,7 @@ if (typeof morpheus === 'undefined') {
 morpheus.Util = function () {
 };
 
-morpheus.Util.URL = 'https://www.broadinstitute.org/cancer/software/morpheus/';
+morpheus.Util.URL = 'https://software.broadinstitute.org/morpheus/';
 morpheus.Util.RIGHT_ARROW = String.fromCharCode(8594);
 /**
  * Add properties in c2 to c1
@@ -29,7 +29,7 @@ morpheus.Util.viewPortSize = function () {
 
 morpheus.Util.TRACKING_CODE_LOADED = false;
 morpheus.Util.loadTrackingCode = function () {
-	if (typeof window !== 'undefined') {
+	if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && navigator.onLine) {
 		if (morpheus.Util.TRACKING_CODE_LOADED) {
 			return;
 		} else if (typeof ga === 'undefined') {
@@ -143,20 +143,20 @@ morpheus.Util.getWindowSearchObject = function () {
 };
 
 morpheus.Util.copyString = function (s) {
+	return (' ' + s).substr(1);
 	//return (' ' + s).slice(1);
-	// return (' ' + s).substr(1);
-	var copy = [];
-	for (var i = 0, end = s.length; i < end; i++) {
-		copy.push(s[i]);
-	}
-	return copy.join('');
+	// var copy = [];
+	// for (var i = 0, end = s.length; i < end; i++) {
+	// 	copy.push(s[i]);
+	// }
+	// return copy.join('');
 };
 morpheus.Util.getQueryParams = function (s) {
 	var params = {};
 	if (!s) {
 		return params;
 	}
-	var search = unescape(s);
+	var search = decodeURIComponent(s);
 	var keyValuePairs = search.split('&');
 	for (var i = 0; i < keyValuePairs.length; i++) {
 		var pair = keyValuePairs[i].split('=');
@@ -171,18 +171,27 @@ morpheus.Util.getQueryParams = function (s) {
 	}
 	return params;
 };
-morpheus.Util.getScriptPath = function () {
+morpheus.Util.getScriptPath = function (name) {
+	if (!name) {
+		name = 'morpheus-latest.min.js';
+	}
 	var scripts = document.getElementsByTagName('script');
 	for (var i = scripts.length - 1; i >= 0; i--) {
 		var src = scripts[i].src;
 		var index = src.lastIndexOf('/');
 		if (index !== -1) {
-			src = src.substring(index);
+			src = src.substring(index + 1);
 		}
-		if (src.indexOf('morpheus') !== -1 && src.indexOf('external') === -1) {
+		if (src === name) {
 			return scripts[i].src;
 		}
 	}
+
+	// not found
+	if (name === 'morpheus-latest.min.js') {
+		return morpheus.Util.getScriptPath('morpheus.js');
+	}
+	// return 1st script
 	return scripts.length > 0 ? scripts[0].src : '';
 };
 
@@ -238,6 +247,7 @@ morpheus.Util.prefixWithZero = function (value) {
 	return value < 10 ? '0' + value : value;
 };
 morpheus.Util.getExtension = function (name) {
+	name = '' + name;
 	var dotIndex = name.lastIndexOf('.');
 	if (dotIndex > 0) {
 		var suffix = name.substring(dotIndex + 1).toLowerCase();
@@ -305,7 +315,7 @@ morpheus.Util.paramsToObject = function (hash) {
 	if (search.length <= 1) {
 		return {};
 	}
-	search = unescape(search);
+	search = decodeURIComponent(search);
 	var keyValuePairs = search.substring(1).split('&');
 	var result = {};
 	for (var i = 0, length = keyValuePairs.length; i < length; i++) {
@@ -465,8 +475,69 @@ morpheus.Util.autosuggest = function (options) {
 	options = $.extend({}, {
 		multi: true,
 		delay: 500,
+		minLength: 0,
 		suggestWhenEmpty: true,
 	}, options);
+
+	var searching = false;
+
+	function _select(event, ui, isKey) {
+		if (ui.item.skip) {
+			return false;
+		}
+		if (options.multi) {
+			var terms = morpheus.Util
+			.getAutocompleteTokens(
+				options.$el[0].value,
+				{
+					trim: false,
+					selectionStart: options.$el[0].selectionStart
+				});
+
+			var field = (event.toElement && event.toElement.dataset) ? event.toElement.dataset.autocomplete : null;
+			var value = field ? ui.item[field] : ui.item.value;
+			var show = ui.item.show;
+
+			// replace the current input
+			if (terms.length === 0) {
+				terms.push(value);
+			} else if (ui.item.clear) {
+				terms = [value];
+			} else {
+				terms[terms.selectionStartIndex === -1
+				|| terms.selectionStartIndex === undefined ? terms.length - 1
+					: terms.selectionStartIndex] = value;
+			}
+			// add the selected item
+			options.$el[0].value = terms.join(' ');
+			if ((show && !isKey) || (isKey && event.which === 13)) { // did
+				// we
+				// select
+				// just a
+				// field name?
+				searching = true;
+				setTimeout(function () {
+					options.$el.autocomplete('search',
+						options.$el.val());
+				}, 20);
+				setTimeout(function () {
+					searching = false;
+				}, 100);
+
+			}
+			if (!isKey && options.select) {
+				options.select();
+			}
+			return false;
+		}
+		if (!isKey && options.select) {
+			options.select();
+		}
+		if (!isKey && event.which === 13) {
+			event.stopImmediatePropagation();
+		}
+	}
+
 	options.$el
 	// don't navigate away from the field on tab when selecting an item
 	.on(
@@ -479,7 +550,7 @@ morpheus.Util.autosuggest = function (options) {
 		})
 	.autocomplete(
 		{
-			minLength: 0,
+			minLength: options.minLength,
 			delay: options.delay,
 			source: function (request, response) {
 				// delegate back to autocomplete, but extract the
@@ -500,78 +571,43 @@ morpheus.Util.autosuggest = function (options) {
 					options.filter(terms, response);
 				}
 			},
-			focus: function () {
-				// prevent value inserted on focus
+			focus: function (event, ui) {
+				var original = event.originalEvent;
+				while (original.originalEvent != null) {
+					original = original.originalEvent;
+				}
+				if (original && /^key/.test(original.type)) {
+					return _select(original, ui, true);
+				}
 				return false;
 			},
 			select: function (event, ui) {
-				if (ui.item.skip) {
-					return false;
-				}
-
-				if (options.multi) {
-					var terms = morpheus.Util
-					.getAutocompleteTokens(
-						this.value,
-						{
-							trim: false,
-							selectionStart: options.$el[0].selectionStart
-						});
-
-					var field = (event.toElement && event.toElement.dataset) ? event.toElement.dataset.autocomplete : null;
-					var value = field ? ui.item[field] : ui.item.value;
-					var show = ui.item.show;
-
-					// replace the current input
-					if (terms.length === 0) {
-						terms.push(value);
-					} else {
-						terms[terms.selectionStartIndex === -1
-						|| terms.selectionStartIndex === undefined ? terms.length - 1
-							: terms.selectionStartIndex] = value;
-					}
-					// add the selected item
-					this.value = terms.join(' ');
-					if (show) { // did
-						// we
-						// select
-						// just a
-						// field name?
-						setTimeout(function () {
-							options.$el.autocomplete('search',
-								options.$el.val());
-						}, 20);
-
-					}
-					if (options.select) {
-						options.select();
-					}
-					return false;
-				}
-				if (options.select) {
-					options.select();
-				}
-				if (event.which === 13) {
-					event.stopImmediatePropagation();
-				}
+				return _select(event, ui, false);
 			}
 		});
 
-	// use html for label instead of default text
+	// use html for label instead of default text, class for categories vs. items
 	var instance = options.$el.autocomplete('instance');
 	instance._renderItem = function (ul, item) {
-		return $('<li class="' + (item.class ? item.class : 'ui-menu-item') + ' search-item">').html(item.label).appendTo(ul);
+		if (item.value == null) { // category
+			return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-category">')
+			.append($("<div>").html(item.label))
+			.appendTo(ul);
+		}
+		return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-item">')
+		.append($("<div>").html(item.label))
+		.appendTo(ul);
 	};
 	instance._normalize = function (items) {
 		return items;
 	};
-
 	instance._resizeMenu = function () {
 		var ul = this.menu.element;
 		ul.outerWidth(instance.element.outerWidth());
 	};
 
 	var menu = options.$el.autocomplete('widget');
+	menu.menu("option", "items", "> :not(.search-category)");
 	if (menu) {
 		menu.addClass("search-menu")
 	}
@@ -582,8 +618,9 @@ morpheus.Util.autosuggest = function (options) {
 	}
 
 	options.$el.on('keyup', function (e) {
-		if (e.which === 13) {
+		if (e.which === 13 && !searching) {
 			options.$el.autocomplete('close');
+
 		} else if (options.suggestWhenEmpty) {
 			if (options.$el.val() === '') {
 				options.$el.autocomplete('search', '');
@@ -605,7 +642,7 @@ morpheus.Util.getAutocompleteTokens = function (text, options) {
 		return [];
 	}
 	var inQuote = false;
-	var inSelectionStart = false;
+	var inParen = false;
 	var tokens = [];
 	var currentToken = [];
 
@@ -614,8 +651,11 @@ morpheus.Util.getAutocompleteTokens = function (text, options) {
 		if (c === '"') {
 			inQuote = !inQuote;
 			currentToken.push(c);
+		} else if (c === '(' || c === ')') {
+			inParen = c === '(';
+			currentToken.push(c);
 		} else {
-			if ((c === ' ' || c === '\t') && !inQuote) {
+			if ((c === ' ' || c === '\t') && !inQuote && !inParen) {
 				tokens.push({
 					s: currentToken.join(''),
 					inSelectionStart: currentToken.inSelectionStart
@@ -769,6 +809,16 @@ morpheus.Util.showDialog = function ($el, title, options) {
 morpheus.Util.sheetToArray = function (sheet, delim) {
 	var r = XLSX.utils.decode_range(sheet['!ref']);
 	var rows = [];
+	var colors = [];
+	var header = [];
+	for (var C = r.s.c; C <= r.e.c; ++C) {
+		var val = sheet[XLSX.utils.encode_cell({
+			c: C,
+			r: r.s.r
+		})];
+		var txt = String(XLSX.utils.format_cell(val));
+		header.push(txt);
+	}
 	for (var R = r.s.r; R <= r.e.r; ++R) {
 		var row = [];
 		for (var C = r.s.c; C <= r.e.c; ++C) {
@@ -780,11 +830,22 @@ morpheus.Util.sheetToArray = function (sheet, delim) {
 				row.push('');
 				continue;
 			}
+
 			var txt = String(XLSX.utils.format_cell(val));
+			if (val.s != null) {
+				var color = '#' + val.s.fgColor.rgb;
+				colors.push({
+					header: header[row.length],
+					color: color,
+					value: txt
+				});
+			}
 			row.push(txt);
 		}
 		rows.push(delim ? row.join(delim) : row);
 	}
+
+	rows.colors = colors;
 	return rows;
 };
 morpheus.Util.linesToObjects = function (lines) {
@@ -807,7 +868,8 @@ morpheus.Util.xlsxTo2dArray = function (data) {
 	var workbook = XLSX.read(data, {
 		type: 'binary',
 		cellFormula: false,
-		cellHTML: false
+		cellHTML: false,
+		cellStyles: true
 	});
 	var sheetNames = workbook.SheetNames;
 	var worksheet = workbook.Sheets[sheetNames[0]];
@@ -818,12 +880,12 @@ morpheus.Util.xlsxTo1dArray = function (data) {
 	var workbook = XLSX.read(data, {
 		type: 'binary',
 		cellFormula: false,
-		cellHTML: false
+		cellHTML: false,
+		cellStyles: true
 	});
 	var sheetNames = workbook.SheetNames;
 	var worksheet = workbook.Sheets[sheetNames[0]];
-	var lines = morpheus.Util.sheetToArray(worksheet, '\t');
-	return lines;
+	return morpheus.Util.sheetToArray(worksheet, '\t');
 };
 morpheus.Util.hashCode = function (val) {
 	var h = 0;
@@ -903,11 +965,11 @@ morpheus.Util.indexSort = function (array, ascending) {
 morpheus.Util.indexSortPairs = function (array, ascending) {
 	if (ascending) {
 		array.sort(function (a, b) {
-			return (a.value < b.value ? -1 : (a.value === b.value ? 0 : 1));
+			return (a.value < b.value ? -1 : (a.value === b.value ? (a.index < b.index ? -1 : 1) : 1));
 		});
 	} else {
 		array.sort(function (a, b) {
-			return (a.value < b.value ? 1 : (a.value === b.value ? 0 : -1));
+			return (a.value < b.value ? 1 : (a.value === b.value ? (a.index < b.index ? 1 : -1) : -1));
 		});
 	}
 	var indices = [];
@@ -985,7 +1047,7 @@ morpheus.Util.arrayToString = function (value, sep) {
 	for (var i = 0, length = value.length; i < length; i++) {
 		var val_i = value[i];
 		if (_.isNumber(val_i)) {
-			s.push(morpheus.Util.nf(val_i[i]));
+			s.push(morpheus.Util.nf(val_i));
 		} else {
 			s.push('' + val_i);
 		}
@@ -1045,7 +1107,6 @@ morpheus.Util.createSearchPredicates = function (options) {
 	if (!options.caseSensitive && availableFields != null) {
 		for (var i = 0; i < availableFields.length; i++) {
 			availableFields[i] = availableFields[i].toLowerCase();
-
 		}
 	}
 	var validateFieldNames = options.validateFieldNames;
@@ -1144,20 +1205,24 @@ morpheus.Util.createSearchPredicates = function (options) {
 				}
 			} else if (rangeToken === '=') {
 				var val = parseFloat(token.substring(rangeIndex + 1));
-				if (!isNaN(val)) {
-					predicate = new morpheus.Util.EqualsPredicate(
-						field, val);
-				}
+				predicate = new morpheus.Util.EqualsPredicate(
+					field, val);
 			} else {
-				predicate = defaultIsExactMatch ? new morpheus.Util.ExactTermPredicate(
-					field, token)
-					: new morpheus.Util.RegexPredicate(field, token);
+				console.log('Unknown range token:' + rangeToken);
 			}
 		} else if (token[0] === '"' && token[token.length - 1] === '"') { // exact
-			// match
 			token = token.substring(1, token.length - 1);
 			predicate = new morpheus.Util.ExactTermPredicate(field,
 				token);
+		} else if (token[0] === '(' && token[token.length - 1] === ')') { // exact terms
+			token = token.substring(1, token.length - 1);
+			var values = morpheus.Util.getAutocompleteTokens(token);
+			if (values.length > 0) {
+				predicate = new morpheus.Util.ExactTermsPredicate(field,
+					values.map(function (val) {
+						return val.toLowerCase();
+					}));
+			}
 		} else if (token.indexOf('*') !== -1) { // contains
 			predicate = new morpheus.Util.RegexPredicate(field, token);
 		} else {
@@ -1345,6 +1410,9 @@ morpheus.Util.ContainsPredicate.prototype = {
 	getField: function () {
 		return this.field;
 	},
+	getText: function () {
+		return this.text;
+	},
 	isNumber: function () {
 		return false;
 	},
@@ -1352,6 +1420,31 @@ morpheus.Util.ContainsPredicate.prototype = {
 		return 'ContainsPredicate ' + this.field + ':' + this.text;
 	}
 };
+morpheus.Util.ExactTermsPredicate = function (field, values) {
+	this.field = field;
+	this.values = new morpheus.Set();
+	for (var i = 0, nvalues = values.length; i < nvalues; i++) {
+		this.values.add(values[i]);
+	}
+};
+morpheus.Util.ExactTermsPredicate.prototype = {
+	accept: function (value) {
+		return this.values.has((value != null && value.toLowerCase ? value.toLowerCase() : value));
+	},
+	getField: function () {
+		return this.field;
+	},
+	getValues: function () {
+		return this.values;
+	},
+	isNumber: function () {
+		return false;
+	},
+	toString: function () {
+		return 'ExactTermsPredicate ' + this.field + ':' + this.text;
+	}
+};
+
 morpheus.Util.ExactTermPredicate = function (field, term) {
 	this.field = field;
 	term = term.toLowerCase();
@@ -1363,6 +1456,9 @@ morpheus.Util.ExactTermPredicate.prototype = {
 	},
 	getField: function () {
 		return this.field;
+	},
+	getText: function () {
+		return this.text;
 	},
 	isNumber: function () {
 		return false;
@@ -1382,6 +1478,9 @@ morpheus.Util.RegexPredicate.prototype = {
 	},
 	getField: function () {
 		return this.field;
+	},
+	getText: function () {
+		return this.text;
 	},
 	isNumber: function () {
 		return false;

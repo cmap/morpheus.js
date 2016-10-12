@@ -22,7 +22,9 @@ morpheus.MetadataUtil.renameFields = function (dataset, options) {
 
 /**
  * @param options.model
- *            Metadata model
+ *            Metadata model of currently visible tracks
+ * @param options.fullModel
+ *            Metadata model of all metadata tracks
  * @param options.text
  *            Search text
  * @param options.isColumns
@@ -33,6 +35,10 @@ morpheus.MetadataUtil.renameFields = function (dataset, options) {
  */
 morpheus.MetadataUtil.search = function (options) {
 	var model = options.model;
+	var fullModel = options.fullModel;
+	if (!fullModel) {
+		fullModel = model;
+	}
 	var text = options.text;
 	var isColumns = options.isColumns;
 	text = $.trim(text);
@@ -44,7 +50,7 @@ morpheus.MetadataUtil.search = function (options) {
 		return null;
 	}
 	var indexField = isColumns ? 'COLUMN' : 'ROW';
-	var fieldNames = morpheus.MetadataUtil.getMetadataNames(model);
+	var fieldNames = morpheus.MetadataUtil.getMetadataNames(fullModel);
 	fieldNames.push(indexField);
 	var predicates = morpheus.Util.createSearchPredicates({
 		tokens: tokens,
@@ -53,8 +59,8 @@ morpheus.MetadataUtil.search = function (options) {
 	});
 	var vectors = [];
 	var nameToVector = new morpheus.Map();
-	for (var j = 0; j < model.getMetadataCount(); j++) {
-		var v = model.get(j);
+	for (var j = 0; j < fullModel.getMetadataCount(); j++) {
+		var v = fullModel.get(j);
 		var dataType = morpheus.VectorUtil.getDataType(v);
 		var wrapper = {
 			vector: v,
@@ -62,12 +68,33 @@ morpheus.MetadataUtil.search = function (options) {
 			isArray: dataType.indexOf('[') === 0
 		};
 		nameToVector.set(v.getName(), wrapper);
-		vectors.push(wrapper);
+		if (model.getByName(v.getName()) != null) {
+			vectors.push(wrapper);
+		}
 
 	}
 	// TODO only search numeric fields for range searches
 	var indices = [];
 	var npredicates = predicates.length;
+	for (var p = 0; p < npredicates; p++) {
+		var predicate = predicates[p];
+		var filterColumnName = predicate.getField();
+		if (filterColumnName != null && !predicate.isNumber()) {
+			var wrapper = nameToVector.get(filterColumnName);
+			if (wrapper.dataType === 'number' || wrapper.dataType === '[number]') {
+				if (predicate.getText) {
+					predicates[p] = new morpheus.Util.EqualsPredicate(filterColumnName, parseFloat(predicate.getText()));
+				} else if (predicate.getValues) {
+					var values = [];
+					predicate.getValues().forEach(function (val) {
+						values.push(parseFloat(val));
+					});
+					predicate[p] = new morpheus.Util.ExactTermsPredicate(filterColumnName, values);
+				}
+			}
+		}
+
+	}
 	var nfields = vectors.length;
 	for (var i = 0, nitems = model.getItemCount(); i < nitems; i++) {
 		var matches = false;
@@ -106,6 +133,7 @@ morpheus.MetadataUtil.search = function (options) {
 				}
 
 			} else { // try all fields
+
 				for (var j = 0; j < nfields; j++) {
 					var wrapper = vectors[j];
 					var value = wrapper.vector.getValue(i);
@@ -167,109 +195,108 @@ morpheus.MetadataUtil.autocomplete = function (model) {
 		var token = tokens != null && tokens.length > 0 ? tokens[tokens.selectionStartIndex]
 			: '';
 		token = $.trim(token);
-		try {
-			if (token !== '') {
-				var field = null;
-				var semi = token.indexOf(':');
-				if (semi > 0) { // field search?
-					if (token.charCodeAt(semi - 1) !== 92) { // \:
-						var possibleField = $.trim(token.substring(0, semi));
-						if (possibleField.length > 0
-							&& possibleField[0] === '"'
-							&& possibleField[token.length - 1] === '"') {
-							possibleField = possibleField.substring(1,
-								possibleField.length - 1);
-						}
-						var index = morpheus.MetadataUtil.indexOf(searchModel,
-							possibleField);
-						if (index !== -1) {
-							token = $.trim(token.substring(semi + 1));
-							searchModel = new morpheus.MetadataModelColumnView(
-								model, [index]);
-						}
+		var fieldSearchFieldName = null;
+		if (token !== '') {
+
+			var semi = token.indexOf(':');
+			if (semi > 0) { // field search?
+				if (token.charCodeAt(semi - 1) !== 92) { // \:
+					var possibleField = $.trim(token.substring(0, semi));
+					if (possibleField.length > 0
+						&& possibleField[0] === '"'
+						&& possibleField[token.length - 1] === '"') {
+						possibleField = possibleField.substring(1,
+							possibleField.length - 1);
 					}
-
-				}
-				var set = new morpheus.Set();
-				// regex used to determine if a string starts with substring `q`
-
-				regex = new RegExp(morpheus.Util.escapeRegex(token), 'i');
-				regexMatch = new RegExp('(' + morpheus.Util.escapeRegex(token) + ')', 'i');
-				// iterate through the pool of strings and for any string that
-				// contains the substring `q`, add it to the `matches` array
-				var max = 10;
-
-				var vectors = [];
-				var isArray = [];
-				for (var j = 0; j < searchModel.getMetadataCount(); j++) {
-					var v = searchModel.get(j);
-					var dataType = morpheus.VectorUtil.getDataType(v);
-					if (dataType === 'string' || dataType === '[string]') { // skip
-						// numeric
-						// fields
-						vectors.push(v);
-						isArray.push(dataType === '[string]');
+					var index = morpheus.MetadataUtil.indexOf(searchModel,
+						possibleField);
+					if (index !== -1) {
+						fieldSearchFieldName = possibleField;
+						token = $.trim(token.substring(semi + 1));
+						searchModel = new morpheus.MetadataModelColumnView(
+							model, [index]);
 					}
 				}
 
-				var nfields = vectors.length;
+			}
+			var set = new morpheus.Set();
+			// regex used to determine if a string starts with substring `q`
 
-				loop: for (var i = 0, nitems = searchModel.getItemCount(); i < nitems; i++) {
-					for (var j = 0; j < nfields; j++) {
-						var v = vectors[j];
-						var val = v.getValue(i);
-						if (val != null) {
-							if (isArray[j]) {
-								for (var k = 0; k < val.length; k++) {
-									var id = new morpheus.Identifier([val[k],
-										v.getName()]);
-									if (!set.has(id) && regex.test(val[k])) {
-										set.add(id);
-										if (set.size() === max) {
-											break loop;
-										}
-									}
-								}
-							} else {
-								var id = new morpheus.Identifier([val,
+			regex = new RegExp(morpheus.Util.escapeRegex(token), 'i');
+			regexMatch = new RegExp('(' + morpheus.Util.escapeRegex(token) + ')', 'i');
+			// iterate through the pool of strings and for any string that
+			// contains the substring `q`, add it to the `matches` array
+			var max = 10;
+
+			var vectors = [];
+			var isArray = [];
+			for (var j = 0; j < searchModel.getMetadataCount(); j++) {
+				var v = searchModel.get(j);
+				var dataType = morpheus.VectorUtil.getDataType(v);
+				if (dataType === 'string' || dataType === '[string]') { // skip
+					// numeric
+					// fields
+					vectors.push(v);
+					isArray.push(dataType === '[string]');
+				}
+			}
+
+			var nfields = vectors.length;
+
+			loop: for (var i = 0, nitems = searchModel.getItemCount(); i < nitems; i++) {
+				for (var j = 0; j < nfields; j++) {
+					var v = vectors[j];
+					var val = v.getValue(i);
+					if (val != null) {
+						if (isArray[j]) {
+							for (var k = 0; k < val.length; k++) {
+								var id = new morpheus.Identifier([val[k],
 									v.getName()]);
-								if (!set.has(id) && regex.test(val)) {
+								if (!set.has(id) && regex.test(val[k])) {
 									set.add(id);
 									if (set.size() === max) {
 										break loop;
 									}
 								}
 							}
+						} else {
+							var id = new morpheus.Identifier([val,
+								v.getName()]);
+							if (!set.has(id) && regex.test(val)) {
+								set.add(id);
+								if (set.size() === max) {
+									break loop;
+								}
+							}
 						}
-
 					}
+
 				}
-
-				set.forEach(function (id) {
-					var array = id.getArray();
-					var field = array[1];
-					var val = array[0];
-					var quotedField = field;
-					if (quotedField.indexOf(' ') !== -1) {
-						quotedField = '"' + quotedField + '"';
-					}
-					var quotedValue = val;
-					if (quotedValue.indexOf(' ') !== -1) {
-						quotedValue = '"' + quotedValue + '"';
-					}
-					matches.push({
-						value: quotedField + ':' + quotedValue,
-						label: '<span style="font-weight:300;">' + field
-						+ ':</span>'
-						+ '<span>' + val.replace(regexMatch, '<b>$1</b>')
-						+ '</span>'
-					});
-
-				});
 			}
-		} catch (x) {
 
+			set.forEach(function (id) {
+				var array = id.getArray();
+				var field = array[1];
+				var val = array[0];
+				var quotedField = field;
+				if (quotedField.indexOf(' ') !== -1) {
+					quotedField = '"' + quotedField + '"';
+				}
+				var quotedValue = val;
+				if (quotedValue.indexOf(' ') !== -1) {
+					quotedValue = '"' + quotedValue + '"';
+				}
+				matches.push({
+					value: quotedField + ':' + quotedValue,
+					label: '<span style="font-weight:300;">' + field
+					+ ':</span>'
+					+ '<span>' + val.replace(regexMatch, '<b>$1</b>')
+					+ '</span>'
+				});
+
+			});
 		}
+
 		// field names
 		if (regex == null) {
 			regex = new RegExp('.*', 'i');
@@ -281,7 +308,7 @@ morpheus.MetadataUtil.autocomplete = function (model) {
 			var field = v.getName();
 			if (dataType === 'number' || dataType === 'string'
 				|| dataType === '[string]') {
-				if (regex.test(field)) {
+				if (regex.test(field) && field !== fieldSearchFieldName) {
 					var quotedField = field;
 					if (quotedField.indexOf(' ') !== -1) {
 						quotedField = '"' + quotedField + '"';
@@ -290,7 +317,8 @@ morpheus.MetadataUtil.autocomplete = function (model) {
 						value: quotedField + ':',
 						label: '<span style="font-weight:300;">' + (regexMatch == null ? field : field.replace(regexMatch, '<b>$1</b>'))
 						+ ':</span>' + (dataType === 'number' ? ('<span' +
-						' style="font-weight:300;font-size:85%;">min..max</span>') : ''),
+						' style="font-weight:300;font-size:85%;">.., >, <, >=, <=,' +
+						' =</span>') : ''),
 						show: true
 					});
 				}

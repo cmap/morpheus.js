@@ -1,103 +1,56 @@
-morpheus.BufferedReader = function (buffer) {
-	this.buffer = buffer;
-	this.bufferLength = buffer.length;
-	this.index = 0;
-	if (typeof TextDecoder !== 'undefined') {
-		var textDecoder = new TextDecoder();
-		this.decoder = function (buf, start, end) {
-			return textDecoder.decode(buf.subarray(start, end));
-		};
-	} else {
-		this.decoder = function (buf, start, end) {
-			// TODO convert in chunks
-			var s = [];
-			for (var i = start; i < end; i++) {
-				s.push(String.fromCharCode(buffer[i]));
-			}
-			return s.join('');
-		};
-	}
-};
-
-morpheus.BufferedReader.prototype = {
-	readLine: function () {
-		var index = this.index;
-		var bufferLength = this.bufferLength;
-		if (index >= bufferLength) {
-
-			return null;
-		}
-		var buffer = this.buffer;
-		var start = index;
-		var end = start;
-		for (; index < bufferLength; index++) {
-			var c = buffer[index];
-			if (c === 10 || c === 13) { // \n or \r
-				end = index;
-				if ((index !== bufferLength - 1)
-					&& (buffer[index + 1] === 10 || buffer[index + 1] === 13)) { // skip
-					// ahead
-					index++;
-				}
-				index++;
-				break;
+morpheus.BufferedReader = function (reader, callback, doneCallback) {
+	var textDecoder = new TextDecoder();
+	var skipLF = false;
+	var text = '';
+	reader.read().then(function processResult(result) {
+		// result contains a value which is an array of Uint8Array
+		text += (result.done ? '' : textDecoder.decode(result.value));
+		var start = 0;
+		// TODO no need to search previous chunk of text
+		for (var i = 0, length = text.length; i < length; i++) {
+			var c = text[i];
+			if (skipLF && c === '\n') {
+				start++;
+				skipLF = false;
+			} else if (c === '\n' || c === '\r') {
+				skipLF = c === '\r'; // \r\n windows line ending
+				var s = morpheus.Util.copyString(text.substring(start, i));
+				callback(s);
+				start = i + 1;
+			} else {
+				skipLF = false;
 			}
 		}
-		this.index = index;
-		if (start === end && index === bufferLength) { // eof
-			return String(this.decoder(this.buffer, start, bufferLength));
-		}
-
-		return String(this.decoder(this.buffer, start, end));
-
-	}
-};
-
-morpheus.BufferedReader.getArrayBuffer = function (fileOrUrl, callback) {
-	var isString = typeof fileOrUrl === 'string' || fileOrUrl instanceof String;
-	if (isString) { // URL
-		var oReq = new XMLHttpRequest();
-		oReq.open('GET', fileOrUrl, true);
-		oReq.responseType = 'arraybuffer';
-		oReq.onload = function (oEvent) {
-			callback(null, oReq.response);
-		};
-
-		// oReq.onprogress = function(oEvent) {
-		// if (oEvent.lengthComputable) {
-		// var percentComplete = oEvent.loaded / oEvent.total;
-		// console.log(percentComplete + '%')
-		// } else {
-		// console.log(oEvent.loaded + ' loaded')
-		// }
-		// };
-
-		oReq.onerror = function (oEvent) {
-			callback(oEvent);
-		};
-		oReq.onreadystatechange = function (oEvent) {
-			if (oReq.readyState === 4 && oReq.status !== 200) {
-				oReq.onload = null;
-				oReq.onerror = null;
-				if (oReq.status === 404) {
-					callback(new Error(fileOrUrl + ' not found.'));
-				} else {
-					callback(new Error('Unable to read ' + fileOrUrl + '.'));
-				}
+		text = start < text.length ? text.substring(start) : '';
+		if (!result.done) {
+			return reader.read().then(processResult);
+		} else {
+			if (text !== '' && text !== '\r') {
+				callback(text);
 			}
-		};
-
-		oReq.send(null);
-		return oReq;
-	} else {
-		var reader = new FileReader();
-		reader.onload = function (event) {
-			callback(null, event.target.result);
-		};
-		reader.onerror = function (event) {
-			callback(event);
-		};
-		reader.readAsArrayBuffer(fileOrUrl);
-		return reader;
-	}
+			doneCallback();
+		}
+	});
 };
+
+morpheus.BufferedReader.parse = function (url, options) {
+	var delim = options.delimiter;
+	var regex = new RegExp(delim);
+	var handleTokens = options.handleTokens;
+	var complete = options.complete;
+	fetch(url).then(function (response) {
+		if (response.ok) {
+			var reader = response.body.getReader();
+			new morpheus.BufferedReader(reader, function (line) {
+				handleTokens(line.split(regex));
+			}, function () {
+				complete();
+			});
+		} else {
+			options.error('Network error');
+		}
+	}).catch(function (error) {
+		options.error(error);
+	});
+};
+

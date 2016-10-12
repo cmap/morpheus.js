@@ -1,6 +1,7 @@
 /**
  * @param options.autohideTabBar
  *            Whether to autohide the tab bar when only 1 tab showing
+ * @param options.landingPage Landing page to show when all tabs are closed
  */
 morpheus.TabManager = function (options) {
 	this.options = $.extend({}, {
@@ -12,7 +13,7 @@ morpheus.TabManager = function (options) {
 	this.idToTabObject = new morpheus.Map();
 	this.$nav = $('<ul class="nav nav-tabs compact"></ul>');
 	this.$nav.on('click', 'li > a', function (e) {
-		var tabId = $(this).attr('href');
+		var tabId = $(this).data('link');
 		e.preventDefault();
 		if (_this.activeTabId !== tabId) {
 			$(this).tab('show');
@@ -72,8 +73,10 @@ morpheus.TabManager = function (options) {
 	this.$nav.on('click', 'button', function (e) { // close a tab
 		// remove the link and tab content
 		e.preventDefault();
-		var target = $(this).attr('data-target');
-		_this.remove(target);
+		var target = $(this).attr('data-target').substring(1); // remove #
+		if (target != null) {
+			_this.remove(target);
+		}
 	});
 
 	this.$tabContent = $('<div class="tab-content"></div>');
@@ -83,7 +86,7 @@ morpheus.TabManager = function (options) {
 		}
 		// triggered when clicking tab
 		var previous = _this.activeTabObject;
-		_this.activeTabId = $(e.target).attr('href');
+		_this.activeTabId = $(e.target).data('link');
 		_this.activeTabObject = _this.idToTabObject.get(_this.activeTabId);
 		_this.trigger('change', {
 			tab: _this.activeTabObject,
@@ -94,7 +97,7 @@ morpheus.TabManager = function (options) {
 };
 morpheus.TabManager.prototype = {
 	setTabText: function (id, text) {
-		this.$nav.find('a').filter('[href=' + id + ']').contents().first()
+		this.$nav.find('a').filter('[data-link=' + id + ']').contents().first()
 		.replaceWith(text + '&nbsp;');
 		this.idToTabObject.get(id).setName(name);
 	},
@@ -109,9 +112,11 @@ morpheus.TabManager.prototype = {
 	 *            Tab id for task
 	 */
 	addTask: function (task) {
-		var $a = this.$nav.find('a[href=' + task.tabId + ']');
+		var $a = this.$nav.find('[data-link=' + task.tabId + ']');
 		if ($a.length === 0) {
-			throw new Error(task.tabId + ' not found.');
+			console.log(task.tabId + ' not found.');
+			return;
+
 		}
 		var $i = $a.find('i');
 		var tasks = $i.data('tasks');
@@ -133,7 +138,7 @@ morpheus.TabManager.prototype = {
 		$i.addClass('fa fa-spinner fa-spin');
 	},
 	removeTask: function (task) {
-		var $a = this.$nav.find('a[href=' + task.tabId + ']');
+		var $a = this.$nav.find('[data-link=' + task.tabId + ']');
 		var $i = $a.find('i');
 		var tasks = $i.data('tasks');
 		if (!tasks) {
@@ -146,15 +151,12 @@ morpheus.TabManager.prototype = {
 				break;
 			}
 		}
-		if (index === -1) {
-			throw new Error(task.id + ' not found in ' + tasks.map(function (t) {
-					return t.id;
-				}));
-		}
-		tasks.splice(index, 1);
-		$i.data('tasks', tasks);
-		if (tasks.length === 0) {
-			$i.removeClass('fa fa-spinner fa-spin');
+		if (index !== -1) {
+			tasks.splice(index, 1);
+			$i.data('tasks', tasks);
+			if (tasks.length === 0) {
+				$i.removeClass('fa fa-spinner fa-spin');
+			}
 		}
 	},
 	getWidth: function () {
@@ -169,7 +171,7 @@ morpheus.TabManager.prototype = {
 
 	/**
 	 *
-	 * @param options
+	 * @param options.object The object that stores the tab content state and has a setName method.
 	 * @param options.$el
 	 *            the tab element
 	 * @param options.title
@@ -188,16 +190,18 @@ morpheus.TabManager.prototype = {
 	add: function (options) {
 		this.adding = true;
 		var id = _.uniqueId('tab');
-		this.idToTabObject.set('#' + id, options.object);
+		this.idToTabObject.set(id, options.object);
 		var li = [];
 		li.push('<li role="presentation">');
 		li.push('<a data-morpheus-rename="' + options.rename
-			+ '" data-toggle="tab" href="#' + id + '">');
+			+ '" data-toggle="tab" data-link="' + id + '" href="#' + id + '">');
 		li.push(options.title);
 		li.push('&nbsp;<i style="color:black;"></i>');
 		if (options.closeable) {
 			li
-			.push('&nbsp<button type="button" class="close" aria-label="Close" data-target="#'
+			.push('&nbsp<button style="font-size: 18px;" type="button" class="close"' +
+				' aria-label="Close"' +
+				' data-target="#'
 				+ id
 				+ '"><span aria-hidden="true">×</span></button>');
 
@@ -216,7 +220,7 @@ morpheus.TabManager.prototype = {
 		if (options.focus) {
 			// update active tab, but don't fire event
 			this.$nav.find('a[data-toggle="tab"]:last').tab('show');
-			this.activeTabId = '#' + id;
+			this.activeTabId = id;
 			this.activeTabObject = options.object;
 			$panel.focus();
 		}
@@ -228,15 +232,16 @@ morpheus.TabManager.prototype = {
 		this.adding = false;
 		return {
 			$panel: $panel,
-			id: '#' + id
+			id: id
 		};
 	},
 	remove: function (target) {
 		if (target === undefined) {
 			target = this.activeTabId;
 		}
-		this.idToTabObject.remove(target);
-		this.$nav.find('[href=' + target + ']').parent().remove();
+		var obj = this.idToTabObject.remove(target);
+		this.activeTabObject = null;
+		this.$nav.find('[data-link=' + target + ']').parent().remove();
 		this.$tabContent.find(target).remove();
 		var $a = this.$nav.find('a[data-toggle="tab"]:last');
 		if ($a.length === 0) {
@@ -250,6 +255,9 @@ morpheus.TabManager.prototype = {
 		if (this.options.autohideTabBar) {
 			this.$nav.css('display', this.idToTabObject.size() > 1 ? ''
 				: 'none');
+		}
+		if (obj.onRemove) {
+			obj.onRemove();
 		}
 		this.trigger('remove', {
 			tab: target
@@ -272,7 +280,7 @@ morpheus.TabManager.prototype = {
 				previous: null
 			});
 		}
-		var $a = this.$nav.find('[href=' + id + ']');
+		var $a = this.$nav.find('[data-link=' + id + ']');
 		// make sure it's enabled
 		$a.parent().removeClass('disabled');
 		$a.removeClass('btn disabled');
@@ -287,10 +295,10 @@ morpheus.TabManager.prototype = {
 	 *            The title (used to show tooltip)
 	 */
 	setTabTitle: function (id, title) {
-		this.$nav.find('a').filter('[href=' + id + ']').attr('title', title);
+		this.$nav.find('a').filter('[data-link=' + id + ']').attr('title', title);
 	},
 	setTabEnabled: function (id, enabled) {
-		var $a = this.$nav.find('a').filter('[href=' + id + ']');
+		var $a = this.$nav.find('a').filter('[data-link=' + id + ']');
 		if (enabled) {
 			$a.parent().removeClass('disabled');
 			$a.removeClass('btn disabled');

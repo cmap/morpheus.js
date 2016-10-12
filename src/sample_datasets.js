@@ -5,36 +5,7 @@ morpheus.SampleDatasets = function (options) {
 	var _this = this;
 	var $el = options.$el;
 	this.callback = options.callback;
-	var exampleHtml = [];
-
-	exampleHtml.push('<table class="table table-condensed">');
-
-	exampleHtml
-	.push('<td>Cancer Cell Line Encyclopedia (CCLE), Project Achilles</td>');
-	exampleHtml
-	.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="mrna"> Gene Expression</td>');
-
-	exampleHtml
-	.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="cn"> Copy Number By Gene</td>');
-
-	exampleHtml
-	.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="sig_genes"> Mutations</td>');
-
-	exampleHtml
-	.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="ach"> Gene essentiality</td>');
-
-	exampleHtml
-	.push('<td><button disabled type="button" class="btn btn-default" name="ccle">'
-		+ options.openText + '</button></td>');
-	exampleHtml.push('</tr></table>');
-
-	exampleHtml
-	.push('<div class="text-muted">TCGA data version 1/11/2015</div><span class="text-muted">Please adhere to <a target="_blank" href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines"> the TCGA publication guidelines</a></u> when using TCGA data in your publications.</span>');
-
-	exampleHtml.push('<div data-name="tcga"></div>');
-	$(exampleHtml.join('')).appendTo($el);
-	$el.find('[name=ccle]').on('click', function (e) {
-		e.preventDefault();
+	$el.on('click', '[name=ccle]', function (e) {
 		var $this = $(this);
 		var obj = {};
 		$this.parents('tr').find('input:checked').each(function (i, c) {
@@ -42,7 +13,7 @@ morpheus.SampleDatasets = function (options) {
 		});
 
 		_this.openCCLE(obj);
-
+		e.preventDefault();
 	});
 
 	$el.on('click', '[name=tcgaLink]', function (e) {
@@ -91,6 +62,40 @@ morpheus.SampleDatasets = function (options) {
 		'https://s3.amazonaws.com/data.clue.io/morpheus/tcga/tcga_index.txt')
 	.done(
 		function (text) {
+			var exampleHtml = [];
+			exampleHtml.push('<table class="table table-condensed table-bordered">');
+			exampleHtml.push('<thead><tr><th>Name</th><th>Gene' +
+				' Expression</th><th>Copy Number By Gene</th><th>Mutations</th><th>Gene' +
+				' Essentiality</th><th></th></tr></thead>');
+			exampleHtml.push('<tbody>');
+			exampleHtml.push('<tr>');
+			exampleHtml
+			.push('<td>Cancer Cell Line Encyclopedia (CCLE), Project Achilles</td>');
+			exampleHtml
+			.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="mrna"> </td>');
+
+			exampleHtml
+			.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="cn"> </td>');
+
+			exampleHtml
+			.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="sig_genes"> </td>');
+
+			exampleHtml
+			.push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="ach"> </td>');
+
+			exampleHtml
+			.push('<td><button disabled type="button" class="btn btn-link" name="ccle">'
+				+ options.openText + '</button></td>');
+			exampleHtml.push('</tr></tbody></table>');
+
+			exampleHtml
+			.push('<div class="text-muted">TCGA data version 1/11/2015</div><span class="text-muted">Please adhere to <a target="_blank" href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines"> the TCGA publication guidelines</a></u> when using TCGA data in your publications.</span>');
+
+			exampleHtml.push('<div data-name="tcga"></div>');
+			$(exampleHtml.join('')).appendTo($el);
+			if (options.show) {
+				$el.show();
+			}
 			var lines = text.split('\n');
 			var diseases = [];
 			for (var i = 0; i < lines.length; i++) {
@@ -133,10 +138,18 @@ morpheus.SampleDatasets = function (options) {
 			var tcga = [];
 			_this.diseases = diseases;
 
-			tcga.push('<table class="table table-condensed">');
-			// ><tr><th>Disease</th><th>Gene Expression</th><th>Copy
-			// Number</th><th>Copy Number By
-			// Gene</th><th>Mutations</th><th>Proteomics</th><th>Methylation</th></tr>
+			tcga.push('<table class="table table-condensed table-bordered">');
+			tcga.push('<thead><tr>');
+			tcga.push('<th>Disease</th>');
+			tcga.push('<th>Gene Expression</th>');
+			tcga.push('<th>GISTIC Copy Number</th>');
+			tcga.push('<th>Copy Number By Gene</th>');
+			tcga.push('<th>Mutations</th>');
+			tcga.push('<th>Proteomics</th>');
+			tcga.push('<th>Methylation</th>');
+			tcga.push('<th></th>');
+			tcga.push('</tr></thead>');
+			tcga.push('<tbody>');
 			for (var i = 0; i < diseases.length; i++) {
 				var disease = diseases[i];
 				tcga.push('<tr>');
@@ -145,55 +158,54 @@ morpheus.SampleDatasets = function (options) {
 				tcga.push('<td>');
 				if (disease.mrna) {
 					tcga
-					.push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="mrna"> Gene Expression');
-				}
-				tcga.push('</td>');
-				tcga.push('<td>');
-				if (disease.gistic) {
-					tcga
-					.push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="gistic"> GISTIC Copy Number');
+					.push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="mrna"> ');
 				}
 				tcga.push('</td>');
 
 				tcga.push('<td>');
 				if (disease.gistic) {
 					tcga
-					.push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="gisticGene"> Copy Number By Gene');
+					.push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="gistic"> ');
+				}
+				tcga.push('</td>');
+
+				tcga.push('<td>');
+				if (disease.gistic) {
+					tcga
+					.push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="gisticGene"> ');
 				}
 				tcga.push('</td>');
 
 				tcga.push('<td>');
 				if (disease.sig_genes) {
 					tcga
-					.push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="sig_genes"> Mutations');
+					.push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="sig_genes"> ');
 				}
 				tcga.push('</td>');
+
 				tcga.push('<td>');
 				if (disease.rppa) {
 					tcga
-					.push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="rppa"> Proteomics');
+					.push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="rppa"> ');
 				}
 				tcga.push('</td>');
 				tcga.push('<td>');
 				if (disease.methylation) {
 					tcga
-					.push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="methylation"> Methylation');
+					.push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="methylation"> ');
 				}
 				tcga.push('</td>');
 
-				tcga.push('<td>');
-
 				tcga
-				.push('<td><button disabled type="button" class="btn btn-default" name="tcgaLink" data-disease-type="'
+				.push('<td><button disabled type="button" class="btn btn-link" name="tcgaLink" data-disease-type="'
 					+ disease.type
 					+ '">'
 					+ options.openText
 					+ '</button></td>');
 
-				tcga.push('</td>');
-
 				tcga.push('</tr>');
 			}
+			tcga.push('</tbody>');
 			tcga.push('</table>');
 			$(tcga.join('')).appendTo($el.find('[data-name=tcga]'));
 		});
@@ -239,9 +251,7 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
 	var datasets = [];
 	if (options.sig_genes) {
 		datasets
-		.push({
-			dataset: 'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_hybrid_capture1650_hg19_NoCommonSNPs_NoNeutralVariants_CDS_2012.05.07.maf.txt'
-		});
+		.push('https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_hybrid_capture1650_hg19_NoCommonSNPs_NoNeutralVariants_CDS_2012.05.07.maf.txt');
 		// datasets
 		// .push({
 		// dataset :
@@ -250,22 +260,16 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
 	}
 	if (options.cn) {
 		datasets
-		.push({
-			dataset: 'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_copynumber_byGene_2013-12-03.gct'
-		});
+		.push('https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_copynumber_byGene_2013-12-03.gct');
 	}
 
 	if (options.mrna) {
 		datasets
-		.push({
-			dataset: 'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_Expression_Entrez_2012-09-29.txt'
-		});
+		.push('https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_Expression_Entrez_2012-09-29.txt');
 	}
 	if (options.ach) {
 		datasets
-		.push({
-			dataset: 'https://s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct'
-		});
+		.push('https://s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct');
 	}
 	var columnAnnotations = [{
 		file: 'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_Sample_Info.txt',
@@ -283,9 +287,7 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
 
 	}
 	var returnDeferred = $.Deferred();
-	var datasetDef = morpheus.DatasetUtil.readDatasetArray({
-		dataset: datasets
-	});
+	var datasetDef = morpheus.DatasetUtil.readDatasetArray(datasets);
 
 	var annotationDef = morpheus.DatasetUtil.annotate({
 		annotations: columnAnnotations,

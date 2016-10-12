@@ -200,6 +200,17 @@ morpheus.Variance = function (list, mean) {
 	var variance = sum / n;
 	return variance;
 };
+morpheus.Variance.toString = function () {
+	return 'Variance';
+};
+
+morpheus.StandardDeviation = function (list, mean) {
+	return Math.sqrt(morpheus.Variance(list, mean));
+};
+morpheus.StandardDeviation.toString = function () {
+	return 'Standard deviation';
+};
+
 var LOG_10 = Math.log(10);
 morpheus.Log10 = function (x) {
 	return x <= 0 ? 0 : Math.log(x) / LOG_10;
@@ -251,9 +262,7 @@ morpheus.FDR_BH = function (nominalPValues) {
 morpheus.FDR_BH.tString = function () {
 	return 'FDR(BH)';
 };
-morpheus.Variance.toString = function () {
-	return 'Variance';
-};
+
 morpheus.MAD = function (list, median) {
 	if (median == null) {
 		median = morpheus.Percentile(list, 50);
@@ -268,7 +277,7 @@ morpheus.MAD = function (list, median) {
 	var r = morpheus.Percentile(new morpheus.Vector('', temp.length)
 	.setArray(temp), 50);
 	return 1.4826 * r;
-}; 
+};
 morpheus.MAD.toString = function () {
 	return 'Median absolute deviation';
 };

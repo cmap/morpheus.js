@@ -5,7 +5,7 @@ morpheus.XlsxDatasetReader.prototype = {
 		var _this = this;
 		var name = morpheus.Util.getBaseFileName(morpheus.Util
 				.getFileName(fileOrUrl));
-		morpheus.BufferedReader.getArrayBuffer(fileOrUrl, function(err,
+		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function(err,
 				arrayBuffer) {
 			if (err) {
 				callback(err);

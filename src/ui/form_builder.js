@@ -144,31 +144,6 @@ morpheus.FormBuilder.showInDraggableDiv = function (options) {
 	return $div;
 };
 
-morpheus.FormBuilder.promptForDataset = function (cb) {
-	var formBuilder = new morpheus.FormBuilder();
-	formBuilder.append({
-		name: 'file',
-		value: '',
-		type: 'file',
-		required: true,
-		help: morpheus.DatasetUtil.DATASET_FILE_FORMATS
-	});
-	var $modal;
-	formBuilder.on('change', function (e) {
-		var value = e.value;
-		if (value !== '' && value != null) {
-			$modal.modal('hide');
-			$modal.remove();
-			cb(value);
-		}
-	});
-	$modal = morpheus.FormBuilder.showInModal({
-		title: 'Dataset',
-		html: formBuilder.$form,
-		close: false
-	});
-};
-
 morpheus.FormBuilder.showMessageModal = function (options) {
 	var $div = morpheus.FormBuilder
 	._showInModal({

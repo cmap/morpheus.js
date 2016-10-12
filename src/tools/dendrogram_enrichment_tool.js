@@ -54,7 +54,7 @@ morpheus.DendrogramEnrichmentTool.prototype = {
 		var nvalues = values.length;
 		var N = vector.size();
 
-		morpheus.AbstractDendrogram.dfs(dendrogram.tree.rootNode,
+		morpheus.DendrogramUtil.dfs(dendrogram.tree.rootNode,
 				function(node) {
 					delete node.info;
 					var valueToCount = new morpheus.Map();

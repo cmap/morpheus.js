@@ -47,7 +47,7 @@ morpheus.OpenDendrogramTool.prototype = {
 					if (isColumns) {
 						dataset = morpheus.DatasetUtil.transposedView(dataset);
 					}
-					var tree = morpheus.AbstractDendrogram.parseNewick(text);
+					var tree = morpheus.DendrogramUtil.parseNewick(text);
 					if (tree.leafNodes.length !== dataset.getRowCount()) {
 						throw new Error('# leaf nodes in dendrogram '
 								+ tree.leafNodes.length + ' != '

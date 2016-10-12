@@ -88,6 +88,13 @@ morpheus.HeatMapOptions = function (controller) {
 			value: controller.heatmap.isDrawGrid()
 		},
 		{
+			name: 'grid_thickness',
+			required: true,
+			type: 'text',
+			col: 'col-xs-4',
+			value: morpheus.Util.nf(controller.heatmap.getGridThickness())
+		},
+		{
 			name: 'row_size',
 			required: true,
 			type: 'text',
@@ -158,7 +165,9 @@ morpheus.HeatMapOptions = function (controller) {
 		displayFormBuilder.append(item);
 	});
 	var colorSchemeChooser = new morpheus.HeatMapColorSchemeChooser({
-		showRelative: true
+		showRelative: true,
+		colorScheme: controller.heatmap
+		.getColorScheme()
 	});
 	var updatingSizer = false;
 	colorSchemeChooser.on('change', function () {
@@ -263,8 +272,10 @@ morpheus.HeatMapOptions = function (controller) {
 	var $displayDiv = $('<div class="tab-pane" id="' + displayOptionsTabId
 		+ '"></div>');
 	$displayDiv.append($(displayFormBuilder.$form));
+	displayFormBuilder.setEnabled('grid_thickness', controller.heatmap.isDrawGrid());
 	displayFormBuilder.$form.find('[name=show_grid]').on('click', function (e) {
 		var grid = $(this).prop('checked');
+		displayFormBuilder.setEnabled('grid_thickness', grid);
 		controller.heatmap.setDrawGrid(grid);
 		controller.revalidate();
 		colorSchemeChooser.restoreCurrentValue();
@@ -273,13 +284,28 @@ morpheus.HeatMapOptions = function (controller) {
 		function (e) {
 			controller.options.inlineTooltip = $(this).prop('checked');
 		});
+
+	displayFormBuilder.$form.find('[name=grid_thickness]').on(
+		'keyup',
+		_.debounce(function (e) {
+			var value = parseFloat($(this).val());
+			if (!isNaN(value)) {
+				controller.heatmap.setGridThickness(value);
+				controller.heatmap.setInvalid(true);
+				controller.heatmap.repaint();
+			}
+		}, 100));
+
 	displayFormBuilder.$form.find('[name=row_size]').on(
 		'keyup',
 		_.debounce(function (e) {
-			controller.heatmap.getRowPositions().setSize(
-				parseFloat($(this).val()));
-			controller.revalidate();
-			colorSchemeChooser.restoreCurrentValue();
+			var value = parseFloat($(this).val());
+			if (!isNaN(value)) {
+				controller.heatmap.getRowPositions().setSize(
+					value);
+				controller.revalidate();
+				colorSchemeChooser.restoreCurrentValue();
+			}
 
 		}, 100));
 	displayFormBuilder.$form.find('[name=info_window]').on('change',
@@ -298,7 +324,6 @@ morpheus.HeatMapOptions = function (controller) {
 			.getByName(separateSchemesField)).keys()));
 	}
 
-	colorSchemeChooser.setColorScheme(controller.heatmap.getColorScheme());
 	if (separateSchemesField != null) {
 		colorSchemeChooser.setCurrentValue($colorByValue.val());
 	}
@@ -324,7 +349,7 @@ morpheus.HeatMapOptions = function (controller) {
 		'keyup',
 		_.debounce(function (e) {
 			updatingSizer = true;
-			colorSchemeChooser.colorScheme.getSizer().setMax(
+			colorSchemeChooser.colorScheme.getSizer().setMin(
 				parseFloat($(this).val()));
 			colorSchemeChooser.fireChanged(true);
 			updatingSizer = false;
@@ -482,6 +507,7 @@ morpheus.HeatMapOptions = function (controller) {
 			if (colorByField == '(None)') {
 				colorByField = null;
 			}
+			var colorByValue = null;
 			controller.heatmap.getColorScheme()
 			.setSeparateColorSchemeForRowMetadataField(
 				colorByField);
@@ -496,8 +522,11 @@ morpheus.HeatMapOptions = function (controller) {
 					.getByName(
 						colorByField))
 				.keys()));
+				colorByValue = $colorByValue.val();
+			} else {
+				$colorByValue.html('');
 			}
-			var colorByValue = $colorByValue.val();
+
 			controller.heatmap.getColorScheme().setCurrentValue(
 				colorByValue);
 			colorSchemeChooser.setCurrentValue(colorByValue);
@@ -572,6 +601,9 @@ morpheus.HeatMapOptions = function (controller) {
 		+ '" role="tab" data-toggle="tab">Display</a></li>' + '</ul>');
 	$ul.appendTo($div);
 	$tab.appendTo($div);
+	// set current scheme
+	colorSchemeChooser.setColorScheme(controller.heatmap.getColorScheme());
+	colorSchemeChooser.trigger('change');
 	$ul.find('[role=tab]:eq(1)').tab('show');
 	morpheus.FormBuilder.showInModal({
 		title: 'Options',

@@ -9,26 +9,23 @@
           content="7UY7VcXR28Tpmw6m6fc6wtJJQvar71GKqGojp3HPb4Q"/>
     <title>Morpheus</title>
     <link rel="stylesheet" href="css/morpheus-latest.min.css">
-    <script type="text/javascript" src="js/morpheus-external-latest.js"></script>
+    <script type="text/javascript" src="js/morpheus-external-latest.min.js"></script>
 
     <script>
-        ocpu.seturl("/ocpu/library/morpheusR/R");
+        ocpu.seturl("http://localhost:4021/ocpu/library/morpheusR/R")
     </script>
-    <script src="js/morpheus.js"></script>
-    <script src="js/jsme/jsme.nocache.js"></script>
-    <link href="https://fonts.googleapis.com/css?family=Roboto"
-          rel="stylesheet" type="text/css">
+    <script src="js/morpheus-latest.min.js"></script>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <script type="text/javascript"
             src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs"
             data-app-key="6xq3zgeoago5fhw"></script>
+    <script async src="js/jsme/jsme.nocache.js"></script>
 </head>
 <body>
 <noscript>
     <p>Please enable JavaScript</p>
 </noscript>
 <div id="vis"></div>
-
 <script type="text/javascript">
     morpheus.Util.loadTrackingCode();
     window.onerror = function () {
@@ -72,6 +69,14 @@
     }
 </script>
 
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+        .register('sw.js');
+    }
+
+</script>
 </body>
+
 </html>
 

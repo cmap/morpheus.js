@@ -46,14 +46,14 @@ module.exports = function (grunt) {
 				dest: 'css/morpheus.all.css'
 			},
 			extJsAll: {
-				src: ['js/morpheus-external.js',
+				src: ['js/morpheus-external.min.js',
 					'js/plotly-latest.min.js', 'js/papaparse.min.js'],
-				dest: 'js/morpheus-external-latest.js'
+				dest: 'js/morpheus-external-latest.min.js'
 			},
 			extJs: {
 				nonull: true,
 				dest: 'js/morpheus-external.js',
-				src: ['js/d3.min.js', 'js/jquery-1.11.1.min.js',
+				src: ['js/d3.min.js', 'js/jquery-2.2.4.min.js',
 					'js/bootstrap.min.js', 'js/underscore-min.js',
 					'js/newick.js', 'js/hammer.min.js',
 					'js/jquery.mousewheel.min.js',
@@ -68,7 +68,7 @@ module.exports = function (grunt) {
 					'js/clipboard.min.js', 'js/slick.min.js',
 					'js/js.cookie.js', 'js/d3.layout.cloud.js',
 					'js/long.js', 'js/bytebuffer.js', 'js/protobuf.js',
-					'js/opencpu-0.5.js', 'js/FileSaver.min.js']
+					'js/opencpu-0.5.js']
 			},
 			morpheus: {
 				nonull: true,
@@ -76,7 +76,7 @@ module.exports = function (grunt) {
 				src: ['src/util/util.js', 'src/util/*.js',
 					'src/io/*.js', 'src/matrix/vector_adapter.js',
 					'src/matrix/*.js', 'src/*.js',
-					'src/tools/*.js', 'src/ui/*.js', 'src/**/*.js']
+					'src/tools/*.js', 'src/ui/*.js', 'src/**/*.js', 'js/tsne.js']
 			}
 		},
 		watch: {

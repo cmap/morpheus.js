@@ -1,4 +1,4 @@
-morpheus.Divider = function(vertical) {
+morpheus.Divider = function (vertical) {
 	morpheus.AbstractCanvas.call(this, false);
 	this.vertical = vertical;
 	var that = this;
@@ -7,49 +7,50 @@ morpheus.Divider = function(vertical) {
 
 	if (vertical) {
 		this.setBounds({
-			height : 15,
-			width : 4
+			height: 15,
+			width: 4
 		});
 
 	} else {
 		this.setBounds({
-			height : 4,
-			width : 15
+			height: 4,
+			width: 15
 		});
 	}
-	this.hammer = morpheus.Util.hammer(canvas, [ 'pan' ]).on('panstart',
-			function(event) {
-				that.trigger('resizeStart');
-				morpheus.CanvasUtil.dragging = true;
-			}).on('panmove', function(event) {
-				if (that.vertical) {
-					that.trigger('resize', {
-						delta : event.deltaX
-					});
-				} else {
-					that.trigger('resize', {
-						delta : event.deltaY
-					});
-				}
-			}).on('panend', function(event) {
-				morpheus.CanvasUtil.dragging = false;
-				that.trigger('resizeEnd');
+	this.hammer = morpheus.Util.hammer(canvas, ['pan']).on('panstart',
+		this.panstart = function (event) {
+			that.trigger('resizeStart');
+			morpheus.CanvasUtil.dragging = true;
+		}).on('panmove', this.panmove = function (event) {
+		if (that.vertical) {
+			that.trigger('resize', {
+				delta: event.deltaX
 			});
+		} else {
+			that.trigger('resize', {
+				delta: event.deltaY
+			});
+		}
+	}).on('panend', this.panend = function (event) {
+		morpheus.CanvasUtil.dragging = false;
+		that.trigger('resizeEnd');
+	});
 	this.paint();
 
 };
 morpheus.Divider.prototype = {
-	dispose : function() {
+	dispose: function () {
 		morpheus.AbstractCanvas.prototype.dispose.call(this);
+		this.hammer.off('panstart', this.panstart).off('panmove', this.panmove).off('panend', this.panend);
 		this.hammer.destroy();
 	},
-	getPreferredSize : function() {
+	getPreferredSize: function () {
 		return {
-			width : 3,
-			height : this.getUnscaledHeight()
+			width: 3,
+			height: this.getUnscaledHeight()
 		};
 	},
-	draw : function(clip, context) {
+	draw: function (clip, context) {
 		var width = this.getUnscaledWidth();
 		var height = this.getUnscaledHeight();
 		context.clearRect(0, 0, width, height);

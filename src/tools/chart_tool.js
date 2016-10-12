@@ -147,8 +147,6 @@ morpheus.ChartTool = function (chartOptions) {
 
 	function setVisibility() {
 		var chartType = formBuilder.getValue('chart_type');
-		formBuilder.setVisible('group_rows_by', chartType === 'boxplot');
-		formBuilder.setVisible('group_columns_by', chartType === 'boxplot');
 		if (chartType !== 'boxplot') {
 			formBuilder.setOptions('axis_label',
 				(chartType === 'row scatter matrix' || chartType === 'column profile') ? rowOptions : columnOptions,
@@ -164,7 +162,11 @@ morpheus.ChartTool = function (chartOptions) {
 			formBuilder.setOptions('color', options, true);
 			formBuilder.setOptions('size', numericOptions, true);
 		}
-		formBuilder.setVisible('axis_label', chartType !== 'boxplot');
+		formBuilder.setVisible('group_rows_by', (chartType === 'boxplot' || chartType === 'histogram' || chartType === 'ecdf'));
+		formBuilder.setVisible('group_columns_by', (chartType === 'boxplot' || chartType === 'histogram' || chartType === 'ecdf'));
+		formBuilder.setVisible('color', chartType !== 'histogram');
+		formBuilder.setVisible('size', chartType !== 'histogram' && chartType !== 'ecdf');
+		formBuilder.setVisible('axis_label', (chartType !== 'boxplot' && chartType !== 'histogram' && chartType !== 'ecdf'));
 
 	}
 
@@ -208,6 +210,7 @@ morpheus.ChartTool = function (chartOptions) {
 	formBuilder.$form.appendTo($configPane);
 	this.$el.appendTo($dialog);
 	$dialog.dialog({
+		dialogClass: 'morpheus',
 		close: function (event, ui) {
 			project.off('trackChanged.chart', trackChanged);
 			project.getRowSelectionModel().off('selectionChanged.chart', draw);
@@ -312,7 +315,7 @@ morpheus.ChartTool.prototype = {
 			okCallback: function () {
 				var dataset = options.dataset;
 				var eventData = options.eventData;
-				var array = options.array;2
+				var array = options.array;
 				var value = formBuilder.getValue('annotation_value');
 				var annotationName = formBuilder
 				.getValue('annotation_name');
@@ -625,6 +628,75 @@ morpheus.ChartTool.prototype = {
 			_this.$dialog.off('dialogresize');
 		});
 
+	},
+
+	_createHistogram: function (options) {
+		var array = options.array; // array of items
+		var myPlot = options.myPlot;
+		var dataset = options.dataset;
+		var x = [];
+		for (var k = 0, nitems = array.length; k < nitems; k++) {
+			var item = array[k];
+			x.push(dataset.getValue(item.row, item.column));
+		}
+		var traces = [{
+			name: '',
+			x: x,
+			type: 'histogram',
+			histnorm: 'probability density'
+		}];
+
+		var selection = null;
+		var _this = this;
+
+		Plotly.newPlot(myPlot, traces, options.layout, options.config);
+		// myPlot.on('plotly_selected', function (eventData) {
+		// 	selection = eventData;
+		// });
+	},
+	_createEcdf: function (options) {
+		var array = options.array; // array of items
+		var myPlot = options.myPlot;
+		var dataset = options.dataset;
+		var colorByVector = options.colorByVector;
+		var colorByGetter = options.colorByGetter;
+		var colorModel = options.colorModel;
+		var traces = [];
+		// split by color by value
+
+		var colorByValueToArray = new morpheus.Map();
+		for (var k = 0, nitems = array.length; k < nitems; k++) {
+			var item = array[k];
+			var val = dataset.getValue(item.row, item.column);
+			if (!isNaN(val)) {
+				var colorByValue = colorByVector !== null ? colorByGetter(item) : '';
+				var traceArray = colorByValueToArray.get(colorByValue);
+				if (traceArray === undefined) {
+					traceArray = [];
+					colorByValueToArray.set(colorByValue, traceArray);
+				}
+				traceArray.push(val);
+			}
+		}
+		var traces = [];
+		colorByValueToArray.forEach(function (traceArray, colorByValue) {
+			var y = [];
+			var x = [];
+			// FIXME
+			traces.push({
+				name: colorByValue,
+				x: x,
+				y: y,
+				type: 'line'
+			});
+		});
+		var selection = null;
+		var _this = this;
+
+		Plotly.newPlot(myPlot, traces, options.layout, options.config);
+		// myPlot.on('plotly_selected', function (eventData) {
+		// 	selection = eventData;
+		// });
 	},
 	_createBoxPlot: function (options) {
 		var array = options.array; // array of items
@@ -959,7 +1031,7 @@ morpheus.ChartTool.prototype = {
 					}
 				}
 			}
-		} else if (chartType === 'boxplot') {
+		} else if (chartType === 'boxplot' || chartType === 'histogram') {
 			for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
 				for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
 					items.push({
@@ -1106,7 +1178,6 @@ morpheus.ChartTool.prototype = {
 					var array = grid[i][j];
 					var columnId = columnIds[j];
 					if (array) {
-
 						var $chart = $('<div style="width:' + chartWidth
 							+ 'px;height:' + chartHeight
 							+ 'px;position:absolute;left:' + (j * chartWidth)
@@ -1135,6 +1206,27 @@ morpheus.ChartTool.prototype = {
 								colorModel: colorModel,
 								colorByVector: colorByVector,
 								colorByGetter: colorByGetter,
+								myPlot: myPlot,
+								dataset: dataset,
+								config: config
+							});
+						} else if (chartType == 'histogram') {
+							this._createHistogram({
+								layout: $.extend(true, {}, layout, {
+									width: chartWidth,
+									height: chartHeight,
+									yaxis: {
+										title: rowId,
+									},
+									xaxis: {
+										title: columnId,
+										showticklabels: false
+									}
+								}),
+								colorModel: colorModel,
+								colorByVector: colorByVector,
+								colorByGetter: colorByGetter,
+								array: array,
 								myPlot: myPlot,
 								dataset: dataset,
 								config: config

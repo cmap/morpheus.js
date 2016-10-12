@@ -139,10 +139,10 @@ morpheus.HeatMapTooltipProvider._matrixValueToString = function (dataset,
 																 showSeriesNameInTooltip) {
 	var val = dataset.getValue(rowIndex, columnIndex, seriesIndex);
 	if (val != null) {
+
 		if (val.toObject || !_.isNumber(val)) {
 			var obj = val.toObject ? val.toObject() : val;
-			var keys = _.keys(obj);
-			if (keys.length === 0) {
+			if (morpheus.Util.isArray(obj)) {
 				var v = morpheus.Util.toString(obj);
 				if (tipText.length > 0) {
 					tipText.push(separator);
@@ -155,27 +155,41 @@ morpheus.HeatMapTooltipProvider._matrixValueToString = function (dataset,
 				tipText.push(v);
 				tipText.push('</b>');
 			} else {
-				for (var i = 0, nkeys = keys.length; i < nkeys; i++) {
-					var key = keys[i];
-					if (key !== '__v') { // special value key
-						var objVal = obj[key];
-						var v;
-						if (morpheus.Util.isArray(objVal)) {
-							v = morpheus.Util.arrayToString(objVal, ', ');
-						} else {
-							v = morpheus.Util.toString(objVal);
+				var keys = _.keys(obj);
+				if (keys.length === 0) {
+					var v = morpheus.Util.toString(obj);
+					if (tipText.length > 0) {
+						tipText.push(separator);
+					}
+					if (showSeriesNameInTooltip) {
+						tipText.push(dataset.getName(seriesIndex));
+						tipText.push(': ');
+					}
+					tipText.push('<b>');
+					tipText.push(v);
+					tipText.push('</b>');
+				} else {
+					for (var i = 0, nkeys = keys.length; i < nkeys; i++) {
+						var key = keys[i];
+						if (key !== '__v') { // special value key
+							var objVal = obj[key];
+							var v;
+							if (morpheus.Util.isArray(objVal)) {
+								v = morpheus.Util.arrayToString(objVal, ', ');
+							} else {
+								v = morpheus.Util.toString(objVal);
+							}
+							if (tipText.length > 0) {
+								tipText.push(separator);
+							}
+							tipText.push(key);
+							tipText.push(': <b>');
+							tipText.push(v);
+							tipText.push('</b>');
 						}
-						if (tipText.length > 0) {
-							tipText.push(separator);
-						}
-						tipText.push(key);
-						tipText.push(': <b>');
-						tipText.push(v);
-						tipText.push('</b>');
 					}
 				}
 			}
-
 		} else {
 			if (tipText.length > 0) {
 				tipText.push(separator);

@@ -186,7 +186,7 @@ morpheus.PcaPlotTool = function (chartOptions) {
 
         resizable: true,
         height: 600,
-        width: 900
+        width: 950
     });
     this.$dialog = $dialog;
 

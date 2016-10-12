@@ -12,6 +12,9 @@ morpheus.VectorKeys.HEADER_SUMMARY = 'morpheus.headerSummary';
 /** Key indicating to show header summary */
 morpheus.VectorKeys.SHOW_HEADER_SUMMARY = 'morpheus.showHeaderSummary';
 
+/** Project that vector belongs to*/
+morpheus.VectorKeys.PROJECT = 'morpheus.project';
+
 morpheus.VectorKeys.TITLE = 'morpheus.title';
 /** Function to compute vector value */
 morpheus.VectorKeys.FUNCTION = 'morpheus.function';
@@ -21,5 +24,6 @@ morpheus.VectorKeys.RECOMPUTE_FUNCTION = 'morpheus.recompute.function';
 
 morpheus.VectorKeys.COPY_IGNORE = new morpheus.Set();
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.HEADER_SUMMARY);
+morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.PROJECT);
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.DATA_TYPE);
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.VALUE_TO_INDICES);

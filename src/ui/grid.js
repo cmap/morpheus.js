@@ -34,6 +34,7 @@ morpheus.Grid = function (options) {
 		multiColumnSort: true,
 		multiSelect: false,
 		topPanelHeight: 0,
+		enableColumnReorder: false,
 		enableTextSelectionOnCells: true,
 		forceFitColumns: true,
 		dataItemColumnValueExtractor: getItemColumnValue,

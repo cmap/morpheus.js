@@ -23,7 +23,7 @@ morpheus.AnnotateDendrogramTool.prototype = {
 		var dendrogram = isColumns ? controller.columnDendrogram
 				: controller.rowDendrogram;
 		var nameToNode = new morpheus.Map();
-		morpheus.AbstractDendrogram.dfs(dendrogram.tree.rootNode,
+		morpheus.DendrogramUtil.dfs(dendrogram.tree.rootNode,
 				function(node) {
 					nameToNode.set(node.name, node);
 					return true;

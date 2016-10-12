@@ -26,7 +26,7 @@ morpheus.TransposeTool.prototype = {
 		// if (controller.columnDendrogram != null) {
 		// var indices = project.getColumnSelectionModel().getViewIndices()
 		// .toArray();
-		// morpheus.AbstractDendrogram.leastCommonAncestor();
+		// morpheus.DendrogramUtil.leastCommonAncestor();
 		// }
 		// if (controller.rowDendrogram != null) {
 		//

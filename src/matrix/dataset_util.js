@@ -63,23 +63,19 @@ morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
 	return datasetReader;
 };
 
-morpheus.DatasetUtil.readDatasetArray = function (options) {
+morpheus.DatasetUtil.readDatasetArray = function (datasets) {
 	var retDef = $.Deferred();
 	var loadedDatasets = [];
 	var promises = [];
-	_.each(options.dataset, function (option, i) {
-		var p = option.dataset.file ? morpheus.DatasetUtil.read(
-			option.dataset.file, option.dataset.options)
-			: morpheus.DatasetUtil.read(option.dataset);
+	_.each(datasets, function (url, i) {
+		var p = morpheus.DatasetUtil.read(url);
 		p.index = i;
 		p.done(function (dataset) {
 			loadedDatasets[this.index] = dataset;
 		});
 		p.fail(function (err) {
-			var message = ['Error opening '
-			+ (option.dataset.file ? morpheus.Util
-			.getFileName(option.dataset.file) : morpheus.Util
-			.getFileName(option.dataset)) + '.'];
+			var message = ['Error opening ' + morpheus.Util
+				.getFileName(url) + '.'];
 			if (err.message) {
 				message.push('<br />Cause: ');
 				message.push(err.message);
@@ -94,11 +90,11 @@ morpheus.DatasetUtil.readDatasetArray = function (options) {
 	}
 
 	$.when
-	.apply($, promises)
-	.then(
-		function () {
-			retDef.resolve(morpheus.DatasetUtil.join(loadedDatasets, 'id'));
-		});
+		.apply($, promises)
+		.then(
+			function () {
+				retDef.resolve(morpheus.DatasetUtil.join(loadedDatasets, 'id'));
+			});
 	return retDef;
 };
 /**
@@ -171,8 +167,13 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 	var isFile = fileOrUrl instanceof File;
 	var isString = _.isString(fileOrUrl);
 	var ext = options && options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
-	var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
-
+	var datasetReader;
+	var str = fileOrUrl.toString();
+	if (ext === '' && str != null && str.indexOf('blob:') === 0) {
+		datasetReader = new morpheus.TxtReader(); // copy from clipboard
+	} else {
+		datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
+	}
 	if (isString || isFile) { // URL or file
 		var deferred = $.Deferred();
 		// override toString so can determine file name
@@ -188,11 +189,10 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 				+ 'datasetReader.read(e.data.fileOrUrl, function(err,dataset) {'
 				+ '	self.postMessage(dataset);' + '	});' + '}']);
 
-			// Obtain a blob URL reference to our worker 'file'.
+
 			var blobURL = window.URL.createObjectURL(blob);
-			var worker = new Worker(blobURL); // blobURL);
+			var worker = new Worker(blobURL);
 			worker.addEventListener('message', function (e) {
-				// wrap in dataset object
 				deferred.resolve(morpheus.Dataset.fromJson(e.data));
 				window.URL.revokeObjectURL(blobURL);
 			}, false);
@@ -209,8 +209,8 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 					deferred.reject(err);
 				} else {
 					deferred.resolve(dataset);
+					morpheus.DatasetUtil.toESSession(dataset);
 				}
-
 			});
 
 		}
@@ -412,11 +412,11 @@ morpheus.DatasetUtil.getSeriesNames = function (dataset) {
 	for (var i = 0, nseries = dataset.getSeriesCount(); i < nseries; i++) {
 		names.push(dataset.getName(i));
 	}
-	names.sort(function (a, b) {
-		a = a.toLowerCase();
-		b = b.toLowerCase();
-		return (a < b ? -1 : (a === b ? 0 : 1));
-	});
+	// names.sort(function (a, b) {
+	// 	a = a.toLowerCase();
+	// 	b = b.toLowerCase();
+	// 	return (a < b ? -1 : (a === b ? 0 : 1));
+	// });
 	return names;
 };
 
@@ -692,10 +692,14 @@ morpheus.DatasetUtil.fill = function (dataset, value, seriesIndex) {
 };
 
 morpheus.DatasetUtil.join = function (datasets, field) {
+	if (datasets.length === 0) {
+		throw 'No datasets';
+	}
 	if (datasets.length === 1) {
 		datasets[0].getRowMetadata().add('Source').setValue(0, datasets[0].getName());
 		return datasets[0];
 	}
+	// take union of all ids
 	var ids = new morpheus.Set();
 	for (var i = 0; i < datasets.length; i++) {
 		var idVector = datasets[i].getColumnMetadata().getByName(field);
@@ -705,7 +709,8 @@ morpheus.DatasetUtil.join = function (datasets, field) {
 	}
 	var dummyDataset = new morpheus.Dataset({
 		rows: 0,
-		columns: ids.size()
+		columns: ids.size(),
+		name: datasets[0].getName()
 	});
 	var dummyIdVector = dummyDataset.getColumnMetadata().add(field);
 	var counter = 0;

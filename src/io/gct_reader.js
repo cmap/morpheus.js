@@ -7,16 +7,34 @@ morpheus.GctReader.prototype = {
 		return 'gct';
 	},
 	read: function (fileOrUrl, callback) {
+		var _this = this;
 		if (fileOrUrl instanceof File) {
 			this._readChunking(fileOrUrl, callback, false);
 		} else {
-			this._readNoChunking(fileOrUrl, callback);
+			// this._readChunking(fileOrUrl, callback, true);
+			// XXX only do byte range requests from S3
+			if (fileOrUrl.indexOf('s3.amazonaws.com') !== -1) {
+				$.ajax({
+					url: fileOrUrl,
+					method: 'HEAD'
+				}).done(function (data, textStatus, jqXHR) {
+					if ('gzip' === jqXHR.getResponseHeader('Content-Encoding')) {
+						_this._readNoChunking(fileOrUrl, callback);
+					} else {
+						_this._readChunking(fileOrUrl, callback, false);
+					}
+				}).fail(function () {
+					_this._readNoChunking(fileOrUrl, callback);
+				});
+			} else {
+				_this._readNoChunking(fileOrUrl, callback);
+			}
 		}
 	},
-	_readChunking: function (fileOrUrl, callback, tryNoChunkIfError) {
+	_readChunking: function (fileOrUrl, callback, useFetch) {
 		var _this = this;
 		// Papa.LocalChunkSize = 10485760 * 10; // 100 MB
-		// Papa.RemoteChunkSize = 10485760 * 10; // 100 MB
+		//Papa.RemoteChunkSize = 10485760 / 2; // 10485760 = 10MB
 		var lineNumber = 0;
 		var version;
 		var numRowAnnotations = 1; // in addition to row id
@@ -34,7 +52,112 @@ morpheus.GctReader.prototype = {
 		var columnIdFieldName = 'id';
 		var rowIdFieldName = 'id';
 		var columnNamesArray;
-		Papa.parse(fileOrUrl, {
+
+		var handleTokens = function (tokens) {
+
+			if (lineNumber === 0) {
+				var text = tokens[0].trim();
+				if ('#1.2' === text) {
+					version = 2;
+				} else if ('#1.3' === text) {
+					version = 3;
+				} else {
+					console.log('Unknown version: assuming version 2');
+				}
+			} else if (lineNumber === 1) {
+				var dimensions = tokens;
+				if (version === 3) {
+					if (dimensions.length >= 4) {
+						nrows = parseInt(dimensions[0]);
+						ncols = parseInt(dimensions[1]);
+						numRowAnnotations = parseInt(dimensions[2]);
+						numColumnAnnotations = parseInt(dimensions[3]);
+					} else { // no dimensions specified
+						numRowAnnotations = parseInt(dimensions[0]);
+						numColumnAnnotations = parseInt(dimensions[1]);
+					}
+				} else {
+					nrows = parseInt(dimensions[0]);
+					ncols = parseInt(dimensions[1]);
+					if (nrows <= 0 || ncols <= 0) {
+						callback(
+							'Number of rows and columns must be greater than 0.');
+					}
+				}
+				dataColumnStart = numRowAnnotations + 1;
+			} else if (lineNumber === 2) {
+				columnNamesArray = tokens;
+				for (var i = 0; i < columnNamesArray.length; i++) {
+					columnNamesArray[i] = morpheus.Util.copyString(columnNamesArray[i]);
+				}
+				if (ncols === -1) {
+					ncols = columnNamesArray.length - numRowAnnotations - 1;
+				}
+				if (version == 2) {
+					var expectedColumns = ncols + 2;
+					if (columnNamesArray.length !== expectedColumns) {
+						callback('Expected ' + (expectedColumns - 2)
+							+ ' column names, but read '
+							+ (columnNamesArray.length - 2) + ' column names.');
+					}
+				}
+				var name = columnNamesArray[0];
+				var slashIndex = name.lastIndexOf('/');
+
+				if (slashIndex != -1 && slashIndex < (name.length - 1)) {
+					rowIdFieldName = name.substring(0, slashIndex);
+					columnIdFieldName = name.substring(slashIndex + 1);
+				}
+				rowMetadataNames.push(rowIdFieldName);
+				columnMetadataNames.push(columnIdFieldName);
+				for (var j = 0; j < ncols; j++) {
+					var index = j + numRowAnnotations + 1;
+					var columnName = index < columnNamesArray.length ? columnNamesArray[index]
+						: null;
+					columnMetadata[0].push(morpheus.Util.copyString(columnName));
+				}
+
+				for (var j = 0; j < numRowAnnotations; j++) {
+					var rowMetadataName = '' === columnNamesArray[1] ? 'description'
+						: columnNamesArray[j + 1];
+					rowMetadataNames.push(
+						rowMetadataName);
+					rowMetadata.push([]);
+				}
+				dataMatrixLineNumberStart = 3 + numColumnAnnotations;
+			} else { // lines >=3
+				if (lineNumber < dataMatrixLineNumberStart) {
+					var metadataName = morpheus.Util.copyString(tokens[0]);
+					var v = [];
+					columnMetadata.push(v);
+					columnMetadataNames.push(metadataName);
+					for (var j = 0; j < ncols; j++) {
+						v.push(morpheus.Util.copyString(tokens[j + dataColumnStart]));
+					}
+				} else { // data lines
+					if (tokens[0] !== '') {
+						var array = new Float32Array(ncols);
+						matrix.push(array);
+						// we iterate to numRowAnnotations + 1 to include id row
+						// metadata field
+						for (var rowAnnotationIndex = 0; rowAnnotationIndex <= numRowAnnotations; rowAnnotationIndex++) {
+							var rowMetadataValue = tokens[rowAnnotationIndex];
+							rowMetadata[rowAnnotationIndex].push(
+								morpheus.Util.copyString(rowMetadataValue));
+
+						}
+
+						for (var columnIndex = 0; columnIndex < ncols; columnIndex++) {
+							var token = tokens[columnIndex + dataColumnStart];
+							array[columnIndex] = parseFloat(token);
+						}
+					}
+				}
+			}
+			lineNumber++;
+
+		};
+		(useFetch ? morpheus.BufferedReader : Papa).parse(fileOrUrl, {
 			delimiter: "\t",	// auto-detect
 			newline: "",	// auto-detect
 			header: false,
@@ -44,108 +167,7 @@ morpheus.GctReader.prototype = {
 			worker: false,
 			comments: false,
 			step: function (result) {
-				if (lineNumber === 0) {
-					var text = result.data[0][0].trim();
-					if ('#1.2' === text) {
-						version = 2;
-					} else if ('#1.3' === text) {
-						version = 3;
-					} else {
-						console.log('Unknown version: assuming version 2');
-					}
-				} else if (lineNumber === 1) {
-					var dimensions = result.data[0];
-					if (version === 3) {
-						if (dimensions.length >= 4) {
-							nrows = parseInt(dimensions[0]);
-							ncols = parseInt(dimensions[1]);
-							numRowAnnotations = parseInt(dimensions[2]);
-							numColumnAnnotations = parseInt(dimensions[3]);
-						} else { // no dimensions specified
-							numRowAnnotations = parseInt(dimensions[0]);
-							numColumnAnnotations = parseInt(dimensions[1]);
-						}
-					} else {
-						nrows = parseInt(dimensions[0]);
-						ncols = parseInt(dimensions[1]);
-						if (nrows <= 0 || ncols <= 0) {
-							callback(
-								'Number of rows and columns must be greater than 0.');
-						}
-					}
-					dataColumnStart = numRowAnnotations + 1;
-				} else if (lineNumber === 2) {
-					columnNamesArray = result.data[0];
-					for (var i = 0; i < columnNamesArray.length; i++) {
-						columnNamesArray[i] = morpheus.Util.copyString(columnNamesArray[i]);
-					}
-					if (ncols === -1) {
-						ncols = columnNamesArray.length - numRowAnnotations - 1;
-					}
-					if (version == 2) {
-						var expectedColumns = ncols + 2;
-						if (columnNamesArray.length !== expectedColumns) {
-							callback('Expected ' + (expectedColumns - 2)
-								+ ' column names, but read '
-								+ (columnNamesArray.length - 2) + ' column names.');
-						}
-					}
-					var name = columnNamesArray[0];
-					var slashIndex = name.lastIndexOf('/');
-
-					if (slashIndex != -1 && slashIndex < (name.length - 1)) {
-						rowIdFieldName = name.substring(0, slashIndex);
-						columnIdFieldName = name.substring(slashIndex + 1);
-					}
-					rowMetadataNames.push(rowIdFieldName);
-					columnMetadataNames.push(columnIdFieldName);
-					for (var j = 0; j < ncols; j++) {
-						var index = j + numRowAnnotations + 1;
-						var columnName = index < columnNamesArray.length ? columnNamesArray[index]
-							: null;
-						columnMetadata[0].push(morpheus.Util.copyString(columnName));
-					}
-
-					for (var j = 0; j < numRowAnnotations; j++) {
-						var rowMetadataName = '' === columnNamesArray[1] ? 'description'
-							: columnNamesArray[j + 1];
-						rowMetadataNames.push(
-							rowMetadataName);
-						rowMetadata.push([]);
-					}
-					dataMatrixLineNumberStart = 3 + numColumnAnnotations;
-				} else { // lines >=3
-					var tokens = result.data[0];
-					if (lineNumber < dataMatrixLineNumberStart) {
-						var metadataName = morpheus.Util.copyString(tokens[0]);
-						var v = [];
-						columnMetadata.push(v);
-						columnMetadataNames.push(metadataName);
-						for (var j = 0; j < ncols; j++) {
-							v.push(morpheus.Util.copyString(tokens[j + dataColumnStart]));
-						}
-					} else { // data lines
-						if (tokens[0] !== '') {
-							var array = new Float32Array(ncols);
-							matrix.push(array);
-							// we iterate to numRowAnnotations + 1 to include id row
-							// metadata field
-							for (var rowAnnotationIndex = 0; rowAnnotationIndex <= numRowAnnotations; rowAnnotationIndex++) {
-								var rowMetadataValue = tokens[rowAnnotationIndex];
-								rowMetadata[rowAnnotationIndex].push(
-									morpheus.Util.copyString(rowMetadataValue));
-
-							}
-
-							for (var columnIndex = 0; columnIndex < ncols; columnIndex++) {
-								var token = tokens[columnIndex + dataColumnStart];
-								array[columnIndex] = parseFloat(token);
-							}
-						}
-					}
-				}
-				lineNumber++;
-
+				handleTokens(result.data[0]);
 			},
 			complete: function () {
 				var dataset = new morpheus.Dataset({
@@ -184,7 +206,7 @@ morpheus.GctReader.prototype = {
 	},
 	_read: function (datasetName, reader) {
 		var tab = /\t/;
-		var versionLine = $.trim(reader.readLine());
+		var versionLine = morpheus.Util.copyString(reader.readLine().trim());
 		if (versionLine === '') {
 			throw new Error('Missing version line');
 		}
@@ -196,7 +218,7 @@ morpheus.GctReader.prototype = {
 		} else {
 			console.log('Unknown version: assuming version 2');
 		}
-		var dimensionsLine = reader.readLine();
+		var dimensionsLine = morpheus.Util.copyString(reader.readLine());
 		if (dimensionsLine == null) {
 			throw new Error('No dimensions specified');
 		}
@@ -224,7 +246,7 @@ morpheus.GctReader.prototype = {
 					'Number of rows and columns must be greater than 0.');
 			}
 		}
-		var columnNamesLine = reader.readLine();
+		var columnNamesLine = morpheus.Util.copyString(reader.readLine());
 		if (columnNamesLine == null) {
 			throw new Error('No column annotations');
 		}
@@ -383,7 +405,6 @@ morpheus.GctReader.prototype = {
 
 			var nonEmptyDescriptionFound = false;
 			var numRowAnnotationsPlusOne = numRowAnnotations + 1;
-
 			for (var rowIndex = 0, nrows = dataset.getRowCount(); rowIndex < nrows; rowIndex++) {
 				var s = reader.readLine();
 				if (s === null) {
@@ -433,29 +454,29 @@ morpheus.GctReader.prototype = {
 				1);
 			return dataset;
 		}
-
 	},
 	_readNoChunking: function (fileOrUrl, callback) {
 		var _this = this;
 		var name = morpheus.Util.getBaseFileName(morpheus.Util
 		.getFileName(fileOrUrl));
-		morpheus.BufferedReader.getArrayBuffer(fileOrUrl, function (err,
-																	arrayBuffer) {
+		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
+																	   arrayBuffer) {
 			if (err) {
 				callback(err);
 			} else {
-				try {
-					callback(null, _this._read(name,
-						new morpheus.BufferedReader(new Uint8Array(
-							arrayBuffer))));
-				} catch (x) {
-					if (x.stack) {
-						console.log(x.stack);
-					}
-					callback(x);
-				}
+				callback(null, _this._read(name,
+					new morpheus.ArrayBufferReader(new Uint8Array(
+						arrayBuffer))));
 			}
 		});
+		// $.ajax({
+		// 	url: fileOrUrl,
+		// 	dataType: 'text'
+		// }).done(function (text) {
+		// 	callback(null, _this.read(name, new morpheus.StringReader(text)));
+		// }).fail(function (err) {
+		// 	callback(err);
+		// });
 
 	}
 };
