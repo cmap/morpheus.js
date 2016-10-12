@@ -925,8 +925,6 @@ morpheus.DatasetUtil.toESSession = function (dataset) {
 			}]
 		}
 	};
-
-	console.log(messageJSON);
 	ProtoBuf = dcodeIO.ProtoBuf;
 	ProtoBuf.protoFromFile("./message.proto", function (error, success) {
 			if (error) {

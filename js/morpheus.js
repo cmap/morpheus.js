@@ -5960,8 +5960,6 @@ morpheus.DatasetUtil.toESSession = function (dataset) {
 			}]
 		}
 	};
-
-	console.log(messageJSON);
 	ProtoBuf = dcodeIO.ProtoBuf;
 	ProtoBuf.protoFromFile("./message.proto", function (error, success) {
 			if (error) {
@@ -7755,7 +7753,9 @@ morpheus.Project.prototype = {
 		this.rowSelectionModel.clear();
 		this.elementSelectionModel.clear();
 
-		this.originalDataset.setESSession(morpheus.DatasetUtil.toESSession(dataset));
+		if (this.originalDataset.getESSession()) {
+			this.originalDataset.setESSession(morpheus.DatasetUtil.toESSession(dataset));
+		}
 		if (notify) {
 			this.trigger(morpheus.Project.Events.DATASET_CHANGED);
 		}
@@ -14294,14 +14294,18 @@ morpheus.PcaPlotTool.prototype = {
             console.log(arguments);
             var req = ocpu.call("pcaPlot", arguments, function (session) {
                 console.log(session);
-                console.log(session.txt);
-                var txt = session.txt.split("\n");
-                console.log(txt);
+                session.getObject(function (success) {
+                    var coolUrl = success.substring(5, success.length - 2) + ".embed" + "?" + "link=false";
+                    console.log(coolUrl);
+                    var coolImg = $('<iframe />', {frameborder : "0", seamless : "seamless", scrolling : "yes", src : coolUrl, style : "width:720px;height:540px"});
+                    _this.$chart.prepend(coolImg);
+                });
+                /*var txt = session.txt.split("\n");
                 var imageLocationAr = txt[txt.length - 2].split("/");
                 var imageLocation = session.getLoc() + "files/" + imageLocationAr[imageLocationAr.length - 1];
                 console.log(imageLocation);
                 var img = $('<img />', {src : imageLocation, style : "width:720px;height:540px"});
-                _this.$chart.prepend(img);
+                _this.$chart.prepend(img);*/
                 /*var img = $('<img />', {src : session.getLoc() + 'graphics/1/png', style : "width:720px;height:540px"});*/
 
             });
@@ -26124,13 +26128,19 @@ morpheus.HeatMapToolBar = function (controller) {
 
 	$buttons.on('click', '[name=pca]', function () {
 		console.log("test button clicked");
-		if (!controller.getProject().getFullDataset().getESSession()) {
+		try {
+			if (controller.getProject().getFullDataset().getESSession()) {
+				console.log(controller.getProject());
+				new morpheus.PcaPlotTool({project: controller.getProject()});
+			}
+			else {
+				alert("Not allowed to plot PCA on this dataset's modification");
+			}
+		}
+		catch (e) {
 			alert("Not allowed to plot PCA on this dataset's modification");
+			console.log(controller.getProject());
 		}
-		else {
-			new morpheus.PcaPlotTool({project: controller.getProject()});
-		}
-
 	});
 
 

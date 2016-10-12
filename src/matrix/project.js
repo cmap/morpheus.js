@@ -100,7 +100,9 @@ morpheus.Project.prototype = {
 		this.rowSelectionModel.clear();
 		this.elementSelectionModel.clear();
 
-		this.originalDataset.setESSession(morpheus.DatasetUtil.toESSession(dataset));
+		if (this.originalDataset.getESSession()) {
+			this.originalDataset.setESSession(morpheus.DatasetUtil.toESSession(dataset));
+		}
 		if (notify) {
 			this.trigger(morpheus.Project.Events.DATASET_CHANGED);
 		}

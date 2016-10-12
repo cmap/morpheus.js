@@ -350,14 +350,18 @@ morpheus.PcaPlotTool.prototype = {
             console.log(arguments);
             var req = ocpu.call("pcaPlot", arguments, function (session) {
                 console.log(session);
-                console.log(session.txt);
-                var txt = session.txt.split("\n");
-                console.log(txt);
+                session.getObject(function (success) {
+                    var coolUrl = success.substring(5, success.length - 2) + ".embed" + "?" + "link=false";
+                    console.log(coolUrl);
+                    var coolImg = $('<iframe />', {frameborder : "0", seamless : "seamless", scrolling : "yes", src : coolUrl, style : "width:720px;height:540px"});
+                    _this.$chart.prepend(coolImg);
+                });
+                /*var txt = session.txt.split("\n");
                 var imageLocationAr = txt[txt.length - 2].split("/");
                 var imageLocation = session.getLoc() + "files/" + imageLocationAr[imageLocationAr.length - 1];
                 console.log(imageLocation);
                 var img = $('<img />', {src : imageLocation, style : "width:720px;height:540px"});
-                _this.$chart.prepend(img);
+                _this.$chart.prepend(img);*/
                 /*var img = $('<img />', {src : session.getLoc() + 'graphics/1/png', style : "width:720px;height:540px"});*/
 
             });
