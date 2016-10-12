@@ -3,6 +3,7 @@ morpheus.HeatMapOptions = function (controller) {
 		{
 			name: 'color_by',
 			required: true,
+			help: 'Use a different color scheme for distinct row annotation values',
 			type: 'select',
 			options: ['(None)'].concat(morpheus.MetadataUtil
 			.getMetadataNames(controller.getProject()

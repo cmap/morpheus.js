@@ -19,6 +19,8 @@ morpheus.HeatMapElementCanvas = function (project) {
 	});
 	this.gridColor = morpheus.HeatMapElementCanvas.GRID_COLOR;
 	this.gridThickness = 0.1;
+	this.elementDrawCallback = null;
+	this.drawCallback = null;
 };
 morpheus.HeatMapElementCanvas.GRID_COLOR = 'rgb(128,128,128)';
 morpheus.HeatMapElementCanvas.prototype = {
@@ -204,7 +206,10 @@ morpheus.HeatMapElementCanvas.prototype = {
 		}
 	},
 	setElementDrawCallback: function (elementDrawCallback) {
-		this._elementDrawCallback = elementDrawCallback;
+		this.elementDrawCallback = elementDrawCallback;
+	},
+	setDrawCallback: function (drawCallback) {
+		this.drawCallback = drawCallback;
 	},
 	draw: function (clip, context) {
 		var columnPositions = this.columnPositions;
@@ -226,6 +231,12 @@ morpheus.HeatMapElementCanvas.prototype = {
 			});
 			context.translate(clip.x, clip.y);
 		}
+		if (this.drawCallback) {
+			this.drawCallback({
+				clip: clip,
+				context: context
+			});
+		}
 
 	},
 	_draw: function (options) {
@@ -244,7 +255,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 
 		var colorScheme = this.colorScheme;
 		var drawGrid = this.drawGrid;
-		var elementDrawCallback = this._elementDrawCallback;
+		var elementDrawCallback = this.elementDrawCallback;
 		var seriesNameToIndex = {};
 		for (var i = 0; i < dataset.getSeriesCount(); i++) {
 			seriesNameToIndex[dataset.getName(i)] = i;
@@ -307,15 +318,29 @@ morpheus.HeatMapElementCanvas.prototype = {
 
 					}
 					if (condition !== null) {
-						context.fillRect(px + xoffset, py + yoffset, cellColumnSize,
-							cellRowSize);
-						// x and y are at center
-						var x = px + xoffset + cellRowSize / 2;
-						var y = py + yoffset + cellColumnSize / 2;
-						context.fillStyle = condition.color;
-						morpheus.CanvasUtil.drawShape(context, condition.shape,
-							x, y, Math.min(cellColumnSize, cellRowSize) / 4);
-						context.fill();
+						if (condition.shape != null) {
+							if (condition.inheritColor) {
+								var x = px + xoffset + cellRowSize / 2;
+								var y = py + yoffset + cellColumnSize / 2;
+								morpheus.CanvasUtil.drawShape(context, condition.shape,
+									x, y, Math.min(cellColumnSize, cellRowSize) / 2);
+								context.fill();
+							} else {
+								context.fillRect(px + xoffset, py + yoffset, cellColumnSize,
+									cellRowSize);
+								// x and y are at center
+								var x = px + xoffset + cellRowSize / 2;
+								var y = py + yoffset + cellColumnSize / 2;
+								context.fillStyle = condition.color;
+								morpheus.CanvasUtil.drawShape(context, condition.shape,
+									x, y, Math.min(cellColumnSize, cellRowSize) / 4);
+								context.fill();
+							}
+
+						} else {
+							context.fillRect(px + xoffset, py + yoffset, cellColumnSize,
+								cellRowSize);
+						}
 					} else {
 						context.fillRect(px + xoffset, py + yoffset, cellColumnSize,
 							cellRowSize);

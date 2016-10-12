@@ -57,11 +57,14 @@ morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
 		}
 	} else if (ext === 'txt' || ext === 'tsv' || ext === 'csv') {
 		datasetReader = new morpheus.TxtReader();
+	} else if (ext === 'json') {
+		datasetReader = new morpheus.JsonDatasetReader();
 	} else {
 		datasetReader = new morpheus.GctReader();
 	}
 	return datasetReader;
-};
+}
+;
 
 morpheus.DatasetUtil.readDatasetArray = function (datasets) {
 	var retDef = $.Deferred();
@@ -189,7 +192,6 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 				+ 'datasetReader.read(e.data.fileOrUrl, function(err,dataset) {'
 				+ '	self.postMessage(dataset);' + '	});' + '}']);
 
-
 			var blobURL = window.URL.createObjectURL(blob);
 			var worker = new Worker(blobURL);
 			worker.addEventListener('message', function (e) {
@@ -211,7 +213,6 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 					deferred.resolve(dataset);
 				}
 			});
-
 		}
 		var pr = deferred.promise();
 		pr.toString = function () {

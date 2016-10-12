@@ -276,7 +276,7 @@ morpheus.MafFileReader.prototype = {
 		}
 		if (ccfColumnIndex !== undefined) {
 			dataset.addSeries({
-				dataType: 'object',
+				dataType: 'Float32',
 				name: 'allelic_fraction',
 				array: ccfMatrix
 			});

@@ -126,12 +126,7 @@ morpheus.Dataset.createArray = function (options) {
 		for (var i = 0; i < options.rows; i++) {
 			array.push(new Int16Array(options.columns));
 		}
-	} else if (options.dataType === 'sparse') {
-		// array of objects
-		for (var i = 0; i < options.rows; i++) {
-			array.push({});
-		}
-	} else { // dataType===object, array of arrays
+	} else { // [object, number, Number] array of arrays
 		for (var i = 0; i < options.rows; i++) {
 			array.push([]);
 		}

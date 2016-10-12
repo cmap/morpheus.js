@@ -163,7 +163,7 @@ morpheus.SegTabReader.prototype = {
 		var dataset = new morpheus.Dataset({
 			name : datasetName,
 			array : matrix,
-			dataType : 'object',
+			dataType : 'number',
 			rows : chromosomeStartEndToIndex.size(),
 			columns : sampleIdToIndex.size()
 		});
