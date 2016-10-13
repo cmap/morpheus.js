@@ -434,7 +434,7 @@ morpheus.DatasetUtil.searchValues = function (dataset, text, cb) {
 	var seriesIndices = [];
 	for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
 		for (var k = 0, nseries = dataset.getSeriesCount(); k < nseries; k++) {
-			if (dataset.getDataType(i, k) === 'object') {
+			if (dataset.getDataType(i, k) === 'Number') {
 				seriesIndices.push([i, k]);
 			}
 		}
@@ -512,7 +512,7 @@ morpheus.DatasetUtil.autocompleteValues = function (dataset) {
 		var seriesIndices = [];
 		for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
 			for (var k = 0, nseries = dataset.getSeriesCount(); k < nseries; k++) {
-				if (dataset.getDataType(i, k) === 'object') {
+				if (dataset.getDataType(i, k) === 'Number') {
 					seriesIndices.push([i, k]);
 				}
 			}
@@ -747,7 +747,7 @@ morpheus.DatasetUtil.copy = function (dataset) {
 		name: dataset.getName(),
 		rows: dataset.getRowCount(),
 		columns: dataset.getColumnCount(),
-		dataType: 'object'
+		dataType: dataset.getDataType(0)
 	});
 	for (var seriesIndex = 0, nseries = dataset.getSeriesCount(); seriesIndex < nseries; seriesIndex++) {
 		if (seriesIndex > 0) {
@@ -755,7 +755,7 @@ morpheus.DatasetUtil.copy = function (dataset) {
 				name: dataset.getName(seriesIndex),
 				rows: dataset.getRowCount(),
 				columns: dataset.getColumnCount(),
-				dataType: 'object'
+				dataType: dataset.getDataType(seriesIndex)
 			});
 		}
 		for (var i = 0, nrows = dataset.getRowCount(), ncols = dataset

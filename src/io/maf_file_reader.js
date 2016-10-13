@@ -254,7 +254,7 @@ morpheus.MafFileReader.prototype = {
 		var dataset = new morpheus.Dataset({
 			name: datasetName,
 			array: variantMatrix,
-			dataType: 'object',
+			dataType: 'Number',
 			rows: geneSymbolToIndex.size(),
 			columns: sampleIdToIndex.size()
 		});
