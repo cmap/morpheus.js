@@ -95,6 +95,21 @@ morpheus.Dataset.fromJson = function (options) {
 	// }
 	// }
 
+	// map ordinal values
+	for (var seriesIndex = 0; seriesIndex < options.seriesArrays.length; seriesIndex++) {
+		if (options.seriesMappings && options.seriesMappings[seriesIndex]) {
+			var map = options.seriesMappings[seriesIndex];
+			var array = options.seriesArrays[seriesIndex];
+			for (var i = 0, nrows = array.length; i < nrows; i++) {
+				var row = array[i];
+				for (var j = 0, ncols = array[0].length; j < ncols; j++) {
+					var value = row[j];
+					var mappedValue = map[value];
+					row[j] = mappedValue;
+				}
+			}
+		}
+	}
 	var dataset = new morpheus.Dataset({
 		name: options.seriesNames[0],
 		dataType: options.seriesDataTypes[0],
@@ -118,6 +133,7 @@ morpheus.Dataset.fromJson = function (options) {
 		});
 	}
 	for (var i = 1; i < options.seriesArrays.length; i++) {
+
 		dataset.addSeries({
 			name: options.seriesNames[i],
 			dataType: options.seriesDataTypes[i],

@@ -144,15 +144,13 @@ morpheus.AbstractDataset.prototype = {
 		return this.seriesArrays.length;
 	},
 	/**
-	 * Returns the data type at the specified row and series index.
+	 * Returns the data type at the specified series index.
 	 *
-	 * @param rowIndex
-	 *            the row index
 	 * @param seriesIndex
 	 *            the series index
-	 * @return the series data type (e.g. object, Float32, Int8)
+	 * @return the series data type (e.g. Number, Float32, Int8)
 	 */
-	getDataType: function (rowIndex, seriesIndex) {
+	getDataType: function (seriesIndex) {
 		return this.seriesDataTypes[seriesIndex || 0];
 	},
 	toString: function () {
