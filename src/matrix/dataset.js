@@ -95,8 +95,6 @@ morpheus.Dataset.fromJson = function (options) {
 	// }
 	// }
 
-	options.array = options.seriesArrays[0];
-	options.dataType = options.dataType[0];
 	var dataset = new morpheus.Dataset({
 		name: options.seriesNames[0],
 		dataType: options.seriesDataTypes[0],
