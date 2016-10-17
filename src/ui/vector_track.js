@@ -691,34 +691,35 @@ morpheus.VectorTrack.prototype = {
 		context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
 		context.strokeStyle = morpheus.HeatMapElementCanvas.GRID_COLOR;
 		context.lineWidth = 0.1;
-
 		// grid lines
 		if (this.heatmap.heatmap.isDrawGrid() && !this.settings.squished) {
 			if (this.isColumns) {
 				var gridSize = availableSpace;
+				context.beginPath();
 				for (var i = start; i < end; i++) {
 					var size = positions.getItemSize(i);
 					var pix = positions.getPosition(i);
 					if (size > 7) {
-						context.beginPath();
 						context.moveTo(pix + size, 0);
 						context.lineTo(pix + size, gridSize);
-						context.stroke();
 					}
 				}
+				context.stroke();
 			} else {
 				if (!this.isRenderAs(morpheus.VectorTrack.RENDER.MOLECULE)) {
 					var gridSize = availableSpace;
+					context.beginPath();
 					for (var i = start; i < end; i++) {
 						var size = positions.getItemSize(i);
 						var pix = positions.getPosition(i);
 						if (size > 7) {
-							context.beginPath();
+
 							context.moveTo(0, pix + size);
 							context.lineTo(gridSize, pix + size);
-							context.stroke();
+
 						}
 					}
+					context.stroke();
 				}
 			}
 		}
