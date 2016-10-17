@@ -22,7 +22,7 @@ morpheus.HeatMapElementCanvas = function (project) {
 	this.elementDrawCallback = null;
 	this.drawCallback = null;
 };
-morpheus.HeatMapElementCanvas.GRID_COLOR = 'rgb(128,128,128)';
+morpheus.HeatMapElementCanvas.GRID_COLOR = '#808080';
 morpheus.HeatMapElementCanvas.prototype = {
 	drawGrid: true,
 	setPropertiesFromParent: function (parentHeatMapElementCanvas) {
