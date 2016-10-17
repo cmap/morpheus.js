@@ -691,6 +691,96 @@ morpheus.DatasetUtil.fill = function (dataset, value, seriesIndex) {
 	}
 };
 
+/**
+ * Add an additional series to a dataset from another dataset.
+ * @param options.dataset The dataset to add a series to
+ * @param options.newDataset The dataset that is used as the source for the overlay
+ * @param options.rowAnnotationName dataset row annotation name to use for matching
+ * @param options.columnAnnotationName dataset column annotation name to use for matching
+ * @param options.newRowAnnotationName newDataset row annotation name to use for matching
+ * @param options.newColumnAnnotationName newDataset column annotation name to use for matching
+ *
+ */
+morpheus.DatasetUtil.overlay = function (options) {
+	var dataset = options.dataset;
+	var newDataset = options.newDataset;
+	var current_dataset_row_annotation_name = options.rowAnnotationName;
+	var current_dataset_column_annotation_name = options.columnAnnotationName;
+	var new_dataset_row_annotation_name = options.newRowAnnotationName;
+	var new_dataset_column_annotation_name = options.newColumnAnnotationName;
+
+	var rowValueToIndexMap = morpheus.VectorUtil
+	.createValueToIndexMap(dataset
+	.getRowMetadata()
+	.getByName(
+		current_dataset_row_annotation_name));
+	var columnValueToIndexMap = morpheus.VectorUtil
+	.createValueToIndexMap(dataset
+	.getColumnMetadata()
+	.getByName(
+		current_dataset_column_annotation_name));
+	var seriesIndex = dataset
+	.addSeries({
+		name: newDataset
+		.getName(),
+		dataType: newDataset.getDataType(0)
+	});
+
+	var rowVector = newDataset
+	.getRowMetadata()
+	.getByName(
+		new_dataset_row_annotation_name);
+	var rowIndices = [];
+	var newDatasetRowIndicesSubset = [];
+	for (var i = 0, size = rowVector
+	.size(); i < size; i++) {
+		var index = rowValueToIndexMap
+		.get(rowVector
+		.getValue(i));
+		if (index !== undefined) {
+			rowIndices.push(index);
+			newDatasetRowIndicesSubset
+			.push(i);
+		}
+	}
+
+	var columnVector = newDataset
+	.getColumnMetadata()
+	.getByName(
+		new_dataset_column_annotation_name);
+	var columnIndices = [];
+	var newDatasetColumnIndicesSubset = [];
+	for (var i = 0, size = columnVector
+	.size(); i < size; i++) {
+		var index = columnValueToIndexMap
+		.get(columnVector
+		.getValue(i));
+		if (index !== undefined) {
+			columnIndices.push(index);
+			newDatasetColumnIndicesSubset
+			.push(i);
+		}
+	}
+	newDataset = new morpheus.SlicedDatasetView(
+		newDataset,
+		newDatasetRowIndicesSubset,
+		newDatasetColumnIndicesSubset);
+	for (var i = 0, nrows = newDataset
+	.getRowCount(); i < nrows; i++) {
+		for (var j = 0, ncols = newDataset
+		.getColumnCount(); j < ncols; j++) {
+			dataset.setValue(
+				rowIndices[i],
+				columnIndices[j],
+				newDataset
+				.getValue(
+					i,
+					j),
+				seriesIndex);
+
+		}
+	}
+};
 morpheus.DatasetUtil.join = function (datasets, field) {
 	if (datasets.length === 0) {
 		throw 'No datasets';
