@@ -179,6 +179,7 @@ morpheus.VectorUtil.maybeConvertToStringArray = function (vector, delim) {
 	var newValues = [];
 	var regex = new RegExp(delim);
 	var found = false;
+
 	for (var i = 0, nrows = vector.size(); i < nrows; i++) {
 		var s = vector.getValue(i);
 		if (s != null) {
@@ -188,6 +189,8 @@ morpheus.VectorUtil.maybeConvertToStringArray = function (vector, delim) {
 			var tokens = s.split(regex);
 			newValues.push(tokens);
 			if (!found && tokens.length > 1) {
+				console.log('found');
+				console.log(s);
 				found = true;
 			}
 		}
@@ -197,8 +200,9 @@ morpheus.VectorUtil.maybeConvertToStringArray = function (vector, delim) {
 		for (var i = 0, nrows = newValues.length; i < nrows; i++) {
 			vector.setValue(i, newValues[i]);
 		}
+		vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, '[string]');
 	}
-	vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, '[string]');
+
 	return found;
 };
 
