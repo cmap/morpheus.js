@@ -358,6 +358,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 		if (drawGrid) {
 			context.strokeStyle = this.gridColor;
 			context.lineWidth = this.gridThickness;
+			context.beginPath();
 			for (var row = top; row < bottom; row++) {
 				var rowSize = rowPositions.getItemSize(row);
 				var py = rowPositions.getPosition(row);
@@ -366,10 +367,11 @@ morpheus.HeatMapElementCanvas.prototype = {
 					var px = columnPositions.getPosition(column);
 					var grid = drawGrid && columnSize > 10 && rowSize > 10;
 					if (grid) {
-						context.strokeRect(px, py, columnSize, rowSize);
+						context.rect(px, py, columnSize, rowSize);
 					}
 				}
 			}
+			context.stroke();
 
 		}
 		context.lineWidth = 1;
