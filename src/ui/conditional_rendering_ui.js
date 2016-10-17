@@ -35,11 +35,12 @@ morpheus.ConditionalRenderingUI = function (heatmap) {
 	});
 	var html = [];
 	html
-	.push('<div style="border-bottom:1px solid LightGrey" class="morpheus-entry">');
+	.push('<div class="morpheus-entry">');
 	html.push('<div class="row">');
 	html
-	.push('<div class="col-xs-8"><a class="btn btn-default btn-xs" role="button"' +
-		' data-name="add" href="#">Add</a></div>');
+	.push('<div style="padding-bottom:20px;" class="col-xs-8"><a class="btn btn-default btn-xs"' +
+		' role="button"' +
+		' data-name="add" href="#">Add Condition</a></div>');
 
 	html.push('</div>');
 	html.push('</div>');
@@ -62,7 +63,8 @@ morpheus.ConditionalRenderingUI.prototype = {
 		// series name
 		// value >= x and <= x
 		var html = [];
-		html.push('<div class="morpheus-entry">');
+		html.push('<div style="border-top:1px solid LightGrey;padding-bottom:6px;padding-top:6px;"' +
+			' class="morpheus-entry">');
 		html.push('<form class="form-horizontal">');
 		// series
 		html.push('<div class="form-group">');
@@ -120,15 +122,11 @@ morpheus.ConditionalRenderingUI.prototype = {
 		html.push('</div>');
 		html.push('</div>');
 
-		// add/delete
-		html
-		.push('<div style="border-bottom:1px solid LightGrey" class="row">');
-
-		html.push('<div class="col-xs-11">');
+		html.push('<div class="row"><div class="col-xs-11">');
 		html
 		.push('<a class="btn btn-default btn-xs" role="button" data-name="delete"' +
-			' href="#">Remove</a>');
-		html.push('</div>');
+			' href="#">Delete Condition</a>');
+		html.push('</div></div>');
 		html.push('</div>'); // morpheus-entry
 		var $el = $(html.join(''));
 		shapeField.$el.appendTo($el.find('[data-name=shapeHolder]'));
