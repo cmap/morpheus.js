@@ -369,11 +369,13 @@ morpheus.OpenDatasetTool.prototype = {
 				name: 'current_dataset_annotation_name',
 				options: currentDatasetMetadataNames,
 				type: 'select',
+				value: 'id',
 				required: true
 			}];
 			items.push({
 				name: 'new_dataset_annotation_name',
 				type: 'select',
+				value: 'id',
 				options: newDatasetMetadataNames,
 				required: true
 			});
@@ -397,11 +399,13 @@ morpheus.OpenDatasetTool.prototype = {
 				name: 'current_dataset_column_annotation_name',
 				options: currentDatasetColumnMetadataNames,
 				type: 'select',
+				value: 'id',
 				required: true
 			});
 			items.push({
 				name: 'new_dataset_column_annotation_name',
 				type: 'select',
+				value: 'id',
 				options: newDatasetColumnMetadataNames,
 				required: true
 			});
@@ -409,11 +413,13 @@ morpheus.OpenDatasetTool.prototype = {
 				name: 'current_dataset_row_annotation_name',
 				options: currentDatasetRowMetadataNames,
 				type: 'select',
+				value: 'id',
 				required: true
 			});
 			items.push({
 				name: 'new_dataset_row_annotation_name',
 				type: 'select',
+				value: 'id',
 				options: newDatasetRowMetadataNames,
 				required: true
 			});

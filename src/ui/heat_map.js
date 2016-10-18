@@ -446,7 +446,6 @@ morpheus.HeatMap = function (options) {
 							.createColorSupplier(option.colorScheme));
 
 					} else {
-
 						try {
 							_this
 							.autoDisplay({
@@ -494,11 +493,31 @@ morpheus.HeatMap = function (options) {
 		});
 
 		promises.push(deferred);
+		var datasetOverlay = null;
+		if (options.datasetOverlay) {
+			var d = options.datasetOverlay.file ? morpheus.DatasetUtil.read(
+				options.datasetOverlay.file, options.datasetOverlay.options)
+				: morpheus.DatasetUtil.read(options.datasetOverlay);
+			d.done(function (dataset) {
+				datasetOverlay = dataset;
+			});
+			promises.push(d);
+		}
 		$.when.apply($, promises).then(function () {
 			if (_this.options.$loadingImage) {
 				_this.options.$loadingImage.remove();
 			}
 			_this._init();
+			if (datasetOverlay) {
+				morpheus.DatasetUtil.overlay({
+					dataset: _this.options.dataset,
+					newDataset: datasetOverlay,
+					rowAnnotationName: 'id',
+					newRowAnnotationName: 'id',
+					columnAnnotationName: 'id',
+					newColumnAnnotationName: 'id'
+				});
+			}
 			heatMapLoaded();
 		});
 	}

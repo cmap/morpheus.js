@@ -38,6 +38,9 @@ morpheus.DatasetAdapter.prototype = {
 	addSeries: function (options) {
 		return this.dataset.addSeries(options);
 	},
+	removeSeries: function (seriesIndex) {
+		this.dataset.removeSeries(seriesIndex);
+	},
 	getSeriesCount: function () {
 		return this.dataset.getSeriesCount();
 	},

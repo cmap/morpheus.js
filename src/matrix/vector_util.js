@@ -189,8 +189,6 @@ morpheus.VectorUtil.maybeConvertToStringArray = function (vector, delim) {
 			var tokens = s.split(regex);
 			newValues.push(tokens);
 			if (!found && tokens.length > 1) {
-				console.log('found');
-				console.log(s);
 				found = true;
 			}
 		}

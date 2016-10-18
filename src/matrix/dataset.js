@@ -95,21 +95,26 @@ morpheus.Dataset.fromJson = function (options) {
 	// }
 	// }
 
-	for (var seriesIndex = 0; seriesIndex < options.seriesArrays.length; seriesIndex++) {
-		// map ordinal values
-		if (options.seriesMappings && options.seriesMappings[seriesIndex]) {
-			var map = options.seriesMappings[seriesIndex]; // e.g. foo:1, bar:3
-			var array = options.seriesArrays[seriesIndex];
-			var valueMap = new morpheus.Map();
-			for (var name in map) {
-				valueMap.set(name, morpheus.Util.wrapNumber(map[name], name));
-			}
-			for (var i = 0, nrows = array.length; i < nrows; i++) {
-				var row = array[i];
-				for (var j = 0, ncols = array[0].length; j < ncols; j++) {
-					var value = row[j];
-					row[j] = valueMap.get(value);
+	if (options.seriesMappings) {
+		for (var seriesIndex = 0; seriesIndex < options.seriesMappings.length; seriesIndex++) {
+			// map ordinal values
+			if (options.seriesMappings[seriesIndex]) {
+
+				var map = options.seriesMappings[seriesIndex]; // e.g. foo:1, bar:3
+				var valueMap = new morpheus.Map();
+				for (var key in map) {
+					var value = map[key];
+					valueMap.set(value, morpheus.Util.wrapNumber(value, key));
 				}
+
+				var array = options.seriesArrays[seriesIndex];
+				for (var i = 0; i < options.rows; i++) {
+					for (var j = 0; j < options.columns; j++) {
+						var value = array[i][j];
+						array[i][j] = valueMap.get(value);
+					}
+				}
+				options.seriesDataTypes[seriesIndex] = 'Number';
 			}
 		}
 	}

@@ -14,6 +14,26 @@ morpheus.AbstractColorSupplier = function () {
 morpheus.AbstractColorSupplier.Z_SCORE = 1;
 morpheus.AbstractColorSupplier.ROBUST_Z_SCORE = 2;
 
+morpheus.AbstractColorSupplier.toJson = function (cs) {
+	return {
+		fractions: cs.fractions,
+		colors: cs.colors,
+		names: cs.names,
+		min: cs.min,
+		max: cs.max,
+		missingColor: cs.missingColor,
+		scalingMode: cs.scalingMode,
+		stepped: cs.stepped,
+		transformValues: cs.transformValues,
+		conditions: cs.conditions.array,
+		size: {
+			seriesName: cs.sizer.seriesName,
+			min: cs.sizer.min,
+			max: cs.sizer.max
+		}
+	};
+
+};
 morpheus.AbstractColorSupplier.fromJson = function (json) {
 	var cs = json.stepped ? new morpheus.SteppedColorSupplier()
 		: new morpheus.GradientColorSupplier();
@@ -25,12 +45,50 @@ morpheus.AbstractColorSupplier.fromJson = function (json) {
 	if (morpheus.HeatMapColorScheme.ScalingMode.RELATIVE !== json.scalingMode) {
 		cs.setTransformValues(json.transformValues);
 	}
+	if (json.colors != null && json.colors.length > 0) {
+		cs.setFractions({
+			colors: json.colors,
+			fractions: json.fractions,
+			names: json.names
+		});
+	}
 
-	cs.setFractions({
-		colors: json.colors,
-		fractions: json.fractions,
-		names: json.names
-	});
+	if (json.size) {
+		cs.getSizer().setSeriesName(json.size.seriesName);
+		cs.getSizer().setMin(json.size.min);
+		cs.getSizer().setMax(json.size.max);
+	}
+
+	if (json.conditions) {
+		// load conditions
+		json.conditions.forEach(function (condition) {
+			var gtf = function () {
+				return true;
+			};
+			var ltf = function () {
+				return true;
+			};
+			if (condition.v1 != null && !isNaN(condition.v1)) {
+				gtf = condition.v1Op === 'gt' ? function (val) {
+					return val > condition.v1;
+				} : function (val) {
+					return val >= condition.v1;
+				};
+			}
+
+			if (condition.v2 != null && !isNaN(condition.v2)) {
+				ltf = condition.v2Op === 'lt' ? function (val) {
+					return val < condition.v2;
+				} : function (val) {
+					return val <= condition.v2;
+				};
+			}
+			condition.accept = function (val) {
+				return gtf(val) && ltf(val);
+			};
+		});
+		cs.conditions.array = json.conditions;
+	}
 	return cs;
 };
 

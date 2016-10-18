@@ -136,6 +136,10 @@ morpheus.JoinedDataset.prototype = {
 		this.dataset1.addSeries(options);
 		return this.dataset2.addSeries(options);
 	},
+	removeSeries: function (seriesIndex) {
+		this.dataset1.removeSeries(seriesIndex);
+		this.dataset2.removeSeries(seriesIndex);
+	},
 	toString: function () {
 		return this.getName();
 	}

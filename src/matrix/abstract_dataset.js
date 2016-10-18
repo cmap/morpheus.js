@@ -135,6 +135,16 @@ morpheus.AbstractDataset.prototype = {
 		// not implemented
 	},
 	/**
+	 * Removes the specified series.
+	 *
+	 * @param seriesIndex The series index.
+	 */
+	removeSeries: function (seriesIndex) {
+		this.seriesArrays.splice(seriesIndex, 1);
+		this.seriesNames.splice(seriesIndex, 1);
+		this.seriesDataTypes.splice(seriesIndex, 1);
+	},
+	/**
 	 * Returns the number of matrix series. Series can be used to store standard
 	 * error of data points for example.
 	 *

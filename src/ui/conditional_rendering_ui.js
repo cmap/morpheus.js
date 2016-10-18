@@ -141,37 +141,44 @@ morpheus.ConditionalRenderingUI.prototype = {
 		$color.val(condition.color);
 		$series.val(condition.series);
 		shapeField.setShapeValue(condition.shape);
-		$v1.val(condition.v1);
-		$v2.val(condition.v2);
+		if (condition.v1 != null && !isNaN(condition.v1)) {
+			$v1.val(condition.v1);
+		}
+		if (condition.v2 != null && !isNaN(condition.v2)) {
+			$v2.val(condition.v2);
+		}
 		$v1Op.val(condition.v1Op);
 		$v2Op.val(condition.v2Op);
 		function updateAccept() {
 			var v1 = parseFloat($($v1).val());
-			if (isNaN(v1)) {
-				v1 = -Number.MAX_VALUE;
-			}
-
 			var v2 = parseFloat($($v2).val());
-			if (isNaN(v2)) {
-				v2 = Number.MAX_VALUE;
-			}
-
 			var v1Op = $v1Op.val();
 			var v2Op = $v2Op.val();
-			var gtf = v1Op === 'gt' ? function (val) {
-				return val > v1;
-			} : function (val) {
-				return val >= v1;
-			};
-			var ltf = v2Op === 'lt' ? function (val) {
-				return val < v2;
-			} : function (val) {
-				return val <= v2;
-			};
 			condition.v1 = v1;
 			condition.v2 = v2;
 			condition.v1Op = v1Op;
 			condition.v2Op = v2Op;
+			var gtf = function () {
+				return true;
+			};
+			var ltf = function () {
+				return true;
+			};
+			if (!isNaN(v1)) {
+				gtf = v1Op === 'gt' ? function (val) {
+					return val > v1;
+				} : function (val) {
+					return val >= v1;
+				};
+			}
+
+			if (!isNaN(v2)) {
+				ltf = v2Op === 'lt' ? function (val) {
+					return val < v2;
+				} : function (val) {
+					return val <= v2;
+				};
+			}
 			condition.accept = function (val) {
 				return gtf(val) && ltf(val);
 			};

@@ -21,6 +21,9 @@ morpheus.Util.extend = function (c1, c2) {
 		}
 	}
 };
+morpheus.Util.isFetchSupported = function () {
+	return navigator.userAgent.indexOf('Chrome') !== -1;
+};
 
 morpheus.Util.viewPortSize = function () {
 	return window.getComputedStyle(document.body, ':before').content.replace(
