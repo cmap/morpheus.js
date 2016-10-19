@@ -3065,12 +3065,18 @@ morpheus.HeatMap.prototype = {
 	saveImage: function (file, format) {
 		var bounds = this.getTotalSize();
 		if (format === 'pdf') {
-			var context = new C2S(bounds.width, bounds.height);
-			this.snapshot(context);
-			var svg = context.getSerializedSvg();
-			var doc = new jsPDF();
-			doc.addSVG(svg, 0, 0, bounds.width, bounds.height);
-			doc.save(file);
+			// var context = new morpheus.PdfGraphics();
+			// this.snapshot(context);
+			// context.toBlob(function (blob) {
+			// 	saveAs(blob, file, true);
+			// });
+			// var context = new C2S(bounds.width, bounds.height);
+			// this.snapshot(context);
+			// var svg = context.getSerializedSvg();
+			// var doc = new jsPDF();
+			// doc.addSVG(svg, 0, 0, bounds.width, bounds.height);
+			// doc.save(file);
+
 		} else if (format === 'svg') {
 			var context = new C2S(bounds.width, bounds.height);
 			this.snapshot(context);
