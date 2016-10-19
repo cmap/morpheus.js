@@ -330,14 +330,14 @@ morpheus.HeatMapColorScheme.createColorSupplier = function (options) {
 		max: max,
 		transformValues: options.transformValues
 	};
-	if (options.missingColor !== undefined) {
+	if (options.missingColor != null) {
 		json.missingColor = options.missingColor;
 	}
 
-	if (options.conditions !== undefined) {
+	if (options.conditions != null) {
 		json.conditions = options.conditions;
 	}
-	if (options.size !== undefined) {
+	if (options.size != null) {
 		json.size = options.size;
 	}
 	return morpheus.AbstractColorSupplier.fromJson(json);

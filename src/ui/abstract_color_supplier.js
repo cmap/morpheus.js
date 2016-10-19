@@ -41,7 +41,9 @@ morpheus.AbstractColorSupplier.fromJson = function (json) {
 	cs.setScalingMode(json.scalingMode);
 	cs.setMin(json.min);
 	cs.setMax(json.max);
-	cs.setMissingColor(json.missingColor);
+	if (json.missingColor != null) {
+		cs.setMissingColor(json.missingColor);
+	}
 	if (morpheus.HeatMapColorScheme.ScalingMode.RELATIVE !== json.scalingMode) {
 		cs.setTransformValues(json.transformValues);
 	}

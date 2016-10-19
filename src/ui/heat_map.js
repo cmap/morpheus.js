@@ -3093,6 +3093,43 @@ morpheus.HeatMap.prototype = {
 			canvas.width = width;
 			var context = canvas.getContext('2d');
 			this.snapshot(context);
+			// var stack = context.stack();
+			// var s = [];
+			// for (var i = 0; i < stack.length; i++) {
+			// 	var arg = stack[i];
+			// 	if (arg.attr) {
+			// 		if (_.isString(arg.val)) {
+			// 			s.push('context.' + arg.attr + ' = \'' + arg.val + '\';');
+			// 		} else {
+			// 			s.push('context.' + arg.attr + ' = ' + arg.val + ';');
+			// 		}
+			// 		s.push('\n');
+			// 	} else {
+			// 		var arguments = arg.arguments;
+			// 		s.push('context.' + arg.method + '(');
+			// 		if (arguments) {
+			// 			for (var j = 0; j < arguments.length; j++) {
+			// 				if (j > 0) {
+			// 					s.push(', ');
+			// 				}
+			// 				var val = arguments[j];
+			// 				if (_.isString()) {
+			// 					s.push("'");
+			// 					s.push(val);
+			// 					s.push("'");
+			// 				} else {
+			// 					s.push(val);
+			// 				}
+			//
+			// 			}
+			// 		}
+			// 		s.push(');\n');
+			// 	}
+			//
+			// }
+			// saveAs(new Blob([s.join('')], {
+			// 	type: 'text/plain;charset=utf-8'
+			// }), 'canvas.txt', true);
 			canvas.toBlob(function (blob) {
 				if (blob == null || blob.size === 0) {
 					morpheus.FormBuilder.showInModal({
