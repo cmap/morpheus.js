@@ -14256,7 +14256,7 @@ morpheus.PcaPlotTool.prototype = {
 
             console.log('draw plot button clicked');
             var dataset = _this.project.getSelectedDataset({
-                emptyToAll : false
+                emptyToAll: false
             });
             _this.dataset = dataset;
             var expressionSet = project.getFullDataset().getESSession();
@@ -14269,9 +14269,9 @@ morpheus.PcaPlotTool.prototype = {
 
             console.log(colorBy, sizeBy, pc1, pc2, label);
             var arguments = {
-                es : expressionSet,
-                c1 : pc1,
-                c2 : pc2
+                es: expressionSet,
+                c1: pc1,
+                c2: pc2
             };
             if (columnIndices.length > 0) {
                 arguments.columns = columnIndices;
@@ -14290,22 +14290,27 @@ morpheus.PcaPlotTool.prototype = {
             }
 
 
-
             console.log(arguments);
             var req = ocpu.call("pcaPlot", arguments, function (session) {
                 console.log(session);
                 session.getObject(function (success) {
-                    var coolUrl = success.substring(5, success.length - 2) + ".embed" + "?" + "link=false";
-                    console.log(coolUrl);
-                    var coolImg = $('<iframe />', {frameborder : "0", seamless : "seamless", scrolling : "yes", src : coolUrl, style : "width:720px;height:540px"});
-                    _this.$chart.prepend(coolImg);
+                    var $chart = $('<div></div>');
+                    var myPlot = $chart[0];
+                    $chart.appendTo(_this.$chart);
+
+                    var coolUrl = success.split("\n");
+                    var json = JSON.parse($.parseHTML(coolUrl[1])[0].innerText);
+                    var data = json.x.data;
+                    var layout = json.x.layout;
+                    Plotly.newPlot(myPlot, data, layout, {showLink: false});
+                    console.log(json);
                 });
                 /*var txt = session.txt.split("\n");
-                var imageLocationAr = txt[txt.length - 2].split("/");
-                var imageLocation = session.getLoc() + "files/" + imageLocationAr[imageLocationAr.length - 1];
-                console.log(imageLocation);
-                var img = $('<img />', {src : imageLocation, style : "width:720px;height:540px"});
-                _this.$chart.prepend(img);*/
+                 var imageLocationAr = txt[txt.length - 2].split("/");
+                 var imageLocation = session.getLoc() + "files/" + imageLocationAr[imageLocationAr.length - 1];
+                 console.log(imageLocation);
+                 var img = $('<img />', {src : imageLocation, style : "width:720px;height:540px"});
+                 _this.$chart.prepend(img);*/
                 /*var img = $('<img />', {src : session.getLoc() + 'graphics/1/png', style : "width:720px;height:540px"});*/
 
             });
@@ -14314,9 +14319,41 @@ morpheus.PcaPlotTool.prototype = {
             });
         });
 
+        var json = {
+            "x": {
+                "layout": {
+                    "margin": {"b": 40, "l": 60, "t": 25, "r": 10},
+                    "xaxis": {"domain": [0, 1], "title": "PC1 (24.6%)", "zeroline": false},
+                    "yaxis": {"domain": [0, 1], "title": "PC1 (24.6%)", "zeroline": false},
+                    "hovermode": "closest"
+                },
+                "config": {"modeBarButtonsToRemove": ["sendDataToCloud"]},
+                "base_url": "https://plot.ly",
+                "source": "A",
+                "data": [{
+                    "mode": "markers",
+                    "x": [-80.0179841481051, -80.1366552661857, -68.3110262898909, -33.3940172705522, -64.4158791179995, -37.048367016534, 113.385377003965, 110.323103309578, -1.17684919095275, 1.16462472474452, 68.2853240471577, 71.3423492147754],
+                    "y": [-80.0179841481051, -80.1366552661857, -68.3110262898909, -33.3940172705522, -64.4158791179995, -37.048367016534, 113.385377003965, 110.323103309578, -1.17684919095275, 1.16462472474452, 68.2853240471577, 71.3423492147754],
+                    "marker": {
+                        "fillcolor": "rgba(252,141,98,0.5)",
+                        "color": "rgba(252,141,98,1)",
+                        "size": 10,
+                        "line": {"color": "transparent"}
+                    },
+                    "text": ["GSM357839", "GSM357841", "GSM357842", "GSM357843", "GSM357844", "GSM357845", "GSM357847", "GSM357848", "GSM357849", "GSM357850", "GSM357852", "GSM357853"],
+                    "type": "scatter",
+                    "name": "rgba(0, 0, 0, .9)",
+                    "xaxis": "x",
+                    "yaxis": "y"
+                }]
+            }
 
+
+        }
     }
+
 };
+
 
 
 
