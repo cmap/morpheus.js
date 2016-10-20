@@ -608,6 +608,7 @@ morpheus.HeatMapToolBar = function (controller) {
 			morpheus.DatasetUtil.searchValues(project
 			.getSortedFilteredDataset(), text, function (value, i, j) {
 				viewIndices.add(new morpheus.Identifier([i, j]));
+				return true;
 			});
 			project.getElementSelectionModel().setViewIndices(viewIndices);
 			$searchResultsLabel.html(viewIndices.size() + ' match'

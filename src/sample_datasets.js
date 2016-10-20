@@ -357,6 +357,9 @@ morpheus.SampleDatasets.prototype = {
 				field: 'mutation_summary',
 				display: 'stacked_bar'
 			}, {
+				field: 'mutation_summary_selection',
+				display: 'stacked_bar'
+			}, {
 				field: 'mRNAseq_cluster',
 				display: 'color, highlight'
 			}],

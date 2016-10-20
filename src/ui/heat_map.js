@@ -746,26 +746,39 @@ morpheus.HeatMap.prototype = {
 			var colorMap = morpheus.HeatMapColorScheme.Predefined.MAF().map;
 			var rowMutProfile = this.project.getFullDataset().getRowMetadata()
 			.getByName('mutation_summary');
-			var columnMutProfile = this.project.getFullDataset()
-			.getColumnMetadata().getByName('mutation_summary');
+			var columnMutationSummaryVectors = [];
+			var columnMutationSummaryNames = ['mutation_summary', 'mutation_summary_selection'];
+			for (var i = 0; i < columnMutationSummaryNames.length; i++) {
+				var name = columnMutationSummaryNames[i];
+				if (this.project.getFullDataset()
+					.getColumnMetadata().getByName(name)) {
+					columnMutationSummaryVectors.push(this.project.getFullDataset()
+					.getColumnMetadata().getByName(name));
+					track = this.getTrack(name, true);
+					if (track) {
+						track.settingFromConfig('stacked_bar');
+						if (name === 'mutation_summary_selection') {
+							track.settings.autoscaleAlways = true;
+						}
+					}
+				}
+			}
 
 			var track = this.getTrack('mutation_summary', false);
 			if (track) {
 				track.settingFromConfig('stacked_bar');
 			}
-			track = this.getTrack('mutation_summary', true);
-			if (track) {
-				track.settingFromConfig('stacked_bar');
-			}
+
 			for (var i = 1; i < colorMap.length; i++) {
 				if (rowMutProfile) {
 					this.getProject().getRowColorModel().setMappedValue(
 						rowMutProfile, i - 1, colorMap[i].color);
 				}
-				if (columnMutProfile) {
+				for (var j = 0; j < columnMutationSummaryVectors.length; j++) {
 					this.getProject().getColumnColorModel().setMappedValue(
-						columnMutProfile, i - 1, colorMap[i].color);
+						columnMutationSummaryVectors[j], i - 1, colorMap[i].color);
 				}
+
 			}
 		} else if (options.extension === 'gmt') {
 			colorScheme = morpheus.HeatMapColorScheme.Predefined.BINARY();
@@ -1890,12 +1903,21 @@ morpheus.HeatMap.prototype = {
 				// repaint tracks that indicate selection
 				for (var i = 0; i < _this.columnTracks.length; i++) {
 					var track = _this.columnTracks[i];
-					if (track.settings.stackedBar
-						&& track
-						.isRenderAs(morpheus.VectorTrack.RENDER.BAR)) {
+					if (track.getFullVector().getProperties().get(morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION)) {
+						var vector = track.getVector();
+						var f = vector.getProperties().get(morpheus.VectorKeys.FUNCTION);
+						var selectedDataset = _this.getProject().getSelectedDataset({
+							selectedRows: true,
+							selectedColumns: false,
+							emptyToAll: false
+						});
+						var view = new morpheus.DatasetColumnView(selectedDataset);
+						// TODO only set values that are currently visible
+						for (var i = 0, size = vector.size(); i < size; i++) {
+							vector.setValue(i, f(view.setIndex(i), selectedDataset, i));
+						}
 						track.setInvalid(true);
 						track.repaint();
-
 					}
 				}
 				_this.verticalSearchBar.update();
@@ -1909,7 +1931,6 @@ morpheus.HeatMap.prototype = {
 			});
 		this.getProject().getColumnSelectionModel().on('selectionChanged',
 			function () {
-
 				_this.horizontalSearchBar.update();
 				_this.heatmap.updateColumnSelectionCache();
 				_this.paintAll({
@@ -3070,12 +3091,12 @@ morpheus.HeatMap.prototype = {
 			// context.toBlob(function (blob) {
 			// 	saveAs(blob, file, true);
 			// });
-			// var context = new C2S(bounds.width, bounds.height);
-			// this.snapshot(context);
-			// var svg = context.getSerializedSvg();
-			// var doc = new jsPDF();
-			// doc.addSVG(svg, 0, 0, bounds.width, bounds.height);
-			// doc.save(file);
+			var context = new C2S(bounds.width, bounds.height);
+			this.snapshot(context);
+			var svg = context.getSerializedSvg();
+			var doc = new jsPDF();
+			doc.addHTML(svg, 0, 0, bounds.width, bounds.height);
+			doc.save(file);
 
 		} else if (format === 'svg') {
 			var context = new C2S(bounds.width, bounds.height);

@@ -108,6 +108,7 @@ morpheus.VectorTrack = function (project, name, positions, isColumns, heatmap) {
 		min: undefined,
 		mid: undefined,
 		max: undefined,
+		autoscaleAlways: false, // autoscale on every repaint
 		minMaxReversed: false
 		// whether to reverse min and max when auto-setting min and max
 	};
@@ -318,7 +319,7 @@ morpheus.VectorTrack.prototype = {
 					this._createDiscreteValueMap();
 				}
 			} else {
-				if (this.settings.min == null || this.settings.max == null
+				if (this.settings.autoscaleAlways || this.settings.min == null || this.settings.max == null
 					|| this.settings.mid == null) {
 					var vector = this.getFullVector();
 					var minMax = morpheus.VectorUtil.getMinMax(vector);
@@ -329,13 +330,13 @@ morpheus.VectorTrack.prototype = {
 						max = min;
 						min = tmp;
 					}
-					if (this.settings.min == null) {
+					if (this.settings.autoscaleAlways || this.settings.min == null) {
 						this.settings.min = Math.min(0, min);
 					}
-					if (this.settings.max == null) {
+					if (this.settings.autoscaleAlways || this.settings.max == null) {
 						this.settings.max = Math.max(0, max);
 					}
-					if (this.settings.mid == null) {
+					if (this.settings.autoscaleAlways || this.settings.mid == null) {
 						this.settings.mid = this.settings.min < 0 ? 0
 							: this.settings.min;
 					}
@@ -682,7 +683,9 @@ morpheus.VectorTrack.prototype = {
 		var end = options.end;
 		var clip = options.clip;
 		var positions = this.positions;
-
+		if (this.settings.autoscaleAlways) {
+			this._setChartMinMax();
+		}
 		context.textAlign = 'left';
 		context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
 

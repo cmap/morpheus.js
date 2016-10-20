@@ -12,18 +12,20 @@ morpheus.VectorKeys.HEADER_SUMMARY = 'morpheus.headerSummary';
 /** Key indicating to show header summary */
 morpheus.VectorKeys.SHOW_HEADER_SUMMARY = 'morpheus.showHeaderSummary';
 
-/** Project that vector belongs to*/
-morpheus.VectorKeys.PROJECT = 'morpheus.project';
-
 morpheus.VectorKeys.TITLE = 'morpheus.title';
 /** Function to compute vector value */
 morpheus.VectorKeys.FUNCTION = 'morpheus.function';
 
+/** Indicates that vector values are dynamically computed based on selection */
+morpheus.VectorKeys.SELECTION = 'morpheus.selection';
+
 /** Whether to recompute a function when creating a new heat map */
 morpheus.VectorKeys.RECOMPUTE_FUNCTION = 'morpheus.recompute.function';
 
+/** Whether to recompute a function when heat map selection changes */
+morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION = 'morpheus.recompute.function.selection';
+
 morpheus.VectorKeys.COPY_IGNORE = new morpheus.Set();
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.HEADER_SUMMARY);
-morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.PROJECT);
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.DATA_TYPE);
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.VALUE_TO_INDICES);

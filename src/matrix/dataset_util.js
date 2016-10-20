@@ -432,24 +432,25 @@ morpheus.DatasetUtil.searchValues = function (dataset, text, cb) {
 		return;
 	}
 	var seriesIndices = [];
-	for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-		for (var k = 0, nseries = dataset.getSeriesCount(); k < nseries; k++) {
-			if (dataset.getDataType(i, k) === 'Number') {
-				seriesIndices.push([i, k]);
-			}
+	for (var i = 0, nseries = dataset.getSeriesCount(); i < nseries; i++) {
+		if (dataset.getDataType(i) === 'Number' || dataset.getDataType(i) === 'object') {
+			seriesIndices.push(i);
 		}
 	}
 	if (seriesIndices.length === 0) {
 		return;
 	}
 	var _val;
+	// find first non-null value
 	elementSearch: for (var k = 0, nseries = seriesIndices.length; k < nseries; k++) {
-		var pair = seriesIndices[k];
-		for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-			var element = dataset.getValue(pair[0], j, pair[1]);
-			if (element != null && element.toObject) {
-				_val = element.toObject();
-				break elementSearch;
+		var seriesIndex = seriesIndices[k];
+		for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+			for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+				var element = dataset.getValue(i, j, seriesIndex);
+				if (element != null && element.toObject) {
+					_val = element.toObject();
+					break elementSearch;
+				}
 			}
 		}
 	}
@@ -460,40 +461,39 @@ morpheus.DatasetUtil.searchValues = function (dataset, text, cb) {
 	});
 
 	var npredicates = predicates.length;
-
-	for (var k = 0, nseries = seriesIndices.length; k < nseries; k++) {
-		var pair = seriesIndices[k];
+	for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
 		for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-			var matches = false;
-			var element = dataset.getValue(pair[0], j, pair[1]);
-			if (element && element.toObject) {
-				var object = element.toObject();
-				for (var p = 0; p < npredicates && !matches; p++) {
-					var predicate = predicates[p];
-					var filterColumnName = predicate.getField();
-					if (filterColumnName != null) {
-						var value = object[filterColumnName];
-						if (value != null && predicate.accept(value)) {
-							if (cb(value, pair[0], j) === false) {
-								return;
-							}
-							matches = true;
-							break;
-						}
-					} else { // try all fields
-						for (var name in object) {
-							var value = object[name];
+			for (var k = 0, nseries = seriesIndices.length; k < nseries; k++) {
+				var matches = false;
+				var element = dataset.getValue(i, j, seriesIndices[k]);
+				if (element && element.toObject) {
+					var object = element.toObject();
+					for (var p = 0; p < npredicates && !matches; p++) {
+						var predicate = predicates[p];
+						var filterColumnName = predicate.getField();
+						if (filterColumnName != null) {
+							var value = object[filterColumnName];
 							if (value != null && predicate.accept(value)) {
-								if (cb(value, pair[0], j) === false) {
+								if (cb(value, i, j) === false) {
 									return;
 								}
 								matches = true;
 								break;
 							}
+						} else { // try all fields
+							for (var name in object) {
+								var value = object[name];
+								if (value != null && predicate.accept(value)) {
+									if (cb(value, i, j) === false) {
+										return;
+									}
+									matches = true;
+									break;
+								}
+							}
 						}
 					}
 				}
-
 			}
 		}
 	}
