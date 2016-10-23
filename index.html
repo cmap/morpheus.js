@@ -32,17 +32,17 @@
         });
     };
 
-    var search = window.location.search;
-    if (search.length === 0) {
-        search = window.location.hash;
+    var searchString = window.location.search;
+    if (searchString.length === 0) {
+        searchString = window.location.hash;
     }
     var landingPage = new morpheus.LandingPage();
     landingPage.$el.prependTo($(document.body));
-    if (search.length === 0) {
+    if (searchString.length === 0) {
         landingPage.show();
     } else {
-        var search = search.substring(1);
-        var keyValuePairs = search.split('&');
+        searchString = searchString.substring(1);
+        var keyValuePairs = searchString.split('&');
         var params = {};
         for (var i = 0; i < keyValuePairs.length; i++) {
             var pair = keyValuePairs[i].split('=');
