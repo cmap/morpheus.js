@@ -49,7 +49,7 @@
             params[pair[0]] = decodeURIComponent(pair[1]);
         }
         if (params.json) {
-            var options = JSON.parse(params.json);
+            var options = JSON.parse(decodeURIComponent(params.json));
             landingPage.open(options);
         } else if (params.url) { // url to config
             $.ajax({
