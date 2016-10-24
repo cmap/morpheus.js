@@ -145,16 +145,14 @@ morpheus.LandingPage.prototype = {
 	openFile: function (value) {
 		var _this = this;
 		var options = {
-			dataset: value
+			dataset: {
+				file: value,
+				options: {interactive: true}
+			}
 		};
 		var fileName = morpheus.Util.getFileName(value);
 		morpheus.OpenDatasetTool.fileExtensionPrompt(fileName, function (readOptions) {
 			if (readOptions) {
-				var dataset = options.dataset;
-				options.dataset = {
-					file: dataset,
-					options: {}
-				};
 				for (var key in readOptions) {
 					options.dataset.options[key] = readOptions[key];
 				}

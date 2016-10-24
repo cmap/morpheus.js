@@ -503,9 +503,13 @@ morpheus.HeatMap = function (options) {
 			});
 			promises.push(d);
 		}
-		$.when.apply($, promises).then(function () {
+		$.when.apply($, promises).done(function () {
+
 			if (_this.options.$loadingImage) {
 				_this.options.$loadingImage.remove();
+			}
+			if (_this.options.dataset == null) {
+				return _this.tabManager.remove(_this.tabId);
 			}
 			_this._init();
 			if (datasetOverlay) {
@@ -2835,9 +2839,15 @@ morpheus.HeatMap.prototype = {
 		return '';
 	},
 	onRemove: function () {
-		this.project.off();
 		this.$content.remove();
+		if (this.project == null) {
+			return; // failed to initialize
+
+		}
+		this.project.off();
+
 		this.$tipInfoWindow.dialog('destroy');
+
 		this.rowTrackHeaders.forEach(function (header) {
 			header.dispose();
 		});

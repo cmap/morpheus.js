@@ -349,6 +349,10 @@ morpheus.OpenDatasetTool.prototype = {
 		morpheus.OpenDatasetTool
 		.fileExtensionPrompt(file,
 			function (readOptions) {
+				if (!readOptions) {
+					readOptions = {};
+				}
+				readOptions.interactive = true;
 				var deferred = morpheus.DatasetUtil.read(file,
 					readOptions);
 				_this._read(options, deferred);

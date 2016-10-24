@@ -168,7 +168,8 @@ morpheus.FormBuilder.showMessageModal = function (options) {
 morpheus.FormBuilder._showInModal = function (options) {
 	var html = [];
 	options = $.extend({}, {
-		size: ''
+		size: '',
+		close: true
 	}, options);
 	html.push('<div class="modal" role="dialog" aria-hidden="false"');
 	if (options.z) {
@@ -178,8 +179,10 @@ morpheus.FormBuilder._showInModal = function (options) {
 	html.push('<div class="modal-dialog ' + options.size + '">');
 	html.push('<div class="modal-content">');
 	html.push(' <div class="modal-header">');
-	html
-	.push('  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>');
+	if (options.close) {
+		html
+		.push('  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>');
+	}
 	if (options.title != null) {
 		html.push('<h4 class="modal-title">' + options.title + '</h4>');
 	}
@@ -251,7 +254,8 @@ morpheus.FormBuilder.showOkCancel = function (options) {
 		html: options.content,
 		footer: footer.join(''),
 		onClose: options.hiddenCallback,
-		size: options.size
+		size: options.size,
+		close: options.close
 	});
 	// if (options.align === 'right') {
 	// $div.css('left', $(window).width()
@@ -260,6 +264,12 @@ morpheus.FormBuilder.showOkCancel = function (options) {
 	var $ok = $div.find('[name=ok]');
 	$ok.on('click', function (e) {
 		options.okCallback();
+		$div.modal('hide');
+	});
+	$div.find('[name=cancel]').on('click', function (e) {
+		if (options.cancelCallback) {
+			options.cancelCallback();
+		}
 		$div.modal('hide');
 	});
 	if (options.focus) {
