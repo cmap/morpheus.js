@@ -101,21 +101,6 @@ morpheus.Util.getDataType = function (firstNonNull) {
 	}
 	return dataType;
 };
-/**
- * Trims leading and trailing whitespace from a string.
- */
-morpheus.Util.trim = function (val) {
-	var len = val.length;
-	var st = 0;
-
-	while ((st < len) && (val[st] <= ' ')) {
-		st++;
-	}
-	while ((st < len) && (val[len - 1] <= ' ')) {
-		len--;
-	}
-	return ((st > 0) || (len < val.length)) ? val.substring(st, len) : val;
-};
 
 /**
  * Checks whether supplied argument is an array
@@ -890,15 +875,7 @@ morpheus.Util.xlsxTo1dArray = function (data) {
 	var worksheet = workbook.Sheets[sheetNames[0]];
 	return morpheus.Util.sheetToArray(worksheet, '\t');
 };
-morpheus.Util.hashCode = function (val) {
-	var h = 0;
-	if (val.length > 0) {
-		for (var i = 0; i < val.length; i++) {
-			h = 31 * h + val.charCodeAt(i);
-		}
-	}
-	return h;
-};
+
 /**
  * Returns a promise that resolves to a string
  */

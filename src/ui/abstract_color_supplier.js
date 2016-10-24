@@ -61,7 +61,7 @@ morpheus.AbstractColorSupplier.fromJson = function (json) {
 		cs.getSizer().setMax(json.size.max);
 	}
 
-	if (json.conditions) {
+	if (json.conditions && _.isArray(json.conditions)) {
 		// load conditions
 		json.conditions.forEach(function (condition) {
 			var gtf = function () {

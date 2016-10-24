@@ -28,7 +28,7 @@ morpheus.TxtReader.prototype = {
 	_read: function (datasetName, reader) {
 		var dataColumnStart = this.options.dataColumnStart;
 		var tab = /\t/;
-		var header = morpheus.Util.trim(reader.readLine()).split(tab);
+		var header = reader.readLine().trim().split(tab);
 		if (this.options.dataRowStart > 1) {
 			for (var i = 1; i < this.options.dataRowStart; i++) {
 				reader.readLine(); // skip
@@ -37,7 +37,7 @@ morpheus.TxtReader.prototype = {
 		var testLine = null;
 		if (dataColumnStart == null) { // try to figure out where data starts by finding 1st
 			// numeric column
-			testLine = morpheus.Util.trim(reader.readLine());
+			testLine = reader.readLine().trim();
 			var tokens = testLine.split(tab);
 			for (var i = 1; i < tokens.length; i++) {
 				var token = tokens[i];
@@ -73,7 +73,7 @@ morpheus.TxtReader.prototype = {
 			}
 		}
 		while ((s = reader.readLine()) !== null) {
-			s = morpheus.Util.trim(s);
+			s = s.trim();
 			if (s !== '') {
 				var array = new Float32Array(ncols);
 				matrix.push(array);

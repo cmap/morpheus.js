@@ -37,6 +37,9 @@ morpheus.DatasetUtil.max = function (dataset, seriesIndex) {
 };
 
 morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
+	if (options == null) {
+		options = {};
+	}
 	var datasetReader;
 	if (ext === 'maf') {
 		datasetReader = new morpheus.MafFileReader();
@@ -49,14 +52,14 @@ morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
 	} else if (ext === 'gmt') {
 		datasetReader = new morpheus.GmtDatasetReader();
 	} else if (ext === 'xlsx') {
-		datasetReader = new morpheus.XlsxDatasetReader();
+		datasetReader = options.interactive ? new morpheus.Array2dReader() : new morpheus.XlsxDatasetReader();
 	} else if (ext === 'segtab' || ext === 'seg') {
 		datasetReader = new morpheus.SegTabReader();
 		if (options && options.regions) {
 			datasetReader.setRegions(options.regions);
 		}
 	} else if (ext === 'txt' || ext === 'tsv' || ext === 'csv') {
-		datasetReader = new morpheus.TxtReader();
+		datasetReader = options.interactive ? new morpheus.Array2dReader() : new morpheus.TxtReader();
 	} else if (ext === 'json') {
 		datasetReader = new morpheus.JsonDatasetReader();
 	} else {
@@ -167,9 +170,12 @@ morpheus.DatasetUtil.annotate = function (options) {
  * @return A promise that resolves to Dataset
  */
 morpheus.DatasetUtil.read = function (fileOrUrl, options) {
+	if (options == null) {
+		options = {};
+	}
 	var isFile = fileOrUrl instanceof File;
 	var isString = _.isString(fileOrUrl);
-	var ext = options && options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
+	var ext = options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
 	var datasetReader;
 	var str = fileOrUrl.toString();
 	if (ext === '' && str != null && str.indexOf('blob:') === 0) {
@@ -180,7 +186,7 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 	if (isString || isFile) { // URL or file
 		var deferred = $.Deferred();
 		// override toString so can determine file name
-		if (options && options.background) {
+		if (options.background) {
 			var path = morpheus.Util.getScriptPath();
 			var blob = new Blob(
 				['self.onmessage = function(e) {'
