@@ -179,7 +179,7 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 	var datasetReader;
 	var str = fileOrUrl.toString();
 	if (ext === '' && str != null && str.indexOf('blob:') === 0) {
-		datasetReader = new morpheus.TxtReader(); // copy from clipboard
+		datasetReader = options.interactive ? new morpheus.Array2dReader() : new morpheus.TxtReader(); // copy from clipboard
 	} else {
 		datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
 	}

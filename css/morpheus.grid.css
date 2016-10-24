@@ -13,6 +13,11 @@
     margin: 0px;
 }
 
+
+.slick-bordered-table .slick-cell {
+    border: 1px solid lightgrey;
+}
+
 .slick-header-column.ui-state-default {
     height: 20px;
     line-height: 20px;
