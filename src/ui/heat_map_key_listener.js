@@ -5,10 +5,6 @@ morpheus.HeatMapKeyListener = function (controller) {
 		var commandKey = morpheus.Util.IS_MAC ? e.metaKey : e.ctrlKey;
 		var altKey = e.altKey;
 		var shiftKey = e.shiftKey;
-		if (commandKey && shiftKey && e.which === 70) { // ctrl-shift-f
-			controller.getToolbar().toggleMenu();
-			found = true;
-		}
 
 		if (tagName == 'INPUT' || tagName == 'SELECT' || tagName == 'TEXTAREA') {
 			; // skip
@@ -120,10 +116,8 @@ morpheus.HeatMapKeyListener = function (controller) {
 				morpheus.HeatMap.showTool(new morpheus.OpenFileTool(),
 					controller);
 				found = true;
-			} else if (e.which === 70) { // search columns or rows
-				controller.getToolbarElement().find(
-					e.shiftKey ? '[data-name=searchColumns]'
-						: '[data-name=searchRows]').focus();
+			} else if (e.which === 191) { // slash toggle search
+				controller.getToolbar().toggleSearch();
 				found = true;
 			} else if (e.which === 88) { // ctrl-X
 				morpheus.HeatMap.showTool(new morpheus.NewHeatMapTool(),
