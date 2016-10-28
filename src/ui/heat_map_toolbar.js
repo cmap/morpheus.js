@@ -81,7 +81,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml.push('</ul>');
 		searchHtml.push('</div>'); // input-group-btn
 		searchHtml
-		.push('<input type="text" style="border-top:3px solid rgb(127,127,127);width:240px;padding-right:25px;" class="form-control input-sm" autocomplete="off" name="searchColumns">');
+		.push('<input type="text" style="border-right:4px solid rgb(127,127,127);width:240px;padding-right:25px;" class="form-control input-sm" autocomplete="off" name="searchColumns">');
 		searchHtml.push('</div>');
 		searchHtml.push('</div>');
 		searchHtml.push('<div class="form-group">');
