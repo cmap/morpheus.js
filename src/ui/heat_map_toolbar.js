@@ -17,17 +17,16 @@ morpheus.HeatMapToolBar = function (controller) {
 	if (controller.options.toolbar.searchRows && controller.options.toolbar.searchColumns) {
 		searchHtml
 		.push('<button data-toggle="tooltip" title="Toggle Search (' + morpheus.Util.COMMAND_KEY + '/)" name="searchRowsToggle" type="button" class="btn btn-default btn-xxs' +
-			' btn-primary">Rows</button>');
+			' btn-primary"> Rows</button>');
 		searchHtml
 		.push('<button data-toggle="tooltip" title="Toggle Search (' + morpheus.Util.COMMAND_KEY + '/)" name="searchColumnsToggle" type="button" class="btn btn-default' +
-			' btn-xxs">Columns</button>');
+			' btn-xxs"> Columns</button>');
 	}
 
 	if (controller.options.toolbar.searchRows) {
+
 		searchHtml.push('<div style="display:inline-block;" data-name="searchRowsGroup">');
 		searchHtml.push('<div class="form-group">');
-		searchHtml.push('<div class="input-group">');
-		searchHtml.push('<div class="input-group-btn">');
 		searchHtml
 		.push('<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></button>');
 		searchHtml.push('<ul data-name="rowSearchOptions" class="dropdown-menu">');
@@ -41,15 +40,16 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml
 		.push('<li><a data-name="searchHelp" href="#">Help</a></li>');
 		searchHtml.push('</ul>');
-		searchHtml.push('</div>'); // input-group-btn
+		searchHtml.push('</div>')
+
+		searchHtml.push('<div class="form-group">');
 		searchHtml
-		.push('<input type="text" style="border-top:3px solid rgb(127,127,127);width:240px;padding-right:25px;" class="form-control input-sm" autocomplete="off" name="searchRows">');
-		searchHtml.push('</div>'); // input-group
-		searchHtml.push('</div>'); // form-group
+		.push('<input type="text" style="border-top:3.8px solid #636363;border-bottom:3.8px solid #636363;width:240px;" class="form-control input-sm" autocomplete="off" name="searchRows">');
+		searchHtml.push('</div>');
 		searchHtml.push('<div class="form-group">');
 		searchHtml.push('<span data-name="rowSearchDiv" style="display:none;">');
 		searchHtml
-		.push('<span data-name="searchResultsRows"></span>');
+		.push('<span style="font-size:12px;" data-name="searchResultsRows"></span>');
 		searchHtml
 		.push('<button name="previousRowMatch" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Previous"><i class="fa fa-chevron-up"></i></button>');
 		searchHtml
@@ -62,10 +62,10 @@ morpheus.HeatMapToolBar = function (controller) {
 
 	}
 	if (controller.options.toolbar.searchColumns) {
+
 		searchHtml.push('<div style="display:none;" data-name="searchColumnsGroup">');
+
 		searchHtml.push('<div class="form-group">');
-		searchHtml.push('<div class="input-group">');
-		searchHtml.push('<div class="input-group-btn">');
 		searchHtml
 		.push('<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></button>');
 		searchHtml.push('<ul data-name="columnSearchOptions" class="dropdown-menu">');
@@ -79,15 +79,16 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml
 		.push('<li><a data-name="searchHelp" href="#">Help</a></li>');
 		searchHtml.push('</ul>');
-		searchHtml.push('</div>'); // input-group-btn
+		searchHtml.push('</div>')
+
+		searchHtml.push('<div class="form-group">');
 		searchHtml
-		.push('<input type="text" style="border-right:4px solid rgb(127,127,127);width:240px;padding-right:25px;" class="form-control input-sm" autocomplete="off" name="searchColumns">');
-		searchHtml.push('</div>');
+		.push('<input type="text" style="border-right:3.8px solid #636363;border-left:3.8px solid #636363;width:240px;" class="form-control input-sm" autocomplete="off" name="searchColumns">');
 		searchHtml.push('</div>');
 		searchHtml.push('<div class="form-group">');
 		searchHtml.push('<span data-name="columnSearchDiv" style="display:none;">');
 		searchHtml
-		.push('<span data-name="searchResultsColumns"></span>');
+		.push('<span style="font-size:12px;" data-name="searchResultsColumns"></span>');
 		searchHtml
 		.push('<button name="previousColumnMatch" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Previous"><i class="fa fa-chevron-up"></i></button>');
 		searchHtml
