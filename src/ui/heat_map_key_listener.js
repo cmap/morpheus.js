@@ -116,8 +116,8 @@ morpheus.HeatMapKeyListener = function (controller) {
 				morpheus.HeatMap.showTool(new morpheus.OpenFileTool(),
 					controller);
 				found = true;
-			} else if (e.which === 70) { // ctrl-shift-f search columns or rows
-				controller.getToolbar().setSearchColumns(e.shiftKey);
+			} else if (e.which === 191) { // slash toggle search
+				controller.getToolbar().toggleSearch();
 				found = true;
 			} else if (e.which === 88) { // ctrl-X
 				morpheus.HeatMap.showTool(new morpheus.NewHeatMapTool(),
