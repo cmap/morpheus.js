@@ -72,6 +72,7 @@ morpheus.LandingPage.prototype = {
 			var options = optionsArray[i];
 			options.tabManager = _this.tabManager;
 			options.focus = i === 0;
+			options.landingPage = _this;
 			new morpheus.HeatMap(options);
 		}
 
