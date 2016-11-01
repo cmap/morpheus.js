@@ -28,8 +28,8 @@
 }
 
 .morpheus-button-divider {
-    width: 4px;
-    display: inline-block;
+    padding-left: 4px;
+    display: inline;
 }
 
 .morpheus-hover-show {

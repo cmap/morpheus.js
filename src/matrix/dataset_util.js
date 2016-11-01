@@ -439,9 +439,9 @@ morpheus.DatasetUtil.searchValues = function (dataset, text, cb) {
 	}
 	var seriesIndices = [];
 	for (var i = 0, nseries = dataset.getSeriesCount(); i < nseries; i++) {
-		if (dataset.getDataType(i) === 'Number' || dataset.getDataType(i) === 'object') {
-			seriesIndices.push(i);
-		}
+		// if (dataset.getDataType(i) === 'Number' || dataset.getDataType(i) === 'object') {
+		seriesIndices.push(i);
+		// }
 	}
 	if (seriesIndices.length === 0) {
 		return;
@@ -472,7 +472,7 @@ morpheus.DatasetUtil.searchValues = function (dataset, text, cb) {
 			for (var k = 0, nseries = seriesIndices.length; k < nseries; k++) {
 				var matches = false;
 				var element = dataset.getValue(i, j, seriesIndices[k]);
-				if (element && element.toObject) {
+				if (element != null && element.toObject) {
 					var object = element.toObject();
 					for (var p = 0; p < npredicates && !matches; p++) {
 						var predicate = predicates[p];

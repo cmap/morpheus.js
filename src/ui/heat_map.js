@@ -185,6 +185,7 @@ morpheus.HeatMap = function (options) {
 			// set, it will be determined automatically
 			/** Whether to focus this tab */
 			focus: true,
+			tooltipMode: 0, // 0=top status bar, 1=dialog, 2=follow
 			inheritFromParent: true,
 			inheritFromParentOptions: {
 				transpose: false
@@ -212,6 +213,7 @@ morpheus.HeatMap = function (options) {
 			 */
 			closeable: true,
 			toolbar: {
+				dimensions: true,
 				zoom: true,
 				tools: true,
 				searchRows: true,
@@ -332,7 +334,6 @@ morpheus.HeatMap = function (options) {
 	this.options.dataSource = !options.dataset ? ''
 		: (options.dataset.file ? options.dataset.file : options.dataset);
 	this._togglingInfoWindow = false;
-	this.tooltipMode = 0; // 0=docked, 1=dialog, 2=follow
 
 	var promises = [];
 	if (options.promises) {
@@ -399,6 +400,8 @@ morpheus.HeatMap = function (options) {
 		if (_this.options.focus) {
 			_this.tabManager.setActiveTab(tab.id);
 			$(_this.heatmap.canvas).focus();
+		} else if (_this.tabManager.getTabCount() === 1) {
+			_this.tabManager.setActiveTab(tab.id);
 		}
 		_this.$el.trigger('heatMapLoaded', _this);
 	};
@@ -1828,7 +1831,7 @@ morpheus.HeatMap.prototype = {
 			},
 			title: 'Info'
 		});
-
+		this.setTooltipMode(this.options.tooltipMode);
 		this
 		.getProject()
 		.on(
@@ -2236,7 +2239,7 @@ morpheus.HeatMap.prototype = {
 			this._updateTipFollowPosition(options);
 
 		}
-		// else if (this.tooltipMode === 2 &&
+		// else if (this.options.tooltipMode === 2 &&
 		// (this.project.getHoverColumnIndex() !== -1 || this.project
 		// .getHoverRowIndex() !== -1)) {
 		//
@@ -2249,15 +2252,16 @@ morpheus.HeatMap.prototype = {
 	},
 	setTooltipMode: function (mode) {
 		this._togglingInfoWindow = true;
-		this.tooltipMode = mode;
+		this.options.tooltipMode = mode;
 		this.$tipInfoWindow.html('');
 		this.toolbar.$tip.html('');
 		this.$tipFollow.html('').css({
 			left: -1000,
 			top: -1000
 		});
+		this.toolbar.$tip.css('display', mode === 0 ? '' : 'none');
 		this.setToolTip(-1, -1);
-		if (this.tooltipMode === 1) {
+		if (this.options.tooltipMode === 1) {
 			this.$tipInfoWindow.dialog('open');
 		} else {
 			this.$tipInfoWindow.dialog('close');
@@ -2265,12 +2269,12 @@ morpheus.HeatMap.prototype = {
 		this._togglingInfoWindow = false;
 	},
 	toggleInfoWindow: function () {
-		this.setTooltipMode(this.tooltipMode == 1 ? 0 : 1);
+		this.setTooltipMode(this.options.tooltipMode == 1 ? 0 : 1);
 	},
 	_setTipText: function (tipText, tipFollowText, options) {
-		if (this.tooltipMode === 0) {
+		if (this.options.tooltipMode === 0) {
 			this.toolbar.$tip.html(tipText.join(''));
-		} else if (this.tooltipMode === 1) {
+		} else if (this.options.tooltipMode === 1) {
 			this.$tipInfoWindow.html(tipText.join(''));
 		}
 
@@ -2390,7 +2394,7 @@ morpheus.HeatMap.prototype = {
 					var tipFollowText = [];
 					for (var hoverIndex = 0; hoverIndex < inline.length; hoverIndex++) {
 						this.tooltipProvider(this, inline[hoverIndex], -1,
-							options, this.tooltipMode === 0 ? '&nbsp;&nbsp;&nbsp;'
+							options, this.options.tooltipMode === 0 ? '&nbsp;&nbsp;&nbsp;'
 								: '<br />', false, tipText);
 						if (this.options.inlineTooltip) {
 							this.tooltipProvider(this, inline[hoverIndex], -1,
@@ -2491,7 +2495,7 @@ morpheus.HeatMap.prototype = {
 					var tipFollowText = [];
 					for (var hoverIndex = 0; hoverIndex < inline.length; hoverIndex++) {
 						this.tooltipProvider(this, -1, inline[hoverIndex],
-							options, this.tooltipMode === 0 ? '&nbsp;&nbsp;&nbsp;'
+							options, this.options.tooltipMode === 0 ? '&nbsp;&nbsp;&nbsp;'
 								: '<br />', false, tipText);
 						if (this.options.inlineTooltip) {
 							this.tooltipProvider(this, -1, inline[hoverIndex],
@@ -2509,7 +2513,7 @@ morpheus.HeatMap.prototype = {
 		// tooltipMode=0 top, 1=window, 2=inline
 		var tipText = [];
 		this.tooltipProvider(this, rowIndex, columnIndex,
-			options, this.tooltipMode === 0 ? '&nbsp;&nbsp;&nbsp;'
+			options, this.options.tooltipMode === 0 ? '&nbsp;&nbsp;&nbsp;'
 				: '<br />', false, tipText);
 
 		var tipFollowText = [];

@@ -98,6 +98,9 @@ morpheus.TabManager = function (options) {
 
 };
 morpheus.TabManager.prototype = {
+	getTabCount: function () {
+		return this.idToTabObject.size();
+	},
 	setTabText: function (id, text) {
 		this.$nav.find('a').filter('[data-link=' + id + ']').contents().first()
 		.replaceWith(text + '&nbsp;');

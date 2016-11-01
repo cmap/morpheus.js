@@ -192,7 +192,16 @@ morpheus.VectorTrack.prototype = {
 		} else if (_.isObject(conf)) {
 			conf.maxTextWidth = undefined;
 			this.settings = $.extend({}, this.settings, conf);
+			if (conf.renderMethod) {
+				for (var method in conf.renderMethod) {
+					method = method.toUpperCase();
+					var mapped = morpheus.VectorTrack.RENDER[method];
+					if (mapped !== undefined) {
+						this.settings.renderMethod[mapped] = true;
+					}
+				}
 
+			}
 		}
 		this._update();
 

@@ -130,13 +130,15 @@ morpheus.HeatMapToolBar = function (controller) {
 	.push('<h6 data-name="searchResultsColumnDendrogram" style="display: inline;"></h6>');
 	searchHtml.push('</div>');
 	// dimensions
-	searchHtml.push('<div class="form-group">');
-	searchHtml
-	.push('<h6 style="display: inline; margin-left:10px;" data-name="dim"></h6>');
-	searchHtml
-	.push('<h6 style="display: inline; margin-left:10px; background-color:rgb(182,213,253);"' +
-		' data-name="selection"></h6>');
-	searchHtml.push('</div>');
+	if (controller.options.toolbar.dimensions) {
+		searchHtml.push('<div class="form-group">');
+		searchHtml
+		.push('<h6 style="display: inline; margin-left:10px;" data-name="dim"></h6>');
+		searchHtml
+		.push('<h6 style="display: inline; margin-left:10px; background-color:rgb(182,213,253);"' +
+			' data-name="selection"></h6>');
+		searchHtml.push('</div>');
+	}
 	searchHtml.push('<div data-name="buttons" style="margin-left:10px;" class="form-group"></div>');
 
 	$(searchHtml.join('')).appendTo($search);

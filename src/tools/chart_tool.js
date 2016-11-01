@@ -841,8 +841,17 @@ morpheus.ChartTool.prototype = {
 			emptyToAll: false
 		});
 		this.dataset = dataset;
-		if (dataset.getRowCount() * dataset.getColumnCount() === 0) {
+		if (dataset.getRowCount() === 0 && dataset.getColumnCount() === 0) {
 			$('<h4>Please select rows and columns in the heat map.</h4>')
+			.appendTo(this.$chart);
+			return;
+		} else if (dataset.getRowCount() === 0) {
+			$('<h4>Please select rows in the heat map.</h4>')
+			.appendTo(this.$chart);
+			return;
+		}
+		if (dataset.getColumnCount() === 0) {
+			$('<h4>Please select columns in the heat map.</h4>')
 			.appendTo(this.$chart);
 			return;
 		}
@@ -1082,15 +1091,27 @@ morpheus.ChartTool.prototype = {
 						return vector.getValue(item.row);
 					};
 
+					var isArray = morpheus.VectorUtil.getDataType(vector)[0] = '[';
 					for (var i = 0, nitems = items.length; i < nitems; i++) {
 						var item = items[i];
 						var value = getter(item);
-						var array = rowIdToArray.get(value);
-						if (array == undefined) {
-							array = [];
-							rowIdToArray.set(value, array);
+						if (isArray && value != null) {
+							value.forEach(function (val) {
+								var array = rowIdToArray.get(val);
+								if (array == undefined) {
+									array = [];
+									rowIdToArray.set(val, array);
+								}
+								array.push(item);
+							});
+						} else {
+							var array = rowIdToArray.get(value);
+							if (array == undefined) {
+								array = [];
+								rowIdToArray.set(value, array);
+							}
+							array.push(item);
 						}
-						array.push(item);
 					}
 				} else {
 					rowIdToArray.set(undefined, items);
@@ -1108,7 +1129,7 @@ morpheus.ChartTool.prototype = {
 					} : function (item) {
 						return vector.getValue(item.row);
 					};
-
+					var isArray = morpheus.VectorUtil.getDataType(vector)[0] = '[';
 					var columnIdToIndex = new morpheus.Map();
 					var rowIndex = 0;
 					rowIdToArray.forEach(function (array, id) {
@@ -1116,16 +1137,34 @@ morpheus.ChartTool.prototype = {
 						for (var i = 0, nitems = array.length; i < nitems; i++) {
 							var item = array[i];
 							var value = getter(item);
-							var columnIndex = columnIdToIndex.get(value);
-							if (columnIndex === undefined) {
-								columnIndex = columnIdToIndex.size();
-								columnIdToIndex.set(value, columnIndex);
-							}
-							if (grid[rowIndex][columnIndex] === undefined) {
-								grid[rowIndex][columnIndex] = [];
+							if (isArray && value != null) {
+
+								value.forEach(function (val) {
+									var columnIndex = columnIdToIndex.get(val);
+									if (columnIndex === undefined) {
+										columnIndex = columnIdToIndex.size();
+										columnIdToIndex.set(val, columnIndex);
+									}
+									if (grid[rowIndex][columnIndex] === undefined) {
+										grid[rowIndex][columnIndex] = [];
+									}
+
+									grid[rowIndex][columnIndex].push(item);
+								});
+
+							} else {
+								var columnIndex = columnIdToIndex.get(value);
+								if (columnIndex === undefined) {
+									columnIndex = columnIdToIndex.size();
+									columnIdToIndex.set(value, columnIndex);
+								}
+								if (grid[rowIndex][columnIndex] === undefined) {
+									grid[rowIndex][columnIndex] = [];
+								}
+
+								grid[rowIndex][columnIndex].push(item);
 							}
 
-							grid[rowIndex][columnIndex].push(item);
 						}
 						rowIds[rowIndex] = id;
 						rowIndex++;
