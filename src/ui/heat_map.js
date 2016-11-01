@@ -213,6 +213,7 @@ morpheus.HeatMap = function (options) {
 			 */
 			closeable: true,
 			toolbar: {
+				chart: true,
 				dimensions: true,
 				zoom: true,
 				tools: true,

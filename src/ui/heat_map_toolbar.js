@@ -200,7 +200,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		toolbarHtml
 		.push('<button name="filterButton" data-toggle="tooltip" title="Filter" type="button" class="btn btn-default btn-xxs"><span class="fa fa-filter"></span></button>');
 	}
-	if (typeof Plotly !== 'undefined') {
+	if (controller.options.toolbar.chart && typeof Plotly !== 'undefined') {
 		toolbarHtml
 		.push('<button name="chart" data-toggle="tooltip" title="Chart" type="button" class="btn btn-default btn-xxs"><span class="fa fa-line-chart"></span></button>');
 
@@ -223,7 +223,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		tool: new morpheus.SimilarityMatrixTool()
 	}, {
 		tool: new morpheus.TransposeTool()
-	}, {tool: new morpheus.TsneTool()}]; // DevAPI, {
+	}, {tool: new morpheus.TsneTool()}, null, {tool: new morpheus.DevAPI()}];
 	this.getToolByName = function (name) {
 		for (var i = 0; i < tools.length; i++) {
 			if (tools[i] && tools[i].tool.toString
@@ -874,7 +874,8 @@ morpheus.HeatMapToolBar = function (controller) {
 	});
 	this.updateDimensionsLabel();
 	this.updateSelectionLabel();
-};
+}
+;
 morpheus.HeatMapToolBar.HIGHLIGHT_SEARCH_MODE = 0;
 morpheus.HeatMapToolBar.FILTER_SEARCH_MODE = 1;
 morpheus.HeatMapToolBar.MATCHES_TO_TOP_SEARCH_MODE = 2;
