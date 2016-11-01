@@ -7,7 +7,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		+ '<div class="row"><div style="padding-left:0px;padding-right:0px;"' +
 		' class="col-xs-12"><div' +
 		' data-name="lineOneColumn"></div></div></div>'
-		+ '<div class="row"><div class="col-xs-12"><div data-name="lineTwoColumn" style="white-space:nowrap; border-bottom: 1px solid #e7e7e7;margin-bottom:10px;"></div></div></div>'
+		+ '<div class="row"><div class="col-xs-12"><div data-name="lineTwoColumn" style="white-space:nowrap; border-bottom: thin solid #e7e7e7;margin-bottom:4px;"></div></div></div>'
 		+ '</div>');
 	var searchHtml = [];
 	var $search = $('<form name="searchForm" class="form form-inline form-compact" role="search"></form>');

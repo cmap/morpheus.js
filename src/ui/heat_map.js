@@ -250,7 +250,7 @@ morpheus.HeatMap = function (options) {
 	var isPrimary = this.options.parent == null;
 	if (this.options.parent == null) {
 
-		this.tabManager = this.options.tabManager ? this.options.tabManager
+		this.tabManager = this.options.tabManager != null ? this.options.tabManager
 			: new morpheus.TabManager({
 			landingPage: this.options.landingPage
 		});
