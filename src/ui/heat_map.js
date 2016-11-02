@@ -2251,6 +2251,11 @@ morpheus.HeatMap.prototype = {
 			arguments: arguments
 		});
 	},
+	/**
+	 Set where the tooltip is shown
+	 @param mode 0 is formula bar, 1 is dialog, -1 is no tooltip
+	 */
+
 	setTooltipMode: function (mode) {
 		this._togglingInfoWindow = true;
 		this.options.tooltipMode = mode;

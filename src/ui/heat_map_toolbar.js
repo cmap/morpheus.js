@@ -7,7 +7,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		+ '<div class="row"><div style="padding-left:0px;padding-right:0px;"' +
 		' class="col-xs-12"><div' +
 		' data-name="lineOneColumn"></div></div></div>'
-		+ '<div class="row"><div class="col-xs-12"><div data-name="lineTwoColumn" style="white-space:nowrap; border-bottom: thin solid #e7e7e7;margin-bottom:4px;"></div></div></div>'
+		+ '<div class="row"><div class="col-xs-12"><div data-name="tip" style="white-space:nowrap; border-top: thin solid #e7e7e7;margin-bottom:2px;height: 14px; font-size: 10px;overflow:hidden;"></div></div></div>'
 		+ '</div>');
 	var searchHtml = [];
 	var $search = $('<form name="searchForm" class="form form-inline form-compact" role="search"></form>');
@@ -30,11 +30,25 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml
 		.push('<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></button>');
 		searchHtml.push('<ul data-name="rowSearchOptions" class="dropdown-menu">');
-		searchHtml.push('<li><a data-name="exact" href="#"><span data-type="toggle"></span>Exact' +
+		searchHtml.push('<li><a data-group="matchMode" data-name="exact" href="#"><span' +
+			' data-type="toggle"></span>Exact' +
 			' Match</a></li>');
 		searchHtml
-		.push('<li><a data-name="contains" href="#"><span data-type="toggle"' +
+		.push('<li><a data-group="matchMode" data-name="contains" href="#"><span' +
+			' data-type="toggle"' +
 			' class="dropdown-checkbox fa fa-check"></span>Contains</a></li>');
+		searchHtml
+		.push('<li role="separator" class="divider"></li>');
+
+		searchHtml
+		.push('<li><a data-group="searchMode" data-name="matchAny" href="#"><span' +
+			' data-type="toggle"' +
+			' class="dropdown-checkbox fa fa-check"></span>Match Any Search Term</a></li>');
+
+		searchHtml
+		.push('<li><a data-group="searchMode" data-name="matchAll" href="#"><span' +
+			' data-type="toggle"></span>Match All Search Terms</a></li>');
+
 		searchHtml
 		.push('<li role="separator" class="divider"></li>');
 		searchHtml
@@ -69,11 +83,24 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml
 		.push('<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></button>');
 		searchHtml.push('<ul data-name="columnSearchOptions" class="dropdown-menu">');
-		searchHtml.push('<li><a data-name="exact" href="#"><span data-type="toggle"></span>Exact' +
+		searchHtml.push('<li><a data-group="matchMode" data-name="exact" href="#"><span' +
+			' data-type="toggle"></span>Exact' +
 			' Match</a></li>');
 		searchHtml
-		.push('<li><a data-name="contains" href="#"><span data-type="toggle"' +
+		.push('<li><a data-group="matchMode" data-name="contains" href="#"><span' +
+			' data-type="toggle"' +
 			' class="dropdown-checkbox fa fa-check"></span>Contains</a></li>');
+		searchHtml
+		.push('<li role="separator" class="divider"></li>');
+		searchHtml
+		.push('<li><a data-group="searchMode" data-name="matchAny" href="#"><span' +
+			' data-type="toggle"' +
+			' class="dropdown-checkbox fa fa-check"></span>Match Any Search Term</a></li>');
+
+		searchHtml
+		.push('<li><a data-group="searchMode" data-name="matchAll" href="#"><span' +
+			' data-type="toggle"></span>Match All Search Terms</a></li>');
+
 		searchHtml
 		.push('<li role="separator" class="divider"></li>');
 		searchHtml
@@ -273,7 +300,6 @@ morpheus.HeatMapToolBar = function (controller) {
 	if (controller.options.$help) {
 		controller.options.$help.appendTo($buttons);
 	}
-	$('<div data-name="tip" style="height: 14px; font-size: 12px;overflow:hidden;"></div>').appendTo($el.find('[data-name=lineTwoColumn]'));
 
 	// $hide.appendTo($el.find('[data-name=toggleEl]'));
 	$el.prependTo(controller.$content);
@@ -289,15 +315,24 @@ morpheus.HeatMapToolBar = function (controller) {
 		}
 	});
 	this.defaultRowMatchMode = 'contains';
+	this.rowSearchMatchAllPredicates = false;
 	this.defaultColumnMatchMode = 'contains';
+	this.columnSearchMatchAllPredicates = false;
 	var $rowSearchOptions = $el.find('[data-name=rowSearchOptions]');
 	$rowSearchOptions.on('click', 'li > a', function (e) {
 		e.preventDefault();
-		_this.defaultRowMatchMode = $(this).attr('data-name');
+		var $this = $(this);
+		var group = $this.data('group');
+		if (group === 'matchMode') {
+			_this.defaultRowMatchMode = $this.data('name');
+		} else {
+			_this.rowSearchMatchAllPredicates = $this.data('name') === 'matchAll';
+		}
 		_this.search(true);
 		var $span = $(this).find('span');
 		if ($span.data('type') === 'toggle') {
-			$rowSearchOptions.find('[data-type=toggle]').removeClass('dropdown-checkbox fa' +
+			$rowSearchOptions.find('[data-group=' + group + '] > [data-type=toggle]').removeClass('dropdown-checkbox' +
+				' fa' +
 				' fa-check');
 			$span.addClass('dropdown-checkbox fa fa-check');
 		}
@@ -309,11 +344,18 @@ morpheus.HeatMapToolBar = function (controller) {
 	var $columnSearchOptions = $el.find('[data-name=columnSearchOptions]');
 	$columnSearchOptions.on('click', 'li > a', function (e) {
 		e.preventDefault();
-		_this.defaultColumnMatchMode = $(this).attr('data-name');
+		var $this = $(this);
+		var group = $this.data('group');
+		if (group === 'matchMode') {
+			_this.defaultColumnMatchMode = $this.data('name');
+		} else {
+			_this.columnSearchMatchAllPredicates = $this.data('name') === 'matchAll';
+		}
 		_this.search(false);
 		var $span = $(this).find('span');
 		if ($span.data('type') === 'toggle') {
-			$columnSearchOptions.find('[data-type=toggle]').removeClass('dropdown-checkbox fa' +
+			$columnSearchOptions.find('[data-group=' + group + '] > [data-type=toggle]').removeClass('dropdown-checkbox' +
+				' fa' +
 				' fa-check');
 			$span.addClass('dropdown-checkbox fa fa-check');
 		}
@@ -1068,6 +1110,7 @@ morpheus.HeatMapToolBar.prototype = {
 			fullModel: fullModel,
 			text: searchText,
 			isColumns: !isRows,
+			matchAllPredicates: isRows ? this.rowSearchMatchAllPredicates : this.columnSearchMatchAllPredicates,
 			defaultMatchMode: isRows ? this.defaultRowMatchMode
 				: this.defaultColumnMatchMode
 		});

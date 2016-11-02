@@ -204,6 +204,7 @@ morpheus.FormBuilder._showInModal = function (options) {
 	$div.find('.modal-body').html(options.html);
 	$div.prependTo($(document.body));
 	$div.modal({
+		keyboard: true,
 		backdrop: options.backdrop === true ? true : false,
 	}).on('hidden.bs.modal', function (e) {
 		$div.remove();

@@ -31,6 +31,7 @@ morpheus.MetadataUtil.renameFields = function (dataset, options) {
  *            Whether to search columns
  * @param options.defaultMatchMode
  *            'exact' or 'contains'
+ * @param options.matchAllPredicates Whether to match all predicates
  *
  */
 morpheus.MetadataUtil.search = function (options) {
@@ -95,70 +96,90 @@ morpheus.MetadataUtil.search = function (options) {
 		}
 
 	}
-	var nfields = vectors.length;
-	for (var i = 0, nitems = model.getItemCount(); i < nitems; i++) {
-		var matches = false;
-		for (var p = 0; p < npredicates && !matches; p++) {
-			var predicate = predicates[p];
-			var filterColumnName = predicate.getField();
-			if (filterColumnName != null) {
-				var value = null;
-				if (filterColumnName === indexField) {
-					value = i + 1;
-					if (predicate.accept(value)) {
-						matches = true;
-						break;
-					}
-				} else {
-					var wrapper = nameToVector.get(filterColumnName);
-					if (wrapper) {
-						value = wrapper.vector.getValue(i);
-						if (value != null) {
-							if (wrapper.isArray) {
-								for (var k = 0; k < value.length; k++) {
-									if (predicate.accept(value[k])) {
-										matches = true;
-										break;
-									}
-								}
-							} else {
-								if (predicate.accept(value)) {
-									matches = true;
-									break;
-								}
-							}
 
-						}
-					}
+	function isMatch(predicate) {
+		var filterColumnName = predicate.getField();
+		if (filterColumnName != null) {
+			var value = null;
+			if (filterColumnName === indexField) {
+				value = i + 1;
+				if (predicate.accept(value)) {
+					return true;
 				}
-
-			} else { // try all fields
-
-				for (var j = 0; j < nfields; j++) {
-					var wrapper = vectors[j];
-					var value = wrapper.vector.getValue(i);
+			} else {
+				var wrapper = nameToVector.get(filterColumnName);
+				if (wrapper) {
+					value = wrapper.vector.getValue(i);
 					if (value != null) {
 						if (wrapper.isArray) {
 							for (var k = 0; k < value.length; k++) {
 								if (predicate.accept(value[k])) {
-									matches = true;
-									break;
+									return true;
+
 								}
 							}
 						} else {
 							if (predicate.accept(value)) {
-								matches = true;
-								break;
+								return true;
 							}
 						}
 
 					}
 				}
 			}
+
+		} else { // try all fields
+
+			for (var j = 0; j < nfields; j++) {
+				var wrapper = vectors[j];
+				var value = wrapper.vector.getValue(i);
+				if (value != null) {
+					if (wrapper.isArray) {
+						for (var k = 0; k < value.length; k++) {
+							if (predicate.accept(value[k])) {
+								matches = true;
+								break;
+							}
+						}
+					} else {
+						if (predicate.accept(value)) {
+							matches = true;
+							break;
+						}
+					}
+
+				}
+			}
 		}
-		if (matches) {
-			indices.push(i);
+
+	}
+
+	var matchAllPredicates = options.matchAllPredicates === true;
+	var nfields = vectors.length;
+	for (var i = 0, nitems = model.getItemCount(); i < nitems; i++) {
+		if (!matchAllPredicates) { // at least one predicate matches
+			var matches = false;
+			for (var p = 0; p < npredicates; p++) {
+				var predicate = predicates[p];
+				if (isMatch(predicate)) {
+					indices.push(i);
+					break;
+				}
+			}
+		} else {
+			var matches = true;
+			for (var p = 0; p < npredicates; p++) {
+				var predicate = predicates[p];
+				if (!isMatch(predicate)) {
+					matches = false;
+					break;
+				}
+			}
+			if (matches) {
+				indices.push(i);
+			}
 		}
+
 	}
 	return indices;
 };
