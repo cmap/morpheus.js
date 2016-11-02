@@ -171,7 +171,7 @@ morpheus.FormBuilder._showInModal = function (options) {
 		size: '',
 		close: true
 	}, options);
-	html.push('<div class="modal" role="dialog" aria-hidden="false"');
+	html.push('<div tabindex="-1" class="modal" role="dialog" aria-hidden="false"');
 	if (options.z) {
 		html.push(' style="z-index: ' + options.z + ' !important;"');
 	}

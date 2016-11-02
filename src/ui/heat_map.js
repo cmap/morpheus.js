@@ -537,6 +537,9 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
 	if (tool.gui) {
 		var gui = tool.gui(controller.getProject());
 		var formBuilder = new morpheus.FormBuilder();
+		// if (tool.quickHelp) {
+		// 	formBuilder.appendContent(tool.quickHelp());
+		// }
 		_.each(gui, function (item) {
 			formBuilder.append(item);
 		});
