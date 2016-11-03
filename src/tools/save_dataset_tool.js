@@ -4,6 +4,9 @@ morpheus.SaveDatasetTool.prototype = {
 	toString: function () {
 		return 'Save Dataset';
 	},
+	init: function (project, form) {
+		form.find('file_name').prop('autofocus', true);
+	},
 	gui: function () {
 		return [
 			{
