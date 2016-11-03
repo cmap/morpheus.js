@@ -191,6 +191,11 @@ morpheus.Project.prototype = {
 	},
 	setRowSortKeys: function (keys, notify) {
 		this._saveSelection(false);
+		for (var i = 0, nkeys = keys.length; i < nkeys; i++) {
+			if (keys[i].isColumns() === undefined) {
+				keys[i].setColumns(false);
+			}
+		}
 		this.rowIndexMapper.setSortKeys(keys);
 		this._restoreSelection(false);
 		if (notify) {
@@ -199,6 +204,11 @@ morpheus.Project.prototype = {
 	},
 	setColumnSortKeys: function (keys, notify) {
 		this._saveSelection(true);
+		for (var i = 0, nkeys = keys.length; i < nkeys; i++) {
+			if (keys[i].isColumns() === undefined) {
+				keys[i].setColumns(true);
+			}
+		}
 		this.columnIndexMapper.setSortKeys(keys);
 		this._restoreSelection(true);
 		if (notify) {

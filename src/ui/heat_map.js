@@ -1114,8 +1114,7 @@ morpheus.HeatMap.prototype = {
 			}
 		}
 
-		this.project = this.options.symmetric ? new morpheus.SymmetricProject(
-			dataset) : new morpheus.Project(dataset);
+		this.project = new morpheus.Project(dataset);
 
 		this.tabManager.setTabTitle(this.tabId, this.project.getFullDataset()
 			.getRowCount()
@@ -2084,6 +2083,10 @@ morpheus.HeatMap.prototype = {
 		}
 		if (this.options.keyboard) {
 			new morpheus.HeatMapKeyListener(this);
+		}
+		if (this.options.symmetric) {
+			var l = new morpheus.SymmetricProjectListener(this.getProject(), this.vscroll, this.hscroll);
+			this.getProject().__symmetricProjectListener = l;
 		}
 		var dragStartScrollTop;
 		var dragStartScrollLeft;

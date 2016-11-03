@@ -1,4 +1,4 @@
-morpheus.IndexMapper = function(project, isRows) {
+morpheus.IndexMapper = function (project, isRows) {
 	this.project = project;
 	this.isRows = isRows;
 	this.sortKeys = [];
@@ -18,32 +18,34 @@ morpheus.IndexMapper = function(project, isRows) {
 };
 
 morpheus.IndexMapper.prototype = {
-	convertModelIndexToView : function(modelIndex) {
+	convertModelIndexToView: function (modelIndex) {
 		var index = this.modelToView.get(modelIndex);
 		return index !== undefined ? index : -1;
 	},
-	convertViewIndexToModel : function(viewIndex) {
+	convertViewIndexToModel: function (viewIndex) {
 		return (viewIndex < this.filteredSortedModelIndices.length
-				&& viewIndex >= 0 ? this.filteredSortedModelIndices[viewIndex]
-				: -1);
+		&& viewIndex >= 0 ? this.filteredSortedModelIndices[viewIndex]
+			: -1);
 	},
-	convertToView : function() {
+	convertToView: function () {
 		return this.filteredSortedModelIndices;
 	},
-	setFilter : function(filter) {
+	setFilter: function (filter) {
 		this.filter = filter;
 		this._filter();
 		this._sort();
 	},
-	_filter : function() {
+	_filter: function () {
 		var filter = this.filter;
-		var dataset = this.getFullDataset();
+		var dataset = this.project.getFullDataset();
+		var count = this.isRows ? dataset.getRowCount() : dataset.getColumnCount();
 		var filteredModelIndices;
 		if (filter != null) {
-			filter.init(dataset);
+			filter.init(dataset); // filter needs to transpose if columns
 			if (filter.isEnabled()) {
 				filteredModelIndices = [];
-				for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+
+				for (var i = 0; i < count; i++) {
 					if (filter.accept(i)) {
 						filteredModelIndices.push(i);
 					}
@@ -52,20 +54,20 @@ morpheus.IndexMapper.prototype = {
 		}
 
 		this.filteredModelIndices = filteredModelIndices != null ? filteredModelIndices
-				: morpheus.Util.seq(dataset.getRowCount());
+			: morpheus.Util.seq(count);
 	},
-	_sort : function() {
+	_sort: function () {
 		var sortKeys = this.sortKeys;
 		if (sortKeys.length > 0) {
-			var dataset = this.getFullDataset();
+			var dataset = this.project.getFullDataset();
 
 			var nkeys = sortKeys.length;
 			for (var i = 0; i < nkeys; i++) {
-				sortKeys[i].init(dataset, this.filteredSortedModelIndices);
+				sortKeys[i].init(sortKeys[i].isColumns() ? new morpheus.TransposedDatasetView(dataset) : dataset, this.filteredSortedModelIndices);
 			}
 			this.filteredSortedModelIndices = this.filteredModelIndices
-					.slice(0);
-			this.filteredSortedModelIndices.sort(function(a, b) {
+			.slice(0);
+			this.filteredSortedModelIndices.sort(function (a, b) {
 				for (var i = 0; i < nkeys; i++) {
 					var key = sortKeys[i];
 					var comparator = key.getComparator();
@@ -88,28 +90,23 @@ morpheus.IndexMapper.prototype = {
 		}
 		this.modelToView = modelToView;
 	},
-	getFilter : function() {
+	getFilter: function () {
 		return this.filter;
 	},
-	getViewCount : function() {
-		if (this.getFullDataset() == null) {
+	getViewCount: function () {
+		if (this.project.getFullDataset() == null) {
 			return 0;
 		}
 		return this.filteredSortedModelIndices.length;
 	},
-	setSelectedModelIndices : function(selectedModelIndices) {
+	setSelectedModelIndices: function (selectedModelIndices) {
 		this.selectionModel.setSelectedModelIndices(selectedModelIndices);
 	},
-	setSortKeys : function(sortKeys) {
+	setSortKeys: function (sortKeys) {
 		if (sortKeys == null) {
 			sortKeys = [];
 		}
 		this.sortKeys = sortKeys;
 		this._sort();
-	},
-	getFullDataset : function() {
-		var originalDataset = this.project.getFullDataset();
-		return this.isRows ? originalDataset : morpheus.DatasetUtil
-				.transposedView(originalDataset);
 	}
 };
