@@ -331,6 +331,7 @@ morpheus.OpenFileTool.prototype = {
 				.getMetadataNames(isColumns ? dataset
 				.getColumnMetadata() : dataset.getRowMetadata()),
 				type: 'select',
+				value: 'id',
 				required: true
 			}];
 

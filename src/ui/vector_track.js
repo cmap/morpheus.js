@@ -2136,7 +2136,7 @@ morpheus.VectorTrack.prototype = {
 						- scale(box.upperAdjacentValue)), lineHeight);
 					context.fillStyle = '#31a354';
 					// highlight median
-					context.fillRect(scale(box.median) - 3, 1, 3, itemSize - 1);
+					context.fillRect(scale(box.median) - 3, start, 3, end - start);
 					context.fillStyle = '#636363';
 
 					// draw individual points
