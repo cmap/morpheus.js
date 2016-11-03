@@ -83,6 +83,14 @@ morpheus.HeatMapOptions = function (controller) {
 	}
 	var displayItems = [
 		{
+			disabled: controller.getProject().getFullDataset().getColumnCount() !== controller.getProject().getFullDataset().getRowCount(),
+			name: 'link_rows_and_columns',
+			required: true,
+			type: 'checkbox',
+			col: 'col-xs-4',
+			value: controller.getProject().__symmetricProjectListener != null
+		},
+		{
 			name: 'show_grid',
 			required: true,
 			type: 'checkbox',
@@ -142,6 +150,7 @@ morpheus.HeatMapOptions = function (controller) {
 				: 1)
 		});
 	}
+
 	displayItems.push({
 		name: 'info_window',
 		required: true,
@@ -331,6 +340,16 @@ morpheus.HeatMapOptions = function (controller) {
 	displayFormBuilder.$form.find('[name=info_window]').on('change',
 		function (e) {
 			controller.setTooltipMode(parseInt($(this).val()));
+		});
+	displayFormBuilder.find('link_rows_and_columns').on('click',
+		function (e) {
+			var checked = $(this).prop('checked');
+			if (checked) {
+				var l = new morpheus.SymmetricProjectListener(controller.getProject(), controller.vscroll, controller.hscroll);
+				controller.getProject().__symmetricProjectListener = l;
+			} else {
+				controller.getProject().__symmetricProjectListener.dispose();
+			}
 		});
 
 	var $colorByValue = colorSchemeFormBuilder.$form

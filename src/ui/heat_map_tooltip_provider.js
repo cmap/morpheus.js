@@ -279,6 +279,34 @@ morpheus.HeatMapTooltipProvider.vectorToString = function (vector, index,
 					}
 
 				}
+			} else if (primaryVal.summary) {
+				if (tipText.length > 0) {
+					tipText.push(separator);
+				}
+				tipText.push(vector.getName());
+				tipText.push(': ');
+				var obj = primaryVal.summary;
+				var keys = _.keys(obj);
+				for (var i = 0, nkeys = keys.length; i < nkeys; i++) {
+					var key = keys[i];
+					if (key !== '__v') { // special value key
+						var objVal = obj[key];
+						var v;
+						if (morpheus.Util.isArray(objVal)) {
+							v = morpheus.Util.arrayToString(objVal, ', ');
+						} else {
+							v = morpheus.Util.toString(objVal);
+						}
+						if (tipText.length > 0) {
+							tipText.push(separator);
+						}
+						tipText.push(key);
+						tipText.push(': <b>');
+						tipText.push(v);
+						tipText.push('</b>');
+					}
+				}
+
 			} else {
 				if (tipText.length > 0) {
 					tipText.push(separator);

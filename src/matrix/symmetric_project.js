@@ -188,7 +188,6 @@ morpheus.SymmetricProject.prototype = {
 	convertModelColumnIndexToView : function(modelIndex) {
 		return this.indexMapper.convertModelIndexToView(modelIndex);
 	},
-
 	isColumnViewIndexSelected : function(index) {
 		return this.selectionModel.isViewIndexSelected(index);
 	},

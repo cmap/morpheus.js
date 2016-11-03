@@ -331,6 +331,7 @@ morpheus.VectorTrack.prototype = {
 				if (this.settings.autoscaleAlways || this.settings.min == null || this.settings.max == null
 					|| this.settings.mid == null) {
 					var vector = this.getFullVector();
+
 					var minMax = morpheus.VectorUtil.getMinMax(vector);
 					var min = minMax.min;
 					var max = minMax.max;
@@ -1232,13 +1233,13 @@ morpheus.VectorTrack.prototype = {
 							.getFullDataset()
 							.getRowMetadata()
 							.add(_this.name);
-							// remove cached box field
+							// remove cached summary field
 							for (var i = 0; i < updatedVector
 							.size(); i++) {
 								var array = fullVector
 								.getValue(i);
 								if (array != null) {
-									array.box = null;
+									array.summary = null;
 								}
 
 							}
@@ -2089,15 +2090,10 @@ morpheus.VectorTrack.prototype = {
 		var visibleFieldIndices = vector.getProperties().get(
 			morpheus.VectorKeys.VISIBLE_FIELDS);
 
-		if (visibleFieldIndices == null) {
-			visibleFieldIndices = morpheus.Util.seq(vector.getProperties().get(
-				morpheus.VectorKeys.FIELDS).length);
-		}
 		var colorByVector = this.settings.colorByField != null ? this
 		.getVector(this.settings.colorByField) : null;
 		var colorModel = isColumns ? this.project.getColumnColorModel()
 			: this.project.getRowColorModel();
-		// TODO cache box values
 		for (var i = start; i < end; i++) {
 			var array = vector.getValue(i);
 			if (array != null) {
@@ -2112,14 +2108,14 @@ morpheus.VectorTrack.prototype = {
 				var center = (start + end) / 2;
 				var _itemSize = itemSize - 2;
 				var lineHeight = Math.max(2, _itemSize - 8);
-				var box = array.box;
+				var box = array.summary;
 				if (box == null) {
 					var v = morpheus.VectorUtil.arrayAsVector(array);
 					box = morpheus
 					.BoxPlotItem(visibleFieldIndices != null ? new morpheus.SlicedVector(
 						v, visibleFieldIndices)
 						: v);
-					array.box = box;
+					array.summary = box;
 				}
 				context.fillStyle = '#bdbdbd';
 
@@ -2138,33 +2134,37 @@ morpheus.VectorTrack.prototype = {
 						scale(box.upperAdjacentValue)), center - lineHeight
 						/ 2, Math.abs(scale(box.q3)
 						- scale(box.upperAdjacentValue)), lineHeight);
-					// points
+					context.fillStyle = '#31a354';
+					// highlight median
+					context.fillRect(scale(box.median) - 3, 1, 3, itemSize - 1);
 					context.fillStyle = '#636363';
 
-					for (var j = 0, length = visibleFieldIndices.length; j < length; j++) {
-						var value = array[visibleFieldIndices[j]];
-						if (value != null) {
-							if (colorByVector != null) {
-								var colorByArray = colorByVector.getValue(i);
-								if (colorByArray != null) {
-									var color = colorModel
-									.getMappedValue(
-										colorByVector,
-										colorByArray[visibleFieldIndices[j]]);
-									context.fillStyle = color;
-								} else {
-									context.fillStyle = '#636363';
-								}
-
-							}
-							var pix = scale(value);
-							context.beginPath();
-							context
-							.arc(pix, center, radius, Math.PI * 2,
-								false);
-							context.fill();
-						}
-					}
+					// draw individual points
+					// for (var j = 0, length = visibleFieldIndices == null ? array.length : visibleFieldIndices.length; j < length; j++) {
+					// 	var index = visibleFieldIndices == null ? j : visibleFieldIndices[j];
+					// 	var value = array[index];
+					// 	if (value != null) {
+					// 		if (colorByVector != null) {
+					// 			var colorByArray = colorByVector.getValue(i);
+					// 			if (colorByArray != null) {
+					// 				var color = colorModel
+					// 				.getMappedValue(
+					// 					colorByVector,
+					// 					colorByArray[index]);
+					// 				context.fillStyle = color;
+					// 			} else {
+					// 				context.fillStyle = '#636363';
+					// 			}
+					//
+					// 		}
+					// 		var pix = scale(value);
+					// 		context.beginPath();
+					// 		context
+					// 		.arc(pix, center, radius, Math.PI * 2,
+					// 			false);
+					// 		context.fill();
+					// 	}
+					// }
 
 				} else { // TOD implement for columns
 

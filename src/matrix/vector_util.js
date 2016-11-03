@@ -297,12 +297,26 @@ morpheus.VectorUtil.getMinMax = function (vector) {
 	var min = Number.MAX_VALUE;
 	var max = -Number.MAX_VALUE;
 	var fields = vector.getProperties().get(morpheus.VectorKeys.FIELDS);
+	var isArray = morpheus.VectorUtil.getDataType(vector)[0] === '[';
 	if (fields != null) {
 		var nvalues = fields.length;
 		for (var i = 0, size = vector.size(); i < size; i++) {
 			var array = vector.getValue(i);
 			if (array) {
 				for (var j = 0; j < nvalues; j++) {
+					var value = array[j];
+					if (!isNaN(value)) {
+						min = value < min ? value : min;
+						max = value > max ? value : max;
+					}
+				}
+			}
+		}
+	} else if (isArray) {
+		for (var i = 0, size = vector.size(); i < size; i++) {
+			var array = vector.getValue(i);
+			if (array != null) {
+				for (var j = 0, nvalues = array.length; j < nvalues; j++) {
 					var value = array[j];
 					if (!isNaN(value)) {
 						min = value < min ? value : min;
@@ -324,7 +338,8 @@ morpheus.VectorUtil.getMinMax = function (vector) {
 		min: min,
 		max: max
 	};
-};
+}
+;
 morpheus.VectorUtil.getFirstNonNull = function (vector) {
 	for (var i = 0, length = vector.size(); i < length; i++) {
 		var val = vector.getValue(i);
