@@ -1197,9 +1197,13 @@ morpheus.Util.createSearchPredicates = function (options) {
 		} else if (token[0] === '(' && token[token.length - 1] === ')') { // exact terms
 			token = token.substring(1, token.length - 1);
 			var values = morpheus.Util.getAutocompleteTokens(token);
+
 			if (values.length > 0) {
 				predicate = new morpheus.Util.ExactTermsPredicate(field,
 					values.map(function (val) {
+						if (val[0] === '"' && val[val.length - 1] === '"') {
+							val = val.substring(1, val.length - 1);
+						}
 						return val.toLowerCase();
 					}));
 			}
