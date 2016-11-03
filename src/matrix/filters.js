@@ -110,7 +110,6 @@ morpheus.CombinedFilter.prototype = {
 			}
 			return false;
 		}
-		return true;
 	},
 	isEnabled: function () {
 		return this.enabledFilters.length > 0;

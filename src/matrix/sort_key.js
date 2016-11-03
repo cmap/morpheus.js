@@ -254,7 +254,7 @@ morpheus.SpecifiedModelSortOrder.prototype = {
 		return this.columns;
 	},
 	setColumns: function (columns) {
-		this.columns;
+		this.columns = columns;
 	},
 	init: function (dataset) {
 	},
@@ -296,7 +296,7 @@ morpheus.SpecifiedGroupByKey.prototype = {
 		return this.columns;
 	},
 	setColumns: function (columns) {
-		this.columns;
+		this.columns = columns;
 	},
 	init: function (dataset) {
 	},
@@ -388,6 +388,7 @@ morpheus.SortKey.NUMBER_DESCENDING_COMPARATOR = function (a, b) {
 	if (aNaN && bNaN) {
 		return 0;
 	}
+	//noinspection JSConstructorReturnsPrimitive
 	if (aNaN) {
 		return 1;
 	}
