@@ -77,7 +77,6 @@ morpheus.SortKey.prototype = {
 				this.c = this.sortOrder === morpheus.SortKey.SortOrder.ASCENDING ? morpheus.SortKey.NUMBER_ASCENDING_COMPARATOR
 					: morpheus.SortKey.NUMBER_DESCENDING_COMPARATOR;
 			} else if (dataType === '[number]') {
-
 				var summary = this.v.getProperties().get(
 						morpheus.VectorKeys.ARRAY_SUMMARY_FUNCTION)
 					|| morpheus.SortKey.ARRAY_MAX_SUMMARY_FUNCTION;

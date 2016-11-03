@@ -708,13 +708,13 @@ morpheus.HeatMap.getSpaces = function (groupByKeys, length, gapSize) {
 	}
 	return spaces;
 };
-morpheus.HeatMap.createGroupBySpaces = function (dataset, groupByKeys, gapSize) {
+morpheus.HeatMap.createGroupBySpaces = function (dataset, groupByKeys, gapSize, isColumns) {
 	if (groupByKeys.length > 0) {
 		var nkeys = groupByKeys.length;
 		for (var keyIndex = 0; keyIndex < nkeys; keyIndex++) {
-			groupByKeys[keyIndex].init(dataset);
+			groupByKeys[keyIndex].init(groupByKeys[keyIndex].isColumns() ? new morpheus.TransposedDatasetView(dataset) : dataset);
 		}
-		return morpheus.HeatMap.getSpaces(groupByKeys, dataset.getRowCount(),
+		return morpheus.HeatMap.getSpaces(groupByKeys, isColumns ? dataset.getColumnCount() : dataset.getRowCount(),
 			gapSize);
 	}
 };
@@ -2717,11 +2717,10 @@ morpheus.HeatMap.prototype = {
 		this.heatmap.setDataset(dataset);
 		this.heatmap.getRowPositions().spaces = morpheus.HeatMap
 		.createGroupBySpaces(dataset, this.project.getGroupRows(),
-			this.gapSize);
+			this.gapSize, false);
 		this.heatmap.getColumnPositions().spaces = morpheus.HeatMap
 		.createGroupBySpaces(
-			new morpheus.TransposedDatasetView(dataset),
-			this.project.getGroupColumns(), this.gapSize);
+			dataset, this.project.getGroupColumns(), this.gapSize, true);
 		this.trigger('change', {
 			name: 'updateDataset',
 			source: this,

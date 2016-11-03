@@ -104,12 +104,22 @@ morpheus.Project.prototype = {
 	},
 	setGroupRows: function (keys, notify) {
 		this.groupRows = keys;
+		for (var i = 0, nkeys = keys.length; i < nkeys; i++) {
+			if (keys[i].isColumns() === undefined) {
+				keys[i].setColumns(false);
+			}
+		}
 		if (notify) {
 			this.trigger(morpheus.Project.Events.ROW_GROUP_BY_CHANGED);
 		}
 	},
 	setGroupColumns: function (keys, notify) {
 		this.groupColumns = keys;
+		for (var i = 0, nkeys = keys.length; i < nkeys; i++) {
+			if (keys[i].isColumns() === undefined) {
+				keys[i].setColumns(true);
+			}
+		}
 		if (notify) {
 			this.trigger(morpheus.Project.Events.COLUMN_GROUP_BY_CHANGED);
 		}
