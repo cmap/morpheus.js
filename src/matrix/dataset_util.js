@@ -437,59 +437,51 @@ morpheus.DatasetUtil.searchValues = function (dataset, text, cb) {
 	if (tokens.length == 0) {
 		return;
 	}
-	var seriesIndices = [];
-	for (var i = 0, nseries = dataset.getSeriesCount(); i < nseries; i++) {
-		// if (dataset.getDataType(i) === 'Number' || dataset.getDataType(i) === 'object') {
-		seriesIndices.push(i);
-		// }
-	}
-	if (seriesIndices.length === 0) {
-		return;
-	}
-	var _val;
-	// find first non-null value
-	elementSearch: for (var k = 0, nseries = seriesIndices.length; k < nseries; k++) {
-		var seriesIndex = seriesIndices[k];
-		for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-			for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-				var element = dataset.getValue(i, j, seriesIndex);
-				if (element != null && element.toObject) {
-					_val = element.toObject();
-					break elementSearch;
-				}
-			}
-		}
-	}
-	var fields = _val == null ? [] : _.keys(_val);
 	var predicates = morpheus.Util.createSearchPredicates({
-		tokens: tokens,
-		fields: fields
+		tokens: tokens
 	});
 
 	var npredicates = predicates.length;
 	for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
 		for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-			for (var k = 0, nseries = seriesIndices.length; k < nseries; k++) {
+			for (var k = 0, nseries = dataset.getSeriesCount(); k < nseries; k++) {
 				var matches = false;
-				var element = dataset.getValue(i, j, seriesIndices[k]);
-				if (element != null && element.toObject) {
-					var object = element.toObject();
-					for (var p = 0; p < npredicates && !matches; p++) {
-						var predicate = predicates[p];
-						var filterColumnName = predicate.getField();
-						if (filterColumnName != null) {
-							var value = object[filterColumnName];
-							if (value != null && predicate.accept(value)) {
-								if (cb(value, i, j) === false) {
-									return;
-								}
-								matches = true;
-								break;
-							}
-						} else { // try all fields
-							for (var name in object) {
-								var value = object[name];
+				var element = dataset.getValue(i, j, k);
+				if (element != null) {
+					if (element.toObject) {
+						var object = element.toObject();
+						for (var p = 0; p < npredicates && !matches; p++) {
+							var predicate = predicates[p];
+							var filterColumnName = predicate.getField();
+							if (filterColumnName != null) {
+								var value = object[filterColumnName];
 								if (value != null && predicate.accept(value)) {
+									if (cb(value, i, j) === false) {
+										return;
+									}
+									matches = true;
+									break;
+								}
+							} else { // try all fields
+								for (var name in object) {
+									var value = object[name];
+									if (value != null && predicate.accept(value)) {
+										if (cb(value, i, j) === false) {
+											return;
+										}
+										matches = true;
+										break;
+									}
+								}
+							}
+						}
+					} else {
+						var value = element;
+						for (var p = 0; p < npredicates && !matches; p++) {
+							var predicate = predicates[p];
+							var filterColumnName = predicate.getField();
+							if (filterColumnName == null || filterColumnName === dataset.getName(k)) {
+								if (predicate.accept(value)) {
 									if (cb(value, i, j) === false) {
 										return;
 									}

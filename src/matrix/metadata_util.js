@@ -97,7 +97,9 @@ morpheus.MetadataUtil.search = function (options) {
 
 	}
 
-	function isMatch(predicate) {
+	var matchAllPredicates = options.matchAllPredicates === true;
+
+	function isPredicateMatch(predicate) {
 		var filterColumnName = predicate.getField();
 		if (filterColumnName != null) {
 			var value = null;
@@ -128,8 +130,8 @@ morpheus.MetadataUtil.search = function (options) {
 				}
 			}
 
-		} else { // try all fields
-
+		}
+		else { // try all fields
 			for (var j = 0; j < nfields; j++) {
 				var wrapper = vectors[j];
 				var value = wrapper.vector.getValue(i);
@@ -137,14 +139,12 @@ morpheus.MetadataUtil.search = function (options) {
 					if (wrapper.isArray) {
 						for (var k = 0; k < value.length; k++) {
 							if (predicate.accept(value[k])) {
-								matches = true;
-								break;
+								return true;
 							}
 						}
 					} else {
 						if (predicate.accept(value)) {
-							matches = true;
-							break;
+							return true;
 						}
 					}
 
@@ -154,14 +154,12 @@ morpheus.MetadataUtil.search = function (options) {
 
 	}
 
-	var matchAllPredicates = options.matchAllPredicates === true;
 	var nfields = vectors.length;
 	for (var i = 0, nitems = model.getItemCount(); i < nitems; i++) {
 		if (!matchAllPredicates) { // at least one predicate matches
-			var matches = false;
 			for (var p = 0; p < npredicates; p++) {
 				var predicate = predicates[p];
-				if (isMatch(predicate)) {
+				if (isPredicateMatch(predicate)) {
 					indices.push(i);
 					break;
 				}
@@ -170,7 +168,7 @@ morpheus.MetadataUtil.search = function (options) {
 			var matches = true;
 			for (var p = 0; p < npredicates; p++) {
 				var predicate = predicates[p];
-				if (!isMatch(predicate)) {
+				if (!isPredicateMatch(predicate)) {
 					matches = false;
 					break;
 				}
