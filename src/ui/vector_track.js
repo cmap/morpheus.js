@@ -1239,7 +1239,7 @@ morpheus.VectorTrack.prototype = {
 								var array = fullVector
 								.getValue(i);
 								if (array != null) {
-									array.summary = null;
+									array.summary = undefined;
 								}
 
 							}

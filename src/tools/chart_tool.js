@@ -1091,7 +1091,7 @@ morpheus.ChartTool.prototype = {
 						return vector.getValue(item.row);
 					};
 
-					var isArray = morpheus.VectorUtil.getDataType(vector)[0] = '[';
+					var isArray = morpheus.VectorUtil.getDataType(vector)[0] === '[';
 					for (var i = 0, nitems = items.length; i < nitems; i++) {
 						var item = items[i];
 						var value = getter(item);
@@ -1129,7 +1129,7 @@ morpheus.ChartTool.prototype = {
 					} : function (item) {
 						return vector.getValue(item.row);
 					};
-					var isArray = morpheus.VectorUtil.getDataType(vector)[0] = '[';
+					var isArray = morpheus.VectorUtil.getDataType(vector)[0] === '[';
 					var columnIdToIndex = new morpheus.Map();
 					var rowIndex = 0;
 					rowIdToArray.forEach(function (array, id) {
