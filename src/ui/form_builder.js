@@ -309,9 +309,7 @@ morpheus.FormBuilder.getValue = function ($element) {
 	if ($element.data('type') === 'file') {
 		return $element.data('files');
 	}
-	return $element.attr('type') === 'checkbox' ? $element.prop('checked') ? true
-		: false
-		: $element.val();
+	return $element.attr('type') === 'checkbox' ? $element.prop('checked') : $element.val();
 };
 
 // morpheus.FormBuilder._showInModal = function(title, stuff, footer,
@@ -683,6 +681,15 @@ morpheus.FormBuilder.prototype = {
 			}
 			if (field.placeholder) {
 				html.push(' placeholder="' + field.placeholder + '"');
+			}
+			if (field.min != null) {
+				html.push(' min="' + field.min + '"');
+			}
+			if (field.max != null) {
+				html.push(' max="' + field.max + '"');
+			}
+			if (field.step) {
+				html.push(' step="' + field.step + '"');
 			}
 			if (required) {
 				html.push(' required');
