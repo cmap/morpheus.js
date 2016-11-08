@@ -87,7 +87,8 @@ morpheus.AdjustDataTool.prototype = {
 				}
 			}
 
-			project.trigger('datasetChanged');
+			project.trigger(morpheus.Project.Events.DATASET_CHANGED);
+			morpheus.DatasetUtil.toESSessionPromise(project.getFullDataset());
 			project.getColumnSelectionModel().setViewIndices(
 					selectedColumnIndices, true);
 			project.getRowSelectionModel().setViewIndices(selectedRowIndices,

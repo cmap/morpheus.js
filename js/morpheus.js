@@ -4889,9 +4889,11 @@ morpheus.Dataset.prototype = {
 		return this.seriesNames.length - 1;
 	},
 	setESSession : function (session) {
+		console.log("morpheus.Dataset.prototype.setESSession ::", this, session);
 		this.esSession = session;
 	},
 	getESSession : function () {
+		console.log("morpheus.Dataset.prototype.getESSession ::", this);
 		return this.esSession;
 	}
 
@@ -5244,7 +5246,8 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 					deferred.reject(err);
 				} else {
 					deferred.resolve(dataset);
-					morpheus.DatasetUtil.toESSession(dataset);
+					//morpheus.DatasetUtil.toESSession(dataset);
+					morpheus.DatasetUtil.toESSessionPromise(dataset);
 				}
 			});
 
@@ -5861,7 +5864,7 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 	var pDataArray = [];
 	var participantID = [];
 	var labelDescription = [];
-	console.log(dataset);
+	console.log("morpheus.DatasetUtil.getMetadataArray ::", dataset);
 	var columnMeta = dataset.getColumnMetadata();
 	var features = columnMeta.getMetadataCount();
 	var participants = dataset.getColumnCount();
@@ -5908,6 +5911,14 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 	return {pdata : pDataArray, participants : participantID, labels : labelDescription, rownames : rowNames};
 };
 morpheus.DatasetUtil.toESSession = function (dataset) {
+	console.log("morpheus.DatasetUtil.toESSession ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
+	if (dataset instanceof morpheus.SlicedDatasetView) {
+		console.log("morpheus.DatasetUtil.toESSession ::", "dataset in instanceof morpheus.SlicedDatasetView", "go deeper");
+		morpheus.DatasetUtil.toESSession(dataset.dataset);
+	}
+	if (dataset.getESSession()) {
+		return;
+	}
 	var array = morpheus.DatasetUtil.getContentArray(dataset);
 	var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
 
@@ -5966,14 +5977,15 @@ morpheus.DatasetUtil.toESSession = function (dataset) {
 				alert(error);
 				return;
 			}
-			console.log(error, success);
+			console.log("morpheus.DatasetUtil.toESSession ::", "protobuilder error", error);
+			console.log("morpheus.DatasetUtil.toESSession ::", "protobuilder success", success);
 			var builder = success,
 				rexp = builder.build("rexp"),
 				REXP = rexp.REXP;
 
 			var proto = new REXP(messageJSON);
 			var req = ocpu.call("createES", proto, function (session) {
-				console.log(session);
+				console.log("morpheus.DatasetUtil.toESSession ::", "from successful request", session);
 				dataset.setESSession(session);
 			}, true);
 
@@ -5984,6 +5996,99 @@ morpheus.DatasetUtil.toESSession = function (dataset) {
 
 	/*var blob = new Blob([new Uint8Array((new REXP(messageJSON)).toArrayBuffer())], {type: "application/octet-stream"});
 	saveAs(blob, "test1.bin");*/
+};
+
+
+morpheus.DatasetUtil.toESSessionPromise = function (dataset) {
+	console.log("ENTERED TO_ESSESSION_PROMISE");
+	dataset.setESSession(new Promise(function (resolve, reject) {
+		console.log("morpheus.DatasetUtil.toESSessionPromise ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
+		if (dataset instanceof morpheus.SlicedDatasetView) {
+			console.log("morpheus.DatasetUtil.toESSessionPromise ::", "dataset in instanceof morpheus.SlicedDatasetView", "go deeper");
+			morpheus.DatasetUtil.toESSessionPromise(dataset.dataset);
+		}
+		if (dataset.getESSession()) {
+			resolve(dataset.getESSession());
+			console.log("resolved with old value");
+			return;
+		}
+		var array = morpheus.DatasetUtil.getContentArray(dataset);
+		var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
+
+		var messageJSON = {
+			rclass : "LIST",
+			rexpValue : [{
+				rclass : "REAL",
+				realValue : array,
+				attrName : "dim",
+				attrValue : {
+					rclass : "INTEGER",
+					intValue : [dataset.getColumnCount(), dataset.getRowCount()]
+				}
+			}, {
+				rclass : "STRING",
+				stringValue : meta.pdata,
+				attrName : "dim",
+				attrValue : {
+					rclass : "INTEGER",
+					intValue : [dataset.getColumnCount(), meta.pdata.length/dataset.getColumnCount()]
+				}
+			}, {
+				rclass : "STRING",
+				stringValue : meta.labels
+			}, {
+				rclass : "STRING",
+				stringValue : meta.participants
+			}, {
+				rclass : "STRING",
+				stringValue : meta.rownames
+			}],
+			attrName : "names",
+			attrValue : {
+				rclass : "STRING",
+				stringValue : [{
+					strval : "data",
+					isNA : false
+				}, {
+					strval : "pData",
+					isNA : false
+				}, {
+					strval : "labelDescription",
+					isNA : false
+				}, {
+					strval : "colNames",
+					isNA : false
+				}, {
+					strval : "rowNames",
+					isNA : false
+				}]
+			}
+		};
+		ProtoBuf = dcodeIO.ProtoBuf;
+		ProtoBuf.protoFromFile("./message.proto", function (error, success) {
+			if (error) {
+				alert(error);
+				return;
+			}
+			console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder error", error);
+			console.log("morpheus.DatasetUtil.toESSessionpromise ::", "protobuilder success", success);
+			var builder = success,
+				rexp = builder.build("rexp"),
+				REXP = rexp.REXP;
+
+			var proto = new REXP(messageJSON);
+			var req = ocpu.call("createES", proto, function (session) {
+				console.log("morpheus.DatasetUtil.toESSessionPromise ::", "from successful request", session);
+				resolve(session);
+			}, true);
+
+			req.fail(function () {
+				reject(req.responseText);
+			});
+		});
+	}));
+	/*var blob = new Blob([new Uint8Array((new REXP(messageJSON)).toArrayBuffer())], {type: "application/octet-stream"});
+	 saveAs(blob, "test1.bin");*/
 };
 morpheus.ElementSelectionModel = function (project) {
 	this.viewIndices = new morpheus.Set();
@@ -7697,7 +7802,6 @@ morpheus.Project._recomputeCalculatedFields = function(dataset) {
 			}
 		}
 	}
-
 };
 morpheus.Project.prototype = {
 	getHoverColumnIndex : function() {
@@ -7753,9 +7857,6 @@ morpheus.Project.prototype = {
 		this.rowSelectionModel.clear();
 		this.elementSelectionModel.clear();
 
-		if (this.originalDataset.getESSession()) {
-			this.originalDataset.setESSession(morpheus.DatasetUtil.toESSession(dataset));
-		}
 		if (notify) {
 			this.trigger(morpheus.Project.Events.DATASET_CHANGED);
 		}
@@ -7959,6 +8060,14 @@ morpheus.SlicedDatasetView = function(dataset, rowIndices, columnIndices) {
 	this.columnIndices = columnIndices;
 };
 morpheus.SlicedDatasetView.prototype = {
+	setESSession : function (session) {
+		console.log("morpheus.SlicedDatasetView.prototype.setESSession ::", this, session);
+		this.dataset.setESSession(session);
+	},
+	getESSession : function() {
+		console.log("morpheus.SlicedDatasetView.prototype.getESSession ::", this);
+		return this.dataset.getESSession();
+	},
 	getRowCount : function() {
 		return this.rowIndices !== null ? this.rowIndices.length : this.dataset
 				.getRowCount();
@@ -10591,7 +10700,8 @@ morpheus.AdjustDataTool.prototype = {
 				}
 			}
 
-			project.trigger('datasetChanged');
+			project.trigger(morpheus.Project.Events.DATASET_CHANGED);
+			morpheus.DatasetUtil.toESSessionPromise(project.getFullDataset());
 			project.getColumnSelectionModel().setViewIndices(
 					selectedColumnIndices, true);
 			project.getRowSelectionModel().setViewIndices(selectedRowIndices,
@@ -13001,7 +13111,7 @@ morpheus.NewHeatMapTool.prototype = {
 			selectedColumns : true
 		});
 		morpheus.DatasetUtil.shallowCopy(dataset);
-
+		morpheus.DatasetUtil.toESSessionPromise(dataset);
 		// TODO see if we can subset dendrograms
 		// only handle contiguous selections for now
 		// if (controller.columnDendrogram != null) {
@@ -14242,10 +14352,6 @@ morpheus.PcaPlotTool.prototype = {
 
         var project = this.project;
 
-        if (_this.project.getFullDataset().getESSession()) {
-            _this.formBuilder.setEnabled('draw', true);
-        }
-
         this.formBuilder.$form.find('[name="draw"]').on('click', function () {
             _this.$chart.empty();
             var colorBy = _this.formBuilder.getValue('color');
@@ -14254,102 +14360,94 @@ morpheus.PcaPlotTool.prototype = {
             var pc2 = _this.formBuilder.getValue('y-axis');
             var label = _this.formBuilder.getValue('label');
 
-            console.log('draw plot button clicked');
+            console.log("morpheus.PcaPlotTool.prototype.draw ::", "DRAW BUTTON CLICKED");
             var dataset = _this.project.getSelectedDataset({
                 emptyToAll: false
             });
+            var fullDataset = _this.project.getFullDataset();
             _this.dataset = dataset;
-            var expressionSet = project.getFullDataset().getESSession();
 
-            var columnIndices = dataset.columnIndices;
-            var rowIndices = dataset.rowIndices;
-            console.log(dataset);
-            console.log(columnIndices);
-            console.log(rowIndices);
-
-            console.log(colorBy, sizeBy, pc1, pc2, label);
-            var arguments = {
-                es: expressionSet,
-                c1: pc1,
-                c2: pc2
-            };
-            if (columnIndices.length > 0) {
-                arguments.columns = columnIndices;
+            console.log("morpheus.PcaPlotTool.prototype.draw ::", "full dataset", fullDataset);
+            var columnIndices = [];
+            var rowIndices = [];
+            if (fullDataset instanceof morpheus.Dataset ||
+                fullDataset instanceof morpheus.SlicedDatasetView && !(dataset.columnIndices.length == 0 && dataset.rowIndices.length == 0)) {
+                columnIndices = dataset.columnIndices;
+                rowIndices = dataset.rowIndices;
             }
-            if (rowIndices.length > 0) {
-                arguments.rows = rowIndices;
-            }
-            if (colorBy != "") {
-                arguments.colour = colorBy;
-            }
-            if (sizeBy != "") {
-                arguments.size = sizeBy;
-            }
-            if (label != "") {
-                arguments.label = label;
+            else {
+                columnIndices = fullDataset.columnIndices;
+                rowIndices = fullDataset.rowIndices;
             }
 
 
-            console.log(arguments);
-            var req = ocpu.call("pcaPlot", arguments, function (session) {
-                console.log(session);
-                session.getObject(function (success) {
-                    var $chart = $('<div></div>');
-                    var myPlot = $chart[0];
-                    $chart.appendTo(_this.$chart);
+            var expressionSetPromise = fullDataset.getESSession();
 
-                    var coolUrl = success.split("\n");
-                    var json = JSON.parse($.parseHTML(coolUrl[1])[0].innerText);
-                    var data = json.x.data;
-                    var layout = json.x.layout;
-                    Plotly.newPlot(myPlot, data, layout, {showLink: false});
-                    console.log(json);
+            console.log("morpheus.PcaPlotTool.prototype.draw ::", "selected dataset", dataset, ", columnIndices", columnIndices, ", rowIndices", rowIndices);
+
+            console.log("morpheus.PcaPlotTool.prototype.draw ::", "color", colorBy, ", sizeBy", sizeBy, ", pc1", pc1, ", pc2", pc2, ", label", label);
+
+            expressionSetPromise.then(function (essession) {
+                var arguments = {
+                    es: essession,
+                    c1: pc1,
+                    c2: pc2
+                };
+                if (columnIndices && columnIndices.length > 0) {
+                    arguments.columns = columnIndices;
+                }
+                if (rowIndices && rowIndices.length > 0) {
+                    arguments.rows = rowIndices;
+                }
+                if (colorBy != "") {
+                    arguments.colour = colorBy;
+                }
+                if (sizeBy != "") {
+                    arguments.size = sizeBy;
+                }
+                if (label != "") {
+                    arguments.label = label;
+                }
+
+
+                console.log(arguments);
+                var req = ocpu.call("pcaPlot", arguments, function (session) {
+                    console.log("morpheus.PcaPlotTool.prototype.draw ::", "successful", session);
+                    session.getObject(function (success) {
+                        var $chart = $('<div></div>');
+                        var myPlot = $chart[0];
+                        $chart.appendTo(_this.$chart);
+
+                        var coolUrl = success.split("\n");
+                        var json = JSON.parse($.parseHTML(coolUrl[1])[0].innerText);
+                        var data = json.x.data;
+                        var layout = json.x.layout;
+                        Plotly.newPlot(myPlot, data, layout, {showLink: false});
+                        console.log("morpheus.PcaPlotTool.prototype.draw ::", "plot json", json);
+                    });
+                    /*var txt = session.txt.split("\n");
+                     var imageLocationAr = txt[txt.length - 2].split("/");
+                     var imageLocation = session.getLoc() + "files/" + imageLocationAr[imageLocationAr.length - 1];
+                     console.log(imageLocation);
+                     var img = $('<img />', {src : imageLocation, style : "width:720px;height:540px"});
+                     _this.$chart.prepend(img);*/
+                    /*var img = $('<img />', {src : session.getLoc() + 'graphics/1/png', style : "width:720px;height:540px"});*/
+
                 });
-                /*var txt = session.txt.split("\n");
-                 var imageLocationAr = txt[txt.length - 2].split("/");
-                 var imageLocation = session.getLoc() + "files/" + imageLocationAr[imageLocationAr.length - 1];
-                 console.log(imageLocation);
-                 var img = $('<img />', {src : imageLocation, style : "width:720px;height:540px"});
-                 _this.$chart.prepend(img);*/
-                /*var img = $('<img />', {src : session.getLoc() + 'graphics/1/png', style : "width:720px;height:540px"});*/
+                req.fail(function () {
+                    alert(req.responseText);
+                });
+            });
 
+            expressionSetPromise.catch(function (reason) {
+                alert("Problems occured during transforming dataset to ExpressionSet\n" + reason);
             });
-            req.fail(function () {
-                alert(req.responseText);
-            });
+
         });
 
-        var json = {
-            "x": {
-                "layout": {
-                    "margin": {"b": 40, "l": 60, "t": 25, "r": 10},
-                    "xaxis": {"domain": [0, 1], "title": "PC1 (24.6%)", "zeroline": false},
-                    "yaxis": {"domain": [0, 1], "title": "PC1 (24.6%)", "zeroline": false},
-                    "hovermode": "closest"
-                },
-                "config": {"modeBarButtonsToRemove": ["sendDataToCloud"]},
-                "base_url": "https://plot.ly",
-                "source": "A",
-                "data": [{
-                    "mode": "markers",
-                    "x": [-80.0179841481051, -80.1366552661857, -68.3110262898909, -33.3940172705522, -64.4158791179995, -37.048367016534, 113.385377003965, 110.323103309578, -1.17684919095275, 1.16462472474452, 68.2853240471577, 71.3423492147754],
-                    "y": [-80.0179841481051, -80.1366552661857, -68.3110262898909, -33.3940172705522, -64.4158791179995, -37.048367016534, 113.385377003965, 110.323103309578, -1.17684919095275, 1.16462472474452, 68.2853240471577, 71.3423492147754],
-                    "marker": {
-                        "fillcolor": "rgba(252,141,98,0.5)",
-                        "color": "rgba(252,141,98,1)",
-                        "size": 10,
-                        "line": {"color": "transparent"}
-                    },
-                    "text": ["GSM357839", "GSM357841", "GSM357842", "GSM357843", "GSM357844", "GSM357845", "GSM357847", "GSM357848", "GSM357849", "GSM357850", "GSM357852", "GSM357853"],
-                    "type": "scatter",
-                    "name": "rgba(0, 0, 0, .9)",
-                    "xaxis": "x",
-                    "yaxis": "y"
-                }]
-            }
 
 
-        }
+
     }
 
 };

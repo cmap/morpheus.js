@@ -44,7 +44,6 @@ morpheus.Project._recomputeCalculatedFields = function(dataset) {
 			}
 		}
 	}
-
 };
 morpheus.Project.prototype = {
 	getHoverColumnIndex : function() {
@@ -100,9 +99,6 @@ morpheus.Project.prototype = {
 		this.rowSelectionModel.clear();
 		this.elementSelectionModel.clear();
 
-		if (this.originalDataset.getESSession()) {
-			this.originalDataset.setESSession(morpheus.DatasetUtil.toESSession(dataset));
-		}
 		if (notify) {
 			this.trigger(morpheus.Project.Events.DATASET_CHANGED);
 		}

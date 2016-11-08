@@ -10,6 +10,14 @@ morpheus.SlicedDatasetView = function(dataset, rowIndices, columnIndices) {
 	this.columnIndices = columnIndices;
 };
 morpheus.SlicedDatasetView.prototype = {
+	setESSession : function (session) {
+		console.log("morpheus.SlicedDatasetView.prototype.setESSession ::", this, session);
+		this.dataset.setESSession(session);
+	},
+	getESSession : function() {
+		console.log("morpheus.SlicedDatasetView.prototype.getESSession ::", this);
+		return this.dataset.getESSession();
+	},
 	getRowCount : function() {
 		return this.rowIndices !== null ? this.rowIndices.length : this.dataset
 				.getRowCount();

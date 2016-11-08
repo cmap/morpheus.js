@@ -26,7 +26,7 @@ morpheus.NewHeatMapTool.prototype = {
 			selectedColumns : true
 		});
 		morpheus.DatasetUtil.shallowCopy(dataset);
-
+		morpheus.DatasetUtil.toESSessionPromise(dataset);
 		// TODO see if we can subset dendrograms
 		// only handle contiguous selections for now
 		// if (controller.columnDendrogram != null) {

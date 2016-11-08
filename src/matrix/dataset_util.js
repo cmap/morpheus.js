@@ -82,7 +82,7 @@ morpheus.DatasetUtil.readDatasetArray = function (datasets) {
 			}
 			retDef.reject(message.join(''));
 
-		});
+		});es
 		promises.push(p);
 	});
 	if (promises.length === 0) {
@@ -209,7 +209,8 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 					deferred.reject(err);
 				} else {
 					deferred.resolve(dataset);
-					morpheus.DatasetUtil.toESSession(dataset);
+					//morpheus.DatasetUtil.toESSession(dataset);
+					morpheus.DatasetUtil.toESSessionPromise(dataset);
 				}
 			});
 
@@ -826,7 +827,7 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 	var pDataArray = [];
 	var participantID = [];
 	var labelDescription = [];
-	console.log(dataset);
+	console.log("morpheus.DatasetUtil.getMetadataArray ::", dataset);
 	var columnMeta = dataset.getColumnMetadata();
 	var features = columnMeta.getMetadataCount();
 	var participants = dataset.getColumnCount();
@@ -873,6 +874,14 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 	return {pdata : pDataArray, participants : participantID, labels : labelDescription, rownames : rowNames};
 };
 morpheus.DatasetUtil.toESSession = function (dataset) {
+	console.log("morpheus.DatasetUtil.toESSession ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
+	if (dataset instanceof morpheus.SlicedDatasetView) {
+		console.log("morpheus.DatasetUtil.toESSession ::", "dataset in instanceof morpheus.SlicedDatasetView", "go deeper");
+		morpheus.DatasetUtil.toESSession(dataset.dataset);
+	}
+	if (dataset.getESSession()) {
+		return;
+	}
 	var array = morpheus.DatasetUtil.getContentArray(dataset);
 	var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
 
@@ -931,14 +940,15 @@ morpheus.DatasetUtil.toESSession = function (dataset) {
 				alert(error);
 				return;
 			}
-			console.log(error, success);
+			console.log("morpheus.DatasetUtil.toESSession ::", "protobuilder error", error);
+			console.log("morpheus.DatasetUtil.toESSession ::", "protobuilder success", success);
 			var builder = success,
 				rexp = builder.build("rexp"),
 				REXP = rexp.REXP;
 
 			var proto = new REXP(messageJSON);
 			var req = ocpu.call("createES", proto, function (session) {
-				console.log(session);
+				console.log("morpheus.DatasetUtil.toESSession ::", "from successful request", session);
 				dataset.setESSession(session);
 			}, true);
 
@@ -949,4 +959,97 @@ morpheus.DatasetUtil.toESSession = function (dataset) {
 
 	/*var blob = new Blob([new Uint8Array((new REXP(messageJSON)).toArrayBuffer())], {type: "application/octet-stream"});
 	saveAs(blob, "test1.bin");*/
+};
+
+
+morpheus.DatasetUtil.toESSessionPromise = function (dataset) {
+	console.log("ENTERED TO_ESSESSION_PROMISE");
+	dataset.setESSession(new Promise(function (resolve, reject) {
+		console.log("morpheus.DatasetUtil.toESSessionPromise ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
+		if (dataset instanceof morpheus.SlicedDatasetView) {
+			console.log("morpheus.DatasetUtil.toESSessionPromise ::", "dataset in instanceof morpheus.SlicedDatasetView", "go deeper");
+			morpheus.DatasetUtil.toESSessionPromise(dataset.dataset);
+		}
+		if (dataset.getESSession()) {
+			resolve(dataset.getESSession());
+			console.log("resolved with old value");
+			return;
+		}
+		var array = morpheus.DatasetUtil.getContentArray(dataset);
+		var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
+
+		var messageJSON = {
+			rclass : "LIST",
+			rexpValue : [{
+				rclass : "REAL",
+				realValue : array,
+				attrName : "dim",
+				attrValue : {
+					rclass : "INTEGER",
+					intValue : [dataset.getColumnCount(), dataset.getRowCount()]
+				}
+			}, {
+				rclass : "STRING",
+				stringValue : meta.pdata,
+				attrName : "dim",
+				attrValue : {
+					rclass : "INTEGER",
+					intValue : [dataset.getColumnCount(), meta.pdata.length/dataset.getColumnCount()]
+				}
+			}, {
+				rclass : "STRING",
+				stringValue : meta.labels
+			}, {
+				rclass : "STRING",
+				stringValue : meta.participants
+			}, {
+				rclass : "STRING",
+				stringValue : meta.rownames
+			}],
+			attrName : "names",
+			attrValue : {
+				rclass : "STRING",
+				stringValue : [{
+					strval : "data",
+					isNA : false
+				}, {
+					strval : "pData",
+					isNA : false
+				}, {
+					strval : "labelDescription",
+					isNA : false
+				}, {
+					strval : "colNames",
+					isNA : false
+				}, {
+					strval : "rowNames",
+					isNA : false
+				}]
+			}
+		};
+		ProtoBuf = dcodeIO.ProtoBuf;
+		ProtoBuf.protoFromFile("./message.proto", function (error, success) {
+			if (error) {
+				alert(error);
+				return;
+			}
+			console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder error", error);
+			console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder success", success);
+			var builder = success,
+				rexp = builder.build("rexp"),
+				REXP = rexp.REXP;
+
+			var proto = new REXP(messageJSON);
+			var req = ocpu.call("createES", proto, function (session) {
+				console.log("morpheus.DatasetUtil.toESSessionPromise ::", "from successful request", session);
+				resolve(session);
+			}, true);
+
+			req.fail(function () {
+				reject(req.responseText);
+			});
+		});
+	}));
+	/*var blob = new Blob([new Uint8Array((new REXP(messageJSON)).toArrayBuffer())], {type: "application/octet-stream"});
+	 saveAs(blob, "test1.bin");*/
 };
