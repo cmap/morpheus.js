@@ -22,7 +22,8 @@ morpheus.ChartTool = function (chartOptions) {
 	formBuilder.append({
 		name: 'chart_type',
 		type: 'bootstrap-select',
-		options: ['boxplot', 'row scatter matrix', 'column scatter matrix', 'row profile', 'column' +
+		options: ['boxplot', 'row scatter matrix', 'column scatter matrix', 'row' +
+		' profile', 'column' +
 		' profile']
 	});
 	var rowOptions = [];
@@ -145,9 +146,26 @@ morpheus.ChartTool = function (chartOptions) {
 		options: options.slice(1)
 	});
 
+	formBuilder.append({
+		name: 'chart_width',
+		type: 'range',
+		value: 400,
+		min: 60,
+		max: 800,
+		step: 10
+	});
+	formBuilder.append({
+		name: 'chart_height',
+		type: 'range',
+		value: 400,
+		min: 20,
+		max: 800,
+		step: 10
+	});
+
 	function setVisibility() {
 		var chartType = formBuilder.getValue('chart_type');
-		if (chartType !== 'boxplot') {
+		if (chartType !== 'boxplot' && chartType !== 'histogram') {
 			formBuilder.setOptions('axis_label',
 				(chartType === 'row scatter matrix' || chartType === 'column profile') ? rowOptions : columnOptions,
 				true);
@@ -162,6 +180,7 @@ morpheus.ChartTool = function (chartOptions) {
 			formBuilder.setOptions('color', options, true);
 			formBuilder.setOptions('size', numericOptions, true);
 		}
+		formBuilder.setVisible('tooltip', chartType !== 'histogram');
 		formBuilder.setVisible('group_rows_by', (chartType === 'boxplot' || chartType === 'histogram' || chartType === 'ecdf'));
 		formBuilder.setVisible('group_columns_by', (chartType === 'boxplot' || chartType === 'histogram' || chartType === 'ecdf'));
 		formBuilder.setVisible('color', chartType !== 'histogram');
@@ -171,7 +190,7 @@ morpheus.ChartTool = function (chartOptions) {
 	}
 
 	this.tooltip = [];
-	formBuilder.$form.find('select').on('change', function (e) {
+	formBuilder.$form.find('select,input[type=range]').on('change', function (e) {
 		if ($(this).attr('name') === 'tooltip') {
 			var tooltipVal = _this.formBuilder.getValue('tooltip');
 			_this.tooltip = [];
@@ -236,8 +255,8 @@ morpheus.ChartTool.getPlotlyDefaults = function () {
 		showlegend: false,
 		margin: {
 			l: 80,
-			r: 0,
-			t: 24, // leave space for modebar
+			r: 10,
+			t: 8, // leave space for modebar
 			b: 14,
 			autoexpand: true
 		},
@@ -639,12 +658,16 @@ morpheus.ChartTool.prototype = {
 			var item = array[k];
 			x.push(dataset.getValue(item.row, item.column));
 		}
-		var traces = [{
+		var trace = {
 			name: '',
-			x: x,
-			type: 'histogram',
-			histnorm: 'probability density'
-		}];
+			type: 'histogram'
+		};
+		var traces = [trace];
+		if (options.horizontal) {
+			trace.x = x;
+		} else {
+			trace.y = x;
+		}
 
 		var selection = null;
 		var _this = this;
@@ -701,6 +724,13 @@ morpheus.ChartTool.prototype = {
 	_createBoxPlot: function (options) {
 		var array = options.array; // array of items
 		var points = options.points;
+		var filterFunction = options.filter;
+		if (!filterFunction) {
+			filterFunction = function () {
+				return true;
+			};
+		}
+		var isHorizontal = options.horizontal;
 		var colorByVector = options.colorByVector;
 		var colorByGetter = options.colorByGetter;
 		var colorModel = options.colorModel;
@@ -717,7 +747,11 @@ morpheus.ChartTool.prototype = {
 		var scale = d3.scale.linear().domain([0, 1]).range([-0.3, -1]);
 		for (var k = 0, nitems = array.length; k < nitems; k++) {
 			var item = array[k];
-			y.push(dataset.getValue(item.row, item.column));
+			if (!filterFunction(dataset, item)) {
+				continue;
+			}
+			var value = dataset.getValue(item.row, item.column);
+			y.push(value);
 			if (points) {
 				x.push(scale(Math.random()));
 				if (colorByVector) {
@@ -754,18 +788,19 @@ morpheus.ChartTool.prototype = {
 
 		}
 
-		var traces = [{
+		var valuesField = isHorizontal ? 'x' : 'y';
+		var traces = [];
+		var trace = {
 			name: '',
-			y: y,
 			type: 'box',
 			boxpoints: false
-		}];
+		};
+		trace[valuesField] = y;
+		traces.push(trace);
 		if (points) {
-			traces.push({
+			trace = {
 				name: '',
-				x: x,
-				y: y,
-				hoverinfo: 'y+text',
+				hoverinfo: valuesField + '+text',
 				mode: 'markers',
 				type: 'scatter',
 				text: text,
@@ -774,7 +809,11 @@ morpheus.ChartTool.prototype = {
 					size: size,
 					color: color
 				}
-			});
+			};
+			var xField = isHorizontal ? 'y' : 'x';
+			trace[xField] = x;
+			trace[valuesField] = y;
+			traces.push(trace);
 		}
 		var selection = null;
 		var _this = this;
@@ -826,8 +865,9 @@ morpheus.ChartTool.prototype = {
 		var plotlyDefaults = morpheus.ChartTool.getPlotlyDefaults();
 		var layout = plotlyDefaults.layout;
 		var config = plotlyDefaults.config;
-		var chartWidth = 400;
-		var chartHeight = 400;
+		// 140 to 800
+		var gridWidth = parseInt(this.formBuilder.getValue('chart_width'));
+		var gridHeight = parseInt(this.formBuilder.getValue('chart_height'));
 		var showPoints = this.formBuilder.getValue('show_points');
 
 		var groupColumnsBy = this.formBuilder.getValue('group_columns_by');
@@ -909,8 +949,8 @@ morpheus.ChartTool.prototype = {
 					layout,
 					{
 						showlegend: true,
-						width: chartWidth,
-						height: chartHeight,
+						width: gridWidth,
+						height: gridHeight,
 						margin: {
 							b: 80
 						},
@@ -940,11 +980,11 @@ morpheus.ChartTool.prototype = {
 					if (rowIndexOne > rowIndexTwo) {
 						continue;
 					}
-					var $chart = $('<div style="width:' + chartWidth
-						+ 'px;height:' + chartHeight
+					var $chart = $('<div style="width:' + gridWidth
+						+ 'px;height:' + gridHeight
 						+ 'px;position:absolute;left:'
-						+ (rowIndexTwo * chartWidth) + 'px;top:'
-						+ (rowIndexOne * chartHeight) + 'px;"></div>');
+						+ (rowIndexTwo * gridWidth) + 'px;top:'
+						+ (rowIndexOne * gridHeight) + 'px;"></div>');
 					var myPlot = $chart[0];
 					$chart.appendTo(this.$chart);
 
@@ -982,8 +1022,8 @@ morpheus.ChartTool.prototype = {
 								{},
 								layout,
 								{
-									width: chartWidth,
-									height: chartHeight,
+									width: gridWidth,
+									height: gridHeight,
 									margin: {
 										b: 80
 									},
@@ -1019,8 +1059,8 @@ morpheus.ChartTool.prototype = {
 								{},
 								layout,
 								{
-									width: chartWidth,
-									height: chartHeight,
+									width: gridWidth,
+									height: gridHeight,
 									margin: {
 										b: 80
 									},
@@ -1161,10 +1201,8 @@ morpheus.ChartTool.prototype = {
 								if (grid[rowIndex][columnIndex] === undefined) {
 									grid[rowIndex][columnIndex] = [];
 								}
-
 								grid[rowIndex][columnIndex].push(item);
 							}
-
 						}
 						rowIds[rowIndex] = id;
 						rowIndex++;
@@ -1172,7 +1210,6 @@ morpheus.ChartTool.prototype = {
 					columnIdToIndex.forEach(function (index, id) {
 						columnIds[index] = id;
 					});
-
 				} else {
 					var rowIndex = 0;
 					rowIdToArray.forEach(function (array, id) {
@@ -1188,11 +1225,39 @@ morpheus.ChartTool.prototype = {
 
 			var gridRowCount = rowIds.length;
 			var gridColumnCount = columnIds.length;
+			var horizontal = gridColumnCount === 1;
+			var dataRanges = []; //
+			var _gridWidth = gridWidth;
+			var _gridHeight = gridHeight;
+			if (horizontal) { // each xaxis in a column has the same scale
+				for (var j = 0; j < gridColumnCount; j++) {
+					var yrange = [Number.MAX_VALUE, -Number.MAX_VALUE];
+					for (var i = 0; i < gridRowCount; i++) {
+						var array = grid[i][j];
+						if (array) {
+							for (var k = 0, nitems = array.length; k < nitems; k++) {
+								var item = array[k];
+								var value = dataset.getValue(item.row, item.column);
+								if (!isNaN(value)) {
+									yrange[0] = Math.min(yrange[0], value);
+									yrange[1] = Math.max(yrange[1], value);
+								}
 
-			for (var i = 0; i < gridRowCount; i++) {
-				var rowId = rowIds[i];
-				var yrange = [Number.MAX_VALUE, -Number.MAX_VALUE];
-				if (chartType === 'boxplot') {
+							}
+						}
+					}
+					// increase range by 1%
+					var span = yrange[1] - yrange[0];
+					var delta = (span * 0.01);
+					yrange[1] += delta;
+					yrange[0] -= delta;
+					dataRanges.push(yrange);
+				}
+
+			} else { // each yaxis in a row has the same scale
+				for (var i = 0; i < gridRowCount; i++) {
+					var yrange = [Number.MAX_VALUE, -Number.MAX_VALUE];
+
 					for (var j = 0; j < gridColumnCount; j++) {
 						var array = grid[i][j];
 						if (array) {
@@ -1207,37 +1272,79 @@ morpheus.ChartTool.prototype = {
 							}
 						}
 					}
-					// for now increase range by 1%
+					// increase range by 1%
 					var span = yrange[1] - yrange[0];
 					var delta = (span * 0.01);
 					yrange[1] += delta;
 					yrange[0] -= delta;
+					dataRanges.push(yrange);
 				}
+			}
+			for (var i = 0; i < gridRowCount; i++) {
+				var rowId = rowIds[i];
+
 				for (var j = 0; j < gridColumnCount; j++) {
 					var array = grid[i][j];
 					var columnId = columnIds[j];
 					if (array) {
-						var $chart = $('<div style="width:' + chartWidth
-							+ 'px;height:' + chartHeight
-							+ 'px;position:absolute;left:' + (j * chartWidth)
-							+ 'px;top:' + (i * chartHeight) + 'px;"></div>');
+						var xaxis = {};
+						var marginLeft;
+						var marginBottom;
+						// yaxis.title !== '' ? 60 : 30,
+						if (i === gridRowCount - 1) {
+							xaxis.title = columnId;
+							marginBottom = 30;
+
+						} else {
+							xaxis.ticks = '';
+							xaxis.showticklabels = false;
+							marginBottom = 0;
+						}
+						// only show xaxis if on bottom of grid
+
+						var yaxis = {};
+						if (j === 0) {
+							yaxis.title = rowId;
+							marginLeft = 30;
+						} else {
+							yaxis.ticks = '';
+							yaxis.showticklabels = false;
+							marginLeft = 0;
+						}
+
+						var $chart = $('<div style="width:' + gridWidth
+							+ 'px;height:' + gridHeight
+							+ 'px;position:absolute;left:' + (j * gridWidth)
+							+ 'px;top:' + (i * gridHeight) + 'px;"></div>');
 						$chart.appendTo(this.$chart);
 						var myPlot = $chart[0];
+						yaxis.showgrid = (gridHeight - marginBottom) > 150;
+						xaxis.showgrid = (gridWidth - marginLeft) > 150;
 						if (chartType === 'boxplot') {
-
+							if (horizontal) {
+								yaxis.showticklabels = false;
+								yaxis.ticks = '';
+								xaxis.range = dataRanges[j];
+							} else {
+								xaxis.ticks = '';
+								xaxis.showticklabels = false;
+								yaxis.range = dataRanges[i];
+							}
+							var margin = {
+								b: marginBottom,
+								l: marginLeft,
+								autoexpand: false
+							};
 							this._createBoxPlot({
 								layout: $.extend(true, {}, layout, {
-									width: chartWidth,
-									height: chartHeight,
-									yaxis: {
-										range: yrange,
-										title: rowId,
-									},
-									xaxis: {
-										title: columnId,
-										showticklabels: false
-									}
+									width: gridWidth + margin.l,
+									autosize: false,
+									height: gridHeight + margin.b,
+									margin: margin,
+									xaxis: xaxis,
+									yaxis: yaxis
 								}),
+								horizontal: horizontal,
 								array: array,
 								points: showPoints,
 								sizeByGetter: sizeByGetter,
@@ -1252,19 +1359,17 @@ morpheus.ChartTool.prototype = {
 						} else if (chartType == 'histogram') {
 							this._createHistogram({
 								layout: $.extend(true, {}, layout, {
-									width: chartWidth,
-									height: chartHeight,
-									yaxis: {
-										title: rowId,
-									},
-									xaxis: {
-										title: columnId,
-										showticklabels: false
+									width: gridWidth,
+									height: gridHeight,
+									horizontal: horizontal,
+									xaxis: xaxis,
+									yaxis: yaxis,
+									margin: {
+										b: 80,
+										l: 80
 									}
 								}),
-								colorModel: colorModel,
-								colorByVector: colorByVector,
-								colorByGetter: colorByGetter,
+
 								array: array,
 								myPlot: myPlot,
 								dataset: dataset,
