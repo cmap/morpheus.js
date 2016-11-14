@@ -69,10 +69,10 @@ morpheus.ConditionalRenderingUI.prototype = {
 		// series
 		html.push('<div class="form-group">');
 		html
-		.push('<label for="cond_series" class="col-xs-2">Series</label>');
+		.push('<label class="col-xs-2">Series</label>');
 		html.push('<div class="col-xs-6">');
 		html
-		.push('<select class="form-control morpheus-form-control-inline" id="cond_series">');
+		.push('<select class="form-control morpheus-form-control-inline" name="cond_series">');
 		html.push(morpheus.Util.createOptions(morpheus.DatasetUtil
 		.getSeriesNames(this.heatmap.getProject().getFullDataset())));
 		html.push('</select>');
@@ -131,7 +131,7 @@ morpheus.ConditionalRenderingUI.prototype = {
 		var $el = $(html.join(''));
 		shapeField.$el.appendTo($el.find('[data-name=shapeHolder]'));
 		var $color = $el.find('[name=color]');
-		var $series = $el.find('[id=cond_series]');
+		var $series = $el.find('[name=cond_series]');
 		var $v1 = $el.find('[name=v1]');
 		var $v2 = $el.find('[name=v2]');
 		var $v1Op = $el.find('[name=lower]');

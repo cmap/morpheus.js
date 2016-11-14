@@ -1,7 +1,7 @@
-morpheus.NewHeatMapTool = function() {
+morpheus.NewHeatMapTool = function () {
 };
 morpheus.NewHeatMapTool.prototype = {
-	toString : function() {
+	toString: function () {
 		return 'New Heat Map (' + morpheus.Util.COMMAND_KEY + 'X)';
 	},
 	// gui : function() {
@@ -18,12 +18,12 @@ morpheus.NewHeatMapTool.prototype = {
 	// value : true
 	// } ];
 	// },
-	execute : function(options) {
+	execute: function (options) {
 		var project = options.project;
 		var controller = options.controller;
 		var dataset = project.getSelectedDataset({
-			selectedRows : true,
-			selectedColumns : true
+			selectedRows: true,
+			selectedColumns: true
 		});
 		morpheus.DatasetUtil.shallowCopy(dataset);
 
@@ -38,11 +38,11 @@ morpheus.NewHeatMapTool.prototype = {
 		//
 		// }
 		var name = options.input.name || controller.getName();
-		new morpheus.HeatMap({
-			name : name,
-			dataset : dataset,
-			parent : controller
-
+		var heatmap = new morpheus.HeatMap({
+			name: name,
+			dataset: dataset,
+			parent: controller,
+			symmetric: project.__symmetricProjectListener != null && dataset.getColumnCount() === dataset.getRowCount()
 		});
 
 	}

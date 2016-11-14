@@ -53,7 +53,12 @@ morpheus.SaveDatasetTool.prototype = {
 		var controller = options.controller;
 		var dataset = project.getSortedFilteredDataset();
 		if (series != null) {
-			dataset = new morpheus.DatasetSeriesView(dataset, [morpheus.DatasetUtil.getSeriesIndex(dataset, series)]);
+			var seriesIndex = morpheus.DatasetUtil.getSeriesIndex(dataset, series);
+			if (seriesIndex === -1) {
+				seriesIndex = 0;
+			}
+			console.log(seriesIndex);
+			dataset = seriesIndex === 0 ? dataset : new morpheus.DatasetSeriesView(dataset, [seriesIndex]);
 		}
 		var text = (format === '1.2') ? new morpheus.GctWriter12()
 		.write(dataset) : new morpheus.GctWriter().write(dataset);

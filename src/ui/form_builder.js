@@ -439,6 +439,9 @@ morpheus.FormBuilder.prototype = {
 			if (value) {
 				html.push(' checked');
 			}
+			if (disabled) {
+				html.push(' disabled');
+			}
 			html.push('> ');
 			html.push(title);
 			html.push('</label></div>');

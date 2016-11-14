@@ -346,7 +346,7 @@ morpheus.OpenFileTool.prototype = {
 		promptTool.execute = function (options) {
 			var metadataName = options.input.dataset_field_name;
 			var fileColumnName = options.input.file_field_name;
-			var vectors = _this.annotate(lines, dataset, isColumns, sets,
+			var vectors = _this.annotate(lines, dataset, isColumns, null,
 				metadataName, fileColumnName);
 
 			var nameToIndex = new morpheus.Map();
