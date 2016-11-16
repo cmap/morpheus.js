@@ -264,9 +264,10 @@ morpheus.HeatMapToolBar = function (controller) {
 
 	$buttons.on('click', '[name=pca]', function () {
 		console.log("test button clicked");
+		console.log("morpheus.HeatMapToolBar ::", controller.getProject().getFullDataset().getESSession());
 		try {
 			if (controller.getProject().getFullDataset().getESSession()) {
-				console.log(controller.getProject());
+				console.log("morpheus.HeatMapToolBar ::", controller.getProject(), "Creating PcaPlot");
 				new morpheus.PcaPlotTool({project: controller.getProject()});
 			}
 			else {
@@ -274,8 +275,9 @@ morpheus.HeatMapToolBar = function (controller) {
 			}
 		}
 		catch (e) {
+			console.log(e);
 			alert("Not allowed to plot PCA on this dataset's modification");
-			console.log(controller.getProject());
+			console.log("morpheus.HeatMapToolBar ::", controller.getProject(), "Problems occured");
 		}
 	});
 

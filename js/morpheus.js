@@ -3946,6 +3946,8 @@ morpheus.TcgaUtil.getDataset = function (options) {
 					f(datasetToReturn);
 				});
 			}
+			console.log("morpheus.TcgaUtil.setIdAndSampleType ::", datasetToReturn);
+			morpheus.DatasetUtil.toESSessionPromise(datasetToReturn);
 			returnDeferred.resolve(datasetToReturn);
 		});
 	return returnDeferred;
@@ -6071,7 +6073,7 @@ morpheus.DatasetUtil.toESSessionPromise = function (dataset) {
 				return;
 			}
 			console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder error", error);
-			console.log("morpheus.DatasetUtil.toESSessionpromise ::", "protobuilder success", success);
+			console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder success", success);
 			var builder = success,
 				rexp = builder.build("rexp"),
 				REXP = rexp.REXP;
@@ -10524,6 +10526,7 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
 		annotationCallbacks.forEach(function (f) {
 			f(datasetToReturn);
 		});
+        morpheus.DatasetUtil.toESSessionPromise(datasetToReturn);
 		returnDeferred.resolve(datasetToReturn);
 	});
 
@@ -14076,6 +14079,13 @@ morpheus.PcaPlotTool = function (chartOptions) {
     var options = [];
     var numericOptions = [];
     var pcaOptions = [];
+    var naOptions = [{
+        name: 'mean',
+        value: 'mean'
+    }, {
+        name: 'median',
+        value: 'median'
+    }];
     var updateOptions = function () {
         var dataset = project.getFullDataset();
         rowOptions = [{
@@ -14186,7 +14196,11 @@ morpheus.PcaPlotTool = function (chartOptions) {
         type: 'bootstrap-select',
         options: columnOptions
     });
-
+    formBuilder.append({
+        name: 'replace_NA_with',
+        type: 'bootstrap-select',
+        options: naOptions
+    });
     formBuilder.append({
         name: 'draw',
         type: 'button'
@@ -14199,6 +14213,7 @@ morpheus.PcaPlotTool = function (chartOptions) {
         formBuilder.setOptions('color', options, true);
         formBuilder.setOptions('size', numericOptions, true);
         formBuilder.setOptions('label', columnOptions, true);
+        formBuilder.setOptions('replace_NA_with', naOptions, true);
     }
 
     this.tooltip = [];
@@ -14359,6 +14374,7 @@ morpheus.PcaPlotTool.prototype = {
             var pc1 = _this.formBuilder.getValue('x-axis');
             var pc2 = _this.formBuilder.getValue('y-axis');
             var label = _this.formBuilder.getValue('label');
+            var na = _this.formBuilder.getValue('replace_NA_with');
 
             console.log("morpheus.PcaPlotTool.prototype.draw ::", "DRAW BUTTON CLICKED");
             var dataset = _this.project.getSelectedDataset({
@@ -14391,7 +14407,8 @@ morpheus.PcaPlotTool.prototype = {
                 var arguments = {
                     es: essession,
                     c1: pc1,
-                    c2: pc2
+                    c2: pc2,
+                    replacena: na
                 };
                 if (columnIndices && columnIndices.length > 0) {
                     arguments.columns = columnIndices;
@@ -26263,9 +26280,10 @@ morpheus.HeatMapToolBar = function (controller) {
 
 	$buttons.on('click', '[name=pca]', function () {
 		console.log("test button clicked");
+		console.log("morpheus.HeatMapToolBar ::", controller.getProject().getFullDataset().getESSession());
 		try {
 			if (controller.getProject().getFullDataset().getESSession()) {
-				console.log(controller.getProject());
+				console.log("morpheus.HeatMapToolBar ::", controller.getProject(), "Creating PcaPlot");
 				new morpheus.PcaPlotTool({project: controller.getProject()});
 			}
 			else {
@@ -26273,8 +26291,9 @@ morpheus.HeatMapToolBar = function (controller) {
 			}
 		}
 		catch (e) {
+			console.log(e);
 			alert("Not allowed to plot PCA on this dataset's modification");
-			console.log(controller.getProject());
+			console.log("morpheus.HeatMapToolBar ::", controller.getProject(), "Problems occured");
 		}
 	});
 

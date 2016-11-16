@@ -334,6 +334,8 @@ morpheus.TcgaUtil.getDataset = function (options) {
 					f(datasetToReturn);
 				});
 			}
+			console.log("morpheus.TcgaUtil.setIdAndSampleType ::", datasetToReturn);
+			morpheus.DatasetUtil.toESSessionPromise(datasetToReturn);
 			returnDeferred.resolve(datasetToReturn);
 		});
 	return returnDeferred;

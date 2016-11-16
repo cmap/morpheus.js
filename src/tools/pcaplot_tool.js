@@ -22,6 +22,13 @@ morpheus.PcaPlotTool = function (chartOptions) {
     var options = [];
     var numericOptions = [];
     var pcaOptions = [];
+    var naOptions = [{
+        name: 'mean',
+        value: 'mean'
+    }, {
+        name: 'median',
+        value: 'median'
+    }];
     var updateOptions = function () {
         var dataset = project.getFullDataset();
         rowOptions = [{
@@ -132,7 +139,11 @@ morpheus.PcaPlotTool = function (chartOptions) {
         type: 'bootstrap-select',
         options: columnOptions
     });
-
+    formBuilder.append({
+        name: 'replace_NA_with',
+        type: 'bootstrap-select',
+        options: naOptions
+    });
     formBuilder.append({
         name: 'draw',
         type: 'button'
@@ -145,6 +156,7 @@ morpheus.PcaPlotTool = function (chartOptions) {
         formBuilder.setOptions('color', options, true);
         formBuilder.setOptions('size', numericOptions, true);
         formBuilder.setOptions('label', columnOptions, true);
+        formBuilder.setOptions('replace_NA_with', naOptions, true);
     }
 
     this.tooltip = [];
@@ -305,6 +317,7 @@ morpheus.PcaPlotTool.prototype = {
             var pc1 = _this.formBuilder.getValue('x-axis');
             var pc2 = _this.formBuilder.getValue('y-axis');
             var label = _this.formBuilder.getValue('label');
+            var na = _this.formBuilder.getValue('replace_NA_with');
 
             console.log("morpheus.PcaPlotTool.prototype.draw ::", "DRAW BUTTON CLICKED");
             var dataset = _this.project.getSelectedDataset({
@@ -337,7 +350,8 @@ morpheus.PcaPlotTool.prototype = {
                 var arguments = {
                     es: essession,
                     c1: pc1,
-                    c2: pc2
+                    c2: pc2,
+                    replacena: na
                 };
                 if (columnIndices && columnIndices.length > 0) {
                     arguments.columns = columnIndices;

@@ -313,6 +313,7 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
 		annotationCallbacks.forEach(function (f) {
 			f(datasetToReturn);
 		});
+        morpheus.DatasetUtil.toESSessionPromise(datasetToReturn);
 		returnDeferred.resolve(datasetToReturn);
 	});
 

@@ -82,7 +82,7 @@ morpheus.DatasetUtil.readDatasetArray = function (datasets) {
 			}
 			retDef.reject(message.join(''));
 
-		});es
+		});
 		promises.push(p);
 	});
 	if (promises.length === 0) {
