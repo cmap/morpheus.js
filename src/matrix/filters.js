@@ -11,6 +11,9 @@ morpheus.CombinedFilter.prototype = {
 		f.filters = this.filters.slice(0);
 		return f;
 	},
+	isColumns: function () {
+		return this.filters[0].isColumns();
+	},
 	toString: function () {
 		return this.name;
 	},

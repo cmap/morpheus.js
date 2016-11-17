@@ -3135,8 +3135,9 @@ morpheus.HeatMap.prototype = {
 			var canvas = $('<canvas></canvas>')[0];
 			var height = bounds.height;
 			var width = bounds.width;
-			canvas.height = height;
-			canvas.width = width;
+			var backingScale = morpheus.CanvasUtil.BACKING_SCALE;
+			canvas.height = backingScale * height;
+			canvas.width = backingScale * width;
 			var context = canvas.getContext('2d');
 			this.snapshot(context);
 			// var stack = context.stack();
