@@ -57,7 +57,6 @@ morpheus.SaveDatasetTool.prototype = {
 			if (seriesIndex === -1) {
 				seriesIndex = 0;
 			}
-			console.log(seriesIndex);
 			dataset = seriesIndex === 0 ? dataset : new morpheus.DatasetSeriesView(dataset, [seriesIndex]);
 		}
 		var text = (format === '1.2') ? new morpheus.GctWriter12()

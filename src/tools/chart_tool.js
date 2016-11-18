@@ -781,12 +781,6 @@ morpheus.ChartTool.prototype = {
 	_createBoxPlot: function (options) {
 		var array = options.array; // array of items
 		var points = options.points;
-		var datasetFilter = options.datasetFilter;
-		if (!datasetFilter) {
-			datasetFilter = function () {
-				return true;
-			};
-		}
 		var isHorizontal = options.horizontal;
 		var colorByVector = options.colorByVector;
 		var colorByGetter = options.colorByGetter;
@@ -804,9 +798,7 @@ morpheus.ChartTool.prototype = {
 		var scale = d3.scale.linear().domain([0, 1]).range([-0.3, -1]);
 		for (var k = 0, nitems = array.length; k < nitems; k++) {
 			var item = array[k];
-			if (!datasetFilter(dataset, item)) {
-				continue;
-			}
+
 			var value = dataset.getValue(item.row, item.column);
 			y.push(value);
 			if (points) {
@@ -965,7 +957,9 @@ morpheus.ChartTool.prototype = {
 		});
 
 		var seriesIndex = morpheus.DatasetUtil.getSeriesIndex(dataset, seriesName);
-		var datasetFilter = seriesIndex === -1 ? null : function (ds, item) {
+		var datasetFilter = seriesIndex === -1 ? function () {
+			return true;
+		} : function (ds, item) {
 			var val = ds.getValue(item.row, item.column, seriesIndex);
 			return gtf(val) && ltf(val);
 		};
@@ -990,8 +984,7 @@ morpheus.ChartTool.prototype = {
 		}
 
 		var grid = [];
-		var rowIds = [undefined];
-		var columnIds = [undefined];
+
 		var items = [];
 		var heatmap = this.heatmap;
 		var colorByInfo = morpheus.ChartTool.getVectorInfo(colorBy);
@@ -1005,7 +998,8 @@ morpheus.ChartTool.prototype = {
 			sizeByInfo.field);
 		var colorByVector = colorByInfo.isColumns ? dataset.getColumnMetadata().getByName(colorByInfo.field) : dataset.getRowMetadata().getByName(
 			colorByInfo.field);
-
+		var rowIds = [undefined];
+		var columnIds = [undefined];
 		var sizeByScale = null;
 		if (sizeByVector) {
 			var minMax = morpheus.VectorUtil.getMinMax(sizeByVector);
@@ -1173,12 +1167,17 @@ morpheus.ChartTool.prototype = {
 		} else if (chartType === 'boxplot' || chartType === 'histogram') {
 			for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
 				for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-					items.push({
+					var item = {
 						row: i,
 						column: j
-					});
+					};
+					if (datasetFilter(dataset, item)) {
+						items.push(item);
+					}
+
 				}
 			}
+			showPoints = items.length <= 100000;
 			var colorByInfo = morpheus.ChartTool.getVectorInfo(colorBy);
 			var colorByVector = colorByInfo.isColumns ? dataset.getColumnMetadata()
 			.getByName(colorByInfo.field) : dataset.getRowMetadata()
@@ -1312,9 +1311,49 @@ morpheus.ChartTool.prototype = {
 			} else {
 				grid = [[items]];
 			}
-
 			var gridRowCount = rowIds.length;
 			var gridColumnCount = columnIds.length;
+			// sort rows and columns by median
+			var summary = [];
+			for (var i = 0; i < gridRowCount; i++) {
+				summary[i] = [];
+				for (var j = 0; j < gridColumnCount; j++) {
+					var array = grid[i][j];
+					var values = [];
+					if (array) {
+						for (var k = 0, nitems = array.length; k < nitems; k++) {
+							var item = array[k];
+							var value = dataset.getValue(item.row, item.column);
+							if (!isNaN(value)) {
+								values.push(value);
+							}
+
+						}
+					}
+					summary[i][j] = morpheus.Median(morpheus.VectorUtil.arrayAsVector(values));
+				}
+			}
+			// sort rows
+			var rowMedians = [];
+			for (var i = 0; i < gridRowCount; i++) {
+				var values = [];
+				for (var j = 0; j < gridColumnCount; j++) {
+					values.push(summary[i][j]);
+				}
+				rowMedians.push(morpheus.Median(morpheus.VectorUtil.arrayAsVector(values)));
+			}
+
+			var newRowOrder = morpheus.Util.indexSort(rowMedians, false);
+			var newRowIds = [];
+			var newGrid = [];
+
+			for (var i = 0; i < gridRowCount; i++) {
+				newGrid.push(grid[newRowOrder[i]]);
+				newRowIds.push(rowIds[newRowOrder[i]]);
+			}
+			grid = newGrid;
+			rowIds = newRowIds;
+
 			var horizontal = gridColumnCount === 1;
 			var dataRanges = []; //
 			var _gridWidth = gridWidth;
@@ -1353,6 +1392,7 @@ morpheus.ChartTool.prototype = {
 						if (array) {
 							for (var k = 0, nitems = array.length; k < nitems; k++) {
 								var item = array[k];
+
 								var value = dataset.getValue(item.row, item.column);
 								if (!isNaN(value)) {
 									yrange[0] = Math.min(yrange[0], value);
@@ -1380,7 +1420,7 @@ morpheus.ChartTool.prototype = {
 						var xaxis = {};
 						var marginLeft;
 						var marginBottom;
-						// yaxis.title !== '' ? 60 : 30,
+
 						if (i === gridRowCount - 1) {
 							xaxis.title = columnId;
 							marginBottom = 30;
@@ -1393,20 +1433,23 @@ morpheus.ChartTool.prototype = {
 						// only show xaxis if on bottom of grid
 
 						var yaxis = {};
-						var annotations = [];
-						if (j === 0) {
+						var annotations = undefined;
+						if (j === 0 && rowId != null) {
 							annotations = [{
 								xref: 'paper',
 								yref: 'paper',
 								x: 0,
 								xanchor: 'right',
 								y: 0.5,
-								yanchor: 'bottom',
+								yanchor: 'middle',
 								text: rowId,
-								showarrow: false
+								showarrow: false,
+								font: {
+									size: 10
+								}
 							}]; // rotate axis label
 							//yaxis.title = ;
-							marginLeft = 30;
+							marginLeft = 120;
 						} else {
 							yaxis.ticks = '';
 							yaxis.showticklabels = false;
@@ -1443,10 +1486,9 @@ morpheus.ChartTool.prototype = {
 									height: gridHeight + margin.b,
 									margin: margin,
 									xaxis: xaxis,
-									yaxis: yaxis
+									yaxis: yaxis,
+									annotations: annotations
 								}),
-								annotations: annotations,
-								datasetFilter: datasetFilter,
 								horizontal: horizontal,
 								array: array,
 								points: showPoints,
