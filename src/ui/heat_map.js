@@ -1319,8 +1319,8 @@ morpheus.HeatMap.prototype = {
 							canvas.style.height = height + 'px';
 							canvas.width = backingScale * width;
 							canvas.style.width = width + 'px';
-							morpheus.CanvasUtil.resetTransform(context);
 							var context = canvas.getContext('2d');
+							morpheus.CanvasUtil.resetTransform(context);
 							_this.snapshot(context);
 							var url = canvas.toDataURL();
 							// canvas.toBlob(function (blob) {
@@ -3143,8 +3143,8 @@ morpheus.HeatMap.prototype = {
 			canvas.style.height = height + 'px';
 			canvas.width = backingScale * width;
 			canvas.style.width = width + 'px';
-			morpheus.CanvasUtil.resetTransform(context);
 			var context = canvas.getContext('2d');
+			morpheus.CanvasUtil.resetTransform(context);
 			this.snapshot(context);
 			// var stack = context.stack();
 			// var s = [];
