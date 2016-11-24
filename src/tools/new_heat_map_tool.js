@@ -25,6 +25,8 @@ morpheus.NewHeatMapTool.prototype = {
 			selectedRows : true,
 			selectedColumns : true
 		});
+
+        console.log("morpheus.NewHeatMapTool.prototype.execute ::", dataset);
 		morpheus.DatasetUtil.shallowCopy(dataset);
 		morpheus.DatasetUtil.toESSessionPromise(dataset);
 		// TODO see if we can subset dendrograms
@@ -38,12 +40,12 @@ morpheus.NewHeatMapTool.prototype = {
 		//
 		// }
 		var name = options.input.name || controller.getName();
-		new morpheus.HeatMap({
-			name : name,
-			dataset : dataset,
-			parent : controller
-
-		});
+        var heatmap = new morpheus.HeatMap({
+            name: name,
+            dataset: dataset,
+            parent: controller,
+            symmetric: project.__symmetricProjectListener != null && dataset.getColumnCount() === dataset.getRowCount()
+        });
 
 	}
 };

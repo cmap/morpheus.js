@@ -164,11 +164,16 @@ morpheus.MetadataUtil.search = function (options) {
 };
 
 morpheus.MetadataUtil.shallowCopy = function (model) {
+
 	var copy = new morpheus.MetadataModel(model.getItemCount());
+
+    console.log("METADATAUTIL.SHALLOWCOPY ::", model, model.getItemCount(), model.getMetadataCount(), copy);
 	for (var i = 0; i < model.getMetadataCount(); i++) {
 		var v = model.get(i);
+		console.log(v);
 		// copy properties b/c they can be modified via ui
 		var newVector = new morpheus.VectorAdapter(v);
+		console.log(newVector);
 		newVector.properties = new morpheus.Map();
 		newVector.getProperties = function () {
 			return this.properties;

@@ -329,6 +329,7 @@ morpheus.PcaPlotTool.prototype = {
             console.log("morpheus.PcaPlotTool.prototype.draw ::", "full dataset", fullDataset);
             var columnIndices = [];
             var rowIndices = [];
+
             if (fullDataset instanceof morpheus.Dataset ||
                 fullDataset instanceof morpheus.SlicedDatasetView && !(dataset.columnIndices.length == 0 && dataset.rowIndices.length == 0)) {
                 columnIndices = dataset.columnIndices;

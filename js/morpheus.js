@@ -7287,11 +7287,16 @@ morpheus.MetadataUtil.search = function (options) {
 };
 
 morpheus.MetadataUtil.shallowCopy = function (model) {
+
 	var copy = new morpheus.MetadataModel(model.getItemCount());
+
+    console.log("METADATAUTIL.SHALLOWCOPY ::", model, model.getItemCount(), model.getMetadataCount(), copy);
 	for (var i = 0; i < model.getMetadataCount(); i++) {
 		var v = model.get(i);
+		console.log(v);
 		// copy properties b/c they can be modified via ui
 		var newVector = new morpheus.VectorAdapter(v);
+		console.log(newVector);
 		newVector.properties = new morpheus.Map();
 		newVector.getProperties = function () {
 			return this.properties;
@@ -7760,6 +7765,15 @@ morpheus.Positions.prototype = {
 
 morpheus.Project = function(dataset) {
 	this.originalDataset = dataset;
+	if (morpheus.MetadataUtil.indexOf(dataset.getRowMetadata(), "index") < 0) {
+    	dataset.getRowMetadata().add("index").setArray(Array.apply(null, {length: dataset.rows}).map(Number.call, Number));
+    	console.log(dataset.getRowMetadata().getByName("index").getProperties());
+    	dataset.getRowMetadata().getByName("index").getProperties().set(morpheus.VectorKeys.DATA_TYPE, "number");
+	}
+    this.trigger('trackChanged', {
+    	vectors : [dataset.getRowMetadata().getByName("index")],
+		render : ['text']
+	});
 	this.rowIndexMapper = new morpheus.IndexMapper(this, true);
 	this.columnIndexMapper = new morpheus.IndexMapper(this, false);
 	this.groupRows = [];
@@ -12564,6 +12578,118 @@ morpheus.HClusterTool.prototype = {
 	}
 };
 
+/**
+ * Created by dzenkova on 11/18/16.
+ */
+morpheus.KmeansTool = function() {
+};
+morpheus.KmeansTool.prototype = {
+    toString : function() {
+        return 'k-means';
+    },
+    gui : function() {
+        // z-score, robust z-score, log2, inverse log2
+        return [ {
+            name : 'number_of_clusters',
+            type : 'text'
+        },{
+            name : 'use_selected_rows_and_columns_only',
+            type : 'checkbox'
+        } ];
+    },
+    execute : function(options) {
+        var project = options.project;
+        var controller = options.controller;
+
+        var columnIndices = [];
+        var rowIndices = [];
+        var fullDataset = project.getFullDataset();
+        console.log("morpheus.KmeansTool.prototype.execute ::", "full dataset", fullDataset);
+        var dataset = project.getSortedFilteredDataset();
+        while(dataset.dataset instanceof morpheus.SlicedDatasetView) {
+            dataset = dataset.dataset;
+        }
+        var selectedDataset = project.getSelectedDataset();
+        console.log("morpheus.KmeansTool.prototype.execute ::", "sorted dataset", dataset);
+        console.log("selected dataset", selectedDataset);
+        if (fullDataset instanceof morpheus.SlicedDatasetView) {
+            columnIndices = fullDataset.columnIndices;
+            rowIndices = fullDataset.rowIndices;
+        }
+        if (options.input.use_selected_rows_and_columns_only) {
+            if ((!selectedDataset.columnIndices && !selectedDataset.rowIndices)) {
+                alert("So select some rows and/or columns")
+                return;
+            }
+            if (fullDataset instanceof morpheus.Dataset ||
+                fullDataset instanceof morpheus.SlicedDatasetView && !((!selectedDataset.columnIndices) && (!selectedDataset.rowIndices))) {
+                columnIndices = selectedDataset.columnIndices;
+                rowIndices = selectedDataset.rowIndices;
+            }
+            else {
+                columnIndices = fullDataset.columnIndices;
+                rowIndices = fullDataset.rowIndices;
+            }
+        }
+        console.log(columnIndices, rowIndices);
+        /*if (columnIndices) {
+            for (var i = 0; i < columnIndices.length; i++) {
+                columnIndices[i] = dataset.columnIndices[i];
+            }
+        }
+        if (rowIndices) {
+            for (var i = 0; i < rowIndices.length; i++) {
+                rowIndices[i] = dataset.rowIndices[i];
+            }
+        }
+        console.log(columnIndices, rowIndices);*/
+        var number = parseInt(options.input.number_of_clusters);
+        if (isNaN(number)) {
+            alert("Enter the expected number of clusters");
+            return;
+        }
+        console.log(number);
+        var esPromise = fullDataset.getESSession();
+        esPromise.then(function(essession) {
+            var arguments = {
+                es : essession,
+                k : number
+            };
+            if (columnIndices && columnIndices.length > 0) {
+                arguments.cols = columnIndices;
+            }
+            if (rowIndices && rowIndices.length > 0) {
+                arguments.rows = rowIndices;
+            }
+            console.log(arguments);
+            var req = ocpu.call("kmeans", arguments, function(session) {
+                session.getObject(function(success) {
+                    var clusters = JSON.parse(success);
+                    var ind = morpheus.MetadataUtil.indexOf(fullDataset.getRowMetadata(), "clusters");
+
+                    if (ind < 0) {
+                        fullDataset.getRowMetadata().add("clusters");
+                    }
+                    var v = fullDataset.getRowMetadata().getByName("clusters");
+                    console.log(fullDataset.getRowMetadata().getByName("clusters"));
+                    while (v instanceof morpheus.VectorAdapter || v instanceof morpheus.SlicedVector) {
+                        v = v.v
+                    }
+                    console.log(v);
+                    v.setArray(clusters);
+                    console.log("morpheus.KmeansTool.prototype.execute ::", "updated dataset?", fullDataset);
+                    console.log("morpheus.KmeansTool.prototype.execute ::", "clusters?", fullDataset.getRowMetadata().get(morpheus.MetadataUtil.indexOf(fullDataset.getRowMetadata(), "clusters")));
+                    project.trigger('trackChanged', {
+                        vectors: [fullDataset.getRowMetadata().getByName("clusters")],
+                        render: ['color'],
+                        continuous: false
+                    });
+                })
+            });
+
+        });
+    }
+};
 morpheus.MarkerSelection = function() {
 
 };
@@ -13113,6 +13239,8 @@ morpheus.NewHeatMapTool.prototype = {
 			selectedRows : true,
 			selectedColumns : true
 		});
+
+        console.log("morpheus.NewHeatMapTool.prototype.execute ::", dataset);
 		morpheus.DatasetUtil.shallowCopy(dataset);
 		morpheus.DatasetUtil.toESSessionPromise(dataset);
 		// TODO see if we can subset dendrograms
@@ -14386,6 +14514,7 @@ morpheus.PcaPlotTool.prototype = {
             console.log("morpheus.PcaPlotTool.prototype.draw ::", "full dataset", fullDataset);
             var columnIndices = [];
             var rowIndices = [];
+
             if (fullDataset instanceof morpheus.Dataset ||
                 fullDataset instanceof morpheus.SlicedDatasetView && !(dataset.columnIndices.length == 0 && dataset.rowIndices.length == 0)) {
                 columnIndices = dataset.columnIndices;
@@ -21735,9 +21864,11 @@ morpheus.HeatMap.prototype = {
 				var columnMetadata = dataset
 				.getColumnMetadata();
 				var rowMetadata = dataset.getRowMetadata();
+				console.log("ATTENTION", "copyListener ::", columnMetadata, rowMetadata);
 				// only copy visible tracks
 				var visibleColumnFields = _this
 				.getVisibleTrackNames(true);
+				console.log("ATTENTION", "copyListener ::", visibleColumnFields);
 				var columnFieldIndices = [];
 				_.each(visibleColumnFields, function (name) {
 					var index = morpheus.MetadataUtil.indexOf(
@@ -21752,6 +21883,8 @@ morpheus.HeatMap.prototype = {
 				// only copy visible tracks
 				var visibleRowFields = _this
 				.getVisibleTrackNames(false);
+
+                console.log("ATTENTION", "copyListener ::", visibleRowFields);
 				var rowFieldIndices = [];
 				_.each(visibleRowFields, function (name) {
 					var index = morpheus.MetadataUtil.indexOf(
@@ -22606,6 +22739,7 @@ morpheus.HeatMap.prototype = {
 	getVisibleTrackNames: function (isColumns) {
 		var names = [];
 		var tracks = isColumns ? this.columnTracks : this.rowTracks;
+		console.log("ATTENTION", "getVisibleTrackNames :: ", tracks);
 		for (var i = 0, length = tracks.length; i < length; i++) {
 			if (tracks[i].isVisible()) {
 				names.push(tracks[i].name);
@@ -26228,7 +26362,8 @@ morpheus.HeatMapToolBar = function (controller) {
 		tool: new morpheus.SimilarityMatrixTool()
 	}, {
 		tool: new morpheus.TransposeTool()
-	}, {tool: new morpheus.TsneTool()}]; // DevAPI, {
+	}, {tool: new morpheus.TsneTool()},
+		{tool : new morpheus.KmeansTool()}]; // DevAPI, {
 	this.getToolByName = function (name) {
 		for (var i = 0; i < tools.length; i++) {
 			if (tools[i] && tools[i].tool.toString

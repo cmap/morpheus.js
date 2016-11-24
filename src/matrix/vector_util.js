@@ -179,6 +179,7 @@ morpheus.VectorUtil.maybeConvertToStringArray = function (vector, delim) {
 	var newValues = [];
 	var regex = new RegExp(delim);
 	var found = false;
+
 	for (var i = 0, nrows = vector.size(); i < nrows; i++) {
 		var s = vector.getValue(i);
 		if (s != null) {
@@ -197,8 +198,9 @@ morpheus.VectorUtil.maybeConvertToStringArray = function (vector, delim) {
 		for (var i = 0, nrows = newValues.length; i < nrows; i++) {
 			vector.setValue(i, newValues[i]);
 		}
+		vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, '[string]');
 	}
-	vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, '[string]');
+
 	return found;
 };
 
@@ -295,12 +297,26 @@ morpheus.VectorUtil.getMinMax = function (vector) {
 	var min = Number.MAX_VALUE;
 	var max = -Number.MAX_VALUE;
 	var fields = vector.getProperties().get(morpheus.VectorKeys.FIELDS);
+	var isArray = morpheus.VectorUtil.getDataType(vector)[0] === '[';
 	if (fields != null) {
 		var nvalues = fields.length;
 		for (var i = 0, size = vector.size(); i < size; i++) {
 			var array = vector.getValue(i);
 			if (array) {
 				for (var j = 0; j < nvalues; j++) {
+					var value = array[j];
+					if (!isNaN(value)) {
+						min = value < min ? value : min;
+						max = value > max ? value : max;
+					}
+				}
+			}
+		}
+	} else if (isArray) {
+		for (var i = 0, size = vector.size(); i < size; i++) {
+			var array = vector.getValue(i);
+			if (array != null) {
+				for (var j = 0, nvalues = array.length; j < nvalues; j++) {
 					var value = array[j];
 					if (!isNaN(value)) {
 						min = value < min ? value : min;
@@ -322,7 +338,8 @@ morpheus.VectorUtil.getMinMax = function (vector) {
 		min: min,
 		max: max
 	};
-};
+}
+;
 morpheus.VectorUtil.getFirstNonNull = function (vector) {
 	for (var i = 0, length = vector.size(); i < length; i++) {
 		var val = vector.getValue(i);

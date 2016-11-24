@@ -3,6 +3,7 @@ morpheus.HeatMapOptions = function (controller) {
 		{
 			name: 'color_by',
 			required: true,
+			help: 'Use a different color scheme for distinct row annotation values',
 			type: 'select',
 			options: ['(None)'].concat(morpheus.MetadataUtil
 			.getMetadataNames(controller.getProject()
@@ -82,6 +83,14 @@ morpheus.HeatMapOptions = function (controller) {
 	}
 	var displayItems = [
 		{
+			disabled: controller.getProject().getFullDataset().getColumnCount() !== controller.getProject().getFullDataset().getRowCount(),
+			name: 'link_rows_and_columns',
+			required: true,
+			type: 'checkbox',
+			col: 'col-xs-4',
+			value: controller.getProject().__symmetricProjectListener != null
+		},
+		{
 			name: 'show_grid',
 			required: true,
 			type: 'checkbox',
@@ -93,6 +102,13 @@ morpheus.HeatMapOptions = function (controller) {
 			type: 'text',
 			col: 'col-xs-4',
 			value: morpheus.Util.nf(controller.heatmap.getGridThickness())
+		},
+		{
+			name: 'grid_color',
+			required: true,
+			type: 'color',
+			col: 'col-xs-2',
+			value: controller.heatmap.getGridColor()
 		},
 		{
 			name: 'row_size',
@@ -134,6 +150,7 @@ morpheus.HeatMapOptions = function (controller) {
 				: 1)
 		});
 	}
+
 	displayItems.push({
 		name: 'info_window',
 		required: true,
@@ -273,9 +290,12 @@ morpheus.HeatMapOptions = function (controller) {
 		+ '"></div>');
 	$displayDiv.append($(displayFormBuilder.$form));
 	displayFormBuilder.setEnabled('grid_thickness', controller.heatmap.isDrawGrid());
+	displayFormBuilder.setEnabled('grid_color', controller.heatmap.isDrawGrid());
+
 	displayFormBuilder.$form.find('[name=show_grid]').on('click', function (e) {
 		var grid = $(this).prop('checked');
 		displayFormBuilder.setEnabled('grid_thickness', grid);
+		displayFormBuilder.setEnabled('grid_color', grid);
 		controller.heatmap.setDrawGrid(grid);
 		controller.revalidate();
 		colorSchemeChooser.restoreCurrentValue();
@@ -283,6 +303,15 @@ morpheus.HeatMapOptions = function (controller) {
 	displayFormBuilder.$form.find('[name=inline_tooltip]').on('click',
 		function (e) {
 			controller.options.inlineTooltip = $(this).prop('checked');
+		});
+
+	displayFormBuilder.$form.find('[name=grid_color]').on(
+		'change',
+		function (e) {
+			var value = $(this).val();
+			controller.heatmap.setGridColor(value);
+			controller.heatmap.setInvalid(true);
+			controller.heatmap.repaint();
 		});
 
 	displayFormBuilder.$form.find('[name=grid_thickness]').on(
@@ -311,6 +340,16 @@ morpheus.HeatMapOptions = function (controller) {
 	displayFormBuilder.$form.find('[name=info_window]').on('change',
 		function (e) {
 			controller.setTooltipMode(parseInt($(this).val()));
+		});
+	displayFormBuilder.find('link_rows_and_columns').on('click',
+		function (e) {
+			var checked = $(this).prop('checked');
+			if (checked) {
+				var l = new morpheus.SymmetricProjectListener(controller.getProject(), controller.vscroll, controller.hscroll);
+				controller.getProject().__symmetricProjectListener = l;
+			} else {
+				controller.getProject().__symmetricProjectListener.dispose();
+			}
 		});
 
 	var $colorByValue = colorSchemeFormBuilder.$form

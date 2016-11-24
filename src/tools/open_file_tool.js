@@ -140,15 +140,14 @@ morpheus.OpenFileTool.prototype = {
 					var sets = new morpheus.GmtReader()
 					.read(new morpheus.ArrayBufferReader(new Uint8Array(
 						buf)));
-					that.prompt(null, dataset, controller, isAnnotateColumns,
-						sets);
+					that.promptSets(dataset, controller, isAnnotateColumns,
+						sets, morpheus.Util.getBaseFileName(morpheus.Util.getFileName(fileOrUrl)));
 				});
 
 			} else {
 				var result = morpheus.Util.readLines(fileOrUrl);
 				result.done(function (lines) {
-					that.prompt(lines, dataset, controller, isAnnotateColumns,
-						null);
+					that.prompt(lines, dataset, controller, isAnnotateColumns);
 				});
 
 			}
@@ -176,6 +175,34 @@ morpheus.OpenFileTool.prototype = {
 				columns: isColumns
 			});
 		}
+	},
+
+	annotateSets: function (dataset, isColumns, sets,
+							datasetMetadataName, setSourceFileName) {
+		if (isColumns) {
+			dataset = morpheus.DatasetUtil.transposedView(dataset);
+		}
+		var vector = dataset.getRowMetadata().getByName(datasetMetadataName);
+		var idToIndices = morpheus.VectorUtil.createValueToIndicesMap(vector);
+		var setVector = dataset.getRowMetadata().add(setSourceFileName);
+		sets.forEach(function (set) {
+			var name = set.name;
+			var members = set.ids;
+			members.forEach(function (id) {
+				var indices = idToIndices.get(id);
+				if (indices !== undefined) {
+					for (var i = 0, nIndices = indices.length; i < nIndices; i++) {
+						var array = setVector.getValue(indices[i]);
+						if (array === undefined) {
+							array = [];
+						}
+						array.push(name);
+						setVector.setValue(indices[i], array);
+					}
+				}
+			});
+		});
+		return setVector;
 	},
 	/**
 	 *
@@ -213,12 +240,8 @@ morpheus.OpenFileTool.prototype = {
 				function (set) {
 					var name = set.name;
 					var members = set.ids;
-					// var v = dataset.getRowMetadata()
-					// .getByName(name);
-					// overwrite existing values
-					// if (!v) {
+
 					var v = dataset.getRowMetadata().add(name);
-					// }
 					vectors.push(v);
 					_
 					.each(
@@ -283,15 +306,47 @@ morpheus.OpenFileTool.prototype = {
 		}
 		return vectors;
 	},
-	// prompt for metadata field name in dataset and in file
-	prompt: function (lines, dataset, controller, isColumns, sets) {
+	// prompt for metadata field name in dataset
+	promptSets: function (dataset, controller, isColumns, sets, setSourceFileName) {
+		var promptTool = {};
+		var _this = this;
+		promptTool.execute = function (options) {
+			var metadataName = options.input.dataset_field_name;
+			var vector = _this.annotateSets(dataset, isColumns, sets,
+				metadataName, setSourceFileName);
+
+			controller.getProject().trigger('trackChanged', {
+				vectors: [vector],
+				render: ['text'],
+				columns: isColumns
+			});
+		};
+		promptTool.toString = function () {
+			return 'Select Fields To Match On';
+		};
+		promptTool.gui = function () {
+			return [{
+				name: 'dataset_field_name',
+				options: morpheus.MetadataUtil
+				.getMetadataNames(isColumns ? dataset
+				.getColumnMetadata() : dataset.getRowMetadata()),
+				type: 'select',
+				value: 'id',
+				required: true
+			}];
+
+		};
+		morpheus.HeatMap.showTool(promptTool, controller);
+
+	},
+	prompt: function (lines, dataset, controller, isColumns) {
 		var promptTool = {};
 		var _this = this;
 		var header = lines != null ? lines[0].split('\t') : null;
 		promptTool.execute = function (options) {
 			var metadataName = options.input.dataset_field_name;
 			var fileColumnName = options.input.file_field_name;
-			var vectors = _this.annotate(lines, dataset, isColumns, sets,
+			var vectors = _this.annotate(lines, dataset, isColumns, null,
 				metadataName, fileColumnName);
 
 			var nameToIndex = new morpheus.Map();

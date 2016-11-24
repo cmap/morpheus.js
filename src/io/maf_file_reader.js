@@ -9,17 +9,6 @@ morpheus.MafFileReader.summarizeMutations = function (dataset) {
 			'Missense', 'Splice Site', 'Frame Shift', 'Nonsense']);
 	vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, '[number]');
 
-	// v.getProperties().set(morpheus.VectorKeys.RECOMPUTE_FUNCTION, true);
-	// v.getProperties().set(morpheus.VectorKeys.FUNCTION, function (view) {
-	// 	var bins = new Int32Array(7); // 1-7
-	// 	for (var i = 0, size = view.size(); i < size; i++) {
-	// 		var value = view.getValue(i);
-	// 		if (value > 0) {
-	// 			bins[value - 1]++;
-	// 		}
-	// 	}
-	// 	return bins;
-	// });
 	// computing dynamically screws things up b/c summary is computed for other data types (e.g. CN)
 	for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
 		var bins = new Int32Array(7); // 1-7
@@ -254,7 +243,7 @@ morpheus.MafFileReader.prototype = {
 		var dataset = new morpheus.Dataset({
 			name: datasetName,
 			array: variantMatrix,
-			dataType: 'object',
+			dataType: 'Number',
 			rows: geneSymbolToIndex.size(),
 			columns: sampleIdToIndex.size()
 		});
@@ -276,7 +265,7 @@ morpheus.MafFileReader.prototype = {
 		}
 		if (ccfColumnIndex !== undefined) {
 			dataset.addSeries({
-				dataType: 'object',
+				dataType: 'Float32',
 				name: 'allelic_fraction',
 				array: ccfMatrix
 			});
@@ -326,6 +315,29 @@ morpheus.MafFileReader.prototype = {
 		morpheus.MafFileReader.summarizeMutations(dataset);
 		morpheus.MafFileReader
 		.summarizeMutations(new morpheus.TransposedDatasetView(dataset));
+
+		var vector = dataset.getColumnMetadata().add('mutation_summary_selection');
+		vector.getProperties().set(
+			morpheus.VectorKeys.FIELDS,
+			['Synonymous', 'In Frame Indel', 'Other Non-Synonymous',
+				'Missense', 'Splice Site', 'Frame Shift', 'Nonsense']);
+		vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, '[number]');
+		vector.getProperties().set(morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION, true);
+		var name = dataset.getName();
+		vector.getProperties().set(morpheus.VectorKeys.FUNCTION, function (view, selectedDataset, index) {
+			var sourceVector = selectedDataset.getRowMetadata().getByName('Source');
+			if (sourceVector == null || sourceVector.getValue(index) === name) {
+				var bins = new Int32Array(7); // 1-7
+				for (var j = 0, size = view.size(); j < size; j++) {
+					var value = view.getValue(j);
+					if (value > 0) {
+						bins[value - 1]++;
+					}
+				}
+				return bins;
+			}
+		});
+
 		return dataset;
 	},
 	read: function (fileOrUrl, callback) {
@@ -333,7 +345,7 @@ morpheus.MafFileReader.prototype = {
 		var name = morpheus.Util.getBaseFileName(morpheus.Util
 		.getFileName(fileOrUrl));
 		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
-																	arrayBuffer) {
+																	   arrayBuffer) {
 			if (err) {
 				callback(err);
 			} else {

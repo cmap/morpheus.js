@@ -14,7 +14,7 @@ morpheus.TsneTool.execute = function (dataset, input) {
 		for (var i = 0; i < N; i++) {
 			matrix.push([]);
 			for (var j = i + 1; j < N; j++) {
-				matrix[i][j] = dataset, getValue(i, j);
+				matrix[i][j] = dataset.getValue(i, j);
 			}
 		}
 	} else if (f === morpheus.TsneTool.PRECOMPUTED_SIM) {
@@ -22,7 +22,7 @@ morpheus.TsneTool.execute = function (dataset, input) {
 		for (var i = 0; i < N; i++) {
 			matrix.push([]);
 			for (var j = i + 1; j < N; j++) {
-				matrix[i][j] = max - dataset, getValue(i, j);
+				matrix[i][j] = max - dataset.getValue(i, j);
 			}
 		}
 	} else {

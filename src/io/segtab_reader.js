@@ -1,22 +1,22 @@
-morpheus.SegTabReader = function() {
+morpheus.SegTabReader = function () {
 	this.regions = null;
 };
-morpheus.SegTabReader.binByRegion = function(dataset, regions) {
+morpheus.SegTabReader.binByRegion = function (dataset, regions) {
 
 	var chromosomeVector = dataset.getRowMetadata().getByName('Chromosome');
 	var startVector = dataset.getRowMetadata().getByName('Start_bp');
 	var endVector = dataset.getRowMetadata().getByName('End_bp');
 
 	var collapsedDataset = new morpheus.Dataset({
-		name : dataset.getName(),
-		rows : regions.length,
-		columns : dataset.getColumnCount(),
-		dataType : 'Float32'
+		name: dataset.getName(),
+		rows: regions.length,
+		columns: dataset.getColumnCount(),
+		dataType: 'Float32'
 	});
 	morpheus.DatasetUtil.fill(collapsedDataset, NaN);
 	var regionIdVector = collapsedDataset.getRowMetadata().add('id');
 	var newChromosomeVector = collapsedDataset.getRowMetadata().add(
-			'chromosome');
+		'chromosome');
 	var newStartVector = collapsedDataset.getRowMetadata().add('start');
 	var newEndVector = collapsedDataset.getRowMetadata().add('end');
 	var nsegmentsVector = collapsedDataset.getRowMetadata().add('nsegments');
@@ -24,8 +24,8 @@ morpheus.SegTabReader.binByRegion = function(dataset, regions) {
 
 	for (var series = 1; series < nseries; series++) {
 		collapsedDataset.addSeries({
-			name : dataset.getName(series),
-			dataType : 'Float32'
+			name: dataset.getName(series),
+			dataType: 'Float32'
 		});
 
 	}
@@ -40,20 +40,20 @@ morpheus.SegTabReader.binByRegion = function(dataset, regions) {
 			var start = startVector.getValue(i);
 			var end = endVector.getValue(i);
 			if (region.chromosome == chromosome && start >= region.start
-					&& end <= region.end) {
+				&& end <= region.end) {
 				rowIndices.push(i);
 			}
 		}
 		if (rowIndices.length > 0) {
 			var slice = morpheus.DatasetUtil.slicedView(dataset, rowIndices,
-					null);
+				null);
 			var columnView = new morpheus.DatasetColumnView(slice);
 			for (var j = 0; j < dataset.getColumnCount(); j++) {
 				columnView.setIndex(j);
 				for (var series = 0; series < nseries; series++) {
 					columnView.setSeriesIndex(series);
 					collapsedDataset.setValue(regionIndex, j,
-							summarizeFunction(columnView), series);
+						summarizeFunction(columnView), series);
 				}
 
 			}
@@ -68,13 +68,13 @@ morpheus.SegTabReader.binByRegion = function(dataset, regions) {
 };
 
 morpheus.SegTabReader.prototype = {
-	getFormatName : function() {
+	getFormatName: function () {
 		return 'seg';
 	},
-	setRegions : function(regions) {
+	setRegions: function (regions) {
 		this.regions = regions;
 	},
-	_read : function(datasetName, reader) {
+	_read: function (datasetName, reader) {
 		var tab = /\t/;
 		var header = reader.readLine().split(tab);
 		var fieldNameToIndex = {};
@@ -83,19 +83,19 @@ morpheus.SegTabReader.prototype = {
 			fieldNameToIndex[name] = i;
 		}
 
-		var sampleField = morpheus.MafFileReader.getField([ 'pair_id',
-				'Tumor_Sample_Barcode', 'tumor_name', 'Tumor_Sample_UUID',
-				'Sample' ], fieldNameToIndex, {
-					remove : false,
-					lc : true
-				});
+		var sampleField = morpheus.MafFileReader.getField(['pair_id',
+			'Tumor_Sample_Barcode', 'tumor_name', 'Tumor_Sample_UUID',
+			'Sample'], fieldNameToIndex, {
+			remove: false,
+			lc: true
+		});
 		var sampleColumnName = sampleField.name;
 		var sampleIdColumnIndex = sampleField.index;
-		var tumorFractionField = morpheus.MafFileReader.getField([ 'ccf_hat',
-				'tumor_f', 'i_tumor_f' ], fieldNameToIndex, {
-					remove : false,
-					lc : true
-				});
+		var tumorFractionField = morpheus.MafFileReader.getField(['ccf_hat',
+			'tumor_f', 'i_tumor_f'], fieldNameToIndex, {
+			remove: false,
+			lc: true
+		});
 		var ccfColumnName;
 		var ccfColumnIndex;
 		if (tumorFractionField !== undefined) {
@@ -103,21 +103,21 @@ morpheus.SegTabReader.prototype = {
 			ccfColumnIndex = tumorFractionField.index;
 		}
 		var chromosomeColumn = fieldNameToIndex.Chromosome;
-		var startPositionColumn = morpheus.MafFileReader.getField([ 'Start_bp',
-				'Start' ], fieldNameToIndex, {
-					remove : false,
-					lc : true
-				}).index;
-		var endPositionColumn = morpheus.MafFileReader.getField([ 'End_bp',
-				'End' ], fieldNameToIndex, {
-					remove : false,
-					lc : true
-				}).index;
-		var valueField = morpheus.MafFileReader.getField([ 'tau',
-				'Segment_Mean' ], fieldNameToIndex, {
-					remove : false,
-					lc : true
-				}).index;
+		var startPositionColumn = morpheus.MafFileReader.getField(['Start_bp',
+			'Start'], fieldNameToIndex, {
+			remove: false,
+			lc: true
+		}).index;
+		var endPositionColumn = morpheus.MafFileReader.getField(['End_bp',
+			'End'], fieldNameToIndex, {
+			remove: false,
+			lc: true
+		}).index;
+		var valueField = morpheus.MafFileReader.getField(['tau',
+			'Segment_Mean'], fieldNameToIndex, {
+			remove: false,
+			lc: true
+		}).index;
 
 		var s;
 		var matrix = [];
@@ -138,7 +138,7 @@ morpheus.SegTabReader.prototype = {
 			var rowId = new morpheus.Identifier([
 				String(tokens[chromosomeColumn]),
 				String(tokens[startPositionColumn]),
-				String(tokens[endPositionColumn]) ]);
+				String(tokens[endPositionColumn])]);
 
 			var rowIndex = chromosomeStartEndToIndex.get(rowId);
 			if (rowIndex === undefined) {
@@ -161,22 +161,22 @@ morpheus.SegTabReader.prototype = {
 			}
 		}
 		var dataset = new morpheus.Dataset({
-			name : datasetName,
-			array : matrix,
-			dataType : 'object',
-			rows : chromosomeStartEndToIndex.size(),
-			columns : sampleIdToIndex.size()
+			name: datasetName,
+			array: matrix,
+			dataType: 'number',
+			rows: chromosomeStartEndToIndex.size(),
+			columns: sampleIdToIndex.size()
 		});
 
 		var columnIds = dataset.getColumnMetadata().add('id');
-		sampleIdToIndex.forEach(function(index, id) {
+		sampleIdToIndex.forEach(function (index, id) {
 			columnIds.setValue(index, id);
 		});
 
 		var chromosomeVector = dataset.getRowMetadata().add('Chromosome');
 		var startVector = dataset.getRowMetadata().add('Start_bp');
 		var endVector = dataset.getRowMetadata().add('End_bp');
-		chromosomeStartEndToIndex.forEach(function(index, id) {
+		chromosomeStartEndToIndex.forEach(function (index, id) {
 			chromosomeVector.setValue(index, id.getArray()[0]);
 			startVector.setValue(index, id.getArray()[1]);
 			endVector.setValue(index, id.getArray()[2]);
@@ -184,9 +184,9 @@ morpheus.SegTabReader.prototype = {
 
 		if (ccfColumnIndex !== undefined) {
 			dataset.addSeries({
-				dataType : 'object',
-				name : 'ccf',
-				array : ccfMatrix
+				dataType: 'number',
+				name: 'ccf',
+				array: ccfMatrix
 			});
 		}
 
@@ -195,18 +195,18 @@ morpheus.SegTabReader.prototype = {
 		}
 		return dataset;
 	},
-	read : function(fileOrUrl, callback) {
+	read: function (fileOrUrl, callback) {
 		var _this = this;
 		var name = morpheus.Util.getBaseFileName(morpheus.Util
-				.getFileName(fileOrUrl));
-		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function(err,
-				arrayBuffer) {
+		.getFileName(fileOrUrl));
+		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
+																	   arrayBuffer) {
 			if (err) {
 				callback(err);
 			} else {
 				// try {
 				callback(null, _this._read(name, new morpheus.ArrayBufferReader(
-						new Uint8Array(arrayBuffer))));
+					new Uint8Array(arrayBuffer))));
 				// } catch (err) {
 				// callback(err);
 				// }

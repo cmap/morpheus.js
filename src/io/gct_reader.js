@@ -11,24 +11,28 @@ morpheus.GctReader.prototype = {
 		if (fileOrUrl instanceof File) {
 			this._readChunking(fileOrUrl, callback, false);
 		} else {
-			// this._readChunking(fileOrUrl, callback, true);
-			// XXX only do byte range requests from S3
-			if (fileOrUrl.indexOf('s3.amazonaws.com') !== -1) {
-				$.ajax({
-					url: fileOrUrl,
-					method: 'HEAD'
-				}).done(function (data, textStatus, jqXHR) {
-					if ('gzip' === jqXHR.getResponseHeader('Content-Encoding')) {
-						_this._readNoChunking(fileOrUrl, callback);
-					} else {
-						_this._readChunking(fileOrUrl, callback, false);
-					}
-				}).fail(function () {
-					_this._readNoChunking(fileOrUrl, callback);
-				});
+			if (morpheus.Util.isFetchSupported()) {
+				this._readChunking(fileOrUrl, callback, true);
 			} else {
-				_this._readNoChunking(fileOrUrl, callback);
+				this._readNoChunking(fileOrUrl, callback);
 			}
+			// XXX only do byte range requests from S3
+			// if (fileOrUrl.indexOf('s3.amazonaws.com') !== -1) {
+			// 	$.ajax({
+			// 		url: fileOrUrl,
+			// 		method: 'HEAD'
+			// 	}).done(function (data, textStatus, jqXHR) {
+			// 		if ('gzip' === jqXHR.getResponseHeader('Content-Encoding')) {
+			// 			_this._readNoChunking(fileOrUrl, callback);
+			// 		} else {
+			// 			_this._readChunking(fileOrUrl, callback, false);
+			// 		}
+			// 	}).fail(function () {
+			// 		_this._readNoChunking(fileOrUrl, callback);
+			// 	});
+			// } else {
+			// 	_this._readNoChunking(fileOrUrl, callback);
+			// }
 		}
 	},
 	_readChunking: function (fileOrUrl, callback, useFetch) {
@@ -166,6 +170,7 @@ morpheus.GctReader.prototype = {
 			encoding: "",
 			worker: false,
 			comments: false,
+			handleTokens: handleTokens,
 			step: function (result) {
 				handleTokens(result.data[0]);
 			},
@@ -190,11 +195,7 @@ morpheus.GctReader.prototype = {
 				callback(null, dataset);
 			},
 			error: function (err) {
-				if (tryNoChunkIfError) {
-					_this._readNoChunking(fileOrUrl, callback);
-				} else {
-					callback(err);
-				}
+				callback(err);
 			},
 			download: !(fileOrUrl instanceof File),
 			skipEmptyLines: false,

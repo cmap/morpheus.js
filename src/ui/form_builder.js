@@ -168,9 +168,10 @@ morpheus.FormBuilder.showMessageModal = function (options) {
 morpheus.FormBuilder._showInModal = function (options) {
 	var html = [];
 	options = $.extend({}, {
-		size: ''
+		size: '',
+		close: true
 	}, options);
-	html.push('<div class="modal" role="dialog" aria-hidden="false"');
+	html.push('<div tabindex="-1" class="modal" role="dialog" aria-hidden="false"');
 	if (options.z) {
 		html.push(' style="z-index: ' + options.z + ' !important;"');
 	}
@@ -178,8 +179,10 @@ morpheus.FormBuilder._showInModal = function (options) {
 	html.push('<div class="modal-dialog ' + options.size + '">');
 	html.push('<div class="modal-content">');
 	html.push(' <div class="modal-header">');
-	html
-	.push('  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>');
+	if (options.close) {
+		html
+		.push('  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>');
+	}
 	if (options.title != null) {
 		html.push('<h4 class="modal-title">' + options.title + '</h4>');
 	}
@@ -201,6 +204,7 @@ morpheus.FormBuilder._showInModal = function (options) {
 	$div.find('.modal-body').html(options.html);
 	$div.prependTo($(document.body));
 	$div.modal({
+		keyboard: true,
 		backdrop: options.backdrop === true ? true : false,
 	}).on('hidden.bs.modal', function (e) {
 		$div.remove();
@@ -251,7 +255,8 @@ morpheus.FormBuilder.showOkCancel = function (options) {
 		html: options.content,
 		footer: footer.join(''),
 		onClose: options.hiddenCallback,
-		size: options.size
+		size: options.size,
+		close: options.close
 	});
 	// if (options.align === 'right') {
 	// $div.css('left', $(window).width()
@@ -260,6 +265,12 @@ morpheus.FormBuilder.showOkCancel = function (options) {
 	var $ok = $div.find('[name=ok]');
 	$ok.on('click', function (e) {
 		options.okCallback();
+		$div.modal('hide');
+	});
+	$div.find('[name=cancel]').on('click', function (e) {
+		if (options.cancelCallback) {
+			options.cancelCallback();
+		}
 		$div.modal('hide');
 	});
 	if (options.focus) {
@@ -298,9 +309,7 @@ morpheus.FormBuilder.getValue = function ($element) {
 	if ($element.data('type') === 'file') {
 		return $element.data('files');
 	}
-	return $element.attr('type') === 'checkbox' ? $element.prop('checked') ? true
-		: false
-		: $element.val();
+	return $element.attr('type') === 'checkbox' ? $element.prop('checked') : $element.val();
 };
 
 // morpheus.FormBuilder._showInModal = function(title, stuff, footer,
@@ -429,6 +438,9 @@ morpheus.FormBuilder.prototype = {
 				+ '" type="checkbox"');
 			if (value) {
 				html.push(' checked');
+			}
+			if (disabled) {
+				html.push(' disabled');
 			}
 			html.push('> ');
 			html.push(title);
@@ -672,6 +684,15 @@ morpheus.FormBuilder.prototype = {
 			}
 			if (field.placeholder) {
 				html.push(' placeholder="' + field.placeholder + '"');
+			}
+			if (field.min != null) {
+				html.push(' min="' + field.min + '"');
+			}
+			if (field.max != null) {
+				html.push(' max="' + field.max + '"');
+			}
+			if (field.step) {
+				html.push(' step="' + field.step + '"');
 			}
 			if (required) {
 				html.push(' required');

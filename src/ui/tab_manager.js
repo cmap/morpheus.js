@@ -73,8 +73,10 @@ morpheus.TabManager = function (options) {
 	this.$nav.on('click', 'button', function (e) { // close a tab
 		// remove the link and tab content
 		e.preventDefault();
-		var target = $(this).attr('data-target').substring(1); // remove #
+		var target = $(this).attr('data-target');
+
 		if (target != null) {
+			target = target.substring(1); // remove #
 			_this.remove(target);
 		}
 	});
@@ -96,6 +98,9 @@ morpheus.TabManager = function (options) {
 
 };
 morpheus.TabManager.prototype = {
+	getTabCount: function () {
+		return this.idToTabObject.size();
+	},
 	setTabText: function (id, text) {
 		this.$nav.find('a').filter('[data-link=' + id + ']').contents().first()
 		.replaceWith(text + '&nbsp;');

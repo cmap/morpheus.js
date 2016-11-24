@@ -1,4 +1,4 @@
-morpheus.DatasetAdapter = function(dataset, rowMetadata, columnMetadata) {
+morpheus.DatasetAdapter = function (dataset, rowMetadata, columnMetadata) {
 	if (dataset == null) {
 		throw 'dataset is null';
 	}
@@ -8,43 +8,46 @@ morpheus.DatasetAdapter = function(dataset, rowMetadata, columnMetadata) {
 
 };
 morpheus.DatasetAdapter.prototype = {
-	getDataset : function() {
+	getDataset: function () {
 		return this.dataset;
 	},
-	getName : function(seriesIndex) {
+	getName: function (seriesIndex) {
 		return this.dataset.getName(seriesIndex);
 	},
-	setName : function(seriesIndex, name) {
+	setName: function (seriesIndex, name) {
 		this.dataset.setName(seriesIndex, name);
 	},
-	getRowMetadata : function() {
+	getRowMetadata: function () {
 		return this.rowMetadata;
 	},
-	getColumnMetadata : function() {
+	getColumnMetadata: function () {
 		return this.columnMetadata;
 	},
-	getRowCount : function() {
+	getRowCount: function () {
 		return this.dataset.getRowCount();
 	},
-	getColumnCount : function() {
+	getColumnCount: function () {
 		return this.dataset.getColumnCount();
 	},
-	getValue : function(rowIndex, columnIndex, seriesIndex) {
+	getValue: function (rowIndex, columnIndex, seriesIndex) {
 		return this.dataset.getValue(rowIndex, columnIndex, seriesIndex);
 	},
-	setValue : function(rowIndex, columnIndex, value, seriesIndex) {
+	setValue: function (rowIndex, columnIndex, value, seriesIndex) {
 		this.dataset.setValue(rowIndex, columnIndex, value, seriesIndex);
 	},
-	addSeries : function(options) {
+	addSeries: function (options) {
 		return this.dataset.addSeries(options);
 	},
-	getSeriesCount : function() {
+	removeSeries: function (seriesIndex) {
+		this.dataset.removeSeries(seriesIndex);
+	},
+	getSeriesCount: function () {
 		return this.dataset.getSeriesCount();
 	},
-	getDataType : function(rowIndex, seriesIndex) {
-		return this.dataset.getDataType(rowIndex, seriesIndex);
+	getDataType: function (seriesIndex) {
+		return this.dataset.getDataType(seriesIndex);
 	},
-	toString : function() {
+	toString: function () {
 		return this.dataset.toString();
 	}
 };

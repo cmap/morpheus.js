@@ -21,6 +21,9 @@ morpheus.Util.extend = function (c1, c2) {
 		}
 	}
 };
+morpheus.Util.isFetchSupported = function () {
+	return navigator.userAgent.indexOf('Chrome') !== -1;
+};
 
 morpheus.Util.viewPortSize = function () {
 	return window.getComputedStyle(document.body, ':before').content.replace(
@@ -97,21 +100,6 @@ morpheus.Util.getDataType = function (firstNonNull) {
 		dataType = '[' + dataType + ']';
 	}
 	return dataType;
-};
-/**
- * Trims leading and trailing whitespace from a string.
- */
-morpheus.Util.trim = function (val) {
-	var len = val.length;
-	var st = 0;
-
-	while ((st < len) && (val[st] <= ' ')) {
-		st++;
-	}
-	while ((st < len) && (val[len - 1] <= ' ')) {
-		len--;
-	}
-	return ((st > 0) || (len < val.length)) ? val.substring(st, len) : val;
 };
 
 /**
@@ -887,15 +875,7 @@ morpheus.Util.xlsxTo1dArray = function (data) {
 	var worksheet = workbook.Sheets[sheetNames[0]];
 	return morpheus.Util.sheetToArray(worksheet, '\t');
 };
-morpheus.Util.hashCode = function (val) {
-	var h = 0;
-	if (val.length > 0) {
-		for (var i = 0; i < val.length; i++) {
-			h = 31 * h + val.charCodeAt(i);
-		}
-	}
-	return h;
-};
+
 /**
  * Returns a promise that resolves to a string
  */
@@ -1217,9 +1197,13 @@ morpheus.Util.createSearchPredicates = function (options) {
 		} else if (token[0] === '(' && token[token.length - 1] === ')') { // exact terms
 			token = token.substring(1, token.length - 1);
 			var values = morpheus.Util.getAutocompleteTokens(token);
+
 			if (values.length > 0) {
 				predicate = new morpheus.Util.ExactTermsPredicate(field,
 					values.map(function (val) {
+						if (val[0] === '"' && val[val.length - 1] === '"') {
+							val = val.substring(1, val.length - 1);
+						}
 						return val.toLowerCase();
 					}));
 			}

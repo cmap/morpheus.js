@@ -1,20 +1,20 @@
-morpheus.GisticReader = function() {
+morpheus.GisticReader = function () {
 
 };
 morpheus.GisticReader.prototype = {
-	read : function(fileOrUrl, callback) {
+	read: function (fileOrUrl, callback) {
 		var _this = this;
 		var name = morpheus.Util.getBaseFileName(morpheus.Util
-				.getFileName(fileOrUrl));
-		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function(err,
-				arrayBuffer) {
+		.getFileName(fileOrUrl));
+		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
+																	   arrayBuffer) {
 			if (err) {
 				callback(err);
 			} else {
 				try {
 					callback(null, _this._read(name,
-							new morpheus.ArrayBufferReader(new Uint8Array(
-									arrayBuffer))));
+						new morpheus.ArrayBufferReader(new Uint8Array(
+							arrayBuffer))));
 				} catch (x) {
 					if (x.stack) {
 						console.log(x.stack);
@@ -25,9 +25,9 @@ morpheus.GisticReader.prototype = {
 		});
 
 	},
-	_read : function(datasetName, reader) {
+	_read: function (datasetName, reader) {
 		var tab = /\t/;
-		var header = morpheus.Util.trim(reader.readLine()).split(tab);
+		var header = reader.readLine().trim().split(tab);
 
 		// Unique Name, Descriptor, Wide Peak Limits, Peak Limits, Region
 		// Limits, q values, Residual q values after removing segments shared
@@ -39,7 +39,7 @@ morpheus.GisticReader.prototype = {
 		var rowIds = [];
 		var qValues = [];
 		while ((s = reader.readLine()) !== null) {
-			s = morpheus.Util.trim(s);
+			s = s.trim();
 
 			if (s !== '') {
 				var tokens = s.split(tab);
@@ -56,11 +56,11 @@ morpheus.GisticReader.prototype = {
 			}
 		}
 		var dataset = new morpheus.Dataset({
-			name : datasetName,
-			rows : matrix.length,
-			columns : ncols,
-			array : matrix,
-			dataType : 'Float32'
+			name: datasetName,
+			rows: matrix.length,
+			columns: ncols,
+			array: matrix,
+			dataType: 'Float32'
 		});
 
 		var columnIds = dataset.getColumnMetadata().add('id');

@@ -252,28 +252,28 @@ morpheus.HeatMapColorScheme.ScalingMode = {
 };
 
 morpheus.HeatMapConditions = function () {
-	this.conditions = [];
-	// each condition is a object with fields: series, shape, color and
+	this.array = [];
+	// each condition is a object with: series, shape, color and
 	// accept(val) function
 
 };
 morpheus.HeatMapConditions.prototype = {
 	insert: function (index, c) {
-		this.conditions.splice(index, 0, c);
+		this.array.splice(index, 0, c);
 	},
 	add: function (c) {
-		this.conditions.push(c);
+		this.array.push(c);
 	},
 	getConditions: function () {
-		return this.conditions;
+		return this.array;
 	},
 	remove: function (index) {
-		this.conditions.splice(index, 1);
+		this.array.splice(index, 1);
 	},
 	copy: function () {
 		var c = new morpheus.HeatMapConditions();
-		this.conditions.forEach(function (cond) {
-			c.conditions.push(_.clone(cond));
+		this.array.forEach(function (cond) {
+			c.array.push(_.clone(cond));
 		});
 		return c;
 	}
@@ -284,35 +284,31 @@ morpheus.HeatMapColorScheme.createColorSupplier = function (options) {
 	var stepped = options.stepped;
 	var map = options.map;
 	var scalingMode;
-	var colorSupplier = stepped ? new morpheus.SteppedColorSupplier()
-		: new morpheus.GradientColorSupplier();
+	var min = 0;
+	var max = 1;
 	if (type === 'fixed') {
 		scalingMode = morpheus.HeatMapColorScheme.ScalingMode.FIXED;
 		if (map) { // get min/max
-			var min = Number.MAX_VALUE;
-			var max = -Number.MAX_VALUE;
+			min = Number.MAX_VALUE;
+			max = -Number.MAX_VALUE;
 			for (var i = 0; i < map.length; i++) {
 				min = Math.min(min, map[i].value);
 				max = Math.max(max, map[i].value);
 			}
-			colorSupplier.setMin(min);
-			colorSupplier.setMax(max);
 		}
 	} else {
 		scalingMode = morpheus.HeatMapColorScheme.ScalingMode.RELATIVE;
 	}
-	if (options.missingColor !== undefined) {
-		colorSupplier.setMissingColor(options.missingColor);
-	}
-	colorSupplier.setScalingMode(scalingMode);
+
+	var fractions = [];
+	var colors = [];
+	var names = [];
+	var hasNames = false;
 	if (map) {
-		var fractions = [];
-		var colors = [];
-		var names = [];
 		var valueToFraction = d3.scale.linear().domain(
-			[colorSupplier.getMin(), colorSupplier.getMax()]).range(
+			[min, max]).range(
 			[0, 1]).clamp(true);
-		var hasNames = false;
+
 		for (var i = 0; i < map.length; i++) {
 			fractions.push(valueToFraction(map[i].value));
 			colors.push(map[i].color);
@@ -322,14 +318,29 @@ morpheus.HeatMapColorScheme.createColorSupplier = function (options) {
 			}
 			names.push(name);
 		}
-		colorSupplier.setFractions({
-			fractions: fractions,
-			colors: colors,
-			names: hasNames ? names : null
-		});
 	}
 
-	return colorSupplier;
+	var json = {
+		discrete: options.stepped,
+		scalingMode: scalingMode,
+		fractions: fractions,
+		colors: colors,
+		names: hasNames ? names : null,
+		min: min,
+		max: max,
+		transformValues: options.transformValues
+	};
+	if (options.missingColor != null) {
+		json.missingColor = options.missingColor;
+	}
+
+	if (options.conditions != null) {
+		json.conditions = options.conditions;
+	}
+	if (options.size != null) {
+		json.size = options.size;
+	}
+	return morpheus.AbstractColorSupplier.fromJson(json);
 };
 morpheus.HeatMapColorScheme.prototype = {
 	getColors: function () {
@@ -397,7 +408,7 @@ morpheus.HeatMapColorScheme.prototype = {
 		var newColorSupplier = stepped ? new morpheus.SteppedColorSupplier()
 			: new morpheus.GradientColorSupplier();
 		newColorSupplier.sizer = oldColorSupplier.getSizer();
-		newColorSupplier.conditions = oldColorSupplier.getConditions();
+		newColorSupplier.array = oldColorSupplier.getConditions();
 		newColorSupplier.setScalingMode(oldColorSupplier.getScalingMode());
 		newColorSupplier.setMin(oldColorSupplier.getMin());
 		newColorSupplier.setMax(oldColorSupplier.getMax());
@@ -417,8 +428,7 @@ morpheus.HeatMapColorScheme.prototype = {
 		json.colorSchemes = {};
 		_.each(_.keys(this.rowValueToColorSupplier), function (key) {
 			// save each scheme
-			var val = _this.rowValueToColorSupplier[key];
-			json.colorSchemes[key] = val;
+			json.colorSchemes[key] = morpheus.AbstractColorSupplier.toJson(_this.rowValueToColorSupplier[key]);
 		});
 
 		return JSON.stringify(json);

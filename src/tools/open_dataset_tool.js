@@ -304,7 +304,6 @@ morpheus.OpenDatasetTool.prototype = {
 				}
 
 			} else if (action === 'overlay') {
-
 				_this
 				._matchOverlay(
 					morpheus.MetadataUtil
@@ -321,78 +320,14 @@ morpheus.OpenDatasetTool.prototype = {
 					.getRowMetadata()),
 					controller,
 					function (appendOptions) {
-						var rowValueToIndexMap = morpheus.VectorUtil
-						.createValueToIndexMap(dataset
-						.getRowMetadata()
-						.getByName(
-							appendOptions.current_dataset_row_annotation_name));
-						var columnValueToIndexMap = morpheus.VectorUtil
-						.createValueToIndexMap(dataset
-						.getColumnMetadata()
-						.getByName(
-							appendOptions.current_dataset_column_annotation_name));
-						var seriesIndex = dataset
-						.addSeries({
-							name: newDataset
-							.getName(),
-							dataType: newDataset.getDataType(0)
+						morpheus.DatasetUtil.overlay({
+							dataset: dataset,
+							newDataset: newDataset,
+							rowAnnotationName: appendOptions.current_dataset_row_annotation_name,
+							newRowAnnotationName: appendOptions.new_dataset_row_annotation_name,
+							columnAnnotationName: appendOptions.current_dataset_column_annotation_name,
+							newColumnAnnotationName: appendOptions.new_dataset_column_annotation_name
 						});
-
-						var rowVector = newDataset
-						.getRowMetadata()
-						.getByName(
-							appendOptions.new_dataset_row_annotation_name);
-						var rowIndices = [];
-						var newDatasetRowIndicesSubset = [];
-						for (var i = 0, size = rowVector
-						.size(); i < size; i++) {
-							var index = rowValueToIndexMap
-							.get(rowVector
-							.getValue(i));
-							if (index !== undefined) {
-								rowIndices.push(index);
-								newDatasetRowIndicesSubset
-								.push(i);
-							}
-						}
-
-						var columnVector = newDataset
-						.getColumnMetadata()
-						.getByName(
-							appendOptions.new_dataset_column_annotation_name);
-						var columnIndices = [];
-						var newDatasetColumnIndicesSubset = [];
-						for (var i = 0, size = columnVector
-						.size(); i < size; i++) {
-							var index = columnValueToIndexMap
-							.get(columnVector
-							.getValue(i));
-							if (index !== undefined) {
-								columnIndices.push(index);
-								newDatasetColumnIndicesSubset
-								.push(i);
-							}
-						}
-						newDataset = new morpheus.SlicedDatasetView(
-							newDataset,
-							newDatasetRowIndicesSubset,
-							newDatasetColumnIndicesSubset);
-						for (var i = 0, nrows = newDataset
-						.getRowCount(); i < nrows; i++) {
-							for (var j = 0, ncols = newDataset
-							.getColumnCount(); j < ncols; j++) {
-								dataset.setValue(
-									rowIndices[i],
-									columnIndices[j],
-									newDataset
-									.getValue(
-										i,
-										j),
-									seriesIndex);
-
-							}
-						}
-
 					});
 			} else if (action === 'open') { // new tab
 				new morpheus.HeatMap({
@@ -414,6 +349,10 @@ morpheus.OpenDatasetTool.prototype = {
 		morpheus.OpenDatasetTool
 		.fileExtensionPrompt(file,
 			function (readOptions) {
+				if (!readOptions) {
+					readOptions = {};
+				}
+				readOptions.interactive = true;
 				var deferred = morpheus.DatasetUtil.read(file,
 					readOptions);
 				_this._read(options, deferred);
@@ -434,11 +373,13 @@ morpheus.OpenDatasetTool.prototype = {
 				name: 'current_dataset_annotation_name',
 				options: currentDatasetMetadataNames,
 				type: 'select',
+				value: 'id',
 				required: true
 			}];
 			items.push({
 				name: 'new_dataset_annotation_name',
 				type: 'select',
+				value: 'id',
 				options: newDatasetMetadataNames,
 				required: true
 			});
@@ -462,11 +403,13 @@ morpheus.OpenDatasetTool.prototype = {
 				name: 'current_dataset_column_annotation_name',
 				options: currentDatasetColumnMetadataNames,
 				type: 'select',
+				value: 'id',
 				required: true
 			});
 			items.push({
 				name: 'new_dataset_column_annotation_name',
 				type: 'select',
+				value: 'id',
 				options: newDatasetColumnMetadataNames,
 				required: true
 			});
@@ -474,11 +417,13 @@ morpheus.OpenDatasetTool.prototype = {
 				name: 'current_dataset_row_annotation_name',
 				options: currentDatasetRowMetadataNames,
 				type: 'select',
+				value: 'id',
 				required: true
 			});
 			items.push({
 				name: 'new_dataset_row_annotation_name',
 				type: 'select',
+				value: 'id',
 				options: newDatasetRowMetadataNames,
 				required: true
 			});
