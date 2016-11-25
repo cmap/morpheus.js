@@ -915,7 +915,7 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 	var pDataArray = [];
 	var participantID = [];
 	var labelDescription = [];
-	console.log("morpheus.DatasetUtil.getMetadataArray ::", dataset);
+	//console.log("morpheus.DatasetUtil.getMetadataArray ::", dataset);
 	var columnMeta = dataset.getColumnMetadata();
 	var features = columnMeta.getMetadataCount();
 	var participants = dataset.getColumnCount();
@@ -1051,16 +1051,16 @@ morpheus.DatasetUtil.toESSession = function (dataset) {
 
 
 morpheus.DatasetUtil.toESSessionPromise = function (dataset) {
-	console.log("ENTERED TO_ESSESSION_PROMISE");
+	//console.log("ENTERED TO_ESSESSION_PROMISE");
 	dataset.setESSession(new Promise(function (resolve, reject) {
-		console.log("morpheus.DatasetUtil.toESSessionPromise ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
+		//console.log("morpheus.DatasetUtil.toESSessionPromise ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
 		if (dataset instanceof morpheus.SlicedDatasetView) {
-			console.log("morpheus.DatasetUtil.toESSessionPromise ::", "dataset in instanceof morpheus.SlicedDatasetView", "go deeper");
+			//console.log("morpheus.DatasetUtil.toESSessionPromise ::", "dataset in instanceof morpheus.SlicedDatasetView", "go deeper");
 			morpheus.DatasetUtil.toESSessionPromise(dataset.dataset);
 		}
 		if (dataset.getESSession()) {
 			resolve(dataset.getESSession());
-			console.log("resolved with old value");
+			//console.log("resolved with old value");
 			return;
 		}
 		var array = morpheus.DatasetUtil.getContentArray(dataset);
@@ -1121,15 +1121,15 @@ morpheus.DatasetUtil.toESSessionPromise = function (dataset) {
 				alert(error);
 				return;
 			}
-			console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder error", error);
-			console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder success", success);
+			//console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder error", error);
+			//console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder success", success);
 			var builder = success,
 				rexp = builder.build("rexp"),
 				REXP = rexp.REXP;
 
 			var proto = new REXP(messageJSON);
 			var req = ocpu.call("createES", proto, function (session) {
-				console.log("morpheus.DatasetUtil.toESSessionPromise ::", "from successful request", session);
+				//console.log("morpheus.DatasetUtil.toESSessionPromise ::", "from successful request", session);
 				resolve(session);
 			}, true);
 

@@ -196,11 +196,11 @@ morpheus.Dataset.prototype = {
         return this.seriesNames.length - 1;
     },
 	setESSession : function (session) {
-		console.log("morpheus.Dataset.prototype.setESSession ::", this, session);
+		//console.log("morpheus.Dataset.prototype.setESSession ::", this, session);
 		this.esSession = session;
 	},
 	getESSession : function () {
-		console.log("morpheus.Dataset.prototype.getESSession ::", this);
+		//console.log("morpheus.Dataset.prototype.getESSession ::", this);
 		return this.esSession;
 	}
 

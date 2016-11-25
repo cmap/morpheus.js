@@ -150,7 +150,7 @@ if(!window.jQuery) {
     settings.data = settings.data || {};
     settings.dataType = settings.dataType || "text";
     settings.async = true;
-    console.log("OpenCPU.r_fun_ajax ::", "ajax request settings", settings);
+    //console.log("OpenCPU.r_fun_ajax ::", "ajax request settings", settings);
     //ajax call
     var jqxhr = $.ajax(settings).done(function(){
       var loc = jqxhr.getResponseHeader('Location') || console.log("Location response header missing.");

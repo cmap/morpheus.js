@@ -1,6 +1,6 @@
 morpheus.Project = function (dataset) {
 	this.originalDataset = dataset;
-	if (morpheus.MetadataUtil.indexOf(dataset.getRowMetadata(), "index") < 0) {
+	/*if (morpheus.MetadataUtil.indexOf(dataset.getRowMetadata(), "index") < 0) {
     	dataset.getRowMetadata().add("index").setArray(Array.apply(null, {length: dataset.rows}).map(Number.call, Number));
     	console.log(dataset.getRowMetadata().getByName("index").getProperties());
     	dataset.getRowMetadata().getByName("index").getProperties().set(morpheus.VectorKeys.DATA_TYPE, "number");
@@ -8,7 +8,7 @@ morpheus.Project = function (dataset) {
     this.trigger('trackChanged', {
     	vectors: [dataset.getRowMetadata().getByName("index")],
 		render: ['text']
-	});
+	});*/
     this.rowIndexMapper = new morpheus.IndexMapper(this, true);
     this.columnIndexMapper = new morpheus.IndexMapper(this, false);
     this.groupRows = [];

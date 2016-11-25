@@ -11,11 +11,11 @@ morpheus.SlicedDatasetView = function(dataset, rowIndices, columnIndices) {
 };
 morpheus.SlicedDatasetView.prototype = {
 	setESSession : function (session) {
-		console.log("morpheus.SlicedDatasetView.prototype.setESSession ::", this, session);
+		//console.log("morpheus.SlicedDatasetView.prototype.setESSession ::", this, session);
 		this.dataset.setESSession(session);
 	},
 	getESSession : function() {
-		console.log("morpheus.SlicedDatasetView.prototype.getESSession ::", this);
+		//console.log("morpheus.SlicedDatasetView.prototype.getESSession ::", this);
 		return this.dataset.getESSession();
 	},
 	getRowCount : function() {
