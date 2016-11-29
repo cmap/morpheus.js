@@ -112,34 +112,13 @@ morpheus.MetadataUtil.search = function (options) {
 				var wrapper = nameToVector.get(filterColumnName);
 				if (wrapper) {
 					value = wrapper.vector.getValue(i);
-					if (value != null) {
-						if (wrapper.isArray) {
+					if (wrapper.isArray) {
+						if (value != null) {
 							for (var k = 0; k < value.length; k++) {
 								if (predicate.accept(value[k])) {
 									return true;
 
 								}
-							}
-						} else {
-							if (predicate.accept(value)) {
-								return true;
-							}
-						}
-
-					}
-				}
-			}
-
-		}
-		else { // try all fields
-			for (var j = 0; j < nfields; j++) {
-				var wrapper = vectors[j];
-				var value = wrapper.vector.getValue(i);
-				if (value != null) {
-					if (wrapper.isArray) {
-						for (var k = 0; k < value.length; k++) {
-							if (predicate.accept(value[k])) {
-								return true;
 							}
 						}
 					} else {
@@ -149,6 +128,28 @@ morpheus.MetadataUtil.search = function (options) {
 					}
 
 				}
+			}
+
+		}
+		else { // try all fields
+			for (var j = 0; j < nfields; j++) {
+				var wrapper = vectors[j];
+				var value = wrapper.vector.getValue(i);
+
+				if (wrapper.isArray) {
+					if (value != null) {
+						for (var k = 0; k < value.length; k++) {
+							if (predicate.accept(value[k])) {
+								return true;
+							}
+						}
+					}
+				} else {
+					if (predicate.accept(value)) {
+						return true;
+					}
+				}
+
 			}
 		}
 

@@ -37,9 +37,8 @@ morpheus.NewHeatMapTool.prototype = {
 		// if (controller.rowDendrogram != null) {
 		//
 		// }
-		var name = options.input.name || controller.getName();
 		var heatmap = new morpheus.HeatMap({
-			name: name,
+			name: controller.getName(),
 			dataset: dataset,
 			parent: controller,
 			symmetric: project.__symmetricProjectListener != null && dataset.getColumnCount() === dataset.getRowCount()

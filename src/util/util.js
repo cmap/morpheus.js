@@ -84,7 +84,7 @@ morpheus.Util.trackEvent = function (options) {
 };
 
 /**
- * 
+ *
  * @param val The value to determine the data type for.
  * @return {String} One of string, number, object, [string], [number], [object]
  */
@@ -1389,8 +1389,11 @@ morpheus.Util.ContainsPredicate = function (field, text) {
 };
 morpheus.Util.ContainsPredicate.prototype = {
 	accept: function (value) {
-		return value.toLowerCase
-			&& value.toLowerCase().indexOf(this.text) !== -1;
+		if (value == null) {
+			return false;
+		}
+		value = ('' + value).toLowerCase();
+		return value.indexOf(this.text) !== -1;
 	},
 	getField: function () {
 		return this.field;
@@ -1414,7 +1417,11 @@ morpheus.Util.ExactTermsPredicate = function (field, values) {
 };
 morpheus.Util.ExactTermsPredicate.prototype = {
 	accept: function (value) {
-		return this.values.has((value != null && value.toLowerCase ? value.toLowerCase() : value));
+		if (value == null) {
+			return false;
+		}
+		value = ('' + value).toLowerCase();
+		return this.values.has(value);
 	},
 	getField: function () {
 		return this.field;
@@ -1437,7 +1444,11 @@ morpheus.Util.ExactTermPredicate = function (field, term) {
 };
 morpheus.Util.ExactTermPredicate.prototype = {
 	accept: function (value) {
-		return value && value.toLowerCase && value.toLowerCase() === this.text;
+		if (value == null) {
+			return false;
+		}
+		value = ('' + value).toLowerCase();
+		return value === this.text;
 	},
 	getField: function () {
 		return this.field;
@@ -1459,7 +1470,7 @@ morpheus.Util.RegexPredicate = function (field, text) {
 };
 morpheus.Util.RegexPredicate.prototype = {
 	accept: function (value) {
-		return this.regex.test(value);
+		return this.regex.test('' + value);
 	},
 	getField: function () {
 		return this.field;
