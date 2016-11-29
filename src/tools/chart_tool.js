@@ -229,6 +229,8 @@ morpheus.ChartTool = function (chartOptions) {
 			formBuilder.setVisible(name, chartType === 'boxplot');
 		});
 
+		formBuilder.setVisible('chart_width', chartType !== 'row profile' && chartType !== 'column profile');
+		formBuilder.setVisible('chart_height', chartType !== 'row profile' && chartType !== 'column profile');
 		formBuilder.setVisible('tooltip', chartType !== 'histogram');
 		formBuilder.setVisible('group_rows_by', (chartType === 'boxplot' || chartType === 'histogram' || chartType === 'ecdf'));
 		formBuilder.setVisible('group_columns_by', (chartType === 'boxplot' || chartType === 'histogram' || chartType === 'ecdf'));
@@ -979,9 +981,6 @@ morpheus.ChartTool.prototype = {
 			.appendTo(this.$chart);
 			return;
 		}
-		if ((dataset.getRowCount() * dataset.getColumnCount()) > 100000) {
-			showPoints = false;
-		}
 
 		var grid = [];
 
@@ -1007,7 +1006,9 @@ morpheus.ChartTool.prototype = {
 				[minMax.min, minMax.max]).range([3, 16])
 			.clamp(true);
 		}
+
 		if (chartType === 'row profile' || chartType === 'column profile') {
+			showPoints = showPoints && (dataset.getRowCount() * dataset.getColumnCount()) <= 100000;
 			var $chart = $('<div></div>');
 			var myPlot = $chart[0];
 			$chart.appendTo(this.$chart);
@@ -1042,10 +1043,9 @@ morpheus.ChartTool.prototype = {
 						xaxis: {}
 					})
 			});
-		}
-		if (chartType === 'row scatter matrix' || chartType === 'column scatter matrix') {
+		} else if (chartType === 'row scatter matrix' || chartType === 'column scatter matrix') {
 			var transpose = chartType === 'column scatter matrix';
-
+			showPoints = showPoints && (dataset.getRowCount() * dataset.getColumnCount()) <= 100000;
 			if (transpose) {
 				dataset = new morpheus.TransposedDatasetView(dataset);
 			}
