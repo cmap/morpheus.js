@@ -1316,7 +1316,6 @@ morpheus.ChartTool.prototype = {
 			// sort rows and columns by median
 			if (gridRowCount > 1) {
 				var summary = [];
-
 				for (var i = 0; i < gridRowCount; i++) {
 					summary[i] = [];
 					var gridRow = grid[i];
@@ -1349,7 +1348,6 @@ morpheus.ChartTool.prototype = {
 				var newRowOrder = morpheus.Util.indexSort(rowMedians, false);
 				var newRowIds = [];
 				var newGrid = [];
-
 				for (var i = 0; i < gridRowCount; i++) {
 					newGrid.push(grid[newRowOrder[i]]);
 					newRowIds.push(rowIds[newRowOrder[i]]);
@@ -1358,6 +1356,9 @@ morpheus.ChartTool.prototype = {
 				rowIds = newRowIds;
 			}
 
+			if (grid.length === 0) {
+				return;
+			}
 			// compute max text width
 			var container = d3.select('body').append('svg');
 
