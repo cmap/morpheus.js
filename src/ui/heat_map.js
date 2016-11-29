@@ -388,12 +388,11 @@ morpheus.HeatMap = function (options) {
 		});
 		promises.push(columnDendrogramDeferred);
 	}
-	this.resizeListener = function () {
-		_this.revalidate();
-	};
 	var heatMapLoaded = function () {
 		if (typeof window !== 'undefined') {
-			$(window).on('orientationchange.morpheus resize.morpheus', this.resizeListener);
+			$(window).on('orientationchange.morpheus resize.morpheus', _this.resizeListener = function () {
+				_this.revalidate();
+			});
 		}
 		_this.revalidate();
 		if (options.loadedCallback) {
@@ -2894,10 +2893,12 @@ morpheus.HeatMap.prototype = {
 		this.hammer.off('panmove', this.panmove).off('panstart', this.panstart).off('tap',
 			this.tap).off('pinch', this.pinch);
 		this.hammer.destroy();
-		$(window)
-		.off('paste.morpheus', this.pasteListener)
-		.off('beforecopy.morpheus', this.beforeCopyListener)
-		.off('copy.morpheus', this.copyListener).off('orientationchange.morpheus resize.morpheus', this.resizeListener);
+		if (typeof window !== 'undefined') {
+			$(window)
+			.off('paste.morpheus', this.pasteListener)
+			.off('beforecopy.morpheus', this.beforeCopyListener)
+			.off('copy.morpheus', this.copyListener).off('orientationchange.morpheus resize.morpheus', this.resizeListener);
+		}
 	}
 	,
 	getVisibleTrackNames: function (isColumns) {
