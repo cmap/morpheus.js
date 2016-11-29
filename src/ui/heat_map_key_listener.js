@@ -117,7 +117,7 @@ morpheus.HeatMapKeyListener = function (controller) {
 			} else if (e.which === 191) { // slash toggle search
 				controller.getToolbar().toggleSearch();
 				found = true;
-			} else if (!isInputField && e.which === 88) { // ctrl-X
+			} else if (e.which === 88 && (!isInputField || window.getSelection().toString() === '')) { // ctrl-X
 				morpheus.HeatMap.showTool(new morpheus.NewHeatMapTool(),
 					controller);
 				found = true;
