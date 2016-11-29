@@ -1177,7 +1177,7 @@ morpheus.ChartTool.prototype = {
 
 				}
 			}
-			showPoints = items.length <= 100000;
+			showPoints = showPoints && items.length <= 100000;
 			var colorByInfo = morpheus.ChartTool.getVectorInfo(colorBy);
 			var colorByVector = colorByInfo.isColumns ? dataset.getColumnMetadata()
 			.getByName(colorByInfo.field) : dataset.getRowMetadata()
@@ -1314,46 +1314,70 @@ morpheus.ChartTool.prototype = {
 			var gridRowCount = rowIds.length;
 			var gridColumnCount = columnIds.length;
 			// sort rows and columns by median
-			var summary = [];
-			for (var i = 0; i < gridRowCount; i++) {
-				summary[i] = [];
-				for (var j = 0; j < gridColumnCount; j++) {
-					var array = grid[i][j];
-					var values = [];
-					if (array) {
-						for (var k = 0, nitems = array.length; k < nitems; k++) {
-							var item = array[k];
-							var value = dataset.getValue(item.row, item.column);
-							if (!isNaN(value)) {
-								values.push(value);
+			if (gridRowCount > 1) {
+				var summary = [];
+
+				for (var i = 0; i < gridRowCount; i++) {
+					summary[i] = [];
+					var gridRow = grid[i];
+					for (var j = 0; j < gridColumnCount; j++) {
+						var array = gridRow[j];
+						var values = [];
+						if (array) {
+							for (var k = 0, nitems = array.length; k < nitems; k++) {
+								var item = array[k];
+								var value = dataset.getValue(item.row, item.column);
+								if (!isNaN(value)) {
+									values.push(value);
+								}
+
 							}
-
 						}
+						summary[i][j] = morpheus.Median(morpheus.VectorUtil.arrayAsVector(values));
 					}
-					summary[i][j] = morpheus.Median(morpheus.VectorUtil.arrayAsVector(values));
+				}
+				// sort rows
+				var rowMedians = [];
+				for (var i = 0; i < gridRowCount; i++) {
+					var values = [];
+					for (var j = 0; j < gridColumnCount; j++) {
+						values.push(summary[i][j]);
+					}
+					rowMedians.push(morpheus.Median(morpheus.VectorUtil.arrayAsVector(values)));
+				}
+
+				var newRowOrder = morpheus.Util.indexSort(rowMedians, false);
+				var newRowIds = [];
+				var newGrid = [];
+
+				for (var i = 0; i < gridRowCount; i++) {
+					newGrid.push(grid[newRowOrder[i]]);
+					newRowIds.push(rowIds[newRowOrder[i]]);
+				}
+				grid = newGrid;
+				rowIds = newRowIds;
+			}
+
+			// compute max text width
+			var container = d3.select('body').append('svg');
+
+			var t = container.append('text');
+			t.attr({
+				x: -1000,
+				y: -1000
+			}).style('font-family', '"Open Sans", verdana, arial, sans-serif').style('font-size', '9px');
+			var node = container.node();
+			var maxYAxisWidth = 0;
+			for (var i = 0; i < gridRowCount; i++) {
+				var rowId = rowIds[i];
+				if (rowId != null) {
+					t.text(rowId);
+					var bbox = node.getBBox();
+					maxYAxisWidth = Math.max(maxYAxisWidth, bbox.width + 2);
 				}
 			}
-			// sort rows
-			var rowMedians = [];
-			for (var i = 0; i < gridRowCount; i++) {
-				var values = [];
-				for (var j = 0; j < gridColumnCount; j++) {
-					values.push(summary[i][j]);
-				}
-				rowMedians.push(morpheus.Median(morpheus.VectorUtil.arrayAsVector(values)));
-			}
-
-			var newRowOrder = morpheus.Util.indexSort(rowMedians, false);
-			var newRowIds = [];
-			var newGrid = [];
-
-			for (var i = 0; i < gridRowCount; i++) {
-				newGrid.push(grid[newRowOrder[i]]);
-				newRowIds.push(rowIds[newRowOrder[i]]);
-			}
-			grid = newGrid;
-			rowIds = newRowIds;
-
+			maxYAxisWidth = Math.min(maxYAxisWidth, 200);
+			container.remove();
 			var horizontal = gridColumnCount === 1;
 			var dataRanges = []; //
 			var _gridWidth = gridWidth;
@@ -1445,15 +1469,15 @@ morpheus.ChartTool.prototype = {
 								text: rowId,
 								showarrow: false,
 								font: {
-									size: 10
+									size: 9
 								}
 							}]; // rotate axis label
 							//yaxis.title = ;
-							marginLeft = 120;
+							marginLeft = maxYAxisWidth;
 						} else {
 							yaxis.ticks = '';
 							yaxis.showticklabels = false;
-							marginLeft = 0;
+							marginLeft = 6;
 						}
 
 						var $chart = $('<div style="width:' + gridWidth

@@ -118,7 +118,7 @@ morpheus.Popup.showPopup = function (menuItems, position, component, callback) {
 	if ((left + popupWidth) >= windowWidth) { // offscreen right
 		left -= popupWidth;
 	}
-	if ((top + popupHeight) >= (windowHeight)) { // offscreen
+	if ((top + popupHeight) >= (windowHeight)) { // offscreen bottom
 		top -= popupHeight;
 	}
 

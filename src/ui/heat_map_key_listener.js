@@ -1,4 +1,19 @@
+/**
+ *
+ * @param options.which Array of key codes
+ * @param options.shift Whether shift key is required
+ * @param options.alt Whether alt key is required
+ * @param options.name Shortcut name
+ * @param options.description Shortcut description
+ * @param options.cb Function callback
+ * @constructor
+ */
+morpheus.KeyboardShortcut = function (options) {
+
+};
+
 morpheus.HeatMapKeyListener = function (controller) {
+
 	var keydown = function (e) {
 		var tagName = e.target.tagName;
 		var found = false;

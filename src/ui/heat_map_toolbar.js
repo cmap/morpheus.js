@@ -54,7 +54,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml
 		.push('<li><a data-name="searchHelp" href="#">Help</a></li>');
 		searchHtml.push('</ul>');
-		searchHtml.push('</div>')
+		searchHtml.push('</div>');
 
 		searchHtml.push('<div class="form-group">');
 		searchHtml
@@ -106,7 +106,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml
 		.push('<li><a data-name="searchHelp" href="#">Help</a></li>');
 		searchHtml.push('</ul>');
-		searchHtml.push('</div>')
+		searchHtml.push('</div>');
 
 		searchHtml.push('<div class="form-group">');
 		searchHtml

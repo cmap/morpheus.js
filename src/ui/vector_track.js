@@ -400,10 +400,10 @@ morpheus.VectorTrack.prototype = {
 						_this.moleculeCache[value] = image;
 					});
 
-					setTimeout(2000, function () {
+					setTimeout(function () {
 						_this.setInvalid(true);
 						_this.repaint();
-					});
+					}, 2000);
 				} else {
 					var values = valueToModelIndices.keys();
 					var doRequest = function (smile) {

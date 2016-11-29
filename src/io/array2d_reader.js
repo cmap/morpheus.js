@@ -6,12 +6,14 @@ morpheus.Array2dReader.prototype = {
 	read: function (fileOrUrl, callback) {
 		var _this = this;
 		var name = morpheus.Util.getBaseFileName(morpheus.Util.getFileName(fileOrUrl));
-
 		var html = [];
 		html.push('<div>');
 		html.push('<label>Click the table cell containing the first data row and column.</label>');
+		html.push('<div class="checkbox"> <label> <input name="transpose" type="checkbox">' +
+			' Tranpose </label>' +
+			' </div>');
 
-		html.push('<br /><div' +
+		html.push('<div' +
 			' style="display:inline-block;width:10px;height:10px;background-color:#b3cde3;"></div><span> Data Matrix</span>');
 		html.push('<br /><div' +
 			' style="display:inline-block;width:10px;height:10px;background-color:#fbb4ae;"></div><span> Column' +
@@ -20,9 +22,11 @@ morpheus.Array2dReader.prototype = {
 			' style="display:inline-block;' +
 			' width:10px;height:10px;background-color:#ccebc5;"></div><span> Row' +
 			' Annotations</span>');
+
 		html.push('<div class="slick-bordered-table" style="width:550px;height:400px;"></div>');
 		html.push('</div>');
 		var $el = $(html.join(''));
+
 		morpheus.Util.readLines(fileOrUrl).done(function (lines) {
 			// show in table
 			var tab = /\t/;
@@ -40,6 +44,7 @@ morpheus.Array2dReader.prototype = {
 
 			var dataRowStart = 1;
 			var dataColumnStart = 1;
+			var _lines = lines;
 			var grid = new Slick.Grid($el.find('.slick-bordered-table')[0], lines, columns, {
 				enableCellNavigation: true,
 				enableColumnReorder: false,
@@ -78,6 +83,42 @@ morpheus.Array2dReader.prototype = {
 					}
 					html.push('</div>');
 					return html.join('');
+				}
+			});
+			var transposedLines;
+			var transposedColumns;
+			$el.find('[name=transpose]').on('click', function (e) {
+				if ($(this).prop('checked')) {
+					if (transposedLines == null) {
+						transposedLines = [];
+						for (var j = 0, ncols = lines[0].length; j < ncols; j++) {
+							var row = [];
+							transposedLines.push(row);
+							for (var i = 0, nrows = lines.length; i < nrows; i++) {
+								row.push(lines[i][j]);
+							}
+						}
+
+						transposedColumns = [];
+						for (var j = 0, ncols = transposedLines[0].length; j < ncols; j++) {
+							transposedColumns.push({
+								id: j,
+								field: j
+							});
+						}
+
+					}
+					lines = transposedLines;
+					grid.setData(transposedLines);
+					grid.setColumns(transposedColumns);
+					grid.resizeCanvas();
+					grid.invalidate();
+				} else {
+					grid.setData(_lines);
+					grid.setColumns(columns);
+					grid.resizeCanvas();
+					grid.invalidate();
+					lines = _lines;
 				}
 			});
 			grid.onClick.subscribe(function (e, args) {

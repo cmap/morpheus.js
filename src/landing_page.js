@@ -53,7 +53,7 @@ morpheus.LandingPage = function (pageOptions) {
 		if (index < brands.length) {
 			setTimeout(step, 200);
 		}
-	}
+	};
 	setTimeout(step, 300);
 	this.tabManager = new morpheus.TabManager({landingPage: this});
 	this.tabManager.$nav.appendTo($(this.pageOptions.el));

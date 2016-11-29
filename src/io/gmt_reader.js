@@ -1,7 +1,7 @@
-morpheus.GmtReader = function() {
+morpheus.GmtReader = function () {
 };
 morpheus.GmtReader.prototype = {
-	read : function(reader) {
+	read: function (reader) {
 		var sets = [];
 		var tab = /\t/;
 		var s;
@@ -18,18 +18,16 @@ morpheus.GmtReader.prototype = {
 			var ids = [];
 			for (var i = 2; i < tokens.length; i++) {
 				var geneName = tokens[i].trim();
-				if (geneName === '') {
-					continue; // dont really expect, but for consistency
-				} else {
+				if (geneName !== '') {
 					ids.push(geneName);
 				}
 			}
 			var set = {
-				name : name,
-				description : description,
-				ids : ids
+				name: name,
+				description: description,
+				ids: ids
 			};
-			set.toString = function() {
+			set.toString = function () {
 				return this.name;
 			};
 			sets.push(set);

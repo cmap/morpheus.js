@@ -396,7 +396,7 @@ morpheus.DatasetUtil.DENDROGRAM_FILE_FORMATS = 'a <a href="http://en.wikipedia.o
 morpheus.DatasetUtil.OPEN_FILE_FORMATS = '<a target="_blank" href="http://support.lincscloud.org/hc/en-us/articles/202105453-GCT-Gene-Cluster-Text-Format-">GCT 1.3</a>, '
 	+ '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
 	+ '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
-	+ '<a target="_blank", href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
+	+ '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
 	+ ' a tab-delimited text file, or a <a href="http://en.wikipedia.org/wiki/Newick_format" target="_blank">Newick</a> file';
 morpheus.DatasetUtil.getRootDataset = function (dataset) {
 	while (dataset.getDataset) {
@@ -779,6 +779,12 @@ morpheus.DatasetUtil.overlay = function (options) {
 		}
 	}
 };
+/**
+ * Joins datasets by appending rows.
+ * @param datasets
+ * @param field
+ * @return {morpheus.AbstractDataset} The joined dataset.
+ */
 morpheus.DatasetUtil.join = function (datasets, field) {
 	if (datasets.length === 0) {
 		throw 'No datasets';

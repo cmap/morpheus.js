@@ -37,7 +37,7 @@ morpheus.TsneTool.execute = function (dataset, input) {
 			}
 		}
 	}
-	var opt = {}
+	var opt = {};
 	opt.epsilon = input.epsilon;
 	opt.perplexity = input.perplexity;
 	opt.dim = 2;

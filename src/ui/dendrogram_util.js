@@ -336,11 +336,9 @@ morpheus.DendrogramUtil.leastCommonAncestor = function (leafNodes) {
 // };
 morpheus.DendrogramUtil.search = function (rootNode, searchText) {
 	var tokens = morpheus.Util.getAutocompleteTokens(searchText);
-	var clearSearch = false;
 	var predicates;
 	var nmatches = 0;
 	if (tokens == null || tokens.length == 0) {
-		clearSearch = true;
 		morpheus.DendrogramUtil.dfs(rootNode, function (node) {
 			node.search = false;
 			return true;

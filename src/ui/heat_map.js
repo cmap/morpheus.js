@@ -176,6 +176,12 @@ morpheus.HeatMap = function (options) {
 			 */
 			rowFilter: undefined,
 			columnFilter: undefined,
+			/**
+			 * Whether this heat map tab can be closed
+			 */
+			closeable: true,
+			rowSize: undefined,
+			columnSize: undefined,
 			customUrls: undefined, // Custom urls for File>Open.
 			height: 'window', // set the available height for the
 			// heat map. If not
@@ -208,10 +214,6 @@ morpheus.HeatMap = function (options) {
 			keyboard: true,
 			inlineTooltip: true,
 			$loadingImage: morpheus.Util.createLoadingEl(),
-			/**
-			 * Whether this heat map tab can be closed
-			 */
-			closeable: true,
 			toolbar: {
 				chart: true,
 				dimensions: true,
@@ -1517,7 +1519,7 @@ morpheus.HeatMap.prototype = {
 			// one
 			// display option
 			// supplied
-			var displaySpecified = false || (_this.options.parent != null && _this.options.inheritFromParent);
+			var displaySpecified = (_this.options.parent != null && _this.options.inheritFromParent);
 			_.each(options, function (option) {
 				if (!displaySpecified) {
 					displaySpecified = option.display != null;

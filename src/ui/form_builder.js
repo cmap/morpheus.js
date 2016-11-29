@@ -555,12 +555,11 @@ morpheus.FormBuilder.prototype = {
 				+ '" name="'
 				+ name
 				+ '_picker" data-width="35%" class="file-input selectpicker form-control">');
-			var npre = 1;
 			var options = [];
 
 			if (field.options) {
 				options = options.concat(field.options);
-				npre = 1 + field.options.length;
+
 			}
 			// data types are file, dropbox, url, and predefined
 			options.push('My Computer');

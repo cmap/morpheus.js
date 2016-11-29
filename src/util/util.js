@@ -83,15 +83,20 @@ morpheus.Util.trackEvent = function (options) {
 
 };
 
-morpheus.Util.getDataType = function (firstNonNull) {
+/**
+ * 
+ * @param val The value to determine the data type for.
+ * @return {String} One of string, number, object, [string], [number], [object]
+ */
+morpheus.Util.getDataType = function (val) {
 	var dataType;
-	var isArray = morpheus.Util.isArray(firstNonNull);
-	if (isArray && firstNonNull.length > 0) {
-		firstNonNull = firstNonNull[0];
+	var isArray = morpheus.Util.isArray(val);
+	if (isArray && val.length > 0) {
+		val = val[0];
 	}
-	if (_.isString(firstNonNull)) {
+	if (_.isString(val)) {
 		dataType = 'string';
-	} else if (_.isNumber(firstNonNull)) {
+	} else if (_.isNumber(val)) {
 		dataType = 'number';
 	} else {
 		dataType = 'object';
@@ -396,11 +401,7 @@ morpheus.Util.hammer = function (el, recognizers) {
 	if (_.indexOf(recognizers, 'press') !== -1) {
 		hammer.add(new Hammer.Press());
 	}
-	// $(el).on('mousedown', function(e) {
-	// // e.preventDefault();
-	// // e.stopPropagation();
-	// // e.stopImmediatePropagation();
-	// });
+
 	return hammer;
 };
 morpheus.Util.autocompleteArrayMatcher = function (q, cb, array, fields, max) {

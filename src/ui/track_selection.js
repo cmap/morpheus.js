@@ -25,6 +25,8 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
 
 	}
 
+	var panning = false;
+
 	this.hammer = morpheus.Util
 	.hammer(canvas, ['pan', 'tap', 'longpress'])
 	.on('longpress', this.longpress = function (event) {
@@ -33,6 +35,8 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
 		event.srcEvent.stopPropagation();
 		controller.setSelectedTrack(track.name, isColumns);
 		track.showPopup(event.srcEvent);
+	}).on('panend', this.panend = function (event) {
+		panning = false;
 	})
 	.on(
 		'panmove',
@@ -81,6 +85,7 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
 		controller.setSelectedTrack(track.name, isColumns);
 		var position = getPosition(event, true);
 		startIndex = positions.getIndex(position[coord], false);
+		panning = true;
 	})
 	.on(
 		'tap doubletap',
@@ -92,10 +97,6 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
 					|| (!isColumns && !controller.options.rowsSortable)) {
 					return;
 				}
-				// var viewIndices = new morpheus.Set();
-				// viewIndices.add(index);
-				// selectionModel.setViewIndices(viewIndices,
-				// false);
 				controller.sortBasedOnSelection(null, isColumns,
 					event.srcEvent.shiftKey);
 			} else {
@@ -146,7 +147,7 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
 morpheus.TrackSelection.prototype = {
 	dispose: function () {
 		this.hammer.off('longpress', this.longpress).off('panstart',
-			this.panstart).off('panmove', this.panmove).off('tap', this.tap).off('doubletap', this.tap);
+			this.panstart).off('panmove', this.panmove).off('panend', this.panend).off('tap', this.tap).off('doubletap', this.tap);
 		this.hammer.destroy();
 	}
 };

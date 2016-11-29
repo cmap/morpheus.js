@@ -133,7 +133,7 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
 									}
 								}
 								selectedNode.children.reverse();
-								var min = selectedNode.minIndex
+								var min = selectedNode.minIndex;
 								var max = selectedNode.maxIndex;
 								var modelIndexToValue = sortKeys[sortKeyIndex].modelIndexToValue;
 								var values = [];

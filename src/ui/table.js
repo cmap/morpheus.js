@@ -85,7 +85,7 @@ morpheus.Table = function (options) {
 		// sort column names
 		var sortedColumns = this.columns.slice().sort(function (a, b) {
 			a = a.name.toLowerCase();
-			b = b.name.toLowerCase()
+			b = b.name.toLowerCase();
 			return (a === b ? 0 : (a < b ? -1 : 1));
 		});
 		sortedColumns.forEach(function (c, i) {
