@@ -27,8 +27,7 @@ morpheus.Popup.init = function () {
 	morpheus.Popup.client = client;
 	morpheus.Popup.initted = true;
 	morpheus.Popup.$popupDiv = $(document.createElement('div'));
-	morpheus.Popup.$popupDiv.css('position', 'absolute').css('zIndex', 10001)
-	.addClass('dropdown clearfix');
+	morpheus.Popup.$popupDiv.css('position', 'absolute').css('zIndex', 10001).css('overflow', 'auto').addClass('dropdown clearfix');
 	morpheus.Popup.$contextMenu = $(document.createElement('ul'));
 	morpheus.Popup.$contextMenu.addClass('dropdown-menu').css('display',
 		'block').css('position', 'static').css('margin-bottom', '5px');
@@ -117,12 +116,15 @@ morpheus.Popup.showPopup = function (menuItems, position, component, callback) {
 	// default is bottom-right
 	if ((left + popupWidth) >= windowWidth) { // offscreen right
 		left -= popupWidth;
+		left = Math.max(4, left);
 	}
 	if ((top + popupHeight) >= (windowHeight)) { // offscreen bottom
 		top -= popupHeight;
+		top = Math.max(4, top);
 	}
 
 	morpheus.Popup.$popupDiv.css({
+		height: popupHeight + 'px',
 		display: 'block',
 		left: left,
 		top: top
