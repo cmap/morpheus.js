@@ -790,7 +790,11 @@ morpheus.DatasetUtil.join = function (datasets, field) {
 		throw 'No datasets';
 	}
 	if (datasets.length === 1) {
-		datasets[0].getRowMetadata().add('Source').setValue(0, datasets[0].getName());
+		var name = datasets[0].getName();
+		var sourceVector = datasets[0].getRowMetadata().add('Source');
+		for (var i = 0, size = sourceVector.size(); i < size; i++) {
+			sourceVector.setValue(i, name);
+		}
 		return datasets[0];
 	}
 	// take union of all ids

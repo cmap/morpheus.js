@@ -136,7 +136,7 @@ morpheus.Popup.showPopup = function (menuItems, position, component, callback) {
 	window.setTimeout(function () {
 		$body.on('mousedown', function (e) {
 			var $target = $(e.target);
-			if ($target.data('type') !== 'popup-item') {
+			if ($target[0] !== morpheus.Popup.$popupDiv[0] && $target.data('type') !== 'popup-item') {
 				morpheus.Popup.hidePopupMenu(e);
 			}
 		});
