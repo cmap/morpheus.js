@@ -801,7 +801,6 @@ morpheus.ChartTool.prototype = {
 		var scale = d3.scale.linear().domain([0, 1]).range([-0.3, -1]);
 		for (var k = 0, nitems = array.length; k < nitems; k++) {
 			var item = array[k];
-
 			var value = dataset.getValue(item.row, item.column);
 			y.push(value);
 			if (points) {
@@ -907,9 +906,23 @@ morpheus.ChartTool.prototype = {
 			});
 
 		morpheus.ChartTool.newPlot(myPlot, traces, options.layout, config);
+		var $span = $('<div' +
+			' style="display:none;position:absolute;font-size:10px;left:2px;top:4px;">#' +
+			' points:' + morpheus.Util.intFormat(array.length) + '</div>');
 
+		$span.appendTo($(myPlot));
 		myPlot.on('plotly_selected', function (eventData) {
 			selection = eventData;
+		});
+		myPlot.on('plotly_hover', function (eventData) {
+			if (eventData.points && eventData.points.length > 0 && eventData.points[0].curveNumber === 0) {
+				$span.show();
+			} else {
+				$span.hide();
+			}
+		});
+		myPlot.on('plotly_unhover', function (eventData) {
+			$span.hide();
 		});
 
 	},
@@ -1562,7 +1575,8 @@ morpheus.ChartTool.prototype = {
 
 morpheus.ChartTool.newPlot = function (myPlot, traces, layout, config) {
 	Plotly.newPlot(myPlot, traces, layout, config);
-	var $a = $('<a data-title="Toggle mode bar" href="#" style="fill: rgb(68, 122,' +
+	var $a = $('<a data-toggle="tooltip" title="Toggle mode bar" href="#" style="fill: rgb(68,' +
+		' 122,' +
 		' 219);position:' +
 		' absolute;top:' +
 		' -2px;right:-6px;z-index:' +
@@ -1571,7 +1585,8 @@ morpheus.ChartTool.newPlot = function (myPlot, traces, layout, config) {
 	$a.appendTo($myPlot);
 	var $modeBar = $(myPlot).find('.modebar');
 	$modeBar.css('display', 'none');
-	$a.on('click', function () {
+	$a.on('click', function (e) {
+		e.preventDefault();
 		$modeBar.toggle();
 	});
 }
