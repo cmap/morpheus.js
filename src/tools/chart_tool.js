@@ -346,6 +346,7 @@ morpheus.ChartTool.getPlotlyDefaults = function () {
 	};
 	var config = {
 		showLink: false,
+		displayModeBar: true, // always show modebar
 		displaylogo: false,
 		staticPlot: false,
 		showHints: true,
@@ -561,7 +562,7 @@ morpheus.ChartTool.prototype = {
 					}
 				}]]
 			});
-		Plotly.newPlot(myPlot, [trace], options.layout, config);
+		morpheus.ChartTool.newPlot(myPlot, [trace], options.layout, config);
 		myPlot.on('plotly_selected', function (eventData) {
 			selection = eventData;
 		});
@@ -687,7 +688,7 @@ morpheus.ChartTool.prototype = {
 		var $parent = $(myPlot).parent();
 		options.layout.width = $parent.width();
 		options.layout.height = this.$dialog.height() - 30;
-		Plotly.newPlot(myPlot, traces, options.layout, config);
+		morpheus.ChartTool.newPlot(myPlot, traces, options.layout, config);
 		myPlot.on('plotly_selected', function (eventData) {
 			selection = eventData;
 		});
@@ -731,7 +732,7 @@ morpheus.ChartTool.prototype = {
 		var selection = null;
 		var _this = this;
 
-		Plotly.newPlot(myPlot, traces, options.layout, options.config);
+		morpheus.ChartTool.newPlot(myPlot, traces, options.layout, options.config);
 		// myPlot.on('plotly_selected', function (eventData) {
 		// 	selection = eventData;
 		// });
@@ -775,7 +776,7 @@ morpheus.ChartTool.prototype = {
 		var selection = null;
 		var _this = this;
 
-		Plotly.newPlot(myPlot, traces, options.layout, options.config);
+		morpheus.ChartTool.newPlot(myPlot, traces, options.layout, options.config);
 		// myPlot.on('plotly_selected', function (eventData) {
 		// 	selection = eventData;
 		// });
@@ -844,7 +845,8 @@ morpheus.ChartTool.prototype = {
 		var trace = {
 			name: '',
 			type: 'box',
-			boxpoints: false
+			boxpoints: false,
+			hoverinfo: valuesField + '+text'
 		};
 		trace[valuesField] = y;
 		traces.push(trace);
@@ -904,7 +906,8 @@ morpheus.ChartTool.prototype = {
 				}]]
 			});
 
-		Plotly.newPlot(myPlot, traces, options.layout, config);
+		morpheus.ChartTool.newPlot(myPlot, traces, options.layout, config);
+
 		myPlot.on('plotly_selected', function (eventData) {
 			selection = eventData;
 		});
@@ -1064,9 +1067,7 @@ morpheus.ChartTool.prototype = {
 					if (rowIndexOne > rowIndexTwo) {
 						continue;
 					}
-					var $chart = $('<div style="width:' + gridWidth
-						+ 'px;height:' + gridHeight
-						+ 'px;position:absolute;left:'
+					var $chart = $('<div style="position:absolute;left:'
 						+ (rowIndexTwo * gridWidth) + 'px;top:'
 						+ (rowIndexOne * gridHeight) + 'px;"></div>');
 					var myPlot = $chart[0];
@@ -1435,9 +1436,11 @@ morpheus.ChartTool.prototype = {
 					dataRanges.push(yrange);
 				}
 			}
+			var toppx = 0;
 			for (var i = 0; i < gridRowCount; i++) {
 				var rowId = rowIds[i];
-
+				var leftpx = 0;
+				var maxChartHeight = 0;
 				for (var j = 0; j < gridColumnCount; j++) {
 					var array = grid[i][j];
 					var columnId = columnIds[j];
@@ -1481,10 +1484,8 @@ morpheus.ChartTool.prototype = {
 							marginLeft = 6;
 						}
 
-						var $chart = $('<div style="width:' + gridWidth
-							+ 'px;height:' + gridHeight
-							+ 'px;position:absolute;left:' + (j * gridWidth)
-							+ 'px;top:' + (i * gridHeight) + 'px;"></div>');
+						var $chart = $('<div style="position:absolute;left:' + leftpx
+							+ 'px;top:' + toppx + 'px;"></div>');
 						$chart.appendTo(this.$chart);
 						var myPlot = $chart[0];
 						yaxis.showgrid = (gridHeight - marginBottom) > 150;
@@ -1504,6 +1505,8 @@ morpheus.ChartTool.prototype = {
 								l: marginLeft,
 								autoexpand: false
 							};
+							leftpx += gridWidth + margin.l;
+							maxChartHeight = Math.max(maxChartHeight, gridHeight + margin.b);
 							this._createBoxPlot({
 								layout: $.extend(true, {}, layout, {
 									width: gridWidth + margin.l,
@@ -1549,9 +1552,26 @@ morpheus.ChartTool.prototype = {
 
 					}
 				}
+				toppx += maxChartHeight;
 
 			}
 		}
 
 	}
 };
+
+morpheus.ChartTool.newPlot = function (myPlot, traces, layout, config) {
+	Plotly.newPlot(myPlot, traces, layout, config);
+	var $a = $('<a data-title="Toggle mode bar" href="#" style="fill: rgb(68, 122,' +
+		' 219);position:' +
+		' absolute;top:' +
+		' -2px;right:-6px;z-index:' +
+		' 1002;"><svg height="1em" width="1em" viewBox="0 0 1542 1000"><path d="m0-10h182v-140h-182v140z m228 146h183v-286h-183v286z m225 714h182v-1000h-182v1000z m225-285h182v-715h-182v715z m225 142h183v-857h-183v857z m231-428h182v-429h-182v429z m225-291h183v-138h-183v138z" transform="matrix(1 0 0 -1 0 850)"></path></svg></a>');
+	var $myPlot = $(myPlot);
+	$a.appendTo($myPlot);
+	var $modeBar = $(myPlot).find('.modebar');
+	$modeBar.css('display', 'none');
+	$a.on('click', function () {
+		$modeBar.toggle();
+	});
+}
