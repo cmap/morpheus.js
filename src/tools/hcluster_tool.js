@@ -56,15 +56,15 @@ morpheus.HClusterTool.execute = function (dataset, input) {
 
 	if (rows) {
 		rowsHcl = doCluster(
-			input.selectedColumns ? new morpheus.SlicedDatasetView(dataset,
-				null, input.selectedColumns) : dataset,
+			input.selectedColumnsToUseForClusteringRows ? new morpheus.SlicedDatasetView(dataset,
+				null, input.selectedColumnsToUseForClusteringRows) : dataset,
 			input.group_rows_by);
 	}
 	if (columns) {
 		columnsHcl = doCluster(
 			morpheus.DatasetUtil
-			.transposedView(input.selectedRows ? new morpheus.SlicedDatasetView(
-				dataset, input.selectedRows, null)
+			.transposedView(input.selectedRowsToUseForClusteringColumns ? new morpheus.SlicedDatasetView(
+				dataset, input.selectedRowsToUseForClusteringColumns, null)
 				: dataset), input.group_columns_by);
 
 	}
@@ -150,18 +150,24 @@ morpheus.HClusterTool.prototype = {
 
 		var project = options.project;
 		var controller = options.controller;
-		var selectedRows = options.input.cluster_columns_in_space_of_selected_rows_only ? project
+		var selectedRowsToUseForClusteringColumns = options.input.cluster_columns_in_space_of_selected_rows_only ? project
 		.getRowSelectionModel().getViewIndices().values()
 			: null;
-		var selectedColumns = options.input.cluster_rows_in_space_of_selected_columns_only ? project
+		if (selectedRowsToUseForClusteringColumns != null && selectedRowsToUseForClusteringColumns.length === 0) {
+			selectedRowsToUseForClusteringColumns = null;
+		}
+		var selectedColumnsToUseForClusteringRows = options.input.cluster_rows_in_space_of_selected_columns_only ? project
 		.getColumnSelectionModel().getViewIndices().values()
 			: null;
+		if (selectedColumnsToUseForClusteringRows != null && selectedColumnsToUseForClusteringRows.length === 0) {
+			selectedColumnsToUseForClusteringRows = null;
+		}
 		var rows = options.input.cluster == 'Rows'
 			|| options.input.cluster == 'Rows and columns';
 		var columns = options.input.cluster == 'Columns'
 			|| options.input.cluster == 'Rows and columns';
-		options.input.selectedRows = selectedRows;
-		options.input.selectedColumns = selectedColumns;
+		options.input.selectedRowsToUseForClusteringColumns = selectedRowsToUseForClusteringColumns;
+		options.input.selectedColumnsToUseForClusteringRows = selectedColumnsToUseForClusteringRows;
 		var dataset = project.getSortedFilteredDataset();
 
 		if (options.input.background === false) {

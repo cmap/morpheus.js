@@ -148,7 +148,7 @@ morpheus.HeatMapKeyListener = function (controller) {
 			return false;
 		}
 	};
-	var $keyelement = controller.$content;
+	var $keyelement = controller.$tabPanel;
 	$keyelement.on('keydown', keydown);
 	$keyelement.on('dragover.morpheus dragenter.morpheus', function (e) {
 		e.preventDefault();

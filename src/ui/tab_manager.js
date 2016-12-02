@@ -195,6 +195,7 @@ morpheus.TabManager.prototype = {
 	add: function (options) {
 		this.adding = true;
 		var id = _.uniqueId('tab');
+
 		this.idToTabObject.set(id, options.object);
 		var li = [];
 		li.push('<li role="presentation">');
@@ -246,7 +247,7 @@ morpheus.TabManager.prototype = {
 		}
 		var obj = this.idToTabObject.remove(target);
 		this.activeTabObject = null;
-		this.$nav.find('[data-link=' + target + ']').parent().remove();
+		this.$nav.find('[data-link=' + target + ']:first').parent().remove();
 		this.$tabContent.find(target).remove();
 		var $a = this.$nav.find('a[data-toggle="tab"]:last');
 		if ($a.length === 0) {
@@ -260,6 +261,10 @@ morpheus.TabManager.prototype = {
 		if (this.options.autohideTabBar) {
 			this.$nav.css('display', this.idToTabObject.size() > 1 ? ''
 				: 'none');
+		}
+		if (this.idToTabObject.size() > 0) {
+			$($a.attr('href')).focus();
+
 		}
 		if (obj.onRemove) {
 			obj.onRemove();

@@ -349,6 +349,7 @@ morpheus.HeatMapOptions = function (controller) {
 				controller.getProject().__symmetricProjectListener = l;
 			} else {
 				controller.getProject().__symmetricProjectListener.dispose();
+				delete controller.getProject().__symmetricProjectListener;
 			}
 		});
 
