@@ -1,14 +1,16 @@
 {
   "name": "morpheus.js",
+  "productName": "morpheus.js",
   "description": "morpheus.js JavaScript Library",
   "license": "MIT",
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/joshua-gould/morpheus.js.git"
+    "url": "https://github.com/cmap/morpheus.js.git"
   },
+  "homepage": "https://cmap.github.io/morpheus.js/",
   "bugs": {
-    "url": "https://github.com/joshua-gould/morpheus.js/issues"
+    "url": "https://github.com/cmap/morpheus.js/issues"
   },
   "author": {
     "name": "Joshua Gould"
@@ -25,14 +27,38 @@
     "morpheus"
   ],
   "devDependencies": {
-    "finalhandler": "^0.4.1",
-    "grunt": "~0.4.5",
+    "electron": "^1.4.1",
+    "electron-builder": "next",
+    "finalhandler": "^0.5.0",
+    "grunt": "~1.0.1",
     "grunt-contrib-concat": "~1.0.0",
     "grunt-contrib-copy": "~1.0.0",
     "grunt-contrib-cssmin": "~1.0.1",
     "grunt-contrib-jshint": "~1.0.0",
-    "grunt-contrib-uglify": "~1.0.1",
+    "grunt-contrib-uglify": "~2.0.0",
     "grunt-contrib-watch": "~1.0.0",
+    "grunt-jsdoc": "^2.1.0",
+    "ink-docstrap": "^1.3.0",
     "serve-static": "^1.10.2"
+  },
+  "build": {
+    "appId": "org.broadinstitute.morpheus",
+    "category": "public.app-category.graphics-design",
+    "asar": false,
+    "files": [
+      "js/*",
+      "fonts/*",
+      "index.js",
+      "css/*",
+      "*.html",
+      "package.json"
+    ]
+  },
+  "scripts": {
+    "pack": "build --dir",
+    "dist": "build"
+  },
+  "dependencies": {
+    "doxdox": "^1.1.3"
   }
 }
