@@ -57,7 +57,7 @@ morpheus.HelpMenu = function () {
 		e.stopImmediatePropagation();
 	});
 	this.$el.find('[data-name=source]').on('click', function (e) {
-		window.open('https://github.com/joshua-gould/morpheus.js');
+		window.open('https://github.com/cmap/morpheus.js');
 		morpheus.Util.trackEvent({
 			eventCategory: 'ToolBar',
 			eventAction: 'source'

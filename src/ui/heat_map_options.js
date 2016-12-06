@@ -51,36 +51,36 @@ morpheus.HeatMapOptions = function (controller) {
 			name: 'load_color_scheme',
 			type: 'file'
 		}];
-	if (controller.getProject().getFullDataset().getSeriesCount() > 1) {
-		items.push({
-			name: 'size_by',
-			required: true,
-			type: 'select',
-			options: ['(None)'].concat(morpheus.DatasetUtil
-			.getSeriesNames(controller.getProject().getFullDataset()))
-		});
-		items.push({
-			name: 'size_by_minimum',
-			title: 'Size by minimum',
-			required: true,
-			type: 'text',
-			col: 'col-xs-4'
-		});
-		items.push({
-			name: 'size_by_maximum',
-			title: 'Size by maximum',
-			required: true,
-			type: 'text',
-			col: 'col-xs-4'
-		});
 
-		items.push({
-			name: 'conditional_rendering',
-			required: true,
-			type: 'button',
-			col: 'col-xs-4'
-		});
-	}
+	items.push({
+		name: 'size_by',
+		required: true,
+		type: 'select',
+		options: ['(None)'].concat(morpheus.DatasetUtil
+		.getSeriesNames(controller.getProject().getFullDataset()))
+	});
+	items.push({
+		name: 'size_by_minimum',
+		title: 'Size by minimum',
+		required: true,
+		type: 'text',
+		col: 'col-xs-4'
+	});
+	items.push({
+		name: 'size_by_maximum',
+		title: 'Size by maximum',
+		required: true,
+		type: 'text',
+		col: 'col-xs-4'
+	});
+
+	items.push({
+		name: 'conditional_rendering',
+		required: true,
+		type: 'button',
+		col: 'col-xs-4'
+	});
+
 	var displayItems = [
 		{
 			disabled: controller.getProject().getFullDataset().getColumnCount() !== controller.getProject().getFullDataset().getRowCount(),
