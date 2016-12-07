@@ -53,11 +53,14 @@ morpheus.CheckBoxList = function (options) {
 	}
 	this.table = table;
 	var html = [];
+
 	html.push('<div style="display:inline;">');
 	html.push('<div style="display:inline;" class="dropdown">');
-	html
-	.push('<button type="button" data-toggle="dropdown" class="btn btn-default btn-xs dropdown-toggle" aria-haspopup="true" aria-expanded="false">');
-	html.push('<span class="caret"></span>');
+	html.push('<button class="btn btn-default btn-xs dropdown-toggle" type="button"' +
+		' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">');
+	html.push('<i data-name="checkbox" class="fa fa-square-o"' +
+		' aria-hidden="true"></i>');
+	html.push(' <span class="caret"></span>');
 	html.push('</button>');
 	html.push('<ul style="font-size:12px;" class="dropdown-menu">');
 	html.push('<li><a name="selectAll" href="#">Select All</a></li>');
@@ -66,13 +69,35 @@ morpheus.CheckBoxList = function (options) {
 
 	html.push('</ul>');
 	html.push('</div>');
-	html.push('<span name="checkBoxResults" style="padding-left:6px;"></span>');
+	html.push('<span data-name="available" style="font-size:12px;padding-left:6px;"></span>');
 	html.push('</div>');
 	var $checkBoxEl = $(html.join(''));
 	table.$header.find('[name=left]').html($checkBoxEl);
-	var $checkBoxResults = $checkBoxEl.find('[name=checkBoxResults]');
+	var $selection = $checkBoxEl.find('[data-name=available]');
 	var $selectAll = $checkBoxEl.find('[name=selectAll]');
 	var $selectNone = $checkBoxEl.find('[name=selectNone]');
+	var $cb = $checkBoxEl.find('[data-name=checkbox]');
+
+	$cb.on('click', function (e) {
+		if ($cb.hasClass('fa-square-o')) {
+			var items = table.getItems(); // select all
+			for (var i = 0; i < items.length; i++) {
+				set.add(_this.getter(items[i]));
+			}
+		} else { // select none
+			var items = table.getItems();
+			for (var i = 0; i < items.length; i++) {
+				set.remove(_this.getter(items[i]));
+			}
+		}
+		table.trigger('checkBoxSelectionChanged', {
+			source: _this,
+			set: set
+		});
+		e.preventDefault();
+		e.stopPropagation();
+
+	});
 	$selectAll.on('click', function (e) {
 		var items = table.getItems();
 		for (var i = 0, nitems = items.length; i < nitems; i++) {
@@ -120,35 +145,42 @@ morpheus.CheckBoxList = function (options) {
 
 	this.set = set;
 	this.table = table;
-	$checkBoxResults.html('selected ' + morpheus.Util.intFormat(set.size())
-		+ ' of ' + morpheus.Util.intFormat(table.getAllItemCount()));
+	$selection.html(morpheus.Util.intFormat(set.size()) + '/' + morpheus.Util.intFormat(table.getAllItemCount()));
 
 	var priorCount = 0;
 	this.table.on('checkBoxSelectionChanged', function () {
-		// if (options.checkBoxSelectionOnTop) {
-		// var selectedItems = set.values();
-		// selectedItems.sort();
-		// for (var i = 0, n = selectedItems.length; i < n; i++) {
-		// selectedItems[i].__selected = true;
-		// }
-		// var previousItems = _this.table.getItems();
-		// for (var i = 0, n = previousItems.length; i < n; i++) {
-		// var item = previousItems[i];
-		// if (!item.__selected) {
-		// selectedItems.push(item);
-		// }
-		// }
-		//
-		// var $viewport = table.$gridDiv.find('.slick-viewport');
-		// var top = $viewport.scrollTop();
-		//
-		// _this.table.setItems(selectedItems);
-		// $viewport.scrollTop(Math.max(0, top
-		// + (20 * (set.size() - priorCount))));
-		// priorCount = set.size();
-		// }
-		$checkBoxResults.html('selected ' + morpheus.Util.intFormat(set.size())
-			+ ' of ' + morpheus.Util.intFormat(table.getAllItemCount()));
+		if (set.size() === 0) {
+			$cb.attr('class', 'fa fa-square-o');
+		} else {
+			var items = table.getItems();
+			var count = 0;
+			var found = false;
+			var notFound = false;
+			for (var i = 0; i < items.length; i++) {
+				if (set.has(_this.getter(items[i]))) {
+					count++;
+					found = true;
+					if (notFound) {
+						break;
+					}
+				} else {
+					notFound = true;
+					if (found) {
+						break;
+					}
+				}
+			}
+			if (count === 0) {
+				$cb.attr('class', 'fa fa-square-o');
+			} else if (count === items.length) {
+				$cb.attr('class', 'fa fa-check-square-o');
+			} else {
+				$cb.attr('class', 'fa fa-minus-square-o');
+			}
+		}
+
+		$selection.html(morpheus.Util.intFormat(set.size()) + '/' + morpheus.Util.intFormat(table.getAllItemCount()));
+
 		_this.table.redraw();
 	});
 

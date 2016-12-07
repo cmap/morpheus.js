@@ -1526,13 +1526,12 @@ morpheus.HeatMap.prototype = {
 				nameToOption.set(option.renameTo != null ? option.renameTo
 					: option.field, option);
 			});
-
 			var displayMetadata = isColumns ? dataset.getColumnMetadata()
 				: dataset.getRowMetadata();
 			// see if default fields found
 			if (!displaySpecified) {
 				var defaultFieldsToShow = new morpheus.Set();
-				['pert_iname', 'moa', 'target', 'description']
+				['pert_iname', 'moa', 'target', 'description', 'cell_id', 'pert_type']
 				.forEach(function (field) {
 					defaultFieldsToShow.add(field);
 				});

@@ -381,7 +381,7 @@ morpheus.MetadataUtil.indexOf = function (metadataModel, name) {
 	return -1;
 };
 
-morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS = ['target', 'moa'];
+morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS = ['target', 'gene_target', 'moa'];
 
 morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS = new morpheus.Set();
 ['pr_analyte_id', 'pr_gene_title', 'pr_gene_id', 'pr_analyte_num',
