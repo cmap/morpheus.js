@@ -49,8 +49,10 @@ morpheus.Util.loadTrackingCode = function () {
 				m.parentNode.insertBefore(a, m)
 			})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 		}
-		ga('create', 'UA-53973555-1', 'auto', 'morpheus');
-		ga('morpheus.send', 'pageview');
+		if (typeof ga !== 'undefined') {
+			ga('create', 'UA-53973555-1', 'auto', 'morpheus');
+			ga('morpheus.send', 'pageview');
+		}
 		morpheus.Util.TRACKING_CODE_LOADED = true;
 	}
 };
@@ -71,7 +73,7 @@ morpheus.Util.trackEvent = function (options) {
 		if (!morpheus.Util.TRACKING_CODE_LOADED) {
 			morpheus.Util.loadTrackingCode();
 		}
-		if (morpheus.Util.TRACKING_CODE_LOADED) {
+		if (morpheus.Util.TRACKING_CODE_LOADED && typeof ga !== 'undefined') {
 			ga('morpheus.send', {
 				hitType: 'event',
 				eventCategory: options.eventCategory,
