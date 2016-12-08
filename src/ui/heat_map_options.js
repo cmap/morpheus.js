@@ -125,6 +125,11 @@ morpheus.HeatMapOptions = function (controller) {
 			col: 'col-xs-4',
 			value: morpheus.Util.nf(controller.heatmap
 			.getColumnPositions().getSize())
+		}, {
+			name: 'show_values',
+			required: true,
+			type: 'checkbox',
+			value: controller.heatmap.isDrawValues()
 		}];
 	if (controller.rowDendrogram) {
 		displayItems
@@ -297,6 +302,11 @@ morpheus.HeatMapOptions = function (controller) {
 		displayFormBuilder.setEnabled('grid_thickness', grid);
 		displayFormBuilder.setEnabled('grid_color', grid);
 		controller.heatmap.setDrawGrid(grid);
+		controller.revalidate();
+		colorSchemeChooser.restoreCurrentValue();
+	});
+	displayFormBuilder.$form.find('[name=show_values]').on('click', function (e) {
+		controller.heatmap.setDrawValues($(this).prop('checked'));
 		controller.revalidate();
 		colorSchemeChooser.restoreCurrentValue();
 	});

@@ -1899,54 +1899,49 @@ morpheus.VectorTrack.prototype = {
 		context.lineWidth = lineWidth;
 	},
 	renderArc: function (context, vector, start, end, clip, size) {
+
 		var isColumns = this.isColumns;
 		var positions = this.positions;
 		var project = this.project;
 		context.save();
 		context.lineWidth = 1;
-		var scale = d3.scale.linear().domain([1, size]).range([0.8, 1])
-		.clamp(true);
-		var fill = d3.scale.category20b();
-		var valueToIndices = morpheus.VectorUtil
-		.createValueToIndicesMap(vector);
+		// var scale = d3.scale.linear().domain([1, size]).range([0.8, 1])
+		// .clamp(true);
+		// var fill = d3.scale.category20b();
+
 		var total = positions.getPosition(positions.getLength() - 1)
 			+ positions.getItemSize(positions.getLength() - 1);
 		context.translate(clip.x, clip.y);
 		var width = clip.width;
 		var height = clip.height;
-		if (!isColumns) {
-			var squishFactor = height / total;
-			context.scale(1, squishFactor);
-		} else {
-			var squishFactor = width / total;
-			context.scale(squishFactor, 1);
-		}
-		start = 0;
-		end = vector.size();
+		// if (!isColumns) {
+		// 	var squishFactor = height / total;
+		// 	context.scale(1, squishFactor);
+		// } else {
+		// 	var squishFactor = width / total;
+		// 	context.scale(squishFactor, 1);
+		// }
+
 		for (var i = start; i < end; i++) {
-			var value = vector.getValue(i);
+			var value = vector.getValue(i); // value is an array of other indices to link to
 			if (value != null) {
-				context.strokeStyle = fill(value);
-				var indices = valueToIndices.get(value);
-				var pix = positions.getPosition(i) + positions.getItemSize(i)
+				var startPix = positions.getPosition(i) + positions.getItemSize(i)
 					/ 2;
-				for (var j = 0, nindices = indices.length; j < nindices; j++) {
-					var viewIndex = indices[j];
-					if (viewIndex === i) {
-						continue;
-					}
+				for (var j = 0, nindices = value.length; j < nindices; j++) {
+					var viewIndex = value[j];
 					var endPix = positions.getPosition(viewIndex)
 						+ positions.getItemSize(viewIndex) / 2;
-					var midPix = (endPix + pix) / 2;
+					var midPix = (endPix + startPix) / 2;
 					var distance = Math.abs(i - viewIndex);
 					var arcRadius = size; // scale(distance) * size;
 					if (isColumns) {
 						context.beginPath();
-						context.moveTo(pix, arcRadius);
+						context.moveTo(startPix, arcRadius);
 						context.quadraticCurveTo(midPix, 1, endPix, arcRadius);
 					} else {
+						console.log(i, viewIndex, startPix, endPix);
 						context.beginPath();
-						context.moveTo(1, pix);
+						context.moveTo(1, startPix);
 						context.quadraticCurveTo(arcRadius, midPix, 1, endPix);
 					}
 

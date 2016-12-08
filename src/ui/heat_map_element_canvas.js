@@ -25,10 +25,12 @@ morpheus.HeatMapElementCanvas = function (project) {
 morpheus.HeatMapElementCanvas.GRID_COLOR = '#808080';
 morpheus.HeatMapElementCanvas.prototype = {
 	drawGrid: true,
+	drawValues: false,
 	setPropertiesFromParent: function (parentHeatMapElementCanvas) {
 		this.drawGrid = parentHeatMapElementCanvas.drawGrid;
 		this.gridThickness = parentHeatMapElementCanvas.gridThickness;
 		this.gridColor = parentHeatMapElementCanvas.gridColor;
+		this.drawValues = parentHeatMapElementCanvas.drawValues;
 	},
 	updateRowSelectionCache: function (repaint) {
 		this.selectedRowElements = morpheus.HeatMapElementCanvas.getSelectedSpans(this.project.getRowSelectionModel().getViewIndices());
@@ -62,6 +64,12 @@ morpheus.HeatMapElementCanvas.prototype = {
 	},
 	setDrawGrid: function (drawGrid) {
 		this.drawGrid = drawGrid;
+	},
+	setDrawValues: function (drawValues) {
+		this.drawValues = drawValues;
+	},
+	isDrawValues: function () {
+		return this.drawValues;
 	},
 	setColorScheme: function (colorScheme) {
 		this.colorScheme = colorScheme;
@@ -245,6 +253,8 @@ morpheus.HeatMapElementCanvas.prototype = {
 		var top = options.top;
 		var bottom = options.bottom;
 		var context = options.context;
+		context.textAlign = 'center';
+		context.textBaseline = 'middle';
 		var dataset = this.dataset;
 
 		var columnPositions = this.columnPositions;
@@ -256,6 +266,18 @@ morpheus.HeatMapElementCanvas.prototype = {
 		var colorScheme = this.colorScheme;
 		var drawGrid = this.drawGrid;
 		var elementDrawCallback = this.elementDrawCallback;
+		var drawValues = this.drawValues && columnPositions.getSize() > 7 && rowPositions.getSize() > 7;
+		var nf;
+		if (drawValues) {
+			nf = typeof d3 !== 'undefined' ? d3.format('.2f') : function (d) {
+				return '' + d;
+			};
+			var fontSize = rowPositions.getSize() - 2;
+			context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+			var textWidth = context.measureText("-9999.99").width;
+			fontSize = ((  rowPositions.getSize() - 2) / textWidth) * fontSize;
+			context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+		}
 		var seriesNameToIndex = {};
 		for (var i = 0; i < dataset.getSeriesCount(); i++) {
 			seriesNameToIndex[dataset.getName(i)] = i;
@@ -266,7 +288,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 
 		var conditions;
 		var conditionSeriesIndices;
-		context.lineWidth = 0.1;
+		// context.lineWidth = 0.1;
 		var minSize = 2;
 		for (var row = top; row < bottom; row++) {
 			var rowSize = rowPositions.getItemSize(row);
@@ -274,8 +296,8 @@ morpheus.HeatMapElementCanvas.prototype = {
 			for (var column = left; column < right; column++) {
 				var columnSize = columnPositions.getItemSize(column);
 				var px = columnPositions.getPosition(column);
-				context.fillStyle = colorScheme.getColor(row, column, dataset
-				.getValue(row, column));
+				var value = dataset.getValue(row, column);
+				context.fillStyle = colorScheme.getColor(row, column, value);
 				if (column === left) { // check if the color scheme for this
 					// row is sizing
 					sizer = colorScheme.getSizer();
@@ -348,7 +370,10 @@ morpheus.HeatMapElementCanvas.prototype = {
 				} else {
 					context.fillRect(px + xoffset, py + yoffset, cellColumnSize, cellRowSize);
 				}
-
+				if (drawValues && cellColumnSize > 7 && cellRowSize > 7) {
+					context.fillStyle = 'rgb(0,0,0)';
+					context.fillText(nf(value), px + xoffset + cellColumnSize / 2, py + yoffset + cellRowSize / 2, cellColumnSize);
+				}
 				if (elementDrawCallback) {
 					elementDrawCallback(context, dataset, row, column, px, py,
 						columnSize, rowSize);
