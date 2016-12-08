@@ -171,12 +171,19 @@ morpheus.DatasetUtil.annotate = function (options) {
  * @return A promise that resolves to Dataset
  */
 morpheus.DatasetUtil.read = function (fileOrUrl, options) {
+	console.log("morpheus.DatasetUtil.read ::", fileOrUrl, options);
 	var isFile = fileOrUrl instanceof File;
 	var isString = _.isString(fileOrUrl);
 	var ext = options && options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
 	var datasetReader;
 	var str = fileOrUrl.toString();
-	if (ext === '' && str != null && str.indexOf('blob:') === 0) {
+
+    var isGSE = isString && fileOrUrl.substring(0, 3) === 'GSE';
+
+	if (isGSE) {
+		datasetReader = new morpheus.GseReader();
+	}
+	else if (ext === '' && str != null && str.indexOf('blob:') === 0) {
 		datasetReader = new morpheus.TxtReader(); // copy from clipboard
 	} else {
 		datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
@@ -226,6 +233,7 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 		pr.toString = function () {
 			return '' + fileOrUrl;
 		};
+		console.log("morpheus.DatasetUtil.read ::", pr);
 		return pr;
 	} else if (typeof fileOrUrl.done === 'function') { // assume it's a
 		// deferred

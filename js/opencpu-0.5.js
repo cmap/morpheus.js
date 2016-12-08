@@ -38,7 +38,7 @@ if(!window.jQuery) {
       return key;
     };
 
-    this.getLoc = function(){
+    this.getLoc = function() {
       return loc;
     };
 
@@ -66,7 +66,9 @@ if(!window.jQuery) {
         name = ".val";
       }
 
+
       var url = this.getLoc() + "R/" + name;
+      console.log("opencpu.Session.getObject ::", this.getLoc(), url);
       return $.get(url, data, success);
     };
 
@@ -280,7 +282,7 @@ if(!window.jQuery) {
 
   $.fn.graphic = function(session, n){
     initplot(this).setlocation(session.getLoc(), n || "last");
-  }
+  };
 
   function initplot(targetdiv){
     if(targetdiv.data("ocpuplot")){
@@ -403,7 +405,6 @@ if(!window.jQuery) {
       r_path = document.createElement('a');
       r_path.href = newpath;
       r_path.href = r_path.href; //IE needs this
-
       if(location.protocol != r_path.protocol || location.host != r_path.host){
         r_cors = true;
         if (!('withCredentials' in new XMLHttpRequest())) {

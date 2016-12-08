@@ -53,7 +53,7 @@ morpheus.LandingPage = function (pageOptions) {
 		if (index < brands.length) {
 			setTimeout(step, 200);
 		}
-	}
+	};
 	setTimeout(step, 300);
 	this.tabManager = new morpheus.TabManager({landingPage: this});
 	this.tabManager.$nav.appendTo($(this.pageOptions.el));
@@ -65,6 +65,7 @@ morpheus.LandingPage = function (pageOptions) {
 
 morpheus.LandingPage.prototype = {
 	open: function (openOptions) {
+		console.log("morpheus.LandingPage.prototype ::", openOptions);
 		this.dispose();
 		var optionsArray = _.isArray(openOptions) ? openOptions : [openOptions];
 		var _this = this;
@@ -148,6 +149,7 @@ morpheus.LandingPage.prototype = {
 			dataset: value
 		};
 		var fileName = morpheus.Util.getFileName(value);
+		console.log("morpheus.LandingPage.openFile ::", fileName);
 		morpheus.OpenDatasetTool.fileExtensionPrompt(fileName, function (readOptions) {
 			if (readOptions) {
 				var dataset = options.dataset;

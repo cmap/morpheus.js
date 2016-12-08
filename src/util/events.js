@@ -39,6 +39,7 @@ morpheus.Events.prototype = {
 				handler: handler
 			});
 		}
+		console.log(this.eventListeners);
 		return this;
 	},
 	getListeners: function () {

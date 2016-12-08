@@ -1588,6 +1588,30 @@ morpheus.Util.NotPredicate.prototype = {
 	}
 };
 
+/**
+ * Created by dzenkova on 12/8/16.
+ */
+morpheus.BlobFromPath = function () {};
+morpheus.BlobFromPath.getFileBlob = function (url, cb) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url);
+    xhr.responseType = "blob";
+    xhr.addEventListener('load', function() {
+        cb(xhr.response);
+    });
+    xhr.send();
+};
+
+morpheus.BlobFromPath.blobToFile = function (blob) {
+    blob.lastModifiedDate = new Date();
+    return blob;
+};
+
+morpheus.BlobFromPath.getFileObject = function(filePathOrUrl, cb) {
+    morpheus.BlobFromPath.getFileBlob(filePathOrUrl, function (blob) {
+        cb(morpheus.BlobFromPath.blobToFile(blob));
+    });
+};
 // code taken from KineticJS
 morpheus.Events = function () {
 };
@@ -1629,6 +1653,7 @@ morpheus.Events.prototype = {
 				handler: handler
 			});
 		}
+		console.log(this.eventListeners);
 		return this;
 	},
 	getListeners: function () {
@@ -1859,56 +1884,6 @@ morpheus.Map.prototype = {
 	}
 };
 
-/**
- * Created by baba_beda on 8/16/16.
- */
-morpheus.ocpu = function () {
-};
-
-morpheus.ocpu.call = function(obj, settings) {
-    settings.host = settings.host || "localhost:8004";
-    if (settings.library == null) {
-        alert("Library is not specified. Call terminated");
-        return -1;
-    }
-    if (settings.fun == null) {
-        alert("Function is not specified. Call terminated");
-        return -1;
-    }
-    if (obj == null) {
-        alert("No arguments for function presented. Call terminated");
-        return -1;
-    }
-    var http = new XMLHttpRequest();
-    var url = "http://" + settings.host + "/ocpu/library/" + settings.library + "/R/" + settings.fun;
-    http.open("POST", url, false);
-    settings.contentType = settings.contentType || "application/x-protobuf";
-    http.setRequestHeader("Content-Type", settings.contentType);
-
-    var params = new Uint8Array(obj.toArrayBuffer());
-    http.send(params);
-
-    var loc;
-    if (http.status == 201) {
-        loc = http.getResponseHeader("Location");
-    }
-    else {
-        alert("Some problems occurred during POST request. Call terminated");
-        return -1;
-    }
-
-    var url2 = loc + "R/.val/print";
-    var http2 = new XMLHttpRequest();
-    http2.open("GET", url2, false);
-    http2.send(null);
-    if (http2.status == 200) {
-        return http2.responseText;
-    }
-    else {
-        alert("Some problems occurred during GET request. Call terminated");
-        return -1;
-    }
-};
 morpheus.Set = function() {
 	this._map = new morpheus.Map();
 };
@@ -3215,6 +3190,64 @@ morpheus.GmtReader.prototype = {
 		return sets;
 	}
 };
+/**
+ * Created by dzenkova on 12/8/16.
+ */
+morpheus.GseReader = function (options) {
+    this.options = $.extend({}, {
+        dataRowStart: 1,
+        dataColumnStart: undefined
+    }, options);
+};
+morpheus.GseReader.prototype = {
+    read: function (name, callback) {
+        var _this = this;
+        var req = ocpu.call('loadGSE', {name : name}, function (session) {
+            console.log('morpheus.GseReader.prototype.read ::', session);
+            session.getObject(function (success) {
+                console.log('morpheus.GseReader.prototype.read ::', success);
+                var r = new FileReader();
+                success = success.split("/");
+                var filePath = session.getLoc() + "files/" + success[success.length - 1];
+                filePath = filePath.substring(0, filePath.length - 2);
+                console.log('morpheus.GseReader.prototype.read ::', filePath);
+
+
+                r.onload = function (e) {
+                    var contents = e.target.result;
+                    ProtoBuf = dcodeIO.ProtoBuf;
+                    ProtoBuf.protoFromFile("./message.proto", function (error, success) {
+                        if (error) {
+                            alert(error);
+                            return;
+                        }
+                        var builder = success,
+                            rexp = builder.build("rexp"),
+                            REXP = rexp.REXP;
+
+                        var res = REXP.decode(contents);
+                        console.log(contents, res.rexpValue);
+                    });
+                };
+
+                morpheus.BlobFromPath.getFileObject(filePath, function (file) {
+                    console.log('morpheus.GseReader.prototype.read ::', file);
+                    r.readAsArrayBuffer(file);
+                });
+
+            })
+        });
+        req.fail(function () {
+            callback(req.responseText);
+            console.log('morpheus.GseReader.prototype.read ::', req.responseText);
+        });
+
+    },
+    _parse : function (text) {
+
+    }
+};
+
 morpheus.JsonDatasetReader = function () {
 
 };
@@ -5499,12 +5532,19 @@ morpheus.DatasetUtil.annotate = function (options) {
  * @return A promise that resolves to Dataset
  */
 morpheus.DatasetUtil.read = function (fileOrUrl, options) {
+	console.log("morpheus.DatasetUtil.read ::", fileOrUrl, options);
 	var isFile = fileOrUrl instanceof File;
 	var isString = _.isString(fileOrUrl);
 	var ext = options && options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
 	var datasetReader;
 	var str = fileOrUrl.toString();
-	if (ext === '' && str != null && str.indexOf('blob:') === 0) {
+
+    var isGSE = isString && fileOrUrl.substring(0, 3) === 'GSE';
+
+	if (isGSE) {
+		datasetReader = new morpheus.GseReader();
+	}
+	else if (ext === '' && str != null && str.indexOf('blob:') === 0) {
 		datasetReader = new morpheus.TxtReader(); // copy from clipboard
 	} else {
 		datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
@@ -5554,6 +5594,7 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 		pr.toString = function () {
 			return '' + fileOrUrl;
 		};
+		console.log("morpheus.DatasetUtil.read ::", pr);
 		return pr;
 	} else if (typeof fileOrUrl.done === 'function') { // assume it's a
 		// deferred
@@ -10497,7 +10538,7 @@ morpheus.LandingPage = function (pageOptions) {
 		if (index < brands.length) {
 			setTimeout(step, 200);
 		}
-	}
+	};
 	setTimeout(step, 300);
 	this.tabManager = new morpheus.TabManager({landingPage: this});
 	this.tabManager.$nav.appendTo($(this.pageOptions.el));
@@ -10509,6 +10550,7 @@ morpheus.LandingPage = function (pageOptions) {
 
 morpheus.LandingPage.prototype = {
 	open: function (openOptions) {
+		console.log("morpheus.LandingPage.prototype ::", openOptions);
 		this.dispose();
 		var optionsArray = _.isArray(openOptions) ? openOptions : [openOptions];
 		var _this = this;
@@ -10592,6 +10634,7 @@ morpheus.LandingPage.prototype = {
 			dataset: value
 		};
 		var fileName = morpheus.Util.getFileName(value);
+		console.log("morpheus.LandingPage.openFile ::", fileName);
 		morpheus.OpenDatasetTool.fileExtensionPrompt(fileName, function (readOptions) {
 			if (readOptions) {
 				var dataset = options.dataset;
@@ -13350,7 +13393,7 @@ morpheus.KmeansTool.prototype = {
             if (rowIndices && rowIndices.length > 0 && rowIndices.length < dataset.rowIndices.length) {
                 arguments.rows = rowIndices;
             }
-            console.log(arguments);
+            //console.log(arguments);
             var req = ocpu.call("kmeans", arguments, function(session) {
                 session.getObject(function(success) {
                     var clusters = JSON.parse(success);
@@ -13359,7 +13402,7 @@ morpheus.KmeansTool.prototype = {
                     if (v == null) {
                         v = sortedDataset.getRowMetadata().add("clusters");
                     }
-                    console.log(sortedDataset, sortedDataset.getRowCount(), v, sortedDataset);
+                    //console.log(sortedDataset, sortedDataset.getRowCount(), v, sortedDataset);
                     for (var i = 0; i < sortedDataset.getRowCount(); i++) {
                         v.setValue(i, clusters[dataset.rowIndices[i]]);
                     }
@@ -13961,6 +14004,7 @@ morpheus.OpenDatasetTool = function () {
 };
 
 morpheus.OpenDatasetTool.fileExtensionPrompt = function (file, callback) {
+	//console.log("morpheus.OpenDatasetTool.fileExtensionPrompt ::", file);
 	var ext = morpheus.Util.getExtension(morpheus.Util.getFileName(file));
 	var deferred;
 	if (ext === 'maf') {
@@ -15004,12 +15048,14 @@ morpheus.PcaPlotTool = function (chartOptions) {
     formBuilder.append({
         name: 'x-axis',
         type: 'bootstrap-select',
-        options: pcaOptions
+        options: pcaOptions,
+        value: 1
     });
     formBuilder.append({
         name: 'y-axis',
         type: 'bootstrap-select',
-        options: pcaOptions
+        options: pcaOptions,
+        value: 2
     });
     formBuilder.append({
         name: 'label',
@@ -15216,7 +15262,10 @@ morpheus.PcaPlotTool.prototype = {
                 columnIndices = fullDataset.columnIndices;
                 rowIndices = fullDataset.rowIndices;
             }
-
+            if (columnIndices.length < 2) {
+                alert("Choose at least two columns");
+                return;
+            }
 
             var expressionSetPromise = fullDataset.getESSession();
 
@@ -15264,7 +15313,7 @@ morpheus.PcaPlotTool.prototype = {
                         console.log("morpheus.PcaPlotTool.prototype.draw ::", "plot json", json);
                     });
                     /*var txt = session.txt.split("\n");
-                     var imageLocationAr = txt[txt.length - 2].split("/");
+                     var imageLocationAr = txt[txt.length - 2].split("/"0);
                      var imageLocation = session.getLoc() + "files/" + imageLocationAr[imageLocationAr.length - 1];
                      console.log(imageLocation);
                      var img = $('<img />', {src : imageLocation, style : "width:720px;height:540px"});
@@ -19758,9 +19807,10 @@ morpheus.FormBuilder.prototype = {
 				options = options.concat(field.options);
 				npre = 1 + field.options.length;
 			}
-			// data types are file, dropbox, url, and predefined
+			// data types are file, dropbox, url, GSE, and predefined
 			options.push('My Computer');
 			options.push('URL');
+			options.push("GSE");
 			if (typeof Dropbox !== 'undefined') {
 				options.push('Dropbox');
 			}
@@ -19780,7 +19830,9 @@ morpheus.FormBuilder.prototype = {
 				} else if (optionValue === 'My Computer') {
 					html.push(' data-icon="fa fa-desktop"');
 				} else if (optionValue === 'URL') {
-					html.push(' data-icon="fa fa-external-link"');
+                    html.push(' data-icon="fa fa-external-link"');
+                } else if (optionValue === 'GSE') {
+                    html.push(' data-icon="fa fa-external-link"');
 				} else if (index > 0) {
 					html.push(' data-icon="fa fa-star"');
 				}
@@ -19796,8 +19848,17 @@ morpheus.FormBuilder.prototype = {
 					+ (isMultiple ? 'Enter one or more URLs'
 						: 'Enter a URL')
 					+ '" class="form-control" style="width:50%; display:none;" type="text" name="'
-					+ name + '_text">');
+					+ name + '_url">');
 				html.push('</div>');
+			}
+			if (field.gse !== false) {
+                html.push('<div>');
+                html
+                    .push('<input placeholder="'
+                        + "Enter a GSE identifier"
+                        + '" class="form-control" style="width:50%; display:none;" type="text" name="'
+                        + name + '_gse">');
+                html.push('</div>');
 			}
 			html.push('<input style="display:none;" type="file" name="' + name
 				+ '_file"' + (isMultiple ? ' multiple' : '') + '>');
@@ -19811,7 +19872,8 @@ morpheus.FormBuilder.prototype = {
 					var $this = $(this);
 					var val = $this.val();
 
-					var showTextInput = val === 'URL';
+					var showURLInput = val === 'URL';
+					var showGSEInput = val === 'GSE';
 					if ('Dropbox' === val) {
 						var options = {
 							success: function (results) {
@@ -19835,12 +19897,15 @@ morpheus.FormBuilder.prototype = {
 						.click();
 						that.$form.find('[name=' + name + '_picker]').selectpicker('val', '');
 					}
-					that.$form.find('[name=' + name + '_text]')
+					that.$form.find('[name=' + name + '_url]')
 					.css('display',
-						showTextInput ? '' : 'none');
+						showURLInput ? '' : 'none');
+                    that.$form.find('[name=' + name + '_gse]')
+                        .css('display',
+                            showGSEInput ? '' : 'none');
 				});
 			// URL
-			that.$form.on('keyup', '[name=' + name + '_text]', function (evt) {
+			that.$form.on('keyup', '[name=' + name + '_url]', function (evt) {
 				var text = $.trim($(this).val());
 				if (isMultiple) {
 					text = text.split(',').filter(function (t) {
@@ -19856,6 +19921,17 @@ morpheus.FormBuilder.prototype = {
 					});
 				}
 			});
+			// GSE
+			that.$form.on('keyup', '[name=' + name + '_gse]', function (evt) {
+				var text = $.trim($(this).val());
+				that.setValue(name, text);
+				if (evt.which === 13) {
+					that.trigger('change', {
+						name: name,
+						value: text
+					})
+				}
+            });
 			// browse file selected
 			that.$form.on('change', '[name=' + name + '_file]', function (evt) {
 
@@ -20679,6 +20755,7 @@ morpheus.CombinedGridFilter.prototype = {
  */
 
 morpheus.HeatMap = function (options) {
+	console.log("morpheus.HeatMap ::", options);
 	morpheus.Util.loadTrackingCode();
 	var _this = this;
 	// don't extend
@@ -20906,6 +20983,7 @@ morpheus.HeatMap = function (options) {
 		}, options);
 	options.parent = parent;
 	this.options = options;
+    console.log("morpheus.HeatMap ::", this.options);
 	this.tooltipProvider = morpheus.HeatMapTooltipProvider;
 	if (!options.el) {
 		this.$el = $('<div></div>');
@@ -20925,7 +21003,6 @@ morpheus.HeatMap = function (options) {
 	}
 	var isPrimary = this.options.parent == null;
 	if (this.options.parent == null) {
-
 		this.tabManager = this.options.tabManager != null ? this.options.tabManager
 			: new morpheus.TabManager({
 			landingPage: this.options.landingPage
@@ -21061,6 +21138,9 @@ morpheus.HeatMap = function (options) {
 		});
 		promises.push(columnDendrogramDeferred);
 	}
+
+    console.log("morpheus.HeatMap ::", promises);
+
 	this.resizeListener = function () {
 		_this.revalidate();
 	};

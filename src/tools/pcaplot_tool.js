@@ -127,12 +127,14 @@ morpheus.PcaPlotTool = function (chartOptions) {
     formBuilder.append({
         name: 'x-axis',
         type: 'bootstrap-select',
-        options: pcaOptions
+        options: pcaOptions,
+        value: 1
     });
     formBuilder.append({
         name: 'y-axis',
         type: 'bootstrap-select',
-        options: pcaOptions
+        options: pcaOptions,
+        value: 2
     });
     formBuilder.append({
         name: 'label',
@@ -339,7 +341,10 @@ morpheus.PcaPlotTool.prototype = {
                 columnIndices = fullDataset.columnIndices;
                 rowIndices = fullDataset.rowIndices;
             }
-
+            if (columnIndices.length < 2) {
+                alert("Choose at least two columns");
+                return;
+            }
 
             var expressionSetPromise = fullDataset.getESSession();
 
@@ -387,7 +392,7 @@ morpheus.PcaPlotTool.prototype = {
                         console.log("morpheus.PcaPlotTool.prototype.draw ::", "plot json", json);
                     });
                     /*var txt = session.txt.split("\n");
-                     var imageLocationAr = txt[txt.length - 2].split("/");
+                     var imageLocationAr = txt[txt.length - 2].split("/"0);
                      var imageLocation = session.getLoc() + "files/" + imageLocationAr[imageLocationAr.length - 1];
                      console.log(imageLocation);
                      var img = $('<img />', {src : imageLocation, style : "width:720px;height:540px"});

@@ -4,6 +4,7 @@
  */
 
 morpheus.HeatMap = function (options) {
+	console.log("morpheus.HeatMap ::", options);
 	morpheus.Util.loadTrackingCode();
 	var _this = this;
 	// don't extend
@@ -231,6 +232,7 @@ morpheus.HeatMap = function (options) {
 		}, options);
 	options.parent = parent;
 	this.options = options;
+    console.log("morpheus.HeatMap ::", this.options);
 	this.tooltipProvider = morpheus.HeatMapTooltipProvider;
 	if (!options.el) {
 		this.$el = $('<div></div>');
@@ -250,7 +252,6 @@ morpheus.HeatMap = function (options) {
 	}
 	var isPrimary = this.options.parent == null;
 	if (this.options.parent == null) {
-
 		this.tabManager = this.options.tabManager != null ? this.options.tabManager
 			: new morpheus.TabManager({
 			landingPage: this.options.landingPage
@@ -386,6 +387,9 @@ morpheus.HeatMap = function (options) {
 		});
 		promises.push(columnDendrogramDeferred);
 	}
+
+    console.log("morpheus.HeatMap ::", promises);
+
 	this.resizeListener = function () {
 		_this.revalidate();
 	};
