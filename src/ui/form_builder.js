@@ -570,6 +570,9 @@ morpheus.FormBuilder.prototype = {
 			if (typeof Dropbox !== 'undefined') {
 				options.push('Dropbox');
 			}
+			if (field.text != null) {
+				options.push(field.text);
+			}
 			_.each(options, function (choice, index) {
 				var isChoiceObject = _.isObject(choice)
 					&& choice.value !== undefined;
@@ -595,16 +598,23 @@ morpheus.FormBuilder.prototype = {
 				html.push('</option>');
 			});
 			html.push('</select>');
-			if (field.url !== false) {
-				html.push('<div>');
+
+			html.push('<div>');
+
+			html
+			.push('<input placeholder="'
+				+ (isMultiple ? 'Enter one or more URLs'
+					: 'Enter a URL')
+				+ '" class="form-control" style="width:50%; display:none;" type="text" name="'
+				+ name + '_url">');
+
+			if (field.text) {
 				html
-				.push('<input placeholder="'
-					+ (isMultiple ? 'Enter one or more URLs'
-						: 'Enter a URL')
-					+ '" class="form-control" style="width:50%; display:none;" type="text" name="'
+				.push('<input placeholder="' + field.text + '" class="form-control" style="width:50%; display:none;" type="text" name="'
 					+ name + '_text">');
-				html.push('</div>');
 			}
+			html.push('</div>');
+
 			html.push('<input style="display:none;" type="file" name="' + name
 				+ '_file"' + (isMultiple ? ' multiple' : '') + '>');
 			// browse button clicked
@@ -616,8 +626,8 @@ morpheus.FormBuilder.prototype = {
 				function (evt) {
 					var $this = $(this);
 					var val = $this.val();
-
-					var showTextInput = val === 'URL';
+					var showUrlInput = val === 'URL';
+					var showTextInput = val === field.text;
 					if ('Dropbox' === val) {
 						var options = {
 							success: function (results) {
@@ -641,12 +651,16 @@ morpheus.FormBuilder.prototype = {
 						.click();
 						that.$form.find('[name=' + name + '_picker]').selectpicker('val', '');
 					}
+
+					that.$form.find('[name=' + name + '_url]')
+					.css('display',
+						showUrlInput ? '' : 'none');
 					that.$form.find('[name=' + name + '_text]')
 					.css('display',
 						showTextInput ? '' : 'none');
 				});
 			// URL
-			that.$form.on('keyup', '[name=' + name + '_text]', function (evt) {
+			that.$form.on('keyup', '[name=' + name + '_url]', function (evt) {
 				var text = $.trim($(this).val());
 				if (isMultiple) {
 					text = text.split(',').filter(function (t) {
@@ -654,6 +668,16 @@ morpheus.FormBuilder.prototype = {
 						return t !== '';
 					});
 				}
+				that.setValue(name, text);
+				if (evt.which === 13) {
+					that.trigger('change', {
+						name: name,
+						value: text
+					});
+				}
+			});
+			that.$form.on('keyup', '[name=' + name + '_text]', function (evt) {
+				var text = $.trim($(this).val());
 				that.setValue(name, text);
 				if (evt.which === 13) {
 					that.trigger('change', {
