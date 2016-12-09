@@ -197,7 +197,7 @@ morpheus.HeatMapKeyListener = function (controller) {
 				controller.scrollTop(controller.scrollTop() - scrolly);
 			}
 			if (scrollx !== 0) {
-				controller.scrollLeft(controller.scrollLeft() - scrollx);
+				controller.scrollLeft(controller.scrollLeft() + scrollx);
 			}
 		}
 		e.preventDefault();
