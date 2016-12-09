@@ -855,28 +855,85 @@ morpheus.Util.linesToObjects = function (lines) {
 	}
 	return array;
 };
-morpheus.Util.xlsxTo2dArray = function (data) {
-	var workbook = XLSX.read(data, {
+/**
+ *
+ * @param options.data Binary data string
+ * @param options.prompt Prompt for sheet name
+ * @param callback {Function} Callback
+ */
+morpheus.Util.xlsxTo2dArray = function (options, callback) {
+	var workbook = XLSX.read(options.data, {
 		type: 'binary',
 		cellFormula: false,
 		cellHTML: false,
 		cellStyles: true
 	});
 	var sheetNames = workbook.SheetNames;
-	var worksheet = workbook.Sheets[sheetNames[0]];
-	var lines = morpheus.Util.sheetToArray(worksheet);
-	return lines;
+	if (options.prompt && sheetNames.length > 1) {
+		var formBuilder = new morpheus.FormBuilder();
+		formBuilder.append({
+			name: 'sheet',
+			type: 'bootstrap-select',
+			options: sheetNames,
+			required: true,
+			col: 'col-xs-2'
+		});
+		morpheus.FormBuilder.showInModal({
+			title: 'Choose Sheet',
+			html: formBuilder.$form,
+			onClose: function () {
+				var worksheet = workbook.Sheets[formBuilder.getValue('sheet')];
+				var lines = morpheus.Util.sheetToArray(worksheet);
+				callback(null, lines);
+			}
+		});
+
+	} else {
+		var worksheet = workbook.Sheets[sheetNames[0]];
+		var lines = morpheus.Util.sheetToArray(worksheet);
+		callback(null, lines);
+	}
+
 };
-morpheus.Util.xlsxTo1dArray = function (data) {
-	var workbook = XLSX.read(data, {
+/**
+ *
+ * @param options.data Binary data string
+ * @param options.prompt Prompt for sheet name
+ * @param callback {Function} Callback
+ */
+morpheus.Util.xlsxTo1dArray = function (options, callback) {
+	var workbook = XLSX.read(options.data, {
 		type: 'binary',
 		cellFormula: false,
 		cellHTML: false,
 		cellStyles: true
 	});
 	var sheetNames = workbook.SheetNames;
-	var worksheet = workbook.Sheets[sheetNames[0]];
-	return morpheus.Util.sheetToArray(worksheet, '\t');
+	if (options.prompt && sheetNames.length > 1) {
+		var formBuilder = new morpheus.FormBuilder();
+		formBuilder.append({
+			name: 'sheet',
+			type: 'bootstrap-select',
+			options: sheetNames,
+			required: true,
+			col: 'col-xs-2'
+		});
+
+		morpheus.FormBuilder.showOkCancel({
+			title: 'Choose Sheet',
+			cancel: false,
+			content: formBuilder.$form,
+			okCallback: function () {
+				var worksheet = workbook.Sheets[formBuilder.getValue('sheet')];
+				callback(null, morpheus.Util.sheetToArray(worksheet, '\t'));
+			}
+		});
+
+	} else {
+		var worksheet = workbook.Sheets[sheetNames[0]];
+		callback(null, morpheus.Util.sheetToArray(worksheet, '\t'));
+	}
+
 };
 
 /**
@@ -1283,7 +1340,7 @@ morpheus.Util.splitLines = function (lines) {
  *            a File or url
  * @return A deferred object that resolves to an array of arrays
  */
-morpheus.Util.readLines = function (fileOrUrl) {
+morpheus.Util.readLines = function (fileOrUrl, interactive) {
 	var isFile = fileOrUrl instanceof File;
 	var isString = typeof fileOrUrl === 'string' || fileOrUrl instanceof String;
 	var name = morpheus.Util.getFileName(fileOrUrl);
@@ -1296,8 +1353,7 @@ morpheus.Util.readLines = function (fileOrUrl) {
 			$.ajaxPrefilter({url: fileOrUrl}, {}, oReq);
 			oReq.responseType = 'arraybuffer';
 			oReq.onload = function (oEvent) {
-				var arrayBuffer = oReq.response; // Note: not
-				// oReq.responseText
+				var arrayBuffer = oReq.response;
 				if (arrayBuffer) {
 					var data = new Uint8Array(arrayBuffer);
 					var arr = [];
@@ -1305,8 +1361,13 @@ morpheus.Util.readLines = function (fileOrUrl) {
 						arr[i] = String.fromCharCode(data[i]);
 					}
 					var bstr = arr.join('');
-					var lines = morpheus.Util.xlsxTo1dArray(bstr);
-					deferred.resolve(lines);
+					morpheus.Util.xlsxTo1dArray({
+						data: bstr,
+						prompt: interactive
+					}, function (err, lines) {
+						deferred.resolve(lines);
+					});
+
 				} else {
 					throw 'not found';
 				}
@@ -1322,8 +1383,13 @@ morpheus.Util.readLines = function (fileOrUrl) {
 	} else if (isFile) {
 		var reader = new FileReader();
 		reader.onload = function (event) {
-			deferred.resolve(ext === 'xlsx' ? morpheus.Util
-			.xlsxTo1dArray(event.target.result) : morpheus.Util
+			(ext === 'xlsx' ? morpheus.Util
+			.xlsxTo1dArray({
+				data: event.target.result,
+				prompt: interactive
+			}, function (err, lines) {
+				deferred.resolve(lines);
+			}) : morpheus.Util
 			.splitOnNewLine(event.target.result));
 		};
 		if (ext === 'xlsx') {

@@ -237,7 +237,8 @@ morpheus.FormBuilder.showInModal = function (options) {
 
 morpheus.FormBuilder.showOkCancel = function (options) {
 	options = $.extend({}, {
-		ok: true
+		ok: true,
+		cancel: true
 	}, options);
 	var footer = [];
 	if (options.ok) {
@@ -248,8 +249,10 @@ morpheus.FormBuilder.showOkCancel = function (options) {
 		footer
 		.push('<button name="apply" type="button" class="btn btn-default">Apply</button>');
 	}
-	footer
-	.push('<button name="cancel" type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>');
+	if (options.cancel) {
+		footer
+		.push('<button name="cancel" type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>');
+	}
 	var $div = morpheus.FormBuilder._showInModal({
 		title: options.title,
 		html: options.content,

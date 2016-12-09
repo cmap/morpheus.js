@@ -52,14 +52,14 @@ morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
 	} else if (ext === 'gmt') {
 		datasetReader = new morpheus.GmtDatasetReader();
 	} else if (ext === 'xlsx') {
-		datasetReader = options.interactive ? new morpheus.Array2dReader() : new morpheus.XlsxDatasetReader();
+		datasetReader = options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.XlsxDatasetReader();
 	} else if (ext === 'segtab' || ext === 'seg') {
 		datasetReader = new morpheus.SegTabReader();
 		if (options && options.regions) {
 			datasetReader.setRegions(options.regions);
 		}
 	} else if (ext === 'txt' || ext === 'tsv' || ext === 'csv') {
-		datasetReader = options.interactive ? new morpheus.Array2dReader() : new morpheus.TxtReader();
+		datasetReader = options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.TxtReader();
 	} else if (ext === 'json') {
 		datasetReader = new morpheus.JsonDatasetReader();
 	} else {
@@ -179,7 +179,7 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 	var datasetReader;
 	var str = fileOrUrl.toString();
 	if (ext === '' && str != null && str.indexOf('blob:') === 0) {
-		datasetReader = options.interactive ? new morpheus.Array2dReader() : new morpheus.TxtReader(); // copy from clipboard
+		datasetReader = options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.TxtReader(); // copy from clipboard
 	} else {
 		datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
 	}

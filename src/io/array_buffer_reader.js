@@ -55,7 +55,6 @@ morpheus.ArrayBufferReader.prototype = {
 morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
 	var isString = typeof fileOrUrl === 'string' || fileOrUrl instanceof String;
 	if (isString) { // URL
-
 		var oReq = new XMLHttpRequest();
 		oReq.open('GET', fileOrUrl, true);
 		oReq.responseType = 'arraybuffer';

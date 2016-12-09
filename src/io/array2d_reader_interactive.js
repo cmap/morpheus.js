@@ -1,8 +1,8 @@
-morpheus.Array2dReader = function () {
+morpheus.Array2dReaderInteractive = function () {
 
 };
 
-morpheus.Array2dReader.prototype = {
+morpheus.Array2dReaderInteractive.prototype = {
 	read: function (fileOrUrl, callback) {
 		var _this = this;
 		var name = morpheus.Util.getBaseFileName(morpheus.Util.getFileName(fileOrUrl));
@@ -27,7 +27,7 @@ morpheus.Array2dReader.prototype = {
 		html.push('</div>');
 		var $el = $(html.join(''));
 
-		morpheus.Util.readLines(fileOrUrl).done(function (lines) {
+		morpheus.Util.readLines(fileOrUrl, true).done(function (lines) {
 			// show in table
 			var tab = /\t/;
 			for (var i = 0, nrows = lines.length; i < nrows; i++) {
