@@ -38,7 +38,7 @@ if(!window.jQuery) {
       return key;
     };
 
-    this.getLoc = function(){
+    this.getLoc = function() {
       return loc;
     };
 
@@ -66,7 +66,9 @@ if(!window.jQuery) {
         name = ".val";
       }
 
+
       var url = this.getLoc() + "R/" + name;
+      //console.log("opencpu.Session.getObject ::", this.getLoc(), url);
       return $.get(url, data, success);
     };
 
@@ -158,8 +160,8 @@ if(!window.jQuery) {
       var txt = jqxhr.responseText;
 
       //in case of cors we translate relative paths to the target domain
-      if(r_cors && loc.match("^/[^/]")){
-        loc = r_path.protocol + "//" + r_path.host + loc;
+      if(r_cors && loc.match("^/[^/]")) {
+          loc = r_path.protocol + "//" + r_path.host + loc;
       }
       handler(new Session(loc, key, txt));
 
@@ -191,10 +193,10 @@ if(!window.jQuery) {
 
   //call function using url encoding
   //needs to wrap arguments in quotes, etc
-  function r_fun_call_urlencoded(fun, args, handler){
+  function r_fun_call_urlencoded(fun, args, handler, addToKey){
     var data = {};
     $.each(args, function(key, val){
-      data[key] = stringify(val);
+      data[key] = stringify(val) + (val instanceof Session ? addToKey : "");
     });
     return r_fun_ajax(fun, {
       data: $.param(data)
@@ -218,9 +220,10 @@ if(!window.jQuery) {
   }
 
   //Automatically determines type based on argument classes.
-  function r_fun_call(fun, args, handler, useProtobuf){
+  function r_fun_call(fun, args, handler, useProtobuf, addToKey){
     useProtobuf = useProtobuf || false;
     args = args || {};
+    addToKey = addToKey || "";
     var hasfiles = false;
     var hascode = false;
 
@@ -237,7 +240,7 @@ if(!window.jQuery) {
     if(hasfiles){
       return r_fun_call_multipart(fun, args, handler);
     } else if(hascode){
-      return r_fun_call_urlencoded(fun, args, handler);
+      return r_fun_call_urlencoded(fun, args, handler, addToKey);
     } else if (useProtobuf) {
       return r_fun_call_proto(fun, args, handler);
     } else {
@@ -280,7 +283,7 @@ if(!window.jQuery) {
 
   $.fn.graphic = function(session, n){
     initplot(this).setlocation(session.getLoc(), n || "last");
-  }
+  };
 
   function initplot(targetdiv){
     if(targetdiv.data("ocpuplot")){
@@ -403,7 +406,6 @@ if(!window.jQuery) {
       r_path = document.createElement('a');
       r_path.href = newpath;
       r_path.href = r_path.href; //IE needs this
-
       if(location.protocol != r_path.protocol || location.host != r_path.host){
         r_cors = true;
         if (!('withCredentials' in new XMLHttpRequest())) {

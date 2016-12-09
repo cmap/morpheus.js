@@ -15,6 +15,16 @@ morpheus.KmeansTool.prototype = {
         },{
             name : 'use_selected_rows_and_columns_only',
             type : 'checkbox'
+        },{
+            name : 'replace_NA_with',
+            type : 'bootstrap-select',
+            options : [{
+                name : 'mean',
+                value :'mean'
+            }, {
+                name : 'median',
+                value : 'median'
+            }]
         } ];
     },
     execute : function(options) {
@@ -84,6 +94,7 @@ morpheus.KmeansTool.prototype = {
             alert("Enter the expected number of clusters");
             return;
         }
+        var replacena = options.input.replace_NA_with;
         //console.log(number);
         var esPromise = fullDataset.getESSession();
         esPromise.then(function(essession) {
@@ -124,7 +135,7 @@ morpheus.KmeansTool.prototype = {
                         render: ['color']
                     });
                 })
-            });
+            }, false, "::es");
 
         });
     }

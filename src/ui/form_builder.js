@@ -562,9 +562,10 @@ morpheus.FormBuilder.prototype = {
 				options = options.concat(field.options);
 				npre = 1 + field.options.length;
 			}
-			// data types are file, dropbox, url, and predefined
+			// data types are file, dropbox, url, GSE, and predefined
 			options.push('My Computer');
 			options.push('URL');
+			options.push('GEO Datasets');
 			if (typeof Dropbox !== 'undefined') {
 				options.push('Dropbox');
 			}
@@ -584,7 +585,9 @@ morpheus.FormBuilder.prototype = {
 				} else if (optionValue === 'My Computer') {
 					html.push(' data-icon="fa fa-desktop"');
 				} else if (optionValue === 'URL') {
-					html.push(' data-icon="fa fa-external-link"');
+                    html.push(' data-icon="fa fa-external-link"');
+                } else if (optionValue === 'GEO Datasets') {
+                    html.push(' data-icon="fa fa-external-link"');
 				} else if (index > 0) {
 					html.push(' data-icon="fa fa-star"');
 				}
@@ -600,8 +603,17 @@ morpheus.FormBuilder.prototype = {
 					+ (isMultiple ? 'Enter one or more URLs'
 						: 'Enter a URL')
 					+ '" class="form-control" style="width:50%; display:none;" type="text" name="'
-					+ name + '_text">');
+					+ name + '_url">');
 				html.push('</div>');
+			}
+			if (field.gse !== false) {
+                html.push('<div>');
+                html
+                    .push('<input placeholder="'
+                        + "Enter a GSE or GDS identifier"
+                        + '" class="form-control" style="width:50%; display:none;" type="text" name="'
+                        + name + '_geo">');
+                html.push('</div>');
 			}
 			html.push('<input style="display:none;" type="file" name="' + name
 				+ '_file"' + (isMultiple ? ' multiple' : '') + '>');
@@ -615,7 +627,8 @@ morpheus.FormBuilder.prototype = {
 					var $this = $(this);
 					var val = $this.val();
 
-					var showTextInput = val === 'URL';
+					var showURLInput = val === 'URL';
+					var showGSEInput = val === 'GEO Datasets';
 					if ('Dropbox' === val) {
 						var options = {
 							success: function (results) {
@@ -639,12 +652,15 @@ morpheus.FormBuilder.prototype = {
 						.click();
 						that.$form.find('[name=' + name + '_picker]').selectpicker('val', '');
 					}
-					that.$form.find('[name=' + name + '_text]')
+					that.$form.find('[name=' + name + '_url]')
 					.css('display',
-						showTextInput ? '' : 'none');
+						showURLInput ? '' : 'none');
+                    that.$form.find('[name=' + name + '_geo]')
+                        .css('display',
+                            showGSEInput ? '' : 'none');
 				});
 			// URL
-			that.$form.on('keyup', '[name=' + name + '_text]', function (evt) {
+			that.$form.on('keyup', '[name=' + name + '_url]', function (evt) {
 				var text = $.trim($(this).val());
 				if (isMultiple) {
 					text = text.split(',').filter(function (t) {
@@ -660,6 +676,17 @@ morpheus.FormBuilder.prototype = {
 					});
 				}
 			});
+			// GEO
+			that.$form.on('keyup', '[name=' + name + '_geo]', function (evt) {
+				var text = $.trim($(this).val());
+				that.setValue(name, text);
+				if (evt.which === 13) {
+					that.trigger('change', {
+						name: name,
+						value: text
+					})
+				}
+            });
 			// browse file selected
 			that.$form.on('change', '[name=' + name + '_file]', function (evt) {
 

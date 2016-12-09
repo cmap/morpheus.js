@@ -127,12 +127,14 @@ morpheus.PcaPlotTool = function (chartOptions) {
     formBuilder.append({
         name: 'x-axis',
         type: 'bootstrap-select',
-        options: pcaOptions
+        options: pcaOptions,
+        value: 1
     });
     formBuilder.append({
         name: 'y-axis',
         type: 'bootstrap-select',
-        options: pcaOptions
+        options: pcaOptions,
+        value: 2
     });
     formBuilder.append({
         name: 'label',
@@ -319,14 +321,14 @@ morpheus.PcaPlotTool.prototype = {
             var label = _this.formBuilder.getValue('label');
             var na = _this.formBuilder.getValue('replace_NA_with');
 
-            console.log("morpheus.PcaPlotTool.prototype.draw ::", "DRAW BUTTON CLICKED");
+            //console.log("morpheus.PcaPlotTool.prototype.draw ::", "DRAW BUTTON CLICKED");
             var dataset = _this.project.getSelectedDataset({
                 emptyToAll: false
             });
             var fullDataset = _this.project.getFullDataset();
             _this.dataset = dataset;
 
-            console.log("morpheus.PcaPlotTool.prototype.draw ::", "full dataset", fullDataset);
+            //console.log("morpheus.PcaPlotTool.prototype.draw ::", "full dataset", fullDataset);
             var columnIndices = [];
             var rowIndices = [];
 
@@ -339,13 +341,16 @@ morpheus.PcaPlotTool.prototype = {
                 columnIndices = fullDataset.columnIndices;
                 rowIndices = fullDataset.rowIndices;
             }
-
+            if (columnIndices.length == 1) {
+                alert("Choose at least two columns");
+                return;
+            }
 
             var expressionSetPromise = fullDataset.getESSession();
 
-            console.log("morpheus.PcaPlotTool.prototype.draw ::", "selected dataset", dataset, ", columnIndices", columnIndices, ", rowIndices", rowIndices);
+            //console.log("morpheus.PcaPlotTool.prototype.draw ::", "selected dataset", dataset, ", columnIndices", columnIndices, ", rowIndices", rowIndices);
 
-            console.log("morpheus.PcaPlotTool.prototype.draw ::", "color", colorBy, ", sizeBy", sizeBy, ", pc1", pc1, ", pc2", pc2, ", label", label);
+            //console.log("morpheus.PcaPlotTool.prototype.draw ::", "color", colorBy, ", sizeBy", sizeBy, ", pc1", pc1, ", pc2", pc2, ", label", label);
 
             expressionSetPromise.then(function (essession) {
                 var arguments = {
@@ -371,9 +376,9 @@ morpheus.PcaPlotTool.prototype = {
                 }
 
 
-                console.log(arguments);
+                //console.log(arguments);
                 var req = ocpu.call("pcaPlot", arguments, function (session) {
-                    console.log("morpheus.PcaPlotTool.prototype.draw ::", "successful", session);
+                    //console.log("morpheus.PcaPlotTool.prototype.draw ::", "successful", session);
                     session.getObject(function (success) {
                         var $chart = $('<div></div>');
                         var myPlot = $chart[0];
@@ -384,17 +389,17 @@ morpheus.PcaPlotTool.prototype = {
                         var data = json.x.data;
                         var layout = json.x.layout;
                         Plotly.newPlot(myPlot, data, layout, {showLink: false});
-                        console.log("morpheus.PcaPlotTool.prototype.draw ::", "plot json", json);
+                        //console.log("morpheus.PcaPlotTool.prototype.draw ::", "plot json", json);
                     });
                     /*var txt = session.txt.split("\n");
-                     var imageLocationAr = txt[txt.length - 2].split("/");
+                     var imageLocationAr = txt[txt.length - 2].split("/"0);
                      var imageLocation = session.getLoc() + "files/" + imageLocationAr[imageLocationAr.length - 1];
                      console.log(imageLocation);
                      var img = $('<img />', {src : imageLocation, style : "width:720px;height:540px"});
                      _this.$chart.prepend(img);*/
                     /*var img = $('<img />', {src : session.getLoc() + 'graphics/1/png', style : "width:720px;height:540px"});*/
 
-                });
+                }, false, "::es");
                 req.fail(function () {
                     alert(req.responseText);
                 });

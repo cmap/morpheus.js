@@ -3,6 +3,7 @@ morpheus.OpenDatasetTool = function () {
 };
 
 morpheus.OpenDatasetTool.fileExtensionPrompt = function (file, callback) {
+	//console.log("morpheus.OpenDatasetTool.fileExtensionPrompt ::", file);
 	var ext = morpheus.Util.getExtension(morpheus.Util.getFileName(file));
 	var deferred;
 	if (ext === 'maf') {
