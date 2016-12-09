@@ -5,10 +5,14 @@ morpheus.Dataset = function (options) {
         options.dataType = 'Float32';
     }
 
+    if (options.esSession) {
+        this.esSession = options.esSession;
+    }
     this.seriesNames.push(options.name);
     this.seriesArrays.push(options.array ? options.array : morpheus.Dataset
         .createArray(options));
     this.seriesDataTypes.push(options.dataType);
+    //console.log(this);
 };
 morpheus.Dataset.toJson = function (dataset, options) {
     options = options || {};

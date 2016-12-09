@@ -565,7 +565,7 @@ morpheus.FormBuilder.prototype = {
 			// data types are file, dropbox, url, GSE, and predefined
 			options.push('My Computer');
 			options.push('URL');
-			options.push("GSE");
+			options.push('GEO Datasets');
 			if (typeof Dropbox !== 'undefined') {
 				options.push('Dropbox');
 			}
@@ -586,7 +586,7 @@ morpheus.FormBuilder.prototype = {
 					html.push(' data-icon="fa fa-desktop"');
 				} else if (optionValue === 'URL') {
                     html.push(' data-icon="fa fa-external-link"');
-                } else if (optionValue === 'GSE') {
+                } else if (optionValue === 'GEO Datasets') {
                     html.push(' data-icon="fa fa-external-link"');
 				} else if (index > 0) {
 					html.push(' data-icon="fa fa-star"');
@@ -610,9 +610,9 @@ morpheus.FormBuilder.prototype = {
                 html.push('<div>');
                 html
                     .push('<input placeholder="'
-                        + "Enter a GSE identifier"
+                        + "Enter a GSE or GDS identifier"
                         + '" class="form-control" style="width:50%; display:none;" type="text" name="'
-                        + name + '_gse">');
+                        + name + '_geo">');
                 html.push('</div>');
 			}
 			html.push('<input style="display:none;" type="file" name="' + name
@@ -628,7 +628,7 @@ morpheus.FormBuilder.prototype = {
 					var val = $this.val();
 
 					var showURLInput = val === 'URL';
-					var showGSEInput = val === 'GSE';
+					var showGSEInput = val === 'GEO Datasets';
 					if ('Dropbox' === val) {
 						var options = {
 							success: function (results) {
@@ -655,7 +655,7 @@ morpheus.FormBuilder.prototype = {
 					that.$form.find('[name=' + name + '_url]')
 					.css('display',
 						showURLInput ? '' : 'none');
-                    that.$form.find('[name=' + name + '_gse]')
+                    that.$form.find('[name=' + name + '_geo]')
                         .css('display',
                             showGSEInput ? '' : 'none');
 				});
@@ -676,8 +676,8 @@ morpheus.FormBuilder.prototype = {
 					});
 				}
 			});
-			// GSE
-			that.$form.on('keyup', '[name=' + name + '_gse]', function (evt) {
+			// GEO
+			that.$form.on('keyup', '[name=' + name + '_geo]', function (evt) {
 				var text = $.trim($(this).val());
 				that.setValue(name, text);
 				if (evt.which === 13) {

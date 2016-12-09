@@ -4,7 +4,7 @@
  */
 
 morpheus.HeatMap = function (options) {
-	console.log("morpheus.HeatMap ::", options);
+	//console.log("morpheus.HeatMap ::", options);
 	morpheus.Util.loadTrackingCode();
 	var _this = this;
 	// don't extend
@@ -232,7 +232,7 @@ morpheus.HeatMap = function (options) {
 		}, options);
 	options.parent = parent;
 	this.options = options;
-    console.log("morpheus.HeatMap ::", this.options);
+    //console.log("morpheus.HeatMap ::", this.options);
 	this.tooltipProvider = morpheus.HeatMapTooltipProvider;
 	if (!options.el) {
 		this.$el = $('<div></div>');
@@ -388,7 +388,7 @@ morpheus.HeatMap = function (options) {
 		promises.push(columnDendrogramDeferred);
 	}
 
-    console.log("morpheus.HeatMap ::", promises);
+    //console.log("morpheus.HeatMap ::", promises);
 
 	this.resizeListener = function () {
 		_this.revalidate();
@@ -581,7 +581,7 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
 								close: 'Close'
 							});
 							if (e.stack) {
-								console.log(e.stack);
+								//console.log(e.stack);
 							}
 						};
 						var terminate = _.bind(value.terminate, value);
@@ -591,7 +591,7 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
 							try {
 								controller.getTabManager().removeTask(task);
 							} catch (x) {
-								console.log('Error removing task');
+								//console.log('Error removing task');
 							}
 							if (callback) {
 								callback(input);
@@ -609,14 +609,14 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
 						close: 'Close'
 					});
 					if (e.stack) {
-						console.log(e.stack);
+						//console.log(e.stack);
 					}
 				} finally {
 					if (task.worker === undefined) {
 						try {
 							controller.getTabManager().removeTask(task);
 						} catch (x) {
-							console.log('Error removing task');
+							//console.log('Error removing task');
 						}
 					}
 					if (tool.dispose) {
@@ -661,7 +661,7 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
 				close: 'Close'
 			});
 			if (e.stack) {
-				console.log(e.stack);
+				//console.log(e.stack);
 			}
 		} finally {
 			if (tool.dispose) {
@@ -1340,7 +1340,7 @@ morpheus.HeatMap.prototype = {
 								'<img src="' + url + '">');
 
 						} else {
-							console.log(item + ' unknown.');
+							//console.log(item + ' unknown.');
 						}
 					});
 
@@ -2198,7 +2198,7 @@ morpheus.HeatMap.prototype = {
 
 			var tool = _this.toolbar.getToolByName(item.name);
 			if (tool == null) {
-				console.log(item.name + ' not found.');
+				//console.log(item.name + ' not found.');
 			} else {
 				try {
 					var gui = tool.gui(_this.getProject());
@@ -2224,9 +2224,9 @@ morpheus.HeatMap.prototype = {
 					});
 				} catch (x) {
 					if (x.stack) {
-						console.log(x.stack);
+						//console.log(x.stack);
 					}
-					console.log('Error running ' + item.name);
+					//console.log('Error running ' + item.name);
 				} finally {
 					if (tool.dispose) {
 						tool.dispose();
@@ -2697,7 +2697,7 @@ morpheus.HeatMap.prototype = {
 		var index = this.getTrackIndex(name, isColumns);
 		var tracks = isColumns ? this.columnTracks : this.rowTracks;
 		if (isNaN(index) || index < 0 || index >= tracks.length) {
-			console.log('removeTrack: ' + name + ' not found.');
+			//console.log('removeTrack: ' + name + ' not found.');
 			return;
 		}
 

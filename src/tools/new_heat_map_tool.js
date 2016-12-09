@@ -26,7 +26,7 @@ morpheus.NewHeatMapTool.prototype = {
 			selectedColumns : true
 		});
 
-        console.log("morpheus.NewHeatMapTool.prototype.execute ::", dataset);
+        //console.log("morpheus.NewHeatMapTool.prototype.execute ::", dataset);
 		morpheus.DatasetUtil.shallowCopy(dataset);
 		morpheus.DatasetUtil.toESSessionPromise(dataset);
 		// TODO see if we can subset dendrograms
