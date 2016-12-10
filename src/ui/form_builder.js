@@ -683,7 +683,7 @@ morpheus.FormBuilder.prototype = {
 				if (evt.which === 13) {
 					that.trigger('change', {
 						name: name,
-						value: text
+						value: text.toUpperCase()
 					})
 				}
             });
