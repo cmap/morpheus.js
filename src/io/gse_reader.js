@@ -14,8 +14,7 @@ morpheus.GseReader.prototype = {
                 var r = new FileReader();
                 success = success.split("/");
                 var fileName = success[success.length - 1].substring(0, success[success.length - 1].length - 2);
-                var filePath = session.getLoc() + "files/" + success[success.length - 1];
-                filePath = filePath.substring(0, filePath.length - 2);
+                var filePath = session.getLoc() + "files/" + fileName;
                 //console.log('morpheus.GseReader.prototype.read ::', filePath);
 
 
