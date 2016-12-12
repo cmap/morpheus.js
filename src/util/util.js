@@ -1383,16 +1383,20 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
 	} else if (isFile) {
 		var reader = new FileReader();
 		reader.onload = function (event) {
-			(ext === 'xlsx' ? morpheus.Util
-			.xlsxTo1dArray({
-				data: event.target.result,
-				prompt: interactive
-			}, function (err, lines) {
-				deferred.resolve(lines);
-			}) : morpheus.Util
-			.splitOnNewLine(event.target.result));
+			if (ext === 'xlsx' || ext === 'xls') {
+				morpheus.Util
+				.xlsxTo1dArray({
+					data: event.target.result,
+					prompt: interactive
+				}, function (err, lines) {
+					deferred.resolve(lines);
+				})
+			} else {
+				deferred.resolve(morpheus.Util.splitOnNewLine(event.target.result));
+			}
+
 		};
-		if (ext === 'xlsx') {
+		if (ext === 'xlsx' || ext === 'xls') {
 			reader.readAsBinaryString(fileOrUrl);
 		} else {
 			reader.readAsText(fileOrUrl);

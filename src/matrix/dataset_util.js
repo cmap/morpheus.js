@@ -51,7 +51,7 @@ morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
 		// datasetReader = new morpheus.StreamingGctReader();
 	} else if (ext === 'gmt') {
 		datasetReader = new morpheus.GmtDatasetReader();
-	} else if (ext === 'xlsx') {
+	} else if (ext === 'xlsx' || ext === 'xls') {
 		datasetReader = options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.XlsxDatasetReader();
 	} else if (ext === 'segtab' || ext === 'seg') {
 		datasetReader = new morpheus.SegTabReader();

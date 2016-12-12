@@ -122,7 +122,8 @@ morpheus.VectorTrack.RENDER = {
 	TEXT_AND_COLOR: 4,
 	SHAPE: 5,
 	ARC: 6,
-	BOX_PLOT: 7
+	BOX_PLOT: 7,
+	HEAT_MAP: 8
 };
 morpheus.VectorTrack.vectorToString = function (vector) {
 	var formatter = function (v) {
@@ -178,8 +179,6 @@ morpheus.VectorTrack.prototype = {
 				} else if (method === 'STACKED_BAR') {
 					settings.stackedBar = true;
 					settings.renderMethod[morpheus.VectorTrack.RENDER.BAR] = true;
-				} else if (method === 'BOX_PLOT') {
-					settings.renderMethod[morpheus.VectorTrack.RENDER.BOX_PLOT] = true;
 				} else if (method === 'TOOLTIP') {
 					settings.inlineTooltip = true;
 				} else {
@@ -284,6 +283,9 @@ morpheus.VectorTrack.prototype = {
 			width += this.settings.arcSize;
 		}
 		if (this.isRenderAs(morpheus.VectorTrack.RENDER.BOX_PLOT)) {
+			width += 100;
+		}
+		if (this.isRenderAs(morpheus.VectorTrack.RENDER.HEAT_MAP)) {
 			width += 100;
 		}
 		// 2 pixel spacing between display types
@@ -770,6 +772,15 @@ morpheus.VectorTrack.prototype = {
 				: this.settings.barSize;
 			offset++;
 			this.renderBoxPlot(context, vector, start, end, clip, offset,
+				barSize);
+			offset += barSize + 2;
+			availableSpace -= offset;
+		}
+		if (this.isRenderAs(morpheus.VectorTrack.RENDER.HEAT_MAP)) {
+			var barSize = !this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT) ? (availableSpace - 2)
+				: this.settings.barSize;
+			offset++;
+			this.renderHeatMap(context, vector, start, end, clip, offset,
 				barSize);
 			offset += barSize + 2;
 			availableSpace -= offset;
@@ -1909,7 +1920,7 @@ morpheus.VectorTrack.prototype = {
 		context.translate(clip.x, clip.y);
 		var width = clip.width;
 		var height = clip.height;
-		var colorScheme = this.heatmap.getColorScheme();
+		var colorScheme = this.heatmap.getHeatMapElementComponent().getColorScheme();
 		for (var i = start; i < end; i++) {
 			var value = vector.getValue(i); // value is an array of values to render as a heat map
 			if (value != null) {
@@ -1921,12 +1932,12 @@ morpheus.VectorTrack.prototype = {
 				for (var j = 0; j < nvalues; j++) {
 					var val = value[j];
 					context.fillStyle = colorScheme.getColor(i, -1, val);
-					context.rect(j * pixPer, pixPer, pix, itemSize);
+					context.fillRect(j * pixPer, pix, pixPer, itemSize);
 				}
 			}
 
 		}
-		context.fill();
+
 		context.restore();
 	},
 	renderArc: function (context, vector, start, end, clip, size) {
