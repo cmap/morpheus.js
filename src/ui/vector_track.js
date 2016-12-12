@@ -1898,6 +1898,37 @@ morpheus.VectorTrack.prototype = {
 		}
 		context.lineWidth = lineWidth;
 	},
+	renderHeatMap: function (context, vector, start, end, clip, size) {
+
+		var isColumns = this.isColumns;
+		var positions = this.positions;
+		var project = this.project;
+		context.save();
+		context.lineWidth = 1;
+
+		context.translate(clip.x, clip.y);
+		var width = clip.width;
+		var height = clip.height;
+		var colorScheme = this.heatmap.getColorScheme();
+		for (var i = start; i < end; i++) {
+			var value = vector.getValue(i); // value is an array of values to render as a heat map
+			if (value != null) {
+				var pix = positions.getPosition(i);
+				var itemSize = positions.getItemSize(i);
+				var currentPix = 0;
+				var nvalues = value.length;
+				var pixPer = size / nvalues;
+				for (var j = 0; j < nvalues; j++) {
+					var val = value[j];
+					context.fillStyle = colorScheme.getColor(i, -1, val);
+					context.rect(j * pixPer, pixPer, pix, itemSize);
+				}
+			}
+
+		}
+		context.fill();
+		context.restore();
+	},
 	renderArc: function (context, vector, start, end, clip, size) {
 
 		var isColumns = this.isColumns;

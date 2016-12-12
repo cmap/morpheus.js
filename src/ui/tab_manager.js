@@ -11,7 +11,7 @@ morpheus.TabManager = function (options) {
 	this.activeTabObject = null;
 	this.activeTabId = null;
 	this.idToTabObject = new morpheus.Map();
-	this.$nav = $('<ul class="nav nav-tabs compact"></ul>');
+	this.$nav = $('<ul style="border-bottom:none;" class="nav nav-tabs compact"></ul>');
 	this.$nav.on('click', 'li > a', function (e) {
 		var tabId = $(this).data('link');
 		e.preventDefault();
@@ -194,7 +194,7 @@ morpheus.TabManager.prototype = {
 	 */
 	add: function (options) {
 		this.adding = true;
-		var id = _.uniqueId('tab');
+		var id = _.uniqueId('morpheus-tab');
 
 		this.idToTabObject.set(id, options.object);
 		var li = [];
@@ -246,6 +246,7 @@ morpheus.TabManager.prototype = {
 			target = this.activeTabId;
 		}
 		var obj = this.idToTabObject.remove(target);
+		$('#' + target).remove(); // remove tab-pane
 		this.activeTabObject = null;
 		this.$nav.find('[data-link=' + target + ']:first').parent().remove();
 		this.$tabContent.find(target).remove();
@@ -266,6 +267,7 @@ morpheus.TabManager.prototype = {
 			$($a.attr('href')).focus();
 
 		}
+
 		if (obj.onRemove) {
 			obj.onRemove();
 		}

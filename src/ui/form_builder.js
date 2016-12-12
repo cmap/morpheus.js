@@ -590,8 +590,6 @@ morpheus.FormBuilder.prototype = {
 					html.push(' data-icon="fa fa-desktop"');
 				} else if (optionValue === 'URL') {
 					html.push(' data-icon="fa fa-external-link"');
-				} else if (index > 0) {
-					html.push(' data-icon="fa fa-star"');
 				}
 				html.push('>');
 				html.push(optionText);
@@ -610,7 +608,7 @@ morpheus.FormBuilder.prototype = {
 
 			if (field.text) {
 				html
-				.push('<input placeholder="' + field.text + '" class="form-control" style="width:50%; display:none;" type="text" name="'
+				.push('<input class="form-control" style="width:50%; display:none;" type="text" name="'
 					+ name + '_text">');
 			}
 			html.push('</div>');
