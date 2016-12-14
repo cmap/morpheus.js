@@ -60,7 +60,7 @@ morpheus.PcaPlotTool = function (chartOptions) {
         for (var i = 1; i <= _this.project.getSelectedDataset().getColumnCount(); i++) {
             pcaOptions.push({
                 name :  "PC" + String(i),
-                value : i
+                value : i - 1
             });
         }
 
@@ -113,7 +113,7 @@ morpheus.PcaPlotTool = function (chartOptions) {
 
     updateOptions();
 
-
+    console.log(options);
     formBuilder.append({
         name: 'size',
         type: 'bootstrap-select',
@@ -122,19 +122,19 @@ morpheus.PcaPlotTool = function (chartOptions) {
     formBuilder.append({
         name: 'color',
         type: 'bootstrap-select',
-        options: options
+        options: columnOptions
     });
     formBuilder.append({
         name: 'x-axis',
         type: 'bootstrap-select',
         options: pcaOptions,
-        value: 1
+        value: 0
     });
     formBuilder.append({
         name: 'y-axis',
         type: 'bootstrap-select',
         options: pcaOptions,
-        value: 2
+        value: 1
     });
     formBuilder.append({
         name: 'label',
@@ -312,21 +312,78 @@ morpheus.PcaPlotTool.prototype = {
 
         var project = this.project;
 
+
         this.formBuilder.$form.find('[name="draw"]').on('click', function () {
             _this.$chart.empty();
-            var colorBy = _this.formBuilder.getValue('color');
-            var sizeBy = _this.formBuilder.getValue('size');
-            var pc1 = _this.formBuilder.getValue('x-axis');
-            var pc2 = _this.formBuilder.getValue('y-axis');
-            var label = _this.formBuilder.getValue('label');
-            var na = _this.formBuilder.getValue('replace_NA_with');
 
-            //console.log("morpheus.PcaPlotTool.prototype.draw ::", "DRAW BUTTON CLICKED");
             var dataset = _this.project.getSelectedDataset({
                 emptyToAll: false
             });
             var fullDataset = _this.project.getFullDataset();
             _this.dataset = dataset;
+
+            var colorBy = _this.formBuilder.getValue('color');
+            var sizeBy = _this.formBuilder.getValue('size');
+
+            var colorByVector = dataset.getColumnMetadata().getByName(colorBy);
+            while (colorByVector && colorByVector.indices.length == 0) {
+                colorByVector = colorByVector.v;
+            }
+
+            var sizeByVector = dataset.getColumnMetadata().getByName(sizeBy);
+            while (sizeByVector && sizeByVector.indices.length == 0) {
+                sizeByVector = sizeByVector.v;
+            }
+            console.log(colorByVector, sizeByVector);
+
+            var pc1 = _this.formBuilder.getValue('x-axis');
+            var pc2 = _this.formBuilder.getValue('y-axis');
+
+            var label = _this.formBuilder.getValue('label');
+            var textByVector = dataset.getColumnMetadata().getByName(label);
+            while (textByVector && textByVector.indices.length == 0) {
+                textByVector = textByVector.v;
+            }
+
+            var na = _this.formBuilder.getValue('replace_NA_with');
+            var color = colorByVector ? [] : '#1f78b4';
+            var size = sizeByVector ? [] : 12;
+            var text = [];
+            var sizeFunction = null;
+            var n = dataset.getColumnCount() > 0 ? dataset.getColumnCount() : fullDataset.columns;
+            if (sizeByVector) {
+                var minMax = morpheus.VectorUtil.getMinMax(sizeByVector);
+                sizeFunction = d3.scale.linear().domain(
+                    [minMax.min, minMax.max]).range([3, 16])
+                    .clamp(true);
+            }
+            if (colorByVector) {
+                var categories = new Map();
+                var catNum = 1;
+                for (var j = 0; j < colorByVector.indices.length; j++) {
+                    var colorByValue = colorByVector.getValue(j);
+                    if (!categories.get(colorByValue)) {
+                        categories.set(colorByValue, catNum);
+                        catNum += 3;
+                        catNum %= 20;
+                    }
+                    color.push(morpheus.VectorColorModel.TWENTY_COLORS[categories.get(colorByValue)]);
+                }
+            }
+            if (sizeByVector) {
+                for (var j = 0; j < sizeByVector.indices.length; j++) {
+                    var sizeByValue = sizeByVector.getValue(j);
+                    size.push(sizeFunction(sizeByValue));
+                }
+            }
+
+            if (textByVector) {
+                for (var j = 0; j < textByVector.indices.length; j++) {
+                    text.push(textByVector.getValue(j));
+                }
+            }
+            //console.log("morpheus.PcaPlotTool.prototype.draw ::", "DRAW BUTTON CLICKED");
+
 
             //console.log("morpheus.PcaPlotTool.prototype.draw ::", "full dataset", fullDataset);
             var columnIndices = [];
@@ -355,8 +412,6 @@ morpheus.PcaPlotTool.prototype = {
             expressionSetPromise.then(function (essession) {
                 var arguments = {
                     es: essession,
-                    c1: pc1,
-                    c2: pc2,
                     replacena: na
                 };
                 if (columnIndices && columnIndices.length > 0) {
@@ -365,30 +420,40 @@ morpheus.PcaPlotTool.prototype = {
                 if (rowIndices && rowIndices.length > 0) {
                     arguments.rows = rowIndices;
                 }
-                if (colorBy != "") {
-                    arguments.colour = colorBy;
-                }
-                if (sizeBy != "") {
-                    arguments.size = sizeBy;
-                }
-                if (label != "") {
-                    arguments.label = label;
-                }
-
+                var drawResult = function () {
+                    var trace = {
+                        x : _this.pca.pca[pc1],
+                        y : _this.pca.pca[pc2],
+                        mode : 'markers',
+                        type : 'scatter',
+                        text : text,
+                        marker : {
+                            color: color,
+                            size: size
+                        }
+                    };
+                    layout.xaxis.title = _this.pca.xlabs[pc1];
+                    layout.yaxis.title = _this.pca.xlabs[pc2];
+                    var $chart = $('<div></div>');
+                    var myPlot = $chart[0];
+                    $chart.appendTo(_this.$chart);
+                    Plotly.newPlot(myPlot, [trace], layout, config);
+                };
 
                 //console.log(arguments);
+
                 var req = ocpu.call("pcaPlot", arguments, function (session) {
                     //console.log("morpheus.PcaPlotTool.prototype.draw ::", "successful", session);
                     session.getObject(function (success) {
-                        var $chart = $('<div></div>');
-                        var myPlot = $chart[0];
-                        $chart.appendTo(_this.$chart);
-
-                        var coolUrl = success.split("\n");
-                        var json = JSON.parse($.parseHTML(coolUrl[1])[0].innerText);
-                        var data = json.x.data;
-                        var layout = json.x.layout;
-                        Plotly.newPlot(myPlot, data, layout, {showLink: false});
+                        //console.log(success);
+                        _this.pca = JSON.parse(success);
+                        drawResult();
+                       /*
+                         var coolUrl = success.split("\n");
+                         var json = JSON.parse($.parseHTML(coolUrl[1])[0].innerText);
+                         var data = json.x.data;
+                         var layout = json.x.layout;
+                         Plotly.newPlot(myPlot, data, layout, {showLink: false});*/
                         //console.log("morpheus.PcaPlotTool.prototype.draw ::", "plot json", json);
                     });
                     /*var txt = session.txt.split("\n");
@@ -403,17 +468,15 @@ morpheus.PcaPlotTool.prototype = {
                 req.fail(function () {
                     alert(req.responseText);
                 });
+
             });
+
 
             expressionSetPromise.catch(function (reason) {
                 alert("Problems occured during transforming dataset to ExpressionSet\n" + reason);
             });
 
         });
-
-
-
-
     }
 
 };

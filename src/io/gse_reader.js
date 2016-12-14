@@ -58,7 +58,9 @@ morpheus.GseReader.prototype = {
                         });
 
 
-
+                        console.log("morpheus.GseReader.prototype.read ::", "input list", res);
+                        console.log("morpheus.GseReader.prototype.read ::", "metaNames", metaNames);
+                        console.log("morpheus.GseReader.prototype.read ::", dataset);
                         var columnsIds = dataset.getColumnMetadata().add('id');
                         for (var i = 0; i < ncolData; i++) {
                             columnsIds.setValue(i, morpheus.Util.copyString(participants[i].strval));

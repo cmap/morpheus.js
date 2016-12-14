@@ -347,7 +347,7 @@ morpheus.ChartTool.getPlotlyDefaults = function () {
 		displaylogo: false,
 		staticPlot: false,
 		showHints: true,
-		modeBarButtonsToRemove: ['sendDataToCloud', 'zoomIn2d', 'zoomOut2d', 'hoverCompareCartesian', 'hoverClosestCartesian']
+		modeBarButtonsToRemove: ['sendDataToCloud', 'hoverCompareCartesian', 'hoverClosestCartesian']
 	};
 	return {
 		layout: layout,
