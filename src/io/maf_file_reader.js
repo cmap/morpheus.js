@@ -301,7 +301,7 @@ morpheus.MafFileReader.prototype = {
 						}
 						f2 = f2.valueOf();
 						var returnVal = (f1 === f2 ? 0 : (f1 < f2 ? 1
-							: -1));
+								: -1));
 						if (returnVal !== 0) {
 							return returnVal;
 						}
@@ -316,26 +316,28 @@ morpheus.MafFileReader.prototype = {
 		morpheus.MafFileReader
 		.summarizeMutations(new morpheus.TransposedDatasetView(dataset));
 
-		var vector = dataset.getColumnMetadata().add('mutation_summary_selection');
-		vector.getProperties().set(
+		var mutationSummarySelectionVector = dataset.getColumnMetadata().add('mutation_summary_selection');
+		mutationSummarySelectionVector.getProperties().set(
 			morpheus.VectorKeys.FIELDS,
 			['Synonymous', 'In Frame Indel', 'Other Non-Synonymous',
 				'Missense', 'Splice Site', 'Frame Shift', 'Nonsense']);
-		vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, '[number]');
-		vector.getProperties().set(morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION, true);
-		var name = dataset.getName();
-		vector.getProperties().set(morpheus.VectorKeys.FUNCTION, function (view, selectedDataset, index) {
+		mutationSummarySelectionVector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, '[number]');
+		mutationSummarySelectionVector.getProperties().set(morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION, true);
+		var datasetName = dataset.getName();
+		mutationSummarySelectionVector.getProperties().set(morpheus.VectorKeys.FUNCTION, function (view, selectedDataset, columnIndex) {
 			var sourceVector = selectedDataset.getRowMetadata().getByName('Source');
-			if (sourceVector == null || sourceVector.getValue(index) === name) {
-				var bins = new Int32Array(7); // 1-7
-				for (var j = 0, size = view.size(); j < size; j++) {
-					var value = view.getValue(j);
+			var bins = new Int32Array(7); // 1-7
+			for (var i = 0, nrows = selectedDataset.getRowCount(); i < nrows; i++) {
+				var source = sourceVector.getValue(i);
+				if (source == null || source === datasetName) {
+					var value = selectedDataset.getValue(i, columnIndex);
 					if (value > 0) {
 						bins[value - 1]++;
 					}
 				}
-				return bins;
 			}
+			return bins;
+
 		});
 
 		return dataset;

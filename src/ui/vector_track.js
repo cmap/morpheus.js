@@ -780,7 +780,7 @@ morpheus.VectorTrack.prototype = {
 			var barSize = !this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT) ? (availableSpace - 2)
 				: this.settings.barSize;
 			offset++;
-			this.renderHeatMap(context, vector, start, end, clip, offset,
+			this.renderHeatMap(context, vector, start, end, clip,
 				barSize);
 			offset += barSize + 2;
 			availableSpace -= offset;
@@ -1910,17 +1910,18 @@ morpheus.VectorTrack.prototype = {
 		context.lineWidth = lineWidth;
 	},
 	renderHeatMap: function (context, vector, start, end, clip, size) {
-
 		var isColumns = this.isColumns;
 		var positions = this.positions;
 		var project = this.project;
 		context.save();
 		context.lineWidth = 1;
-
-		context.translate(clip.x, clip.y);
+	//	context.translate(clip.x, clip.y);
 		var width = clip.width;
 		var height = clip.height;
 		var colorScheme = this.heatmap.getHeatMapElementComponent().getColorScheme();
+		var drawGrid = this.heatmap.getHeatMapElementComponent().isDrawGrid();
+		var gridColor = this.heatmap.getHeatMapElementComponent().getGridColor();
+		var gridThickness = this.heatmap.getHeatMapElementComponent().getGridThickness();
 		for (var i = start; i < end; i++) {
 			var value = vector.getValue(i); // value is an array of values to render as a heat map
 			if (value != null) {
@@ -1933,6 +1934,17 @@ morpheus.VectorTrack.prototype = {
 					var val = value[j];
 					context.fillStyle = colorScheme.getColor(i, -1, val);
 					context.fillRect(j * pixPer, pix, pixPer, itemSize);
+				}
+				if (drawGrid && itemSize > 10) {
+					context.strokeStyle = gridColor;
+					context.lineWidth = gridThickness;
+					context.beginPath();
+					for (var j = 0; j < nvalues; j++) {
+						var val = value[j];
+						context.rect(j * pixPer, pix, pixPer, itemSize);
+					}
+					context.stroke();
+
 				}
 			}
 
