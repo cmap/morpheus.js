@@ -4,7 +4,7 @@ if (typeof morpheus === 'undefined') {
 morpheus.Util = function () {
 };
 
-morpheus.Util.URL = 'https://software.broadinstitute.org/morpheus/';
+morpheus.Util.URL = 'https://clue.io/morpheus/';
 morpheus.Util.RIGHT_ARROW = String.fromCharCode(8594);
 /**
  * Add properties in c2 to c1

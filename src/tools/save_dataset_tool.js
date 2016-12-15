@@ -65,7 +65,7 @@ morpheus.SaveDatasetTool.prototype = {
 		var writer = (format === '1.2') ? new morpheus.GctWriter12()
 			: new morpheus.GctWriter();
 
-		if (streamSaver && streamSaver.supported) {
+		if (typeof streamSaver !== 'undefined' && streamSaver.supported) {
 			var fileStream = streamSaver.createWriteStream(fileName);
 			var fileStreamWriter = fileStream.getWriter();
 			var encoder = new TextEncoder();
