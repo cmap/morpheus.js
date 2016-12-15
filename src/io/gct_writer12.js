@@ -1,16 +1,18 @@
-morpheus.GctWriter12 = function() {
+morpheus.GctWriter12 = function () {
 	this.options = {
-		rowDescription : 'Description',
-		rowId : 'id',
-		columnId : 'id'
+		rowDescription: 'Description',
+		rowId: 'id',
+		columnId: 'id'
 	};
 };
 morpheus.GctWriter12.prototype = {
-	toString : function(value) {
+	toString: function (value) {
 		return morpheus.Util.toString(value);
 	},
-	write : function(dataset) {
-		var pw = [];
+	write: function (dataset, pw) {
+		if (pw == null) {
+			pw = [];
+		}
 		var rows = dataset.getRowCount();
 		var columns = dataset.getColumnCount();
 		var version = '#1.2';
@@ -20,7 +22,7 @@ morpheus.GctWriter12.prototype = {
 		pw.push('\n');
 		var rowMetadata = morpheus.GctWriter.idFirst(dataset.getRowMetadata());
 		var columnMetadata = morpheus.GctWriter.idFirst(dataset
-				.getColumnMetadata());
+		.getColumnMetadata());
 		pw.push('Name');
 		pw.push('\t');
 		pw.push('Description');
@@ -37,7 +39,7 @@ morpheus.GctWriter12.prototype = {
 			rowIds = rowMetadata.get(0);
 		}
 		var rowDescriptions = rowMetadata
-				.getByName(this.options.rowDescription);
+		.getByName(this.options.rowDescription);
 		if (rowDescriptions == null && rowMetadata.getMetadataCount() > 1) {
 			rowDescriptions = rowMetadata.get(1);
 		}
@@ -47,7 +49,7 @@ morpheus.GctWriter12.prototype = {
 			pw.push(this.toString(rowIds.getValue(i)));
 			pw.push('\t');
 			var rowDescription = rowDescriptions != null ? rowDescriptions
-					.getValue(i) : null;
+				.getValue(i) : null;
 			if (rowDescription != null) {
 				pw.push(this.toString(rowDescription));
 			}

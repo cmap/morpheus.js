@@ -1,8 +1,8 @@
-morpheus.GctWriter = function() {
+morpheus.GctWriter = function () {
 };
 
-morpheus.GctWriter.idFirst = function(model) {
-	var fields = [ 'id', 'Id', 'pr_id' ];
+morpheus.GctWriter.idFirst = function (model) {
+	var fields = ['id', 'Id', 'pr_id'];
 	var idIndex = -1;
 	for (var i = 0; i < fields.length; i++) {
 		idIndex = morpheus.MetadataUtil.indexOf(model, fields[i]);
@@ -24,19 +24,21 @@ morpheus.GctWriter.idFirst = function(model) {
 };
 
 morpheus.GctWriter.prototype = {
-	toString : function(value) {
+	toString: function (value) {
 		return morpheus.Util.toString(value);
 	},
-	write : function(dataset) {
-		var pw = [];
+	write: function (dataset, pw) {
+		if (pw == null) {
+			pw = [];
+		}
 		var rowMetadata = morpheus.GctWriter.idFirst(dataset.getRowMetadata());
 		var columnMetadata = morpheus.GctWriter.idFirst(dataset
-				.getColumnMetadata());
+		.getColumnMetadata());
 		this.writeHeader(rowMetadata, columnMetadata, pw);
 		this.writeData(dataset, rowMetadata, pw);
 		return pw.join('');
 	},
-	writeData : function(dataset, rowMetadata, pw) {
+	writeData: function (dataset, rowMetadata, pw) {
 		var ncols = dataset.getColumnCount();
 		var rowMetadataCount = rowMetadata.getMetadataCount();
 		for (var i = 0, rows = dataset.getRowCount(); i < rows; i++) {
@@ -59,13 +61,13 @@ morpheus.GctWriter.prototype = {
 			pw.push('\n');
 		}
 	},
-	writeHeader : function(rowMetadata, columnMetadata, pw) {
+	writeHeader: function (rowMetadata, columnMetadata, pw) {
 		var rows = rowMetadata.getItemCount();
 		var ncols = columnMetadata.getItemCount();
 		pw.push('#1.3\n');
 		var rowMetadataCount = rowMetadata.getMetadataCount();
 		pw.push(rows + '\t' + ncols + '\t' + (rowMetadataCount - 1) + '\t'
-				+ (columnMetadata.getMetadataCount() - 1));
+			+ (columnMetadata.getMetadataCount() - 1));
 		pw.push('\n');
 		for (var i = 0; i < rowMetadataCount; i++) {
 			if (i > 0) {
@@ -83,7 +85,7 @@ morpheus.GctWriter.prototype = {
 		}
 		pw.push('\n');
 		for (var columnMetadataIndex = 1, metadataSize = columnMetadata
-				.getMetadataCount(); columnMetadataIndex < metadataSize; columnMetadataIndex++) {
+		.getMetadataCount(); columnMetadataIndex < metadataSize; columnMetadataIndex++) {
 			pw.push(columnMetadata.get(columnMetadataIndex).getName());
 			for (var i = 1; i < rowMetadataCount; i++) {
 				pw.push('\t');

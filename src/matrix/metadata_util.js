@@ -50,7 +50,7 @@ morpheus.MetadataUtil.search = function (options) {
 	if (tokens.length == 0) {
 		return null;
 	}
-	var indexField = isColumns ? 'COLUMN' : 'ROW';
+	var indexField = 'INDEX';
 	var fieldNames = morpheus.MetadataUtil.getMetadataNames(fullModel);
 	fieldNames.push(indexField);
 	var predicates = morpheus.Util.createSearchPredicates({
@@ -337,8 +337,8 @@ morpheus.MetadataUtil.autocomplete = function (model) {
 						value: quotedField + ':',
 						label: '<span style="font-weight:300;">' + (regexMatch == null ? field : field.replace(regexMatch, '<b>$1</b>'))
 						+ ':</span>' + (dataType === 'number' ? ('<span' +
-						' style="font-weight:300;font-size:85%;">.., >, <, >=, <=,' +
-						' =</span>') : ''),
+							' style="font-weight:300;font-size:85%;">.., >, <, >=, <=,' +
+							' =</span>') : ''),
 						show: true
 					});
 				}

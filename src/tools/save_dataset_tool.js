@@ -59,15 +59,31 @@ morpheus.SaveDatasetTool.prototype = {
 			}
 			dataset = seriesIndex === 0 ? dataset : new morpheus.DatasetSeriesView(dataset, [seriesIndex]);
 		}
-		var text = (format === '1.2') ? new morpheus.GctWriter12()
-		.write(dataset) : new morpheus.GctWriter().write(dataset);
-
-		var blob = new Blob([text], {
-			type: 'text/plain;charset=charset=utf-8'
-		});
 		if (!morpheus.Util.endsWith(fileName.toLowerCase(), '.gct')) {
 			fileName += '.gct';
 		}
-		saveAs(blob, fileName, true);
+		var writer = (format === '1.2') ? new morpheus.GctWriter12()
+			: new morpheus.GctWriter();
+
+		if (streamSaver && streamSaver.supported) {
+			var fileStream = streamSaver.createWriteStream(fileName);
+			var fileStreamWriter = fileStream.getWriter();
+			var encoder = new TextEncoder();
+			fileStreamWriter.push = function (text) {
+				this.write(encoder.encode(text));
+			};
+			fileStreamWriter.join = function () {
+			};
+			writer.write(dataset, fileStreamWriter);
+			fileStreamWriter.close();
+		} else {
+			var text = writer.write(dataset);
+			var blob = new Blob([text], {
+				type: 'text/plain;charset=charset=utf-8'
+			});
+
+			saveAs(blob, fileName, true);
+		}
+
 	}
 };
