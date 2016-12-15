@@ -82,10 +82,10 @@ morpheus.LandingPage.prototype = {
 		this.$el.hide();
 		$(window)
 		.off(
-			'paste.morpheus drop.morpheus dragover.morpheus dragenter.morpheus beforeunload.morpheus');
-		$(window).on('beforeunload.morpheus', function () {
-			return 'Are you sure you want to close Morpheus?';
-		});
+			'paste.morpheus drop.morpheus dragover.morpheus dragenter.morpheus');
+		// $(window).on('beforeunload.morpheus', function () {
+		// 	return 'Are you sure you want to close Morpheus?';
+		// });
 		this.formBuilder.off('change');
 	},
 	show: function () {
