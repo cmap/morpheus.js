@@ -82,7 +82,7 @@ morpheus.MetadataUtil.search = function (options) {
 		var filterColumnName = predicate.getField();
 		if (filterColumnName != null && !predicate.isNumber()) {
 			var wrapper = nameToVector.get(filterColumnName);
-			if (wrapper.dataType === 'number' || wrapper.dataType === '[number]') {
+			if (wrapper && (wrapper.dataType === 'number' || wrapper.dataType === '[number]')) {
 				if (predicate.getText) {
 					predicates[p] = new morpheus.Util.EqualsPredicate(filterColumnName, parseFloat(predicate.getText()));
 				} else if (predicate.getValues) {
