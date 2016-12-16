@@ -159,6 +159,9 @@ morpheus.ScrollBar.prototype = {
 	getTotalExtent: function () {
 		return this.totalExtent;
 	},
+	getVisibleExtent: function () {
+		return this.visibleExtent;
+	},
 	_setRange: function () {
 		this.thumbExtent = Math.max(10, this.visibleExtent
 			* (this.visibleExtent / this.totalExtent));

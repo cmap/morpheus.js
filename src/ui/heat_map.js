@@ -3067,24 +3067,44 @@ morpheus.HeatMap.prototype = {
 		if (pos === undefined) {
 			return this.vscroll.getValue();
 		}
-		this.vscroll.setValue(pos, true);
-		this.trigger('change', {
-			name: 'scrollTop',
-			source: this,
-			arguments: arguments
-		});
+		if (isNaN(pos)) {
+			pos = 0;
+		}
+		if (this.vscroll.getVisibleExtent() === this.vscroll.getTotalExtent()) {
+			pos = 0;
+		}
+		pos = Math.max(pos, 0);
+		pos = Math.min(this.vscroll.getMaxValue(), pos);
+		if (pos !== this.vscroll.getValue()) {
+			this.vscroll.setValue(pos, true);
+			this.trigger('change', {
+				name: 'scrollTop',
+				source: this,
+				arguments: arguments
+			});
+		}
 	}
 	,
 	scrollLeft: function (pos) {
 		if (pos === undefined) {
 			return this.hscroll.getValue();
 		}
-		this.trigger('change', {
-			name: 'scrollLeft',
-			source: this,
-			arguments: arguments
-		});
-		this.hscroll.setValue(pos, true);
+		if (isNaN(pos)) {
+			pos = 0;
+		}
+		if (this.hscroll.getVisibleExtent() === this.hscroll.getTotalExtent()) {
+			pos = 0;
+		}
+		pos = Math.max(pos, 0);
+		pos = Math.min(this.hscroll.getMaxValue(), pos);
+		if (pos !== this.hscroll.getValue()) {
+			this.trigger('change', {
+				name: 'scrollLeft',
+				source: this,
+				arguments: arguments
+			});
+			this.hscroll.setValue(pos, true);
+		}
 	}
 	,
 	isSelectedTrackColumns: function () {
