@@ -30,16 +30,16 @@ morpheus.HeatMapColorScheme.Predefined.SUMMLY = function () {
 		type: 'fixed',
 		map: [{
 			value: -100,
-			color: 'blue'
+			color: '#0000ff'
 		}, {
 			value: -98,
-			color: 'white'
+			color: '#ffffff'
 		}, {
 			value: 98,
-			color: 'white'
+			color: '#ffffff'
 		}, {
 			value: 100,
-			color: 'red'
+			color: '#ff0000'
 		}]
 	};
 };
@@ -49,22 +49,22 @@ morpheus.HeatMapColorScheme.Predefined.SUMMLY2 = function () {
 		type: 'fixed',
 		map: [{
 			value: -100,
-			color: 'blue'
+			color: '#0000ff'
 		}, {
 			value: -98,
 			color: '#abdda4'
 		}, {
 			value: -95,
-			color: 'white'
+			color: '#ffffff'
 		}, {
 			value: 95,
-			color: 'white'
+			color: '#ffffff'
 		}, {
 			value: 98,
 			color: '#fdae61'
 		}, {
 			value: 100,
-			color: 'red'
+			color: '#ff0000'
 		}]
 	};
 };
@@ -74,7 +74,7 @@ morpheus.HeatMapColorScheme.Predefined.SUMMLY3 = function () {
 		type: 'fixed',
 		map: [{
 			value: -100,
-			color: 'blue'
+			color: '#0000ff'
 		}, {
 			value: -90,
 			color: '#abdda4'
@@ -83,10 +83,10 @@ morpheus.HeatMapColorScheme.Predefined.SUMMLY3 = function () {
 			color: '#e6f598'
 		}, {
 			value: -70,
-			color: 'white'
+			color: '#ffffff'
 		}, {
 			value: 70,
-			color: 'white'
+			color: '#ffffff'
 		}, {
 			value: 80,
 			color: '#fee08b'
@@ -95,7 +95,7 @@ morpheus.HeatMapColorScheme.Predefined.SUMMLY3 = function () {
 			color: '#fdae61'
 		}, {
 			value: 100,
-			color: 'red'
+			color: '#ff0000'
 		}]
 	};
 };
@@ -105,16 +105,16 @@ morpheus.HeatMapColorScheme.Predefined.CN = function () {
 		type: 'fixed',
 		map: [{
 			value: -2,
-			color: 'blue'
+			color: '#0000ff'
 		}, {
 			value: -0.1,
-			color: 'white'
+			color: '#ffffff'
 		}, {
 			value: 0.1,
-			color: 'white'
+			color: '#ffffff'
 		}, {
 			value: 2,
-			color: 'red'
+			color: '#ff0000'
 		}]
 	};
 };
@@ -123,7 +123,7 @@ morpheus.HeatMapColorScheme.Predefined.BINARY = function () {
 		type: 'fixed',
 		map: [{
 			value: 0,
-			color: 'white'
+			color: '#ffffff'
 		}, {
 			value: 1,
 			color: 'black'
@@ -233,16 +233,16 @@ morpheus.HeatMapColorScheme.Predefined.ZS = function () {
 		type: 'fixed',
 		map: [{
 			value: -10,
-			color: 'blue'
+			color: '#0000ff'
 		}, {
 			value: -2,
-			color: 'white'
+			color: '#ffffff'
 		}, {
 			value: 2,
-			color: 'white'
+			color: '#ffffff'
 		}, {
 			value: 10,
-			color: 'red'
+			color: '#ff0000'
 		}]
 	};
 };

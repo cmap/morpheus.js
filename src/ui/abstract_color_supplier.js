@@ -1,6 +1,6 @@
 morpheus.AbstractColorSupplier = function () {
 	this.fractions = [0, 0.5, 1];
-	this.colors = ['blue', 'white', 'red'];
+	this.colors = ['#0000ff', '#ffffff', '#ff0000'];
 	this.names = null; // optional color stop names
 	this.min = 0;
 	this.max = 1;
@@ -72,18 +72,18 @@ morpheus.AbstractColorSupplier.fromJson = function (json) {
 			};
 			if (condition.v1 != null && !isNaN(condition.v1)) {
 				gtf = condition.v1Op === 'gt' ? function (val) {
-					return val > condition.v1;
-				} : function (val) {
-					return val >= condition.v1;
-				};
+						return val > condition.v1;
+					} : function (val) {
+						return val >= condition.v1;
+					};
 			}
 
 			if (condition.v2 != null && !isNaN(condition.v2)) {
 				ltf = condition.v2Op === 'lt' ? function (val) {
-					return val < condition.v2;
-				} : function (val) {
-					return val <= condition.v2;
-				};
+						return val < condition.v2;
+					} : function (val) {
+						return val <= condition.v2;
+					};
 			}
 			condition.accept = function (val) {
 				return gtf(val) && ltf(val);
@@ -203,6 +203,6 @@ morpheus.AbstractColorSupplier.prototype = {
 		this.fractions = morpheus.Util.reorderArray(options.fractions, index);
 		this.colors = morpheus.Util.reorderArray(options.colors, index);
 		this.names = options.names ? morpheus.Util.reorderArray(options.names,
-			index) : null;
+				index) : null;
 	}
 };
