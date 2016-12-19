@@ -24,7 +24,7 @@ morpheus.MetadataModel.prototype = {
 	 * @return {morpheus.AbstractVector} the added vector.
 	 */
 	add: function (name, options) {
-		console.log("morpheus.MetadataModel.prototype.add ::", name);
+		//console.log("morpheus.MetadataModel.prototype.add ::", name);
 		var index = morpheus.MetadataUtil.indexOf(this, name);
 		var oldVector;
 		if (index !== -1) {
