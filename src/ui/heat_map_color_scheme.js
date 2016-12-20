@@ -321,7 +321,7 @@ morpheus.HeatMapColorScheme.createColorSupplier = function (options) {
 	}
 
 	var json = {
-		discrete: options.stepped,
+		stepped: options.stepped,
 		scalingMode: scalingMode,
 		fractions: fractions,
 		colors: colors,
@@ -389,9 +389,6 @@ morpheus.HeatMapColorScheme.prototype = {
 	},
 	isStepped: function () {
 		return this.currentColorSupplier.isStepped();
-	},
-	isDiscrete: function () {
-		return this.currentColorSupplier.isDiscrete();
 	},
 	setFractions: function (options) {
 		this.currentColorSupplier.setFractions(options);

@@ -246,7 +246,7 @@ morpheus.Util.getExtension = function (name) {
 	var dotIndex = name.lastIndexOf('.');
 	if (dotIndex > 0) {
 		var suffix = name.substring(dotIndex + 1).toLowerCase();
-		if (suffix === 'txt' || suffix === 'gz') { // see if file is in
+		if (suffix === 'txt' || suffix === 'gz' || suffix === 'tsv') { // see if file is in
 			// the form
 			// name.gct.txt
 			var newPath = name.substring(0, dotIndex);
@@ -1042,17 +1042,17 @@ morpheus.Util.arrayEquals = function (array1, array2, comparator) {
 };
 morpheus.Util._intFormat = typeof d3 !== 'undefined' ? d3.format(',i')
 	: function (d) {
-	return '' + Math.round(d);
-};
+		return '' + Math.round(d);
+	};
 morpheus.Util.intFormat = function (n) {
 	return morpheus.Util._intFormat(n);
 };
 morpheus.Util._nf = typeof d3 !== 'undefined' ? d3.format('.4f') : function (d) {
-	return '' + d;
-};
+		return '' + d;
+	};
 morpheus.Util.nf = function (n) {
 	var str = (n < 1 && n > -1 && n.toPrecision !== undefined) ? n
-	.toPrecision(4) : morpheus.Util._nf(n);
+		.toPrecision(4) : morpheus.Util._nf(n);
 	return morpheus.Util.removeTrailingZerosInFraction(str);
 };
 morpheus.Util.createNumberFormat = function (nfractionDigits) {
@@ -1271,13 +1271,13 @@ morpheus.Util.createSearchPredicates = function (options) {
 			predicate = new morpheus.Util.RegexPredicate(field, token);
 		} else {
 			predicate = defaultIsExactMatch ? new morpheus.Util.ExactTermPredicate(
-				field, token)
+					field, token)
 				: new morpheus.Util.RegexPredicate(field, token);
 
 		}
 		if (predicate != null) {
 			predicates.push(isNot ? new morpheus.Util.NotPredicate(
-				predicate) : predicate);
+					predicate) : predicate);
 		}
 
 	});

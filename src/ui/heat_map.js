@@ -758,6 +758,36 @@ morpheus.HeatMap.prototype = {
 			var colorMap = morpheus.HeatMapColorScheme.Predefined.MAF().map;
 			var rowMutProfile = this.project.getFullDataset().getRowMetadata()
 			.getByName('mutation_summary');
+			var fieldNames = rowMutProfile.getProperties().get(morpheus.VectorKeys.FIELDS);
+			var useMafColorMap = true;
+			if (fieldNames.length !== morpheus.MafFileReader.FIELD_NAMES.length) {
+				useMafColorMap = false;
+			} else {
+				for (var i = 0; i < fieldNames.length; i++) {
+					if (fieldNames[i] !== morpheus.MafFileReader.FIELD_NAMES[i]) {
+						useMafColorMap = false;
+						break;
+					}
+				}
+			}
+			if (!useMafColorMap) {
+				colorScheme = {
+					type: 'fixed',
+					stepped: true,
+					map: [{
+						value: 0,
+						color: 'rgb(255,255,255)'
+					}]
+				};
+				for (var i = 0; i < fieldNames.length; i++) {
+					colorScheme.map.push({
+						value: i + 1,
+						color: morpheus.VectorColorModel.TWENTY_COLORS[i % morpheus.VectorColorModel.TWENTY_COLORS.length],
+						name: fieldNames[i]
+					});
+				}
+				colorMap = colorScheme.map;
+			}
 			var columnMutationSummaryVectors = [];
 			var columnMutationSummaryNames = ['mutation_summary', 'mutation_summary_selection'];
 			for (var i = 0; i < columnMutationSummaryNames.length; i++) {

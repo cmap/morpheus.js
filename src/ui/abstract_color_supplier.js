@@ -37,7 +37,6 @@ morpheus.AbstractColorSupplier.toJson = function (cs) {
 morpheus.AbstractColorSupplier.fromJson = function (json) {
 	var cs = json.stepped ? new morpheus.SteppedColorSupplier()
 		: new morpheus.GradientColorSupplier();
-	cs.setDiscrete(json.discrete);
 	cs.setScalingMode(json.scalingMode);
 	cs.setMin(json.min);
 	cs.setMax(json.max);
@@ -47,10 +46,30 @@ morpheus.AbstractColorSupplier.fromJson = function (json) {
 	if (morpheus.HeatMapColorScheme.ScalingMode.RELATIVE !== json.scalingMode) {
 		cs.setTransformValues(json.transformValues);
 	}
+
+	var fractions = json.fractions;
+	if (json.values) { // map to fractions
+		fractions = [];
+		var values = json.values;
+		var min = Number.MAX_VALUE;
+		var max = -Number.MAX_VALUE;
+		for (var i = 0; i < values.length; i++) {
+			var value = values[i];
+			min = Math.min(min, value);
+			max = Math.max(max, value);
+		}
+		var valueToFraction = d3.scale.linear().domain(
+			[min, max]).range(
+			[0, 1]).clamp(true);
+
+		for (var i = 0; i < values.length; i++) {
+			fractions.push(valueToFraction(values[i]));
+		}
+	}
 	if (json.colors != null && json.colors.length > 0) {
 		cs.setFractions({
 			colors: json.colors,
-			fractions: json.fractions,
+			fractions: fractions,
 			names: json.names
 		});
 	}
@@ -95,7 +114,6 @@ morpheus.AbstractColorSupplier.fromJson = function (json) {
 };
 
 morpheus.AbstractColorSupplier.prototype = {
-	discrete: false,
 	getTransformValues: function () {
 		return this.transformValues;
 	},
@@ -108,18 +126,12 @@ morpheus.AbstractColorSupplier.prototype = {
 	getConditions: function () {
 		return this.conditions;
 	},
-	isDiscrete: function () {
-		return this.discrete;
-	},
-	setDiscrete: function (discrete) {
-		this.discrete = discrete;
-	},
 	createInstance: function () {
 		throw 'not implemented';
 	},
 	copy: function () {
 		var c = this.createInstance();
-		c.discrete = this.discrete;
+		c.stepped = this.stepped;
 		c.setFractions({
 			fractions: this.fractions.slice(0),
 			colors: this.colors.slice(0)
