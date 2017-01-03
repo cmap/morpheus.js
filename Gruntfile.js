@@ -61,12 +61,11 @@ module.exports = function (grunt) {
 					'js/xlsx.full.min.js', 'js/canvas2svg.js',
 					'js/canvg.js', 'js/rgbcolor.js',
 					'js/jquery-ui.min.js', 'js/parser.js',
-					'js/FileSaver.min.js', 'js/Blob.js',
-					'js/canvas-toBlob.js', 'js/colorbrewer.js',
+					'js/FileSaver.min.js', 'js/colorbrewer.js',
 					'js/hopscotch.min.js', 'js/typed.min.js',
 					'js/jquery.event.drag-2.2.js',
 					'js/clipboard.min.js', 'js/slick.min.js',
-					'js/js.cookie.js', 'js/d3.layout.cloud.js']
+					'js/js.cookie.js']
 			},
 			morpheus: {
 				nonull: true,
