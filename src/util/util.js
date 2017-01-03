@@ -406,11 +406,10 @@ morpheus.Util.hammer = function (el, recognizers) {
 
 	return hammer;
 };
-morpheus.Util.autocompleteArrayMatcher = function (q, cb, array, fields, max) {
+morpheus.Util.autocompleteArrayMatcher = function (token, cb, array, fields, max) {
 	var filteredSet = new morpheus.Set();
-	// an array that will be populated with substring matches
-	// regex used to determine if a string starts with substring `q`
-	var substrRegex = new RegExp('^' + q, 'i');
+	var regex = new RegExp(morpheus.Util.escapeRegex(token), 'i');
+	var regexMatch = new RegExp('(' + morpheus.Util.escapeRegex(token) + ')', 'i');
 	// iterate through the pool of strings and for any string that
 	// contains the substring `q`, add it to the `matches` array
 	if (fields) {
@@ -420,7 +419,7 @@ morpheus.Util.autocompleteArrayMatcher = function (q, cb, array, fields, max) {
 			for (var j = 0; j < nfields; j++) {
 				var field = fields[j];
 				var value = item[field];
-				if (substrRegex.test(value)) {
+				if (regex.test(value)) {
 					filteredSet.add(value);
 					break;
 				}
@@ -432,15 +431,30 @@ morpheus.Util.autocompleteArrayMatcher = function (q, cb, array, fields, max) {
 	} else {
 		for (var i = 0, n = array.length; i < n; i++) {
 			var value = array[i];
-			if (substrRegex.test(value)) {
+			if (regex.test(value)) {
 				filteredSet.add(value);
+				if (filteredSet.size() === max) {
+					break;
+				}
 			}
-			if (filteredSet.size() === max) {
-				break;
-			}
+
 		}
 	}
-	cb(filteredSet.values());
+	var matches = [];
+
+	filteredSet.forEach(function (value) {
+		var quotedValue = value;
+		if (quotedValue.indexOf(' ') !== -1) {
+			quotedValue = '"' + quotedValue + '"';
+		}
+		matches.push({
+			value: quotedValue,
+			label: '<span>' + value.replace(regexMatch, '<b>$1</b>')
+			+ '</span>'
+		});
+	});
+
+	cb(matches);
 };
 
 /**

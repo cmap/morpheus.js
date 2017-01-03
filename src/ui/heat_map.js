@@ -997,6 +997,9 @@ morpheus.HeatMap.prototype = {
 	getProject: function () {
 		return this.project;
 	},
+	getDendrogram: function (isColumns) {
+		return isColumns ? this.columnDendrogram : this.rowDendrogram;
+	},
 	/**
 	 * @param tree
 	 *            An object with maxHeight, a rootNode, leafNodes, and

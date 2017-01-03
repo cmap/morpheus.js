@@ -143,7 +143,9 @@ morpheus.HeatMapToolBar = function (controller) {
 	.push('<div style="display: none;  margin-left:10px;" data-name="searchRowDendrogramWrapper"' +
 		' class="form-group">');
 	searchHtml
-	.push('<div class="input-group"><span class="input-group-addon">Row Dendrogram</span><input type="text" style="width:240px;" class="form-control input-sm" autocomplete="off" name="searchRowDendrogram"></div>');
+	.push('<span style="font-size: 12px;">Row Dendrogram</span><input type="text"' +
+		' style="width:240px;"' +
+		' class="form-control input-sm" autocomplete="off" name="searchRowDendrogram">');
 	searchHtml
 	.push('<h6 data-name="searchResultsRowDendrogram" style="display: inline;"></h6>');
 	searchHtml.push('</div>');
@@ -152,7 +154,7 @@ morpheus.HeatMapToolBar = function (controller) {
 	.push('<div style="display: none; margin-left:10px;"' +
 		' data-name="searchColumnDendrogramWrapper" class="form-group">');
 	searchHtml
-	.push('<div class="input-group"><span class="input-group-addon">Column Dendrogram</span><input type="text" style="width:240px;" class="form-control input-sm" autocomplete="off" name="searchColumnDendrogram"></div>');
+	.push('<span style="font-size: 12px;">Column Dendrogram</span><input type="text" style="width:240px;" class="form-control input-sm" autocomplete="off" name="searchColumnDendrogram">');
 	searchHtml
 	.push('<h6 data-name="searchResultsColumnDendrogram" style="display: inline;"></h6>');
 	searchHtml.push('</div>');
@@ -653,10 +655,32 @@ morpheus.HeatMapToolBar = function (controller) {
 		});
 	}, 500));
 
-	// TODO combine search with autocomplete
+	// dendrogram search
+
+	morpheus.Util.autosuggest({
+		$el: this.$searchRowDendrogram,
+		filter: function (tokens, cb) {
+			var d = controller.getDendrogram(false);
+			if (!d.searchTerms) {
+				cb([]);
+			} else {
+				var token = tokens != null && tokens.length > 0 ? tokens[tokens.selectionStartIndex]
+					: '';
+				token = $.trim(token);
+				if (token === '') {
+					cb([]);
+				} else {
+					morpheus.Util.autocompleteArrayMatcher(token, cb, d.searchTerms, null, 10);
+				}
+			}
+		},
+		select: function () {
+			_this.searchDendrogram(false);
+		}
+	});
+
 	this.$searchRowDendrogram.on('keyup', _.debounce(function (e) {
 		if (e.which === 13) {
-			// _this.$searchRowDendrogram.autocomplete('close');
 			e.preventDefault();
 		}
 		_this.searchDendrogram(false);
@@ -665,9 +689,31 @@ morpheus.HeatMapToolBar = function (controller) {
 			eventAction: 'searchRowDendrogram'
 		});
 	}, 500));
+
+	morpheus.Util.autosuggest({
+		$el: this.$searchColumnDendrogram,
+		filter: function (tokens, cb) {
+			var d = controller.getDendrogram(true);
+			if (!d.searchTerms) {
+				cb([]);
+			} else {
+				var token = tokens != null && tokens.length > 0 ? tokens[tokens.selectionStartIndex]
+					: '';
+				token = $.trim(token);
+				if (token === '') {
+					cb([]);
+				} else {
+					morpheus.Util.autocompleteArrayMatcher(token, cb, d.searchTerms, null, 10);
+				}
+			}
+		},
+		select: function () {
+			_this.searchDendrogram(true);
+		}
+	});
+
 	this.$searchColumnDendrogram.on('keyup', _.debounce(function (e) {
 		if (e.which === 13) {
-			// _this.$searchColumnDendrogram.autocomplete('close');
 			e.preventDefault();
 		}
 		_this.searchDendrogram(true);
@@ -996,8 +1042,8 @@ morpheus.HeatMapToolBar.prototype = {
 		}
 		if (options.onTop) {
 			options.isColumns ? this.$columnMatchesToTop
-			.addClass('btn-primary') : this.$rowMatchesToTop
-			.addClass('btn-primary');
+				.addClass('btn-primary') : this.$rowMatchesToTop
+				.addClass('btn-primary');
 
 		}
 		$tf.val(existing + options.text);
@@ -1050,9 +1096,9 @@ morpheus.HeatMapToolBar.prototype = {
 		}
 		if (matches <= 0) {
 			var positions = isColumns ? this.controller
-			.getHeatMapElementComponent().getColumnPositions()
+				.getHeatMapElementComponent().getColumnPositions()
 				: this.controller.getHeatMapElementComponent()
-			.getRowPositions();
+				.getRowPositions();
 			positions.setSquishedIndices(null);
 			if (isColumns) {
 				this.controller.getProject().setGroupColumns([], true);
@@ -1072,13 +1118,13 @@ morpheus.HeatMapToolBar.prototype = {
 	search: function (isRows) {
 		this.searching = true;
 		var isMatchesOnTop = isRows ? this.$rowMatchesToTop
-		.hasClass('btn-primary') : this.$columnMatchesToTop
-		.hasClass('btn-primary');
+			.hasClass('btn-primary') : this.$columnMatchesToTop
+			.hasClass('btn-primary');
 		var controller = this.controller;
 		var project = controller.getProject();
 
 		var sortKeys = isRows ? project.getRowSortKeys() : project
-		.getColumnSortKeys();
+			.getColumnSortKeys();
 		var keyIndex = -1;
 		for (var i = 0; i < sortKeys.length; i++) {
 			if (sortKeys[i].toString() === 'matches on top') {
@@ -1094,10 +1140,10 @@ morpheus.HeatMapToolBar.prototype = {
 		var $searchResultsLabel = this.$el.find('[data-name=searchResults'
 			+ (isRows ? 'Rows' : 'Columns') + ']');
 		var searchText = !isRows ? $.trim(this.$columnTextField.val()) : $
-		.trim(this.$rowTextField.val());
+			.trim(this.$rowTextField.val());
 
 		var metadata = isRows ? dataset.getRowMetadata() : dataset
-		.getColumnMetadata();
+			.getColumnMetadata();
 		var visibleIndices = [];
 		controller.getVisibleTrackNames(!isRows).forEach(function (name) {
 			visibleIndices.push(morpheus.MetadataUtil.indexOf(metadata, name));
@@ -1139,8 +1185,8 @@ morpheus.HeatMapToolBar.prototype = {
 			for (var i = 0, length = searchResultViewIndices.length; i < length; i++) {
 				var viewIndex = searchResultViewIndices[i];
 				searchResultsModelIndices.push(isRows ? project
-				.convertViewRowIndexToModel(viewIndex) : project
-				.convertViewColumnIndexToModel(viewIndex));
+					.convertViewRowIndexToModel(viewIndex) : project
+					.convertViewColumnIndexToModel(viewIndex));
 			}
 		}
 
@@ -1190,7 +1236,7 @@ morpheus.HeatMapToolBar.prototype = {
 		}
 		// update selection
 		(!isRows ? project.getColumnSelectionModel() : project
-		.getRowSelectionModel()).setViewIndices(
+			.getRowSelectionModel()).setViewIndices(
 			searchResultsViewIndicesSet, true);
 
 		if (isMatchesOnTop) { // resort

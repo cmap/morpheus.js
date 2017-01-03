@@ -32,6 +32,7 @@ morpheus.AnnotateDendrogramTool.prototype = {
 		result.done(function(lines) {
 			var header = lines[0].split(tab);
 			var promptTool = {};
+			// node.info = {foo:['a', 'b'], bar:[3]}
 			promptTool.execute = function(options) {
 				var nodeIdField = options.input.node_id_field;
 				var nodeIdIndex = _.indexOf(header, nodeIdField);
