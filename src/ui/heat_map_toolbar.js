@@ -15,12 +15,18 @@ morpheus.HeatMapToolBar = function (controller) {
 		e.preventDefault();
 	});
 	if (controller.options.toolbar.searchRows && controller.options.toolbar.searchColumns) {
+		searchHtml.push('<div class="btn-group" data-toggle="buttons">');
+		searchHtml.push('<label class="btn btn-default btn-xxs active">');
 		searchHtml
-		.push('<button data-toggle="tooltip" title="Toggle Search (' + morpheus.Util.COMMAND_KEY + '/)" name="searchRowsToggle" type="button" class="btn btn-default btn-xxs' +
-			' btn-primary"> Rows</button>');
+		.push('<input type="radio" autocomplete="off" checked data-toggle="tooltip" title="Toggle Search (' + morpheus.Util.COMMAND_KEY + '/)" name="searchRowsToggle" type="button"> Rows');
+		searchHtml.push('</label>');
+
+		searchHtml.push('<label class="btn btn-default btn-xxs">');
 		searchHtml
-		.push('<button data-toggle="tooltip" title="Toggle Search (' + morpheus.Util.COMMAND_KEY + '/)" name="searchColumnsToggle" type="button" class="btn btn-default' +
-			' btn-xxs"> Columns</button>');
+		.push('<input type="radio" autocomplete="off" data-toggle="tooltip" title="Toggle Search (' + morpheus.Util.COMMAND_KEY + '/)" name="searchColumnsToggle"> Columns');
+		searchHtml.push('</label>');
+
+		searchHtml.push('</div>');
 	}
 
 	if (controller.options.toolbar.searchRows) {
@@ -573,21 +579,17 @@ morpheus.HeatMapToolBar = function (controller) {
 	var $searchRowsGroup = $search.find('[data-name=searchRowsGroup]');
 	var $searchColumnsGroup = $search.find('[data-name=searchColumnsGroup]');
 	$searchRowsToggle.on('click', function () {
-		$searchRowsToggle.addClass('btn-primary');
-		$searchColumnsToggle.removeClass('btn-primary');
 		$searchRowsGroup.css('display', 'inline-block');
 		$searchColumnsGroup.css('display', 'none');
 		_this.$rowTextField.focus();
 	});
 	$searchColumnsToggle.on('click', function () {
-		$searchRowsToggle.removeClass('btn-primary');
-		$searchColumnsToggle.addClass('btn-primary');
 		$searchRowsGroup.css('display', 'none');
 		$searchColumnsGroup.css('display', 'inline-block');
 		_this.$columnTextField.focus();
 	});
 	this.toggleSearch = function () {
-		if ($searchRowsToggle.hasClass('btn-primary')) {
+		if ($searchRowsToggle.parent().hasClass('active')) {
 			$searchColumnsToggle.click();
 		} else {
 			$searchRowsToggle.click();
@@ -730,12 +732,14 @@ morpheus.HeatMapToolBar = function (controller) {
 			$searchResultsLabel.html('');
 			project.getElementSelectionModel().setViewIndices(null);
 		} else {
-			var viewIndices = new morpheus.Set();
-			morpheus.DatasetUtil.searchValues(project
-			.getSortedFilteredDataset(), text, function (value, i, j) {
-				viewIndices.add(new morpheus.Identifier([i, j]));
-				return true;
+			var viewIndices = morpheus.DatasetUtil.searchValues({
+				dataset: project
+				.getSortedFilteredDataset(),
+				text: text,
+				matchAllPredicates: false, // TODO choose
+				defaultMatchMode: 'contains'
 			});
+
 			project.getElementSelectionModel().setViewIndices(viewIndices);
 			$searchResultsLabel.html(viewIndices.size() + ' match'
 				+ (viewIndices.size() === 1 ? '' : 'es'));
@@ -1086,8 +1090,12 @@ morpheus.HeatMapToolBar.prototype = {
 			: this.controller.rowDendrogram;
 		var $searchResults = isColumns ? this.$searchResultsColumnDendrogram
 			: this.$searchResultsRowDendrogram;
-		var matches = morpheus.DendrogramUtil.search(
-			dendrogram.tree.rootNode, text);
+		var matches = morpheus.DendrogramUtil.search({
+			rootNode: dendrogram.tree.rootNode,
+			text: text,
+			matchAllPredicates: false,
+			defaultMatchMode: 'contains' // TODO
+		});
 		if (matches === -1) {
 			$searchResults.html('');
 		} else {

@@ -19,7 +19,7 @@ morpheus.DatasetUtil.slicedView = function (dataset, rows, columns) {
 };
 morpheus.DatasetUtil.transposedView = function (dataset) {
 	return dataset instanceof morpheus.TransposedDatasetView ? dataset
-	.getDataset() : new morpheus.TransposedDatasetView(dataset);
+		.getDataset() : new morpheus.TransposedDatasetView(dataset);
 };
 morpheus.DatasetUtil.max = function (dataset, seriesIndex) {
 	seriesIndex = seriesIndex || 0;
@@ -428,73 +428,110 @@ morpheus.DatasetUtil.getSeriesNames = function (dataset) {
 
 /**
  * Search dataset values.
+ *
+ * @param options.dataset
+ *      The dataset
+ * @param options.text
+ *            Search text
+ * @param options.cb
+ *            Callback to add a match
+ * @param options.defaultMatchMode
+ *            'exact' or 'contains'
+ * @param options.matchAllPredicates Whether to match all predicates
+ *
  */
-morpheus.DatasetUtil.searchValues = function (dataset, text, cb) {
+morpheus.DatasetUtil.searchValues = function (options) {
 	if (text === '') {
 		return;
 	}
+	var dataset = options.dataset;
+	var text = options.text;
+	var cb = options.cb;
 	var tokens = morpheus.Util.getAutocompleteTokens(text);
 	if (tokens.length == 0) {
 		return;
 	}
 	var predicates = morpheus.Util.createSearchPredicates({
-		tokens: tokens
+		tokens: tokens,
+		defaultMatchMode: options.defaultMatchMode
 	});
-
+	var matchAllPredicates = options.matchAllPredicates === true;
 	var npredicates = predicates.length;
-	for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-		for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-			for (var k = 0, nseries = dataset.getSeriesCount(); k < nseries; k++) {
-				var matches = false;
-				var element = dataset.getValue(i, j, k);
-				if (element != null) {
-					if (element.toObject) {
-						var object = element.toObject();
-						for (var p = 0; p < npredicates && !matches; p++) {
-							var predicate = predicates[p];
-							var filterColumnName = predicate.getField();
-							if (filterColumnName != null) {
-								var value = object[filterColumnName];
-								if (value != null && predicate.accept(value)) {
-									if (cb(value, i, j) === false) {
-										return;
-									}
-									matches = true;
-									break;
-								}
-							} else { // try all fields
-								for (var name in object) {
-									var value = object[name];
-									if (value != null && predicate.accept(value)) {
-										if (cb(value, i, j) === false) {
-											return;
-										}
-										matches = true;
-										break;
-									}
-								}
-							}
-						}
-					} else {
-						var value = element;
-						for (var p = 0; p < npredicates && !matches; p++) {
-							var predicate = predicates[p];
-							var filterColumnName = predicate.getField();
-							if (filterColumnName == null || filterColumnName === dataset.getName(k)) {
-								if (predicate.accept(value)) {
-									if (cb(value, i, j) === false) {
-										return;
-									}
-									matches = true;
-									break;
-								}
-							}
-						}
+	var viewIndices = new morpheus.Set();
+
+	function isMatch(object, toObject, predicate) {
+		if (object != null) {
+			if (toObject) {
+				var filterColumnName = predicate.getField();
+				if (filterColumnName != null) {
+					var value = object[filterColumnName];
+					return predicate.accept(value);
+				} else { // try all fields
+					for (var name in object) {
+						var value = object[name];
+						return predicate.accept(value);
 					}
+				}
+			} else {
+				var filterColumnName = predicate.getField();
+				if (filterColumnName == null || filterColumnName === dataset.getName(k)) {
+					return predicate.accept(object);
+
 				}
 			}
 		}
 	}
+
+	for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+		for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+			var matches = false;
+			itemSearch:
+				if (matchAllPredicates) {
+					matches = true;
+					for (var p = 0; p < npredicates; p++) {
+						var predicate = predicates[p];
+						var pmatch = false;
+						for (var k = 0, nseries = dataset.getSeriesCount(); k < nseries; k++) {
+							var element = dataset.getValue(i, j, k);
+							var isObject = element != null && element.toObject != null;
+							if (isObject) {
+								element = element.toObject();
+							}
+							if (isMatch(element, isObject, predicate)) {
+								pmatch = true;
+								break;
+							}
+						}
+						if (!pmatch) {
+							matches = false;
+							break itemSearch;
+						}
+					}
+				} else {
+					for (var k = 0, nseries = dataset.getSeriesCount(); k < nseries; k++) {
+						var element = dataset.getValue(i, j, k);
+						var isObject = element != null && element.toObject != null;
+						if (isObject) {
+							element = element.toObject();
+						}
+						for (var p = 0; p < npredicates; p++) {
+							var predicate = predicates[p];
+							if (isMatch(element, isObject, predicate)) {
+								matches = true;
+								break itemSearch;
+							}
+						}
+					}
+				}
+
+			if (matches) {
+				viewIndices
+				.add(new morpheus.Identifier(
+					[i, j]));
+			}
+		}
+	}
+	return viewIndices;
 
 };
 

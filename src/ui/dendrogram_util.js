@@ -266,7 +266,7 @@ morpheus.DendrogramUtil.sortDendrogram = function (root, vectorToSortBy,
 		if (node.children) {
 			node.children.sort(function (a, b) {
 				return (a.weight === b.weight ? 0 : (a.weight < b.weight ? -1
-					: 1));
+						: 1));
 			});
 		}
 		return true;
@@ -334,10 +334,23 @@ morpheus.DendrogramUtil.leastCommonAncestor = function (leafNodes) {
 // + positions.getPosition(node.index);
 // }
 // };
-morpheus.DendrogramUtil.search = function (rootNode, searchText) {
+
+/**
+ *
+ * @param options.rootNode Dendrogram root node
+ * @param options.text Search text
+ * @param options.defaultMatchMode
+ *            'exact' or 'contains'
+ * @param options.matchAllPredicates Whether to match all predicates
+ */
+morpheus.DendrogramUtil.search = function (options) {
+	var searchText = options.text;
+	var rootNode = options.rootNode;
 	var tokens = morpheus.Util.getAutocompleteTokens(searchText);
 	var predicates;
 	var nmatches = 0;
+	var matchAllPredicates = options.matchAllPredicates === true;
+
 	if (tokens == null || tokens.length == 0) {
 		morpheus.DendrogramUtil.dfs(rootNode, function (node) {
 			node.search = false;
@@ -346,7 +359,8 @@ morpheus.DendrogramUtil.search = function (rootNode, searchText) {
 		nmatches = -1;
 	} else {
 		predicates = morpheus.Util.createSearchPredicates({
-			tokens: tokens
+			tokens: tokens,
+			defaultMatchMode: options.defaultMatchMode
 		});
 		var npredicates = predicates.length;
 		morpheus.DendrogramUtil
@@ -355,32 +369,72 @@ morpheus.DendrogramUtil.search = function (rootNode, searchText) {
 			function (node) {
 				var matches = false;
 				if (node.info) {
-					searchLabel: for (var name in node.info) {
-						var vals = node.info[name];
-						if (node.info) {
+					searchLabel:
+						if (!matchAllPredicates) { // at least one predicate matches
 							for (var p = 0; p < npredicates; p++) {
 								var predicate = predicates[p];
-								for (var i = 0, nvals = vals.length; i < nvals; i++) {
-									if (predicate.accept(vals[i])) {
-										matches = true;
-										break searchLabel;
+								var filterColumnName = predicate.getField();
+								if (filterColumnName != null) {
+									var vals = node.info[filterColumnName];
+									for (var i = 0, nvals = vals.length; i < nvals; i++) {
+										if (predicate.accept(vals[i])) {
+											matches = true;
+											break searchLabel;
+										}
 									}
-								}
+								} else {
+									for (var name in node.info) {
+										var vals = node.info[name];
+										for (var i = 0, nvals = vals.length; i < nvals; i++) {
+											if (predicate.accept(vals[i])) {
+												matches = true;
+												break searchLabel;
+											}
+										}
+									}
 
+								}
+							}
+						} else { // all predicates must match
+							matches = true;
+							for (var p = 0; p < npredicates; p++) {
+								var predicate = predicates[p];
+								var filterColumnName = predicate.getField();
+								if (filterColumnName != null) {
+									var vals = node.info[filterColumnName];
+									for (var i = 0, nvals = vals.length; i < nvals; i++) {
+										if (!predicate.accept(vals[i])) {
+											matches = false;
+											break searchLabel;
+										}
+									}
+								} else {
+									for (var name in node.info) {
+										var vals = node.info[name];
+										for (var i = 0, nvals = vals.length; i < nvals; i++) {
+											if (!predicate.accept(vals[i])) {
+												matches = false;
+												break searchLabel;
+											}
+										}
+									}
+
+								}
 							}
 						}
-					}
 				}
 				node.search = matches;
 				if (matches) {
 					nmatches++;
 				}
 				return true;
-			});
+			}
+		);
 
 	}
 	return nmatches;
-};
+}
+;
 morpheus.DendrogramUtil.squishNonSearchedNodes = function (heatMap,
 														   isColumns) {
 	if (isColumns) {
