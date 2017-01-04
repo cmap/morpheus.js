@@ -15,11 +15,12 @@ morpheus.HeatMapToolBar = function (controller) {
 		e.preventDefault();
 	});
 	if (controller.options.toolbar.searchRows && controller.options.toolbar.searchColumns) {
-		searchHtml.push('<div class="btn-group"' +
+		searchHtml.push('<div title="Toggle' +
+			' Search (' + morpheus.Util.COMMAND_KEY + '/)" class="btn-group"' +
 			' data-toggle="buttons">');
 		searchHtml.push('<label class="btn btn-default btn-xxs active">');
 		searchHtml
-		.push('<input data-search="rows" type="radio" autocomplete="off" checked' +
+		.push('<input title="foo" data-search="rows" type="radio" autocomplete="off" checked' +
 			' name="searchToggle"' +
 			' type="button"> Rows');
 		searchHtml.push('</label>');
