@@ -1,7 +1,7 @@
 morpheus.NearestNeighbors = function () {
 };
 morpheus.NearestNeighbors.Functions = [morpheus.Cosine, morpheus.Euclidean,
-	morpheus.Jaccard, morpheus.Pearson, morpheus.Spearman,
+	morpheus.Jaccard, morpheus.KendallsCorrelation, morpheus.Pearson, morpheus.Spearman,
 	morpheus.WeightedMean];
 morpheus.NearestNeighbors.Functions.fromString = function (s) {
 	for (var i = 0; i < morpheus.NearestNeighbors.Functions.length; i++) {
@@ -38,8 +38,8 @@ morpheus.NearestNeighbors.prototype = {
 				form.setVisible('annotation', false);
 				if (val === 'column annotation' || val === 'row annotation') {
 					var metadata = val === 'column annotation' ? project.getFullDataset()
-					.getColumnMetadata() : project.getFullDataset()
-					.getRowMetadata();
+						.getColumnMetadata() : project.getFullDataset()
+						.getRowMetadata();
 					var names = [];
 					// get numeric columns only
 					for (var i = 0; i < metadata.getMetadataCount(); i++) {

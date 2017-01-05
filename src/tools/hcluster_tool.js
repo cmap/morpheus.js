@@ -4,6 +4,7 @@ morpheus.HClusterTool.PRECOMPUTED_DIST = 'Matrix values (for a precomputed dista
 morpheus.HClusterTool.PRECOMPUTED_SIM = 'Matrix values (for a precomputed similarity matrix)';
 morpheus.HClusterTool.Functions = [morpheus.Euclidean, morpheus.Jaccard,
 	new morpheus.OneMinusFunction(morpheus.Cosine),
+	new morpheus.OneMinusFunction(morpheus.KendallsCorrelation),
 	new morpheus.OneMinusFunction(morpheus.Pearson),
 	new morpheus.OneMinusFunction(morpheus.Spearman),
 	morpheus.HClusterTool.PRECOMPUTED_DIST,
@@ -46,9 +47,9 @@ morpheus.HClusterTool.execute = function (dataset, input) {
 		|| input.cluster == 'Rows and columns';
 	var doCluster = function (d, groupByFields) {
 		return (groupByFields && groupByFields.length > 0) ? new morpheus.HClusterGroupBy(
-			d, groupByFields, f, linkageMethod)
+				d, groupByFields, f, linkageMethod)
 			: new morpheus.HCluster(morpheus.HCluster
-		.computeDistanceMatrix(d, f), linkageMethod);
+			.computeDistanceMatrix(d, f), linkageMethod);
 	};
 
 	var rowsHcl;
@@ -57,14 +58,14 @@ morpheus.HClusterTool.execute = function (dataset, input) {
 	if (rows) {
 		rowsHcl = doCluster(
 			input.selectedColumnsToUseForClusteringRows ? new morpheus.SlicedDatasetView(dataset,
-				null, input.selectedColumnsToUseForClusteringRows) : dataset,
+					null, input.selectedColumnsToUseForClusteringRows) : dataset,
 			input.group_rows_by);
 	}
 	if (columns) {
 		columnsHcl = doCluster(
 			morpheus.DatasetUtil
 			.transposedView(input.selectedRowsToUseForClusteringColumns ? new morpheus.SlicedDatasetView(
-				dataset, input.selectedRowsToUseForClusteringColumns, null)
+					dataset, input.selectedRowsToUseForClusteringColumns, null)
 				: dataset), input.group_columns_by);
 
 	}
@@ -116,7 +117,7 @@ morpheus.HClusterTool.prototype = {
 		return [{
 			name: 'metric',
 			options: morpheus.HClusterTool.Functions,
-			value: morpheus.HClusterTool.Functions[3].toString(),
+			value: morpheus.HClusterTool.Functions[4].toString(),
 			type: 'select'
 		}, {
 			name: 'cluster',
@@ -151,13 +152,13 @@ morpheus.HClusterTool.prototype = {
 		var project = options.project;
 		var controller = options.controller;
 		var selectedRowsToUseForClusteringColumns = options.input.cluster_columns_in_space_of_selected_rows_only ? project
-		.getRowSelectionModel().getViewIndices().values()
+			.getRowSelectionModel().getViewIndices().values()
 			: null;
 		if (selectedRowsToUseForClusteringColumns != null && selectedRowsToUseForClusteringColumns.length === 0) {
 			selectedRowsToUseForClusteringColumns = null;
 		}
 		var selectedColumnsToUseForClusteringRows = options.input.cluster_rows_in_space_of_selected_columns_only ? project
-		.getColumnSelectionModel().getViewIndices().values()
+			.getColumnSelectionModel().getViewIndices().values()
 			: null;
 		if (selectedColumnsToUseForClusteringRows != null && selectedColumnsToUseForClusteringRows.length === 0) {
 			selectedColumnsToUseForClusteringRows = null;

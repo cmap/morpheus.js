@@ -368,3 +368,130 @@ morpheus.LinearRegression = function (xVector, yVector) {
 		b: b
 	};
 };
+
+morpheus.KendallsCorrelation = function (x, y) {
+
+	/**
+	 * Returns the sum of the number from 1 .. n according to Gauss' summation formula:
+	 * \[ \sum\limits_{k=1}^n k = \frac{n(n + 1)}{2} \]
+	 *
+	 * @param n the summation end
+	 * @return the sum of the number from 1 to n
+	 */
+	function sum(n) {
+		return n * (n + 1) / 2;
+	}
+
+	var xArray = [];
+	var yArray = [];
+	for (var i = 0, size = x.size(); i < size; ++i) {
+		var x_i = x.getValue(i);
+		var y_i = y.getValue(i);
+		if (isNaN(x_i) || isNaN(y_i)) {
+			continue;
+		}
+		xArray.push(x_i);
+		yArray.push(y_i);
+	}
+	var n = xArray.length;
+	var numPairs = sum(n - 1);
+	var pairs = [];
+	for (var i = 0; i < n; i++) {
+		pairs[i] = [xArray[i], yArray[i]];
+	}
+	pairs.sort(function (pair1, pair2) {
+		var a = pair1[0];
+		var b = pair2[0];
+		var compareFirst = (a === b ? 0 : (a < b ? -1 : 1));
+		if (compareFirst !== 0) {
+			return compareFirst;
+		}
+		a = pair1[1];
+		b = pair2[1];
+		return (a === b ? 0 : (a < b ? -1 : 1));
+	});
+
+	var tiedXPairs = 0;
+	var tiedXYPairs = 0;
+	var consecutiveXTies = 1;
+	var consecutiveXYTies = 1;
+	var prev = pairs[0];
+	for (var i = 1; i < n; i++) {
+		var curr = pairs[i];
+		if (curr[0] === prev[0]) {
+			consecutiveXTies++;
+			if (curr[1] === prev[1]) {
+				consecutiveXYTies++;
+			} else {
+				tiedXYPairs += sum(consecutiveXYTies - 1);
+				consecutiveXYTies = 1;
+			}
+		} else {
+			tiedXPairs += sum(consecutiveXTies - 1);
+			consecutiveXTies = 1;
+			tiedXYPairs += sum(consecutiveXYTies - 1);
+			consecutiveXYTies = 1;
+		}
+		prev = curr;
+	}
+	tiedXPairs += sum(consecutiveXTies - 1);
+	tiedXYPairs += sum(consecutiveXYTies - 1);
+	var swaps = 0;
+	var pairsDestination = [];
+	for (var segmentSize = 1; segmentSize < n; segmentSize <<= 1) {
+		for (var offset = 0; offset < n; offset += 2 * segmentSize) {
+			var i = offset;
+			var iEnd = Math.min(i + segmentSize, n);
+			var j = iEnd;
+			var jEnd = Math.min(j + segmentSize, n);
+			var copyLocation = offset;
+			while (i < iEnd || j < jEnd) {
+				if (i < iEnd) {
+					if (j < jEnd) {
+						var c = (pairs[i][1] === pairs[j][1] ? 0 : (pairs[i][1] < pairs[j][1] ? -1 : 1));
+						if (c <= 0) {
+							pairsDestination[copyLocation] = pairs[i];
+							i++;
+						} else {
+							pairsDestination[copyLocation] = pairs[j];
+							j++;
+							swaps += iEnd - i;
+						}
+					} else {
+						pairsDestination[copyLocation] = pairs[i];
+						i++;
+					}
+				} else {
+					pairsDestination[copyLocation] = pairs[j];
+					j++;
+				}
+				copyLocation++;
+			}
+		}
+		var pairsTemp = pairs;
+		pairs = pairsDestination;
+		pairsDestination = pairsTemp;
+	}
+
+	var tiedYPairs = 0;
+	var consecutiveYTies = 1;
+	prev = pairs[0];
+	for (var i = 1; i < n; i++) {
+		var curr = pairs[i];
+		if (curr[1] === prev[1]) {
+			consecutiveYTies++;
+		} else {
+			tiedYPairs += sum(consecutiveYTies - 1);
+			consecutiveYTies = 1;
+		}
+		prev = curr;
+	}
+	tiedYPairs += sum(consecutiveYTies - 1);
+
+	var concordantMinusDiscordant = numPairs - tiedXPairs - tiedYPairs + tiedXYPairs - 2 * swaps;
+	var nonTiedPairsMultiplied = (numPairs - tiedXPairs) * (numPairs - tiedYPairs);
+	return concordantMinusDiscordant / Math.sqrt(nonTiedPairsMultiplied);
+}
+morpheus.KendallsCorrelation.toString = function () {
+	return 'Kendall\'s correlation';
+};
