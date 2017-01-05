@@ -41,7 +41,7 @@ module.exports = function (grunt) {
 					'css/bootstrap-select.min.css',
 					'css/jquery-ui.min.css',
 					'css/font-awesome.min.css',
-					'css/hopscotch.min.css', 'css/slick.grid.css', 'css/morpheus.grid.css',
+					'css/slick.grid.css', 'css/morpheus.grid.css',
 					'css/animate.css', 'css/morpheus.css'],
 				dest: 'css/morpheus.all.css'
 			},
@@ -62,7 +62,6 @@ module.exports = function (grunt) {
 					'js/canvg.js', 'js/rgbcolor.js',
 					'js/jquery-ui.min.js', 'js/parser.js',
 					'js/FileSaver.min.js', 'js/colorbrewer.js',
-					'js/hopscotch.min.js', 'js/typed.min.js',
 					'js/jquery.event.drag-2.2.js',
 					'js/clipboard.min.js', 'js/slick.min.js',
 					'js/js.cookie.js']
