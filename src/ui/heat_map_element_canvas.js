@@ -161,6 +161,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 		var right = morpheus.Positions.getRight(clip, columnPositions);
 		var top = morpheus.Positions.getTop(clip, rowPositions);
 		var bottom = morpheus.Positions.getBottom(clip, rowPositions);
+
 		context.strokeStyle = 'rgb(0,0,0)';
 		context.lineWidth = 2;
 		// context.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -188,17 +189,19 @@ morpheus.HeatMapElementCanvas.prototype = {
 		context.strokeStyle = 'rgb(182,213,253)';
 		var selectedRowElements = this.selectedRowElements;
 		var selectedColumnElements = this.selectedColumnElements;
+
 		if (!(selectedRowElements.length === 0 &&
 			selectedColumnElements.length === 0)) {
 			if (selectedRowElements.length === 0) {
-				selectedRowElements.push([top, bottom - 1]);
+				selectedRowElements = [[top, bottom - 1]];
 			}
 			if (selectedColumnElements.length === 0) {
-				selectedColumnElements.push([left, right - 1]);
+				selectedColumnElements = [[left, right - 1]];
 			}
 		}
 		var nrows = selectedRowElements.length;
 		var ncols = selectedColumnElements.length;
+
 		if (nrows !== 0 || ncols !== 0) {
 			for (var i = 0; i < nrows; i++) {
 				var r = selectedRowElements[i];
