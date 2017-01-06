@@ -54,7 +54,7 @@ morpheus.HeatMapToolBar = function (controller) {
 		searchHtml.push('<div class="form-group">');
 		searchHtml.push('<div style="display:inline-block;" class="dropdown">');
 		searchHtml
-		.push('<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></button>');
+		.push('<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="fa fa-caret-down"></span></button>');
 		searchHtml.push('<ul data-name="searchOptions" class="dropdown-menu">');
 		searchHtml.push('<li><a data-group="matchMode" data-name="exact" href="#"><span' +
 			' data-type="toggle"></span>Exact' +

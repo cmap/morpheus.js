@@ -62,7 +62,7 @@ morpheus.SortKey.prototype = {
 	setColumns: function (columns) {
 		this.columns = columns;
 	},
-	init: function (dataset) {
+	init: function (dataset, visibleModelIndices) {
 		this.v = dataset.getRowMetadata().getByName(this.field);
 		if (!this.v) {
 			this.v = {};
@@ -82,30 +82,96 @@ morpheus.SortKey.prototype = {
 					|| morpheus.SortKey.ARRAY_MAX_SUMMARY_FUNCTION;
 
 				this.c = this.sortOrder === morpheus.SortKey.SortOrder.ASCENDING ? morpheus.SortKey
-				.ARRAY_ASCENDING_COMPARATOR(summary)
+					.ARRAY_ASCENDING_COMPARATOR(summary)
 					: morpheus.SortKey.ARRAY_DESCENDING_COMPARATOR(summary);
 			} else {
 				this.c = this.sortOrder === morpheus.SortKey.SortOrder.ASCENDING ? morpheus.SortKey.ASCENDING_COMPARATOR
 					: morpheus.SortKey.DESCENDING_COMPARATOR;
 			}
 		}
+		if (this.sortOrder === morpheus.SortKey.SortOrder.TOP_N) {
+			var pairs = [];
+			var missingIndices = [];
+			for (var i = 0, nrows = visibleModelIndices.length; i < nrows; i++) {
+				var index = visibleModelIndices[i];
+				var value = this.v.getValue(index);
+				if (!isNaN(value)) {
+					pairs.push({
+						index: index,
+						value: value
+					});
+				} else {
+					missingIndices.push(index);
+				}
+			}
+			// sort values in descending order
+			var c = this.c;
+			this.c = morpheus.SortKey.NUMBER_ASCENDING_COMPARATOR;
+			pairs
+			.sort(function (pair1, pair2) {
+				return c(pair1.value, pair2.value);
+			});
+
+			var modelIndexToValue = [];
+			var nInGroup = Math.min(pairs.length, 10);
+			var counter = 0;
+			var topIndex = 0;
+
+			var half = Math.floor(pairs.length / 2);
+			var topPairs = pairs.slice(0, half);
+			var bottomPairs = pairs.slice(half);
+			var bottomIndex = bottomPairs.length - 1;
+			var ntop = topPairs.length;
+			var npairs = pairs.length;
+			while (counter < npairs) {
+				for (var i = 0; i < nInGroup && topIndex < ntop; i++, topIndex++, counter++) {
+					modelIndexToValue[topPairs[topIndex].index] = counter;
+				}
+				var indexCounterPairs = [];
+				for (var i = 0; i < nInGroup && bottomIndex >= 0; i++, bottomIndex--, counter++) {
+					indexCounterPairs.push([bottomPairs[bottomIndex].index,
+						counter]);
+				}
+				for (var i = indexCounterPairs.length - 1, j = 0; i >= 0; i--, j++) {
+					var item_i = indexCounterPairs[i];
+					var item_j = indexCounterPairs[j];
+					modelIndexToValue[item_i[0]] = item_j[1];
+				}
+
+			}
+
+			// add on missing
+			for (var i = 0, length = missingIndices.length; i < length; i++, counter++) {
+				modelIndexToValue[missingIndices[i]] = counter;
+			}
+			this.modelIndexToValue = modelIndexToValue;
+
+		}
+		else {
+			delete this.modelIndexToValue;
+		}
 	},
 	getComparator: function () {
 		return this.c;
-	},
+	}
+	,
 	getValue: function (i) {
-		return this.v.getValue(i);
-	},
+		return this.modelIndexToValue ? this.modelIndexToValue[i] : this.v.getValue(i);
+	}
+	,
 	setSortOrder: function (sortOrder) {
 		this.sortOrder = sortOrder;
-	},
+	}
+	,
 	getSortOrder: function () {
 		return this.sortOrder;
-	},
+	}
+	,
 	toString: function () {
 		return this.field;
 	}
-};
+}
+;
 /**
  * @param modelIndices
  *            Selected rows or columns
@@ -136,8 +202,8 @@ morpheus.SortByValuesKey.prototype = {
 		this.rowView = new morpheus.DatasetRowView(this.dataset);
 		this.summaryFunction = this.modelIndices.length > 1 ? morpheus.Median
 			: function (row) {
-			return row.getValue(0);
-		};
+				return row.getValue(0);
+			};
 		if (this.sortOrder === morpheus.SortKey.SortOrder.TOP_N) {
 			var pairs = [];
 
@@ -204,7 +270,7 @@ morpheus.SortByValuesKey.prototype = {
 	},
 	getValue: function (i) {
 		return this.modelIndexToValue ? this.modelIndexToValue[i] : this
-		.summaryFunction(this.rowView.setIndex(i));
+			.summaryFunction(this.rowView.setIndex(i));
 	},
 	setSortOrder: function (sortOrder) {
 		if (typeof sortOrder === 'string') {
@@ -479,7 +545,7 @@ morpheus.SortKey.BOX_PLOT_SUMMARY_FUNCTION = function (array) {
 		var v = morpheus.VectorUtil.arrayAsVector(array);
 		box = morpheus
 		.BoxPlotItem(this.indices != null ? new morpheus.SlicedVector(
-			v, this.indices) : v);
+				v, this.indices) : v);
 		array.box = box;
 	}
 

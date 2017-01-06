@@ -60,7 +60,7 @@ morpheus.CheckBoxList = function (options) {
 		' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">');
 	html.push('<i data-name="checkbox" class="fa fa-square-o"' +
 		' aria-hidden="true"></i>');
-	html.push(' <span class="caret"></span>');
+	html.push(' <span class="fa fa-caret-down"></span>');
 	html.push('</button>');
 	html.push('<ul style="font-size:12px;" class="dropdown-menu">');
 	html.push('<li><a name="selectAll" href="#">Select All</a></li>');

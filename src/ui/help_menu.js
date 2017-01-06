@@ -1,12 +1,12 @@
 morpheus.HelpMenu = function () {
 	var html = [];
 	html.push('<div class="btn-group">');
-	html.push('<button type="button" class="btn btn-default btn-xs' +
+	html.push('<button type="button" class="btn btn-default btn-xxs' +
 		' dropdown-toggle"' +
 		' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">');
 	html.push('<svg width="16px" height="16px"><g><rect x="0" y="0" width="16" height="7"' +
 		' style="fill:#ca0020;stroke:none"/><rect x="0" y="9" width="16" height="7" style="fill:#0571b0;stroke:none"/></g></svg>');
-	html.push(' <span class="caret"></span>');
+	html.push(' <span class="fa fa-caret-down"></span>');
 	html.push('</button>');
 	html
 	.push('<ul class="dropdown-menu dropdown-menu-right" role="menu">');

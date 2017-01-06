@@ -283,6 +283,9 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
 			.getSortKeys(), _this.name);
 			var sortOrder;
 			var sortKey;
+			var vector = (isColumns ? project.getFullDataset().getColumnMetadata()
+				: project.getFullDataset().getRowMetadata()).getByName(name);
+			var dataType = morpheus.VectorUtil.getDataType(vector);
 			if (existingSortKeyIndex != -1) {
 				sortKey = _this.getSortKeys()[existingSortKeyIndex];
 				if (sortKey.getSortOrder() === morpheus.SortKey.SortOrder.UNSORTED) {
@@ -291,8 +294,10 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
 				} else if (sortKey.getSortOrder() === morpheus.SortKey.SortOrder.ASCENDING) {
 					sortOrder = morpheus.SortKey.SortOrder.DESCENDING; // 2nd
 					// click
+				} else if (sortKey.getSortOrder() === morpheus.SortKey.SortOrder.TOP_N) {
+					sortOrder = morpheus.SortKey.SortOrder.UNSORTED;
 				} else {
-					sortOrder = morpheus.SortKey.SortOrder.UNSORTED; // 3rd
+					sortOrder = dataType === 'number' || dataType === '[number]' ? morpheus.SortKey.SortOrder.TOP_N : morpheus.SortKey.SortOrder.UNSORTED; // 3rd
 					// click
 				}
 
@@ -359,7 +364,7 @@ morpheus.VectorTrackHeader.prototype = {
 	},
 	getSortKeys: function () {
 		return this.isColumns ? this.project.getColumnSortKeys() : this.project
-		.getRowSortKeys();
+			.getRowSortKeys();
 	},
 	setOrder: function (sortKeys) {
 		if (this.isColumns) {
