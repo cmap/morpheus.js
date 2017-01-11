@@ -84,7 +84,8 @@ morpheus.HeatMapToolBar = function (controller) {
 
 		searchHtml.push('<div class="form-group">');
 		searchHtml
-		.push('<input type="text" class="form-control input-sm" autocomplete="off" name="search">');
+		.push('<input type="text" class="form-control input-sm" autocomplete="off"' +
+			' name="search">');
 		searchHtml.push('</div>');
 		searchHtml.push('<div class="form-group">');
 		searchHtml.push('<span data-name="searchResultsWrapper" style="display:none;">');
@@ -520,16 +521,22 @@ morpheus.HeatMapToolBar = function (controller) {
 	// set button and search controls visibility
 	if (!controller.options.toolbar.searchRows) {
 		this.rowSearchObject.$toggleButton.hide();
+		this.rowSearchObject.$group.css('display', 'none');
 	}
 
 	if (!controller.options.toolbar.searchColumns) {
 		this.columnSearchObject.$toggleButton.hide();
+		this.columnSearchObject.$group.css('display', 'none');
 	}
 	if (!controller.options.toolbar.searchValues) {
 		this.valueSearchObject.$toggleButton.hide();
 	}
 	this.rowDendrogramSearchObject.$toggleButton.hide();
+	this.rowDendrogramSearchObject.$group.hide();
+
 	this.columnDendrogramSearchObject.$toggleButton.hide();
+	this.columnDendrogramSearchObject.$group.hide();
+
 	this.rowDendrogramSearchObject.$searchResultsWrapper.show();
 	this.columnDendrogramSearchObject.$searchResultsWrapper.show();
 	this.valueSearchObject.$searchResultsWrapper.show();
