@@ -298,7 +298,7 @@ morpheus.HeatMapToolBar = function (controller) {
 	$filterModal.on('mousewheel', function (e) {
 		e.stopPropagation();
 	});
-	var $filter = $('<div></div>');
+	var $filter = $('<div style="padding-bottom:30px;"></div>');
 	$filter.appendTo($filterModal.find('.modal-body'));
 	$filterModal.appendTo($el);
 	var filterHtml = [];
