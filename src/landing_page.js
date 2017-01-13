@@ -1,4 +1,5 @@
 morpheus.LandingPage = function (pageOptions) {
+
 	pageOptions = $.extend({}, {
 		el: $('#vis')
 	}, pageOptions);
@@ -83,9 +84,6 @@ morpheus.LandingPage.prototype = {
 		$(window)
 		.off(
 			'paste.morpheus drop.morpheus dragover.morpheus dragenter.morpheus');
-		// $(window).on('beforeunload.morpheus', function () {
-		// 	return 'Are you sure you want to close Morpheus?';
-		// });
 		this.formBuilder.off('change');
 	},
 	show: function () {
@@ -106,6 +104,12 @@ morpheus.LandingPage.prototype = {
 			var value = e.value;
 			if (value !== '' && value != null) {
 				_this.openFile(value);
+			}
+		});
+
+		$(window).on('beforeunload.morpheus', function () {
+			if (_this.tabManager.getTabCount() > 0) {
+				return 'Are you sure you want to close Morpheus?';
 			}
 		});
 		$(window).on('paste.morpheus', function (e) {

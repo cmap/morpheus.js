@@ -271,11 +271,7 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
 		datasets
 		.push('https://s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct');
 	}
-	var columnAnnotations = [{
-		file: 'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_Sample_Info.txt',
-		datasetField: 'id',
-		fileField: 'id'
-	}];
+	var columnAnnotations = [];
 	if (options.ach) {
 		// there are several cell lines that are in Achilles but not CCLE
 		columnAnnotations
@@ -286,6 +282,12 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
 		});
 
 	}
+	columnAnnotations.push({
+		file: 'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_Sample_Info.txt',
+		datasetField: 'id',
+		fileField: 'id'
+	});
+
 	var returnDeferred = $.Deferred();
 	var datasetDef = morpheus.DatasetUtil.readDatasetArray(datasets);
 
