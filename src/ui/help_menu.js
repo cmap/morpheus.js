@@ -10,11 +10,12 @@ morpheus.HelpMenu = function () {
 	html
 	.push('<ul class="dropdown-menu dropdown-menu-right" role="menu">');
 	html.push('<li><a data-name="contact" href="#">Contact</a></li>');
-	// <li role="presentation" class="divider"></li>
 
 	html.push('<li><a data-name="linking" href="#">Linking</a></li>');
 	html.push('<li><a data-name="tutorial" href="#">Tutorial</a></li>');
 	html.push('<li><a data-name="source" href="#">Source Code</a></li>');
+	html.push('<li role="presentation" class="divider"></li>');
+	html.push('<li><a data-name="keymap" href="#">Keymap Reference</a></li>');
 
 	html.push('</ul>');
 	html.push('</div>');
@@ -61,6 +62,18 @@ morpheus.HelpMenu = function () {
 			eventCategory: 'ToolBar',
 			eventAction: 'source'
 		});
+		e.preventDefault();
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+	});
+	this.$el.find('[data-name=keymap]').on('click', function (e) {
+		morpheus.Util.trackEvent({
+			eventCategory: 'ToolBar',
+			eventAction: 'keymap_reference'
+		});
+		new morpheus.HeatMapKeyListener({
+			$tabPanel: $()
+		}).showKeyMapReference();
 		e.preventDefault();
 		e.stopPropagation();
 		e.stopImmediatePropagation();
