@@ -190,7 +190,7 @@ morpheus.KeyboardCharMap = [
 	"COMMA", // [188]
 	"MINUS", // [189]
 	"PERIOD", // [190]
-	"Slash", // [191]
+	"/", // [191]
 	"BACK_QUOTE", // [192]
 	"", // [193]
 	"", // [194]
