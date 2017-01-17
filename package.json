@@ -27,38 +27,15 @@
     "morpheus"
   ],
   "devDependencies": {
-    "electron": "^1.4.1",
-    "electron-builder": "next",
-    "finalhandler": "^0.5.0",
-    "grunt": "~1.0.1",
+    "grunt": "^1.0.1",
     "grunt-contrib-concat": "~1.0.0",
     "grunt-contrib-copy": "~1.0.0",
     "grunt-contrib-cssmin": "~1.0.1",
-    "grunt-contrib-jshint": "~1.0.0",
+    "grunt-contrib-jshint": "~1.1.0",
     "grunt-contrib-uglify": "~2.0.0",
     "grunt-contrib-watch": "~1.0.0",
     "grunt-jsdoc": "^2.1.0",
-    "ink-docstrap": "^1.3.0",
-    "serve-static": "^1.10.2"
-  },
-  "build": {
-    "appId": "org.broadinstitute.morpheus",
-    "category": "public.app-category.graphics-design",
-    "asar": false,
-    "files": [
-      "js/*",
-      "fonts/*",
-      "index.js",
-      "css/*",
-      "*.html",
-      "package.json"
-    ]
-  },
-  "scripts": {
-    "pack": "build --dir",
-    "dist": "build"
-  },
-  "dependencies": {
-    "doxdox": "^1.1.3"
+    "serve-static": "^1.10.2",
+    "finalhandler": "^0.5.0"
   }
 }
