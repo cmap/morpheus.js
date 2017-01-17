@@ -47,7 +47,6 @@ morpheus.Array2dReaderInteractive.prototype = {
 			var _lines = lines;
 			var grid = new Slick.Grid($el.find('.slick-bordered-table')[0], lines, columns, {
 				enableCellNavigation: true,
-				enableColumnReorder: false,
 				headerRowHeight: 0,
 				showHeaderRow: false,
 				multiColumnSort: false,

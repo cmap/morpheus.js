@@ -6,6 +6,13 @@ morpheus.SaveDatasetTool.prototype = {
 	},
 	init: function (project, form) {
 		form.find('file_name').prop('autofocus', true);
+		var seriesNames = [];
+		var dataset = project.getFullDataset();
+		for (var i = 0, nseries = dataset.getSeriesCount(); i < nseries; i++) {
+			seriesNames.push(dataset.getName(i)); // TODO check data type
+		}
+		form.setOptions('series', seriesNames.length > 1 ? seriesNames : null);
+		form.setVisible('series', seriesNames.length > 1);
 	},
 	gui: function () {
 		return [
@@ -33,17 +40,6 @@ morpheus.SaveDatasetTool.prototype = {
 				options: [],
 				required: true
 			}];
-	},
-	init: function (project, form) {
-
-		var seriesNames = [];
-		var dataset = project.getFullDataset();
-		for (var i = 0, nseries = dataset.getSeriesCount(); i < nseries; i++) {
-			seriesNames.push(dataset.getName(i)); // TODO check data type
-		}
-		form.setOptions('series', seriesNames.length > 1 ? seriesNames : null);
-		form.setVisible('series', seriesNames.length > 1);
-
 	},
 	execute: function (options) {
 		var project = options.project;
