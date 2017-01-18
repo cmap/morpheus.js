@@ -467,12 +467,12 @@ morpheus.Table.prototype = {
 								value: showField ? (field + ':' + val)
 									: val,
 								label: showField ? ('<span style="font-weight:300;">'
-								+ field
-								+ ':</span>'
-								+ '<span style="font-weight:900;">'
-								+ val + '</span>')
+									+ field
+									+ ':</span>'
+									+ '<span style="font-weight:900;">'
+									+ val + '</span>')
 									: ('<span style="font-weight:900;">'
-								+ val + '</span>')
+									+ val + '</span>')
 							});
 						}
 						if (matches.length === maxSize) {
@@ -487,12 +487,12 @@ morpheus.Table.prototype = {
 							value: showField ? (field + ':' + value)
 								: value,
 							label: showField ? ('<span style="font-weight:300;">'
-							+ field
-							+ ':</span>'
-							+ '<span style="font-weight:900;">'
-							+ value + '</span>')
+								+ field
+								+ ':</span>'
+								+ '<span style="font-weight:900;">'
+								+ value + '</span>')
 								: ('<span style="font-weight:900;">'
-							+ value + '</span>')
+								+ value + '</span>')
 						});
 						if (matches.length === maxSize) {
 							return response(matches);

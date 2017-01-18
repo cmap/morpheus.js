@@ -14,11 +14,11 @@ morpheus.HeatMap = function (options) {
 		true,
 		{},
 		{
-			/**
+			/*
 			 * The element in which to render to the heat map.
 			 */
 			el: null,
-			/**
+			/*
 			 * A File or URL to a <a target="_blank"
 			 * href="http://support.lincscloud.org/hc/en-us/articles/202105453-GCT-Gene-Cluster-Text-Format-">GCT
 			 * 1.3</a>, ' + '<a target="_blank"
@@ -32,7 +32,7 @@ morpheus.HeatMap = function (options) {
 			 * combined by matching on column ids.
 			 */
 			dataset: undefined,
-			/**
+			/*
 			 *
 			 * @description Array of file, datasetField, fileField,
 			 *              and include (optional fields to include
@@ -46,14 +46,14 @@ morpheus.HeatMap = function (options) {
 			 *              <code>[{file:'https://MY_URL', datasetField:'name', fileField:'id'}]</code>
 			 */
 			rowAnnotations: undefined,
-			/**
+			/*
 			 * Array of file, datasetField, fileField, and include
 			 * (optional fields to include from file). File can be
 			 * xlsx file, tab-delimitted text file, or gmt file.
 			 */
 			columnAnnotations: undefined,
 
-			/**
+			/*
 			 * Array of column metadata names to group the heat map
 			 * by.
 			 *
@@ -65,7 +65,7 @@ morpheus.HeatMap = function (options) {
 			 * <code>['type', 'gender']</code>
 			 */
 			columnGroupBy: undefined,
-			/**
+			/*
 			 * Array of row metadata names to group the heat map by.
 			 *
 			 * <p>
@@ -74,7 +74,7 @@ morpheus.HeatMap = function (options) {
 			 * <code>['gene']</code>
 			 */
 			rowGroupBy: undefined,
-			/**
+			/*
 			 * Object that describes mapping of values to colors.
 			 * Type can be 'fixed' or 'relative'. Stepped indicates
 			 * whether color scheme is continuous (false) or
@@ -84,11 +84,11 @@ morpheus.HeatMap = function (options) {
 			 * stops at -100, -90, 90, and 100.
 			 * <p>
 			 * <code>{ type : 'fixed', stepped:false, map : [ { value : -100, color :
-						 * 'blue' }, { value : -90, color : 'white' }, { value :
-						 * 90, color : 'white' }, { value : 100, color : 'red' } ] };</code>
+			 * 'blue' }, { value : -90, color : 'white' }, { value :
+			 * 90, color : 'white' }, { value : 100, color : 'red' } ] };</code>
 			 */
 			colorScheme: undefined,
-			/**
+			/*
 			 * Array of metadata names and sort order. Use 0 for
 			 * ascending and 1 for descending. To sort by values use
 			 * modelIndices.
@@ -98,10 +98,10 @@ morpheus.HeatMap = function (options) {
 			 * descending by stdev
 			 * </p>
 			 * <code>[{field:'gene', order:0}, {field:'stdev',
-						 *              order:1}]</code>
+			 *              order:1}]</code>
 			 */
 			rowSortBy: undefined,
-			/**
+			/*
 			 * Array of metadata names and sort order. Use 0 for
 			 * ascending and 1 for descending.
 			 *
@@ -110,33 +110,33 @@ morpheus.HeatMap = function (options) {
 			 * descending by stdev
 			 * </p>
 			 * <code> [{name:'gene',
-						 *              order:0}, {name:'stdev', order:1}]</code>
+			 *              order:0}, {name:'stdev', order:1}]</code>
 			 */
 			columnSortBy: undefined,
-			/**
+			/*
 			 * URL to a dendrogram in <a target="_blank"
 			 * href="https://en.wikipedia.org/wiki/Newick_format">Newick
 			 * format</a>
 			 */
 			rowDendrogram: undefined,
-			/**
+			/*
 			 * URL to a dendrogram in <a target="_blank"
 			 * href="https://en.wikipedia.org/wiki/Newick_format">Newick
 			 * format</a>
 			 */
 			columnDendrogram: undefined,
 
-			/**
+			/*
 			 * Column metadata field in dataset used to match leaf
 			 * node ids in column dendrogram Newick file
 			 */
 			columnDendrogramField: 'id',
-			/**
+			/*
 			 * Row metadata field in dataset used to match leaf node
 			 * ids in row dendrogram Newick file
 			 */
 			rowDendrogramField: 'id',
-			/**
+			/*
 			 * Array of objects describing how to display row
 			 * metadata fields. Each object in the array must have
 			 * field, and optionally display, order, and renameTo.
@@ -149,7 +149,7 @@ morpheus.HeatMap = function (options) {
 			 * allows you to rename a field.
 			 */
 			rows: [],
-			/**
+			/*
 			 * Array of objects describing how to display column
 			 * metadata fields. Each object in the array must have
 			 * field, and optionally display, order, and renameTo.
@@ -162,21 +162,21 @@ morpheus.HeatMap = function (options) {
 			 * allows you to rename a field.
 			 */
 			columns: [],
-			/**
+			/*
 			 * Optional array of tools to run at load time. For
 			 * example: <code>tools : [ {
-						 * name : 'Marker Selection',
-						 * params : {
-						 * 		field : [ comparisonVector.getName() ],
-						 *      class_a : [ 'A' ], class_b : [ 'B' ] }} ]</code>
+			 * name : 'Marker Selection',
+			 * params : {
+			 * 		field : [ comparisonVector.getName() ],
+			 *      class_a : [ 'A' ], class_b : [ 'B' ] }} ]</code>
 			 */
 			tools: undefined,
-			/**
+			/*
 			 * Optional array of {name:string, values:[]}
 			 */
 			rowFilter: undefined,
 			columnFilter: undefined,
-			/**
+			/*
 			 * Whether this heat map tab can be closed
 			 */
 			closeable: true,
@@ -189,7 +189,7 @@ morpheus.HeatMap = function (options) {
 			width: undefined, // set the available width for the
 			// heat map. If not
 			// set, it will be determined automatically
-			/** Whether to focus this tab */
+			/* Whether to focus this tab */
 			focus: true,
 			tooltipMode: 0, // 0=top status bar, 1=dialog, 2=follow
 			inheritFromParent: true,
@@ -461,7 +461,8 @@ morpheus.HeatMap = function (options) {
 								.getBaseFileName(morpheus.Util
 								.getFileName(option.dataset))
 							});
-						} catch (x) {
+						}
+						catch (x) {
 							console
 							.log('Autodisplay errror');
 						}
@@ -587,7 +588,8 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
 							terminate();
 							try {
 								controller.getTabManager().removeTask(task);
-							} catch (x) {
+							}
+							catch (x) {
 								console.log('Error removing task');
 							}
 							if (callback) {
@@ -599,7 +601,8 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
 							callback(input);
 						}
 					}
-				} catch (e) {
+				}
+				catch (e) {
 					morpheus.FormBuilder.showInModal({
 						title: 'Error',
 						html: e,
@@ -608,11 +611,13 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
 					if (e.stack) {
 						console.log(e.stack);
 					}
-				} finally {
+				}
+				finally {
 					if (task.worker === undefined) {
 						try {
 							controller.getTabManager().removeTask(task);
-						} catch (x) {
+						}
+						catch (x) {
 							console.log('Error removing task');
 						}
 					}
@@ -651,7 +656,8 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
 			if (callback) {
 				callback({});
 			}
-		} catch (e) {
+		}
+		catch (e) {
 			morpheus.FormBuilder.showInModal({
 				title: 'Error',
 				html: e,
@@ -660,7 +666,8 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
 			if (e.stack) {
 				console.log(e.stack);
 			}
-		} finally {
+		}
+		finally {
 			if (tool.dispose) {
 				tool.dispose();
 			}
@@ -1713,7 +1720,8 @@ morpheus.HeatMap.prototype = {
 				try {
 					ext = morpheus.Util.getExtension(morpheus.Util
 					.getFileName(this.options.dataSource));
-				} catch (x) {
+				}
+				catch (x) {
 
 				}
 			}
@@ -2018,8 +2026,7 @@ morpheus.HeatMap.prototype = {
 				var activeComponent = _this
 				.getActiveComponent();
 				var project = _this.project;
-
-				if (activeComponent === 'heatMap') {
+				if (activeComponent === 'heatMap' || ev.shiftKey) {
 					// copy selected text or image
 					// var text = _this.getSelectedElementsText();
 					// if (text !== '') {
@@ -2253,12 +2260,14 @@ morpheus.HeatMap.prototype = {
 						project: _this.getProject(),
 						input: input
 					});
-				} catch (x) {
+				}
+				catch (x) {
 					if (x.stack) {
 						console.log(x.stack);
 					}
 					console.log('Error running ' + item.name);
-				} finally {
+				}
+				finally {
 					if (tool.dispose) {
 						tool.dispose();
 					}
@@ -2886,7 +2895,7 @@ morpheus.HeatMap.prototype = {
 				}
 			}
 			if (this.heatmap.canvas === active) {
-				return 'heatMap'
+				return 'heatMap';
 			}
 		}
 		return '';
@@ -2898,9 +2907,7 @@ morpheus.HeatMap.prototype = {
 
 		}
 		this.project.off();
-
 		this.$tipInfoWindow.dialog('destroy');
-
 		this.rowTrackHeaders.forEach(function (header) {
 			header.dispose();
 		});

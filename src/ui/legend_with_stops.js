@@ -27,8 +27,8 @@ morpheus.LegendWithStops = function () {
 			.findIndexForPosition(morpheus.CanvasUtil
 			.getMousePos(event.target, event, true));
 		}).on('panend', this.panend = function (event) {
-		that.panStartSelectedIndex = -1;
-	}).on(
+			that.panStartSelectedIndex = -1;
+		}).on(
 		'tap',
 		this.tap = function (event) {
 			var position = morpheus.CanvasUtil.getMousePos(

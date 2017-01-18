@@ -85,7 +85,7 @@ morpheus.Positions.prototype = {
 	},
 	getItemSize: function (index) {
 		return this.squishedIndices[index] === true ? this.size
-		* this.squishFactor : this.size;
+			* this.squishFactor : this.size;
 	},
 	getSize: function () {
 		return this.size;
@@ -178,7 +178,7 @@ morpheus.Positions.prototype = {
 			var midVal = this.getPosition(mid);
 			var size = this.getItemSize(mid);
 			var nextStart = maxIndex === mid ? midVal + size : this
-			.getPosition(mid + 1);
+				.getPosition(mid + 1);
 			if (midVal <= position && position < nextStart) {
 				return mid;
 			}

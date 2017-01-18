@@ -38,42 +38,42 @@ morpheus.FormBuilder = function (options) {
 				e.stopPropagation();
 			}
 		}).on('dragleave', function (e) {
-		var node = $(e.originalEvent.srcElement).parent().parent().prev();
-		if (node.is('select') && node.hasClass('file-input')) {
-			$(e.originalEvent.srcElement).parent().css('border', '');
-			e.preventDefault();
-			e.stopPropagation();
-		}
-	}).on('drop', function (e) {
-		var node = $(e.originalEvent.srcElement).parent().parent().prev();
-		if (node.is('select') && node.hasClass('file-input')) {
-			var isMultiple = node.data('multiple'); // multiple files?
-			$(e.originalEvent.srcElement).parent().css('border', '');
-			var name = node.attr('name');
-			name = name.substring(0, name.length - '_picker'.length);
-			if (e.originalEvent.dataTransfer) {
-				if (e.originalEvent.dataTransfer.files.length) {
-					e.preventDefault();
-					e.stopPropagation();
-					var files = e.originalEvent.dataTransfer.files;
-					that.setValue(name, isMultiple ? files : files[0]);
-					that.trigger('change', {
-						name: name,
-						value: files[0]
-					});
-				} else {
-					var url = e.originalEvent.dataTransfer.getData('URL');
-					e.preventDefault();
-					e.stopPropagation();
-					that.setValue(name, isMultiple ? [url] : url);
-					that.trigger('change', {
-						name: name,
-						value: url
-					});
+			var node = $(e.originalEvent.srcElement).parent().parent().prev();
+			if (node.is('select') && node.hasClass('file-input')) {
+				$(e.originalEvent.srcElement).parent().css('border', '');
+				e.preventDefault();
+				e.stopPropagation();
+			}
+		}).on('drop', function (e) {
+			var node = $(e.originalEvent.srcElement).parent().parent().prev();
+			if (node.is('select') && node.hasClass('file-input')) {
+				var isMultiple = node.data('multiple'); // multiple files?
+				$(e.originalEvent.srcElement).parent().css('border', '');
+				var name = node.attr('name');
+				name = name.substring(0, name.length - '_picker'.length);
+				if (e.originalEvent.dataTransfer) {
+					if (e.originalEvent.dataTransfer.files.length) {
+						e.preventDefault();
+						e.stopPropagation();
+						var files = e.originalEvent.dataTransfer.files;
+						that.setValue(name, isMultiple ? files : files[0]);
+						that.trigger('change', {
+							name: name,
+							value: files[0]
+						});
+					} else {
+						var url = e.originalEvent.dataTransfer.getData('URL');
+						e.preventDefault();
+						e.stopPropagation();
+						that.setValue(name, isMultiple ? [url] : url);
+						that.trigger('change', {
+							name: name,
+							value: url
+						});
+					}
 				}
 			}
-		}
-	});
+		});
 	// this.labelColumnDef = '4';
 	// this.fieldColumnDef = '8';
 };
@@ -221,7 +221,7 @@ morpheus.FormBuilder.showInModal = function (options) {
 		title: options.title,
 		html: options.html,
 		footer: options.close ? ('<button type="button" class="btn btn-default" data-dismiss="modal">'
-		+ options.close + '</button>')
+			+ options.close + '</button>')
 			: null,
 		onClose: options.callback,
 		backdrop: options.backdrop,
@@ -631,8 +631,8 @@ morpheus.FormBuilder.prototype = {
 							success: function (results) {
 								var val = !isMultiple ? results[0].link
 									: results.map(function (result) {
-									return result.link;
-								});
+										return result.link;
+									});
 								that.setValue(name, val);
 								that.trigger('change', {
 									name: name,

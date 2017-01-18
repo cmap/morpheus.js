@@ -1,4 +1,4 @@
-morpheus.SingleLinkage = function(nelements, distmatrix) {
+morpheus.SingleLinkage = function (nelements, distmatrix) {
 	var i, j, k;
 	var nnodes = nelements - 1;
 	var temp = []; // var[nnodes];
@@ -7,9 +7,9 @@ morpheus.SingleLinkage = function(nelements, distmatrix) {
 	var result = []; // new Node[nelements];
 	for (i = 0; i < nelements; i++) {
 		result[i] = {
-			left : 0,
-			right : 0,
-			distance : 0
+			left: 0,
+			right: 0,
+			distance: 0
 		};
 	}
 	for (i = 0; i < nnodes; i++)
@@ -40,7 +40,7 @@ morpheus.SingleLinkage = function(nelements, distmatrix) {
 	for (i = 0; i < nnodes; i++) {
 		result[i].left = i;
 	}
-	result.sort(function(node1, node2) {
+	result.sort(function (node1, node2) {
 		var term1 = node1.distance;
 		var term2 = node2.distance;
 		if (term1 < term2)

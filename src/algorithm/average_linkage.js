@@ -1,11 +1,11 @@
 /**
  * Performs clustering using pairwise average linking on the given distance
  * matrix.
- * 
+ *
  * @return array of nodes. Each node object contains a left, right, and
  *         distance.
  */
-morpheus.AverageLinkage = function(nelements, distmatrix) {
+morpheus.AverageLinkage = function (nelements, distmatrix) {
 	var j;
 	var n;
 	var clusterid;
@@ -16,9 +16,9 @@ morpheus.AverageLinkage = function(nelements, distmatrix) {
 	result = []; // nelements - 1;
 	for (var i = 0; i < nelements - 1; i++) {
 		result[i] = {
-			left : 0,
-			right : 0,
-			distance : 0
+			left: 0,
+			right: 0,
+			distance: 0
 		};
 	}
 	/*
@@ -46,17 +46,17 @@ morpheus.AverageLinkage = function(nelements, distmatrix) {
 		var sum = number[is] + number[js];
 		for (j = 0; j < js; j++) {
 			distmatrix[js][j] = distmatrix[is][j] * number[is]
-					+ distmatrix[js][j] * number[js];
+				+ distmatrix[js][j] * number[js];
 			distmatrix[js][j] /= sum;
 		}
 		for (j = js + 1; j < is; j++) {
 			distmatrix[j][js] = distmatrix[is][j] * number[is]
-					+ distmatrix[j][js] * number[js];
+				+ distmatrix[j][js] * number[js];
 			distmatrix[j][js] /= sum;
 		}
 		for (j = is + 1; j < n; j++) {
 			distmatrix[j][js] = distmatrix[j][is] * number[is]
-					+ distmatrix[j][js] * number[js];
+				+ distmatrix[j][js] * number[js];
 			distmatrix[j][js] /= sum;
 		}
 		for (j = 0; j < is; j++)

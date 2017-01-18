@@ -10,7 +10,7 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
 				+ positions.getItemSize(positions.getLength() - 1);
 			var squishFactor = total
 				/ (isColumns ? track.getUnscaledWidth() : track
-				.getUnscaledHeight());
+					.getUnscaledHeight());
 			var clientXY = morpheus.CanvasUtil.getClientXY(event, useDelta);
 			var p = morpheus.CanvasUtil.getMousePosWithScroll(event.target,
 				event, 0, 0, useDelta);
@@ -47,7 +47,7 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
 			var commandKey = morpheus.Util.IS_MAC ? event.srcEvent.metaKey
 				: event.srcEvent.ctrlKey;
 			var viewIndices = commandKey ? selectionModel
-			.getViewIndices() : new morpheus.Set();
+				.getViewIndices() : new morpheus.Set();
 			var _startIndex = startIndex;
 			if (startIndex > endIndex) {
 				var tmp = endIndex;

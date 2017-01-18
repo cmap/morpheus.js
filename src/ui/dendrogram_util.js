@@ -236,13 +236,13 @@ morpheus.DendrogramUtil.setNodeDepths = function (rootNode) {
 morpheus.DendrogramUtil.sortDendrogram = function (root, vectorToSortBy,
 												   project, summaryFunction) {
 	summaryFunction = summaryFunction || function (array) {
-			var min = Number.MAX_VALUE;
-			for (var i = 0; i < array.length; i++) {
+		var min = Number.MAX_VALUE;
+		for (var i = 0; i < array.length; i++) {
 				// sum += array[i].weight;
-				min = Math.min(min, array[i].weight);
-			}
-			return min;
-		};
+			min = Math.min(min, array[i].weight);
+		}
+		return min;
+	};
 	var setWeights = function (node) {
 		if (node.children !== undefined) {
 			var children = node.children;

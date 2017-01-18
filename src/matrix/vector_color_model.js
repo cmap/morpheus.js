@@ -97,8 +97,11 @@ morpheus.VectorColorModel.prototype = {
 		});
 		this.vectorNameToColorScheme.forEach(function (colorScheme, name) {
 			c.vectorNameToColorScheme.set(name, colorScheme
-			.copy(new morpheus.Project(new morpheus.Dataset('',
-				1, 1))));
+			.copy(new morpheus.Project(new morpheus.Dataset({
+				name: '',
+				rows: 1,
+				columns: 1
+			}))));
 		});
 		return c;
 	},
@@ -129,16 +132,20 @@ morpheus.VectorColorModel.prototype = {
 		var min = minMax.min;
 		var max = minMax.max;
 		var cs = new morpheus.HeatMapColorScheme(new morpheus.Project(
-			new morpheus.Dataset('', 1, 1)), {
-			type: 'fixed',
-			map: [{
-				value: min,
-				color: colorbrewer.Greens[3][0]
-			}, {
-				value: max,
-				color: colorbrewer.Greens[3][2]
-			}]
-		});
+			new morpheus.Dataset({
+				name: '',
+				rows: 1,
+				columns: 1
+			})), {
+				type: 'fixed',
+				map: [{
+					value: min,
+					color: colorbrewer.Greens[3][0]
+				}, {
+					value: max,
+					color: colorbrewer.Greens[3][2]
+				}]
+			});
 		this.vectorNameToColorScheme.set(vector.getName(), cs);
 		return cs;
 

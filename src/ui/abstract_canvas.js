@@ -1,81 +1,81 @@
-morpheus.AbstractCanvas = function(offscreen) {
+morpheus.AbstractCanvas = function (offscreen) {
 	this.canvas = morpheus.CanvasUtil.createCanvas();
 	this.lastClip = null;
 	if (offscreen) {
 		this.offscreenCanvas = morpheus.CanvasUtil.createCanvas();
 	}
 	this.offset = {
-		x : 0,
-		y : 0
+		x: 0,
+		y: 0
 	};
 };
 
 morpheus.AbstractCanvas.prototype = {
-	visible : true,
-	invalid : true,
-	scrollX : 0,
-	scrollY : 0,
-	prefWidth : undefined,
-	prefHeight : undefined,
-	getCanvas : function() {
+	visible: true,
+	invalid: true,
+	scrollX: 0,
+	scrollY: 0,
+	prefWidth: undefined,
+	prefHeight: undefined,
+	getCanvas: function () {
 		return this.canvas;
 	},
-	scrollTop : function(pos) {
+	scrollTop: function (pos) {
 		if (pos === undefined) {
 			return this.offset.y;
 		}
 		this.offset.y = pos;
 	},
-	appendTo : function($el) {
+	appendTo: function ($el) {
 		// if (this.offscreenCanvas) {
 		// $(this.offscreenCanvas).appendTo($el);
 		// }
 		$(this.canvas).appendTo($el);
 	},
-	scrollLeft : function(pos) {
+	scrollLeft: function (pos) {
 		if (pos === undefined) {
 			return this.offset.x;
 		}
 		this.offset.x = pos;
 	},
-	dispose : function() {
+	dispose: function () {
 		$(this.canvas).remove();
 		this.offscreenCanvas = undefined;
 	},
-	getPrefWidth : function() {
+	getPrefWidth: function () {
 		return this.prefWidth;
 	},
 	/**
 	 * Tells this canvas to invalidate any offscreen cached images
 	 */
-	setInvalid : function(invalid) {
+	setInvalid: function (invalid) {
 		this.invalid = invalid;
 	},
-	setBounds : function(bounds) {
+	setBounds: function (bounds) {
 		var backingScale = morpheus.CanvasUtil.BACKING_SCALE;
-		var canvases = [ this.canvas ];
+		var canvases = [this.canvas];
 		if (this.offscreenCanvas) {
 			canvases.push(this.offscreenCanvas);
 		}
 		if (bounds.height != null) {
-			_.each(canvases, function(canvas) {
+			_.each(canvases, function (canvas) {
 				canvas.height = bounds.height * backingScale;
 				canvas.style.height = bounds.height + 'px';
 			});
 		}
 		if (bounds.width != null) {
-			_.each(canvases, function(canvas) {
+			_.each(canvases, function (canvas) {
 				canvas.width = bounds.width * backingScale;
 				canvas.style.width = bounds.width + 'px';
 			});
 		}
 		if (bounds.left != null) {
-			_.each(canvases, function(canvas) {
+			_.each(canvases, function (canvas) {
 				canvas.style.left = bounds.left + 'px';
 			});
 		}
 		if (bounds.top != null) {
-			_.each(canvases, function(canvas) {
+			_.each(canvases, function (canvas) {
 				canvas.style.top = bounds.top + 'px';
 			});
 		}
@@ -83,7 +83,7 @@ morpheus.AbstractCanvas.prototype = {
 	/**
 	 * Paint this canvas using the specified clip.
 	 */
-	paint : function(clip) {
+	paint: function (clip) {
 		var canvas = this.canvas;
 		var context = canvas.getContext('2d');
 		morpheus.CanvasUtil.resetTransform(context);
@@ -116,13 +116,13 @@ morpheus.AbstractCanvas.prototype = {
 		this.lastClip = clip;
 		this.invalid = false;
 	},
-	repaint : function() {
+	repaint: function () {
 		if (!this.lastClip) {
 			this.lastClip = {
-				x : 0,
-				y : 0,
-				width : this.getUnscaledWidth(),
-				height : this.getUnscaledHeight()
+				x: 0,
+				y: 0,
+				width: this.getUnscaledWidth(),
+				height: this.getUnscaledHeight()
 			};
 		}
 		this.paint(this.lastClip);
@@ -130,37 +130,37 @@ morpheus.AbstractCanvas.prototype = {
 	/**
 	 * Draw this canvas into the specified context.
 	 */
-	draw : function(clip, context) {
+	draw: function (clip, context) {
 		console.log('Not implemented');
 	},
-	getPrefHeight : function() {
+	getPrefHeight: function () {
 		return this.prefHeight;
 	},
-	setPrefWidth : function(prefWidth) {
+	setPrefWidth: function (prefWidth) {
 		this.prefWidth = prefWidth;
 	},
-	setPrefHeight : function(prefHeight) {
+	setPrefHeight: function (prefHeight) {
 		this.prefHeight = prefHeight;
 	},
-	isVisible : function() {
+	isVisible: function () {
 		return this.visible;
 	},
-	setVisible : function(visible) {
+	setVisible: function (visible) {
 		if (this.visible !== visible) {
 			this.visible = visible;
 			this.canvas.style.display = visible ? '' : 'none';
 		}
 	},
-	getUnscaledWidth : function() {
+	getUnscaledWidth: function () {
 		return this.canvas.width / morpheus.CanvasUtil.BACKING_SCALE;
 	},
-	getUnscaledHeight : function() {
+	getUnscaledHeight: function () {
 		return this.canvas.height / morpheus.CanvasUtil.BACKING_SCALE;
 	},
-	getWidth : function() {
+	getWidth: function () {
 		return this.canvas.width;
 	},
-	getHeight : function() {
+	getHeight: function () {
 		return this.canvas.height;
 	}
 };

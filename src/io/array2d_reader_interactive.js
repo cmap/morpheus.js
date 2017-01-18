@@ -167,12 +167,12 @@ morpheus.Array2dReaderInteractive.prototype = {
 		if (dataColumnStart > 0) {
 			for (var i = 0; i < dataRowStart; i++) {
 				var name = lines[i][0];
-				if (name == null || name === "" || name === "na") {
-					name = "Annotation";
+				if (name == null || name === '' || name === 'na') {
+					name = 'Annotation';
 				}
 				var unique = 1;
 				while (dataset.getColumnMetadata().getByName(name) != null) {
-					name = name + "-" + unique;
+					name = name + '-' + unique;
 					unique++;
 				}
 				var v = dataset.getColumnMetadata().add(name);
@@ -194,12 +194,12 @@ morpheus.Array2dReaderInteractive.prototype = {
 			// row metadata names are in first row
 			for (var j = 0; j < dataColumnStart; j++) {
 				var name = lines[0][j];
-				if (name == null || name === "") {
-					name = "Annotation";
+				if (name == null || name === '') {
+					name = 'Annotation';
 				}
 				var unique = 1;
 				while (dataset.getRowMetadata().get(name) != null) {
-					name = name + "-" + unique;
+					name = name + '-' + unique;
 					unique++;
 				}
 				dataset.getRowMetadata().add(name);

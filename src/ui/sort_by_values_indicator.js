@@ -1,15 +1,15 @@
-morpheus.SortByValuesIndicator = function(project, isVertical, positions) {
+morpheus.SortByValuesIndicator = function (project, isVertical, positions) {
 	morpheus.AbstractCanvas.call(this, true);
 	this.project = project;
 	this.isVertical = isVertical;
 	this.positions = positions;
 	this.lastPosition = {
-		start : -1,
-		end : -1
+		start: -1,
+		end: -1
 	};
 };
 morpheus.SortByValuesIndicator.prototype = {
-	prePaint : function(clip, context) {
+	prePaint: function (clip, context) {
 		var positions = this.positions;
 		var start = 0;
 		var end = positions.getLength();
@@ -21,18 +21,18 @@ morpheus.SortByValuesIndicator.prototype = {
 			end = morpheus.Positions.getBottom(clip, positions);
 		}
 		if (this.invalid || start !== this.lastPosition.start
-				|| end !== this.lastPosition.end) {
+			|| end !== this.lastPosition.end) {
 			this.lastPosition.start = start;
 			this.lastPosition.end = end;
 			this.invalid = true;
 		}
 	},
-	draw : function(clip, context) {
+	draw: function (clip, context) {
 		var project = this.project;
 		var isVertical = this.isVertical;
 		var positions = this.positions;
 		var sortKeys = isVertical ? project.getColumnSortKeys() : project
-				.getRowSortKeys();
+			.getRowSortKeys();
 		context.translate(-clip.x, -clip.y);
 		context.fillStyle = 'black';
 		context.textBaseline = 'top';
@@ -59,8 +59,8 @@ morpheus.SortByValuesIndicator.prototype = {
 				for (var j = 0; j < modelIndices.length; j++) {
 					var modelIndex = modelIndices[j];
 					var view = isVertical ? project
-							.convertModelRowIndexToView(modelIndex) : project
-							.convertModelColumnIndexToView(modelIndex);
+						.convertModelRowIndexToView(modelIndex) : project
+						.convertModelColumnIndexToView(modelIndex);
 					if (view !== -1 && view >= start && view < end) {
 						context.save();
 						var pix = positions.getPosition(view);

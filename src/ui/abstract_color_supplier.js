@@ -91,18 +91,18 @@ morpheus.AbstractColorSupplier.fromJson = function (json) {
 			};
 			if (condition.v1 != null && !isNaN(condition.v1)) {
 				gtf = condition.v1Op === 'gt' ? function (val) {
-						return val > condition.v1;
-					} : function (val) {
-						return val >= condition.v1;
-					};
+					return val > condition.v1;
+				} : function (val) {
+					return val >= condition.v1;
+				};
 			}
 
 			if (condition.v2 != null && !isNaN(condition.v2)) {
 				ltf = condition.v2Op === 'lt' ? function (val) {
-						return val < condition.v2;
-					} : function (val) {
-						return val <= condition.v2;
-					};
+					return val < condition.v2;
+				} : function (val) {
+					return val <= condition.v2;
+				};
 			}
 			condition.accept = function (val) {
 				return gtf(val) && ltf(val);

@@ -156,7 +156,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
 				var text = '';
 				if (hasNames) {
 					text = names[i] != '' ? (names[i] + ' ('
-					+ fractionToValue(fractions[i]) + ')') : names[i];
+						+ fractionToValue(fractions[i]) + ')') : names[i];
 				} else {
 					text = morpheus.Util.nf(fractionToValue(fractions[i]));
 				}
@@ -172,7 +172,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
 				var text = '';
 				if (hasNames) {
 					text = names[i] != '' ? (names[i] + ' ('
-					+ fractionToValue(fractions[i]) + ')') : names[i];
+						+ fractionToValue(fractions[i]) + ')') : names[i];
 				} else {
 					text = morpheus.Util.nf(fractionToValue(fractions[i]));
 				}

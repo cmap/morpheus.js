@@ -1,27 +1,27 @@
-morpheus.VectorShapeModel = function() {
+morpheus.VectorShapeModel = function () {
 	this.shapes = morpheus.VectorShapeModel.SHAPES;
 	this.vectorNameToShapeMap = new morpheus.Map();
 };
 
-morpheus.VectorShapeModel.SHAPES = [ 'circle', 'square', 'plus', 'x',
-		'asterisk', 'diamond', 'triangle-up', 'triangle-down', 'triangle-left',
-		'triangle-right', 'minus' ];
+morpheus.VectorShapeModel.SHAPES = ['circle', 'square', 'plus', 'x',
+	'asterisk', 'diamond', 'triangle-up', 'triangle-down', 'triangle-left',
+	'triangle-right', 'minus'];
 morpheus.VectorShapeModel.STANDARD_SHAPES = {
-	cp : 'diamond',
-	oe : 'plus',
-	pcl : 'asterisk',
-	kd : 'minus',
-	ctrl : 'circle'
+	cp: 'diamond',
+	oe: 'plus',
+	pcl: 'asterisk',
+	kd: 'minus',
+	ctrl: 'circle'
 };
 
 morpheus.VectorShapeModel.prototype = {
-	clear : function(vector) {
+	clear: function (vector) {
 		this.vectorNameToShapeMap.remove(vector.getName());
 	},
-	copy : function() {
+	copy: function () {
 		var c = new morpheus.VectorShapeModel();
 		c.shapes = this.shapes.slice(0);
-		this.vectorNameToShapeMap.forEach(function(shapeMap, name) {
+		this.vectorNameToShapeMap.forEach(function (shapeMap, name) {
 			var newShapeMap = new morpheus.Map();
 			newShapeMap.setAll(shapeMap); // copy existing values
 			c.vectorNameToShapeMap.set(name, newShapeMap);
@@ -29,10 +29,10 @@ morpheus.VectorShapeModel.prototype = {
 
 		return c;
 	},
-	clearAll : function() {
+	clearAll: function () {
 		this.vectorNameToShapeMap = new morpheus.Map();
 	},
-	_getShapeForValue : function(value) {
+	_getShapeForValue: function (value) {
 		if (value == null) {
 			return 'none';
 		}
@@ -44,7 +44,7 @@ morpheus.VectorShapeModel.prototype = {
 
 		// try to reuse existing map
 		var existingMetadataValueToShapeMap = this.vectorNameToShapeMap
-				.values();
+		.values();
 		for (var i = 0, length = existingMetadataValueToShapeMap.length; i < length; i++) {
 			var shape = existingMetadataValueToShapeMap[i].get(value);
 			if (shape !== undefined) {
@@ -53,16 +53,16 @@ morpheus.VectorShapeModel.prototype = {
 		}
 
 	},
-	getMap : function(name) {
+	getMap: function (name) {
 		return this.vectorNameToShapeMap.get(name);
 	},
-	getMappedValue : function(vector, value) {
+	getMappedValue: function (vector, value) {
 		var metadataValueToShapeMap = this.vectorNameToShapeMap.get(vector
-				.getName());
+		.getName());
 		if (metadataValueToShapeMap === undefined) {
 			metadataValueToShapeMap = new morpheus.Map();
 			this.vectorNameToShapeMap.set(vector.getName(),
-					metadataValueToShapeMap);
+				metadataValueToShapeMap);
 			// set all possible shapes
 			var values = morpheus.VectorUtil.getValues(vector);
 			for (var i = 0, nvalues = values.length; i < nvalues; i++) {
@@ -84,13 +84,13 @@ morpheus.VectorShapeModel.prototype = {
 		}
 		return shape;
 	},
-	setMappedValue : function(vector, value, shape) {
+	setMappedValue: function (vector, value, shape) {
 		var metadataValueToShapeMap = this.vectorNameToShapeMap.get(vector
-				.getName());
+		.getName());
 		if (metadataValueToShapeMap === undefined) {
 			metadataValueToShapeMap = new morpheus.Map();
 			this.vectorNameToShapeMap.set(vector.getName(),
-					metadataValueToShapeMap);
+				metadataValueToShapeMap);
 		}
 		metadataValueToShapeMap.set(value, shape);
 	}

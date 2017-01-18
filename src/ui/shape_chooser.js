@@ -1,8 +1,8 @@
-morpheus.ShapeChooser = function(options) {
+morpheus.ShapeChooser = function (options) {
 	var formBuilder = new morpheus.FormBuilder();
 	var map = options.map;
-	var html = [ '<select name="valuePicker" class="selectpicker" data-live-search="true">' ];
-	map.forEach(function(val, key) {
+	var html = ['<select name="valuePicker" class="selectpicker" data-live-search="true">'];
+	map.forEach(function (val, key) {
 		html.push('<option');
 		html.push(' value="');
 		html.push(key);
@@ -12,18 +12,18 @@ morpheus.ShapeChooser = function(options) {
 	});
 	html.push('</select>');
 	formBuilder.append({
-		name : 'selected_value',
-		type : 'custom',
-		value : html.join('')
+		name: 'selected_value',
+		type: 'custom',
+		value: html.join('')
 	});
 
 	var shapeField = new morpheus.ShapeField();
 
 	formBuilder.append({
-		col : 'col-xs-2',
-		name : 'selected_shape',
-		type : 'custom',
-		value : '<div data-name="shape"></div>'
+		col: 'col-xs-2',
+		name: 'selected_shape',
+		type: 'custom',
+		value: '<div data-name="shape"></div>'
 	});
 	shapeField.$el.appendTo(formBuilder.$form.find('[data-name=shape]'));
 
@@ -32,15 +32,15 @@ morpheus.ShapeChooser = function(options) {
 	var _this = this;
 
 	shapeField.setShapeValue(map.get(selectedVal));
-	shapeField.on('change', function(e) {
+	shapeField.on('change', function (e) {
 		map.set(selectedVal, e.shape);
 		_this.trigger('change', {
-			value : selectedVal,
-			shape : e.shape
+			value: selectedVal,
+			shape: e.shape
 		});
 
 	});
-	$valuePicker.selectpicker().change(function() {
+	$valuePicker.selectpicker().change(function () {
 		selectedVal = $valuePicker.val();
 		shapeField.setShapeValue(map.get(selectedVal));
 	});

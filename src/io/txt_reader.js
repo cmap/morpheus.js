@@ -10,7 +10,7 @@ morpheus.TxtReader.prototype = {
 		var name = morpheus.Util.getBaseFileName(morpheus.Util
 		.getFileName(fileOrUrl));
 		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
-																	arrayBuffer) {
+																	   arrayBuffer) {
 			if (err) {
 				callback(err);
 			} else {

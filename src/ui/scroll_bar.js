@@ -82,8 +82,8 @@ morpheus.ScrollBar = function (isVertical) {
 						* that.totalExtent;
 					that.scrollToTop = position[that.field] < that.thumbPos;
 					that.setValue(that.scrollToTop ? that.value
-					- thumbExtentToValue : that.value
-					+ thumbExtentToValue, true);
+						- thumbExtentToValue : that.value
+						+ thumbExtentToValue, true);
 				}
 			}
 		});
@@ -147,7 +147,7 @@ morpheus.ScrollBar.prototype = {
 		this.value = value;
 		this.setThumbPosFromValue();
 		if (trigger) {
-			this.trigger('scroll', this.value);
+			this.trigger('scroll', {value: this.value});
 			this.repaint();
 		}
 		return this.value;

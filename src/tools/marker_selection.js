@@ -203,7 +203,7 @@ morpheus.MarkerSelection.prototype = {
 		}
 		var isFishy = f.toString() === morpheus.FisherExact.toString();
 		if (aIndices.length === 1 || bIndices.length === 1
-			&& !f instanceof morpheus.FisherExact) {
+			&& !(f instanceof morpheus.FisherExact)) {
 			f = morpheus.FoldChange;
 		}
 		var list1 = new morpheus.DatasetRowView(new morpheus.SlicedDatasetView(

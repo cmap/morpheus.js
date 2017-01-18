@@ -106,7 +106,7 @@ morpheus.LandingPage.prototype = {
 				_this.openFile(value);
 			}
 		});
-
+		
 		$(window).on('beforeunload.morpheus', function () {
 			if (_this.tabManager.getTabCount() > 0) {
 				return 'Are you sure you want to close Morpheus?';

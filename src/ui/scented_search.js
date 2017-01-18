@@ -53,8 +53,8 @@ morpheus.ScentedSearch = function (model, positions, isVertical, scrollbar,
 					name: 'Selection To Top',
 					checked: controller.getToolbar().isSelectionOnTop(!isVertical),
 					disabled: isVertical ? controller.getProject().getRowSelectionModel()
-					.count() === 0 : controller.getProject().getColumnSelectionModel()
-					.count() === 0
+						.count() === 0 : controller.getProject().getColumnSelectionModel()
+						.count() === 0
 				},
 				{
 					name: 'New Heat Map (' + morpheus.Util.COMMAND_KEY + 'X)'
@@ -199,8 +199,8 @@ morpheus.ScentedSearch.prototype = {
 			}
 			if (track.settings.highlightMatchingValues) {
 				var hoverIndex = isColumns ? heatmap.getProject()
-				.getHoverColumnIndex() : heatmap.getProject()
-				.getHoverRowIndex();
+					.getHoverColumnIndex() : heatmap.getProject()
+					.getHoverRowIndex();
 				if (hoverIndex === -1) {
 					return;
 				}
@@ -224,16 +224,16 @@ morpheus.ScentedSearch.prototype = {
 				}
 				var scale = this.scale;
 				var lineLength = !this.isVertical ? this.scrollbar
-				.getUnscaledHeight() : this.scrollbar
-				.getUnscaledWidth();
+					.getUnscaledHeight() : this.scrollbar
+					.getUnscaledWidth();
 				var isVertical = this.isVertical;
 				var positions = this.positions;
 				var project = heatmap.getProject();
 				for (var i = 0, length = modelIndices.length; i < length; i++) {
 					var modelIndex = modelIndices[i];
 					var index = isVertical ? project
-					.convertModelRowIndexToView(modelIndex) : project
-					.convertModelColumnIndexToView(modelIndex);
+						.convertModelRowIndexToView(modelIndex) : project
+						.convertModelColumnIndexToView(modelIndex);
 					if (index === -1) {
 						continue;
 					}

@@ -162,12 +162,12 @@ morpheus.GctReader.prototype = {
 
 		};
 		(useFetch ? morpheus.BufferedReader : Papa).parse(fileOrUrl, {
-			delimiter: "\t",	// auto-detect
-			newline: "",	// auto-detect
+			delimiter: '\t',	// auto-detect
+			newline: '',	// auto-detect
 			header: false,
 			dynamicTyping: false,
 			preview: 0,
-			encoding: "",
+			encoding: '',
 			worker: false,
 			comments: false,
 			handleTokens: handleTokens,
@@ -460,8 +460,7 @@ morpheus.GctReader.prototype = {
 		var _this = this;
 		var name = morpheus.Util.getBaseFileName(morpheus.Util
 		.getFileName(fileOrUrl));
-		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
-																	   arrayBuffer) {
+		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err, arrayBuffer) {
 			if (err) {
 				callback(err);
 			} else {

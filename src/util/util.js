@@ -1,5 +1,16 @@
-if (typeof morpheus === 'undefined') {
-	morpheus = {};
+/**
+ * @name morpheus
+ * @namespace
+ */
+var morpheus = (typeof morpheus !== 'undefined') ? morpheus : {};
+if (typeof module !== 'undefined' && module.exports) {
+	module.exports = morpheus; // Node
+} else if (typeof define === 'function' && define.amd) {
+	define(function () { // AMD module
+		return morpheus;
+	});
+} else {
+	global.morpheus = morpheus; // browser global
 }
 morpheus.Util = function () {
 };
@@ -40,13 +51,13 @@ morpheus.Util.loadTrackingCode = function () {
 			(function (i, s, o, g, r, a, m) {
 				i['GoogleAnalyticsObject'] = r;
 				i[r] = i[r] || function () {
-						(i[r].q = i[r].q || []).push(arguments)
-					}, i[r].l = 1 * new Date();
+					(i[r].q = i[r].q || []).push(arguments);
+				}, i[r].l = 1 * new Date();
 				a = s.createElement(o),
 					m = s.getElementsByTagName(o)[0];
 				a.async = 1;
 				a.src = g;
-				m.parentNode.insertBefore(a, m)
+				m.parentNode.insertBefore(a, m);
 			})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 		}
 		if (typeof ga !== 'undefined') {
@@ -194,8 +205,8 @@ morpheus.Util.forceDelete = function (obj) {
 	try {
 		var _garbageCollector = (function () {
 			var ef = URL.createObjectURL(new Blob([''], {
-				type: 'text/javascript'
-			})), w = new Worker(ef);
+					type: 'text/javascript'
+				})), w = new Worker(ef);
 
 			URL.revokeObjectURL(ef);
 			return w;
@@ -476,7 +487,6 @@ morpheus.Util.autocompleteArrayMatcher = function (token, cb, array, fields, max
  *
  */
 morpheus.Util.autosuggest = function (options) {
-	var fieldRegExp = /:/g;
 	options = $.extend({}, {
 		multi: true,
 		delay: 500,
@@ -596,11 +606,11 @@ morpheus.Util.autosuggest = function (options) {
 	instance._renderItem = function (ul, item) {
 		if (item.value == null) { // category
 			return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-category">')
-			.append($("<div>").html(item.label))
+			.append($('<div>').html(item.label))
 			.appendTo(ul);
 		}
 		return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-item">')
-		.append($("<div>").html(item.label))
+		.append($('<div>').html(item.label))
 		.appendTo(ul);
 	};
 	instance._normalize = function (items) {
@@ -612,9 +622,9 @@ morpheus.Util.autosuggest = function (options) {
 	};
 
 	var menu = options.$el.autocomplete('widget');
-	menu.menu("option", "items", "> :not(.search-category)");
+	menu.menu('option', 'items', '> :not(.search-category)');
 	if (menu) {
-		menu.addClass("search-menu")
+		menu.addClass('search-menu');
 	}
 	if (options.suggestWhenEmpty) {
 		options.$el.on('focus', function () {
@@ -708,75 +718,6 @@ morpheus.Util.getAutocompleteTokens = function (text, options) {
 	return filteredTokens;
 };
 
-/**
- * @deprecated
- */
-morpheus.Util.autocomplete = function ($el, filterFunction, selectCb,
-									   singleTerm, autoclose) {
-	var fieldRegExp = /:/g;
-	$el
-	// don't navigate away from the field on tab when selecting an item
-	.on(
-		'keydown',
-		function (event) {
-			if ((event.keyCode === $.ui.keyCode.TAB)
-				&& $(this).data('ui-autocomplete').menu.active) {
-				event.preventDefault();
-			}
-		}).autocomplete({
-		minLength: 1,
-		delay: 1200,
-		source: function (request, response) {
-			// delegate back to autocomplete, but extract the last term
-			var terms = morpheus.Util.getAutocompleteTokens(request.term);
-			if (terms.length > 0) {
-				filterFunction(terms.pop(), response);
-			}
-		},
-		focus: function () {
-			// prevent value inserted on focus
-			return false;
-		},
-		select: function (event, ui) {
-			if (!singleTerm) {
-				var terms = morpheus.Util.getAutocompleteTokens(this.value);
-				// remove the current input
-				terms.pop();
-				// add the selected item
-				var val = ui.item.value;
-				if (val.indexOf(' ') > 0 && val[0] !== '"') {
-					val = '"' + val + '"'; // quote
-				}
-				// val = val.replace(fieldRegExp, '\\:'); // escape field
-				// separators
-				terms.push(val);
-
-				this.value = terms.join(' ');
-				if (selectCb) {
-					selectCb();
-				}
-				$(this).autocomplete('close');
-				return false;
-			} else if (selectCb) {
-				selectCb();
-				$(this).autocomplete('close');
-			}
-		}
-	});
-
-	// use html for label instead of default text
-	$el.autocomplete('instance')._renderItem = function (ul, item) {
-		return $('<li>').html(item.label).appendTo(ul);
-	};
-
-	if (autoclose) {
-		$el.on('keyup', function (e) {
-			if (e.which === 13) {
-				$el.autocomplete('close');
-			}
-		});
-	}
-};
 morpheus.Util.showDialog = function ($el, title, options) {
 	var $dialog = $('<div></div>');
 	$el.appendTo($dialog);
@@ -1062,8 +1003,8 @@ morpheus.Util.intFormat = function (n) {
 	return morpheus.Util._intFormat(n);
 };
 morpheus.Util._nf = typeof d3 !== 'undefined' ? d3.format('.4f') : function (d) {
-		return '' + d;
-	};
+	return '' + d;
+};
 morpheus.Util.nf = function (n) {
 	var str = (n < 1 && n > -1 && n.toPrecision !== undefined) ? n
 		.toPrecision(4) : morpheus.Util._nf(n);
@@ -1404,7 +1345,7 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
 					prompt: interactive
 				}, function (err, lines) {
 					deferred.resolve(lines);
-				})
+				});
 			} else {
 				deferred.resolve(morpheus.Util.splitOnNewLine(event.target.result));
 			}

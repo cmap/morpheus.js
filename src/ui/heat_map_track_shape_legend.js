@@ -1,11 +1,11 @@
-morpheus.HeatMapTrackShapeLegend = function(tracks, shapeModel) {
+morpheus.HeatMapTrackShapeLegend = function (tracks, shapeModel) {
 	morpheus.AbstractCanvas.call(this, false);
 	this.tracks = tracks;
 	this.shapeModel = shapeModel;
 	this.canvas.style.position = '';
 };
 morpheus.HeatMapTrackShapeLegend.prototype = {
-	getPreferredSize : function() {
+	getPreferredSize: function () {
 		var tracks = this.tracks;
 		var shapeModel = this.shapeModel;
 		var canvas = this.canvas;
@@ -19,7 +19,7 @@ morpheus.HeatMapTrackShapeLegend.prototype = {
 			var vector = tracks[i].getVector();
 			var map = shapeModel.getMap(vector.getName());
 
-			map.forEach(function(color, key) {
+			map.forEach(function (color, key) {
 				var width = context.measureText(key).width;
 				if (!isNaN(width)) {
 					maxWidth = Math.max(maxWidth, width);
@@ -31,11 +31,11 @@ morpheus.HeatMapTrackShapeLegend.prototype = {
 			maxYPix = Math.max(maxYPix, ypix);
 		}
 		return {
-			width : xpix,
-			height : maxYPix > 0 ? (maxYPix + 30) : 0
+			width: xpix,
+			height: maxYPix > 0 ? (maxYPix + 30) : 0
 		};
 	},
-	draw : function(clip, context) {
+	draw: function (clip, context) {
 		// draw legends horizontally
 		var tracks = this.tracks;
 		var shapeModel = this.shapeModel;
@@ -52,18 +52,18 @@ morpheus.HeatMapTrackShapeLegend.prototype = {
 			var vector = tracks[i].getVector();
 			context.fillText(vector.getName(), xpix, ypix);
 			maxWidth = Math.max(maxWidth,
-					context.measureText(vector.getName()).width);
+				context.measureText(vector.getName()).width);
 			ypix += 14;
 			var map = shapeModel.getMap(vector.getName());
 			var values = map.keys().sort(morpheus.SortKey.ASCENDING_COMPARATOR);
-			values.forEach(function(key) {
+			values.forEach(function (key) {
 				var shape = shapeModel.getMappedValue(vector, key);
 				var width = context.measureText(key).width;
 				if (!isNaN(width)) {
 					maxWidth = Math.max(maxWidth, width);
 				}
 				morpheus.CanvasUtil.drawShape(context, shape, xpix + 8,
-						ypix + 6, 6);
+					ypix + 6, 6);
 				context.fillText(key, xpix + 16, ypix);
 				ypix += 14;
 			});

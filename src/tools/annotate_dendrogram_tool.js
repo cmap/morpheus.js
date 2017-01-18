@@ -1,39 +1,39 @@
-morpheus.AnnotateDendrogramTool = function(isColumns) {
+morpheus.AnnotateDendrogramTool = function (isColumns) {
 	this._isColumns = isColumns;
 };
 morpheus.AnnotateDendrogramTool.prototype = {
-	toString : function() {
+	toString: function () {
 		return 'Annotate Dendrogram';
 	},
-	gui : function() {
-		return [ {
-			name : 'file',
-			value : '',
-			type : 'file',
-			required : true,
-			help : 'an xlsx file or a tab-delimitted text file'
-		} ];
+	gui: function () {
+		return [{
+			name: 'file',
+			value: '',
+			type: 'file',
+			required: true,
+			help: 'an xlsx file or a tab-delimitted text file'
+		}];
 	},
-	execute : function(options) {
+	execute: function (options) {
 		var fileOrUrl = options.input.file;
 		var isColumns = this._isColumns;
 		var controller = options.controller;
 		var result = morpheus.Util.readLines(fileOrUrl);
 		var fileName = morpheus.Util.getFileName(fileOrUrl);
 		var dendrogram = isColumns ? controller.columnDendrogram
-				: controller.rowDendrogram;
+			: controller.rowDendrogram;
 		var nameToNode = new morpheus.Map();
 		morpheus.DendrogramUtil.dfs(dendrogram.tree.rootNode,
-				function(node) {
-					nameToNode.set(node.name, node);
-					return true;
-				});
+			function (node) {
+				nameToNode.set(node.name, node);
+				return true;
+			});
 		var tab = new RegExp('\t');
-		result.done(function(lines) {
+		result.done(function (lines) {
 			var header = lines[0].split(tab);
 			var promptTool = {};
 			// node.info = {foo:['a', 'b'], bar:[3]}
-			promptTool.execute = function(options) {
+			promptTool.execute = function (options) {
 				var nodeIdField = options.input.node_id_field;
 				var nodeIdIndex = _.indexOf(header, nodeIdField);
 				var numberOfMatchingNodes = 0;
@@ -58,26 +58,26 @@ morpheus.AnnotateDendrogramTool.prototype = {
 					}
 				}
 				controller.trigger('dendrogramAnnotated', {
-					isColumns : isColumns
+					isColumns: isColumns
 				});
 				dendrogram.setInvalid(true);
 				dendrogram.repaint();
 			};
-			promptTool.toString = function() {
+			promptTool.toString = function () {
 				return 'Select Node Id Field';
 			};
-			promptTool.gui = function() {
-				return [ {
-					name : 'node_id_field',
-					type : 'select',
-					options : _.map(header, function(item) {
+			promptTool.gui = function () {
+				return [{
+					name: 'node_id_field',
+					type: 'select',
+					options: _.map(header, function (item) {
 						return {
-							name : item,
-							value : item
+							name: item,
+							value: item
 						};
 					}),
-					required : true
-				} ];
+					required: true
+				}];
 			};
 			morpheus.HeatMap.showTool(promptTool, controller);
 		});

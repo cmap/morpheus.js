@@ -594,7 +594,7 @@ morpheus.ChartTool.prototype = {
 			var text = [];
 			var size = sizeByVector ? [] : 6;
 			var color = colorByVector ? colorModel.getMappedValue(colorByVector,
-				colorByVector.getValue(i)) : undefined;
+					colorByVector.getValue(i)) : undefined;
 
 			for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
 				x.push(j);
@@ -628,19 +628,19 @@ morpheus.ChartTool.prototype = {
 				text.push(obj);
 			}
 			var trace = {
-					x: x,
-					y: y,
-					name: colorByVector ? colorByVector.getValue(i) : '',
-					tickmode: 'array',
-					marker: {
-						size: size,
-						symbol: 'circle'
-					},
-					text: text,
-					mode: 'lines' + (options.showPoints ? '+markers' : ''
+				x: x,
+				y: y,
+				name: colorByVector ? colorByVector.getValue(i) : '',
+				tickmode: 'array',
+				marker: {
+					size: size,
+					symbol: 'circle'
+				},
+				text: text,
+				mode: 'lines' + (options.showPoints ? '+markers' : ''
 					),
-					type: 'scatter' // scattergl
-				}
+				type: 'scatter' // scattergl
+			}
 				;
 			traces.push(trace);
 		}
@@ -1008,11 +1008,11 @@ morpheus.ChartTool.prototype = {
 			: this.project.getColumnColorModel();
 		var axisLabelInfo = morpheus.ChartTool.getVectorInfo(axisLabel);
 		var axisLabelVector = axisLabelInfo.isColumns ? dataset.getColumnMetadata().getByName(axisLabelInfo.field) : dataset.getRowMetadata().getByName(
-			axisLabelInfo.field);
+				axisLabelInfo.field);
 		var sizeByVector = sizeByInfo.isColumns ? dataset.getColumnMetadata().getByName(sizeByInfo.field) : dataset.getRowMetadata().getByName(
-			sizeByInfo.field);
+				sizeByInfo.field);
 		var colorByVector = colorByInfo.isColumns ? dataset.getColumnMetadata().getByName(colorByInfo.field) : dataset.getRowMetadata().getByName(
-			colorByInfo.field);
+				colorByInfo.field);
 		var rowIds = [undefined];
 		var columnIds = [undefined];
 		var sizeByScale = null;
@@ -1128,7 +1128,7 @@ morpheus.ChartTool.prototype = {
 									xaxis: {
 										title: axisLabelVector == null ? ''
 											: axisLabelVector
-										.getValue(rowIndexTwo),
+											.getValue(rowIndexTwo),
 										showticklabels: false
 									}
 								})
@@ -1165,12 +1165,12 @@ morpheus.ChartTool.prototype = {
 									yaxis: {
 										title: axisLabelVector == null ? ''
 											: axisLabelVector
-										.getValue(rowIndexOne),
+											.getValue(rowIndexOne),
 									},
 									xaxis: {
 										title: axisLabelVector == null ? ''
 											: axisLabelVector
-										.getValue(rowIndexTwo)
+											.getValue(rowIndexTwo)
 									}
 								})
 						});
@@ -1194,19 +1194,19 @@ morpheus.ChartTool.prototype = {
 			showPoints = showPoints && items.length <= 100000;
 			var colorByInfo = morpheus.ChartTool.getVectorInfo(colorBy);
 			var colorByVector = colorByInfo.isColumns ? dataset.getColumnMetadata()
-			.getByName(colorByInfo.field) : dataset.getRowMetadata()
-			.getByName(colorByInfo.field);
+				.getByName(colorByInfo.field) : dataset.getRowMetadata()
+				.getByName(colorByInfo.field);
 
 			var colorModel = !colorByInfo.isColumns ? this.project
-			.getRowColorModel() : this.project.getColumnColorModel();
+				.getRowColorModel() : this.project.getColumnColorModel();
 			var colorByGetter = colorByInfo.isColumns ? function (item) {
 				return colorByVector.getValue(item.column);
 			} : function (item) {
 				return colorByVector.getValue(item.row);
 			};
 			var sizeByVector = sizeByInfo.isColumns ? dataset.getColumnMetadata()
-			.getByName(sizeByInfo.field) : dataset.getRowMetadata()
-			.getByName(sizeByInfo.field);
+				.getByName(sizeByInfo.field) : dataset.getRowMetadata()
+				.getByName(sizeByInfo.field);
 			var sizeByGetter = sizeByInfo.isColumns ? function (item) {
 				return sizeByVector.getValue(item.column);
 			} : function (item) {
@@ -1224,9 +1224,9 @@ morpheus.ChartTool.prototype = {
 					var groupRowsByInfo = morpheus.ChartTool
 					.getVectorInfo(groupRowsBy);
 					var vector = groupRowsByInfo.isColumns ? dataset
-					.getColumnMetadata().getByName(groupRowsByInfo.field)
+						.getColumnMetadata().getByName(groupRowsByInfo.field)
 						: dataset.getRowMetadata().getByName(
-						groupRowsByInfo.field);
+							groupRowsByInfo.field);
 
 					var getter = groupRowsByInfo.isColumns ? function (item) {
 						return vector.getValue(item.column);
@@ -1266,7 +1266,7 @@ morpheus.ChartTool.prototype = {
 					var isColumns = groupColumnsBy
 						.substring(groupColumnsBy.length - 2) === '_c';
 					var vector = isColumns ? dataset.getColumnMetadata().getByName(
-						name) : dataset.getRowMetadata().getByName(name);
+							name) : dataset.getRowMetadata().getByName(name);
 					var getter = isColumns ? function (item) {
 						return vector.getValue(item.column);
 					} : function (item) {
@@ -1589,4 +1589,4 @@ morpheus.ChartTool.newPlot = function (myPlot, traces, layout, config) {
 		e.preventDefault();
 		$modeBar.toggle();
 	});
-}
+};

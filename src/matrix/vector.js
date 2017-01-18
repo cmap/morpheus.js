@@ -1,7 +1,6 @@
 /**
- * @fileOverview A collection of values.
- */
-/**
+ * An ordered collection of values.
+ *
  * Creates a new vector with the given name and size.
  *
  * @param name

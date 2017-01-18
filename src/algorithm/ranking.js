@@ -1,15 +1,15 @@
-morpheus.Ranking = function(values) {
+morpheus.Ranking = function (values) {
 	var ranks = [];
 	for (var i = 0, length = values.length; i < length; i++) {
 		ranks.push({
-			value : values[i],
-			position : i
+			value: values[i],
+			position: i
 		});
 	}
 	if (ranks.length === 0) {
 		return [];
 	}
-	ranks.sort(function(a, b) {
+	ranks.sort(function (a, b) {
 		return (a.value < b.value ? -1 : (a.value === b.value ? 0 : 1));
 	});
 
@@ -38,12 +38,12 @@ morpheus.Ranking = function(values) {
 	}
 	return out;
 };
-morpheus.Ranking.fill = function(data, tiesTrace, value) {
+morpheus.Ranking.fill = function (data, tiesTrace, value) {
 	for (var i = 0, length = tiesTrace.length; i < length; i++) {
 		data[tiesTrace[i]] = value;
 	}
 };
-morpheus.Ranking.fillAverage = function(ranks, tiesTrace) {
+morpheus.Ranking.fillAverage = function (ranks, tiesTrace) {
 	var c = ranks[tiesTrace[0]];
 	// length of sequence of tied ranks
 	var length = tiesTrace.length;

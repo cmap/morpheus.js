@@ -22,19 +22,19 @@ morpheus.Divider = function (vertical) {
 			that.trigger('resizeStart');
 			morpheus.CanvasUtil.dragging = true;
 		}).on('panmove', this.panmove = function (event) {
-		if (that.vertical) {
-			that.trigger('resize', {
-				delta: event.deltaX
-			});
-		} else {
-			that.trigger('resize', {
-				delta: event.deltaY
-			});
-		}
-	}).on('panend', this.panend = function (event) {
-		morpheus.CanvasUtil.dragging = false;
-		that.trigger('resizeEnd');
-	});
+			if (that.vertical) {
+				that.trigger('resize', {
+					delta: event.deltaX
+				});
+			} else {
+				that.trigger('resize', {
+					delta: event.deltaY
+				});
+			}
+		}).on('panend', this.panend = function (event) {
+			morpheus.CanvasUtil.dragging = false;
+			that.trigger('resizeEnd');
+		});
 	this.paint();
 
 };

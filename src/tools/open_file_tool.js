@@ -329,7 +329,7 @@ morpheus.OpenFileTool.prototype = {
 				name: 'dataset_field_name',
 				options: morpheus.MetadataUtil
 				.getMetadataNames(isColumns ? dataset
-				.getColumnMetadata() : dataset.getRowMetadata()),
+					.getColumnMetadata() : dataset.getRowMetadata()),
 				type: 'select',
 				value: 'id',
 				required: true
@@ -378,7 +378,7 @@ morpheus.OpenFileTool.prototype = {
 				name: 'dataset_field_name',
 				options: morpheus.MetadataUtil
 				.getMetadataNames(isColumns ? dataset
-				.getColumnMetadata() : dataset.getRowMetadata()),
+					.getColumnMetadata() : dataset.getRowMetadata()),
 				type: 'select',
 				required: true
 			}];

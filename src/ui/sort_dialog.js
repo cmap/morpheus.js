@@ -62,10 +62,10 @@ morpheus.SortDialog = function (project) {
 			var groupBy = $div.find('[name=groupBy]').val();
 			var newSortKeys = [];
 			var modelIndices = _this.isColumns ? project
-			.getRowSelectionModel().toModelIndices() : project
-			.getColumnSelectionModel().toModelIndices();
+				.getRowSelectionModel().toModelIndices() : project
+				.getColumnSelectionModel().toModelIndices();
 			var existingSortKeys = _this.isColumns ? project
-			.getColumnSortKeys() : project.getRowSortKeys();
+				.getColumnSortKeys() : project.getRowSortKeys();
 			// keep MatchesOnTopSortKey and dendrogram
 			var keysToKeep = _
 			.filter(
@@ -119,12 +119,12 @@ morpheus.SortDialog.prototype = {
 	isColumns: false,
 	build: function (project, isColumns) {
 		var fields = morpheus.MetadataUtil.getMetadataNames(isColumns ? project
-		.getFullDataset().getColumnMetadata() : project
-		.getFullDataset().getRowMetadata());
+			.getFullDataset().getColumnMetadata() : project
+			.getFullDataset().getRowMetadata());
 		this.fields = fields;
 		var html = [];
 		var sortKeys = isColumns ? project.getColumnSortKeys() : project
-		.getRowSortKeys();
+			.getRowSortKeys();
 		this.createLevel0(html);
 		for (var i = 0; i < sortKeys.length; i++) { // add existing keys
 			// ignoring
@@ -142,9 +142,9 @@ morpheus.SortDialog.prototype = {
 		html.push('<div class="col-xs-2"><label>Group by</label></div>');
 		html.push('<div class="col-xs-4">');
 		var groupByKeys = (isColumns ? project.getGroupColumns() : project
-		.getGroupRows()).map(function (key) {
-			return key.field;
-		});
+			.getGroupRows()).map(function (key) {
+				return key.field;
+			});
 
 		html.push('<select multiple name="groupBy" class="form-control">');
 		_.each(fields, function (field) {

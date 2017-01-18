@@ -1,4 +1,4 @@
-morpheus.SteppedColorSupplier = function() {
+morpheus.SteppedColorSupplier = function () {
 	morpheus.AbstractColorSupplier.call(this);
 	this.hiddenValue = 0;
 	this.hiddenValues = new morpheus.Set();
@@ -7,24 +7,24 @@ morpheus.SteppedColorSupplier = function() {
 /**
  * Convert value from input data range of input0 to input1 to pixel range of
  * pix0, pix1.
- * 
+ *
  * @return The converted value.
  */
-morpheus.SteppedColorSupplier.linearScale = function(value, input0, input1,
-		pix0, pix1) {
+morpheus.SteppedColorSupplier.linearScale = function (value, input0, input1,
+													  pix0, pix1) {
 	return (value - input0) / (input1 - input0) * (pix1 - pix0) + pix0;
 };
 morpheus.SteppedColorSupplier.prototype = {
-	createInstance : function() {
+	createInstance: function () {
 		return new morpheus.SteppedColorSupplier();
 	},
-	isStepped : function() {
+	isStepped: function () {
 		return true;
 	},
-	getHiddenValues : function() {
+	getHiddenValues: function () {
 		return this.hiddenValues;
 	},
-	getIndexForFraction : function(f) {
+	getIndexForFraction: function (f) {
 		var fractions = this.fractions;
 		if (f <= fractions[0]) {
 			return 0;
@@ -43,7 +43,7 @@ morpheus.SteppedColorSupplier.prototype = {
 		}
 		return fractions.length - 1;
 	},
-	getColor : function(row, column, value) {
+	getColor: function (row, column, value) {
 		if (this.hiddenValues.has(value)) {
 			value = this.hiddenValue;
 		}
@@ -64,4 +64,4 @@ morpheus.SteppedColorSupplier.prototype = {
 	}
 };
 morpheus.Util.extend(morpheus.SteppedColorSupplier,
-		morpheus.AbstractColorSupplier);
+	morpheus.AbstractColorSupplier);

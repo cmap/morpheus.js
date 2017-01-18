@@ -51,7 +51,7 @@ module.exports = function (grunt) {
 				dest: 'js/morpheus-external-latest.min.js'
 			},
 			extJs: {
-				nonull: true,
+
 				dest: 'js/morpheus-external.js',
 				src: ['js/d3.min.js', 'js/jquery-2.2.4.min.js',
 					'js/bootstrap.min.js', 'js/underscore-min.js',
@@ -67,7 +67,10 @@ module.exports = function (grunt) {
 					'js/js.cookie.js']
 			},
 			morpheus: {
-				nonull: true,
+				options: {
+					banner: '(function(global){\n\'use strict\';\n',
+					footer: '\n})(typeof window !== \'undefined\' ? window : this);\n'
+				},
 				dest: 'js/morpheus.js',
 				src: ['src/util/util.js', 'src/util/*.js',
 					'src/io/*.js', 'src/matrix/vector_adapter.js',

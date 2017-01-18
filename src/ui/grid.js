@@ -140,7 +140,7 @@ morpheus.Grid.prototype = {
 		for (var i = 0; i < gridSortColumns.length; i++) {
 			var column = this.grid.getColumns()[this.grid.getColumnIndex(gridSortColumns[i].columnId)];
 			if (column == null) {
-				throw "Unable to find column " + gridSortColumns[i];
+				throw 'Unable to find column ' + gridSortColumns[i];
 			}
 			this.sortCols.push({
 				sortCol: column,
@@ -229,11 +229,11 @@ morpheus.Grid.prototype = {
 	},
 	convertViewIndexToModel: function (viewIndex) {
 		return this.viewOrder != null ? (viewIndex < this.viewOrder.length
-		&& viewIndex >= 0 ? this.viewOrder[viewIndex] : -1) : viewIndex;
+			&& viewIndex >= 0 ? this.viewOrder[viewIndex] : -1) : viewIndex;
 	},
 	_updateMappings: function () {
 		var selectedViewIndices = this.grid.getSelectionModel() != null ? this.grid
-		.getSelectedRows()
+			.getSelectedRows()
 			: null;
 		var selectedModelIndices = [];
 		if (selectedViewIndices) {

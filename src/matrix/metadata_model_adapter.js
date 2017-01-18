@@ -1,23 +1,27 @@
-morpheus.MetadataModelAdapter = function(model) {
+/**
+ *
+ *@implements {morpheus.MetadataModelProtocol}
+ */
+morpheus.MetadataModelAdapter = function (model) {
 	this.model = model;
 };
 morpheus.MetadataModelAdapter.prototype = {
-	add : function(name) {
+	add: function (name) {
 		return this.model.add(name);
 	},
-	getItemCount : function() {
+	getItemCount: function () {
 		return this.model.getItemCount();
 	},
-	get : function(index) {
+	get: function (index) {
 		return this.model.get(index);
 	},
-	remove : function(index) {
+	remove: function (index) {
 		return this.model.remove(index);
 	},
-	getByName : function(name) {
+	getByName: function (name) {
 		return this.model.getByName(name);
 	},
-	getMetadataCount : function() {
+	getMetadataCount: function () {
 		return this.model.getMetadataCount();
 	}
 };

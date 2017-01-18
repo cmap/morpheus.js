@@ -491,7 +491,7 @@ morpheus.KendallsCorrelation = function (x, y) {
 	var concordantMinusDiscordant = numPairs - tiedXPairs - tiedYPairs + tiedXYPairs - 2 * swaps;
 	var nonTiedPairsMultiplied = (numPairs - tiedXPairs) * (numPairs - tiedYPairs);
 	return concordantMinusDiscordant / Math.sqrt(nonTiedPairsMultiplied);
-}
+};
 morpheus.KendallsCorrelation.toString = function () {
 	return 'Kendall\'s correlation';
 };

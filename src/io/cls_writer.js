@@ -1,8 +1,8 @@
-morpheus.ClsWriter = function() {
+morpheus.ClsWriter = function () {
 
 };
 morpheus.ClsWriter.prototype = {
-	write : function(vector) {
+	write: function (vector) {
 		var pw = [];
 		var size = vector.size();
 		pw.push(size);
@@ -14,7 +14,7 @@ morpheus.ClsWriter.prototype = {
 		pw.push('#');
 		var valueToIndex = new morpheus.Map();
 		var index = 0;
-		set.forEach(function(name) {
+		set.forEach(function (name) {
 			pw.push(' ');
 			pw.push(name);
 			valueToIndex.set(name, index++);

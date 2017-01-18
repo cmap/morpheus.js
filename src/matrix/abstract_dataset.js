@@ -1,12 +1,10 @@
 /**
- * @fileOverview The interface for a dataset consisting of a two-dimensional matrix of
- * values. A dataset may also optionally contain one or more series of
- * two-dimensional matrices. A dataset also has metadata associated with each
- * row and column.
- */
-/**
- * Creates a new dataset with the specified dimensions.
  *
+ * Creates a new dataset with the specified dimensions. Subclasses must implement getValue and
+ * setValue.
+ * @param rows {number} The number of rows
+ * @param columns {number} The number of columns
+ * @implements {morpheus.DatasetProtocol}
  * @constructor
  */
 morpheus.AbstractDataset = function (rows, columns) {

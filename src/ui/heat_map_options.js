@@ -224,8 +224,8 @@ morpheus.HeatMapOptions = function (controller) {
 			value[name] = true;
 		});
 		_.each(morpheus.MetadataUtil.getMetadataNames(isColumns ? controller
-			.getProject().getFullDataset().getColumnMetadata() : controller
-			.getProject().getFullDataset().getRowMetadata()),
+				.getProject().getFullDataset().getColumnMetadata() : controller
+				.getProject().getFullDataset().getRowMetadata()),
 			function (name) {
 				options.push(name);
 			});
@@ -453,11 +453,11 @@ morpheus.HeatMapOptions = function (controller) {
 						controller.heatmap.repaint();
 
 					}).fail(function () {
-					morpheus.FormBuilder.showInModal({
-						title: 'Error',
-						html: 'Unable to read saved color scheme.'
+						morpheus.FormBuilder.showInModal({
+							title: 'Error',
+							html: 'Unable to read saved color scheme.'
+						});
 					});
-				});
 
 			}
 		}

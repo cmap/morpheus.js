@@ -52,7 +52,7 @@ morpheus.VectorTrack = function (project, name, positions, isColumns, heatmap) {
 					+ positions.getItemSize(positions.getLength() - 1);
 				var squishFactor = total
 					/ (isColumns ? _this.getUnscaledWidth() : _this
-					.getUnscaledHeight());
+						.getUnscaledHeight());
 				position[isColumns ? 'x' : 'y'] *= squishFactor;
 			}
 			index = !isColumns ? _this.positions.getIndex(position.y, false)
@@ -229,14 +229,14 @@ morpheus.VectorTrack.prototype = {
 	getVector: function (name) {
 		name = name == null ? this.name : name;
 		var vector = this.isColumns ? this.project.getSortedFilteredDataset()
-		.getColumnMetadata().getByName(name) : this.project
-		.getSortedFilteredDataset().getRowMetadata().getByName(name);
+			.getColumnMetadata().getByName(name) : this.project
+			.getSortedFilteredDataset().getRowMetadata().getByName(name);
 		return !vector ? new morpheus.Vector(name, 0) : vector;
 	},
 	getFullVector: function () {
 		var vector = this.isColumns ? this.project.getFullDataset()
-		.getColumnMetadata().getByName(this.name) : this.project
-		.getFullDataset().getRowMetadata().getByName(this.name);
+			.getColumnMetadata().getByName(this.name) : this.project
+			.getFullDataset().getRowMetadata().getByName(this.name);
 		return !vector ? new morpheus.Vector(this.name, 0) : vector;
 	},
 	_updatePreferredSize: function () {
@@ -422,13 +422,13 @@ morpheus.VectorTrack.prototype = {
 								},
 								url: 'http://cactus.nci.nih.gov/chemical/structure',
 							}).done(function (text) {
-							_this.moleculeCache[this.smile] = text;
-							if (values.length > 0) {
-								doRequest(values.pop());
-							}
-							_this.invalid = true;
-							_this.repaint();
-						});
+								_this.moleculeCache[this.smile] = text;
+								if (values.length > 0) {
+									doRequest(values.pop());
+								}
+								_this.invalid = true;
+								_this.repaint();
+							});
 					};
 					for (var i = 0; i < 6; i++) {
 						doRequest(values.pop());
@@ -846,7 +846,7 @@ morpheus.VectorTrack.prototype = {
 		var project = this.project;
 		var isColumns = this.isColumns;
 		var hasSelection = isColumns ? project.getColumnSelectionModel()
-		.count() > 0 : project.getRowSelectionModel().count() > 0;
+			.count() > 0 : project.getRowSelectionModel().count() > 0;
 		var ANNOTATE_SELECTION = 'Annotate Selection';
 		var INVERT_SELECTION = 'Invert Selection';
 		var SELECT_ALL = 'Select All';
@@ -934,7 +934,7 @@ morpheus.VectorTrack.prototype = {
 		// name : SHOW_SELECTION_ONLY
 		// });
 		var combinedFilter = isColumns ? project.getColumnFilter() : project
-		.getRowFilter();
+			.getRowFilter();
 		var showSelectionOnlyIndex = combinedFilter
 		.indexOf(SHOW_SELECTION_ONLY);
 		if (showSelectionOnlyIndex !== -1) {
@@ -1157,11 +1157,11 @@ morpheus.VectorTrack.prototype = {
 					var dataset = project
 					.getSortedFilteredDataset();
 					var v = isColumns ? dataset.getColumnMetadata()
-					.getByName(_this.name) : dataset
-					.getRowMetadata().getByName(_this.name);
+						.getByName(_this.name) : dataset
+						.getRowMetadata().getByName(_this.name);
 					var selectionModel = isColumns ? project
-					.getColumnSelectionModel() : project
-					.getRowSelectionModel();
+						.getColumnSelectionModel() : project
+						.getRowSelectionModel();
 					var text = [];
 					selectionModel.getViewIndices().forEach(
 						function (index) {
@@ -1237,13 +1237,13 @@ morpheus.VectorTrack.prototype = {
 								summaryFunction.indices = visibleFieldIndices;
 							}
 							var updatedVector = _this.isColumns ? _this.project
-							.getFullDataset()
-							.getColumnMetadata()
-							.add(_this.name)
+								.getFullDataset()
+								.getColumnMetadata()
+								.add(_this.name)
 								: _this.project
-							.getFullDataset()
-							.getRowMetadata()
-							.add(_this.name);
+								.getFullDataset()
+								.getRowMetadata()
+								.add(_this.name);
 							// remove cached summary field
 							for (var i = 0; i < updatedVector
 							.size(); i++) {
@@ -1348,9 +1348,9 @@ morpheus.VectorTrack.prototype = {
 								annotationName);
 
 							var selectionModel = isColumns ? project
-							.getColumnSelectionModel()
+								.getColumnSelectionModel()
 								: project
-							.getRowSelectionModel();
+								.getRowSelectionModel();
 							selectionModel
 							.getViewIndices()
 							.forEach(
@@ -1381,20 +1381,20 @@ morpheus.VectorTrack.prototype = {
 						+ _this.name + '?',
 						okCallback: function () {
 							var metadata = isColumns ? project
-							.getFullDataset()
-							.getColumnMetadata()
+								.getFullDataset()
+								.getColumnMetadata()
 								: project
-							.getFullDataset()
-							.getRowMetadata();
+								.getFullDataset()
+								.getRowMetadata();
 							metadata
 							.remove(morpheus.MetadataUtil
 							.indexOf(
 								metadata,
 								_this.name));
 							var sortKeys = isColumns ? project
-							.getColumnSortKeys()
+								.getColumnSortKeys()
 								: project
-							.getRowSortKeys();
+								.getRowSortKeys();
 							var sortKeyIndex = _.indexOf(
 								sortKeys.map(function (key) {
 									return key.field;
@@ -1413,9 +1413,9 @@ morpheus.VectorTrack.prototype = {
 								}
 							}
 							var groupByKeys = isColumns ? project
-							.getGroupColumns()
+								.getGroupColumns()
 								: project
-							.getGroupRows();
+								.getGroupRows();
 							var groupByKeyIndex = _
 							.indexOf(
 								groupByKeys
@@ -1460,13 +1460,13 @@ morpheus.VectorTrack.prototype = {
 					});
 				} else if (item === CLEAR_SELECTION) {
 					var model = isColumns ? project
-					.getColumnSelectionModel() : project
-					.getRowSelectionModel();
+						.getColumnSelectionModel() : project
+						.getRowSelectionModel();
 					model.setViewIndices(new morpheus.Set(), true);
 				} else if (item === INVERT_SELECTION) {
 					var model = isColumns ? project
-					.getColumnSelectionModel() : project
-					.getRowSelectionModel();
+						.getColumnSelectionModel() : project
+						.getRowSelectionModel();
 					var viewIndices = model.getViewIndices();
 					var inverse = new morpheus.Set();
 					for (var i = 0, n = positions.getLength(); i < n; i++) {
@@ -1479,10 +1479,10 @@ morpheus.VectorTrack.prototype = {
 					var vector = _this.getFullVector();
 					var filter;
 					var index = _this.isColumns ? _this.project
-					.getColumnFilter().indexOf(
-						vector.getName())
+						.getColumnFilter().indexOf(
+							vector.getName())
 						: _this.project.getRowFilter().indexOf(
-						vector.getName());
+							vector.getName());
 					if (index === -1) {
 						if (morpheus.VectorUtil.isNumber(vector)
 							&& morpheus.VectorUtil
@@ -1559,14 +1559,14 @@ morpheus.VectorTrack.prototype = {
 						isColumns, e && e.shiftKey);
 				} else if (item === SELECT_ALL) {
 					var selectionModel = !isColumns ? heatmap
-					.getProject().getRowSelectionModel()
+						.getProject().getRowSelectionModel()
 						: heatmap.getProject()
-					.getColumnSelectionModel();
+						.getColumnSelectionModel();
 					var count = !isColumns ? heatmap.getProject()
-					.getSortedFilteredDataset()
-					.getRowCount() : heatmap.getProject()
-					.getSortedFilteredDataset()
-					.getColumnCount();
+						.getSortedFilteredDataset()
+						.getRowCount() : heatmap.getProject()
+						.getSortedFilteredDataset()
+						.getColumnCount();
 					var indices = new morpheus.Set();
 					for (var i = 0; i < count; i++) {
 						indices.add(i);
@@ -1621,9 +1621,9 @@ morpheus.VectorTrack.prototype = {
 
 					var legend = new morpheus.HeatMapTrackColorLegend(
 						[_this], isColumns ? _this.project
-						.getColumnColorModel()
+							.getColumnColorModel()
 							: _this.project
-						.getRowColorModel());
+							.getRowColorModel());
 					var size = legend.getPreferredSize();
 					legend.setBounds(size);
 					legend.repaint();
@@ -1635,9 +1635,9 @@ morpheus.VectorTrack.prototype = {
 				} else if (item === 'Shape Key') {
 					var legend = new morpheus.HeatMapTrackShapeLegend(
 						[_this], isColumns ? _this.project
-						.getColumnShapeModel()
+							.getColumnShapeModel()
 							: _this.project
-						.getRowShapeModel());
+							.getRowShapeModel());
 					var size = legend.getPreferredSize();
 					legend.setBounds(size);
 					legend.repaint();
@@ -1649,8 +1649,8 @@ morpheus.VectorTrack.prototype = {
 				} else if (item === 'Edit Shapes...') {
 					var shapeFormBuilder = new morpheus.FormBuilder();
 					var shapeModel = isColumns ? _this.project
-					.getColumnShapeModel() : _this.project
-					.getRowShapeModel();
+						.getColumnShapeModel() : _this.project
+						.getRowShapeModel();
 					var chooser = new morpheus.ShapeChooser({
 						map: shapeModel.getMap(_this.name)
 					});
@@ -1670,8 +1670,8 @@ morpheus.VectorTrack.prototype = {
 				} else if (item === 'Edit Colors...') {
 					var colorSchemeChooser;
 					var colorModel = isColumns ? _this.project
-					.getColumnColorModel() : _this.project
-					.getRowColorModel();
+						.getColumnColorModel() : _this.project
+						.getRowColorModel();
 					if (_this.settings.discrete) {
 						colorSchemeChooser = new morpheus.DiscreteColorSchemeChooser(
 							{
@@ -1805,7 +1805,7 @@ morpheus.VectorTrack.prototype = {
 			: this.project.getRowColorModel();
 		var settings = this.settings;
 		var canvasSize = isColumns ? this.getUnscaledHeight() : this
-		.getUnscaledWidth();
+			.getUnscaledWidth();
 		var colorBarSize = settings.colorBarSize;
 		if (colorBarSize > canvasSize) {
 			colorBarSize = canvasSize >= 5 ? (canvasSize - 1)
@@ -1882,7 +1882,7 @@ morpheus.VectorTrack.prototype = {
 			: this.project.getRowShapeModel();
 		var settings = this.settings;
 		var canvasSize = isColumns ? this.getUnscaledHeight() : this
-		.getUnscaledWidth();
+			.getUnscaledWidth();
 		var colorBarSize = settings.colorBarSize;
 		if (colorBarSize > canvasSize) {
 			colorBarSize = canvasSize >= 5 ? (canvasSize - 1)
@@ -1915,7 +1915,7 @@ morpheus.VectorTrack.prototype = {
 		var project = this.project;
 		context.save();
 		context.lineWidth = 1;
-	//	context.translate(clip.x, clip.y);
+		//	context.translate(clip.x, clip.y);
 		var width = clip.width;
 		var height = clip.height;
 		var colorScheme = this.heatmap.getHeatMapElementComponent().getColorScheme();
@@ -2140,7 +2140,7 @@ morpheus.VectorTrack.prototype = {
 			morpheus.VectorKeys.VISIBLE_FIELDS);
 
 		var colorByVector = this.settings.colorByField != null ? this
-		.getVector(this.settings.colorByField) : null;
+			.getVector(this.settings.colorByField) : null;
 		var colorModel = isColumns ? this.project.getColumnColorModel()
 			: this.project.getRowColorModel();
 		for (var i = start; i < end; i++) {
@@ -2162,7 +2162,7 @@ morpheus.VectorTrack.prototype = {
 					var v = morpheus.VectorUtil.arrayAsVector(array);
 					box = morpheus
 					.BoxPlotItem(visibleFieldIndices != null ? new morpheus.SlicedVector(
-						v, visibleFieldIndices)
+							v, visibleFieldIndices)
 						: v);
 					array.summary = box;
 				}
@@ -2333,7 +2333,7 @@ morpheus.VectorTrack.prototype = {
 		var barSpacer = 0;
 		var barWidth = (availableSpace - (nvalues - 1) * barSpacer) / nvalues;
 		var colorByVector = this.settings.colorByField != null ? this
-		.getVector(this.settings.colorByField) : null;
+			.getVector(this.settings.colorByField) : null;
 		context.strokeStyle = 'white';
 		for (var i = start; i < end; i++) {
 			var array = vector.getValue(i);

@@ -101,9 +101,9 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
 					}, {
 						separator: true
 					},
-						{
-							name: 'Annotate...'
-						}, {
+					{
+						name: 'Annotate...'
+					}, {
 						name: 'Enrichment...'
 					}, {
 						separator: true
@@ -328,7 +328,7 @@ morpheus.AbstractDendrogram.prototype = {
 		var _this = this;
 		var viewIndices;
 		var selectionModel = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? this.project
-		.getColumnSelectionModel()
+			.getColumnSelectionModel()
 			: this.project.getRowSelectionModel();
 		if (node == null) {
 			// clear selection
@@ -411,7 +411,7 @@ morpheus.AbstractDendrogram.prototype = {
 		this.$squishedLabel.text('');
 		var dataset = this.project.getSortedFilteredDataset();
 		var clusterIdVector = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? dataset
-		.getColumnMetadata().getByName('dendrogram_cut')
+			.getColumnMetadata().getByName('dendrogram_cut')
 			: dataset.getRowMetadata().getByName('dendrogram_cut');
 		if (clusterIdVector) {
 			for (var i = 0, size = clusterIdVector.size(); i < size; i++) {
@@ -430,7 +430,7 @@ morpheus.AbstractDendrogram.prototype = {
 			this.cutHeight);
 		var dataset = this.project.getSortedFilteredDataset();
 		var clusterIdVector = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? dataset
-		.getColumnMetadata().add('dendrogram_cut')
+			.getColumnMetadata().add('dendrogram_cut')
 			: dataset.getRowMetadata().add('dendrogram_cut');
 		for (var i = 0, nroots = roots.length; i < nroots; i++) {
 			var root = roots[i];

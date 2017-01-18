@@ -1,45 +1,45 @@
-morpheus.Spacer = function(width, height) {
+morpheus.Spacer = function (width, height) {
 	this.width = width;
 	this.height = height;
 };
 morpheus.Spacer.prototype = {
-	prefWidth : undefined,
-	prefHeight : undefined,
-	visible : true,
-	dispose : function() {
+	prefWidth: undefined,
+	prefHeight: undefined,
+	visible: true,
+	dispose: function () {
 	},
-	getPrefWidth : function() {
+	getPrefWidth: function () {
 		return this.prefWidth;
 	},
-	draw : function(clip) {
+	draw: function (clip) {
 	},
-	getPreferredSize : function() {
+	getPreferredSize: function () {
 		return {
-			width : this.width,
-			height : this.height
+			width: this.width,
+			height: this.height
 		};
 	},
-	setBounds : function() {
+	setBounds: function () {
 	},
-	getPrefHeight : function() {
+	getPrefHeight: function () {
 		return this.prefHeight;
 	},
-	setPrefWidth : function(prefWidth) {
+	setPrefWidth: function (prefWidth) {
 		this.prefWidth = prefWidth;
 	},
-	setPrefHeight : function(prefHeight) {
+	setPrefHeight: function (prefHeight) {
 		this.prefHeight = prefHeight;
 	},
-	isVisible : function() {
+	isVisible: function () {
 		return this.visible;
 	},
-	setVisible : function(visible) {
+	setVisible: function (visible) {
 		this.visible = visible;
 	},
-	getWidth : function() {
+	getWidth: function () {
 		return this.width;
 	},
-	getHeight : function() {
+	getHeight: function () {
 		return this.height;
 	}
 };

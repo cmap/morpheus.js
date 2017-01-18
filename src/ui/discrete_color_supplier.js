@@ -1,4 +1,4 @@
-morpheus.DiscreteColorSupplier = function() {
+morpheus.DiscreteColorSupplier = function () {
 	this.colorMap = new morpheus.Map();
 	this.hiddenValue = 0;
 	this.hiddenValues = new morpheus.Set();
@@ -7,13 +7,13 @@ morpheus.DiscreteColorSupplier = function() {
 };
 
 morpheus.DiscreteColorSupplier.prototype = {
-	createInstance : function() {
+	createInstance: function () {
 		return new morpheus.DiscreteColorSupplier();
 	},
 	/**
 	 * @param.array Array of name, value, color pairs
 	 */
-	setColorMap : function(array) {
+	setColorMap: function (array) {
 		this.colorMap = new morpheus.Map();
 		this.colors = [];
 		this.fractions = [];
@@ -29,16 +29,16 @@ morpheus.DiscreteColorSupplier.prototype = {
 			this.max = Math.max(this.max, array[i].value);
 		}
 	},
-	copy : function() {
+	copy: function () {
 		var c = this.createInstance();
 		c.names = this.names.slice(0);
 		c.colorMap = new morpheus.Map();
-		this.colorMap.forEach(function(color, value) {
+		this.colorMap.forEach(function (color, value) {
 			c.colorMap.set(value, color);
 		});
 		c.colors = this.colors.slice(0);
 		c.fractions = this.fractions.slice(0);
-		this.hiddenValues.forEach(function(val) {
+		this.hiddenValues.forEach(function (val) {
 			c.hiddenValues.add(val);
 		});
 
@@ -46,10 +46,10 @@ morpheus.DiscreteColorSupplier.prototype = {
 		return c;
 	},
 
-	isStepped : function() {
+	isStepped: function () {
 		return true;
 	},
-	getColor : function(row, column, value) {
+	getColor: function (row, column, value) {
 		if (this.hiddenValues.has(value)) {
 			value = this.hiddenValue;
 		}
@@ -61,4 +61,4 @@ morpheus.DiscreteColorSupplier.prototype = {
 	}
 };
 morpheus.Util.extend(morpheus.DiscreteColorSupplier,
-		morpheus.AbstractColorSupplier);
+	morpheus.AbstractColorSupplier);

@@ -104,7 +104,7 @@ morpheus.SymmetricProjectListener = function (project, vscroll, hscroll) {
 		project.getRowSelectionModel().off('selectionChanged', rowSelection);
 		vscroll.off('scroll', vscrollFunction);
 		hscroll.off('scroll', hscrollFunction);
-	}
+	};
 };
 
 

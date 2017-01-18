@@ -1,13 +1,13 @@
-morpheus.CompleteLinkage = function(nelements, distmatrix) {
+morpheus.CompleteLinkage = function (nelements, distmatrix) {
 	var j;
 	var n;
 	var clusterid = []; // new var[nelements];
 	var result = [];// new Node[nelements - 1];
 	for (var i = 0; i < nelements - 1; i++) {
 		result[i] = {
-			left : 0,
-			right : 0,
-			distance : 0
+			left: 0,
+			right: 0,
+			distance: 0
 		};
 	}
 	/* Setup a list specifying to which cluster a gene belongs */

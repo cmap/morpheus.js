@@ -1,13 +1,24 @@
+/**
+ * Default implementation of a dataset.
+ *
+ * @extends {morpheus.AbstractDataset}
+ * @param options.rows {number} Number of rows
+ * @param options.columns {number} Number of columns
+ * @param options.name {string} Dataset name
+ * @param options.dataType {string=} Data type that 1st series holds.
+ * @constructor
+ */
 morpheus.Dataset = function (options) {
 	morpheus.AbstractDataset.call(this, options.rows,
 		options.columns);
+
 	if (options.dataType == null) {
 		options.dataType = 'Float32';
 	}
 
 	this.seriesNames.push(options.name);
 	this.seriesArrays.push(options.array ? options.array : morpheus.Dataset
-	.createArray(options));
+		.createArray(options));
 	this.seriesDataTypes.push(options.dataType);
 };
 morpheus.Dataset.toJson = function (dataset, options) {

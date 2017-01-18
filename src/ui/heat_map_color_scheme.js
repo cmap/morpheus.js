@@ -351,7 +351,7 @@ morpheus.HeatMapColorScheme.prototype = {
 	},
 	getHiddenValues: function () {
 		return this.currentColorSupplier.getHiddenValues ? this.currentColorSupplier
-		.getHiddenValues()
+			.getHiddenValues()
 			: null;
 	},
 	getMissingColor: function () {

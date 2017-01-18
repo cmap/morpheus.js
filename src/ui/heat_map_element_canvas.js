@@ -271,16 +271,16 @@ morpheus.HeatMapElementCanvas.prototype = {
 		var colorScheme = this.colorScheme;
 		var drawGrid = this.drawGrid;
 		var elementDrawCallback = this.elementDrawCallback;
-		var hasElementDrawCallback = elementDrawCallback != null
+		var hasElementDrawCallback = elementDrawCallback != null;
 		var drawValues = this.drawValues && columnPositions.getSize() > 7 && rowPositions.getSize() > 7;
 		var nf;
 		if (drawValues) {
 			nf = typeof d3 !== 'undefined' ? d3.format('.2f') : function (d) {
-					return '' + d;
-				};
+				return '' + d;
+			};
 			var fontSize = rowPositions.getSize() - 2;
 			context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
-			var textWidth = context.measureText("-9999.99").width;
+			var textWidth = context.measureText('-9999.99').width;
 			fontSize = ((  rowPositions.getSize() - 2) / textWidth) * fontSize;
 			context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
 		}

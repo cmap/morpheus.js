@@ -404,8 +404,7 @@ morpheus.MafFileReader.prototype = {
 		var _this = this;
 		var name = morpheus.Util.getBaseFileName(morpheus.Util
 		.getFileName(fileOrUrl));
-		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
-																	   arrayBuffer) {
+		morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err, arrayBuffer) {
 			if (err) {
 				callback(err);
 			} else {

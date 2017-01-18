@@ -1,3 +1,8 @@
+/**
+ *
+ * @param dataset
+ * @constructor
+ */
 morpheus.Project = function (dataset) {
 	this.originalDataset = dataset;
 	this.rowIndexMapper = new morpheus.IndexMapper(this, true);

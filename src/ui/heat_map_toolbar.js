@@ -474,7 +474,7 @@ morpheus.HeatMapToolBar = function (controller) {
 			matchMode: 'contains',
 			matchAllPredicates: false,
 			$toggleButton: $searchToggle.filter('[data-search=' + searchName + ']').parent()
-		}
+		};
 		var $searchOptions = $group.find('[data-name=searchOptions]');
 		$searchOptions.on('click', 'li > a', function (e) {
 			e.preventDefault();

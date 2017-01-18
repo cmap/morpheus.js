@@ -18,8 +18,8 @@ morpheus.CollapseDatasetTool.prototype = {
 		var setValue = function (val) {
 			var isRows = val === 'Rows';
 			var names = morpheus.MetadataUtil.getMetadataNames(isRows ? project
-			.getFullDataset().getRowMetadata() : project
-			.getFullDataset().getColumnMetadata());
+				.getFullDataset().getRowMetadata() : project
+				.getFullDataset().getColumnMetadata());
 			form.setOptions('collapse_to_fields', names);
 		};
 		form.$form.find('[name=collapse]').on('change', function (e) {

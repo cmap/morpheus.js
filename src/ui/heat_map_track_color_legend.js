@@ -1,11 +1,11 @@
-morpheus.HeatMapTrackColorLegend = function(tracks, colorModel) {
+morpheus.HeatMapTrackColorLegend = function (tracks, colorModel) {
 	morpheus.AbstractCanvas.call(this, false);
 	this.tracks = tracks;
 	this.colorModel = colorModel;
 	this.canvas.style.position = '';
 };
 morpheus.HeatMapTrackColorLegend.prototype = {
-	getPreferredSize : function() {
+	getPreferredSize: function () {
 		var tracks = this.tracks;
 		var colorModel = this.colorModel;
 		var xpix = 0;
@@ -23,7 +23,7 @@ morpheus.HeatMapTrackColorLegend.prototype = {
 				maxWidth = 220;
 				ypix += 40;
 			} else {
-				map.forEach(function(color, key) {
+				map.forEach(function (color, key) {
 					var width = context.measureText(key).width;
 					if (!isNaN(width)) {
 						maxWidth = Math.max(maxWidth, width);
@@ -32,16 +32,16 @@ morpheus.HeatMapTrackColorLegend.prototype = {
 				});
 			}
 			maxWidth = Math.max(maxWidth,
-					context.measureText(vector.getName()).width);
+				context.measureText(vector.getName()).width);
 			xpix += maxWidth + 10 + 14;
 			maxYPix = Math.max(maxYPix, ypix);
 		}
 		return {
-			width : xpix,
-			height : maxYPix > 0 ? (maxYPix + 12) : 0
+			width: xpix,
+			height: maxYPix > 0 ? (maxYPix + 12) : 0
 		};
 	},
-	draw : function(clip, context) {
+	draw: function (clip, context) {
 		var tracks = this.tracks;
 		var colorModel = this.colorModel;
 		var xpix = 0;
@@ -69,15 +69,15 @@ morpheus.HeatMapTrackColorLegend.prototype = {
 				context.save();
 				context.translate(xpix, ypix);
 				morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
-						scheme, 200);
+					scheme, 200);
 				context.restore();
 				maxWidth = Math.max(maxWidth, 220);
 				ypix += 40;
 			} else {
 				var map = colorModel.getDiscreteColorScheme(vector);
 				var values = map.keys().sort(
-						morpheus.SortKey.ASCENDING_COMPARATOR);
-				values.forEach(function(key) {
+					morpheus.SortKey.ASCENDING_COMPARATOR);
+				values.forEach(function (key) {
 					if (key != null) {
 						var color = colorModel.getMappedValue(vector, key);
 						var textWidth = context.measureText(key).width;

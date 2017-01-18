@@ -1,56 +1,56 @@
-morpheus.AdjustDataTool = function() {
+morpheus.AdjustDataTool = function () {
 };
 morpheus.AdjustDataTool.prototype = {
-	toString : function() {
+	toString: function () {
 		return 'Adjust';
 	},
-	gui : function() {
+	gui: function () {
 		// z-score, robust z-score, log2, inverse log2
-		return [ {
-			name : 'log_2',
-			type : 'checkbox'
+		return [{
+			name: 'log_2',
+			type: 'checkbox'
 		}, {
-			name : 'inverse_log_2',
-			type : 'checkbox'
+			name: 'inverse_log_2',
+			type: 'checkbox'
 		}, {
-			name : 'z-score',
-			type : 'checkbox',
-			help : 'Subtract mean, divide by standard deviation'
+			name: 'z-score',
+			type: 'checkbox',
+			help: 'Subtract mean, divide by standard deviation'
 		}, {
-			name : 'robust_z-score',
-			type : 'checkbox',
-			help : 'Subtract median, divide by median absolute deviation'
+			name: 'robust_z-score',
+			type: 'checkbox',
+			help: 'Subtract median, divide by median absolute deviation'
 		}, {
-			name : 'use_selected_rows_and_columns_only',
-			type : 'checkbox'
-		} ];
+			name: 'use_selected_rows_and_columns_only',
+			type: 'checkbox'
+		}];
 	},
-	execute : function(options) {
+	execute: function (options) {
 		var project = options.project;
 		var controller = options.controller;
 
 		if (options.input.log_2 || options.input.inverse_log_2
-				|| options.input['z-score'] || options.input['robust_z-score']) {
+			|| options.input['z-score'] || options.input['robust_z-score']) {
 			var selectedColumnIndices = project.getColumnSelectionModel()
-					.getViewIndices();
+			.getViewIndices();
 			var selectedRowIndices = project.getRowSelectionModel()
-					.getViewIndices();
+			.getViewIndices();
 			project.setFullDataset(morpheus.DatasetUtil.copy(project
-					.getFullDataset()));
+			.getFullDataset()));
 			project.getColumnSelectionModel().setViewIndices(
-					selectedColumnIndices);
+				selectedColumnIndices);
 			project.getRowSelectionModel().setViewIndices(selectedRowIndices);
 			// clone the values 1st
 			var dataset = options.input.use_selected_rows_and_columns_only ? project
-					.getSelectedDataset()
-					: project.getSortedFilteredDataset();
+				.getSelectedDataset()
+				: project.getSortedFilteredDataset();
 			var rowView = new morpheus.DatasetRowView(dataset);
 			var functions = [];
 			if (options.input.log_2) {
 				for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
 					for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
 						dataset.setValue(i, j, morpheus.Log2(dataset.getValue(
-								i, j)));
+							i, j)));
 					}
 				}
 			}
@@ -71,7 +71,7 @@ morpheus.AdjustDataTool.prototype = {
 					var stdev = Math.sqrt(morpheus.Variance(rowView));
 					for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
 						dataset.setValue(i, j, (dataset.getValue(i, j) - mean)
-								/ stdev);
+							/ stdev);
 					}
 				}
 			}
@@ -82,16 +82,16 @@ morpheus.AdjustDataTool.prototype = {
 					var mad = morpheus.MAD(rowView, median);
 					for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
 						dataset.setValue(i, j,
-								(dataset.getValue(i, j) - median) / mad);
+							(dataset.getValue(i, j) - median) / mad);
 					}
 				}
 			}
 
 			project.trigger('datasetChanged');
 			project.getColumnSelectionModel().setViewIndices(
-					selectedColumnIndices, true);
+				selectedColumnIndices, true);
 			project.getRowSelectionModel().setViewIndices(selectedRowIndices,
-					true);
+				true);
 		}
 	}
 };

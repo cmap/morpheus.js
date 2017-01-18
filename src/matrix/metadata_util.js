@@ -393,8 +393,8 @@ morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS = new morpheus.Set();
 	'pert_mfc_id', 'pert_time', 'pert_time_unit', 'pert_univ_id',
 	'pert_vehicle', 'pool_id', 'rna_plate', 'rna_well', 'count_mean',
 	'count_cv', 'provenance_code'].forEach(function (name) {
-	morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS.add(name);
-});
+		morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS.add(name);
+	});
 
 morpheus.MetadataUtil.maybeConvertStrings = function (metadata,
 													  metadataStartIndex) {

@@ -41,8 +41,8 @@ morpheus.OpenDatasetTool._promptMaf = function (promptCallback) {
 				}
 			}
 			var readOptions = mafGeneFilter.size() > 0 ? {
-					mafGeneFilter: mafGeneFilter
-				} : null;
+				mafGeneFilter: mafGeneFilter
+			} : null;
 			promptCallback(readOptions);
 		}
 	});
@@ -83,8 +83,8 @@ morpheus.OpenDatasetTool._promptSegtab = function (promptCallback) {
 				}
 			}
 			var readOptions = regions.length > 0 ? {
-					regions: regions
-				} : null;
+				regions: regions
+			} : null;
 			promptCallback(readOptions);
 		}
 	});

@@ -1,12 +1,12 @@
 /**
- * @fileOverview A collection of values.
  *
- * Creates a new vector with the given name and size.
+ * Creates a new vector with the given name and size. Subclasses must implement getValue
  *
- * @param name
+ * @param {string} name
  *            the vector name
- * @param size
+ * @param size {number}
  *            the number of elements in this vector
+ * @implements {morpheus.VectorProtocol}
  * @constructor
  */
 morpheus.AbstractVector = function (name, size) {
@@ -16,33 +16,15 @@ morpheus.AbstractVector = function (name, size) {
 };
 
 morpheus.AbstractVector.prototype = {
-
-	/**
-	 * Returns the value at the specified index.
-	 *
-	 * @param index the index
-	 * @abstract
-	 * @return the value
-	 */
 	getValue: function (index) {
 		throw new Error('Not implemented');
 	},
 	getProperties: function () {
 		return this.properties;
 	},
-	/**
-	 * Returns the number of elements in this vector.
-	 *
-	 * @return the size.
-	 */
 	size: function () {
 		return this.n;
 	},
-	/**
-	 * Returns the name of this vector.
-	 *
-	 * @return the name
-	 */
 	getName: function () {
 		return this.name;
 	}

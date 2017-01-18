@@ -11,8 +11,8 @@ morpheus.FilterUI = function (project, isColumns) {
 		(isColumns ? project.getColumnFilter() : project.getRowFilter())
 		.setAnd(isAndFilter);
 		isColumns ? _this.project.setColumnFilter(_this.project
-		.getColumnFilter(), true) : _this.project.setRowFilter(
-			_this.project.getRowFilter(), true);
+			.getColumnFilter(), true) : _this.project.setRowFilter(
+				_this.project.getRowFilter(), true);
 		e.preventDefault();
 	});
 
@@ -35,8 +35,8 @@ morpheus.FilterUI = function (project, isColumns) {
 		.remove(index);
 		$row.remove();
 		isColumns ? _this.project.setColumnFilter(_this.project
-		.getColumnFilter(), true) : _this.project.setRowFilter(
-			_this.project.getRowFilter(), true);
+			.getColumnFilter(), true) : _this.project.setRowFilter(
+				_this.project.getRowFilter(), true);
 		e.preventDefault();
 	});
 	$div.on('submit', 'form', function (e) {
@@ -54,12 +54,12 @@ morpheus.FilterUI = function (project, isColumns) {
 		});
 
 		isColumns ? _this.project.setColumnFilter(_this.project
-		.getColumnFilter(), true) : _this.project.setRowFilter(
-			_this.project.getRowFilter(), true);
+			.getColumnFilter(), true) : _this.project.setRowFilter(
+				_this.project.getRowFilter(), true);
 	});
 	// show initial filters
 	var combinedFilter = (isColumns ? project.getColumnFilter() : project
-	.getRowFilter());
+		.getRowFilter());
 	var filters = combinedFilter.getFilters ? combinedFilter.getFilters() : [];
 	for (var i = 0; i < filters.length; i++) {
 		this.createFilter({
@@ -103,8 +103,8 @@ morpheus.FilterUI.rangeFilter = function (project, name, isColumns, $ui, filter)
 				name, isColumns, $ui);
 			var index = -1;
 			var filters = isColumns ? project.getColumnFilter()
-			.getFilters() : project.getRowFilter()
-			.getFilters();
+				.getFilters() : project.getRowFilter()
+				.getFilters();
 			for (var i = 0; i < filters.length; i++) {
 				if (filters[i] === filter) {
 					index = i;
@@ -115,10 +115,10 @@ morpheus.FilterUI.rangeFilter = function (project, name, isColumns, $ui, filter)
 				throw new Error('Filter not found.');
 			}
 			(isColumns ? project.getColumnFilter() : project
-			.getRowFilter()).set(index, newFilter);
+				.getRowFilter()).set(index, newFilter);
 			isColumns ? project.setColumnFilter(project
-			.getColumnFilter(), true) : project
-			.setRowFilter(project.getRowFilter(), true);
+				.getColumnFilter(), true) : project
+				.setRowFilter(project.getRowFilter(), true);
 		});
 	var $min = $ui.find('[name=min]');
 	var $max = $ui.find('[name=max]');
@@ -168,8 +168,8 @@ morpheus.FilterUI.topFilter = function (project, name, isColumns, $ui, filter) {
 				name, isColumns, $ui);
 			var index = -1;
 			var filters = isColumns ? project.getColumnFilter()
-			.getFilters() : project.getRowFilter()
-			.getFilters();
+				.getFilters() : project.getRowFilter()
+				.getFilters();
 			for (var i = 0; i < filters.length; i++) {
 				if (filters[i] === filter) {
 					index = i;
@@ -180,10 +180,10 @@ morpheus.FilterUI.topFilter = function (project, name, isColumns, $ui, filter) {
 				throw new Error('Filter not found.');
 			}
 			(isColumns ? project.getColumnFilter() : project
-			.getRowFilter()).set(index, newFilter);
+				.getRowFilter()).set(index, newFilter);
 			isColumns ? project.setColumnFilter(project
-			.getColumnFilter(), true) : project
-			.setRowFilter(project.getRowFilter(), true);
+				.getColumnFilter(), true) : project
+				.setRowFilter(project.getRowFilter(), true);
 		});
 	if (!filter) {
 		filter = new morpheus.TopNFilter(NaN, morpheus.TopNFilter.TOP, name, isColumns);
@@ -253,8 +253,8 @@ morpheus.FilterUI.prototype = {
 
 		$ui.empty();
 		var vector = (isColumns ? this.project.getFullDataset()
-		.getColumnMetadata() : this.project.getFullDataset()
-		.getRowMetadata()).getByName(fieldName);
+			.getColumnMetadata() : this.project.getFullDataset()
+			.getRowMetadata()).getByName(fieldName);
 
 		if (filter instanceof morpheus.RangeFilter) {
 			morpheus.FilterUI.rangeFilter(project, fieldName, isColumns, $ui,
@@ -285,8 +285,8 @@ morpheus.FilterUI.prototype = {
 			});
 			checkBoxList.on('checkBoxSelectionChanged', function () {
 				isColumns ? project.setColumnFilter(project.getColumnFilter(),
-					true) : project.setRowFilter(project.getRowFilter(),
-					true);
+						true) : project.setRowFilter(project.getRowFilter(),
+						true);
 
 			});
 		}
@@ -327,8 +327,8 @@ morpheus.FilterUI.prototype = {
 		var project = this.project;
 		var isColumns = this.isColumns;
 		var fields = morpheus.MetadataUtil.getMetadataNames(isColumns ? project
-		.getFullDataset().getColumnMetadata() : project
-		.getFullDataset().getRowMetadata());
+			.getFullDataset().getColumnMetadata() : project
+			.getFullDataset().getRowMetadata());
 		var html = [];
 		html.push('<div class="morpheus-entry">');
 
