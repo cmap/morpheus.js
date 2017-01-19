@@ -3,7 +3,7 @@
  *
  * @param itemCount {number}
  *            the number of items that vectors in this instances will hold.
- * @implements {morpheus.MetadataModelProtocol}
+ * @implements {morpheus.MetadataModelInterface}
  * @constructor
  */
 morpheus.MetadataModel = function (itemCount) {

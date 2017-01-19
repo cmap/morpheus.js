@@ -1,8 +1,14 @@
+/**
+ *
+ * @param options.dataRowStart
+ * @param options.dataColumnStart
+ * @constructor
+ */
 morpheus.TxtReader = function (options) {
-  this.options = $.extend({}, {
-    dataRowStart: 1,
-    dataColumnStart: undefined
-  }, options);
+  if (options == null) {
+    options = {};
+  }
+  this.options = options;
 };
 morpheus.TxtReader.prototype = {
   read: function (fileOrUrl, callback) {
@@ -28,10 +34,14 @@ morpheus.TxtReader.prototype = {
   },
   _read: function (datasetName, reader) {
     var dataColumnStart = this.options.dataColumnStart;
+    var dataRowStart = this.options.dataRowStart;
+    if (dataRowStart == null) {
+      dataRowStart = 1;
+    }
     var tab = /\t/;
     var header = reader.readLine().trim().split(tab);
-    if (this.options.dataRowStart > 1) {
-      for (var i = 1; i < this.options.dataRowStart; i++) {
+    if (dataRowStart > 1) {
+      for (var i = 1; i < dataRowStart; i++) {
         reader.readLine(); // skip
       }
     }

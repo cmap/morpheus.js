@@ -1,6 +1,6 @@
 /**
  * Stores annotations for the rows or columns of a dataset.
- * @interface morpheus.MetadataModelProtocol
+ * @interface morpheus.MetadataModelInterface
  *
  */
 
@@ -9,10 +9,10 @@
  * with the same name already exists, it is removed and existing properties
  * and values copied to the new vector before appending the new vector.
  * @function
- * @name morpheus.MetadataModelProtocol#add
+ * @name morpheus.MetadataModelInterface#add
  * @param name {String} The vector name to be inserted into this meta data instance.
  * @param options {object}
- * @return {morpheus.VectorProtocol} the added vector.
+ * @return {morpheus.VectorInterface} the added vector.
  */
 
 /**
@@ -20,7 +20,7 @@
  * contains.
  *
  * @function
- * @name morpheus.MetadataModelProtocol#getItemCount
+ * @name morpheus.MetadataModelInterface#getItemCount
  * @return {number} the item count
  */
 
@@ -28,9 +28,9 @@
  * Returns the vector at the specified metadata index.
  *
  * @function
- * @name morpheus.MetadataModelProtocol#get
+ * @name morpheus.MetadataModelInterface#get
  * @param index {number} the metadata index
- * @return {morpheus.VectorProtocol} the vector
+ * @return {morpheus.VectorInterface} the vector
  */
 
 /**
@@ -39,9 +39,9 @@
  * indices).
  *
  * @function
- * @name morpheus.MetadataModelProtocol#remove
+ * @name morpheus.MetadataModelInterface#remove
  * @param index {number} the meta data index to remove.
- * @return {morpheus.VectorProtocol} the removed vector
+ * @return {morpheus.VectorInterface} the removed vector
  * @throws Error if index < 0 or >= getMetadataCount
  */
 
@@ -49,16 +49,16 @@
  * Returns the vector witht the specified name.
  *
  * @function
- * @name morpheus.MetadataModelProtocol#getByName
+ * @name morpheus.MetadataModelInterface#getByName
  * @param name {string} the vector name
- * @return {morpheus.VectorProtocol} the vector
+ * @return {morpheus.VectorInterface} the vector
  */
 
 /**
  * Returns the number of vectors in this meta data instance.
  *
  * @function
- * @name morpheus.MetadataModelProtocol#getMetadataCount
+ * @name morpheus.MetadataModelInterface#getMetadataCount
  * @return {number} the number of vectors.
  */
 

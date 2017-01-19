@@ -4,7 +4,7 @@
  * setValue.
  * @param rows {number} The number of rows
  * @param columns {number} The number of columns
- * @implements {morpheus.DatasetProtocol}
+ * @implements {morpheus.DatasetInterface}
  * @constructor
  */
 morpheus.AbstractDataset = function (rows, columns) {

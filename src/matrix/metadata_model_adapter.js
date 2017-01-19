@@ -1,6 +1,6 @@
 /**
  *
- *@implements {morpheus.MetadataModelProtocol}
+ *@implements {morpheus.MetadataModelInterface}
  */
 morpheus.MetadataModelAdapter = function (model) {
   this.model = model;

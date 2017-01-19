@@ -6,7 +6,7 @@
  *            the vector name
  * @param size {number}
  *            the number of elements in this vector
- * @implements {morpheus.VectorProtocol}
+ * @implements {morpheus.VectorInterface}
  * @constructor
  */
 morpheus.AbstractVector = function (name, size) {
