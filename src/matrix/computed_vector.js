@@ -9,13 +9,13 @@
  * @constructor
  */
 morpheus.ComputedVector = function (name, size, callback) {
-	morpheus.AbstractVector.call(this, name, size);
-	this.callback = callback;
+  morpheus.AbstractVector.call(this, name, size);
+  this.callback = callback;
 };
 
 morpheus.ComputedVector.prototype = {
-	getValue: function (index) {
-		return this.callback(index);
-	}
+  getValue: function (index) {
+    return this.callback(index);
+  }
 };
 morpheus.Util.extend(morpheus.ComputedVector, morpheus.AbstractVector);

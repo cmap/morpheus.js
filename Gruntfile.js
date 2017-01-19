@@ -1,4 +1,3 @@
-/*global module:false*/
 module.exports = function (grunt) {
 	grunt
 	.initConfig({
@@ -51,7 +50,6 @@ module.exports = function (grunt) {
 				dest: 'js/morpheus-external-latest.min.js'
 			},
 			extJs: {
-
 				dest: 'js/morpheus-external.js',
 				src: ['js/d3.min.js', 'js/jquery-2.2.4.min.js',
 					'js/bootstrap.min.js', 'js/underscore-min.js',
