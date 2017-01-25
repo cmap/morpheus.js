@@ -1,3 +1,8 @@
+/**
+ * Static utilities for morpheus.DatasetInterface instances
+ *
+ * @class morpheus.DatasetUtil
+ */
 morpheus.DatasetUtil = function () {
 };
 morpheus.DatasetUtil.min = function (dataset, seriesIndex) {
@@ -165,9 +170,10 @@ morpheus.DatasetUtil.annotate = function (options) {
   return retDef;
 };
 /**
+ * Reads a dataset at the specified URL or file
  * @param file
- *            a File or url
- * @return A promise that resolves to Dataset
+ *            a File or URL
+ * @return A promise that resolves to morpheus.DatasetInterface
  */
 morpheus.DatasetUtil.read = function (fileOrUrl, options) {
   if (options == null) {

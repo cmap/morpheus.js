@@ -256,7 +256,7 @@ morpheus.KeyboardCharMap = [
   'WIN_OEM_CLEAR', // [254]
   '' // [255]
 ];
-morpheus.HeatMapKeyListener = function (controller) {
+morpheus.HeatMapKeyListener = function (heatMap) {
   /**
    * Shortcut object contains
    * @param options.which Array of key codes
@@ -272,30 +272,30 @@ morpheus.HeatMapKeyListener = function (controller) {
     which: [107, 61, 187],
     name: 'Zoom In',
     cb: function () {
-      controller.zoom(true);
+      heatMap.zoom(true);
     }
   });
   shortcutsWhenNotInInputField.push({
     which: [173, 189, 109],
     name: 'Zoom Out',
     cb: function () {
-      controller.zoom(false);
+      heatMap.zoom(false);
     }
   });
   shortcutsWhenNotInInputField.push({
     which: [35],
     name: 'Go To End',
     cb: function () {
-      controller.scrollLeft(controller.heatmap.getPreferredSize().width);
-      controller.scrollTop(controller.heatmap.getPreferredSize().height);
+      heatMap.scrollLeft(heatMap.heatmap.getPreferredSize().width);
+      heatMap.scrollTop(heatMap.heatmap.getPreferredSize().height);
     }
   });
   shortcutsWhenNotInInputField.push({
     which: [36], // home key
     name: 'Go To Start',
     cb: function () {
-      controller.scrollLeft(0);
-      controller.scrollTop(0);
+      heatMap.scrollLeft(0);
+      heatMap.scrollTop(0);
     }
   });
   shortcutsWhenNotInInputField.push({
@@ -303,8 +303,8 @@ morpheus.HeatMapKeyListener = function (controller) {
     commandKey: true,
     name: 'Go To Bottom',
     cb: function () {
-      controller
-      .scrollTop(controller.heatmap.getPreferredSize().height);
+      heatMap
+      .scrollTop(heatMap.heatmap.getPreferredSize().height);
     }
   });
   shortcutsWhenNotInInputField.push({
@@ -312,8 +312,8 @@ morpheus.HeatMapKeyListener = function (controller) {
     commandKey: false,
     name: 'Scroll Page Down',
     cb: function () {
-      var pos = controller.scrollTop();
-      controller.scrollTop(pos + controller.heatmap.getUnscaledHeight()
+      var pos = heatMap.scrollTop();
+      heatMap.scrollTop(pos + heatMap.heatmap.getUnscaledHeight()
         - 2);
     }
   });
@@ -323,7 +323,7 @@ morpheus.HeatMapKeyListener = function (controller) {
     commandKey: true,
     name: 'Go To Top',
     cb: function () {
-      controller
+      heatMap
       .scrollTop(0);
     }
   });
@@ -332,8 +332,8 @@ morpheus.HeatMapKeyListener = function (controller) {
     commandKey: false,
     name: 'Scroll Page Up',
     cb: function () {
-      var pos = controller.scrollTop();
-      controller.scrollTop(pos - controller.heatmap.getUnscaledHeight()
+      var pos = heatMap.scrollTop();
+      heatMap.scrollTop(pos - heatMap.heatmap.getUnscaledHeight()
         + 2);
     }
   });
@@ -343,7 +343,7 @@ morpheus.HeatMapKeyListener = function (controller) {
     commandKey: true,
     name: 'Zoom Out Rows',
     cb: function () {
-      controller.zoom(false, {
+      heatMap.zoom(false, {
         columns: false,
         rows: true
       });
@@ -354,7 +354,7 @@ morpheus.HeatMapKeyListener = function (controller) {
     commandKey: false,
     name: 'Scroll Up',
     cb: function () {
-      controller.scrollTop(controller.scrollTop() - 8);
+      heatMap.scrollTop(heatMap.scrollTop() - 8);
     }
   });
 
@@ -363,7 +363,7 @@ morpheus.HeatMapKeyListener = function (controller) {
     commandKey: true,
     name: 'Zoom In Rows',
     cb: function () {
-      controller.zoom(true, {
+      heatMap.zoom(true, {
         columns: false,
         rows: true
       });
@@ -374,7 +374,7 @@ morpheus.HeatMapKeyListener = function (controller) {
     commandKey: false,
     name: 'Scroll Down',
     cb: function () {
-      controller.scrollTop(controller.scrollTop() + 8);
+      heatMap.scrollTop(heatMap.scrollTop() + 8);
     }
   });
 
@@ -383,7 +383,7 @@ morpheus.HeatMapKeyListener = function (controller) {
     commandKey: true,
     name: 'Zoom Out Columns',
     cb: function () {
-      controller.zoom(false, {
+      heatMap.zoom(false, {
         columns: true,
         rows: false
       });
@@ -394,7 +394,7 @@ morpheus.HeatMapKeyListener = function (controller) {
     commandKey: false,
     name: 'Scroll Left',
     cb: function () {
-      controller.scrollLeft(controller.scrollLeft() - 8);
+      heatMap.scrollLeft(heatMap.scrollLeft() - 8);
     }
   });
 
@@ -403,7 +403,7 @@ morpheus.HeatMapKeyListener = function (controller) {
     commandKey: true,
     name: 'Zoom In Columns',
     cb: function () {
-      controller.zoom(true, {
+      heatMap.zoom(true, {
         columns: true,
         rows: false
       });
@@ -414,7 +414,7 @@ morpheus.HeatMapKeyListener = function (controller) {
     commandKey: false,
     name: 'Scroll Right',
     cb: function () {
-      controller.scrollLeft(controller.scrollLeft() + 8);
+      heatMap.scrollLeft(heatMap.scrollLeft() + 8);
     }
   });
   shortcutsWhenNotInInputField.push({
@@ -422,17 +422,17 @@ morpheus.HeatMapKeyListener = function (controller) {
     commandKey: true,
     name: 'Select All',
     accept: function () {
-      var active = controller.getActiveComponent();
+      var active = heatMap.getActiveComponent();
       return (active === 'rowTrack' || active === 'columnTrack');
     },
     cb: function () {
-      var active = controller.getActiveComponent();
+      var active = heatMap.getActiveComponent();
 
-      var selectionModel = active === 'rowTrack' ? controller.getProject()
-        .getRowSelectionModel() : controller.getProject()
+      var selectionModel = active === 'rowTrack' ? heatMap.getProject()
+        .getRowSelectionModel() : heatMap.getProject()
         .getColumnSelectionModel();
-      var count = active === 'rowTrack' ? controller.getProject()
-        .getSortedFilteredDataset().getRowCount() : controller
+      var count = active === 'rowTrack' ? heatMap.getProject()
+        .getSortedFilteredDataset().getRowCount() : heatMap
         .getProject().getSortedFilteredDataset()
         .getColumnCount();
       var indices = new morpheus.Set();
@@ -451,9 +451,10 @@ morpheus.HeatMapKeyListener = function (controller) {
     name: 'Save Dataset',
     cb: function () {
       morpheus.HeatMap.showTool(new morpheus.SaveDatasetTool(),
-        controller);
+        heatMap);
     }
   });
+
   shortcuts.push({
     which: [83],
     shiftKey: false,
@@ -461,48 +462,54 @@ morpheus.HeatMapKeyListener = function (controller) {
     name: 'Save Image',
     cb: function () {
       morpheus.HeatMap.showTool(new morpheus.SaveImageTool(),
-        controller);
+        heatMap);
     }
   });
-  shortcuts.push({
-    which: [79],
-    commandKey: true,
-    name: 'Open File',
-    cb: function () {
-      morpheus.HeatMap.showTool(new morpheus.OpenFileTool(),
-        controller);
-    }
-  });
+  if (heatMap.options.toolbar.openFile) {
+    shortcuts.push({
+      which: [79],
+      commandKey: true,
+      name: 'Open File',
+      cb: function () {
+        morpheus.HeatMap.showTool(new morpheus.OpenFileTool(),
+          heatMap);
+      }
+    });
+  }
   shortcuts.push({
     which: [191], // slash
     commandKey: true,
     name: 'Toggle Search',
     cb: function () {
-      controller.getToolbar().toggleSearch();
+      heatMap.getToolbar().toggleSearch();
     }
   });
-  shortcuts.push({
-    which: [88], // x
-    commandKey: true,
-    name: 'New Heat Map',
-    accept: function (options) {
-      return (!options.isInputField || window.getSelection().toString() === '');
-    },
-    cb: function () {
-      morpheus.HeatMap.showTool(new morpheus.NewHeatMapTool(),
-        controller);
-    }
-  });
+  if (heatMap.options.toolbar.tools) {
+    shortcuts.push({
+      which: [88], // x
+      commandKey: true,
+      name: 'New Heat Map',
+      accept: function (options) {
+        return (!options.isInputField || window.getSelection().toString() === '');
+      },
+      cb: function () {
+        morpheus.HeatMap.showTool(new morpheus.NewHeatMapTool(),
+          heatMap);
+      }
+    });
+  }
   shortcuts.push({
     which: [67], // C
     commandKey: true,
     name: 'Copy'
   });
-  shortcuts.push({
-    which: [86], // V
-    commandKey: true,
-    name: 'Paste Dataset'
-  });
+  if (heatMap.options.toolbar.openFile) {
+    shortcuts.push({
+      which: [86], // V
+      commandKey: true,
+      name: 'Paste Dataset'
+    });
+  }
 
   var keydown = function (e) {
     var tagName = e.target.tagName;
@@ -544,56 +551,60 @@ morpheus.HeatMapKeyListener = function (controller) {
       return false;
     }
   };
-  var $keyelement = controller.$tabPanel;
+  var $keyelement = heatMap.$tabPanel;
   $keyelement.on('keydown', keydown);
+
   $keyelement.on('dragover.morpheus dragenter.morpheus', function (e) {
     e.preventDefault();
     e.stopPropagation();
   }).on(
     'drop.morpheus',
     function (e) {
-      if (e.originalEvent.dataTransfer
+      if (heatMap.options.toolbar.openFile && e.originalEvent.dataTransfer
         && e.originalEvent.dataTransfer.files.length) {
         e.preventDefault();
         e.stopPropagation();
         var files = e.originalEvent.dataTransfer.files;
         morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
           file: files[0]
-        }), controller);
+        }), heatMap);
       }
     });
   $keyelement.on('paste.morpheus',
     function (e) {
-      var tagName = e.target.tagName;
-      if (tagName == 'INPUT' || tagName == 'SELECT'
-        || tagName == 'TEXTAREA') {
-        return;
-      }
-      var text = e.originalEvent.clipboardData.getData('text/plain');
-      if (text != null && text.length > 0) {
-        e.preventDefault();
-        e.stopPropagation();
-        var blob = new Blob([text]);
-        var url = window.URL.createObjectURL(blob);
-        morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
-          file: url
-        }), controller);
+      if (heatMap.options.toolbar.openFile) {
+        var tagName = e.target.tagName;
+        if (tagName == 'INPUT' || tagName == 'SELECT'
+          || tagName == 'TEXTAREA') {
+          return;
+        }
+        var text = e.originalEvent.clipboardData.getData('text/plain');
+        if (text != null && text.length > 0) {
+          e.preventDefault();
+          e.stopPropagation();
+          var blob = new Blob([text]);
+          var url = window.URL.createObjectURL(blob);
+          morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
+            file: url
+          }), heatMap);
+        }
       }
     });
+
   $keyelement.on('mousewheel', function (e) {
     var scrolly = e.deltaY * e.deltaFactor;
     var scrollx = e.deltaX * e.deltaFactor;
     if (e.altKey) {
-      controller.zoom(scrolly > 0, {
+      heatMap.zoom(scrolly > 0, {
         rows: true,
         columns: true
       });
     } else {
       if (scrolly !== 0) {
-        controller.scrollTop(controller.scrollTop() - scrolly);
+        heatMap.scrollTop(heatMap.scrollTop() - scrolly);
       }
       if (scrollx !== 0) {
-        controller.scrollLeft(controller.scrollLeft() + scrollx);
+        heatMap.scrollLeft(heatMap.scrollLeft() + scrollx);
       }
     }
     e.preventDefault();

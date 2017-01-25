@@ -28,35 +28,21 @@ morpheus.MafFileReader.summarizeMutations = function (options) {
   }
 };
 
-morpheus.MafFileReader.getField = function (fieldNames, fieldNameToIndex,
-                                            options) {
-  options = $.extend({}, {
-    remove: true,
-    lc: false
-  }, options);
+morpheus.MafFileReader.getField = function (fieldNames, headerToIndex) {
   var name;
   var index;
 
   for (var i = 0; i < fieldNames.length; i++) {
     name = fieldNames[i];
-    if (options.lc) {
-      var lc = name.toLowerCase();
-      index = fieldNameToIndex[lc];
-    } else {
-      index = fieldNameToIndex[name];
-    }
+
+    var lc = name.toLowerCase();
+    index = headerToIndex[lc];
+
     if (index !== undefined) {
       break;
     }
   }
-  if (index !== undefined && options.remove) {
-    for (var i = 0; i < fieldNames.length; i++) {
-      if (i !== index) {
-        delete fieldNameToIndex[fieldNames[i]];
-      }
-    }
 
-  }
   if (index !== undefined) {
     return {
       name: name,
@@ -109,37 +95,23 @@ morpheus.MafFileReader.prototype = {
     var header = reader.readLine().split(tab);
     var headerToIndex = {};
     for (var i = 0, length = header.length; i < length; i++) {
-      var name = header[i].toLowerCase();
-      headerToIndex[name] = i;
+      headerToIndex[header[i].toLowerCase()] = i;
     }
     // TODO six classes of base substitution—C>A, C>G, C>T, T>A, T>C, T>G
     // (all substitutions are referred to by the pyrimidine of the mutated
     // Watson–Crick base pair)
-    var fields = ['Hugo_Symbol', 'Chromosome', 'Start_position',
-      'Reference_Allele', 'Tumor_Seq_Allele2',
-      'Variant_Classification', 'Protein_Change', 'ccf_hat',
-      'tumor_f', 'i_tumor_f', 'Tumor_Sample_Barcode', 'tumor_name',
-      'Tumor_Sample_UUID', 'encoding'];
-    var fieldNameToIndex = {};
-
-    for (var i = 0, length = fields.length; i < length; i++) {
-      var index = headerToIndex[fields[i].toLowerCase()];
-      if (index !== undefined) {
-        fieldNameToIndex[fields[i].toLowerCase()] = index;
-      }
-    }
+    // var fields = ['Hugo_Symbol', 'Chromosome', 'Start_position',
+    //   'Reference_Allele', 'Tumor_Seq_Allele2',
+    //   'Variant_Classification', 'Protein_Change', 'Protein_Change', 'ccf_hat',
+    //   'tumor_f', 'i_tumor_f', 'Tumor_Sample_Barcode', 'tumor_name',
+    //   'Tumor_Sample_UUID', 'encoding'];
+    //
     var sampleField = morpheus.MafFileReader.getField([
         'Tumor_Sample_Barcode', 'tumor_name', 'Tumor_Sample_UUID'],
-      fieldNameToIndex, {
-        lc: true,
-        remove: true
-      });
+      headerToIndex);
     var encodingField = morpheus.MafFileReader.getField([
         'encoding'],
-      fieldNameToIndex, {
-        lc: true,
-        remove: true
-      }); // gives a numeric value for string
+      headerToIndex); // gives a numeric value for string
     if (sampleField == null) {
       throw new Error('Sample id column not found.');
     }
@@ -147,53 +119,43 @@ morpheus.MafFileReader.prototype = {
     var sampleColumnName = sampleField.name;
     var sampleIdColumnIndex = sampleField.index;
     var tumorFractionField = morpheus.MafFileReader.getField(['ccf_hat',
-      'tumor_f', 'i_tumor_f'], fieldNameToIndex, {
-      lc: true,
-      remove: true
-    });
+      'tumor_f', 'i_tumor_f'], headerToIndex);
     var ccfColumnName;
     var ccfColumnIndex;
     if (tumorFractionField !== undefined) {
       ccfColumnName = tumorFractionField.name;
       ccfColumnIndex = tumorFractionField.index;
     }
-    var chromosomeColumn = fieldNameToIndex['Chromosome'.toLowerCase()];
-    var startPositionColumn = fieldNameToIndex['Start_position'
+    var chromosomeColumn = headerToIndex['Chromosome'.toLowerCase()];
+    var startPositionColumn = headerToIndex['Start_position'
     .toLowerCase()];
-    var refAlleleColumn = fieldNameToIndex['Reference_Allele'.toLowerCase()];
-    var tumorAllelColumn = fieldNameToIndex['Tumor_Seq_Allele2'
+    var refAlleleColumn = headerToIndex['Reference_Allele'.toLowerCase()];
+    var tumorAllelColumn = headerToIndex['Tumor_Seq_Allele2'
     .toLowerCase()];
-    var proteinChangeColumn = fieldNameToIndex['Protein_Change'
-    .toLowerCase()];
-    var geneSymbolColumn = fieldNameToIndex['Hugo_Symbol'.toLowerCase()];
+
+    var proteinChangeColumn = headerToIndex['Protein_Change'.toLowerCase()];
+    if (proteinChangeColumn == null) {
+      proteinChangeColumn = headerToIndex['Protein'.toLowerCase()];
+    }
+
+    var geneSymbolColumn = headerToIndex['Hugo_Symbol'.toLowerCase()];
     if (geneSymbolColumn == null) {
-      geneSymbolColumn = fieldNameToIndex['gene'];
+      geneSymbolColumn = headerToIndex['gene'];
     }
     if (geneSymbolColumn == null) {
       throw new Error('Gene symbol column not found.');
     }
     var variantColumnIndex = headerToIndex['Variant_Classification'
     .toLowerCase()];
-    if (variantColumnIndex === undefined) {
+    if (variantColumnIndex == null) {
       variantColumnIndex = headerToIndex['variant'
       .toLowerCase()];
     }
-    if (variantColumnIndex === undefined) {
+    if (variantColumnIndex == null) {
       throw new Error('Variant_Classification not found');
     }
     // keep fields that are in file only
-    fields = [];
-    var geneFields = [];
-    for (var key in fieldNameToIndex) {
-      if (key !== sampleColumnName && key !== ccfColumnName) {
-        geneFields.push(key);
-      }
-      fields.push(key);
-    }
-    var geneColumnIndices = geneFields.map(function (field) {
-      return fieldNameToIndex[field];
-    });
-    var nGeneFields = geneColumnIndices.length;
+
     var geneSymbolToIndex = new morpheus.Map();
     var sampleIdToIndex = new morpheus.Map();
     var variantMatrix = [];

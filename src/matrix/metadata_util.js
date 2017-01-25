@@ -217,7 +217,6 @@ morpheus.MetadataUtil.autocomplete = function (model) {
     token = $.trim(token);
     var fieldSearchFieldName = null;
     if (token !== '') {
-
       var semi = token.indexOf(':');
       if (semi > 0) { // field search?
         if (token.charCodeAt(semi - 1) !== 92) { // \:

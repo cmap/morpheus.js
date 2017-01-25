@@ -177,9 +177,17 @@ morpheus.HeatMap = function (options) {
       rowFilter: undefined,
       columnFilter: undefined,
       /*
+       * Whether to auto-hide the tab bar when only one tab is visible
+       */
+      autohideTabBar: false,
+      /*
        * Whether this heat map tab can be closed
        */
       closeable: true,
+      /*
+       * Whether heat map tab can be renamed
+       */
+      rename: true,
       rowSize: undefined,
       columnSize: undefined,
       customUrls: undefined, // Custom urls for File>Open.
@@ -215,6 +223,7 @@ morpheus.HeatMap = function (options) {
       inlineTooltip: true,
       $loadingImage: morpheus.Util.createLoadingEl(),
       toolbar: {
+        help: true,
         chart: true,
         dimensions: true,
         zoom: true,
@@ -255,10 +264,11 @@ morpheus.HeatMap = function (options) {
 
     this.tabManager = this.options.tabManager != null ? this.options.tabManager
       : new morpheus.TabManager({
-        landingPage: this.options.landingPage
+        landingPage: this.options.landingPage,
+        autohideTabBar: this.options.autohideTabBar
       });
 
-    if (!morpheus.HelpMenu.ADDED) { // only show once per page
+    if (this.options.toolbar.help && !morpheus.HelpMenu.ADDED) { // only show once per page
       morpheus.HelpMenu.ADDED = true;
       // var $a = $('<a data-name="ignore" title="Produced with Morpheus"' +
       // 	' style="display:inline;font-size:85%;margin-right:2px;margin-top:2px;" href="'
@@ -281,8 +291,7 @@ morpheus.HeatMap = function (options) {
       $right.appendTo(this.tabManager.$nav);
     }
     if (!this.options.tabManager) {
-      this.tabManager.$nav.appendTo(this.$el);
-      this.tabManager.$tabContent.appendTo(this.$el);
+      this.tabManager.appendTo(this.$el);
     }
   } else {
     if (this.options.inheritFromParent) {
@@ -323,17 +332,18 @@ morpheus.HeatMap = function (options) {
   var tab = this.tabManager.add({
     $el: this.$content,
     closeable: this.options.closeable,
-    rename: true,
+    rename: this.options.rename,
     title: this.options.name,
     object: this,
     focus: this.options.focus
   });
+  this.tabId = tab.id;
+  this.$tabPanel = tab.$panel;
+
   if (options.$loadingImage) {
     options.$loadingImage.appendTo(this.$content);
   }
 
-  this.tabId = tab.id;
-  this.$tabPanel = tab.$panel;
   this.options.dataSource = !options.dataset ? ''
     : (options.dataset.file ? options.dataset.file : options.dataset);
   this._togglingInfoWindow = false;
@@ -1717,13 +1727,8 @@ morpheus.HeatMap.prototype = {
     if (this.options.colorScheme == null) {
       var ext = '';
       if (this.options.dataSource) {
-        try {
-          ext = morpheus.Util.getExtension(morpheus.Util
-          .getFileName(this.options.dataSource));
-        }
-        catch (x) {
-
-        }
+        ext = morpheus.Util.getExtension(morpheus.Util
+        .getFileName(this.options.dataSource));
       }
 
       var colorScheme = this.autoDisplay({

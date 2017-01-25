@@ -5,7 +5,8 @@
  */
 morpheus.TabManager = function (options) {
   this.options = $.extend({}, {
-    autohideTabBar: false
+    autohideTabBar: false,
+    rename: true
   }, options);
   var _this = this;
   this.activeTabObject = null;
@@ -46,7 +47,7 @@ morpheus.TabManager = function (options) {
 
   this.$nav.on('dblclick', 'li > a', function (e) {
     e.preventDefault();
-    if ($(this).data('morpheus-rename')) {
+    if ($(this).data('morpheus-rename') && _this.options.rename) {
       rename($(this));
     }
 
@@ -56,7 +57,7 @@ morpheus.TabManager = function (options) {
     e.stopPropagation();
     e.stopImmediatePropagation();
     var $a = $(this);
-    if ($a.data('morpheus-rename')) {
+    if ($a.data('morpheus-rename') && _this.options.rename) {
       morpheus.Popup.showPopup([{
         name: 'Rename'
       }], {
@@ -165,7 +166,7 @@ morpheus.TabManager.prototype = {
     }
   },
   getWidth: function () {
-    return this.$nav.outerWidth() || $(window).width();
+    return this.$tabContent.outerWidth() || $(window).width();
   },
   getActiveTab: function () {
     return this.activeTabObject;
@@ -176,7 +177,8 @@ morpheus.TabManager.prototype = {
 
   /**
    *
-   * @param options.object The object that stores the tab content state and has a setName method.
+   * @param options.object The object that stores the tab content state and has a setName if
+   * function if rename is true.
    * @param options.$el
    *            the tab element
    * @param options.title
@@ -240,6 +242,10 @@ morpheus.TabManager.prototype = {
       $panel: $panel,
       id: id
     };
+  },
+  appendTo: function ($target) {
+    this.$nav.appendTo($target);
+    this.$tabContent.appendTo($target);
   },
   remove: function (target) {
     if (target === undefined) {
@@ -319,6 +325,9 @@ morpheus.TabManager.prototype = {
       $a.addClass('btn disabled');
     }
 
+  },
+  getTabObject: function (id) {
+    return this.idToTabObject.get(id);
   }
 };
 morpheus.Util.extend(morpheus.TabManager, morpheus.Events);

@@ -257,6 +257,9 @@ morpheus.HeatMapToolBar = function (controller) {
   $search.appendTo($lineOneColumn);
   var $toolbarForm = $(toolbarHtml.join(''));
   $toolbarForm.appendTo($buttons);
+  if (controller.options.toolbar.$customButtons) {
+    controller.options.toolbar.$customButtons.appendTo($buttons);
+  }
   if (controller.options.$help) {
     controller.options.$help.appendTo($buttons);
   }
@@ -810,7 +813,7 @@ morpheus.HeatMapToolBar = function (controller) {
       eventAction: 'resetZoom'
     });
   });
-  this.toggleMenu = function () {
+  this.toggleControls = function () {
     if ($lineOneColumn.css('display') === 'none') {
       $lineOneColumn.css('display', '');
       _this.rowSearchObject.$search.focus();

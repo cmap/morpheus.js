@@ -85,17 +85,11 @@ morpheus.SegTabReader.prototype = {
 
     var sampleField = morpheus.MafFileReader.getField(['pair_id',
       'Tumor_Sample_Barcode', 'tumor_name', 'Tumor_Sample_UUID',
-      'Sample'], fieldNameToIndex, {
-      remove: false,
-      lc: true
-    });
+      'Sample'], fieldNameToIndex);
     var sampleColumnName = sampleField.name;
     var sampleIdColumnIndex = sampleField.index;
     var tumorFractionField = morpheus.MafFileReader.getField(['ccf_hat',
-      'tumor_f', 'i_tumor_f'], fieldNameToIndex, {
-      remove: false,
-      lc: true
-    });
+      'tumor_f', 'i_tumor_f'], fieldNameToIndex);
     var ccfColumnName;
     var ccfColumnIndex;
     if (tumorFractionField !== undefined) {
@@ -104,21 +98,14 @@ morpheus.SegTabReader.prototype = {
     }
     var chromosomeColumn = fieldNameToIndex.Chromosome;
     var startPositionColumn = morpheus.MafFileReader.getField(['Start_bp',
-      'Start'], fieldNameToIndex, {
-      remove: false,
-      lc: true
-    }).index;
+      'Start'], fieldNameToIndex).index;
     var endPositionColumn = morpheus.MafFileReader.getField(['End_bp',
       'End'], fieldNameToIndex, {
       remove: false,
       lc: true
     }).index;
     var valueField = morpheus.MafFileReader.getField(['tau',
-      'Segment_Mean'], fieldNameToIndex, {
-      remove: false,
-      lc: true
-    }).index;
-
+      'Segment_Mean']).index;
     var s;
     var matrix = [];
     var ccfMatrix = [];

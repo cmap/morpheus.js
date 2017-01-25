@@ -1,3 +1,9 @@
+/**
+ *
+ * @param distmatrix
+ * @param linkageAlgorithm {Function}
+ * @constructor
+ */
 morpheus.HCluster = function (distmatrix, linkageAlgorithm) {
   var nelements = distmatrix.length;
   var nNodes = nelements - 1;
@@ -195,7 +201,7 @@ morpheus.HCluster.computeDistanceMatrix = function (dataset, distanceFunction) {
         matrix[i][j] = dataset.getValue(i, j);
       }
     }
-  } else if (distanceFunction === 1) {
+  } else if (distanceFunction === 1) { // already a similarity matrix
     for (var i = 1; i < n; i++) {
       for (var j = 0; j < i; j++) {
         matrix[i][j] = 1 - dataset.getValue(i, j);
