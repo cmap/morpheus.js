@@ -61,25 +61,28 @@ morpheus.SaveDatasetTool.prototype = {
     var writer = (format === '1.2') ? new morpheus.GctWriter12()
       : new morpheus.GctWriter();
 
-    if (typeof streamSaver !== 'undefined' && streamSaver.supported) {
-      var fileStream = streamSaver.createWriteStream(fileName);
-      var fileStreamWriter = fileStream.getWriter();
-      var encoder = new TextEncoder();
-      fileStreamWriter.push = function (text) {
-        this.write(encoder.encode(text));
-      };
-      fileStreamWriter.join = function () {
-      };
-      writer.write(dataset, fileStreamWriter);
-      fileStreamWriter.close();
-    } else {
-      var text = writer.write(dataset);
-      var blob = new Blob([text], {
-        type: 'text/plain;charset=charset=utf-8'
-      });
+    var blobs = [];
+    var textArray = [];
+    var proxy = {
+      push: function (text) {
+        textArray.push(text);
+        if (textArray.length === 10000) {
+          var blob = new Blob([textArray.join('')], {type: 'text/plain;charset=charset=utf-8'});
+          textArray = [];
+          blobs.push(blob);
+        }
+      },
+      join: function () {
+        if (textArray.length > 0) {
+          var blob = new Blob([textArray.join('')], {type: 'text/plain;charset=charset=utf-8'});
+          blobs.push(blob);
+          textArray = [];
+        }
 
-      saveAs(blob, fileName, true);
-    }
-
+        var blob = new Blob(blobs, {type: 'text/plain;charset=charset=utf-8'});
+        saveAs(blob, fileName, true);
+      }
+    };
+    writer.write(dataset, proxy);
   }
 };

@@ -11,8 +11,6 @@
     <link rel="stylesheet" href="css/morpheus-latest.min.css">
     <script type="text/javascript" src="js/morpheus-external-latest.min.js"></script>
     <script src="js/morpheus-latest.min.js"></script>
-    <script type="text/javascript" src="js/StreamSaver.js"></script>
-    <script type="text/javascript" src="js/web-streams-polyfill.js"></script>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <script type="text/javascript"
             src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs"
@@ -69,7 +67,8 @@
 </script>
 
 <script>
-  if (window.location.protocol === 'https:' && 'serviceWorker' in navigator) {
+  if ((window.location.protocol === 'https:' || window.location.protocol === 'http:') &&
+    'serviceWorker' in navigator) {
     navigator.serviceWorker
     .register('sw.js');
   }
