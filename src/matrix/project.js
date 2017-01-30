@@ -18,6 +18,7 @@ morpheus.Project = function (dataset) {
   this.columnSelectionModel = new morpheus.SelectionModel(this, true);
   this.rowSelectionModel = new morpheus.SelectionModel(this, false);
   this.elementSelectionModel = new morpheus.ElementSelectionModel(this);
+  this.symmetricProjectListener = null;
   morpheus.Project._recomputeCalculatedFields(this.originalDataset);
   morpheus.Project
   ._recomputeCalculatedFields(new morpheus.TransposedDatasetView(
@@ -51,6 +52,21 @@ morpheus.Project._recomputeCalculatedFields = function (dataset) {
 
 };
 morpheus.Project.prototype = {
+  isSymmetric: function () {
+    return this.symmetricProjectListener != null;
+  },
+  setSymmetric: function (heatMap) {
+    if (heatMap != null) {
+      if (this.symmetricProjectListener == null) {
+        this.symmetricProjectListener = new morpheus.SymmetricProjectListener(heatMap.getProject(), heatMap.vscroll, heatMap.hscroll);
+      }
+    } else {
+      if (this.symmetricProjectListener != null) {
+        this.symmetricProjectListener.dispose();
+      }
+      this.symmetricProjectListener = null;
+    }
+  },
   getHoverColumnIndex: function () {
     return this.hoverColumnIndex;
   },

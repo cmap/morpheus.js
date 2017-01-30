@@ -88,7 +88,7 @@ morpheus.HeatMapOptions = function (controller) {
       required: true,
       type: 'checkbox',
       col: 'col-xs-4',
-      value: controller.getProject().__symmetricProjectListener != null
+      value: controller.getProject().isSymmetric()
     },
     {
       name: 'show_grid',
@@ -355,11 +355,9 @@ morpheus.HeatMapOptions = function (controller) {
     function (e) {
       var checked = $(this).prop('checked');
       if (checked) {
-        var l = new morpheus.SymmetricProjectListener(controller.getProject(), controller.vscroll, controller.hscroll);
-        controller.getProject().__symmetricProjectListener = l;
+        controller.getProject().setSymmetric(controller);
       } else {
-        controller.getProject().__symmetricProjectListener.dispose();
-        delete controller.getProject().__symmetricProjectListener;
+        controller.getProject().setSymmetric(null);
       }
     });
 

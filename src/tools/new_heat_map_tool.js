@@ -41,7 +41,7 @@ morpheus.NewHeatMapTool.prototype = {
       name: controller.getName(),
       dataset: dataset,
       parent: controller,
-      symmetric: project.__symmetricProjectListener != null && dataset.getColumnCount() === dataset.getRowCount()
+      symmetric: project.isSymmetric() && dataset.getColumnCount() === dataset.getRowCount()
     });
 
   }

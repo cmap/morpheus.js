@@ -170,7 +170,7 @@ morpheus.HClusterTool.prototype = {
     options.input.selectedRowsToUseForClusteringColumns = selectedRowsToUseForClusteringColumns;
     options.input.selectedColumnsToUseForClusteringRows = selectedColumnsToUseForClusteringRows;
     var dataset = project.getSortedFilteredDataset();
-
+    options.input.background = options.input.background || typeof Worker === 'undefined';
     if (options.input.background === false) {
       var result = morpheus.HClusterTool.execute(dataset, options.input);
       if (result.rowsHcl) {

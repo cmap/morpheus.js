@@ -753,7 +753,16 @@ morpheus.HeatMap.isDendrogramVisible = function (project, isColumns) {
 
 morpheus.HeatMap.prototype = {
   gapSize: 10,
+  // total width of row dendrogram + heat map + row metadata + scroll
+  totalWidth: 0,
   updatingScroll: false,
+
+  getParent: function () {
+    return this.$parent;
+  },
+  getTotalWidth: function () {
+    return this.totalWidth;
+  },
   autoDisplay: function (options) {
     if (options.filename == null) {
       options.filename = '';
@@ -2136,8 +2145,7 @@ morpheus.HeatMap.prototype = {
       new morpheus.HeatMapKeyListener(this);
     }
     if (this.options.symmetric) {
-      var l = new morpheus.SymmetricProjectListener(this.getProject(), this.vscroll, this.hscroll);
-      this.getProject().__symmetricProjectListener = l;
+      this.getProject().setSymmetric(this);
     }
     var dragStartScrollTop;
     var dragStartScrollLeft;
@@ -3880,6 +3888,7 @@ morpheus.HeatMap.prototype = {
         invalidateColumns: true
       });
     }
+    this.totalWidth = Math.ceil(xpos);
     this.$parent.css({
       height: Math.ceil(totalHeight) + 'px'
     });

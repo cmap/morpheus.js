@@ -142,10 +142,12 @@ morpheus.HeatMapElementCanvas.prototype = {
         .getHoverColumnIndex()));
 
       if (project.getHoverColumnIndex() !== -1) {
+        // thin rectangle down entire column
         context.strokeRect(x - clip.x, 0, width, this
         .getUnscaledHeight());
       }
       if (project.getHoverRowIndex() !== -1) {
+        // thin rectangle across entire row
         context.strokeRect(0, y - clip.y, this.getUnscaledWidth(),
           height);
       }
@@ -155,6 +157,13 @@ morpheus.HeatMapElementCanvas.prototype = {
         context.lineWidth = 3;
         context.strokeRect(x - clip.x + 1.5, y - clip.y + 1.5,
           width - 1.5, height - 1.5);
+        if (project.isSymmetric()) {
+          var y2 = rowPositions.getPosition(project.getHoverColumnIndex());
+          var x2 = columnPositions.getPosition(project.getHoverRowIndex());
+          context.strokeRect(x2 - clip.x + 1.5, y2 - clip.y + 1.5,
+            width - 1.5, height - 1.5);
+        }
+
       }
     }
     var left = morpheus.Positions.getLeft(clip, columnPositions);
