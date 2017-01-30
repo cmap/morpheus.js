@@ -31,164 +31,178 @@ morpheus.MetadataUtil.renameFields = function (dataset, options) {
  *            Whether to search columns
  * @param options.defaultMatchMode
  *            'exact' or 'contains'
+ * @param options.matchAllPredicates Whether to match all predicates
  *
  */
 morpheus.MetadataUtil.search = function (options) {
-	var model = options.model;
-	var fullModel = options.fullModel;
-	if (!fullModel) {
-		fullModel = model;
-	}
-	var text = options.text;
-	var isColumns = options.isColumns;
-	text = $.trim(text);
-	if (text === '') {
-		return null;
-	}
-	var tokens = morpheus.Util.getAutocompleteTokens(text);
-	if (tokens.length == 0) {
-		return null;
-	}
-	var indexField = isColumns ? 'COLUMN' : 'ROW';
-	var fieldNames = morpheus.MetadataUtil.getMetadataNames(fullModel);
-	fieldNames.push(indexField);
-	var predicates = morpheus.Util.createSearchPredicates({
-		tokens: tokens,
-		fields: fieldNames,
-		defaultMatchMode: options.defaultMatchMode
-	});
-	var vectors = [];
-	var nameToVector = new morpheus.Map();
-	for (var j = 0; j < fullModel.getMetadataCount(); j++) {
-		var v = fullModel.get(j);
-		var dataType = morpheus.VectorUtil.getDataType(v);
-		var wrapper = {
-			vector: v,
-			dataType: dataType,
-			isArray: dataType.indexOf('[') === 0
-		};
-		nameToVector.set(v.getName(), wrapper);
-		if (model.getByName(v.getName()) != null) {
-			vectors.push(wrapper);
-		}
+    var model = options.model;
+    var fullModel = options.fullModel;
+    if (!fullModel) {
+        fullModel = model;
+    }
+    var text = options.text;
+    var isColumns = options.isColumns;
+    text = $.trim(text);
+    if (text === '') {
+        return null;
+    }
+    var tokens = morpheus.Util.getAutocompleteTokens(text);
+    if (tokens.length == 0) {
+        return null;
+    }
+    var indexField = 'INDEX';
+    var fieldNames = morpheus.MetadataUtil.getMetadataNames(fullModel);
+    fieldNames.push(indexField);
+    var predicates = morpheus.Util.createSearchPredicates({
+        tokens: tokens,
+        fields: fieldNames,
+        defaultMatchMode: options.defaultMatchMode
+    });
+    var vectors = [];
+    var nameToVector = new morpheus.Map();
+    for (var j = 0; j < fullModel.getMetadataCount(); j++) {
+        var v = fullModel.get(j);
+        var dataType = morpheus.VectorUtil.getDataType(v);
+        var wrapper = {
+            vector: v,
+            dataType: dataType,
+            isArray: dataType.indexOf('[') === 0
+        };
+        nameToVector.set(v.getName(), wrapper);
+        if (model.getByName(v.getName()) != null) {
+            vectors.push(wrapper);
+        }
 
-	}
-	// TODO only search numeric fields for range searches
-	var indices = [];
-	var npredicates = predicates.length;
-	for (var p = 0; p < npredicates; p++) {
-		var predicate = predicates[p];
-		var filterColumnName = predicate.getField();
-		if (filterColumnName != null && !predicate.isNumber()) {
-			var wrapper = nameToVector.get(filterColumnName);
-			if (wrapper.dataType === 'number' || wrapper.dataType === '[number]') {
-				if (predicate.getText) {
-					predicates[p] = new morpheus.Util.EqualsPredicate(filterColumnName, parseFloat(predicate.getText()));
-				} else if (predicate.getValues) {
-					var values = [];
-					predicate.getValues().forEach(function (val) {
-						values.push(parseFloat(val));
-					});
-					predicate[p] = new morpheus.Util.ExactTermsPredicate(filterColumnName, values);
-				}
-			}
-		}
+    }
+    // TODO only search numeric fields for range searches
+    var indices = [];
+    var npredicates = predicates.length;
+    for (var p = 0; p < npredicates; p++) {
+        var predicate = predicates[p];
+        var filterColumnName = predicate.getField();
+        if (filterColumnName != null && !predicate.isNumber()) {
+            var wrapper = nameToVector.get(filterColumnName);
+            if (wrapper && (wrapper.dataType === 'number' || wrapper.dataType === '[number]')) {
+                if (predicate.getText) {
+                    predicates[p] = new morpheus.Util.EqualsPredicate(filterColumnName, parseFloat(predicate.getText()));
+                } else if (predicate.getValues) {
+                    var values = [];
+                    predicate.getValues().forEach(function (val) {
+                        values.push(parseFloat(val));
+                    });
+                    predicate[p] = new morpheus.Util.ExactTermsPredicate(filterColumnName, values);
+                }
+            }
+        }
 
-	}
-	var nfields = vectors.length;
-	for (var i = 0, nitems = model.getItemCount(); i < nitems; i++) {
-		var matches = false;
-		for (var p = 0; p < npredicates && !matches; p++) {
-			var predicate = predicates[p];
-			var filterColumnName = predicate.getField();
-			if (filterColumnName != null) {
-				var value = null;
-				if (filterColumnName === indexField) {
-					value = i + 1;
-					if (predicate.accept(value)) {
-						matches = true;
-						break;
-					}
-				} else {
-					var wrapper = nameToVector.get(filterColumnName);
-					if (wrapper) {
-						value = wrapper.vector.getValue(i);
-						if (value != null) {
-							if (wrapper.isArray) {
-								for (var k = 0; k < value.length; k++) {
-									if (predicate.accept(value[k])) {
-										matches = true;
-										break;
-									}
-								}
-							} else {
-								if (predicate.accept(value)) {
-									matches = true;
-									break;
-								}
-							}
+    }
 
-						}
-					}
-				}
+    var matchAllPredicates = options.matchAllPredicates === true;
 
-			} else { // try all fields
+    function isPredicateMatch(predicate) {
+        var filterColumnName = predicate.getField();
+        if (filterColumnName != null) {
+            var value = null;
+            if (filterColumnName === indexField) {
+                value = i + 1;
+                if (predicate.accept(value)) {
+                    return true;
+                }
+            } else {
+                var wrapper = nameToVector.get(filterColumnName);
+                if (wrapper) {
+                    value = wrapper.vector.getValue(i);
+                    if (wrapper.isArray) {
+                        if (value != null) {
+                            for (var k = 0; k < value.length; k++) {
+                                if (predicate.accept(value[k])) {
+                                    return true;
 
-				for (var j = 0; j < nfields; j++) {
-					var wrapper = vectors[j];
-					var value = wrapper.vector.getValue(i);
-					if (value != null) {
-						if (wrapper.isArray) {
-							for (var k = 0; k < value.length; k++) {
-								if (predicate.accept(value[k])) {
-									matches = true;
-									break;
-								}
-							}
-						} else {
-							if (predicate.accept(value)) {
-								matches = true;
-								break;
-							}
-						}
+                                }
+                            }
+                        }
+                    } else {
+                        if (predicate.accept(value)) {
+                            return true;
+                        }
+                    }
 
-					}
-				}
-			}
-		}
-		if (matches) {
-			indices.push(i);
-		}
-	}
-	return indices;
+                }
+            }
+
+        }
+        else { // try all fields
+            for (var j = 0; j < nfields; j++) {
+                var wrapper = vectors[j];
+                var value = wrapper.vector.getValue(i);
+
+                if (wrapper.isArray) {
+                    if (value != null) {
+                        for (var k = 0; k < value.length; k++) {
+                            if (predicate.accept(value[k])) {
+                                return true;
+                            }
+                        }
+                    }
+                } else {
+                    if (predicate.accept(value)) {
+                        return true;
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    var nfields = vectors.length;
+    for (var i = 0, nitems = model.getItemCount(); i < nitems; i++) {
+        if (!matchAllPredicates) { // at least one predicate matches
+            for (var p = 0; p < npredicates; p++) {
+                var predicate = predicates[p];
+                if (isPredicateMatch(predicate)) {
+                    indices.push(i);
+                    break;
+                }
+            }
+        } else {
+            var matches = true;
+            for (var p = 0; p < npredicates; p++) {
+                var predicate = predicates[p];
+                if (!isPredicateMatch(predicate)) {
+                    matches = false;
+                    break;
+                }
+            }
+            if (matches) {
+                indices.push(i);
+            }
+        }
+
+    }
+    return indices;
 };
-
 morpheus.MetadataUtil.shallowCopy = function (model) {
+    var copy = new morpheus.MetadataModel(model.getItemCount());
+    for (var i = 0; i < model.getMetadataCount(); i++) {
+        var v = model.get(i);
+        // copy properties b/c they can be modified via ui
+        var newVector = new morpheus.VectorAdapter(v);
+        newVector.properties = new morpheus.Map();
+        newVector.getProperties = function () {
+            return this.properties;
+        };
 
-	var copy = new morpheus.MetadataModel(model.getItemCount());
+        v.getProperties().forEach(function (val, key) {
+            if (!morpheus.VectorKeys.COPY_IGNORE.has(key)) {
+                newVector.properties.set(key, val);
+            }
 
-    //console.log("METADATAUTIL.SHALLOWCOPY ::", model, model.getItemCount(), model.getMetadataCount(), copy);
-	for (var i = 0; i < model.getMetadataCount(); i++) {
-		var v = model.get(i);
-		//console.log(v);
-		// copy properties b/c they can be modified via ui
-		var newVector = new morpheus.VectorAdapter(v);
-		//console.log(newVector);
-		newVector.properties = new morpheus.Map();
-		newVector.getProperties = function () {
-			return this.properties;
-		};
+        });
 
-		v.getProperties().forEach(function (val, key) {
-			if (!morpheus.VectorKeys.COPY_IGNORE.has(key)) {
-				newVector.properties.set(key, val);
-			}
-
-		});
-
-		copy.vectors.push(newVector);
-	}
-	return copy;
+        copy.vectors.push(newVector);
+    }
+    return copy;
 };
 morpheus.MetadataUtil.autocomplete = function (model) {
 	return function (tokens, cb) {
@@ -366,7 +380,7 @@ morpheus.MetadataUtil.indexOf = function (metadataModel, name) {
 	return -1;
 };
 
-morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS = ['target', 'moa'];
+morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS = ['target', 'gene_target', 'moa'];
 
 morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS = new morpheus.Set();
 ['pr_analyte_id', 'pr_gene_title', 'pr_gene_id', 'pr_analyte_num',

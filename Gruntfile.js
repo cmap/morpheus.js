@@ -1,4 +1,3 @@
-/*global module:false*/
 module.exports = function (grunt) {
 	grunt
 	.initConfig({
@@ -29,55 +28,55 @@ module.exports = function (grunt) {
 				}
 			}
 		},
-		cssmin: {
-			css: {
-				src: 'css/morpheus.all.css',
-				dest: 'css/morpheus-latest.min.css'
-			}
-		},
-		concat: {
-			css: {
-				src: ['css/bootstrap.min.css',
-					'css/bootstrap-select.min.css',
-					'css/jquery-ui.min.css',
-					'css/font-awesome.min.css',
-					'css/hopscotch.min.css', 'css/slick.grid.css', 'css/morpheus.grid.css',
-					'css/animate.css', 'css/morpheus.css'],
-				dest: 'css/morpheus.all.css'
-			},
+        cssmin: {
+            css: {
+                src: 'css/morpheus.all.css',
+                dest: 'css/morpheus-latest.min.css'
+            }
+        },
+        concat: {
+            css: {
+                src: ['css/bootstrap.min.css',
+                    'css/bootstrap-select.min.css',
+                    'css/jquery-ui.min.css',
+                    'css/font-awesome.min.css',
+                    'css/slick.grid.css', 'css/morpheus.grid.css',
+                    'css/animate.css', 'css/morpheus.css'],
+                dest: 'css/morpheus.all.css'
+            },
 			extJsAll: {
 				src: ['js/morpheus-external.min.js',
 					'js/plotly-latest.min.js', 'js/papaparse.min.js'],
 				dest: 'js/morpheus-external-latest.min.js'
 			},
 			extJs: {
-				nonull: true,
 				dest: 'js/morpheus-external.js',
 				src: ['js/d3.min.js', 'js/jquery-2.2.4.min.js',
-					'js/bootstrap.min.js', 'js/underscore-min.js',
-					'js/newick.js', 'js/hammer.min.js',
-					'js/jquery.mousewheel.min.js',
-					'js/bootstrap-select.min.js',
-					'js/xlsx.full.min.js', 'js/canvas2svg.js',
-					'js/canvg.js', 'js/rgbcolor.js',
-					'js/jquery-ui.min.js', 'js/parser.js',
-					'js/FileSaver.min.js', 'js/Blob.js',
-					'js/canvas-toBlob.js', 'js/colorbrewer.js',
-					'js/hopscotch.min.js', 'js/typed.min.js',
-					'js/jquery.event.drag-2.2.js',
-					'js/clipboard.min.js', 'js/slick.min.js',
-					'js/js.cookie.js', 'js/d3.layout.cloud.js',
+                    'js/bootstrap.min.js', 'js/underscore-min.js',
+                    'js/newick.js', 'js/hammer.min.js',
+                    'js/jquery.mousewheel.min.js',
+                    'js/bootstrap-select.min.js',
+                    'js/xlsx.full.min.js', 'js/canvas2svg.js',
+                    'js/canvg.js', 'js/rgbcolor.js',
+                    'js/jquery-ui.min.js', 'js/parser.js',
+                    'js/FileSaver.min.js', 'js/colorbrewer.js',
+                    'js/jquery.event.drag-2.2.js',
+                    'js/clipboard.min.js', 'js/slick.min.js', 'js/canvas-toBlob.js',
+                    'js/js.cookie.js', 'js/d3.layout.cloud.js',
 					'js/long.js', 'js/bytebuffer.js', 'js/protobuf.js',
 					'js/opencpu-0.5.js']
 			},
-			morpheus: {
-				nonull: true,
-				dest: 'js/morpheus.js',
-				src: ['src/util/util.js', 'src/util/*.js',
-					'src/io/*.js', 'src/matrix/vector_adapter.js',
-					'src/matrix/*.js', 'src/*.js',
-					'src/tools/*.js', 'src/ui/*.js', 'src/**/*.js', 'js/tsne.js']
-			}
+            morpheus: {
+                options: {
+                    banner: '(function(global){\n\'use strict\';\n',
+                    footer: '\n})(typeof window !== \'undefined\' ? window : this);\n'
+                },
+                dest: 'js/morpheus.js',
+                src: ['src/util/util.js', 'src/util/*.js',
+                    'src/io/*.js', 'src/matrix/vector_adapter.js',
+                    'src/matrix/*.js', 'src/*.js',
+                    'src/tools/*.js', 'src/ui/*.js', 'src/**/*.js', 'js/tsne.js']
+            }
 		},
 		watch: {
 			files: ['src/*.js', 'src/**/*.js'],

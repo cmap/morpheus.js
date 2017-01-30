@@ -14,148 +14,110 @@ morpheus.HeatMapToolBar = function (controller) {
     $search.on('submit', function (e) {
         e.preventDefault();
     });
-    if (controller.options.toolbar.searchRows && controller.options.toolbar.searchColumns) {
+
+    // toogle search buttons
+    searchHtml.push('<div title="Toggle' +
+        ' Search (' + morpheus.Util.COMMAND_KEY + '/)" class="btn-group"' +
+        ' data-toggle="buttons">');
+    searchHtml.push('<label class="btn btn-default btn-xxs">');
+    searchHtml
+        .push('<input data-search="rows" type="radio" autocomplete="off" name="searchToggle"' +
+            ' type="button"> Rows');
+    searchHtml.push('</label>');
+
+    searchHtml.push('<label class="btn btn-default btn-xxs">');
+    searchHtml
+        .push('<input data-search="columns" type="radio" autocomplete="off" name="searchToggle"> Columns');
+    searchHtml.push('</label>');
+
+    searchHtml.push('<label class="btn btn-default btn-xxs">');
+    searchHtml
+        .push('<input data-search="values" type="radio" autocomplete="off" name="searchToggle">' +
+            ' Values');
+    searchHtml.push('</label>');
+
+    searchHtml.push('<label class="btn btn-default btn-xxs">');
+    searchHtml
+        .push('<input data-search="rowDendrogram" type="radio" autocomplete="off"' +
+            ' name="searchToggle"> Row Dendrogram');
+    searchHtml.push('</label>');
+
+    searchHtml.push('<label class="btn btn-default btn-xxs">');
+    searchHtml
+        .push('<input data-search="columnDendrogram" type="radio" autocomplete="off"' +
+            ' name="searchToggle"> Column Dendrogram');
+    searchHtml.push('</label>');
+    searchHtml.push('</div>');
+
+    function createSearchMenu(dataName, navigation) {
+        searchHtml.push('<div style="display:inline-block;" data-name="' + dataName + '">');
+        searchHtml.push('<div class="form-group">');
+        searchHtml.push('<div style="display:inline-block;" class="dropdown">');
         searchHtml
-            .push('<button data-toggle="tooltip" title="Toggle Search (' + morpheus.Util.COMMAND_KEY + '/)" name="searchRowsToggle" type="button" class="btn btn-default btn-xxs' +
-                ' btn-primary"> Rows</button>');
+            .push('<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="fa fa-caret-down"></span></button>');
+        searchHtml.push('<ul data-name="searchOptions" class="dropdown-menu">');
+        searchHtml.push('<li><a data-group="matchMode" data-name="exact" href="#"><span' +
+            ' data-type="toggle"></span>Exact' +
+            ' Match</a></li>');
         searchHtml
-            .push('<button data-toggle="tooltip" title="Toggle Search (' + morpheus.Util.COMMAND_KEY + '/)" name="searchColumnsToggle" type="button" class="btn btn-default' +
-                ' btn-xxs"> Columns</button>');
+            .push('<li><a data-group="matchMode" data-name="contains" href="#"><span' +
+                ' data-type="toggle"' +
+                ' class="dropdown-checkbox fa fa-check"></span>Contains</a></li>');
+        searchHtml
+            .push('<li role="separator" class="divider"></li>');
+
+        searchHtml
+            .push('<li><a data-group="searchMode" data-name="matchAny" href="#"><span' +
+                ' data-type="toggle"' +
+                ' class="dropdown-checkbox fa fa-check"></span>Match Any Search Term</a></li>');
+
+        searchHtml
+            .push('<li><a data-group="searchMode" data-name="matchAll" href="#"><span' +
+                ' data-type="toggle"></span>Match All Search Terms</a></li>');
+
+        searchHtml
+            .push('<li role="separator" class="divider"></li>');
+        searchHtml
+            .push('<li><a data-name="searchHelp" href="#">Help</a></li>');
+        searchHtml.push('</ul>');
+        searchHtml.push('</div>');
+
+        searchHtml.push('<div class="form-group">');
+        searchHtml
+            .push('<input type="text" class="form-control input-sm" autocomplete="off"' +
+                ' name="search">');
+        searchHtml.push('</div>');
+        searchHtml.push('<div class="form-group">');
+        searchHtml.push('<span data-name="searchResultsWrapper" style="display:none;">');
+        searchHtml
+            .push('<span style="font-size:12px;" data-name="searchResults"></span>');
+        if (navigation) {
+            searchHtml
+                .push('<button name="previousMatch" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Previous"><i class="fa fa-chevron-up"></i></button>');
+            searchHtml
+                .push('<button name="nextMatch" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Next"><i class="fa fa-chevron-down"></i></button>');
+            searchHtml
+                .push('<button name="matchesToTop" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Matches To Top"><i class="fa fa-level-up"></i></button>');
+        }
+        searchHtml.push('</span>');
+        searchHtml.push('</div>');
+        searchHtml.push('</div>');
+        searchHtml.push('</div>');
     }
 
     if (controller.options.toolbar.searchRows) {
-
-        searchHtml.push('<div style="display:inline-block;" data-name="searchRowsGroup">');
-        searchHtml.push('<div class="form-group">');
-        searchHtml
-            .push('<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></button>');
-        searchHtml.push('<ul data-name="rowSearchOptions" class="dropdown-menu">');
-        searchHtml.push('<li><a data-group="matchMode" data-name="exact" href="#"><span' +
-            ' data-type="toggle"></span>Exact' +
-            ' Match</a></li>');
-        searchHtml
-            .push('<li><a data-group="matchMode" data-name="contains" href="#"><span' +
-                ' data-type="toggle"' +
-                ' class="dropdown-checkbox fa fa-check"></span>Contains</a></li>');
-        searchHtml
-            .push('<li role="separator" class="divider"></li>');
-
-        searchHtml
-            .push('<li><a data-group="searchMode" data-name="matchAny" href="#"><span' +
-                ' data-type="toggle"' +
-                ' class="dropdown-checkbox fa fa-check"></span>Match Any Search Term</a></li>');
-
-        searchHtml
-            .push('<li><a data-group="searchMode" data-name="matchAll" href="#"><span' +
-                ' data-type="toggle"></span>Match All Search Terms</a></li>');
-
-        searchHtml
-            .push('<li role="separator" class="divider"></li>');
-        searchHtml
-            .push('<li><a data-name="searchHelp" href="#">Help</a></li>');
-        searchHtml.push('</ul>');
-        searchHtml.push('</div>')
-
-        searchHtml.push('<div class="form-group">');
-        searchHtml
-            .push('<input type="text" style="border-top:3.8px solid #636363;border-bottom:3.8px solid #636363;width:240px;" class="form-control input-sm" autocomplete="off" name="searchRows">');
-        searchHtml.push('</div>');
-        searchHtml.push('<div class="form-group">');
-        searchHtml.push('<span data-name="rowSearchDiv" style="display:none;">');
-        searchHtml
-            .push('<span style="font-size:12px;" data-name="searchResultsRows"></span>');
-        searchHtml
-            .push('<button name="previousRowMatch" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Previous"><i class="fa fa-chevron-up"></i></button>');
-        searchHtml
-            .push('<button name="nextRowMatch" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Next"><i class="fa fa-chevron-down"></i></button>');
-        searchHtml
-            .push('<button name="rowMatchesToTop" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Matches To Top"><i class="fa fa-level-up"></i></button>');
-        searchHtml.push('</span>');
-        searchHtml.push('</div>');
-        searchHtml.push('</div>');
-
+        createSearchMenu('searchRowsGroup', true);
     }
     if (controller.options.toolbar.searchColumns) {
-
-        searchHtml.push('<div style="display:none;" data-name="searchColumnsGroup">');
-
-        searchHtml.push('<div class="form-group">');
-        searchHtml
-            .push('<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></button>');
-        searchHtml.push('<ul data-name="columnSearchOptions" class="dropdown-menu">');
-        searchHtml.push('<li><a data-group="matchMode" data-name="exact" href="#"><span' +
-            ' data-type="toggle"></span>Exact' +
-            ' Match</a></li>');
-        searchHtml
-            .push('<li><a data-group="matchMode" data-name="contains" href="#"><span' +
-                ' data-type="toggle"' +
-                ' class="dropdown-checkbox fa fa-check"></span>Contains</a></li>');
-        searchHtml
-            .push('<li role="separator" class="divider"></li>');
-        searchHtml
-            .push('<li><a data-group="searchMode" data-name="matchAny" href="#"><span' +
-                ' data-type="toggle"' +
-                ' class="dropdown-checkbox fa fa-check"></span>Match Any Search Term</a></li>');
-
-        searchHtml
-            .push('<li><a data-group="searchMode" data-name="matchAll" href="#"><span' +
-                ' data-type="toggle"></span>Match All Search Terms</a></li>');
-
-        searchHtml
-            .push('<li role="separator" class="divider"></li>');
-        searchHtml
-            .push('<li><a data-name="searchHelp" href="#">Help</a></li>');
-        searchHtml.push('</ul>');
-        searchHtml.push('</div>')
-
-        searchHtml.push('<div class="form-group">');
-        searchHtml
-            .push('<input type="text" style="border-right:3.8px solid #636363;border-left:3.8px solid #636363;width:240px;" class="form-control input-sm" autocomplete="off" name="searchColumns">');
-        searchHtml.push('</div>');
-        searchHtml.push('<div class="form-group">');
-        searchHtml.push('<span data-name="columnSearchDiv" style="display:none;">');
-        searchHtml
-            .push('<span style="font-size:12px;" data-name="searchResultsColumns"></span>');
-        searchHtml
-            .push('<button name="previousColumnMatch" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Previous"><i class="fa fa-chevron-up"></i></button>');
-        searchHtml
-            .push('<button name="nextColumnMatch" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Next"><i class="fa fa-chevron-down"></i></button>');
-        searchHtml
-            .push('<button name="columnMatchesToTop" type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Matches To Top"><i class="fa fa-level-up"></i></button>');
-        searchHtml.push('</span>');
-        searchHtml.push('</div>');
-        searchHtml.push('</div>');
+        createSearchMenu('searchColumnsGroup', true);
     }
 
-    // search values
-    searchHtml
-        .push('<div data-name="searchValuesDiv" class="form-group" style="margin-left:10px;">');
-    searchHtml
-        .push('<div class="input-group"><span class="input-group-addon">Values</span><input type="text" style="width:240px;padding-right:25px;" class="form-control input-sm" autocomplete="off" name="searchValues"></div>');
-    searchHtml.push('</div>');
-    searchHtml.push('<div class="form-group" style="margin-left:4px;">');
-    searchHtml
-        .push('<h6 data-name="searchResultsValues" style="display: inline;"></h6>');
-    searchHtml.push('</div>');
+    if (controller.options.toolbar.searchValues) {
+        createSearchMenu('searchValuesGroup', false);
+    }
+    createSearchMenu('searchRowDendrogramGroup', false);
+    createSearchMenu('searchColumnDendrogramGroup', false);
 
-    // row dendrogram
-    searchHtml
-        .push('<div style="display: none;  margin-left:10px;" data-name="searchRowDendrogramWrapper"' +
-            ' class="form-group">');
-    searchHtml
-        .push('<div class="input-group"><span class="input-group-addon">Row Dendrogram</span><input type="text" style="width:240px;" class="form-control input-sm" autocomplete="off" name="searchRowDendrogram"></div>');
-    searchHtml
-        .push('<h6 data-name="searchResultsRowDendrogram" style="display: inline;"></h6>');
-    searchHtml.push('</div>');
-    // column dendrogram
-    searchHtml
-        .push('<div style="display: none; margin-left:10px;"' +
-            ' data-name="searchColumnDendrogramWrapper" class="form-group">');
-    searchHtml
-        .push('<div class="input-group"><span class="input-group-addon">Column Dendrogram</span><input type="text" style="width:240px;" class="form-control input-sm" autocomplete="off" name="searchColumnDendrogram"></div>');
-    searchHtml
-        .push('<h6 data-name="searchResultsColumnDendrogram" style="display: inline;"></h6>');
-    searchHtml.push('</div>');
     // dimensions
     if (controller.options.toolbar.dimensions) {
         searchHtml.push('<div class="form-group">');
@@ -170,9 +132,6 @@ morpheus.HeatMapToolBar = function (controller) {
 
     $(searchHtml.join('')).appendTo($search);
 
-    if (!controller.options.toolbar.searchValues) {
-        $search.find('[data-name=searchValuesDiv]').css('display', 'none');
-    }
     var $buttons = $search.find('[data-name=buttons]');
 
     var $tools = $('<form name="tools" class="form-inline" role="form"></form>');
@@ -204,6 +163,12 @@ morpheus.HeatMapToolBar = function (controller) {
     }
 
     toolbarHtml.push('<div class="morpheus-button-divider"></div>');
+    if (controller.options.toolbar.openFile) {
+        toolbarHtml
+            .push('<button name="openFile" data-toggle="tooltip" title="Open File ('
+                + morpheus.Util.COMMAND_KEY
+                + 'O)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-folder-open-o"></span></button>');
+    }
     if (controller.options.toolbar.saveImage) {
         toolbarHtml
             .push('<button name="saveImage" data-toggle="tooltip" title="Save Image ('
@@ -216,12 +181,7 @@ morpheus.HeatMapToolBar = function (controller) {
                 + morpheus.Util.COMMAND_KEY
                 + 'Shift+S)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-floppy-o"></span></button>');
     }
-    if (controller.options.toolbar.openFile) {
-        toolbarHtml
-            .push('<button name="openFile" data-toggle="tooltip" title="Open File ('
-                + morpheus.Util.COMMAND_KEY
-                + 'O)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-folder-open-o"></span></button>');
-    }
+
     toolbarHtml.push('<div class="morpheus-button-divider"></div>');
     if (controller.options.toolbar.filter) {
         toolbarHtml
@@ -250,8 +210,6 @@ morpheus.HeatMapToolBar = function (controller) {
         tool: new morpheus.SimilarityMatrixTool()
     }, {
         tool: new morpheus.TransposeTool()
-    }, {
-        tool: new morpheus.KmeansTool()
     }, {tool: new morpheus.TsneTool()}, null, {tool: new morpheus.DevAPI()}];
     this.getToolByName = function (name) {
         for (var i = 0; i < tools.length; i++) {
@@ -296,7 +254,7 @@ morpheus.HeatMapToolBar = function (controller) {
     }
 
 
-	toolbarHtml.push('<div class="morpheus-button-divider"></div>');
+    toolbarHtml.push('<div class="morpheus-button-divider"></div>');
 	toolbarHtml.push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="PCAPlot" name="pca">PCA</button>');
 	toolbarHtml.push('<div class="morpheus-button-divider"></div>');
 
@@ -324,6 +282,9 @@ morpheus.HeatMapToolBar = function (controller) {
     $search.appendTo($lineOneColumn);
     var $toolbarForm = $(toolbarHtml.join(''));
     $toolbarForm.appendTo($buttons);
+    if (controller.options.toolbar.$customButtons) {
+        controller.options.toolbar.$customButtons.appendTo($buttons);
+    }
     if (controller.options.$help) {
         controller.options.$help.appendTo($buttons);
     }
@@ -340,56 +301,6 @@ morpheus.HeatMapToolBar = function (controller) {
         } else {
             tools[index].action();
         }
-    });
-    this.defaultRowMatchMode = 'contains';
-    this.rowSearchMatchAllPredicates = false;
-    this.defaultColumnMatchMode = 'contains';
-    this.columnSearchMatchAllPredicates = false;
-    var $rowSearchOptions = $el.find('[data-name=rowSearchOptions]');
-    $rowSearchOptions.on('click', 'li > a', function (e) {
-        e.preventDefault();
-        var $this = $(this);
-        var group = $this.data('group');
-        if (group === 'matchMode') {
-            _this.defaultRowMatchMode = $this.data('name');
-        } else {
-            _this.rowSearchMatchAllPredicates = $this.data('name') === 'matchAll';
-        }
-        _this.search(true);
-        var $span = $(this).find('span');
-        if ($span.data('type') === 'toggle') {
-            $rowSearchOptions.find('[data-group=' + group + '] > [data-type=toggle]').removeClass('dropdown-checkbox' +
-                ' fa' +
-                ' fa-check');
-            $span.addClass('dropdown-checkbox fa fa-check');
-        }
-        morpheus.Util.trackEvent({
-            eventCategory: 'ToolBar',
-            eventAction: 'rowSearchMatchMode'
-        });
-    });
-    var $columnSearchOptions = $el.find('[data-name=columnSearchOptions]');
-    $columnSearchOptions.on('click', 'li > a', function (e) {
-        e.preventDefault();
-        var $this = $(this);
-        var group = $this.data('group');
-        if (group === 'matchMode') {
-            _this.defaultColumnMatchMode = $this.data('name');
-        } else {
-            _this.columnSearchMatchAllPredicates = $this.data('name') === 'matchAll';
-        }
-        _this.search(false);
-        var $span = $(this).find('span');
-        if ($span.data('type') === 'toggle') {
-            $columnSearchOptions.find('[data-group=' + group + '] > [data-type=toggle]').removeClass('dropdown-checkbox' +
-                ' fa' +
-                ' fa-check');
-            $span.addClass('dropdown-checkbox fa fa-check');
-        }
-        morpheus.Util.trackEvent({
-            eventCategory: 'ToolBar',
-            eventAction: 'columnSearchMatchMode'
-        });
     });
 
     var filterModal = [];
@@ -415,7 +326,7 @@ morpheus.HeatMapToolBar = function (controller) {
     $filterModal.on('mousewheel', function (e) {
         e.stopPropagation();
     });
-    var $filter = $('<div></div>');
+    var $filter = $('<div style="padding-bottom:30px;"></div>');
     $filter.appendTo($filterModal.find('.modal-body'));
     $filterModal.appendTo($el);
     var filterHtml = [];
@@ -567,68 +478,157 @@ morpheus.HeatMapToolBar = function (controller) {
             html: $searchHelp
         });
     });
-
-    this.$previousColumnMatch = $el.find('[name=previousColumnMatch]');
-    this.$nextColumnMatch = $el.find('[name=nextColumnMatch]');
-    this.$previousRowMatch = $el.find('[name=previousRowMatch]');
-    this.$nextRowMatch = $el.find('[name=nextRowMatch]');
-    this.$dimensionsLabel = $el.find('[data-name=dim]');
-    this.$columnTextField = $el.find('[name=searchColumns]');
-    this.$valueTextField = $el.find('[name=searchValues]');
-    this.$selectionLabel = $el.find('[data-name=selection]');
-    this.$rowTextField = $el.find('[name=searchRows]');
-    this.$columnMatchesToTop = $el.find('[name=columnMatchesToTop]');
-    this.$rowMatchesToTop = $el.find('[name=rowMatchesToTop]');
-    this.$rowSearchDiv = $el.find('[data-name=rowSearchDiv]');
-    this.$columnSearchDiv = $el.find('[data-name=columnSearchDiv]');
-    this.$searchRowDendrogramWrapper = $el
-        .find('[data-name=searchRowDendrogramWrapper]');
-    this.$searchRowDendrogram = $el.find('[name=searchRowDendrogram]');
-    this.$searchResultsRowDendrogram = $el
-        .find('[data-name=searchResultsRowDendrogram]');
-    this.$searchColumnDendrogramWrapper = $el
-        .find('[data-name=searchColumnDendrogramWrapper]');
-    this.$searchColumnDendrogram = $el.find('[name=searchColumnDendrogram]');
-    this.$searchResultsColumnDendrogram = $el
-        .find('[data-name=searchResultsColumnDendrogram]');
-
-    var $searchRowsToggle = $search.find('[name=searchRowsToggle]');
-    var $searchColumnsToggle = $search.find('[name=searchColumnsToggle]');
     var $searchRowsGroup = $search.find('[data-name=searchRowsGroup]');
     var $searchColumnsGroup = $search.find('[data-name=searchColumnsGroup]');
-    $searchRowsToggle.on('click', function () {
-        $searchRowsToggle.addClass('btn-primary');
-        $searchColumnsToggle.removeClass('btn-primary');
-        $searchRowsGroup.css('display', 'inline-block');
-        $searchColumnsGroup.css('display', 'none');
-        _this.$rowTextField.focus();
+    var $searchValuesGroup = $search.find('[data-name=searchValuesGroup]');
+    var $searchRowDendrogramGroup = $search.find('[data-name=searchRowDendrogramGroup]');
+    var $searchColumnDendrogramGroup = $search.find('[data-name=searchColumnDendrogramGroup]');
+
+    this.$searchRowDendrogramGroup = $searchRowDendrogramGroup;
+    this.$searchColumnDendrogramGroup = $searchColumnDendrogramGroup;
+
+    var $searchToggle = $search.find('[name=searchToggle]'); // buttons
+    var nameToSearchObject = {};
+
+    function getSearchElements($group, searchName, cb) {
+        var obj = {
+            $group: $group,
+            $search: $group.find('[name=search]'),
+            $searchResultsWrapper: $group.find('[data-name=searchResultsWrapper]'),
+            $searchResults: $group.find('[data-name=searchResults]'),
+            $previousMatch: $group.find('[name=previousMatch]'),
+            $nextMatch: $group.find('[name=nextMatch]'),
+            $matchesToTop: $group.find('[name=matchesToTop]'),
+            matchMode: 'contains',
+            matchAllPredicates: false,
+            $toggleButton: $searchToggle.filter('[data-search=' + searchName + ']').parent()
+        };
+        var $searchOptions = $group.find('[data-name=searchOptions]');
+        $searchOptions.on('click', 'li > a', function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            var group = $this.data('group');
+            if (group === 'matchMode') {
+                obj.matchMode = $this.data('name');
+            } else {
+                obj.matchAllPredicates = $this.data('name') === 'matchAll';
+            }
+            cb();
+            var $span = $(this).find('span');
+            if ($span.data('type') === 'toggle') {
+                $searchOptions.find('[data-group=' + group + '] > [data-type=toggle]').removeClass('dropdown-checkbox' +
+                    ' fa' +
+                    ' fa-check');
+                $span.addClass('dropdown-checkbox fa fa-check');
+            }
+            morpheus.Util.trackEvent({
+                eventCategory: 'ToolBar',
+                eventAction: 'searchMatchMode'
+            });
+        });
+        nameToSearchObject[searchName] = obj;
+        return obj;
+    }
+
+    this.rowSearchObject = getSearchElements($searchRowsGroup, 'rows', function () {
+        _this.search(true);
     });
-    $searchColumnsToggle.on('click', function () {
-        $searchRowsToggle.removeClass('btn-primary');
-        $searchColumnsToggle.addClass('btn-primary');
-        $searchRowsGroup.css('display', 'none');
-        $searchColumnsGroup.css('display', 'inline-block');
-        _this.$columnTextField.focus();
+    this.columnSearchObject = getSearchElements($searchColumnsGroup, 'columns', function () {
+        _this.search(false);
     });
-    this.toggleSearch = function () {
-        if ($searchRowsToggle.hasClass('btn-primary')) {
-            $searchColumnsToggle.click();
-        } else {
-            $searchRowsToggle.click();
+    this.rowDendrogramSearchObject = getSearchElements($searchRowDendrogramGroup, 'rowDendrogram', function () {
+        _this.searchDendrogram(false);
+    });
+    this.columnDendrogramSearchObject = getSearchElements($searchColumnDendrogramGroup, 'columnDendrogram', function () {
+        _this.searchDendrogram(false);
+    });
+    this.valueSearchObject = getSearchElements($searchValuesGroup, 'values', function () {
+        searchValues();
+    });
+
+    // set button and search controls visibility
+    if (!controller.options.toolbar.searchRows) {
+        this.rowSearchObject.$toggleButton.hide();
+        this.rowSearchObject.$group.css('display', 'none');
+    }
+
+    if (!controller.options.toolbar.searchColumns) {
+        this.columnSearchObject.$toggleButton.hide();
+        this.columnSearchObject.$group.css('display', 'none');
+    }
+    if (!controller.options.toolbar.searchValues) {
+        this.valueSearchObject.$toggleButton.hide();
+    }
+    this.rowDendrogramSearchObject.$toggleButton.hide();
+    this.rowDendrogramSearchObject.$group.hide();
+
+    this.columnDendrogramSearchObject.$toggleButton.hide();
+    this.columnDendrogramSearchObject.$group.hide();
+
+    this.rowDendrogramSearchObject.$searchResultsWrapper.show();
+    this.columnDendrogramSearchObject.$searchResultsWrapper.show();
+    this.valueSearchObject.$searchResultsWrapper.show();
+
+    this.rowSearchObject.$search.css({
+        'border-top': '3.8px solid #636363',
+        'border-bottom': '3.8px solid #636363',
+        width: '240px'
+    });
+
+    this.columnSearchObject.$search.css({
+        'border-right': '3.8px solid #636363',
+        'border-left': '3.8px solid #636363',
+        width: '240px'
+    });
+
+    this.$valueSearchResults = $searchValuesGroup.find('[name=searchResults]');
+    this.$valueTextField = $searchValuesGroup.find('[name=search]');
+    this.$dimensionsLabel = $el.find('[data-name=dim]');
+    this.$selectionLabel = $el.find('[data-name=selection]');
+
+    $searchToggle.on('change', function (e) {
+        var search = $(this).data('search');
+        for (var name in nameToSearchObject) {
+            var searchObject = nameToSearchObject[name];
+            if (name === search) {
+                searchObject.$group.css('display', 'inline-block');
+                searchObject.$search.focus();
+            } else {
+                searchObject.$group.css('display', 'none');
+            }
         }
+    });
+
+    this.toggleSearch = function () {
+        var $visible = $searchToggle.filter(':visible');
+        var $checked = $searchToggle.filter(':checked');
+        var $next = $visible.eq($visible.index($checked) + 1);
+        if (!$next.length) {
+            $next = $visible.first();
+        }
+        $next.click();
     };
+    $($searchToggle.filter(':visible')[0]).click();
     controller.on('dendrogramAnnotated', function (e) {
-        (e.isColumns ? _this.$searchColumnDendrogramWrapper
-            : _this.$searchRowDendrogramWrapper).show();
+        if (e.isColumns) { // show buttons
+            _this.rowDendrogramSearchObject.$toggleButton.show();
+        } else {
+            _this.columnDendrogramSearchObject.$toggleButton.show();
+        }
     });
     controller.on('dendrogramChanged', function (e) {
-        (e.isColumns ? _this.$searchColumnDendrogramWrapper
-            : _this.$searchRowDendrogramWrapper).hide();
+        if (e.isColumns) {
+            _this.rowDendrogramSearchObject.$group.hide();
+            _this.rowDendrogramSearchObject.$toggleButton.hide();
+        } else {
+            _this.columnDendrogramSearchObject.$group.hide();
+            _this.columnDendrogramSearchObject.$toggleButton.hide();
+        }
     });
     var project = controller.getProject();
 
     morpheus.Util.autosuggest({
-        $el: this.$rowTextField,
+        $el: this.rowSearchObject.$search,
         filter: function (terms, cb) {
             var indices = [];
             var meta = project.getSortedFilteredDataset().getRowMetadata();
@@ -643,7 +643,7 @@ morpheus.HeatMapToolBar = function (controller) {
         }
     });
 
-    this.$rowTextField.on('keyup', _.debounce(function (e) {
+    this.rowSearchObject.$search.on('keyup', _.debounce(function (e) {
         if (e.which === 13) {
             e.preventDefault();
         }
@@ -654,7 +654,7 @@ morpheus.HeatMapToolBar = function (controller) {
         });
     }, 500));
     morpheus.Util.autosuggest({
-        $el: this.$columnTextField,
+        $el: this.columnSearchObject.$search,
         filter: function (terms, cb) {
             var indices = [];
             var meta = project.getSortedFilteredDataset().getColumnMetadata();
@@ -668,7 +668,7 @@ morpheus.HeatMapToolBar = function (controller) {
             _this.search(false);
         }
     });
-    this.$columnTextField.on('keyup', _.debounce(function (e) {
+    this.columnSearchObject.$search.on('keyup', _.debounce(function (e) {
         if (e.which === 13) {
             e.preventDefault();
         }
@@ -679,10 +679,32 @@ morpheus.HeatMapToolBar = function (controller) {
         });
     }, 500));
 
-    // TODO combine search with autocomplete
-    this.$searchRowDendrogram.on('keyup', _.debounce(function (e) {
+    // dendrogram search
+
+    morpheus.Util.autosuggest({
+        $el: this.rowDendrogramSearchObject.$search,
+        filter: function (tokens, cb) {
+            var d = controller.getDendrogram(false);
+            if (!d.searchTerms) {
+                cb([]);
+            } else {
+                var token = tokens != null && tokens.length > 0 ? tokens[tokens.selectionStartIndex]
+                    : '';
+                token = $.trim(token);
+                if (token === '') {
+                    cb([]);
+                } else {
+                    morpheus.Util.autocompleteArrayMatcher(token, cb, d.searchTerms, null, 10);
+                }
+            }
+        },
+        select: function () {
+            _this.searchDendrogram(false);
+        }
+    });
+
+    this.rowDendrogramSearchObject.$search.on('keyup', _.debounce(function (e) {
         if (e.which === 13) {
-            // _this.$searchRowDendrogram.autocomplete('close');
             e.preventDefault();
         }
         _this.searchDendrogram(false);
@@ -691,9 +713,31 @@ morpheus.HeatMapToolBar = function (controller) {
             eventAction: 'searchRowDendrogram'
         });
     }, 500));
-    this.$searchColumnDendrogram.on('keyup', _.debounce(function (e) {
+
+    morpheus.Util.autosuggest({
+        $el: this.columnDendrogramSearchObject.$search,
+        filter: function (tokens, cb) {
+            var d = controller.getDendrogram(true);
+            if (!d.searchTerms) {
+                cb([]);
+            } else {
+                var token = tokens != null && tokens.length > 0 ? tokens[tokens.selectionStartIndex]
+                    : '';
+                token = $.trim(token);
+                if (token === '') {
+                    cb([]);
+                } else {
+                    morpheus.Util.autocompleteArrayMatcher(token, cb, d.searchTerms, null, 10);
+                }
+            }
+        },
+        select: function () {
+            _this.searchDendrogram(true);
+        }
+    });
+
+    this.columnDendrogramSearchObject.$search.on('keyup', _.debounce(function (e) {
         if (e.which === 13) {
-            // _this.$searchColumnDendrogram.autocomplete('close');
             e.preventDefault();
         }
         _this.searchDendrogram(true);
@@ -704,18 +748,20 @@ morpheus.HeatMapToolBar = function (controller) {
     }, 500));
 
     function searchValues() {
-        var $searchResultsLabel = _this.$el.find('[data-name=searchResultsValues]');
+        var $searchResultsLabel = _this.$valueSearchResults;
         var text = $.trim(_this.$valueTextField.val());
         if (text === '') {
             $searchResultsLabel.html('');
             project.getElementSelectionModel().setViewIndices(null);
         } else {
-            var viewIndices = new morpheus.Set();
-            morpheus.DatasetUtil.searchValues(project
-                .getSortedFilteredDataset(), text, function (value, i, j) {
-                viewIndices.add(new morpheus.Identifier([i, j]));
-                return true;
+            var viewIndices = morpheus.DatasetUtil.searchValues({
+                dataset: project
+                    .getSortedFilteredDataset(),
+                text: text,
+                matchAllPredicates: _this.valueSearchObject.matchAllPredicates,
+                defaultMatchMode: _this.valueSearchObject.matchMode
             });
+
             project.getElementSelectionModel().setViewIndices(viewIndices);
             $searchResultsLabel.html(viewIndices.size() + ' match'
                 + (viewIndices.size() === 1 ? '' : 'es'));
@@ -792,10 +838,10 @@ morpheus.HeatMapToolBar = function (controller) {
             eventAction: 'resetZoom'
         });
     });
-    this.toggleMenu = function () {
+    this.toggleControls = function () {
         if ($lineOneColumn.css('display') === 'none') {
             $lineOneColumn.css('display', '');
-            _this.$rowTextField.focus();
+            _this.rowSearchObject.$search.focus();
         } else {
             $lineOneColumn.css('display', 'none');
             $(_this.controller.heatmap.canvas).focus();
@@ -813,7 +859,7 @@ morpheus.HeatMapToolBar = function (controller) {
     };
     updateFilterStatus();
 
-    this.$columnMatchesToTop
+    this.columnSearchObject.$matchesToTop
         .on(
             'click',
             function (e) {
@@ -830,7 +876,7 @@ morpheus.HeatMapToolBar = function (controller) {
                     eventAction: 'columnMatchesToTop'
                 });
             });
-    this.$rowMatchesToTop
+    this.rowSearchObject.$matchesToTop
         .on(
             'click',
             function (e) {
@@ -852,7 +898,7 @@ morpheus.HeatMapToolBar = function (controller) {
             return;
         }
         _this._updateSearchIndices(false);
-        _this.$rowMatchesToTop.removeClass('btn-primary');
+        _this.rowSearchObject.$matchesToTop.removeClass('btn-primary');
     });
 
     project.on('columnSortOrderChanged.morpheus', function (e) {
@@ -860,7 +906,7 @@ morpheus.HeatMapToolBar = function (controller) {
             return;
         }
         _this._updateSearchIndices(true);
-        _this.$columnMatchesToTop.removeClass('btn-primary');
+        _this.columnSearchObject.$matchesToTop.removeClass('btn-primary');
     });
 
     controller.getProject().on('rowFilterChanged.morpheus', function (e) {
@@ -888,7 +934,7 @@ morpheus.HeatMapToolBar = function (controller) {
     this.currentRowSearchIndex = 0;
     this.columnSearchResultViewIndicesSorted = null;
     this.currentColumnSearchIndex = -1;
-    this.$previousColumnMatch
+    this.columnSearchObject.$previousMatch
         .on(
             'click',
             function () {
@@ -907,7 +953,7 @@ morpheus.HeatMapToolBar = function (controller) {
                     eventAction: 'previousColumnMatch'
                 });
             });
-    this.$previousRowMatch
+    this.rowSearchObject.$previousMatch
         .on(
             'click',
             function () {
@@ -926,7 +972,7 @@ morpheus.HeatMapToolBar = function (controller) {
                     eventAction: 'previousRowMatch'
                 });
             });
-    this.$nextColumnMatch.on('click', function () {
+    this.columnSearchObject.$nextMatch.on('click', function () {
         _this.next(true);
         morpheus.Util.trackEvent({
             eventCategory: 'ToolBar',
@@ -934,7 +980,7 @@ morpheus.HeatMapToolBar = function (controller) {
         });
 
     });
-    this.$nextRowMatch.on('click', function () {
+    this.rowSearchObject.$nextMatch.on('click', function () {
         _this.next(false);
         morpheus.Util.trackEvent({
             eventCategory: 'ToolBar',
@@ -1014,15 +1060,15 @@ morpheus.HeatMapToolBar.prototype = {
         }
     },
     setSearchText: function (options) {
-        var $tf = options.isColumns ? this.$columnTextField
-            : this.$rowTextField;
+        var $tf = options.isColumns ? this.columnSearchObject.$search
+            : this.rowSearchObject.$search;
         var existing = options.append ? $.trim($tf.val()) : '';
         if (existing !== '') {
             existing += ' ';
         }
         if (options.onTop) {
-            options.isColumns ? this.$columnMatchesToTop
-                .addClass('btn-primary') : this.$rowMatchesToTop
+            options.isColumns ? this.columnSearchObject.$matchesToTop
+                .addClass('btn-primary') : this.rowSearchObject.$matchesToTop
                 .addClass('btn-primary');
 
         }
@@ -1060,14 +1106,17 @@ morpheus.HeatMapToolBar.prototype = {
         this.$selectionLabel.html(text.join(''));
     },
     searchDendrogram: function (isColumns) {
-        var text = $.trim(isColumns ? this.$searchColumnDendrogram.val()
-            : this.$searchRowDendrogram.val());
+        var searchObject = isColumns ? this.columnDendrogramSearchObject : this.rowDendrogramSearchObject;
+        var text = $.trim(searchObject.$search.val());
         var dendrogram = isColumns ? this.controller.columnDendrogram
             : this.controller.rowDendrogram;
-        var $searchResults = isColumns ? this.$searchResultsColumnDendrogram
-            : this.$searchResultsRowDendrogram;
-        var matches = morpheus.DendrogramUtil.search(
-            dendrogram.tree.rootNode, text);
+        var $searchResults = searchObject.$searchResults;
+        var matches = morpheus.DendrogramUtil.search({
+            rootNode: dendrogram.tree.rootNode,
+            text: text,
+            matchAllPredicates: searchObject.matchAllPredicates,
+            defaultMatchMode: searchObject.matchMode
+        });
         if (matches === -1) {
             $searchResults.html('');
         } else {
@@ -1097,8 +1146,8 @@ morpheus.HeatMapToolBar.prototype = {
     },
     search: function (isRows) {
         this.searching = true;
-        var isMatchesOnTop = isRows ? this.$rowMatchesToTop
-            .hasClass('btn-primary') : this.$columnMatchesToTop
+        var isMatchesOnTop = isRows ? this.rowSearchObject.$matchesToTop
+            .hasClass('btn-primary') : this.columnSearchObject.$matchesToTop
             .hasClass('btn-primary');
         var controller = this.controller;
         var project = controller.getProject();
@@ -1117,10 +1166,9 @@ morpheus.HeatMapToolBar.prototype = {
         }
 
         var dataset = project.getSortedFilteredDataset();
-        var $searchResultsLabel = this.$el.find('[data-name=searchResults'
-            + (isRows ? 'Rows' : 'Columns') + ']');
-        var searchText = !isRows ? $.trim(this.$columnTextField.val()) : $
-            .trim(this.$rowTextField.val());
+        var $searchResultsLabel = isRows ? this.rowSearchObject.$searchResults : this.columnSearchObject.$searchResults;
+        var searchText = !isRows ? $.trim(this.columnSearchObject.$search.val()) : $
+            .trim(this.rowSearchObject.$search.val());
 
         var metadata = isRows ? dataset.getRowMetadata() : dataset
             .getColumnMetadata();
@@ -1137,25 +1185,25 @@ morpheus.HeatMapToolBar.prototype = {
             fullModel: fullModel,
             text: searchText,
             isColumns: !isRows,
-            matchAllPredicates: isRows ? this.rowSearchMatchAllPredicates : this.columnSearchMatchAllPredicates,
-            defaultMatchMode: isRows ? this.defaultRowMatchMode
-                : this.defaultColumnMatchMode
+            matchAllPredicates: isRows ? this.rowSearchObject.matchAllPredicates : this.columnSearchObject.matchAllPredicates,
+            defaultMatchMode: isRows ? this.rowSearchObject.matchMode
+                : this.columnSearchObject.matchMode
         });
         if (searchText === '') {
             $searchResultsLabel.html('');
             if (isRows) {
-                this.$rowSearchDiv.hide();
+                this.rowSearchObject.$searchResultsWrapper.hide();
             } else {
-                this.$columnSearchDiv.hide();
+                this.columnSearchObject.$searchResultsWrapper.hide();
             }
 
         } else {
             $searchResultsLabel.html(searchResultViewIndices.length + ' match'
                 + (searchResultViewIndices.length === 1 ? '' : 'es'));
             if (isRows) {
-                this.$rowSearchDiv.show();
+                this.rowSearchObject.$searchResultsWrapper.show();
             } else {
-                this.$columnSearchDiv.show();
+                this.columnSearchObject.$searchResultsWrapper.show();
             }
 
         }
@@ -1235,12 +1283,12 @@ morpheus.HeatMapToolBar.prototype = {
 
     },
     isSelectionOnTop: function (isColumns) {
-        var $btn = isColumns ? this.$columnMatchesToTop : this.$rowMatchesToTop;
+        var $btn = isColumns ? this.columnSearchObject.$matchesToTop : this.rowSearchObject.$matchesToTop;
         return $btn.hasClass('btn-primary');
     },
     setSelectionOnTop: function (options) {
         if (options.updateButtonStatus) {
-            var $btn = options.isColumns ? this.$columnMatchesToTop : this.$rowMatchesToTop;
+            var $btn = options.isColumns ? this.columnSearchObject.$matchesToTop : this.rowSearchObject.$matchesToTop;
             if (options.isOnTop) {
                 $btn.addClass('btn-primary');
             } else {

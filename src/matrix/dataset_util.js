@@ -1,39 +1,44 @@
+/**
+ * Static utilities for morpheus.DatasetInterface instances
+ *
+ * @class morpheus.DatasetUtil
+ */
 morpheus.DatasetUtil = function () {
 };
 morpheus.DatasetUtil.min = function (dataset, seriesIndex) {
-	seriesIndex = seriesIndex || 0;
-	var min = Number.MAX_VALUE;
-	for (var i = 0, rows = dataset.getRowCount(); i < rows; i++) {
-		for (var j = 0, columns = dataset.getColumnCount(); j < columns; j++) {
-			var d = dataset.getValue(i, j, seriesIndex);
-			if (isNaN(d)) {
-				continue;
-			}
-			min = Math.min(min, d);
-		}
-	}
-	return min;
+    seriesIndex = seriesIndex || 0;
+    var min = Number.MAX_VALUE;
+    for (var i = 0, rows = dataset.getRowCount(); i < rows; i++) {
+        for (var j = 0, columns = dataset.getColumnCount(); j < columns; j++) {
+            var d = dataset.getValue(i, j, seriesIndex);
+            if (isNaN(d)) {
+                continue;
+            }
+            min = Math.min(min, d);
+        }
+    }
+    return min;
 };
 morpheus.DatasetUtil.slicedView = function (dataset, rows, columns) {
-	return new morpheus.SlicedDatasetView(dataset, rows, columns);
+    return new morpheus.SlicedDatasetView(dataset, rows, columns);
 };
 morpheus.DatasetUtil.transposedView = function (dataset) {
-	return dataset instanceof morpheus.TransposedDatasetView ? dataset
-	.getDataset() : new morpheus.TransposedDatasetView(dataset);
+    return dataset instanceof morpheus.TransposedDatasetView ? dataset
+        .getDataset() : new morpheus.TransposedDatasetView(dataset);
 };
 morpheus.DatasetUtil.max = function (dataset, seriesIndex) {
-	seriesIndex = seriesIndex || 0;
-	var max = -Number.MAX_VALUE;
-	for (var i = 0, rows = dataset.getRowCount(); i < rows; i++) {
-		for (var j = 0, columns = dataset.getColumnCount(); j < columns; j++) {
-			var d = dataset.getValue(i, j, seriesIndex);
-			if (isNaN(d)) {
-				continue;
-			}
-			max = Math.max(max, d);
-		}
-	}
-	return max;
+    seriesIndex = seriesIndex || 0;
+    var max = -Number.MAX_VALUE;
+    for (var i = 0, rows = dataset.getRowCount(); i < rows; i++) {
+        for (var j = 0, columns = dataset.getColumnCount(); j < columns; j++) {
+            var d = dataset.getValue(i, j, seriesIndex);
+            if (isNaN(d)) {
+                continue;
+            }
+            max = Math.max(max, d);
+        }
+    }
+    return max;
 };
 
 morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
@@ -51,15 +56,15 @@ morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
         // datasetReader = new morpheus.StreamingGctReader();
     } else if (ext === 'gmt') {
         datasetReader = new morpheus.GmtDatasetReader();
-    } else if (ext === 'xlsx') {
-        datasetReader = options.interactive ? new morpheus.Array2dReader() : new morpheus.XlsxDatasetReader();
+    } else if (ext === 'xlsx' || ext === 'xls') {
+        datasetReader = options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.XlsxDatasetReader();
     } else if (ext === 'segtab' || ext === 'seg') {
         datasetReader = new morpheus.SegTabReader();
         if (options && options.regions) {
             datasetReader.setRegions(options.regions);
         }
     } else if (ext === 'txt' || ext === 'tsv' || ext === 'csv') {
-        datasetReader = options.interactive ? new morpheus.Array2dReader() : new morpheus.TxtReader();
+        datasetReader = options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.TxtReader();
     } else if (ext === 'json') {
         datasetReader = new morpheus.JsonDatasetReader();
     } else {
@@ -69,40 +74,39 @@ morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
 }
 ;
 
-
 morpheus.DatasetUtil.readDatasetArray = function (datasets) {
-	var retDef = $.Deferred();
-	var loadedDatasets = [];
-	var promises = [];
-	_.each(datasets, function (url, i) {
-		var p = morpheus.DatasetUtil.read(url);
-		p.index = i;
-		p.done(function (dataset) {
-			loadedDatasets[this.index] = dataset;
-		});
-		p.fail(function (err) {
-			var message = ['Error opening ' + morpheus.Util
-				.getFileName(url) + '.'];
-			if (err.message) {
-				message.push('<br />Cause: ');
-				message.push(err.message);
-			}
-			retDef.reject(message.join(''));
+    var retDef = $.Deferred();
+    var loadedDatasets = [];
+    var promises = [];
+    _.each(datasets, function (url, i) {
+        var p = morpheus.DatasetUtil.read(url);
+        p.index = i;
+        p.done(function (dataset) {
+            loadedDatasets[this.index] = dataset;
+        });
+        p.fail(function (err) {
+            var message = ['Error opening ' + morpheus.Util
+                .getFileName(url) + '.'];
+            if (err.message) {
+                message.push('<br />Cause: ');
+                message.push(err.message);
+            }
+            retDef.reject(message.join(''));
 
-		});
-		promises.push(p);
-	});
-	if (promises.length === 0) {
-		retDef.reject('No datasets specified.');
-	}
+        });
+        promises.push(p);
+    });
+    if (promises.length === 0) {
+        retDef.reject('No datasets specified.');
+    }
 
-	$.when
-		.apply($, promises)
-		.then(
-			function () {
-				retDef.resolve(morpheus.DatasetUtil.join(loadedDatasets, 'id'));
-			});
-	return retDef;
+    $.when
+        .apply($, promises)
+        .then(
+            function () {
+                retDef.resolve(morpheus.DatasetUtil.join(loadedDatasets, 'id'));
+            });
+    return retDef;
 };
 /**
  * Annotate a dataset from external file or text.
@@ -166,14 +170,17 @@ morpheus.DatasetUtil.annotate = function (options) {
 	return retDef;
 };
 /**
+ * Reads a dataset at the specified URL or file
  * @param file
- *            a File or url
- * @return A promise that resolves to Dataset
+ *            a File or URL
+ * @return A promise that resolves to morpheus.DatasetInterface
  */
 morpheus.DatasetUtil.read = function (fileOrUrl, options) {
-	//console.log("morpheus.DatasetUtil.read ::", fileOrUrl, options);
+    if (options == null) {
+        options = {};
+    }
 	var isFile = fileOrUrl instanceof File;
-	var isString = _.isString(fileOrUrl);
+	var isString = morpheus.Util.isString(fileOrUrl);
 	var ext = options && options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
 	var datasetReader;
 	var str = fileOrUrl.toString();
@@ -191,7 +198,7 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 	if (isString || isFile) { // URL or file
 		var deferred = $.Deferred();
 		// override toString so can determine file name
-		if (options && options.background) {
+		if (options.background) {
 			var path = morpheus.Util.getScriptPath();
 			var blob = new Blob(
 				['self.onmessage = function(e) {'
@@ -223,7 +230,6 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 					deferred.reject(err);
 				} else {
 					deferred.resolve(dataset);
-					//console.log("morpheus.DatasetUtil.read ::", 'inside reader callback', dataset);
 					morpheus.DatasetUtil.toESSessionPromise({dataset : dataset, isGEO : isGSE});
 				}
 			});
@@ -392,21 +398,21 @@ morpheus.DatasetUtil.geneSetsToDataset = function (name, sets) {
 	}
 	return dataset;
 };
-morpheus.DatasetUtil.DATASET_FILE_FORMATS = '<a target="_blank" href="http://support.lincscloud.org/hc/en-us/articles/202105453-GCT-Gene-Cluster-Text-Format-">GCT 1.3</a>, '
+morpheus.DatasetUtil.DATASET_FILE_FORMATS = '<a target="_blank" href="https://clue.io/help#datasets">GCT 1.3</a>, '
     + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
     + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
     + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
     + ' a tab-delimited text file, or an Excel spreadsheet';
-morpheus.DatasetUtil.BASIC_DATASET_FILE_FORMATS = '<a target="_blank" href="http://support.lincscloud.org/hc/en-us/articles/202105453-GCT-Gene-Cluster-Text-Format-">GCT 1.3</a>, '
+morpheus.DatasetUtil.BASIC_DATASET_FILE_FORMATS = '<a target="_blank" href="https://clue.io/help#datasets">GCT 1.3</a>, '
     + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
     + ' or a tab-delimited text file';
-morpheus.DatasetUtil.GCT_FILE_FORMAT = '<a target="_blank" href="http://support.lincscloud.org/hc/en-us/articles/202105453-GCT-Gene-Cluster-Text-Format-">GCT 1.3</a>';
+morpheus.DatasetUtil.GCT_FILE_FORMAT = '<a target="_blank" href="https://clue.io/help#datasets">GCT 1.3</a>';
 morpheus.DatasetUtil.ANNOTATION_FILE_FORMATS = 'an xlsx file, tab-delimited text file, or a <a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT file</a>';
 morpheus.DatasetUtil.DENDROGRAM_FILE_FORMATS = 'a <a href="http://en.wikipedia.org/wiki/Newick_format" target="_blank">Newick</a> file';
-morpheus.DatasetUtil.OPEN_FILE_FORMATS = '<a target="_blank" href="http://support.lincscloud.org/hc/en-us/articles/202105453-GCT-Gene-Cluster-Text-Format-">GCT 1.3</a>, '
+morpheus.DatasetUtil.OPEN_FILE_FORMATS = '<a target="_blank" href="https://clue.io/help#datasets">GCT 1.3</a>, '
     + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
     + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
-    + '<a target="_blank", href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
+    + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
     + ' a tab-delimited text file, or a <a href="http://en.wikipedia.org/wiki/Newick_format" target="_blank">Newick</a> file';
 morpheus.DatasetUtil.getRootDataset = function (dataset) {
     while (dataset.getDataset) {
@@ -438,73 +444,110 @@ morpheus.DatasetUtil.getSeriesNames = function (dataset) {
 
 /**
  * Search dataset values.
+ *
+ * @param options.dataset
+ *      The dataset
+ * @param options.text
+ *            Search text
+ * @param options.cb
+ *            Callback to add a match
+ * @param options.defaultMatchMode
+ *            'exact' or 'contains'
+ * @param options.matchAllPredicates Whether to match all predicates
+ *
  */
-morpheus.DatasetUtil.searchValues = function (dataset, text, cb) {
+morpheus.DatasetUtil.searchValues = function (options) {
     if (text === '') {
         return;
     }
+    var dataset = options.dataset;
+    var text = options.text;
+    var cb = options.cb;
     var tokens = morpheus.Util.getAutocompleteTokens(text);
     if (tokens.length == 0) {
         return;
     }
     var predicates = morpheus.Util.createSearchPredicates({
-        tokens: tokens
+        tokens: tokens,
+        defaultMatchMode: options.defaultMatchMode
     });
-
+    var matchAllPredicates = options.matchAllPredicates === true;
     var npredicates = predicates.length;
-    for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-        for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-            for (var k = 0, nseries = dataset.getSeriesCount(); k < nseries; k++) {
-                var matches = false;
-                var element = dataset.getValue(i, j, k);
-                if (element != null) {
-                    if (element.toObject) {
-                        var object = element.toObject();
-                        for (var p = 0; p < npredicates && !matches; p++) {
-                            var predicate = predicates[p];
-                            var filterColumnName = predicate.getField();
-                            if (filterColumnName != null) {
-                                var value = object[filterColumnName];
-                                if (value != null && predicate.accept(value)) {
-                                    if (cb(value, i, j) === false) {
-                                        return;
-                                    }
-                                    matches = true;
-                                    break;
-                                }
-                            } else { // try all fields
-                                for (var name in object) {
-                                    var value = object[name];
-                                    if (value != null && predicate.accept(value)) {
-                                        if (cb(value, i, j) === false) {
-                                            return;
-                                        }
-                                        matches = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        var value = element;
-                        for (var p = 0; p < npredicates && !matches; p++) {
-                            var predicate = predicates[p];
-                            var filterColumnName = predicate.getField();
-                            if (filterColumnName == null || filterColumnName === dataset.getName(k)) {
-                                if (predicate.accept(value)) {
-                                    if (cb(value, i, j) === false) {
-                                        return;
-                                    }
-                                    matches = true;
-                                    break;
-                                }
-                            }
-                        }
+    var viewIndices = new morpheus.Set();
+
+    function isMatch(object, toObject, predicate) {
+        if (object != null) {
+            if (toObject) {
+                var filterColumnName = predicate.getField();
+                if (filterColumnName != null) {
+                    var value = object[filterColumnName];
+                    return predicate.accept(value);
+                } else { // try all fields
+                    for (var name in object) {
+                        var value = object[name];
+                        return predicate.accept(value);
                     }
+                }
+            } else {
+                var filterColumnName = predicate.getField();
+                if (filterColumnName == null || filterColumnName === dataset.getName(k)) {
+                    return predicate.accept(object);
+
                 }
             }
         }
     }
+
+    for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+        for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+            var matches = false;
+            itemSearch:
+                if (matchAllPredicates) {
+                    matches = true;
+                    for (var p = 0; p < npredicates; p++) {
+                        var predicate = predicates[p];
+                        var pmatch = false;
+                        for (var k = 0, nseries = dataset.getSeriesCount(); k < nseries; k++) {
+                            var element = dataset.getValue(i, j, k);
+                            var isObject = element != null && element.toObject != null;
+                            if (isObject) {
+                                element = element.toObject();
+                            }
+                            if (isMatch(element, isObject, predicate)) {
+                                pmatch = true;
+                                break;
+                            }
+                        }
+                        if (!pmatch) {
+                            matches = false;
+                            break itemSearch;
+                        }
+                    }
+                } else {
+                    for (var k = 0, nseries = dataset.getSeriesCount(); k < nseries; k++) {
+                        var element = dataset.getValue(i, j, k);
+                        var isObject = element != null && element.toObject != null;
+                        if (isObject) {
+                            element = element.toObject();
+                        }
+                        for (var p = 0; p < npredicates; p++) {
+                            var predicate = predicates[p];
+                            if (isMatch(element, isObject, predicate)) {
+                                matches = true;
+                                break itemSearch;
+                            }
+                        }
+                    }
+                }
+
+            if (matches) {
+                viewIndices
+                    .add(new morpheus.Identifier(
+                        [i, j]));
+            }
+        }
+    }
+    return viewIndices;
 
 };
 
@@ -512,134 +555,134 @@ morpheus.DatasetUtil.searchValues = function (dataset, text, cb) {
  * Search dataset values.
  */
 morpheus.DatasetUtil.autocompleteValues = function (dataset) {
-	return function (tokens, cb) {
+    return function (tokens, cb) {
 
-		var token = tokens != null && tokens.length > 0 ? tokens[tokens.selectionStartIndex]
-			: '';
-		token = $.trim(token);
-		var seriesIndices = [];
-		for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-			for (var k = 0, nseries = dataset.getSeriesCount(); k < nseries; k++) {
-				if (dataset.getDataType(i, k) === 'object') {
-					seriesIndices.push([i, k]);
-				}
-			}
-		}
-		if (seriesIndices.length === 0) {
-			return cb();
-		}
-		var _val; // first non-null value
-		elementSearch: for (var k = 0, nseries = seriesIndices.length; k < nseries; k++) {
-			var pair = seriesIndices[k];
-			for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-				var element = dataset.getValue(pair[0], j, pair[1]);
-				if (element != null && element.toObject) {
-					_val = element.toObject();
-					break elementSearch;
-				}
-			}
-		}
-		var matches = [];
-		var fields = _val == null ? [] : _.keys(_val);
-		if (token === '') {
-			fields.sort(function (a, b) {
-				return (a === b ? 0 : (a < b ? -1 : 1));
-			});
-			fields.forEach(function (field) {
-				matches.push({
-					value: field + ':',
-					label: '<span style="font-weight:300;">' + field
-					+ ':</span>',
-					show: true
-				});
-			});
-			return cb(matches);
-		}
+        var token = tokens != null && tokens.length > 0 ? tokens[tokens.selectionStartIndex]
+            : '';
+        token = $.trim(token);
+        var seriesIndices = [];
+        for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+            for (var k = 0, nseries = dataset.getSeriesCount(); k < nseries; k++) {
+                if (dataset.getDataType(i, k) === 'Number') {
+                    seriesIndices.push([i, k]);
+                }
+            }
+        }
+        if (seriesIndices.length === 0) {
+            return cb();
+        }
+        var _val; // first non-null value
+        elementSearch: for (var k = 0, nseries = seriesIndices.length; k < nseries; k++) {
+            var pair = seriesIndices[k];
+            for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+                var element = dataset.getValue(pair[0], j, pair[1]);
+                if (element != null && element.toObject) {
+                    _val = element.toObject();
+                    break elementSearch;
+                }
+            }
+        }
+        var matches = [];
+        var fields = _val == null ? [] : _.keys(_val);
+        if (token === '') {
+            fields.sort(function (a, b) {
+                return (a === b ? 0 : (a < b ? -1 : 1));
+            });
+            fields.forEach(function (field) {
+                matches.push({
+                    value: field + ':',
+                    label: '<span style="font-weight:300;">' + field
+                    + ':</span>',
+                    show: true
+                });
+            });
+            return cb(matches);
+        }
 
-		var field = null;
-		var semi = token.indexOf(':');
-		if (semi > 0) { // field search?
-			if (token.charCodeAt(semi - 1) !== 92) { // \:
-				var possibleField = $.trim(token.substring(0, semi));
-				if (possibleField.length > 0 && possibleField[0] === '"'
-					&& possibleField[token.length - 1] === '"') {
-					possibleField = possibleField.substring(1,
-						possibleField.length - 1);
-				}
-				var index = fields.indexOf(possibleField);
-				if (index !== -1) {
-					token = $.trim(token.substring(semi + 1));
-					field = possibleField;
-				}
-			}
+        var field = null;
+        var semi = token.indexOf(':');
+        if (semi > 0) { // field search?
+            if (token.charCodeAt(semi - 1) !== 92) { // \:
+                var possibleField = $.trim(token.substring(0, semi));
+                if (possibleField.length > 0 && possibleField[0] === '"'
+                    && possibleField[token.length - 1] === '"') {
+                    possibleField = possibleField.substring(1,
+                        possibleField.length - 1);
+                }
+                var index = fields.indexOf(possibleField);
+                if (index !== -1) {
+                    token = $.trim(token.substring(semi + 1));
+                    field = possibleField;
+                }
+            }
 
-		}
+        }
 
-		var set = new morpheus.Set();
-		// regex used to determine if a string starts with substring `q`
-		var regex = new RegExp('^' + morpheus.Util.escapeRegex(token), 'i');
-		// iterate through the pool of strings and for any string that
-		// contains the substring `q`, add it to the `matches` array
-		var max = 10;
+        var set = new morpheus.Set();
+        // regex used to determine if a string starts with substring `q`
+        var regex = new RegExp('^' + morpheus.Util.escapeRegex(token), 'i');
+        // iterate through the pool of strings and for any string that
+        // contains the substring `q`, add it to the `matches` array
+        var max = 10;
 
-		loop: for (var k = 0, nseries = seriesIndices.length; k < nseries; k++) {
-			var pair = seriesIndices[k];
-			for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-				var element = dataset.getValue(pair[0], j, pair[1]);
-				if (element && element.toObject) {
-					var object = element.toObject();
-					if (field !== null) {
-						var val = object[field];
-						if (val != null) {
-							var id = new morpheus.Identifier([val, field]);
-							if (!set.has(id) && regex.test(val)) {
-								set.add(id);
-								if (set.size() === max) {
-									break loop;
-								}
-							}
-						}
-					} else { // search all fields
-						for (var name in object) {
-							var val = object[name];
-							var id = new morpheus.Identifier([val, name]);
-							if (!set.has(id) && regex.test(val)) {
-								set.add(id);
-								if (set.size() === max) {
-									break loop;
-								}
-							}
-						}
-					}
+        loop: for (var k = 0, nseries = seriesIndices.length; k < nseries; k++) {
+            var pair = seriesIndices[k];
+            for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+                var element = dataset.getValue(pair[0], j, pair[1]);
+                if (element && element.toObject) {
+                    var object = element.toObject();
+                    if (field !== null) {
+                        var val = object[field];
+                        if (val != null) {
+                            var id = new morpheus.Identifier([val, field]);
+                            if (!set.has(id) && regex.test(val)) {
+                                set.add(id);
+                                if (set.size() === max) {
+                                    break loop;
+                                }
+                            }
+                        }
+                    } else { // search all fields
+                        for (var name in object) {
+                            var val = object[name];
+                            var id = new morpheus.Identifier([val, name]);
+                            if (!set.has(id) && regex.test(val)) {
+                                set.add(id);
+                                if (set.size() === max) {
+                                    break loop;
+                                }
+                            }
+                        }
+                    }
 
-				}
-			}
-		}
-		set.forEach(function (id) {
-			var array = id.getArray();
-			var field = array[1];
-			var val = array[0];
-			matches.push({
-				value: field + ':' + val,
-				label: '<span style="font-weight:300;">' + field + ':</span>'
-				+ '<span style="font-weight:900;">' + val + '</span>'
-			});
+                }
+            }
+        }
+        set.forEach(function (id) {
+            var array = id.getArray();
+            var field = array[1];
+            var val = array[0];
+            matches.push({
+                value: field + ':' + val,
+                label: '<span style="font-weight:300;">' + field + ':</span>'
+                + '<span style="font-weight:900;">' + val + '</span>'
+            });
 
-		});
-		if (field == null) {
-			fields.forEach(function (field) {
-				if (regex.test(field)) {
-					matches.push({
-						value: field + ':',
-						label: '<span style="font-weight:300;">' + field
-						+ ':</span>',
-						show: true
-					});
-				}
-			});
-		}
-		cb(matches);
-	};
+        });
+        if (field == null) {
+            fields.forEach(function (field) {
+                if (regex.test(field)) {
+                    matches.push({
+                        value: field + ':',
+                        label: '<span style="font-weight:300;">' + field
+                        + ':</span>',
+                        show: true
+                    });
+                }
+            });
+        }
+        cb(matches);
+    };
 
 };
 // morpheus.DatasetUtil.toJSON = function(dataset) {
@@ -788,41 +831,51 @@ morpheus.DatasetUtil.overlay = function (options) {
         }
     }
 };
+/**
+ * Joins datasets by appending rows.
+ * @param datasets
+ * @param field
+ * @return {morpheus.AbstractDataset} The joined dataset.
+ */
 morpheus.DatasetUtil.join = function (datasets, field) {
-	if (datasets.length === 0) {
-		throw 'No datasets';
-	}
-	if (datasets.length === 1) {
-		datasets[0].getRowMetadata().add('Source').setValue(0, datasets[0].getName());
-		return datasets[0];
-	}
-	// take union of all ids
-	var ids = new morpheus.Set();
-	for (var i = 0; i < datasets.length; i++) {
-		var idVector = datasets[i].getColumnMetadata().getByName(field);
-		for (var j = 0, size = idVector.size(); j < size; j++) {
-			ids.add(idVector.getValue(j));
-		}
-	}
-	var dummyDataset = new morpheus.Dataset({
-		rows: 0,
-		columns: ids.size(),
-		name: datasets[0].getName()
-	});
-	var dummyIdVector = dummyDataset.getColumnMetadata().add(field);
-	var counter = 0;
-	ids.forEach(function (id) {
-		dummyIdVector.setValue(counter++, id);
-	});
+    if (datasets.length === 0) {
+        throw 'No datasets';
+    }
+    if (datasets.length === 1) {
+        var name = datasets[0].getName();
+        var sourceVector = datasets[0].getRowMetadata().add('Source');
+        for (var i = 0, size = sourceVector.size(); i < size; i++) {
+            sourceVector.setValue(i, name);
+        }
+        return datasets[0];
+    }
+    // take union of all ids
+    var ids = new morpheus.Set();
+    for (var i = 0; i < datasets.length; i++) {
+        var idVector = datasets[i].getColumnMetadata().getByName(field);
+        for (var j = 0, size = idVector.size(); j < size; j++) {
+            ids.add(idVector.getValue(j));
+        }
+    }
+    var dummyDataset = new morpheus.Dataset({
+        rows: 0,
+        columns: ids.size(),
+        name: datasets[0].getName()
+    });
+    var dummyIdVector = dummyDataset.getColumnMetadata().add(field);
+    var counter = 0;
+    ids.forEach(function (id) {
+        dummyIdVector.setValue(counter++, id);
+    });
 
-	var dataset = new morpheus.JoinedDataset(
-		dummyDataset, datasets[0], field,
-		field);
-	for (var i = 1; i < datasets.length; i++) {
-		dataset = new morpheus.JoinedDataset(dataset,
-			datasets[i], field, field);
-	}
-	return dataset;
+    var dataset = new morpheus.JoinedDataset(
+        dummyDataset, datasets[0], field,
+        field);
+    for (var i = 1; i < datasets.length; i++) {
+        dataset = new morpheus.JoinedDataset(dataset,
+            datasets[i], field, field);
+    }
+    return dataset;
 };
 morpheus.DatasetUtil.shallowCopy = function (dataset) {
 	// make a shallow copy of the dataset, metadata is immutable via the UI

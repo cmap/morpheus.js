@@ -1,7 +1,7 @@
-morpheus.NewHeatMapTool = function() {
+morpheus.NewHeatMapTool = function () {
 };
 morpheus.NewHeatMapTool.prototype = {
-	toString : function() {
+	toString: function () {
 		return 'New Heat Map (' + morpheus.Util.COMMAND_KEY + 'X)';
 	},
 	// gui : function() {
@@ -18,15 +18,13 @@ morpheus.NewHeatMapTool.prototype = {
 	// value : true
 	// } ];
 	// },
-	execute : function(options) {
+	execute: function (options) {
 		var project = options.project;
 		var controller = options.controller;
-		var dataset = project.getSelectedDataset({
-			selectedRows : true,
-			selectedColumns : true
-		});
-
-        //console.log("morpheus.NewHeatMapTool.prototype.execute ::", dataset);
+        var dataset = project.getSelectedDataset({
+            selectedRows: true,
+            selectedColumns: true
+        });
 		morpheus.DatasetUtil.shallowCopy(dataset);
 		morpheus.DatasetUtil.toESSessionPromise(dataset);
 		// TODO see if we can subset dendrograms
@@ -39,9 +37,8 @@ morpheus.NewHeatMapTool.prototype = {
 		// if (controller.rowDendrogram != null) {
 		//
 		// }
-		var name = options.input.name || controller.getName();
         var heatmap = new morpheus.HeatMap({
-            name: name,
+            name: controller.getName(),
             dataset: dataset,
             parent: controller,
             symmetric: project.__symmetricProjectListener != null && dataset.getColumnCount() === dataset.getRowCount()
