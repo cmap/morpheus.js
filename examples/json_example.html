@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"
+          content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Morpheus</title>
+    <link rel="stylesheet" href="https:clue.io/morpheus/css/morpheus-latest.min.css">
+    <link rel="shortcut icon" href="https:clue.io/morpheus/favicon.ico" type="image/x-icon">
+
+    <script type="text/javascript"
+            src="https:clue.io/morpheus/js/morpheus-external-latest.min.js"></script>
+    <script src="https:clue.io/morpheus/js/morpheus-latest.min.js"></script>
+
+    <!--optional js files -->
+    <script type="text/javascript" src="https:clue.io/morpheus/js/StreamSaver.js"></script>
+    <script type="text/javascript" src="https:clue.io/morpheus/js/web-streams-polyfill.js"></script>
+    <!--Get a dropbox APP key to allow users to select files from Dropbox -->
+    <!--<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js"  id="dropboxjs" data-app-key="XXXX"></script>-->
+</head>
+<body>
+<noscript>
+    <p>Please enable JavaScript</p>
+</noscript>
+<div id="vis"></div>
+<script type="text/javascript">
+  var json = {
+    "rows": 5,
+    "columns": 7,
+    "seriesArrays": [[[0, -0.004495999775826931, -0.0012469999492168427, -0.0013859999598935246, -0.02394000068306923, 0.000970599998254329, -0.0016629999736323953], [0, -0.0049230000004172325, -0.0012469999492168427, -0.0013859999598935246, -0.00861200038343668, -0.001879999996162951, -0.0016629999736323953], [0.011169999837875366, -0.0046190000139176846, 0.3653999865055084, -0.0022499999031424522, 0.007083000149577856, -0.0022169998846948147, 0.001247999956831336], [-0.0014720000326633453, -0.004370000213384628, -0.004155000206083059, -0.003186000045388937, -0.01737000048160553, -0.00761000020429492, -0.0034630000591278076], [0.00546600017696619, -0.01664000004529953, -0.011339999735355377, 0.013770000077784061, -0.04292000085115433, -0.026510000228881836, -0.019260000437498093]]],
+    "seriesDataTypes": ["Float32"],
+    "seriesNames": ["foo"],
+    "rowMetadataModel": {
+      "vectors": [{
+        "name": "id",
+        "array": ["1p33", "1q43", "11q23.3", "13q31.3", "19p13.2"]
+      }, {
+        "name": "Description",
+        "array": [0.01952, 0.001933, 3.125e-9, 0.2114, 0.2114]
+      }]
+    },
+    "columnMetadataModel": {
+      "vectors": [{
+        "name": "id",
+        "array": ["2803-Primary Blood Derived Cancer - Peripheral Blood", "2804-Primary Blood Derived Cancer - Peripheral Blood", "2805-Primary Blood Derived Cancer - Peripheral Blood", "2806-Primary Blood Derived Cancer - Peripheral Blood", "2807-Primary Blood Derived Cancer - Peripheral Blood", "2808-Primary Blood Derived Cancer - Peripheral Blood", "2809-Primary Blood Derived Cancer - Peripheral Blood"]
+      }, {
+        "name": "foo",
+        "array": ["a", "b", "c", "d", "a", "a", "b"]
+      }]
+    }
+  };
+  new morpheus.HeatMap({
+    el: $('#vis'),
+    dataset: morpheus.Dataset.fromJson(json),
+    colorScheme: { // optional color scheme. default is relative
+      type: 'fixed',
+      map: [{
+        value: -2,
+        color: '#0000ff'
+      }, {
+        value: 0,
+        color: '#ffffff'
+      }, {
+        value: 2,
+        color: '#ff0000'
+      }]
+    },
+    tools: [{ // optional tools to run at load time
+      name: 'Hierarchical Clustering',
+      params: {cluster: 'Rows and columns'}
+    }]
+  });
+</script>
+</body>
+</html>
+

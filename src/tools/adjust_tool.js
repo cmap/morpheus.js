@@ -1,31 +1,31 @@
-morpheus.AdjustDataTool = function() {
+morpheus.AdjustDataTool = function () {
 };
 morpheus.AdjustDataTool.prototype = {
-	toString : function() {
-		return 'Adjust';
-	},
-	gui : function() {
-		// z-score, robust z-score, log2, inverse log2
-		return [ {
-			name : 'log_2',
-			type : 'checkbox'
-		}, {
-			name : 'inverse_log_2',
-			type : 'checkbox'
-		}, {
-			name : 'z-score',
-			type : 'checkbox',
-			help : 'Subtract mean, divide by standard deviation'
-		}, {
-			name : 'robust_z-score',
-			type : 'checkbox',
-			help : 'Subtract median, divide by median absolute deviation'
-		}, {
-			name : 'use_selected_rows_and_columns_only',
-			type : 'checkbox'
-		} ];
-	},
-	execute : function(options) {
+    toString: function () {
+        return 'Adjust';
+    },
+    gui: function () {
+        // z-score, robust z-score, log2, inverse log2
+        return [{
+            name: 'log_2',
+            type: 'checkbox'
+        }, {
+            name: 'inverse_log_2',
+            type: 'checkbox'
+        }, {
+            name: 'z-score',
+            type: 'checkbox',
+            help: 'Subtract mean, divide by standard deviation'
+        }, {
+            name: 'robust_z-score',
+            type: 'checkbox',
+            help: 'Subtract median, divide by median absolute deviation'
+        }, {
+            name: 'use_selected_rows_and_columns_only',
+            type: 'checkbox'
+        }];
+    },
+	execute: function (options) {
 		var project = options.project;
 		var controller = options.controller;
 

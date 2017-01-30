@@ -1,14 +1,10 @@
+/**
+ *
+ * @param dataset
+ * @constructor
+ */
 morpheus.Project = function (dataset) {
 	this.originalDataset = dataset;
-	/*if (morpheus.MetadataUtil.indexOf(dataset.getRowMetadata(), "index") < 0) {
-    	dataset.getRowMetadata().add("index").setArray(Array.apply(null, {length: dataset.rows}).map(Number.call, Number));
-    	console.log(dataset.getRowMetadata().getByName("index").getProperties());
-    	dataset.getRowMetadata().getByName("index").getProperties().set(morpheus.VectorKeys.DATA_TYPE, "number");
-	}
-    this.trigger('trackChanged', {
-    	vectors: [dataset.getRowMetadata().getByName("index")],
-		render: ['text']
-	});*/
     this.rowIndexMapper = new morpheus.IndexMapper(this, true);
     this.columnIndexMapper = new morpheus.IndexMapper(this, false);
     this.groupRows = [];
@@ -40,19 +36,19 @@ morpheus.Project.Events = {
 };
 
 morpheus.Project._recomputeCalculatedFields = function (dataset) {
-	var metadata = dataset.getRowMetadata();
-	var view = new morpheus.DatasetRowView(dataset);
-	for (var metadataIndex = 0, count = metadata.getMetadataCount(); metadataIndex < count; metadataIndex++) {
-		var v = metadata.get(metadataIndex);
-		var f = v.getProperties().get(morpheus.VectorKeys.FUNCTION);
-		if (f != null
-				&& v.getProperties()
-						.get(morpheus.VectorKeys.RECOMPUTE_FUNCTION)) {
-			for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-				v.setValue(i, f(view.setIndex(i)));
-			}
-		}
-	}
+    var metadata = dataset.getRowMetadata();
+    var view = new morpheus.DatasetRowView(dataset);
+    for (var metadataIndex = 0, count = metadata.getMetadataCount(); metadataIndex < count; metadataIndex++) {
+        var v = metadata.get(metadataIndex);
+        var f = v.getProperties().get(morpheus.VectorKeys.FUNCTION);
+        if (f != null
+            && v.getProperties().get(morpheus.VectorKeys.RECOMPUTE_FUNCTION)) {
+            for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+                v.setValue(i, f(view.setIndex(i)));
+            }
+        }
+    }
+
 };
 morpheus.Project.prototype = {
 	getHoverColumnIndex: function () {
@@ -111,18 +107,28 @@ morpheus.Project.prototype = {
 			this.trigger(morpheus.Project.Events.DATASET_CHANGED);
 		}
 	},
-	setGroupRows: function (keys, notify) {
-		this.groupRows = keys;
-		if (notify) {
-			this.trigger(morpheus.Project.Events.ROW_GROUP_BY_CHANGED);
-		}
-	},
-	setGroupColumns: function (keys, notify) {
-		this.groupColumns = keys;
-		if (notify) {
-			this.trigger(morpheus.Project.Events.COLUMN_GROUP_BY_CHANGED);
-		}
-	},
+    setGroupRows: function (keys, notify) {
+        this.groupRows = keys;
+        for (var i = 0, nkeys = keys.length; i < nkeys; i++) {
+            if (keys[i].isColumns() === undefined) {
+                keys[i].setColumns(false);
+            }
+        }
+        if (notify) {
+            this.trigger(morpheus.Project.Events.ROW_GROUP_BY_CHANGED);
+        }
+    },
+    setGroupColumns: function (keys, notify) {
+        this.groupColumns = keys;
+        for (var i = 0, nkeys = keys.length; i < nkeys; i++) {
+            if (keys[i].isColumns() === undefined) {
+                keys[i].setColumns(true);
+            }
+        }
+        if (notify) {
+            this.trigger(morpheus.Project.Events.COLUMN_GROUP_BY_CHANGED);
+        }
+    },
 	setRowFilter: function (filter, notify) {
 		this._saveSelection(false);
 		this.rowIndexMapper.setFilter(filter);
@@ -154,34 +160,34 @@ morpheus.Project.prototype = {
 						.convertToView());
 	},
 	getSelectedDataset: function (options) {
-		options = $.extend({}, {
-			selectedRows: true,
-			selectedColumns: true,
-			emptyToAll: true
-		}, options);
-		var dataset = this.getSortedFilteredDataset();
-		var rows = null;
-		if (options.selectedRows) {
-			rows = this.rowSelectionModel.getViewIndices().values().sort(
-					function (a, b) {
-						return (a === b ? 0: (a < b ? -1: 1));
-					});
-			if (rows.length === 0 && options.emptyToAll) {
-				rows = null;
-			}
-		}
-		var columns = null;
-		if (options.selectedColumns) {
-			columns = this.columnSelectionModel.getViewIndices().values().sort(
-					function (a, b) {
-						return (a === b ? 0: (a < b ? -1: 1));
-					});
-			if (columns.length === 0 && options.emptyToAll) {
-				columns = null;
-			}
-		}
-		return morpheus.DatasetUtil.slicedView(dataset, rows, columns);
-	},
+        options = $.extend({}, {
+            selectedRows: true,
+            selectedColumns: true,
+            emptyToAll: true
+        }, options);
+        var dataset = this.getSortedFilteredDataset();
+        var rows = null;
+        if (options.selectedRows) {
+            rows = this.rowSelectionModel.getViewIndices().values().sort(
+                function (a, b) {
+                    return (a === b ? 0 : (a < b ? -1 : 1));
+                });
+            if (rows.length === 0 && options.emptyToAll) {
+                rows = null;
+            }
+        }
+        var columns = null;
+        if (options.selectedColumns) {
+            columns = this.columnSelectionModel.getViewIndices().values().sort(
+                function (a, b) {
+                    return (a === b ? 0 : (a < b ? -1 : 1));
+                });
+            if (columns.length === 0 && options.emptyToAll) {
+                columns = null;
+            }
+        }
+        return morpheus.DatasetUtil.slicedView(dataset, rows, columns);
+    },
     _saveSelection: function (isColumns) {
         this.elementSelectionModel.save();
         if (isColumns) {

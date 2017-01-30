@@ -1,3 +1,13 @@
+/**
+ * Default implementation of a dataset.
+ *
+ * @extends {morpheus.AbstractDataset}
+ * @param options.rows {number} Number of rows
+ * @param options.columns {number} Number of columns
+ * @param options.name {string} Dataset name
+ * @param options.dataType {string=} Data type that 1st series holds.
+ * @constructor
+ */
 morpheus.Dataset = function (options) {
     morpheus.AbstractDataset.call(this, options.rows,
         options.columns);

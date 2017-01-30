@@ -1,12 +1,9 @@
 /**
- * @fileOverview Stores annotations for the rows or columns of a dataset.
- */
-
-/**
  * Creates a new meta data model instance.
  *
- * @param itemCount
+ * @param itemCount {number}
  *            the number of items that vectors in this instances will hold.
+ * @implements {morpheus.MetadataModelInterface}
  * @constructor
  */
 morpheus.MetadataModel = function (itemCount) {
@@ -14,17 +11,7 @@ morpheus.MetadataModel = function (itemCount) {
 	this.vectors = [];
 };
 morpheus.MetadataModel.prototype = {
-	/**
-	 * Appends the specified vector to this meta data. If an existing vector
-	 * with the same name already exists, it is removed and existing properties
-	 * and values copied to the new vector before appending the new vector.
-	 *
-	 * @param name
-	 *            The vector name to be inserted into this meta data instance.
-	 * @return {morpheus.AbstractVector} the added vector.
-	 */
 	add: function (name, options) {
-		//console.log("morpheus.MetadataModel.prototype.add ::", name);
 		var index = morpheus.MetadataUtil.indexOf(this, name);
 		var oldVector;
 		if (index !== -1) {
@@ -48,58 +35,25 @@ morpheus.MetadataModel.prototype = {
 		this.vectors.push(v);
 		return v;
 	},
-	/**
-	 * Returns the number of items that a vector in this meta data model
-	 * contains.
-	 *
-	 * @return the item count
-	 */
 	getItemCount: function () {
 		return this.itemCount;
 	},
-	/**
-	 * Returns the vector at the specified metadata index.
-	 *
-	 * @param index
-	 *            the metadata index
-	 * @return the vector
-	 */
 	get: function (index) {
 		if (index < 0 || index >= this.vectors.length) {
 			throw 'index ' + index + ' out of range';
 		}
 		return this.vectors[index];
 	},
-	/**
-	 * Removes the column at the specified position in this meta data instance
-	 * Shifts any subsequent columns to the left (subtracts one from their
-	 * indices).
-	 *
-	 * @param index
-	 *            the meta data index to remove.
-	 */
 	remove: function (index) {
 		if (index < 0 || index >= this.vectors.length) {
 			throw 'index ' + index + ' out of range';
 		}
 		return this.vectors.splice(index, 1)[0];
 	},
-	/**
-	 * Returns the vector witht the specified name.
-	 *
-	 * @param name
-	 *            the vector name
-	 * @return the vector
-	 */
 	getByName: function (name) {
 		var index = morpheus.MetadataUtil.indexOf(this, name);
 		return index !== -1 ? this.get(index) : undefined;
 	},
-	/**
-	 * Returns the number of vectors in this meta data instance.
-	 *
-	 * @return the number of vectors.
-	 */
 	getMetadataCount: function () {
 		return this.vectors.length;
 	}
