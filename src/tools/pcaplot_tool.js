@@ -446,15 +446,15 @@ morpheus.PcaPlotTool.prototype = {
             //console.log("morpheus.PcaPlotTool.prototype.draw ::", "color", colorBy, ", sizeBy", sizeBy, ", pc1", pc1, ", pc2", pc2, ", label", label);
 
             expressionSetPromise.then(function (essession) {
-                var arguments = {
+                var args = {
                     es: essession,
                     replacena: na
                 };
                 if (columnIndices && columnIndices.length > 0) {
-                    arguments.columns = columnIndices;
+                    args.columns = columnIndices;
                 }
                 if (rowIndices && rowIndices.length > 0) {
-                    arguments.rows = rowIndices;
+                    args.rows = rowIndices;
                 }
                 var drawResult = function () {
                     var x = _this.pca.pca[pc1];
@@ -505,7 +505,7 @@ morpheus.PcaPlotTool.prototype = {
 
                 //console.log(arguments);
 
-                var req = ocpu.call("pcaPlot", arguments, function (session) {
+                var req = ocpu.call("pcaPlot", args, function (session) {
                     //console.log("morpheus.PcaPlotTool.prototype.draw ::", "successful", session);
                     session.getObject(function (success) {
                         //console.log(success);

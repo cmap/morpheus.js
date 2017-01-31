@@ -100,18 +100,18 @@ morpheus.KmeansTool.prototype = {
         //console.log(number);
         var esPromise = fullDataset.getESSession();
         esPromise.then(function(essession) {
-            var arguments = {
+            var args = {
                 es : essession,
                 k : number
             };
             if (columnIndices && columnIndices.length > 0 && columnIndices.length < dataset.columnIndices.length) {
-                arguments.cols = columnIndices;
+                args.cols = columnIndices;
             }
             if (rowIndices && rowIndices.length > 0 && rowIndices.length < dataset.rowIndices.length) {
-                arguments.rows = rowIndices;
+                args.rows = rowIndices;
             }
             //console.log(arguments);
-            var req = ocpu.call("kmeans", arguments, function(session) {
+            var req = ocpu.call("kmeans", args, function(session) {
                 session.getObject(function(success) {
                     var clusters = JSON.parse(success);
 
