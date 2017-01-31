@@ -1022,7 +1022,7 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 	}
 	return {pdata : pDataArray, participants : participantID, labels : labelDescription, rownames : rowNames};
 };
-morpheus.DatasetUtil.toESSession = function (dataset) {
+m/*orpheus.DatasetUtil.toESSession = function (dataset) {
 	console.log("morpheus.DatasetUtil.toESSession ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
 	if (dataset instanceof morpheus.SlicedDatasetView) {
 		console.log("morpheus.DatasetUtil.toESSession ::", "dataset in instanceof morpheus.SlicedDatasetView", "go deeper");
@@ -1087,28 +1087,30 @@ morpheus.DatasetUtil.toESSession = function (dataset) {
 	ProtoBuf.protoFromFile("./message.proto", function (error, success) {
 			if (error) {
 				alert(error);
+				console.log("ProtoBuilder ::", error);
 				return;
 			}
-			console.log("morpheus.DatasetUtil.toESSession ::", "protobuilder error", error);
-			console.log("morpheus.DatasetUtil.toESSession ::", "protobuilder success", success);
+			//console.log("morpheus.DatasetUtil.toESSession ::", "protobuilder error", error);
+			//console.log("morpheus.DatasetUtil.toESSession ::", "protobuilder success", success);
 			var builder = success,
 				rexp = builder.build("rexp"),
 				REXP = rexp.REXP;
 
 			var proto = new REXP(messageJSON);
 			var req = ocpu.call("createES", proto, function (session) {
-				console.log("morpheus.DatasetUtil.toESSession ::", "from successful request", session);
+				//console.log("morpheus.DatasetUtil.toESSession ::", "from successful request", session);
 				dataset.setESSession(session);
 			}, true);
 
 			req.fail(function () {
 				alert(req.responseText);
+				console.log("ExpressionSetCreation ::", "Request failed", req.responseText);
 			});
 		});
 
-	/*var blob = new Blob([new Uint8Array((new REXP(messageJSON)).toArrayBuffer())], {type: "application/octet-stream"});
-	saveAs(blob, "test1.bin");*/
-};
+	/!*var blob = new Blob([new Uint8Array((new REXP(messageJSON)).toArrayBuffer())], {type: "application/octet-stream"});
+	saveAs(blob, "test1.bin");*!/
+};*/
 
 
 morpheus.DatasetUtil.toESSessionPromise = function (options) {
@@ -1186,6 +1188,7 @@ morpheus.DatasetUtil.toESSessionPromise = function (options) {
 		ProtoBuf.protoFromFile("./message.proto", function (error, success) {
 			if (error) {
 				alert(error);
+				console.log("ExpressionSetCreation :: ", "ProtoBuilder failed", error);
 				return;
 			}
 			//console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder error", error);
