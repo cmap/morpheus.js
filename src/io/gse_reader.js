@@ -20,7 +20,7 @@ morpheus.GseReader.prototype = {
 
                 r.onload = function (e) {
                     var contents = e.target.result;
-                    ProtoBuf = dcodeIO.ProtoBuf;
+                    var ProtoBuf = dcodeIO.ProtoBuf;
                     ProtoBuf.protoFromFile("./message.proto", function (error, success) {
                         if (error) {
                             alert(error);

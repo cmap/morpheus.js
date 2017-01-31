@@ -1022,7 +1022,7 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 	}
 	return {pdata : pDataArray, participants : participantID, labels : labelDescription, rownames : rowNames};
 };
-m/*orpheus.DatasetUtil.toESSession = function (dataset) {
+/*morpheus.DatasetUtil.toESSession = function (dataset) {
 	console.log("morpheus.DatasetUtil.toESSession ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
 	if (dataset instanceof morpheus.SlicedDatasetView) {
 		console.log("morpheus.DatasetUtil.toESSession ::", "dataset in instanceof morpheus.SlicedDatasetView", "go deeper");
@@ -1184,7 +1184,7 @@ morpheus.DatasetUtil.toESSessionPromise = function (options) {
 				}]
 			}
 		};
-		ProtoBuf = dcodeIO.ProtoBuf;
+		var ProtoBuf = dcodeIO.ProtoBuf;
 		ProtoBuf.protoFromFile("./message.proto", function (error, success) {
 			if (error) {
 				alert(error);
