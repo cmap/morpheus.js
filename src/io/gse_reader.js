@@ -24,6 +24,7 @@ morpheus.GseReader.prototype = {
                     ProtoBuf.protoFromFile("./message.proto", function (error, success) {
                         if (error) {
                             alert(error);
+                            console.log("GSEReader ::", "ProtoBuilder failed", error);
                             return;
                         }
                         var builder = success,

@@ -65,7 +65,8 @@ morpheus.KmeansTool.prototype = {
             //console.log(project.getRowSelectionModel());
 
             if (!selectedColumns && !selectedRows) {
-                alert("So select some rows and/or columns")
+                alert("There are no rows and/or columns selected");
+                console.log("KMeans :: There are no rows and/or columns selected");
                 return;
             }
 
@@ -92,6 +93,7 @@ morpheus.KmeansTool.prototype = {
         var number = parseInt(options.input.number_of_clusters);
         if (isNaN(number)) {
             alert("Enter the expected number of clusters");
+            console.log("KMeans :: Enter the expected number of clusters");
             return;
         }
         var replacena = options.input.replace_NA_with;

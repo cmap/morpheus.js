@@ -435,6 +435,7 @@ morpheus.PcaPlotTool.prototype = {
             }
             if (columnIndices.length == 1) {
                 alert("Choose at least two columns");
+                console.log("PcaPlot :: Choose at least two columns");
                 return;
             }
 
@@ -529,6 +530,7 @@ morpheus.PcaPlotTool.prototype = {
                 }, false, "::es");
                 req.fail(function () {
                     alert(req.responseText);
+                    console.log("PcaPlot ::", req.responseText);
                 });
 
             });
@@ -536,6 +538,7 @@ morpheus.PcaPlotTool.prototype = {
 
             expressionSetPromise.catch(function (reason) {
                 alert("Problems occured during transforming dataset to ExpressionSet\n" + reason);
+                console.log("ExpressionSetCreation ::", "Problems occured during transforming dataset to ExpressionSet\n", reason);
             });
 
         });
