@@ -291,9 +291,8 @@ morpheus.HeatMapToolBar = function (controller) {
   filterModal.push('<h4 class="modal-title" id="' + filterLabelId
     + '">Filter</h4>');
   filterModal.push('</div>');
-  filterModal.push('<div class="modal-body">');
-  filterModal.push('');
-  filterModal.push('</div>');
+  filterModal.push('<div class="modal-body"></div>');
+  filterModal.push('<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>');
   filterModal.push('</div>');
   filterModal.push('</div>');
   filterModal.push('</div>');

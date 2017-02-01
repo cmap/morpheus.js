@@ -120,6 +120,8 @@ morpheus.HistogramLegend.prototype = {
     context.moveTo(0, y0);
     context.lineTo(canvasWidth, y0);
     context.stroke();
+    context.lineWidth = 1;
+    context.strokeStyle = 'white';
     for (var i = 0, numberOfBins = binNumberToOccurences.length; i < numberOfBins; i++) {
       var count = binNumberToOccurences[i];
       if (count > 0) {
@@ -129,7 +131,9 @@ morpheus.HistogramLegend.prototype = {
         var x = valueToPosition(start);
         var width = valueToPosition(end) - x;
         var y = countToPosition(count);
-        context.fillRect(x, y0, width, y - y0);
+        context.rect(x, y0, width, y - y0);
+        context.fill();
+        context.stroke();
       }
     }
 
