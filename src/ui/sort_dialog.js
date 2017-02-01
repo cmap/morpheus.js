@@ -138,7 +138,7 @@ morpheus.SortDialog.prototype = {
     // group by
     html.push('<div class="row">');
     html
-    .push('<form name="groupByForm" class="form-horizontal" role="form">');
+    .push('<form class="form-horizontal" role="form">');
     html.push('<div class="col-xs-2"><label>Group by</label></div>');
     html.push('<div class="col-xs-4">');
     var groupByKeys = (isColumns ? project.getGroupColumns() : project
@@ -146,7 +146,7 @@ morpheus.SortDialog.prototype = {
       return key.field;
     });
 
-    html.push('<select multiple name="groupBy" class="form-control">');
+    html.push('<select multiple name="groupBy" class="selectpicker form-control">');
     _.each(fields, function (field) {
       html.push('<option value="' + field + '"');
       if (_.indexOf(groupByKeys, field) !== -1) {
@@ -157,9 +157,15 @@ morpheus.SortDialog.prototype = {
       html.push('</option>');
     });
     html.push('</select>');
-    html.push('</form>');
     html.push('</div>');
-    return $(html.join(''));
+    html.push('</div>');
+    var $div = $(html.join(''));
+    $div.find('.selectpicker').selectpicker({
+      iconBase: 'fa',
+      tickIcon: 'fa-check',
+      style: 'btn-default btn-sm'
+    });
+    return $div;
   },
   createLevel0: function (html) {
     html
