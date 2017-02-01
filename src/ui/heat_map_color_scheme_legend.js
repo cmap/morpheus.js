@@ -1,11 +1,10 @@
 morpheus.HeatMapColorSchemeLegend = function (controller, $keyContent) {
   var colorScheme = controller.heatmap.getColorScheme();
-
-  var tracks = colorScheme.getColorByValues();
+  var colorByValues = colorScheme.getColorByValues();
   var totalHeight;
   $keyContent.empty();
-  var ntracks = tracks.length;
-  tracks
+  var ntracks = colorByValues.length;
+  colorByValues
   .forEach(function (value) {
     if (value != null || ntracks === 1) {
       if (value != 'null') { // values are stored as string
@@ -15,7 +14,7 @@ morpheus.HeatMapColorSchemeLegend = function (controller, $keyContent) {
         $keyContent.append($label);
         totalHeight += $label.height();
       }
-      var trackLegend = new morpheus.HeatMapColorSchemeLegendTrack(
+      var trackLegend = new morpheus.ColorSupplierLegend(
         colorScheme, value);
       $(trackLegend.canvas).css('position', '');
       trackLegend.repaint();
@@ -53,72 +52,12 @@ morpheus.HeatMapColorSchemeLegend = function (controller, $keyContent) {
   });
 };
 
-morpheus.HeatMapColorSchemeLegendTrack = function (colorScheme, value) {
-  morpheus.AbstractCanvas.call(this, false);
-  var _this = this;
-  this.value = value;
-  this.colorScheme = colorScheme;
-  colorScheme.setCurrentValue(value);
-  var hiddenValues = colorScheme.getHiddenValues();
-
-  var names = colorScheme.getNames();
-  var hasNames = names != null;
-  var legendHeight = hasNames ? names.length * 14 : 30;
-  var bounds = {
-    width: 250,
-    height: legendHeight
-  };
-  this.hasNames = hasNames;
-  this.setBounds(bounds);
-  if (hasNames && hiddenValues) {
-    $(this.canvas)
-    .on(
-      'click',
-      function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var clickedRow = Math
-        .floor((e.clientY - _this.canvas
-          .getBoundingClientRect().top) / 14);
-        var fractionToValue = d3.scale.linear().domain(
-          [0, 1]).range(
-          [colorScheme.getMin(),
-            colorScheme.getMax()]).clamp(true);
-        var fractions = colorScheme.getFractions();
-        var value = fractionToValue(fractions[clickedRow]);
-        if (!hiddenValues.has(value)) {
-          hiddenValues.add(value);
-        } else {
-          hiddenValues.remove(value);
-
-        }
-        _this.trigger('selectionChanged');
-        _this.repaint();
-      });
-  }
-};
-
-morpheus.HeatMapColorSchemeLegendTrack.prototype = {
-  draw: function (clip, context) {
-    var colorScheme = this.colorScheme;
-    colorScheme.setCurrentValue(this.value);
-    context.fillStyle = 'white';
-    context.fillRect(0, 0, this.getUnscaledWidth(), this
-    .getUnscaledHeight());
-    context.translate(this.hasNames ? 14
-      : (this.getUnscaledWidth() - 200) / 2, 0);
-    morpheus.HeatMapColorSchemeLegend.drawColorScheme(context, colorScheme,
-      200);
-
-  }
-
-};
-
-morpheus.Util.extend(morpheus.HeatMapColorSchemeLegendTrack,
-  morpheus.AbstractCanvas);
-morpheus.Util.extend(morpheus.HeatMapColorSchemeLegendTrack, morpheus.Events);
 morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
-                                                              colorScheme, width, printing, hideText) {
+                                                              colorScheme, width, printing, hideText, legendHeight) {
+  if (!legendHeight) {
+    legendHeight = 12;
+  }
+  context.font = '11px ' + morpheus.CanvasUtil.FONT_NAME;
   var names = colorScheme.getNames();
   var hasNames = names != null;
   // if hasNames that we draw vertically to ensure space for names
@@ -127,10 +66,10 @@ morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
       colorScheme, colorScheme.getHiddenValues(), printing);
   } else {
     morpheus.HeatMapColorSchemeLegend.draw(context, colorScheme
-      .getFractions(), colorScheme.getColors(), width, 12,
+      .getFractions(), colorScheme.getColors(), width, legendHeight,
       colorScheme.isStepped());
     context.strokeStyle = 'LightGrey';
-    context.strokeRect(0, 0, width, 12);
+    context.strokeRect(0, 0, width, legendHeight);
     if (hideText) {
       return;
     }
@@ -141,10 +80,10 @@ morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
     context.textAlign = 'center';
     context.textBaseline = 'top';
     context.fillStyle = 'black';
-    context.font = '12px ' + morpheus.CanvasUtil.FONT_NAME;
+
     if (colorScheme.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE) {
       context.fillText('row min', 0, 14);
-      context.fillText('row max', width, 14);
+      context.fillText('row max', width, legendHeight + 2);
     } else {
       var fractions = colorScheme.getFractions();
       var lastTextPixEnd = -1;
@@ -162,7 +101,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
         }
         var textWidth = context.measureText(text).width;
         if (pix > lastTextPixEnd) {
-          context.fillText(text, pix, 14);
+          context.fillText(text, pix, legendHeight + 2);
         }
         lastTextPixEnd = pix + textWidth / 2;
       }
@@ -180,8 +119,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
         var textWidth = context.measureText(text).width;
         var textPixEnd = pix + textWidth / 2;
         if (pix < lastTextPixStart) {
-
-          context.fillText(text, pix, 14);
+          context.fillText(text, pix, legendHeight + 2);
           lastTextPixStart = pix - textWidth / 2;
         }
       }
@@ -249,4 +187,72 @@ morpheus.HeatMapColorSchemeLegend.draw = function (context, fractions, colors,
     }
   }
 };
-morpheus.HeatMapColorSchemeLegend.prototype = {};
+
+morpheus.ColorSupplierLegend = function (colorScheme, value) {
+  morpheus.AbstractCanvas.call(this, false);
+  var _this = this;
+  this.value = value;
+  this.colorScheme = colorScheme;
+  colorScheme.setCurrentValue(value);
+  var hiddenValues = colorScheme.getHiddenValues();
+
+  var names = colorScheme.getNames();
+  var hasNames = names != null;
+  var legendHeight = hasNames ? names.length * 14 : 30;
+  var bounds = {
+    width: 250,
+    height: legendHeight
+  };
+  this.hasNames = hasNames;
+  this.setBounds(bounds);
+  if (hasNames && hiddenValues) {
+    $(this.canvas)
+    .on(
+      'click',
+      function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var clickedRow = Math
+        .floor((e.clientY - _this.canvas
+          .getBoundingClientRect().top) / 14);
+        var fractionToValue = d3.scale.linear().domain(
+          [0, 1]).range(
+          [colorScheme.getMin(),
+            colorScheme.getMax()]).clamp(true);
+        var fractions = colorScheme.getFractions();
+        var value = fractionToValue(fractions[clickedRow]);
+        if (!hiddenValues.has(value)) {
+          hiddenValues.add(value);
+        } else {
+          hiddenValues.remove(value);
+
+        }
+        _this.trigger('selectionChanged');
+        _this.repaint();
+      });
+  }
+};
+
+morpheus.ColorSupplierLegend.prototype = {
+  draw: function (clip, context) {
+    var colorScheme = this.colorScheme;
+    colorScheme.setCurrentValue(this.value);
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, this.getUnscaledWidth(), this
+    .getUnscaledHeight());
+    context.translate(this.hasNames ? 14
+      : (this.getUnscaledWidth() - 200) / 2, 0);
+    morpheus.HeatMapColorSchemeLegend.drawColorScheme(context, colorScheme,
+      200);
+
+  }
+
+};
+morpheus.Util.extend(morpheus.ColorSupplierLegend, morpheus.Events);
+morpheus.Util.extend(morpheus.ColorSupplierLegend,
+  morpheus.AbstractCanvas);
+
+
+
+
+

@@ -467,9 +467,9 @@ morpheus.AbstractDendrogram.prototype = {
       var settings = {
         discrete: true,
         discreteAutoDetermined: true,
-        renderMethod: {}
+        render: {}
       };
-      settings.renderMethod[morpheus.VectorTrack.RENDER.COLOR] = true;
+      settings.render[morpheus.VectorTrack.RENDER.COLOR] = true;
       this.controller.addTrack(clusterIdVector.getName(),
         this.type === morpheus.AbstractDendrogram.Type.COLUMN,
         settings);

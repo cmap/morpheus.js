@@ -188,6 +188,10 @@ morpheus.SortByValuesKey = function (modelIndices, sortOrder, isColumnSort) {
 
 };
 morpheus.SortByValuesKey.prototype = {
+  seriesIndex: 0,
+  setSeriesIndex: function (index) {
+    this.seriesIndex = index;
+  },
   isColumns: function () {
     return this.isColumnSort;
   },
@@ -197,6 +201,9 @@ morpheus.SortByValuesKey.prototype = {
   init: function (dataset, visibleModelIndices) {
     // isColumnSort-sort columns by selected rows
     // dataset is transposed if !isColumnSort
+    if (this.seriesIndex !== 0) {
+      dataset = new morpheus.DatasetSeriesView(dataset, [this.seriesIndex]);
+    }
     this.dataset = morpheus.DatasetUtil.slicedView(dataset, null,
       this.modelIndices);
     this.rowView = new morpheus.DatasetRowView(this.dataset);
@@ -302,6 +309,7 @@ morpheus.SortByValuesKey.prototype = {
  *            shown.
  * @param name
  *            This sort key name
+ * @param columns Whether column sort
  */
 morpheus.SpecifiedModelSortOrder = function (modelIndices, nvisible, name, columns) {
   this.nvisible = nvisible;

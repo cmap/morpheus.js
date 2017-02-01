@@ -99,7 +99,7 @@ morpheus.VectorTrack = function (project, name, positions, isColumns, heatmap) {
     discreteAutoDetermined: false,
     colorBarSize: 12,
     stackedBar: false,
-    renderMethod: {},
+    render: {},
     selectionColor: 'rgb(182,213,253)',
     colorByField: null, // color this vector by another vector
     barColor: '#bdbdbd',
@@ -160,14 +160,14 @@ morpheus.VectorTrack.prototype = {
   settingFromConfig: function (conf) {
     var settings = this.settings;
     if (_.isString(conf)) {
-      settings.renderMethod = {};
+      settings.render = {};
       var tokens = conf.split(',');
       for (var i = 0, length = tokens.length; i < length; i++) {
         var method = $.trim(tokens[i]);
         method = method.toUpperCase();
         var mapped = morpheus.VectorTrack.RENDER[method];
         if (mapped !== undefined) {
-          settings.renderMethod[mapped] = true;
+          settings.render[mapped] = true;
         } else if (method === 'DISCRETE') {
           settings.discrete = true;
           settings.discreteAutoDetermined = true;
@@ -178,7 +178,7 @@ morpheus.VectorTrack.prototype = {
           settings.highlightMatchingValues = true;
         } else if (method === 'STACKED_BAR') {
           settings.stackedBar = true;
-          settings.renderMethod[morpheus.VectorTrack.RENDER.BAR] = true;
+          settings.render[morpheus.VectorTrack.RENDER.BAR] = true;
         } else if (method === 'TOOLTIP') {
           settings.inlineTooltip = true;
         } else {
@@ -186,17 +186,17 @@ morpheus.VectorTrack.prototype = {
         }
       }
     } else if (_.isNumber(conf)) {
-      settings.renderMethod = {};
-      settings.renderMethod[conf] = true;
+      settings.render = {};
+      settings.render[conf] = true;
     } else if (_.isObject(conf)) {
       conf.maxTextWidth = undefined;
       this.settings = $.extend({}, this.settings, conf);
-      if (conf.renderMethod) {
-        for (var method in conf.renderMethod) {
+      if (conf.render) {
+        for (var method in conf.render) {
           method = method.toUpperCase();
           var mapped = morpheus.VectorTrack.RENDER[method];
           if (mapped !== undefined) {
-            this.settings.renderMethod[mapped] = true;
+            this.settings.render[mapped] = true;
           }
         }
 
@@ -215,7 +215,7 @@ morpheus.VectorTrack.prototype = {
     return this.settings.tooltip;
   },
   isRenderAs: function (value) {
-    return this.settings.renderMethod[value];
+    return this.settings.render[value];
   },
   dispose: function () {
     morpheus.AbstractCanvas.prototype.dispose.call(this);
@@ -289,7 +289,7 @@ morpheus.VectorTrack.prototype = {
       width += 100;
     }
     // 2 pixel spacing between display types
-    var nkeys = _.keys(this.settings.renderMethod).length;
+    var nkeys = _.keys(this.settings.render).length;
 
     if (nkeys > 0) {
       width += (nkeys - 1) * 2;
@@ -1784,9 +1784,9 @@ morpheus.VectorTrack.prototype = {
           }
           var show = !_this.isRenderAs(item);
           if (!show) {
-            delete _this.settings.renderMethod[item];
+            delete _this.settings.render[item];
           } else {
-            _this.settings.renderMethod[item] = true;
+            _this.settings.render[item] = true;
           }
           _this._update();
           heatmap.revalidate();

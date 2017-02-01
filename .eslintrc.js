@@ -15,15 +15,17 @@ module.exports = {
     "no-unused-vars": 0
   },
   "globals": {
-    "Papa": true,
+    "Math": true,
+    "isNaN": true,
+    "saveAs": true,
     "global": true,
-    "streamSaver": true,
+    "define": true,
+    "module": true,
+    "Papa": true,
+    "ga": true,
     "tsnejs": true,
     "JSApplet": true,
     "Dropbox": true,
-    "module": true,
-    "define": true,
-    "ga": true,
     "morpheus": true,
     "_": true,
     "d3": true,
@@ -34,7 +36,6 @@ module.exports = {
     "canvg": true,
     "Clipboard": true,
     "Newick": true,
-    "saveAs": true,
     "Slick": true,
     "C2S": true
   }

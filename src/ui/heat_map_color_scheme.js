@@ -500,19 +500,6 @@ morpheus.HeatMapColorScheme.prototype = {
     }
     this.cachedRowStats = new morpheus.RowStats(dataset);
   },
-  /**
-   * @private
-   */
-  _ensureColorSupplierExists: function () {
-    this.currentColorSupplier = this.rowValueToColorSupplier[this.value];
-    if (this.currentColorSupplier === undefined) {
-      var cs = morpheus.HeatMapColorScheme.createColorSupplier({
-        type: 'relative'
-      });
-      this.rowValueToColorSupplier[this.value] = cs;
-      this.currentColorSupplier = cs;
-    }
-  },
   setColorSupplierForCurrentValue: function (colorSupplier) {
     this.rowValueToColorSupplier[this.value] = colorSupplier;
     this.currentColorSupplier = colorSupplier;
@@ -544,6 +531,19 @@ morpheus.HeatMapColorScheme.prototype = {
       val = (val - this.cachedRowStats.rowCachedMean) / this.cachedRowStats.rowCachedStandardDeviation;
     }
     return this.currentColorSupplier.getColor(row, column, val);
+  },
+  /**
+   * @private
+   */
+  _ensureColorSupplierExists: function () {
+    this.currentColorSupplier = this.rowValueToColorSupplier[this.value];
+    if (this.currentColorSupplier === undefined) {
+      var cs = morpheus.HeatMapColorScheme.createColorSupplier({
+        type: 'relative'
+      });
+      this.rowValueToColorSupplier[this.value] = cs;
+      this.currentColorSupplier = cs;
+    }
   }
 };
 morpheus.RowStats = function (dataset) {

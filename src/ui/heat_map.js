@@ -303,6 +303,7 @@ morpheus.HeatMap = function (options) {
     }
     this.tabManager = this.options.parent.tabManager;
   }
+  ;
   this.$content = $('<div></div>');
   this.$content.css({
     'width': '100%',
@@ -753,15 +754,11 @@ morpheus.HeatMap.isDendrogramVisible = function (project, isColumns) {
 
 morpheus.HeatMap.prototype = {
   gapSize: 10,
-  // total width of row dendrogram + heat map + row metadata + scroll
-  totalWidth: 0,
+
   updatingScroll: false,
 
-  getParent: function () {
-    return this.$parent;
-  },
-  getTotalWidth: function () {
-    return this.totalWidth;
+  getWhitespaceEl: function () {
+    return this.$whitespace;
   },
   autoDisplay: function (options) {
     if (options.filename == null) {
@@ -1309,6 +1306,8 @@ morpheus.HeatMap.prototype = {
         invalidateColumns: true
       });
     });
+    this.$whitespace = $('<div style="position: absolute;"></div>');
+    this.$whitespace.appendTo(this.$parent);
     var heatmap = new morpheus.HeatMapElementCanvas(this.project);
     if (this.options.drawCallback) {
       heatmap.setDrawCallback(this.options.drawCallback);
@@ -1700,9 +1699,12 @@ morpheus.HeatMap.prototype = {
     setInitialDisplay(false, this.options.rows);
     setInitialDisplay(true, this.options.columns);
     function reorderTracks(array, isColumns) {
+      if (array == null || array.length <= 1) {
+        return;
+      }
       var nameOrderPairs = [];
       var found = false;
-      _.each(array, function (item) {
+      array.forEach(function (item) {
         var name = item.renameTo || item.field;
         var order = 999;
         if (item.order != null) {
@@ -1714,20 +1716,29 @@ morpheus.HeatMap.prototype = {
           order: order
         });
       });
-      if (found) {
-        nameOrderPairs.sort(function (a, b) {
-          return (a.order === b.order ? 0 : (a.order < b.order ? -1
-              : 1));
+      if (!found) {
+        array.forEach(function (item, index) {
+          var name = item.renameTo || item.field;
+          nameOrderPairs.push({
+            name: name,
+            order: index
+          });
         });
-        for (var i = 0, counter = 0; i < nameOrderPairs.length; i++) {
-          var index = _this.getTrackIndex(nameOrderPairs[i].name,
-            isColumns);
-          if (index !== -1) {
-            _this.moveTrack(index, counter, isColumns);
-            counter++;
-          }
+      }
+
+      nameOrderPairs.sort(function (a, b) {
+        return (a.order === b.order ? 0 : (a.order < b.order ? -1
+            : 1));
+      });
+      for (var i = 0, counter = 0; i < nameOrderPairs.length; i++) {
+        var index = _this.getTrackIndex(nameOrderPairs[i].name,
+          isColumns);
+        if (index !== -1) {
+          _this.moveTrack(index, counter, isColumns);
+          counter++;
         }
       }
+
     }
 
     reorderTracks(this.options.rows, false);
@@ -3647,6 +3658,7 @@ morpheus.HeatMap.prototype = {
     }
     // (this.$el.parent().outerWidth() - 30);
     // return this.$el.width() - 30;
+
     return this.tabManager.getWidth() - 30;
   }
   ,
@@ -3758,6 +3770,8 @@ morpheus.HeatMap.prototype = {
         ypos += size.height;
       }
     }
+    this.$whitespace[0].style.left = Math.ceil(xpos + heatMapWidth + 10) + 'px';
+    this.$whitespace[0].style.top = '0px';
     ypos += morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
     var heatMapHeight = heatmapPrefSize.height;
     if (heatMapHeight > (availableHeight - ypos)) {
@@ -3888,10 +3902,16 @@ morpheus.HeatMap.prototype = {
         invalidateColumns: true
       });
     }
-    this.totalWidth = Math.ceil(xpos);
+
     this.$parent.css({
       height: Math.ceil(totalHeight) + 'px'
     });
+    //
+    // if (this.options.setWidth) {
+    //   this.$parent.css({
+    //     width: Math.ceil(xpos + 2) + 'px'
+    //   });
+    // }
 
     this.updatingScroll = false;
     this.trigger('change', {
