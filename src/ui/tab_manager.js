@@ -35,7 +35,9 @@ morpheus.TabManager = function (options) {
       okCallback: function () {
         var name = $.trim(builder.getValue('name'));
         if (name !== '') {
-          _this.activeTabObject.setName(name);
+          if (_this.activeTabObject != null) {
+            _this.activeTabObject.setName(name);
+          }
           $a.contents().first().replaceWith(name + '&nbsp;');
         }
       }
@@ -274,7 +276,7 @@ morpheus.TabManager.prototype = {
 
     }
 
-    if (obj.onRemove) {
+    if (obj != null && obj.onRemove) {
       obj.onRemove();
     }
     this.trigger('remove', {
