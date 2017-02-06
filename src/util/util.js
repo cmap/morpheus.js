@@ -1630,3 +1630,51 @@ morpheus.Util.NotPredicate.prototype = {
     return 'NotPredicate ' + this.p;
   }
 };
+
+
+morpheus.Util.getFieldNames = function(rexp) {
+    var strValues = rexp.attrValue[0].stringValue;
+    var res = [];
+    strValues.forEach(function (v) {
+        res.push(v.strval);
+    });
+    return res;
+};
+morpheus.Util.getRexpData = function(rexp, rclass) {
+    var names = morpheus.Util.getFieldNames(rexp);
+    var data = {};
+    for (var i = 0; i < names.length; i++) {
+        var rexpV = rexp.rexpValue[i];
+        data[names[i]] = {};
+        if (rexpV.attrName.length > 0 && rexpV.attrName[0] == 'dim') {
+            data[names[i]].dim = rexpV.attrValue[0].intValue;
+        }
+        if (rexpV.rclass == rclass.INTEGER) {
+            if (rexpV.attrName.length > 0 && rexpV.attrName[0] == 'levels') {
+                data[names[i]].values = [];
+                rexpV.attrValue[0].stringValue.forEach(function(v) {
+                    data[names[i]].values.push(v.strval);
+                })
+            }
+            else {
+                data[names[i]].values = rexpV.intValue;
+            }
+        }
+        else if (rexpV.rclass == rclass.REAL) {
+            data[names[i]].values = rexpV.realValue;
+        }
+        else if (rexpV.rclass == rclass.STRING) {
+            data[names[i]].values = [];
+            rexpV.stringValue.forEach(function(v) {
+                data[names[i]].values.push(v.strval);
+            });
+        }
+    }
+    return data;
+};
+
+morpheus.Util.getFilePath = function(session, str) {
+  var splitted = str.split("/");
+  var fileName = splitted[splitted.length - 1].substring(0, splitted[splitted.length - 1].length - 2);
+  return session.getLoc() + "files/" + fileName;
+};

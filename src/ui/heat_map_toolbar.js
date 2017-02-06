@@ -210,7 +210,14 @@ morpheus.HeatMapToolBar = function (controller) {
         tool: new morpheus.SimilarityMatrixTool()
     }, {
         tool: new morpheus.TransposeTool()
-    }, {tool: new morpheus.TsneTool()}, null, {tool: new morpheus.DevAPI()}];
+    }, {
+        tool: new morpheus.TsneTool()
+    }, {
+        tool: new morpheus.KmeansTool()
+    }, {
+        tool: new morpheus.LimmaTool()
+    },
+        null, {tool: new morpheus.DevAPI()}];
     this.getToolByName = function (name) {
         for (var i = 0; i < tools.length; i++) {
             if (tools[i] && tools[i].tool.toString
