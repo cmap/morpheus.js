@@ -12,12 +12,8 @@ morpheus.GseReader.prototype = {
             session.getObject(function (success) {
                 //console.log('morpheus.GseReader.prototype.read ::', success);
                 var r = new FileReader();
-                success = success.split("/");
-                var fileName = success[success.length - 1].substring(0, success[success.length - 1].length - 2);
-                var filePath = session.getLoc() + "files/" + fileName;
+                var filePath = morpheus.Util.getFilePath(session, success);
                 //console.log('morpheus.GseReader.prototype.read ::', filePath);
-
-
                 r.onload = function (e) {
                     var contents = e.target.result;
                     var ProtoBuf = dcodeIO.ProtoBuf;
@@ -29,17 +25,24 @@ morpheus.GseReader.prototype = {
                         }
                         var builder = success,
                             rexp = builder.build("rexp"),
-                            REXP = rexp.REXP;
+                            REXP = rexp.REXP,
+                            rclass = REXP.RClass;
+
 
                         var res = REXP.decode(contents);
-                        var flatData = res.rexpValue[0].realValue;
-                        var nrowData = res.rexpValue[0].attrValue[0].intValue[0];
-                        var ncolData = res.rexpValue[0].attrValue[0].intValue[1];
-                        var flatPdata = res.rexpValue[1].stringValue;
-                        var participants = res.rexpValue[2].stringValue;
-                        var annotation = res.rexpValue[3].stringValue;
-                        var id = res.rexpValue[4].stringValue;
-                        var metaNames = res.rexpValue[5].stringValue;
+
+                        var jsondata = morpheus.Util.getRexpData(res, rclass);
+
+                        console.log(res, jsondata);
+
+                        var flatData = jsondata.data.values;
+                        var nrowData = jsondata.data.dim[0];
+                        var ncolData = jsondata.data.dim[1];
+                        var flatPdata = jsondata.pdata.values;
+                        var participants = jsondata.participants.values;
+                        var annotation = jsondata.symbol.values;
+                        var id = jsondata.rownames.values;
+                        var metaNames = jsondata.colMetaNames.values;
                         var matrix = [];
                         for (var i = 0; i < nrowData; i++) {
                             var curArray = new Float32Array(ncolData);
@@ -64,21 +67,21 @@ morpheus.GseReader.prototype = {
                         console.log("morpheus.GseReader.prototype.read ::", dataset);*/
                         var columnsIds = dataset.getColumnMetadata().add('id');
                         for (var i = 0; i < ncolData; i++) {
-                            columnsIds.setValue(i, morpheus.Util.copyString(participants[i].strval));
+                            columnsIds.setValue(i, morpheus.Util.copyString(participants[i]));
                         }
                         //console.log(flatPdata);
                         for (var i = 0; i < metaNames.length; i++) {
-                            var curVec = dataset.getColumnMetadata().add(metaNames[i].strval);
+                            var curVec = dataset.getColumnMetadata().add(metaNames[i]);
                             for (var j = 0; j < ncolData; j++) {
-                                curVec.setValue(j, flatPdata[j + i * ncolData].strval);
+                                curVec.setValue(j, flatPdata[j + i * ncolData]);
                             }
                         }
 
                         var rowIds = dataset.getRowMetadata().add('id');
                         var rowSymbol = dataset.getRowMetadata().add('symbol');
                         for (var i = 0; i < nrowData; i++) {
-                            rowIds.setValue(i, id[i].strval);
-                            rowSymbol.setValue(i, annotation[i].strval);
+                            rowIds.setValue(i, id[i]);
+                            rowSymbol.setValue(i, annotation[i]);
                         }
                         morpheus.MetadataUtil.maybeConvertStrings(dataset.getRowMetadata(), 1);
                         morpheus.MetadataUtil.maybeConvertStrings(dataset.getColumnMetadata(),

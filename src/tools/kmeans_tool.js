@@ -55,9 +55,9 @@ morpheus.KmeansTool.prototype = {
         }
 
         /*if (fullDataset instanceof morpheus.SlicedDatasetView) {
-            columnIndices = fullDataset.columnIndices;
-            rowIndices = fullDataset.rowIndices;
-        }*/
+         columnIndices = fullDataset.columnIndices;
+         rowIndices = fullDataset.rowIndices;
+         }*/
         if (options.input.use_selected_rows_and_columns_only) {
             var selectedColumns = project.getColumnSelectionModel().getViewIndices().values();
             var selectedRows = project.getRowSelectionModel().getViewIndices().values();
@@ -78,15 +78,15 @@ morpheus.KmeansTool.prototype = {
             for (ind in selectedRows) {
                 rowIndices.push(dataset.rowIndices[ind]);
             }/*
-            if (fullDataset instanceof morpheus.Dataset ||
-                fullDataset instanceof morpheus.SlicedDatasetView && !((!selectedDataset.columnIndices) && (!selectedDataset.rowIndices))) {
-                columnIndices = selectedDataset.columnIndices;
-                rowIndices = selectedDataset.rowIndices;
-            }
-            else {
-                columnIndices = fullDataset.columnIndices;
-                rowIndices = fullDataset.rowIndices;
-            }*/
+             if (fullDataset instanceof morpheus.Dataset ||
+             fullDataset instanceof morpheus.SlicedDatasetView && !((!selectedDataset.columnIndices) && (!selectedDataset.rowIndices))) {
+             columnIndices = selectedDataset.columnIndices;
+             rowIndices = selectedDataset.rowIndices;
+             }
+             else {
+             columnIndices = fullDataset.columnIndices;
+             rowIndices = fullDataset.rowIndices;
+             }*/
         }
         //console.log(columnIndices, rowIndices);
         //console.log(project.getRowSelectionModel());
@@ -125,8 +125,8 @@ morpheus.KmeansTool.prototype = {
                     }
                     //console.log(dataset.getRowMetadata().getByName("clusters"));
                     /*while (v instanceof morpheus.VectorAdapter || v instanceof morpheus.SlicedVector) {
-                        v = v.v
-                    }*/
+                     v = v.v
+                     }*/
                     //console.log(v);
                     //v.setArray(clusters);
                     v.getProperties().set("morpheus.dataType", "string");
