@@ -23,10 +23,19 @@ morpheus.HeatMapTooltipProvider = function (heatMap, rowIndex, columnIndex, opti
     }
   }
   if (rowIndex !== -1 && columnIndex !== -1) {
-    for (var i = 0, nseries = dataset.getSeriesCount(); i < nseries; i++) {
-      morpheus.HeatMapTooltipProvider._matrixValueToString(dataset,
-        rowIndex, columnIndex, i, tipText, separator,
-        options.showSeriesNameInTooltip || i > 0);
+
+    if (options.tooltipSeriesIndices) {
+      for (var i = 0, nseries = options.tooltipSeriesIndices.length; i < nseries; i++) {
+        morpheus.HeatMapTooltipProvider._matrixValueToString(dataset,
+          rowIndex, columnIndex, options.tooltipSeriesIndices[i], tipText, separator,
+          options.showSeriesNameInTooltip || i > 0);
+      }
+    } else {
+      for (var i = 0, nseries = dataset.getSeriesCount(); i < nseries; i++) {
+        morpheus.HeatMapTooltipProvider._matrixValueToString(dataset,
+          rowIndex, columnIndex, i, tipText, separator,
+          options.showSeriesNameInTooltip || i > 0);
+      }
     }
     if (quick) {
       var quickRowTracks = heatMap.rowTracks.filter(function (t) {

@@ -2384,6 +2384,9 @@ morpheus.HeatMap.prototype = {
     if (this.options.showSeriesNameInTooltip) {
       options.showSeriesNameInTooltip = true;
     }
+    if (this.options.tooltipSeriesIndices) {
+      options.tooltipSeriesIndices = this.options.tooltipSeriesIndices;
+    }
     if (options.heatMapLens) {
       // don't draw lens if currently visible
       // row lens

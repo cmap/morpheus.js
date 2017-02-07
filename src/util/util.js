@@ -607,24 +607,25 @@ morpheus.Util.autosuggest = function (options) {
 
   // use html for label instead of default text, class for categories vs. items
   var instance = options.$el.autocomplete('instance');
-  instance._renderItem = function (ul, item) {
-    if (item.value == null) { // category
-      return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-category">')
+  if (instance != null) {
+    instance._renderItem = function (ul, item) {
+      if (item.value == null) { // category
+        return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-category">')
+        .append($('<div>').html(item.label))
+        .appendTo(ul);
+      }
+      return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-item">')
       .append($('<div>').html(item.label))
       .appendTo(ul);
-    }
-    return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-item">')
-    .append($('<div>').html(item.label))
-    .appendTo(ul);
-  };
-  instance._normalize = function (items) {
-    return items;
-  };
-  instance._resizeMenu = function () {
-    var ul = this.menu.element;
-    ul.outerWidth(instance.element.outerWidth());
-  };
-
+    };
+    instance._normalize = function (items) {
+      return items;
+    };
+    instance._resizeMenu = function () {
+      var ul = this.menu.element;
+      ul.outerWidth(instance.element.outerWidth());
+    };
+  }
   var menu = options.$el.autocomplete('widget');
   menu.menu('option', 'items', '> :not(.search-category)');
   if (menu) {

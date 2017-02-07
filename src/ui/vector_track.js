@@ -1169,7 +1169,7 @@ morpheus.VectorTrack.prototype = {
               .getValue(index)));
             });
           event.clipboardData.setData('text/plain', text
-          .join('\t'));
+          .join('\n'));
         } else if (item === FIELDS) {
           var visibleFieldIndices = _this
           .getFullVector()
