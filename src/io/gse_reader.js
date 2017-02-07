@@ -1,12 +1,8 @@
-/**
- * Created by dzenkova on 12/8/16.
- */
 morpheus.GseReader = function (options) {
     this.type = options.type;
 };
 morpheus.GseReader.prototype = {
     read: function (name, callback) {
-        var _this = this;
         var req = ocpu.call('loadGSE', {name : name, type : this.type}, function (session) {
             //console.log('morpheus.GseReader.prototype.read ::', session);
             session.getObject(function (success) {
@@ -32,8 +28,6 @@ morpheus.GseReader.prototype = {
                         var res = REXP.decode(contents);
 
                         var jsondata = morpheus.Util.getRexpData(res, rclass);
-
-                        console.log(res, jsondata);
 
                         var flatData = jsondata.data.values;
                         var nrowData = jsondata.data.dim[0];
@@ -107,8 +101,4 @@ morpheus.GseReader.prototype = {
     _parse : function (text) {
 
     }
-};
-
-morpheus.GseReader.nonFlatArray = function (flatArray, nrow, ncol) {
-
 };
