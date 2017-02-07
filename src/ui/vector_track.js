@@ -1170,6 +1170,8 @@ morpheus.VectorTrack.prototype = {
             });
           event.clipboardData.setData('text/plain', text
           .join('\n'));
+          event.clipboardData.setData('text/html', text
+          .join('<br />'));
         } else if (item === FIELDS) {
           var visibleFieldIndices = _this
           .getFullVector()
