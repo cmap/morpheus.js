@@ -188,10 +188,6 @@ morpheus.SortByValuesKey = function (modelIndices, sortOrder, isColumnSort) {
 
 };
 morpheus.SortByValuesKey.prototype = {
-  seriesIndex: 0,
-  setSeriesIndex: function (index) {
-    this.seriesIndex = index;
-  },
   isColumns: function () {
     return this.isColumnSort;
   },
@@ -201,9 +197,6 @@ morpheus.SortByValuesKey.prototype = {
   init: function (dataset, visibleModelIndices) {
     // isColumnSort-sort columns by selected rows
     // dataset is transposed if !isColumnSort
-    if (this.seriesIndex !== 0) {
-      dataset = new morpheus.DatasetSeriesView(dataset, [this.seriesIndex]);
-    }
     this.dataset = morpheus.DatasetUtil.slicedView(dataset, null,
       this.modelIndices);
     this.rowView = new morpheus.DatasetRowView(this.dataset);
@@ -213,7 +206,6 @@ morpheus.SortByValuesKey.prototype = {
       };
     if (this.sortOrder === morpheus.SortKey.SortOrder.TOP_N) {
       var pairs = [];
-
       var missingIndices = [];
       for (var i = 0, nrows = visibleModelIndices.length; i < nrows; i++) {
         var index = visibleModelIndices[i];
@@ -317,6 +309,7 @@ morpheus.SpecifiedModelSortOrder = function (modelIndices, nvisible, name, colum
   for (var i = 0, length = modelIndices.length; i < length; i++) {
     modelIndexToValue[modelIndices[i]] = i;
   }
+  this.modelIndices = modelIndices;
   this.modelIndexToValue = modelIndexToValue;
   this.name = name;
   this.c = morpheus.SortKey.ASCENDING_COMPARATOR;

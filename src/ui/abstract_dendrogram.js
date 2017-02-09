@@ -7,6 +7,7 @@
 morpheus.AbstractDendrogram = function (controller, tree, positions, project,
                                         type) {
   morpheus.AbstractCanvas.call(this, true);
+
   this._overviewHighlightColor = '#d8b365';
   this._searchHighlightColor = '#e41a1c';
   this._selectedNodeColor = type === morpheus.AbstractDendrogram.Type.COLUMN ? '#377eb8'
@@ -123,34 +124,66 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
           function (menuItem, item) {
             if (item === 'Flip') {
               if (selectedNode != null) {
-                var sortKeyIndex = -1;
                 var isColumns = morpheus.AbstractDendrogram.Type.COLUMN === _this.type;
-                var sortKeys = isColumns ? _this.controller.getProject().getColumnSortKeys() : _this.controller.getProject().getRowSortKeys();
-                for (var i = 0; i < sortKeys.length; i++) {
-                  if (sortKeys[i].getName() === 'dendrogram') {
-                    sortKeyIndex = i;
-                    break;
-                  }
-                }
-                selectedNode.children.reverse();
                 var min = selectedNode.minIndex;
                 var max = selectedNode.maxIndex;
-                var modelIndexToValue = sortKeys[sortKeyIndex].modelIndexToValue;
-                var values = [];
-                for (var i = min; i <= max; i++) {
-                  var modelIndex = isColumns ? project.convertViewColumnIndexToModel(i) : project.convertViewRowIndexToModel(i);
-                  values.push(modelIndexToValue[modelIndex]);
-                }
-                for (var i = min, j = values.length - 1; i <= max; i++, j--) {
-                  var modelIndex = isColumns ? project.convertViewColumnIndexToModel(i) : project.convertViewRowIndexToModel(i);
-                  modelIndexToValue[modelIndex] = values[j];
+
+                // morpheus.DendrogramUtil.dfs(selectedNode, function (n) {
+                //   if (n.children) {
+                //     n.children.reverse();
+                //   }
+                //   return true;
+                // });
+
+                var leafNodes = tree.leafNodes;
+                for (var i = min, index = max; i <= max; i++, index--) {
+                  var n = leafNodes[i];
+                  n.index = index;
+                  n.maxIndex = index;
+                  n.minIndex = index;
                 }
 
-                morpheus.DendrogramUtil.setIndices(_this.tree.rootNode);
+                leafNodes.sort(function (a, b) {
+                  return (a.index < b.index ? -1 : 1);
+                });
+                var setIndex = function (n) {
+                  if (n.children != null && n.children.length > 0) {
+                    for (var i = 0; i < n.children.length; i++) {
+                      setIndex(n.children[i]);
+                    }
+                    var sum = 0;
+                    for (var i = 0; i < n.children.length; i++) {
+                      sum += n.children[i].index;
+                    }
+                    n.index = sum / n.children.length;
+                    var maxIndex = -Number.MAX_VALUE;
+                    var minIndex = Number.MAX_VALUE;
+                    for (var i = 0; i < n.children.length; i++) {
+                      maxIndex = Math.max(maxIndex, n.children[i].maxIndex);
+                      minIndex = Math.min(minIndex, n.children[i].minIndex);
+                    }
+                    n.minIndex = minIndex;
+                    n.maxIndex = maxIndex;
+                  }
+                };
+
+                setIndex(selectedNode);
+
+                var currentOrder = [];
+                var count = isColumns ? controller.getProject().getSortedFilteredDataset().getColumnCount() : controller.getProject().getSortedFilteredDataset().getRowCount();
+                for (var i = 0; i < count; i++) {
+                  currentOrder.push(isColumns ? project.convertViewColumnIndexToModel(i) : project.convertViewRowIndexToModel(i));
+                }
+                for (var i = min, j = max; i < j; i++, j--) {
+                  var tmp = currentOrder[j];
+                  currentOrder[j] = currentOrder[i];
+                  currentOrder[i] = tmp;
+                }
+                var key = new morpheus.SpecifiedModelSortOrder(currentOrder, currentOrder.length, 'dendrogram', isColumns);
                 if (isColumns) {
-                  controller.getProject().setColumnSortKeys(sortKeys, true);
+                  controller.getProject().setColumnSortKeys([key], true);
                 } else {
-                  controller.getProject().setRowSortKeys(sortKeys, true);
+                  controller.getProject().setRowSortKeys([key], true);
                 }
                 controller.revalidate();
               }
@@ -550,6 +583,7 @@ morpheus.AbstractDendrogram.prototype = {
       });
     }
     catch (x) {
+      // break of out dfs
     }
     return hit;
   },

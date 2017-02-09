@@ -1028,14 +1028,14 @@ morpheus.HeatMap.prototype = {
    *            An object with maxHeight, a rootNode, leafNodes, and
    *            nLeafNodes
    */
-  setDendrogram: function (tree, isColumns, viewIndices) {
+  setDendrogram: function (tree, isColumns, modelOrder) {
     var dendrogram = isColumns ? this.columnDendrogram : this.rowDendrogram;
     if (dendrogram) {
       dendrogram.dispose();
       dendrogram = null;
     }
     if (tree != null) {
-      var modelIndices = [];
+
       var modelIndexSet = new morpheus.Set();
       var size = isColumns ? this.project.getFullDataset()
         .getColumnCount() : this.project.getFullDataset()
@@ -1043,20 +1043,15 @@ morpheus.HeatMap.prototype = {
       for (var i = 0; i < size; i++) {
         modelIndexSet.add(i);
       }
-      for (var i = 0, length = viewIndices.length; i < length; i++) {
-        var modelIndex = isColumns ? this.project
-          .convertViewColumnIndexToModel(viewIndices[i])
-          : this.project
-          .convertViewRowIndexToModel(viewIndices[i]);
-        modelIndices.push(modelIndex);
-        modelIndexSet.remove(modelIndex);
+      for (var i = 0, nindices = modelOrder.length; i < nindices; i++) {
+        modelIndexSet.remove(modelOrder[i]);
       }
-      var nvisible = modelIndices.length;
+      var nvisible = modelOrder.length;
       // add model indices that weren't visible when clustering
       if (modelIndexSet.size() > 0) {
         var indices = modelIndexSet.values();
         for (var i = 0, length = indices.length; i < length; i++) {
-          modelIndices.push(indices[i]);
+          modelOrder.push(indices[i]);
         }
       }
       if (isColumns) {
@@ -1066,7 +1061,7 @@ morpheus.HeatMap.prototype = {
         .shallowClone();
         this.columnDendrogram = dendrogram;
         this.project.setColumnSortKeys(
-          [new morpheus.SpecifiedModelSortOrder(modelIndices,
+          [new morpheus.SpecifiedModelSortOrder(modelOrder,
             nvisible, 'dendrogram')], true);
       } else {
         dendrogram = new morpheus.RowDendrogram(this, tree,
@@ -1074,7 +1069,7 @@ morpheus.HeatMap.prototype = {
         dendrogram.filter = this.project.getRowFilter().shallowClone();
         this.rowDendrogram = dendrogram;
         this.project.setRowSortKeys(
-          [new morpheus.SpecifiedModelSortOrder(modelIndices,
+          [new morpheus.SpecifiedModelSortOrder(modelOrder,
             nvisible, 'dendrogram')], true);
       }
       dendrogram.appendTo(this.$parent);

@@ -171,13 +171,35 @@ morpheus.HClusterTool.prototype = {
     options.input.selectedColumnsToUseForClusteringRows = selectedColumnsToUseForClusteringRows;
     var dataset = project.getSortedFilteredDataset();
     options.input.background = options.input.background || typeof Worker !== 'undefined';
+    var rowModelOrder;
+    var columnModelOrder;
+    if (rows) {
+      rowModelOrder = [];
+      for (var i = 0; i < dataset.getRowCount(); i++) {
+        rowModelOrder[i] = project.convertViewRowIndexToModel(i);
+      }
+    }
+    if (columns) {
+      columnModelOrder = [];
+      for (var i = 0; i < dataset.getColumnCount(); i++) {
+        columnModelOrder[i] = project.convertViewColumnIndexToModel(i);
+      }
+    }
     if (options.input.background === false) {
       var result = morpheus.HClusterTool.execute(dataset, options.input);
       if (result.rowsHcl) {
+        var modelOrder = [];
+        for (var i = 0; i < result.rowsHcl.reorderedIndices.length; i++) {
+          modelOrder[i] = rowModelOrder[result.rowsHcl.reorderedIndices[i]];
+        }
         controller.setDendrogram(result.rowsHcl.tree, false,
           result.rowsHcl.reorderedIndices);
       }
       if (result.columnsHcl) {
+        var modelOrder = [];
+        for (var i = 0; i < result.columnsHcl.reorderedIndices.length; i++) {
+          modelOrder[i] = columnModelOrder[result.columnsHcl.reorderedIndices[i]];
+        }
         controller.setDendrogram(result.columnsHcl.tree, true,
           result.columnsHcl.reorderedIndices);
       }
@@ -214,12 +236,20 @@ morpheus.HClusterTool.prototype = {
       worker.onmessage = function (e) {
         var result = e.data;
         if (result.rowsHcl) {
+          var modelOrder = [];
+          for (var i = 0; i < result.rowsHcl.reorderedIndices.length; i++) {
+            modelOrder[i] = rowModelOrder[result.rowsHcl.reorderedIndices[i]];
+          }
           controller.setDendrogram(result.rowsHcl.tree, false,
-            result.rowsHcl.reorderedIndices);
+            modelOrder);
         }
         if (result.columnsHcl) {
+          var modelOrder = [];
+          for (var i = 0; i < result.columnsHcl.reorderedIndices.length; i++) {
+            modelOrder[i] = columnModelOrder[result.columnsHcl.reorderedIndices[i]];
+          }
           controller.setDendrogram(result.columnsHcl.tree, true,
-            result.columnsHcl.reorderedIndices);
+            modelOrder);
         }
         worker.terminate();
         window.URL.revokeObjectURL(url);
