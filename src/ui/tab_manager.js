@@ -90,11 +90,11 @@ morpheus.TabManager = function (options) {
       return;
     }
     // triggered when clicking tab
-    var previous = _this.activeTabObject;
+    var previous = _this.activeTabId;
     _this.activeTabId = $(e.target).data('link');
     _this.activeTabObject = _this.idToTabObject.get(_this.activeTabId);
     _this.trigger('change', {
-      tab: _this.activeTabObject,
+      tab: _this.activeTabId,
       previous: previous
     });
   });
@@ -294,17 +294,20 @@ morpheus.TabManager.prototype = {
     return this.options;
   },
   setActiveTab: function (id) {
-    if (id === this.activeTabId) {
+    if (id !== this.activeTabId) {
+      var $a = this.$nav.find('[data-link=' + id + ']');
+      // make sure it's enabled
+      $a.parent().removeClass('disabled');
+      $a.removeClass('btn disabled');
+      $a.tab('show');
+      var previous = this.activeTabId;
+      this.activeTabId = id;
+      this.activeTabObject = this.idToTabObject.get(this.activeTabId);
       this.trigger('change', {
-        tab: this.activeTabObject,
-        previous: null
+        tab: this.activeTabId,
+        previous: previous
       });
     }
-    var $a = this.$nav.find('[data-link=' + id + ']');
-    // make sure it's enabled
-    $a.parent().removeClass('disabled');
-    $a.removeClass('btn disabled');
-    $a.tab('show');
 
   },
   /**
@@ -327,6 +330,9 @@ morpheus.TabManager.prototype = {
       $a.addClass('btn disabled');
     }
 
+  },
+  getIdToTabObject: function () {
+    return this.idToTabObject;
   },
   getTabObject: function (id) {
     return this.idToTabObject.get(id);
