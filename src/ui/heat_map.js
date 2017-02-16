@@ -741,22 +741,19 @@ morpheus.HeatMap.isDendrogramVisible = function (project, isColumns) {
   var sortKeys = isColumns ? project.getColumnSortKeys() : project
     .getRowSortKeys();
   // var filter = isColumns ? this.project.getColumnFilter()
-  // : this.project.getRowFilter();
+  //   : this.project.getRowFilter();
+  // // FIXME compare filters
   var size = isColumns ? project.getSortedFilteredDataset().getColumnCount()
     : project.getSortedFilteredDataset().getRowCount();
+  return sortKeys.length === 1 && sortKeys[0] instanceof morpheus.SpecifiedModelSortOrder
+    && sortKeys[0].name === 'dendrogram'
+    && sortKeys[0].nvisible === size;
 
-  if (sortKeys.length === 1) {
-    return sortKeys[0] instanceof morpheus.SpecifiedModelSortOrder
-      && sortKeys[0].name === 'dendrogram'
-      && sortKeys[0].nvisible === size;
-  }
 };
 
 morpheus.HeatMap.prototype = {
   gapSize: 10,
-
   updatingScroll: false,
-
   getWhitespaceEl: function () {
     return this.$whitespace;
   },
@@ -1036,24 +1033,24 @@ morpheus.HeatMap.prototype = {
     }
     if (tree != null) {
 
-      var modelIndexSet = new morpheus.Set();
+      //  var modelIndexSet = new morpheus.Set();
       var size = isColumns ? this.project.getFullDataset()
         .getColumnCount() : this.project.getFullDataset()
         .getRowCount();
-      for (var i = 0; i < size; i++) {
-        modelIndexSet.add(i);
-      }
-      for (var i = 0, nindices = modelOrder.length; i < nindices; i++) {
-        modelIndexSet.remove(modelOrder[i]);
-      }
+      // for (var i = 0; i < size; i++) {
+      //   modelIndexSet.add(i);
+      // }
+      // for (var i = 0, nindices = modelOrder.length; i < nindices; i++) {
+      //   modelIndexSet.remove(modelOrder[i]);
+      // }
       var nvisible = modelOrder.length;
       // add model indices that weren't visible when clustering
-      if (modelIndexSet.size() > 0) {
-        var indices = modelIndexSet.values();
-        for (var i = 0, length = indices.length; i < length; i++) {
-          modelOrder.push(indices[i]);
-        }
-      }
+      // if (modelIndexSet.size() > 0) {
+      //   var indices = modelIndexSet.values();
+      //   for (var i = 0, length = indices.length; i < length; i++) {
+      //     modelOrder.push(indices[i]);
+      //   }
+      // }
       if (isColumns) {
         dendrogram = new morpheus.ColumnDendrogram(this, tree,
           this.heatmap.getColumnPositions(), this.project);

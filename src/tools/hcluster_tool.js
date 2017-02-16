@@ -148,9 +148,8 @@ morpheus.HClusterTool.prototype = {
     }];
   },
   execute: function (options) {
-
     var project = options.project;
-    var controller = options.controller;
+    var heatmap = options.controller;
     var selectedRowsToUseForClusteringColumns = options.input.cluster_columns_in_space_of_selected_rows_only ? project
       .getRowSelectionModel().getViewIndices().values()
       : null;
@@ -192,7 +191,7 @@ morpheus.HClusterTool.prototype = {
         for (var i = 0; i < result.rowsHcl.reorderedIndices.length; i++) {
           modelOrder[i] = rowModelOrder[result.rowsHcl.reorderedIndices[i]];
         }
-        controller.setDendrogram(result.rowsHcl.tree, false,
+        heatmap.setDendrogram(result.rowsHcl.tree, false,
           result.rowsHcl.reorderedIndices);
       }
       if (result.columnsHcl) {
@@ -200,7 +199,7 @@ morpheus.HClusterTool.prototype = {
         for (var i = 0; i < result.columnsHcl.reorderedIndices.length; i++) {
           modelOrder[i] = columnModelOrder[result.columnsHcl.reorderedIndices[i]];
         }
-        controller.setDendrogram(result.columnsHcl.tree, true,
+        heatmap.setDendrogram(result.columnsHcl.tree, true,
           result.columnsHcl.reorderedIndices);
       }
     } else {
@@ -240,7 +239,7 @@ morpheus.HClusterTool.prototype = {
           for (var i = 0; i < result.rowsHcl.reorderedIndices.length; i++) {
             modelOrder[i] = rowModelOrder[result.rowsHcl.reorderedIndices[i]];
           }
-          controller.setDendrogram(result.rowsHcl.tree, false,
+          heatmap.setDendrogram(result.rowsHcl.tree, false,
             modelOrder);
         }
         if (result.columnsHcl) {
@@ -248,7 +247,7 @@ morpheus.HClusterTool.prototype = {
           for (var i = 0; i < result.columnsHcl.reorderedIndices.length; i++) {
             modelOrder[i] = columnModelOrder[result.columnsHcl.reorderedIndices[i]];
           }
-          controller.setDendrogram(result.columnsHcl.tree, true,
+          heatmap.setDendrogram(result.columnsHcl.tree, true,
             modelOrder);
         }
         worker.terminate();
