@@ -202,7 +202,7 @@ morpheus.Project.prototype = {
         columns = null;
       }
     }
-    return morpheus.DatasetUtil.slicedView(dataset, rows, columns);
+    return rows == null && columns == null ? dataset : new morpheus.SlicedDatasetView(dataset, rows, columns);
   },
   _saveSelection: function (isColumns) {
     this.elementSelectionModel.save();
