@@ -9,6 +9,9 @@ morpheus.GctWriter12.prototype = {
   toString: function (value) {
     return morpheus.Util.toString(value);
   },
+  getExtension: function () {
+    return 'gct';
+  },
   write: function (dataset, pw) {
     if (pw == null) {
       pw = [];
