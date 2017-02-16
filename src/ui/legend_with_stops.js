@@ -34,11 +34,12 @@ morpheus.LegendWithStops = function () {
       var position = morpheus.CanvasUtil.getMousePos(
         event.target, event);
       if (event.tapCount > 1) {
-        var fraction = that.fractionToStopPix
-        .invert(position.x);
-        that.trigger('added', {
-          fraction: fraction
-        });
+        // don't add on double-click
+        // var fraction = that.fractionToStopPix
+        // .invert(position.x);
+        // that.trigger('added', {
+        //   fraction: fraction
+        // });
       } else {
         that.selectedIndex = that
         .findIndexForPosition(position);
