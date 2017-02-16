@@ -32,10 +32,10 @@ morpheus.HeatMapColorScheme.Predefined.SUMMLY = function () {
       value: -100,
       color: '#0000ff'
     }, {
-      value: -98,
+      value: -95,
       color: '#ffffff'
     }, {
-      value: 98,
+      value: 95,
       color: '#ffffff'
     }, {
       value: 100,
@@ -51,16 +51,16 @@ morpheus.HeatMapColorScheme.Predefined.SUMMLY2 = function () {
       value: -100,
       color: '#0000ff'
     }, {
-      value: -98,
+      value: -95,
       color: '#abdda4'
     }, {
-      value: -95,
+      value: -90,
+      color: '#ffffff'
+    }, {
+      value: 90,
       color: '#ffffff'
     }, {
       value: 95,
-      color: '#ffffff'
-    }, {
-      value: 98,
       color: '#fdae61'
     }, {
       value: 100,
