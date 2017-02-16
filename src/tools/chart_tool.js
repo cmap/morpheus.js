@@ -247,7 +247,7 @@ morpheus.ChartTool = function (chartOptions) {
   formBuilder.$form.on('change', 'select,input[type=range]', function (e) {
     if ($(this).attr('name') === 'tooltip') {
       var tooltipVal = _this.formBuilder.getValue('tooltip');
-      _this.tooltip = [];
+      _this.tooltip.length = 0; // clear array
       if (tooltipVal != null) {
         tooltipVal.forEach(function (tip) {
           _this.tooltip.push(morpheus.ChartTool.getVectorInfo(tip));
@@ -305,12 +305,25 @@ morpheus.ChartTool = function (chartOptions) {
   this.draw();
 };
 
+morpheus.ChartTool.getPlotlyDefaults2 = function () {
+  var plotly = morpheus.ChartTool.getPlotlyDefaults();
+  plotly.layout.width = 600;
+  plotly.layout.height = 600;
+  plotly.layout.margin = {
+    l: 40,
+    r: 10,
+    t: 10,
+    b: 40
+  };
+  delete plotly.config.displayModeBar;
+  return plotly;
+};
 morpheus.ChartTool.getPlotlyDefaults = function () {
   var layout = {
     hovermode: 'closest',
     autosize: true,
-    paper_bgcolor: 'rgb(255,255,255)',
-    plot_bgcolor: 'rgb(229,229,229)',
+    // paper_bgcolor: 'rgb(255,255,255)',
+    // plot_bgcolor: 'rgb(229,229,229)',
     showlegend: false,
     margin: {
       l: 80,
@@ -324,9 +337,9 @@ morpheus.ChartTool.getPlotlyDefaults = function () {
       titlefont: {
         size: 12
       },
-      gridcolor: 'rgb(255,255,255)',
+      // gridcolor: 'rgb(255,255,255)',
       showgrid: true,
-      showline: false,
+      showline: true,
       showticklabels: true,
       tickcolor: 'rgb(127,127,127)',
       ticks: 'outside'
@@ -336,21 +349,39 @@ morpheus.ChartTool.getPlotlyDefaults = function () {
       titlefont: {
         size: 12
       },
-      gridcolor: 'rgb(255,255,255)',
+      // gridcolor: 'rgb(255,255,255)',
       showgrid: true,
-      showline: false,
+      showline: true,
       showticklabels: true,
       tickcolor: 'rgb(127,127,127)',
       ticks: 'outside'
     }
   };
+
+  // var toImage = {
+  //   name: 'toImage',
+  //   title: 'Download plot as a svg',
+  //   icon: Icons.camera,
+  //   click: function (gd) {
+  //     var format = 'svg';
+  //     Lib.notifier('Taking snapshot - this may take a few seconds', 'long');
+  //     downloadImage(gd, {'format': format})
+  //     .then(function (filename) {
+  //       Lib.notifier('Snapshot succeeded - ' + filename, 'long');
+  //     })
+  //     .catch(function () {
+  //       Lib.notifier('Sorry there was a problem downloading your snapshot!', 'long');
+  //     });
+  //   }
+  // };
   var config = {
+    modeBarButtonsToAdd: [],
     showLink: false,
     displayModeBar: true, // always show modebar
     displaylogo: false,
     staticPlot: false,
     showHints: true,
-    modeBarButtonsToRemove: ['sendDataToCloud', 'zoomIn2d', 'zoomOut2d', 'hoverCompareCartesian', 'hoverClosestCartesian']
+    modeBarButtonsToRemove: ['zoomIn2d', 'zoomOut2d', 'hoverCompareCartesian', 'hoverClosestCartesian']
   };
   return {
     layout: layout,
@@ -367,6 +398,21 @@ morpheus.ChartTool.getVectorInfo = function (value) {
   };
 };
 morpheus.ChartTool.prototype = {
+  _addListeners: function (div) {
+    var _this = this;
+    div.on('plotly_beforeexport', function () {
+
+    });
+
+    div.on('plotly_afterexport', function () {
+      var data = div.data; // convert text to string
+      for (var i = 0; i < data.length; i++) {
+        var text = data[i].text;
+        data[i].text = data[i]._text;
+      }
+    });
+
+  },
   annotate: function (options) {
     var _this = this;
     var formBuilder = new morpheus.FormBuilder();
@@ -465,7 +511,6 @@ morpheus.ChartTool.prototype = {
     var colorModel = options.colorModel;
     var sizeByVector = options.sizeByVector;
     var sizeFunction = options.sizeFunction;
-
     var heatmap = this.heatmap;
     var myPlot = options.myPlot;
     var isColumnChart = options.isColumnChart;
@@ -475,7 +520,6 @@ morpheus.ChartTool.prototype = {
     var text = [];
     var color = colorByVector ? [] : '#1f78b4';
     var size = sizeByVector ? [] : 6;
-
     var array = [];
     for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
       y.push(dataset.getValue(options.rowIndexOne, j));
@@ -496,6 +540,7 @@ morpheus.ChartTool.prototype = {
       var obj = {
         j: j
       };
+
       obj.toString = function () {
         var s = [];
         for (var tipIndex = 0; tipIndex < _this.tooltip.length; tipIndex++) {
@@ -516,6 +561,8 @@ morpheus.ChartTool.prototype = {
     var trace = {
       x: x,
       y: y,
+      _tooltip: this.tooltip,
+      _dataset: dataset,
       marker: {
         color: color,
         size: size,
@@ -527,45 +574,8 @@ morpheus.ChartTool.prototype = {
     };
     var selection = null;
     var _this = this;
-    var config = $
-    .extend(
-      true,
-      {},
-      options.config,
-      {
-        modeBarButtonsToAdd: [[{
-          name: 'annotate',
-          title: 'Annotate Selection',
-          attr: 'dragmode',
-          val: 'annotate',
-          icon: {
-            'width': 1792,
-            'path': 'M491 1536l91-91-235-235-91 91v107h128v128h107zm523-928q0-22-22-22-10 0-17 7l-542 542q-7 7-7 17 0 22 22 22 10 0 17-7l542-542q7-7 7-17zm-54-192l416 416-832 832h-416v-416zm683 96q0 53-37 90l-166 166-416-416 166-165q36-38 90-38 53 0 91 38l235 234q37 39 37 91z',
-            'ascent': 1792,
-            'descent': 0
-          },
-          click: function () {
-            if (!selection) {
-              morpheus.FormBuilder
-              .showInModal({
-                title: 'Annotate Selection',
-                html: 'Please select points in the chart',
-                close: 'Close'
-              });
-            } else {
-              _this.annotate({
-                array: array,
-                eventData: selection,
-                dataset: dataset
-              });
-            }
-          }
-        }]]
-      });
-    morpheus.ChartTool.newPlot(myPlot, [trace], options.layout, config);
-    myPlot.on('plotly_selected', function (eventData) {
-      selection = eventData;
-    });
+    morpheus.ChartTool.newPlot(myPlot, [trace], options.layout, options.config);
+    this._addListeners(myPlot);
 
   },
   _createProfile: function (options) {
@@ -651,47 +661,47 @@ morpheus.ChartTool.prototype = {
     options.layout.xaxis.ticktext = ticktext;
     options.layout.xaxis.tickmode = 'array';
 
-    var config = $
-    .extend(
-      true,
-      {},
-      options.config,
-      {
-        modeBarButtonsToAdd: [[{
-          name: 'annotate',
-          title: 'Annotate Selection',
-          attr: 'dragmode',
-          val: 'annotate',
-          icon: {
-            'width': 1792,
-            'path': 'M491 1536l91-91-235-235-91 91v107h128v128h107zm523-928q0-22-22-22-10 0-17 7l-542 542q-7 7-7 17 0 22 22 22 10 0 17-7l542-542q7-7 7-17zm-54-192l416 416-832 832h-416v-416zm683 96q0 53-37 90l-166 166-416-416 166-165q36-38 90-38 53 0 91 38l235 234q37 39 37 91z',
-            'ascent': 1792,
-            'descent': 0
-          },
-          click: function () {
-            if (!selection) {
-              morpheus.FormBuilder
-              .showInModal({
-                title: 'Annotate Selection',
-                html: 'Please select points in the chart',
-                close: 'Close'
-              });
-            } else {
-              _this.annotate({
-                eventData: selection,
-                dataset: dataset
-              });
-            }
-          }
-        }]]
-      });
+    // var config = $
+    // .extend(
+    //   true,
+    //   {},
+    //   options.config,
+    //   {
+    //     modeBarButtonsToAdd: [[{
+    //       name: 'annotate',
+    //       title: 'Annotate Selection',
+    //       attr: 'dragmode',
+    //       val: 'annotate',
+    //       icon: {
+    //         'width': 1792,
+    //         'path': 'M491 1536l91-91-235-235-91 91v107h128v128h107zm523-928q0-22-22-22-10 0-17 7l-542 542q-7 7-7 17 0 22 22 22 10 0 17-7l542-542q7-7 7-17zm-54-192l416 416-832 832h-416v-416zm683 96q0 53-37 90l-166 166-416-416 166-165q36-38 90-38 53 0 91 38l235 234q37 39 37 91z',
+    //         'ascent': 1792,
+    //         'descent': 0
+    //       },
+    //       click: function () {
+    //         if (!selection) {
+    //           morpheus.FormBuilder
+    //           .showInModal({
+    //             title: 'Annotate Selection',
+    //             html: 'Please select points in the chart',
+    //             close: 'Close'
+    //           });
+    //         } else {
+    //           _this.annotate({
+    //             eventData: selection,
+    //             dataset: dataset
+    //           });
+    //         }
+    //       }
+    //     }]]
+    //   });
     var $parent = $(myPlot).parent();
     options.layout.width = $parent.width();
     options.layout.height = this.$dialog.height() - 30;
-    morpheus.ChartTool.newPlot(myPlot, traces, options.layout, config);
-    myPlot.on('plotly_selected', function (eventData) {
-      selection = eventData;
-    });
+    morpheus.ChartTool.newPlot(myPlot, traces, options.layout, options.config);
+    // myPlot.on('plotly_selected', function (eventData) {
+    //   selection = eventData;
+    // });
 
     function resize() {
       var width = $parent.width();
@@ -782,6 +792,7 @@ morpheus.ChartTool.prototype = {
     // });
   },
   _createBoxPlot: function (options) {
+    var _this = this;
     var array = options.array; // array of items
     var points = options.points;
     var isHorizontal = options.horizontal;
@@ -867,53 +878,53 @@ morpheus.ChartTool.prototype = {
       trace[valuesField] = y;
       traces.push(trace);
     }
-    var selection = null;
-    var _this = this;
-    var config = $
-    .extend(
-      true,
-      {},
-      options.config,
-      {
-        modeBarButtonsToAdd: [[{
-          name: 'annotate',
-          title: 'Annotate Selection',
-          attr: 'dragmode',
-          val: 'annotate',
-          icon: {
-            'width': 1792,
-            'path': 'M491 1536l91-91-235-235-91 91v107h128v128h107zm523-928q0-22-22-22-10 0-17 7l-542 542q-7 7-7 17 0 22 22 22 10 0 17-7l542-542q7-7 7-17zm-54-192l416 416-832 832h-416v-416zm683 96q0 53-37 90l-166 166-416-416 166-165q36-38 90-38 53 0 91 38l235 234q37 39 37 91z',
-            'ascent': 1792,
-            'descent': 0
-          },
-          click: function () {
-            if (!selection) {
-              morpheus.FormBuilder
-              .showInModal({
-                title: 'Annotate Selection',
-                html: 'Please select points in the chart',
-                close: 'Close'
-              });
-            } else {
-              _this.annotate({
-                array: array,
-                eventData: selection,
-                dataset: dataset
-              });
-            }
-          }
-        }]]
-      });
+    // var selection = null;
+    // var _this = this;
+    // var config = $
+    // .extend(
+    //   true,
+    //   {},
+    //   options.config,
+    //   {
+    //     modeBarButtonsToAdd: [[{
+    //       name: 'annotate',
+    //       title: 'Annotate Selection',
+    //       attr: 'dragmode',
+    //       val: 'annotate',
+    //       icon: {
+    //         'width': 1792,
+    //         'path': 'M491 1536l91-91-235-235-91 91v107h128v128h107zm523-928q0-22-22-22-10 0-17 7l-542 542q-7 7-7 17 0 22 22 22 10 0 17-7l542-542q7-7 7-17zm-54-192l416 416-832 832h-416v-416zm683 96q0 53-37 90l-166 166-416-416 166-165q36-38 90-38 53 0 91 38l235 234q37 39 37 91z',
+    //         'ascent': 1792,
+    //         'descent': 0
+    //       },
+    //       click: function () {
+    //         if (!selection) {
+    //           morpheus.FormBuilder
+    //           .showInModal({
+    //             title: 'Annotate Selection',
+    //             html: 'Please select points in the chart',
+    //             close: 'Close'
+    //           });
+    //         } else {
+    //           _this.annotate({
+    //             array: array,
+    //             eventData: selection,
+    //             dataset: dataset
+    //           });
+    //         }
+    //       }
+    //     }]]
+    //   });
 
-    morpheus.ChartTool.newPlot(myPlot, traces, options.layout, config);
+    morpheus.ChartTool.newPlot(myPlot, traces, options.layout, options.config);
     var $span = $('<div' +
       ' style="display:none;position:absolute;font-size:10px;left:2px;top:4px;">#' +
       ' points:' + morpheus.Util.intFormat(array.length) + '</div>');
 
     $span.appendTo($(myPlot));
-    myPlot.on('plotly_selected', function (eventData) {
-      selection = eventData;
-    });
+    // myPlot.on('plotly_selected', function (eventData) {
+    //   selection = eventData;
+    // });
     myPlot.on('plotly_hover', function (eventData) {
       if (eventData.points && eventData.points.length > 0 && eventData.points[0].curveNumber === 0) {
         $span.show();
