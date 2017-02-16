@@ -90,6 +90,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
       // draw from left to middle and then from right to middle to avoid
       // text overlap
       var halfway = parseInt(fractions.length / 2);
+
       for (var i = 0; i < halfway; i++) {
         var pix = map(fractions[i]);
         var text = '';
@@ -118,7 +119,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
 
         var textWidth = context.measureText(text).width;
         var textPixEnd = pix + textWidth / 2;
-        if (pix < lastTextPixStart) {
+        if (textPixEnd < lastTextPixStart) {
           context.fillText(text, pix, legendHeight + 2);
           lastTextPixStart = pix - textWidth / 2;
         }
