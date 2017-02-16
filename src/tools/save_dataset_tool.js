@@ -33,11 +33,14 @@ morpheus.SaveDatasetTool.prototype = {
           value: '1.3'
         }],
         value: '1.3',
-        required: true
       }, {
         name: 'series',
         type: 'select',
         options: [],
+        required: true
+      }, {
+        name: 'save_selection_only',
+        type: 'checkbox',
         required: true
       }];
   },
@@ -47,7 +50,14 @@ morpheus.SaveDatasetTool.prototype = {
     var fileName = options.input.file_name;
     var series = options.input.series;
     var controller = options.controller;
-    var dataset = project.getSortedFilteredDataset();
+    var dataset = options.input.save_selection_only ? project.getSelectedDataset() : project.getSortedFilteredDataset();
+    var writer;
+    if (format === '1.2') {
+      writer = new morpheus.GctWriter12();
+    } else if (format === '1.3') {
+      writer = new morpheus.GctWriter();
+    }
+
     if (series != null) {
       var seriesIndex = morpheus.DatasetUtil.getSeriesIndex(dataset, series);
       if (seriesIndex === -1) {
@@ -55,11 +65,10 @@ morpheus.SaveDatasetTool.prototype = {
       }
       dataset = seriesIndex === 0 ? dataset : new morpheus.DatasetSeriesView(dataset, [seriesIndex]);
     }
-    if (!morpheus.Util.endsWith(fileName.toLowerCase(), '.gct')) {
-      fileName += '.gct';
+    var ext = writer.getExtension ? writer.getExtension() : '';
+    if (ext !== '' && !morpheus.Util.endsWith(fileName.toLowerCase(), '.' + ext)) {
+      fileName += '.' + ext;
     }
-    var writer = (format === '1.2') ? new morpheus.GctWriter12()
-      : new morpheus.GctWriter();
 
     var blobs = [];
     var textArray = [];
