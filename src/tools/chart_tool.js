@@ -312,8 +312,9 @@ morpheus.ChartTool.getPlotlyDefaults2 = function () {
   plotly.layout.margin = {
     l: 40,
     r: 10,
-    t: 10,
-    b: 40
+    t: 40,
+    b: 40,
+    pad: 0
   };
   delete plotly.config.displayModeBar;
   return plotly;
@@ -332,6 +333,9 @@ morpheus.ChartTool.getPlotlyDefaults = function () {
       b: 14,
       autoexpand: true
     },
+    titlefont: {
+      size: 12
+    },
     xaxis: {
       zeroline: false,
       titlefont: {
@@ -339,7 +343,7 @@ morpheus.ChartTool.getPlotlyDefaults = function () {
       },
       // gridcolor: 'rgb(255,255,255)',
       showgrid: true,
-      showline: true,
+      //   showline: true,
       showticklabels: true,
       tickcolor: 'rgb(127,127,127)',
       ticks: 'outside'
@@ -351,7 +355,7 @@ morpheus.ChartTool.getPlotlyDefaults = function () {
       },
       // gridcolor: 'rgb(255,255,255)',
       showgrid: true,
-      showline: true,
+      //   showline: true,
       showticklabels: true,
       tickcolor: 'rgb(127,127,127)',
       ticks: 'outside'
@@ -381,7 +385,7 @@ morpheus.ChartTool.getPlotlyDefaults = function () {
     displaylogo: false,
     staticPlot: false,
     showHints: true,
-    modeBarButtonsToRemove: ['zoomIn2d', 'zoomOut2d', 'hoverCompareCartesian', 'hoverClosestCartesian']
+    modeBarButtonsToRemove: ['sendDataToCloud', 'zoomIn2d', 'zoomOut2d', 'hoverCompareCartesian', 'hoverClosestCartesian']
   };
   return {
     layout: layout,
