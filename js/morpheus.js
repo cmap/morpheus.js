@@ -1059,6 +1059,10 @@ morpheus.Util.arrayToString = function (value, sep) {
 };
 morpheus.Util.removeTrailingZerosInFraction = function (str) {
   var index = str.lastIndexOf('.');
+  var eIndex = str.lastIndexOf('e');
+  if (eIndex !== -1) {
+    return str;
+  }
   if (index !== -1) {
     var len = str.length;
     var zeros = len;
@@ -3327,15 +3331,11 @@ morpheus.GmtReader.prototype = {
   }
 };
 
-/**
- * Created by dzenkova on 12/8/16.
- */
 morpheus.GseReader = function (options) {
     this.type = options.type;
 };
 morpheus.GseReader.prototype = {
     read: function (name, callback) {
-        var _this = this;
         var req = ocpu.call('loadGSE', {name : name, type : this.type}, function (session) {
             //console.log('morpheus.GseReader.prototype.read ::', session);
             session.getObject(function (success) {
@@ -3361,8 +3361,6 @@ morpheus.GseReader.prototype = {
                         var res = REXP.decode(contents);
 
                         var jsondata = morpheus.Util.getRexpData(res, rclass);
-
-                        console.log(res, jsondata);
 
                         var flatData = jsondata.data.values;
                         var nrowData = jsondata.data.dim[0];
@@ -3436,10 +3434,6 @@ morpheus.GseReader.prototype = {
     _parse : function (text) {
 
     }
-};
-
-morpheus.GseReader.nonFlatArray = function (flatArray, nrow, ncol) {
-
 };
 morpheus.JsonDatasetReader = function () {
 
@@ -6843,96 +6837,6 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 	}
 	return {pdata : pDataArray, participants : participantID, labels : labelDescription, rownames : rowNames};
 };
-/*morpheus.DatasetUtil.toESSession = function (dataset) {
-	console.log("morpheus.DatasetUtil.toESSession ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
-	if (dataset instanceof morpheus.SlicedDatasetView) {
-		console.log("morpheus.DatasetUtil.toESSession ::", "dataset in instanceof morpheus.SlicedDatasetView", "go deeper");
-		morpheus.DatasetUtil.toESSession(dataset.dataset);
-	}
-	if (dataset.getESSession()) {
-		return;
-	}
-	var array = morpheus.DatasetUtil.getContentArray(dataset);
-	var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
-
-	var messageJSON = {
-		rclass : "LIST",
-		rexpValue : [{
-			rclass : "REAL",
-			realValue : array,
-			attrName : "dim",
-			attrValue : {
-				rclass : "INTEGER",
-				intValue : [dataset.getColumnCount(), dataset.getRowCount()]
-			}
-		}, {
-			rclass : "STRING",
-			stringValue : meta.pdata,
-			attrName : "dim",
-			attrValue : {
-				rclass : "INTEGER",
-				intValue : [dataset.getColumnCount(), meta.pdata.length/dataset.getColumnCount()]
-			}
-		}, {
-			rclass : "STRING",
-			stringValue : meta.labels
-		}, {
-			rclass : "STRING",
-			stringValue : meta.participants
-		}, {
-			rclass : "STRING",
-			stringValue : meta.rownames
-		}],
-		attrName : "names",
-		attrValue : {
-			rclass : "STRING",
-			stringValue : [{
-				strval : "data",
-				isNA : false
-			}, {
-				strval : "pData",
-				isNA : false
-			}, {
-				strval : "labelDescription",
-				isNA : false
-			}, {
-				strval : "colNames",
-				isNA : false
-			}, {
-				strval : "rowNames",
-				isNA : false
-			}]
-		}
-	};
-	ProtoBuf = dcodeIO.ProtoBuf;
-	ProtoBuf.protoFromFile("./message.proto", function (error, success) {
-			if (error) {
-				alert(error);
-				console.log("ProtoBuilder ::", error);
-				return;
-			}
-			//console.log("morpheus.DatasetUtil.toESSession ::", "protobuilder error", error);
-			//console.log("morpheus.DatasetUtil.toESSession ::", "protobuilder success", success);
-			var builder = success,
-				rexp = builder.build("rexp"),
-				REXP = rexp.REXP;
-
-			var proto = new REXP(messageJSON);
-			var req = ocpu.call("createES", proto, function (session) {
-				//console.log("morpheus.DatasetUtil.toESSession ::", "from successful request", session);
-				dataset.setESSession(session);
-			}, true);
-
-			req.fail(function () {
-				alert(req.responseText);
-				console.log("ExpressionSetCreation ::", "Request failed", req.responseText);
-			});
-		});
-
-	/!*var blob = new Blob([new Uint8Array((new REXP(messageJSON)).toArrayBuffer())], {type: "application/octet-stream"});
-	saveAs(blob, "test1.bin");*!/
-};*/
-
 
 morpheus.DatasetUtil.toESSessionPromise = function (options) {
 	var dataset = options.dataset ? options.dataset : options;
@@ -14262,18 +14166,15 @@ morpheus.LimmaTool.prototype = {
         var field = options.input.field;
         var classA = options.input.class_a;
         var classB = options.input.class_b;
-        console.log(field, classA, classB);
 
         var dataset = project.getSortedFilteredDataset();
         var es = dataset.getESSession();
 
-        console.log(dataset.getColumnMetadata());
         var v = dataset.getColumnMetadata().getByName("Comparison");
         if (v == null) {
             v = dataset.getColumnMetadata().add("Comparison");
         }
         var v1 = dataset.getColumnMetadata().getByName(field);
-        console.log(v1);
         for (var i = 0; i < dataset.getColumnCount(); i++) {
             v.setValue(i, v1.getValue(i) == classA ? "A" : (v1.getValue(i) == classB ? "B" : ""));
         }
@@ -14312,7 +14213,6 @@ morpheus.LimmaTool.prototype = {
                             var data = morpheus.Util.getRexpData(res, rclass);
                             var names = morpheus.Util.getFieldNames(res, rclass);
                             var vs = [];
-                            console.log(res, data);
                             names.forEach(function (name) {
                                 if (name !== "symbol") {
                                     console.log(name, data[name]);

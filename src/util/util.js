@@ -1057,6 +1057,10 @@ morpheus.Util.arrayToString = function (value, sep) {
 };
 morpheus.Util.removeTrailingZerosInFraction = function (str) {
   var index = str.lastIndexOf('.');
+  var eIndex = str.lastIndexOf('e');
+  if (eIndex !== -1) {
+    return str;
+  }
   if (index !== -1) {
     var len = str.length;
     var zeros = len;

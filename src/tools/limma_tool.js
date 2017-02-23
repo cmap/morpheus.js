@@ -61,18 +61,15 @@ morpheus.LimmaTool.prototype = {
         var field = options.input.field;
         var classA = options.input.class_a;
         var classB = options.input.class_b;
-        console.log(field, classA, classB);
 
         var dataset = project.getSortedFilteredDataset();
         var es = dataset.getESSession();
 
-        console.log(dataset.getColumnMetadata());
         var v = dataset.getColumnMetadata().getByName("Comparison");
         if (v == null) {
             v = dataset.getColumnMetadata().add("Comparison");
         }
         var v1 = dataset.getColumnMetadata().getByName(field);
-        console.log(v1);
         for (var i = 0; i < dataset.getColumnCount(); i++) {
             v.setValue(i, v1.getValue(i) == classA ? "A" : (v1.getValue(i) == classB ? "B" : ""));
         }
@@ -111,7 +108,6 @@ morpheus.LimmaTool.prototype = {
                             var data = morpheus.Util.getRexpData(res, rclass);
                             var names = morpheus.Util.getFieldNames(res, rclass);
                             var vs = [];
-                            console.log(res, data);
                             names.forEach(function (name) {
                                 if (name !== "symbol") {
                                     console.log(name, data[name]);
