@@ -230,6 +230,7 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 					deferred.reject(err);
 				} else {
 					deferred.resolve(dataset);
+					console.log(dataset);
 					morpheus.DatasetUtil.toESSessionPromise({dataset : dataset, isGEO : isGSE});
 				}
 			});
@@ -926,6 +927,7 @@ morpheus.DatasetUtil.copy = function (dataset) {
     newDataset.getColumnMetadata = function () {
         return columnMetadataModel;
     };
+    morpheus.DatasetUtil.toESSessionPromise({ dataset : newDataset, isGSE : false });
     return newDataset;
 };
 morpheus.DatasetUtil.toString = function (dataset, value, seriesIndex) {
@@ -1018,7 +1020,7 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 		rowNames.push({
 			strval : rowNamesVec.getValue(j),
 			isNA : false
-		})
+		});
 	}
 	return {pdata : pDataArray, participants : participantID, labels : labelDescription, rownames : rowNames};
 };
