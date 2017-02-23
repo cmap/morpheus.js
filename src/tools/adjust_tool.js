@@ -21,6 +21,9 @@ morpheus.AdjustDataTool.prototype = {
             type: 'checkbox',
             help: 'Subtract median, divide by median absolute deviation'
         }, {
+        	name: 'quantile_normalization',
+			type: 'checkbox'
+		}, {
             name: 'use_selected_rows_and_columns_only',
             type: 'checkbox'
         }];
@@ -30,7 +33,8 @@ morpheus.AdjustDataTool.prototype = {
 		var controller = options.controller;
 
 		if (options.input.log_2 || options.input.inverse_log_2
-				|| options.input['z-score'] || options.input['robust_z-score']) {
+				|| options.input['z-score'] || options.input['robust_z-score']
+				|| options.input['quantile_normalization']) {
 			var selectedColumnIndices = project.getColumnSelectionModel()
 					.getViewIndices();
 			var selectedRowIndices = project.getRowSelectionModel()
@@ -46,6 +50,7 @@ morpheus.AdjustDataTool.prototype = {
 					: project.getSortedFilteredDataset();
 			var rowView = new morpheus.DatasetRowView(dataset);
 			var functions = [];
+			var changed = false;
 			if (options.input.log_2) {
 				for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
 					for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
@@ -53,6 +58,7 @@ morpheus.AdjustDataTool.prototype = {
 								i, j)));
 					}
 				}
+				changed = true;
 			}
 			if (options.input.inverse_log_2) {
 				for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
@@ -63,6 +69,7 @@ morpheus.AdjustDataTool.prototype = {
 						}
 					}
 				}
+                changed = true;
 			}
 			if (options.input['z-score']) {
 				for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
@@ -74,6 +81,7 @@ morpheus.AdjustDataTool.prototype = {
 								/ stdev);
 					}
 				}
+                changed = true;
 			}
 			if (options.input['robust_z-score']) {
 				for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
@@ -85,10 +93,45 @@ morpheus.AdjustDataTool.prototype = {
 								(dataset.getValue(i, j) - median) / mad);
 					}
 				}
+                changed = true;
 			}
+			if (changed) {
+                morpheus.DatasetUtil.toESSessionPromise(project.getFullDataset());
+            }
+			if (options.input['quantile_normalization']) {
+				var es = dataset.getESSession();
+				es.then(function(session) {
+					var args = {
+						es : session
+					};
+					if (selectedRowIndices.size()) {
+						args.rows = selectedRowIndices.values();
+					}
+					if (selectedColumnIndices.size()) {
+						args.cols = selectedColumnIndices.values();
+					}
+					var req = ocpu.call('quantileNormalization', args, function(resSession) {
+						resSession.getObject(function(success) {
+							var nrows = dataset.getRowCount();
+							var ncols = dataset.getColumnCount();
+							success = JSON.parse(success);
+                            for (var i = 0; i < nrows; i++) {
+                                for (var j = 0; j < ncols; j++) {
+									dataset.setValue(i, j, success[i][j]);
+                                }
+                            }
+						});
+						dataset.setESSession(new Promise(function(resolve, reject) {
+							resolve(resSession);
+						}));
+					}, false, "::es");
+					req.fail(function() {
+						console.log(req.responseText);
+					})
+				})
 
+			}
 			project.trigger(morpheus.Project.Events.DATASET_CHANGED);
-			morpheus.DatasetUtil.toESSessionPromise(project.getFullDataset());
 			project.getColumnSelectionModel().setViewIndices(
 					selectedColumnIndices, true);
 			project.getRowSelectionModel().setViewIndices(selectedRowIndices,
