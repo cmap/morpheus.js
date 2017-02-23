@@ -1344,9 +1344,15 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
     var reader = new FileReader();
     reader.onload = function (event) {
       if (ext === 'xlsx' || ext === 'xls') {
+        var data = new Uint8Array(event.target.result);
+        var arr = [];
+        for (var i = 0; i != data.length; ++i) {
+          arr[i] = String.fromCharCode(data[i]);
+        }
+        var bstr = arr.join('');
         morpheus.Util
         .xlsxTo1dArray({
-          data: event.target.result,
+          data: bstr,
           prompt: interactive
         }, function (err, lines) {
           deferred.resolve(lines);
@@ -1357,7 +1363,7 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
 
     };
     if (ext === 'xlsx' || ext === 'xls') {
-      reader.readAsBinaryString(fileOrUrl);
+      reader.readAsArrayBuffer(fileOrUrl);
     } else {
       reader.readAsText(fileOrUrl);
     }
