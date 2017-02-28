@@ -524,14 +524,10 @@ morpheus.ChartTool.prototype = {
     var text = [];
     var color = colorByVector ? [] : '#1f78b4';
     var size = sizeByVector ? [] : 6;
-    var array = [];
+
     for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
       y.push(dataset.getValue(options.rowIndexOne, j));
       x.push(dataset.getValue(options.rowIndexTwo, j));
-      array.push({
-        row: [options.rowIndexOne, options.rowIndexTwo],
-        column: j
-      });
       if (colorByVector) {
         var colorByValue = colorByVector.getValue(j);
         color.push(colorModel.getMappedValue(colorByVector,
@@ -542,6 +538,7 @@ morpheus.ChartTool.prototype = {
         size.push(sizeFunction(sizeByValue));
       }
       var obj = {
+        i: [options.rowIndexOne, options.rowIndexTwo],
         j: j
       };
 
@@ -549,9 +546,20 @@ morpheus.ChartTool.prototype = {
         var s = [];
         for (var tipIndex = 0; tipIndex < _this.tooltip.length; tipIndex++) {
           var tip = _this.tooltip[tipIndex];
+          var metadata;
           if (tip.isColumns) {
-            morpheus.HeatMapTooltipProvider.vectorToString(dataset.getColumnMetadata().getByName(tip.field),
-              this.j, s, '<br>');
+            metadata = isColumnChart ? dataset.getRowMetadata() : dataset.getColumnMetadata();
+          } else {
+            metadata = isColumnChart ? dataset.getColumnMetadata() : dataset.getRowMetadata();
+          }
+          var indices = tip.isColumns ? [this.j] : this.i;
+          var v = metadata.getByName(tip.field);
+          for (var i = 0; i < indices.length; i++) {
+            var index = indices[i];
+            if (index === 0 || v.getValue(index) !== v.getValue(0)) {
+              morpheus.HeatMapTooltipProvider.vectorToString(v,
+                index, s, '<br>');
+            }
           }
         }
 
@@ -797,6 +805,7 @@ morpheus.ChartTool.prototype = {
   },
   _createBoxPlot: function (options) {
     var _this = this;
+    var transpose = options.transpose;
     var array = options.array; // array of items
     var points = options.points;
     var isHorizontal = options.horizontal;
@@ -834,20 +843,23 @@ morpheus.ChartTool.prototype = {
           j: item.column
         };
         obj.toString = function () {
+
           var s = [];
           for (var tipIndex = 0; tipIndex < _this.tooltip.length; tipIndex++) {
             var tip = _this.tooltip[tipIndex];
+            var metadata;
             if (tip.isColumns) {
-              morpheus.HeatMapTooltipProvider.vectorToString(dataset.getColumnMetadata().getByName(tip.field),
-                this.j, s, '<br>');
+              metadata = transpose ? dataset.getRowMetadata() : dataset.getColumnMetadata();
             } else {
-              morpheus.HeatMapTooltipProvider.vectorToString(dataset.getRowMetadata().getByName(tip.field),
-                this.i, s, '<br>');
+              metadata = transpose ? dataset.getColumnMetadata() : dataset.getRowMetadata();
             }
+            var index = tip.isColumns ? this.j : this.i;
+            var v = metadata.getByName(tip.field);
+            morpheus.HeatMapTooltipProvider.vectorToString(v,
+              index, s, '<br>');
+
           }
-
           return s.join('');
-
         };
         text.push(obj);
       }
@@ -1128,7 +1140,7 @@ morpheus.ChartTool.prototype = {
               myPlot: myPlot,
               dataset: dataset,
               config: config,
-              transposed: isColumns,
+              transpose: transpose,
               layout: $
               .extend(
                 true,

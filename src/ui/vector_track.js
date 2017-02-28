@@ -839,9 +839,6 @@ morpheus.VectorTrack.prototype = {
 
   },
   showPopup: function (e, isHeader) {
-    if (!this.heatmap.options.popupEnabled) {
-      return;
-    }
     var _this = this;
     var project = this.project;
     var isColumns = this.isColumns;
@@ -885,9 +882,11 @@ morpheus.VectorTrack.prototype = {
       'Display': []
     };
     if (isHeader) {
-      sectionToItems.Sort.push({
-        name: FILTER
-      });
+      if (this.heatmap.options.toolbar.filter) {
+        sectionToItems.Sort.push({
+          name: FILTER
+        });
+      }
       // sectionToItems['Sort'].push({
       // name : SORT_ASC
       // });
@@ -917,9 +916,11 @@ morpheus.VectorTrack.prototype = {
     sectionToItems.Selection.push({
       separator: true
     });
-    sectionToItems.Selection.push({
-      name: ANNOTATE_SELECTION
-    });
+    if (this.heatmap.options.toolbar.openFile) {
+      sectionToItems.Selection.push({
+        name: ANNOTATE_SELECTION
+      });
+    }
 
     sectionToItems.Selection.push({
       name: INVERT_SELECTION
@@ -968,7 +969,6 @@ morpheus.VectorTrack.prototype = {
         name: DISPLAY_BAR,
         checked: this.isRenderAs(morpheus.VectorTrack.RENDER.BAR)
       });
-
     }
     if (isArray) {
       sectionToItems.Display.push({
@@ -1136,13 +1136,16 @@ morpheus.VectorTrack.prototype = {
     });
     if (!isHeader) {
       addSection('Selection');
-    } else {
+    } else if (this.heatmap.options.toolbar.options) {
       addSection('Display');
     }
+
     if (e.preventDefault) {
       e.preventDefault();
     }
-
+    if (items.length === 0) {
+      return;
+    }
     morpheus.Popup
     .showPopup(
       items,

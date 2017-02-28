@@ -238,9 +238,9 @@ morpheus.ColorSupplierLegend.prototype = {
   draw: function (clip, context) {
     var colorScheme = this.colorScheme;
     colorScheme.setCurrentValue(this.value);
-    context.fillStyle = 'white';
-    context.fillRect(0, 0, this.getUnscaledWidth(), this
-    .getUnscaledHeight());
+    // context.fillStyle = 'white';
+    // context.fillRect(0, 0, this.getUnscaledWidth(), this
+    // .getUnscaledHeight());
     context.translate(this.hasNames ? 14
       : (this.getUnscaledWidth() - 200) / 2, 0);
     morpheus.HeatMapColorSchemeLegend.drawColorScheme(context, colorScheme,

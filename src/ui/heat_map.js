@@ -329,7 +329,10 @@ morpheus.HeatMap = function (options) {
     'overflow-x': 'visible',
     'overflow-y': 'visible'
   });
-
+  this.$content.on('remove.morpheus', function () {
+    _this.$content.off('remove.morpheus');
+    _this.dispose();
+  });
   var tab = this.tabManager.add({
     $el: this.$content,
     closeable: this.options.closeable,
@@ -1696,9 +1699,9 @@ morpheus.HeatMap.prototype = {
       }
       var nameOrderPairs = [];
       var found = false;
-      array.forEach(function (item) {
+      array.forEach(function (item, index) {
         var name = item.renameTo || item.field;
-        var order = 999;
+        var order = index;
         if (item.order != null) {
           order = item.order;
           found = true;
@@ -2919,11 +2922,10 @@ morpheus.HeatMap.prototype = {
     }
     return '';
   },
-  onRemove: function () {
-    this.$content.remove();
+  dispose: function () {
+    //this.$content.remove();
     if (this.project == null) {
       return; // failed to initialize
-
     }
     this.project.off();
     this.$tipInfoWindow.dialog('destroy');
@@ -3320,11 +3322,24 @@ morpheus.HeatMap.prototype = {
     totalSize.width += maxColumnHeaderWidth + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
     // color legend
     if (options.legend) {
-      var legendHeight = this.heatmap.getColorScheme().getNames() != null ? this.heatmap
-        .getColorScheme().getNames().length * 14
-        : 40;
-      totalSize.height += legendHeight + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
-      totalSize.width = Math.max(totalSize.width, 280);
+      var totalLegendWidth = 5;
+      var colorByValues = this.heatmap.getColorScheme().getColorByValues();
+      var ntracks = colorByValues.length;
+      for (var i = 0, ntracks = colorByValues.length; i < ntracks; i++) {
+        var value = colorByValues[i];
+        if (value != null || ntracks === 1) {
+          // if (value != 'null') { // values are stored as string
+          //
+          // }
+          var trackLegend = new morpheus.ColorSupplierLegend(
+            this.heatmap.getColorScheme(), value);
+          var legendHeight = trackLegend.getUnscaledHeight();
+          var legendWidth = trackLegend.getUnscaledWidth();
+          totalLegendWidth += legendWidth;
+          totalSize.height = Math.max(totalSize.height, legendHeight);
+        }
+      }
+      totalSize.width = Math.max(totalSize.width, totalLegendWidth);
     }
     var trackLegendSize = new morpheus.HeatMapTrackColorLegend(
       _
@@ -3367,14 +3382,35 @@ morpheus.HeatMap.prototype = {
     var totalSize = this.getTotalSize(options);
     var legendHeight = 0;
     if (options.legend) {
+      var colorByValues = this.heatmap.getColorScheme().getColorByValues();
       context.save();
-      context.translate(50, 0);
-      morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
-        this.heatmap.getColorScheme(), 200, true);
+      context.translate(15, 0);
+      var ntracks = colorByValues.length;
+      for (var i = 0, ntracks = colorByValues.length; i < ntracks; i++) {
+        var value = colorByValues[i];
+        if (value != null || ntracks === 1) {
+          if (value != 'null') { // values are stored as string
+            // var $label = $('<div style="overflow:hidden;text-overflow:' +
+            //   ' ellipsis;width:250px;max-width:250px;">'
+            //   + value + '</div>');
+            // $keyContent.append($label);
+            // totalHeight += $label.height();
+          }
+          var trackLegend = new morpheus.ColorSupplierLegend(
+            this.heatmap.getColorScheme(), value);
+          trackLegend.draw({}, context);
+          legendHeight = Math.max(legendHeight, trackLegend.getUnscaledHeight());
+          var legendWidth = trackLegend.getUnscaledWidth();
+          context.translate(legendWidth, 0);
+        }
+      }
+
+      // morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
+      //   this.heatmap.getColorScheme(), 200, true);
       context.restore();
-      legendHeight = this.heatmap.getColorScheme().getNames() != null ? this.heatmap
-        .getColorScheme().getNames().length * 14
-        : 40;
+      // legendHeight = this.heatmap.getColorScheme().getNames() != null ? this.heatmap
+      //   .getColorScheme().getNames().length * 14
+      //   : 40;
     }
     context.save();
     context.translate(4, legendHeight);
