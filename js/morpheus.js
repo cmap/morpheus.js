@@ -3367,6 +3367,7 @@ morpheus.GseReader.prototype = {
                         var flatPdata = jsondata.pdata.values;
                         var participants = jsondata.participants.values;
                         var annotation = jsondata.symbol.values;
+                        console.log(annotation);
                         var id = jsondata.rownames.values;
                         var metaNames = jsondata.colMetaNames.values;
                         var matrix = [];
@@ -3404,10 +3405,14 @@ morpheus.GseReader.prototype = {
                         }
 
                         var rowIds = dataset.getRowMetadata().add('id');
-                        var rowSymbol = dataset.getRowMetadata().add('symbol');
+                        if (annotation) {
+                            var rowSymbol = dataset.getRowMetadata().add('symbol');
+                        }
                         for (var i = 0; i < nrowData; i++) {
                             rowIds.setValue(i, id[i]);
-                            rowSymbol.setValue(i, annotation[i]);
+                            if (annotation) {
+                                rowSymbol.setValue(i, annotation[i]);
+                            }
                         }
                         morpheus.MetadataUtil.maybeConvertStrings(dataset.getRowMetadata(), 1);
                         morpheus.MetadataUtil.maybeConvertStrings(dataset.getColumnMetadata(),
