@@ -3330,20 +3330,21 @@ morpheus.HeatMap.prototype = {
       var maxLegendHeight = 0;
       var colorByValues = this.heatmap.getColorScheme().getColorByValues();
       var ntracks = colorByValues.length;
-      for (var i = 0, ntracks = colorByValues.length; i < ntracks; i++) {
+      for (var i = 0; i < ntracks; i++) {
         var value = colorByValues[i];
         if (value != null || ntracks === 1) {
           // if (value != 'null') { // values are stored as string
           //
           // }
+
           this.heatmap.getColorScheme().setCurrentValue(value);
           var names = this.heatmap.getColorScheme().getNames();
-          var legendHeight = names != null ? names.length * 14 : 30;
-          maxLegendHeight == Math.max(maxLegendHeight, legendHeight);
+          maxLegendHeight = Math.max(maxLegendHeight, names != null ? names.length * 14 : 30);
           totalLegendWidth += 250;
         }
       }
-      totalSize.height = totalSize.height + maxLegendHeight + 50;
+      maxLegendHeight += 10; // spacer
+      totalSize.height = totalSize.height + maxLegendHeight;
       totalSize.width = Math.max(totalSize.width, totalLegendWidth);
     }
     var trackLegendSize = new morpheus.HeatMapTrackColorLegend(
@@ -3409,6 +3410,7 @@ morpheus.HeatMap.prototype = {
           context.translate(legendWidth, 0);
         }
       }
+      legendHeight += 10; // spacer
 
       // morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
       //   this.heatmap.getColorScheme(), 200, true);
