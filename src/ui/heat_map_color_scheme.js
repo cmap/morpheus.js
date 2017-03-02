@@ -27,16 +27,23 @@ morpheus.HeatMapColorScheme = function (project, scheme) {
 morpheus.HeatMapColorScheme.Predefined = {};
 morpheus.HeatMapColorScheme.Predefined.SUMMLY = function () {
   return {
+    name: '(-100, -97.5, -95, 95, 97.5, 100)',
     type: 'fixed',
     map: [{
       value: -100,
       color: '#0000ff'
+    }, {
+      value: -97.5,
+      color: '#abdda4'
     }, {
       value: -95,
       color: '#ffffff'
     }, {
       value: 95,
       color: '#ffffff'
+    }, {
+      value: 97.5,
+      color: '#fdae61'
     }, {
       value: 100,
       color: '#ff0000'
@@ -46,6 +53,7 @@ morpheus.HeatMapColorScheme.Predefined.SUMMLY = function () {
 
 morpheus.HeatMapColorScheme.Predefined.SUMMLY2 = function () {
   return {
+    name: '(-100, -95, -90, 90, 95, 100)',
     type: 'fixed',
     map: [{
       value: -100,

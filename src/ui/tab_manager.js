@@ -13,6 +13,14 @@ morpheus.TabManager = function (options) {
   this.activeTabId = null;
   this.idToTabObject = new morpheus.Map();
   this.$nav = $('<ul style="border-bottom:none;" class="nav nav-tabs compact"></ul>');
+  this.$nav.sortable({
+    cancel: '.pull-right',
+    containment: 'parent',
+    axis: 'x',
+    helper: 'clone'
+  });
+  this.$nav.sortable('disable');
+
   this.$nav.on('click', 'li > a', function (e) {
     var tabId = $(this).data('link');
     e.preventDefault();
@@ -22,7 +30,6 @@ morpheus.TabManager = function (options) {
   });
 
   function rename($a) {
-
     var builder = new morpheus.FormBuilder();
     builder.append({
       name: 'name',
@@ -59,14 +66,37 @@ morpheus.TabManager = function (options) {
     e.stopPropagation();
     e.stopImmediatePropagation();
     var $a = $(this);
+    var menuItems = [];
     if ($a.data('morpheus-rename') && _this.options.rename) {
-      morpheus.Popup.showPopup([{
-        name: 'Rename'
-      }], {
+      menuItems.push({name: 'Rename'});
+    }
+    if ($a.data('morpheus-pin')) { // pinned
+      menuItems.push({name: 'Unpin tab'});
+    } else {
+      menuItems.push({name: 'Pin tab'});
+    }
+    // if ($a.data('morpheus-pin') && _this.options.pin) {
+    //   menuItems.push({name: 'Pin'});
+    // }
+    if (menuItems.length > 0) {
+      morpheus.Popup.showPopup(menuItems, {
         x: e.pageX,
         y: e.pageY
       }, e.target, function (event, item) {
-        rename($a);
+        if (item === 'Rename') {
+          rename($a);
+        } else if (item === 'Pin tab') {
+          $a.data('morpheus-pin', true);
+          var $li = $a.parent('li');
+          $li.detach();
+          _this.$nav.prepend($li);
+          $a.find('.close').hide();
+          // hide close button
+        } else if (item === 'Unpin tab') {
+          $a.data('morpheus-pin', false);
+          $a.find('.close').show();
+          // show close button
+        }
       });
     }
     return false;
@@ -239,6 +269,7 @@ morpheus.TabManager.prototype = {
       this.$nav.css('display', this.idToTabObject.size() > 1 ? ''
         : 'none');
     }
+    this.getTabCount() <= 1 ? this.$nav.sortable('disable') : this.$nav.sortable('enable');
     this.adding = false;
     return {
       $panel: $panel,
@@ -271,11 +302,10 @@ morpheus.TabManager.prototype = {
       this.$nav.css('display', this.idToTabObject.size() > 1 ? ''
         : 'none');
     }
+    this.getTabCount() <= 1 ? this.$nav.sortable('disable') : this.$nav.sortable('enable');
     if (this.idToTabObject.size() > 0) {
       $($a.attr('href')).focus();
-
     }
-
     if (obj != null && obj.onRemove) {
       obj.onRemove();
     }

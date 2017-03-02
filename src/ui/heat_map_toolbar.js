@@ -544,14 +544,14 @@ morpheus.HeatMapToolBar = function (controller) {
   this.valueSearchObject.$searchResultsWrapper.show();
 
   this.rowSearchObject.$search.css({
-    'border-top': '3.8px solid #636363',
-    'border-bottom': '3.8px solid #636363',
+    'border-top': '3.8px solid #e6e6e6',
+    'border-bottom': '3.8px solid #e6e6e6',
     width: '240px'
   });
 
   this.columnSearchObject.$search.css({
-    'border-right': '3.8px solid #636363',
-    'border-left': '3.8px solid #636363',
+    'border-right': '3.8px solid #e6e6e6',
+    'border-left': '3.8px solid #e6e6e6',
     width: '240px'
   });
 

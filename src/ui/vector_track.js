@@ -945,19 +945,21 @@ morpheus.VectorTrack.prototype = {
     }
 
     if (!isHeader) {
-      sectionToItems['Sort'].push({
-        name: SORT_SEL_ASC,
-        disabled: !hasSelection
-      });
-      sectionToItems['Sort'].push({
-        name: SORT_SEL_DESC,
-        disabled: !hasSelection
-      });
+      if (this.heatmap.options.toolbar.sort) {
+        sectionToItems['Sort'].push({
+          name: SORT_SEL_ASC,
+          disabled: !hasSelection
+        });
+        sectionToItems['Sort'].push({
+          name: SORT_SEL_DESC,
+          disabled: !hasSelection
+        });
 
-      sectionToItems['Sort'].push({
-        name: SORT_SEL_TOP_N,
-        disabled: !hasSelection
-      });
+        sectionToItems['Sort'].push({
+          name: SORT_SEL_TOP_N,
+          disabled: !hasSelection
+        });
+      }
     }
     var dataType = morpheus.VectorUtil.getDataType(this.getFullVector());
     var arrayFields = this.getFullVector().getProperties().get(

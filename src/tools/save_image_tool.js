@@ -1,6 +1,8 @@
 morpheus.SaveImageTool = function () {
+
 };
 morpheus.SaveImageTool.prototype = {
+
   toString: function () {
     return 'Save Image';
   },
@@ -22,6 +24,9 @@ morpheus.SaveImageTool.prototype = {
   },
   execute: function (options) {
     var fileName = options.input.file_name;
+    if (fileName === '') {
+      fileName = 'image';
+    }
     var format = options.input.format;
     if (!morpheus.Util.endsWith(fileName.toLowerCase(), '.' + format)) {
       fileName += '.' + format;

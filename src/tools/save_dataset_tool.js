@@ -48,6 +48,9 @@ morpheus.SaveDatasetTool.prototype = {
     var project = options.project;
     var format = options.input.file_format;
     var fileName = options.input.file_name;
+    if (fileName === '') {
+      fileName = 'dataset';
+    }
     var series = options.input.series;
     var controller = options.controller;
     var dataset = options.input.save_selection_only ? project.getSelectedDataset() : project.getSortedFilteredDataset();

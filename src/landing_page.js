@@ -120,10 +120,16 @@ morpheus.LandingPage.prototype = {
 
       var text = e.originalEvent.clipboardData.getData('text/plain');
       if (text != null && text.length > 0) {
-        var blob = new Blob([text]);
-        var url = window.URL.createObjectURL(blob);
         e.preventDefault();
         e.stopPropagation();
+        var url;
+        if (text.indexOf('http') === 0) {
+          url = text;
+        } else {
+          var blob = new Blob([text]);
+          url = window.URL.createObjectURL(blob);
+        }
+
         _this.openFile(url);
       }
 

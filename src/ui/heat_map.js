@@ -303,7 +303,6 @@ morpheus.HeatMap = function (options) {
     }
     this.tabManager = this.options.parent.tabManager;
   }
-  ;
   this.$content = $('<div></div>');
   this.$content.css({
     'width': '100%',
@@ -2023,11 +2022,16 @@ morpheus.HeatMap.prototype = {
         var text = e.originalEvent.clipboardData
         .getData('text/plain');
         if (text != null && text.length > 0) {
-          // open a file from clipboard
-          var blob = new Blob([text], {type: 'text/plain'});
-          var url = URL.createObjectURL(blob);
           e.preventDefault();
           e.stopPropagation();
+          // open a file from clipboard
+          var url;
+          if (text.indexOf('http') === 0) {
+            url = text;
+          } else {
+            var blob = new Blob([text], {type: 'text/plain'});
+            url = URL.createObjectURL(blob);
+          }
           morpheus.HeatMap.showTool(
             new morpheus.OpenFileTool({
               file: url
@@ -3322,7 +3326,8 @@ morpheus.HeatMap.prototype = {
     totalSize.width += maxColumnHeaderWidth + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
     // color legend
     if (options.legend) {
-      var totalLegendWidth = 5;
+      var totalLegendWidth = 15;
+      var maxLegendHeight = 0;
       var colorByValues = this.heatmap.getColorScheme().getColorByValues();
       var ntracks = colorByValues.length;
       for (var i = 0, ntracks = colorByValues.length; i < ntracks; i++) {
@@ -3331,14 +3336,14 @@ morpheus.HeatMap.prototype = {
           // if (value != 'null') { // values are stored as string
           //
           // }
-          var trackLegend = new morpheus.ColorSupplierLegend(
-            this.heatmap.getColorScheme(), value);
-          var legendHeight = trackLegend.getUnscaledHeight();
-          var legendWidth = trackLegend.getUnscaledWidth();
-          totalLegendWidth += legendWidth;
-          totalSize.height = Math.max(totalSize.height, legendHeight);
+          this.heatmap.getColorScheme().setCurrentValue(value);
+          var names = this.heatmap.getColorScheme().getNames();
+          var legendHeight = names != null ? names.length * 14 : 30;
+          maxLegendHeight == Math.max(maxLegendHeight, legendHeight);
+          totalLegendWidth += 250;
         }
       }
+      totalSize.height = totalSize.height + maxLegendHeight + 50;
       totalSize.width = Math.max(totalSize.width, totalLegendWidth);
     }
     var trackLegendSize = new morpheus.HeatMapTrackColorLegend(

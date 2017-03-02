@@ -314,11 +314,13 @@ morpheus.ChartTool.getPlotlyDefaults2 = function () {
     r: 10,
     t: 40,
     b: 40,
-    pad: 0
+    autoexpand: true
   };
   delete plotly.config.displayModeBar;
   return plotly;
 };
+
+morpheus.ChartTool.BUTTONS_TO_REMOVE_FOR_STATIC_CHART = ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'];
 morpheus.ChartTool.getPlotlyDefaults = function () {
   var layout = {
     hovermode: 'closest',
