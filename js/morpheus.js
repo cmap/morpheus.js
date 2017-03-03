@@ -3367,6 +3367,7 @@ morpheus.GseReader.prototype = {
                         var flatPdata = jsondata.pdata.values;
                         var participants = jsondata.participants.values;
                         var annotation = jsondata.symbol.values;
+                        console.log(annotation);
                         var id = jsondata.rownames.values;
                         var metaNames = jsondata.colMetaNames.values;
                         var matrix = [];
@@ -3404,10 +3405,14 @@ morpheus.GseReader.prototype = {
                         }
 
                         var rowIds = dataset.getRowMetadata().add('id');
-                        var rowSymbol = dataset.getRowMetadata().add('symbol');
+                        if (annotation) {
+                            var rowSymbol = dataset.getRowMetadata().add('symbol');
+                        }
                         for (var i = 0; i < nrowData; i++) {
                             rowIds.setValue(i, id[i]);
-                            rowSymbol.setValue(i, annotation[i]);
+                            if (annotation) {
+                                rowSymbol.setValue(i, annotation[i]);
+                            }
                         }
                         morpheus.MetadataUtil.maybeConvertStrings(dataset.getRowMetadata(), 1);
                         morpheus.MetadataUtil.maybeConvertStrings(dataset.getColumnMetadata(),
@@ -11766,14 +11771,37 @@ morpheus.AdjustDataTool.prototype = {
 					}
 					var req = ocpu.call('quantileNormalization', args, function(resSession) {
 						resSession.getObject(function(success) {
-							var nrows = dataset.getRowCount();
-							var ncols = dataset.getColumnCount();
-							success = JSON.parse(success);
-                            for (var i = 0; i < nrows; i++) {
-                                for (var j = 0; j < ncols; j++) {
-									dataset.setValue(i, j, success[i][j]);
-                                }
-                            }
+							console.log("Quantile Normalization :: ", success);
+							var r = new FileReader();
+							var filePath = morpheus.Util.getFilePath(resSession, success);
+							r.onload = function (e) {
+								var contents = e.target.result;
+								var ProtoBuf = dcodeIO.ProtoBuf;
+								ProtoBuf.protoFromFile("./message.proto", function(error, success) {
+                                    if (error) {
+                                        alert(error);
+                                        console.log("Quantile Normalization ::", "ProtoBuilder failed", error);
+                                    }
+                                    var builder = success,
+										rexp = builder.build("rexp"),
+										REXP = rexp.REXP,
+										rclass = REXP.RClass;
+                                    var res = REXP.decode(contents);
+                                    var data = morpheus.Util.getRexpData(res, rclass).data;
+                                    console.log(data);
+
+                                    for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+                                        for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+                                            var value = data.values[i + j * data.dim[0]];
+                                            dataset.setValue(i, j, value);
+
+                                        }
+                                    }
+                                })
+							};
+                            morpheus.BlobFromPath.getFileObject(filePath, function (file) {
+                                r.readAsArrayBuffer(file);
+                            });
 						});
 						dataset.setESSession(new Promise(function(resolve, reject) {
 							resolve(resSession);
