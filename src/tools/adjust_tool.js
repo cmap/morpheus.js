@@ -138,6 +138,7 @@ morpheus.AdjustDataTool.prototype = {
 
                                         }
                                     }
+                                    alert("Quantile normalization finished successfully")
                                 })
 							};
                             morpheus.BlobFromPath.getFileObject(filePath, function (file) {
