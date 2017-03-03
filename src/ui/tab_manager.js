@@ -14,13 +14,13 @@ morpheus.TabManager = function (options) {
   this.idToTabObject = new morpheus.Map();
   this.$nav = $('<ul style="border-bottom:none;" class="nav nav-tabs compact"></ul>');
   this.$nav.sortable({
-    cancel: '.pull-right',
     containment: 'parent',
     axis: 'x',
-    helper: 'clone'
+    helper: 'clone',
+    cancel: 'li:not(.morpheus-sortable)',
+    items: 'li.morpheus-sortable'
   });
   this.$nav.sortable('disable');
-
   this.$nav.on('click', 'li > a', function (e) {
     var tabId = $(this).data('link');
     e.preventDefault();
@@ -75,9 +75,7 @@ morpheus.TabManager = function (options) {
     } else {
       menuItems.push({name: 'Pin tab'});
     }
-    // if ($a.data('morpheus-pin') && _this.options.pin) {
-    //   menuItems.push({name: 'Pin'});
-    // }
+
     if (menuItems.length > 0) {
       morpheus.Popup.showPopup(menuItems, {
         x: e.pageX,
@@ -88,14 +86,21 @@ morpheus.TabManager = function (options) {
         } else if (item === 'Pin tab') {
           $a.data('morpheus-pin', true);
           var $li = $a.parent('li');
+          $li.removeClass('morpheus-sortable');
           $li.detach();
           _this.$nav.prepend($li);
-          $a.find('.close').hide();
-          // hide close button
+          $a.find('.close').hide();    // hide close button
+          _this.$nav.sortable('option', 'items', 'li.morpheus-sortable');
+          _this.$nav.sortable('refresh');
+
         } else if (item === 'Unpin tab') {
           $a.data('morpheus-pin', false);
-          $a.find('.close').show();
-          // show close button
+          var $li = $a.parent('li');
+          $li.addClass('morpheus-sortable');
+          $a.find('.close').show(); // show close button
+          _this.$nav.sortable('option', 'items', 'li.morpheus-sortable');
+          _this.$nav.sortable('refresh');
+
         }
       });
     }
@@ -232,7 +237,7 @@ morpheus.TabManager.prototype = {
 
     this.idToTabObject.set(id, options.object);
     var li = [];
-    li.push('<li role="presentation">');
+    li.push('<li class="morpheus-sortable" role="presentation">');
     li.push('<a data-morpheus-rename="' + options.rename
       + '" data-toggle="tab" data-link="' + id + '" href="#' + id + '">');
     li.push(options.title);

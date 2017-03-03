@@ -572,6 +572,9 @@ morpheus.Util.autosuggest = function (options) {
       minLength: options.minLength,
       delay: options.delay,
       source: function (request, response) {
+        if (request.term.history && options.history) {
+          return options.history(response);
+        }
         // delegate back to autocomplete, but extract the
         // autocomplete term
         var terms = morpheus.Util
@@ -640,12 +643,10 @@ morpheus.Util.autosuggest = function (options) {
   options.$el.on('keyup', function (e) {
     if (e.which === 13 && !searching) {
       options.$el.autocomplete('close');
-
-    } else if (options.suggestWhenEmpty) {
-      if (options.$el.val() === '') {
-        options.$el.autocomplete('search', '');
-      }
-
+    } else if (e.which === 38 && options.history) { // up arrow
+      options.$el.autocomplete('search', {history: true});
+    } else if (options.suggestWhenEmpty && options.$el.val() === '') {
+      options.$el.autocomplete('search', '');
     }
   });
 
