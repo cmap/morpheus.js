@@ -169,7 +169,10 @@ morpheus.HClusterTool.prototype = {
     options.input.selectedRowsToUseForClusteringColumns = selectedRowsToUseForClusteringColumns;
     options.input.selectedColumnsToUseForClusteringRows = selectedColumnsToUseForClusteringRows;
     var dataset = project.getSortedFilteredDataset();
-    options.input.background = options.input.background || typeof Worker !== 'undefined';
+    if (options.input.background === undefined) {
+      options.input.background = true;
+    }
+    options.input.background = options.input.background && typeof Worker !== 'undefined';
     var rowModelOrder;
     var columnModelOrder;
     if (rows) {

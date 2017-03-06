@@ -7,7 +7,7 @@ morpheus.SaveImageTool.prototype = {
     return 'Save Image';
   },
   init: function (project, form) {
-    form.find('file_name').prop('autofocus', true);
+    form.find('file_name').prop('autofocus', true).focus();
   },
   gui: function () {
     return [{

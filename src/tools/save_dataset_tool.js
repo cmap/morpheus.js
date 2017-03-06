@@ -5,7 +5,7 @@ morpheus.SaveDatasetTool.prototype = {
     return 'Save Dataset';
   },
   init: function (project, form) {
-    form.find('file_name').prop('autofocus', true);
+    form.find('file_name').prop('autofocus', true).focus();
     var seriesNames = [];
     var dataset = project.getFullDataset();
     for (var i = 0, nseries = dataset.getSeriesCount(); i < nseries; i++) {
