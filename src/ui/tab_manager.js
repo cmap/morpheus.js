@@ -42,7 +42,7 @@ morpheus.TabManager = function (options) {
       okCallback: function () {
         var name = $.trim(builder.getValue('name'));
         if (name !== '') {
-          if (_this.activeTabObject != null) {
+          if (_this.activeTabObject != null && _this.activeTabObject.setName) {
             _this.activeTabObject.setName(name);
           }
           $a.contents().first().replaceWith(name + '&nbsp;');

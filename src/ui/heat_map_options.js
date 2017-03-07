@@ -192,7 +192,8 @@ morpheus.HeatMapOptions = function (controller) {
     .getColorScheme()
   });
   var updatingSizer = false;
-  colorSchemeChooser.on('change', function () {
+
+  function colorSchemeChooserUpdated() {
     if (controller.heatmap.getColorScheme().getSizer
       && controller.heatmap.getColorScheme().getSizer() != null) {
       colorSchemeFormBuilder.setValue('size_by', controller.heatmap
@@ -210,8 +211,11 @@ morpheus.HeatMapOptions = function (controller) {
         colorSchemeFormBuilder.setValue('size_by_maximum',
           controller.heatmap.getColorScheme().getSizer().getMax());
       }
-
     }
+  }
+
+  colorSchemeChooser.on('change', function () {
+    colorSchemeChooserUpdated();
     // repaint the heat map when color scheme changes
     controller.heatmap.setInvalid(true);
     controller.heatmap.repaint();
@@ -651,7 +655,7 @@ morpheus.HeatMapOptions = function (controller) {
   $tab.appendTo($div);
   // set current scheme
   colorSchemeChooser.setColorScheme(controller.heatmap.getColorScheme());
-  colorSchemeChooser.trigger('change');
+  colorSchemeChooserUpdated();
   $ul.find('[role=tab]:eq(1)').tab('show');
   morpheus.FormBuilder.showInModal({
     title: 'Options',
