@@ -1299,7 +1299,7 @@ morpheus.Util.splitLines = function (lines) {
 /**
  * @param file
  *            a File or url
- * @return A deferred object that resolves to an array of arrays
+ * @return A deferred object that resolves to an array of strings
  */
 morpheus.Util.readLines = function (fileOrUrl, interactive) {
   var isFile = fileOrUrl instanceof File;

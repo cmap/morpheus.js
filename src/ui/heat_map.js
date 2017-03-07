@@ -564,6 +564,10 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
         controller: controller
       });
     }
+    controller.trigger('beforeToolShown', {
+      tool: tool,
+      formBuilder: formBuilder
+    });
 
     var okCallback = function () {
       var task = {
