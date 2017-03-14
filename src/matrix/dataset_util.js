@@ -123,13 +123,13 @@ morpheus.DatasetUtil.annotate = function (options) {
   var promises = [];
   var functions = [];
   var isColumns = options.isColumns;
-  _.each(options.annotations, function (ann) {
+  _.each(options.annotations, function (ann, annotationIndex) {
     if (morpheus.Util.isArray(ann.file)) { // already parsed text
-      functions.push(function (dataset) {
+      functions[annotationIndex] = function (dataset) {
         new morpheus.OpenFileTool().annotate(ann.file, dataset,
           isColumns, null, ann.datasetField, ann.fileField,
           ann.include);
-      });
+      };
     } else {
       var result = morpheus.Util.readLines(ann.file);
       var fileName = morpheus.Util.getFileName(ann.file);
@@ -141,24 +141,24 @@ morpheus.DatasetUtil.annotate = function (options) {
       result.done(function (lines) {
         if (morpheus.Util.endsWith(fileName, '.gmt')) {
           var sets = new morpheus.GmtReader().parseLines(lines);
-          functions.push(function (dataset) {
+          functions[annotationIndex] = function (dataset) {
             new morpheus.OpenFileTool().annotate(null, dataset,
               isColumns, sets, ann.datasetField,
               ann.fileField);
-          });
+          };
           deferred.resolve();
         } else if (morpheus.Util.endsWith(fileName, '.cls')) {
-          functions.push(function (dataset) {
+          functions[annotationIndex] = function (dataset) {
             new morpheus.OpenFileTool().annotateCls(null, dataset,
               fileName, isColumns, lines);
-          });
+          };
           deferred.resolve();
         } else {
-          functions.push(function (dataset) {
+          functions[annotationIndex] = function (dataset) {
             new morpheus.OpenFileTool().annotate(lines, dataset,
               isColumns, null, ann.datasetField,
               ann.fileField, ann.include);
-          });
+          };
           deferred.resolve();
         }
       });
