@@ -390,8 +390,8 @@ morpheus.SortKey.SortOrder = {
 };
 morpheus.SortKey.ASCENDING_COMPARATOR = function (a, b) {
   // we want NaNs to end up at the bottom
-  var aNaN = (a == null || _.isNumber(a) && isNaN(a) || a.length === 0);
-  var bNaN = (b == null || _.isNumber(b) && isNaN(b) || b.length === 0);
+  var aNaN = (a == null);
+  var bNaN = (b == null);
   if (aNaN && bNaN) {
     return 0;
   }
@@ -401,20 +401,15 @@ morpheus.SortKey.ASCENDING_COMPARATOR = function (a, b) {
   if (bNaN) {
     return -1;
   }
-  if (a.toLowerCase) {
-    a = a.toLowerCase();
-  }
-  if (b.toLowerCase) {
-    b = b.toLowerCase();
-  }
-
+  a = ('' + a).toLowerCase();
+  b = ('' + b).toLowerCase();
   return (a === b ? 0 : (a < b ? -1 : 1));
 };
 
 morpheus.SortKey.DESCENDING_COMPARATOR = function (a, b) {
 
-  var aNaN = (a == null || _.isNumber(a) && isNaN(a) || a.length === 0);
-  var bNaN = (b == null || _.isNumber(b) && isNaN(b)) || b.length === 0;
+  var aNaN = (a == null);
+  var bNaN = (b == null);
   if (aNaN && bNaN) {
     return 0;
   }
@@ -424,12 +419,8 @@ morpheus.SortKey.DESCENDING_COMPARATOR = function (a, b) {
   if (bNaN) {
     return -1;
   }
-  if (a.toLowerCase) {
-    a = a.toLowerCase();
-  }
-  if (b.toLowerCase) {
-    b = b.toLowerCase();
-  }
+  a = ('' + a).toLowerCase();
+  b = ('' + b).toLowerCase();
   return (a === b ? 0 : (a < b ? 1 : -1));
 };
 

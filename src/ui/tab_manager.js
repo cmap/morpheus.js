@@ -12,7 +12,7 @@ morpheus.TabManager = function (options) {
   this.activeTabObject = null;
   this.activeTabId = null;
   this.idToTabObject = new morpheus.Map();
-  this.$nav = $('<ul style="border-bottom:none;" class="nav nav-tabs compact"></ul>');
+  this.$nav = $('<ul style="border-bottom:none;" class="nav nav-tabs compact morpheus-nav"></ul>');
   this.$nav.sortable({
     containment: 'parent',
     axis: 'x',
@@ -23,12 +23,67 @@ morpheus.TabManager = function (options) {
   this.$nav.sortable('disable');
   this.$nav.on('click', 'li > a', function (e) {
     var tabId = $(this).data('link');
-    e.preventDefault();
-    if (_this.activeTabId !== tabId) {
-      $(this).tab('show');
+    if (tabId != null) {
+      e.preventDefault();
+      if (_this.activeTabId !== tabId) {
+        $(this).tab('show');
+      }
     }
   });
+  if (options.dropTab) {
+    var html = [];
+    html.push('<li class="morpheus-tab-addon dropdown pull-right">');
+    html.push('<div class="btn-group">');
+    html.push('<button type="button" class="morpheus-drop-tab-toggle btn btn-link' +
+      ' dropdown-toggle"' +
+      ' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">');
+    html.push(' <span class="fa fa-caret-down"></span>');
+    html.push('</button>');
+    html
+    .push('<ul class="dropdown-menu dropdown-menu-right" role="menu">');
+    html.push('</ul>');
+    html.push('</div>');
+    html.push('</li>');
+    var $tabDrop = $(html.join(''));
+    var $tabDropList = $tabDrop.find('.dropdown-menu');
+    $tabDrop.appendTo(this.$nav);
+    // hide all tab items that have offsetTop > 0
 
+    var updateDropTab = function () {
+      var totalWith = _this.$nav.width() - 17; // 17=width of dropdown
+      var sum = 0;
+      var tabDropItems = [];
+      _this.$nav.find('> li').each(function () {
+        var $li = $(this);
+        var $a = $li.find('a');
+        if (!$li.hasClass('morpheus-tab-addon')) {
+          var title = $a.contents().first().text();
+          var isActive = $li.hasClass('active');
+          var href = $a.attr('href');
+          tabDropItems.push('<li class="' + (isActive ? 'active' : '') + '"><a data-link="' + href.substring(1) + '" data-toggle="tab"' +
+            ' href="' + href + '">' + title + '</a></li>');
+          sum += $li.outerWidth();
+          if (sum >= totalWith) {
+            $li.css('display', 'none');
+          } else {
+            $li.css('display', '');
+          }
+        }
+      });
+      $tabDropList.html(tabDropItems.join(''));
+    };
+    this.$nav.on('sortstop', function (event, ui) {
+      updateDropTab();
+    });
+    $(window).on('resize', updateDropTab);
+    this.$nav.on('remove', function () {
+      $(window).off('resize', updateDropTab);
+    });
+    this.on('add remove rename reorder change', function () {
+      updateDropTab();
+
+    });
+  }
   function rename($a) {
     var builder = new morpheus.FormBuilder();
     builder.append({
@@ -46,6 +101,7 @@ morpheus.TabManager = function (options) {
             _this.activeTabObject.setName(name);
           }
           $a.contents().first().replaceWith(name + '&nbsp;');
+          _this.trigger('rename');
         }
       }
     });
@@ -66,6 +122,10 @@ morpheus.TabManager = function (options) {
     e.stopPropagation();
     e.stopImmediatePropagation();
     var $a = $(this);
+    var $li = $a.parent('li');
+    if ($li.hasClass('morpheus-tab-addon')) {
+      return;
+    }
     var menuItems = [];
     if ($a.data('morpheus-rename') && _this.options.rename) {
       menuItems.push({name: 'Rename'});
@@ -85,7 +145,6 @@ morpheus.TabManager = function (options) {
           rename($a);
         } else if (item === 'Pin tab') {
           $a.data('morpheus-pin', true);
-          var $li = $a.parent('li');
           $li.removeClass('morpheus-sortable');
           $li.detach();
           _this.$nav.prepend($li);
@@ -95,7 +154,6 @@ morpheus.TabManager = function (options) {
 
         } else if (item === 'Unpin tab') {
           $a.data('morpheus-pin', false);
-          var $li = $a.parent('li');
           $li.addClass('morpheus-sortable');
           $a.find('.close').show(); // show close button
           _this.$nav.sortable('option', 'items', 'li.morpheus-sortable');
@@ -121,13 +179,18 @@ morpheus.TabManager = function (options) {
 
   this.$tabContent = $('<div class="tab-content"></div>');
   this.$nav.on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
-    if (_this.adding) {
-      return;
-    }
     // triggered when clicking tab
     var previous = _this.activeTabId;
     _this.activeTabId = $(e.target).data('link');
     _this.activeTabObject = _this.idToTabObject.get(_this.activeTabId);
+    _this.$nav.find('li').removeClass('active');
+    _this.$nav.find('[data-link=' + _this.activeTabId + ']').each(function () {
+      $(this).parent().addClass('active');// not added via droptab
+    });
+    if (_this.adding) {
+      return;
+    }
+
     _this.trigger('change', {
       tab: _this.activeTabId,
       previous: previous
@@ -140,7 +203,7 @@ morpheus.TabManager.prototype = {
     return this.idToTabObject.size();
   },
   setTabText: function (id, text) {
-    this.$nav.find('a').filter('[data-link=' + id + ']').contents().first()
+    this.$nav.find('> li > a').filter('[data-link=' + id + ']').contents().first()
     .replaceWith(text + '&nbsp;');
     this.idToTabObject.get(id).setName(name);
   },
@@ -155,7 +218,7 @@ morpheus.TabManager.prototype = {
    *            Tab id for task
    */
   addTask: function (task) {
-    var $a = this.$nav.find('[data-link=' + task.tabId + ']');
+    var $a = this.$nav.find('> li > a[data-link=' + task.tabId + ']');
     if ($a.length === 0) {
       console.log(task.tabId + ' not found.');
       return;
@@ -181,7 +244,7 @@ morpheus.TabManager.prototype = {
     $i.addClass('fa fa-spinner fa-spin');
   },
   removeTask: function (task) {
-    var $a = this.$nav.find('[data-link=' + task.tabId + ']');
+    var $a = this.$nav.find('> li > a[data-link=' + task.tabId + ']');
     var $i = $a.find('i');
     var tasks = $i.data('tasks');
     if (!tasks) {
@@ -264,7 +327,7 @@ morpheus.TabManager.prototype = {
     }
     if (options.focus) {
       // update active tab, but don't fire event
-      this.$nav.find('a[data-toggle="tab"]:last').tab('show');
+      this.$nav.find('> li > a[data-toggle="tab"]:last').tab('show');
       this.activeTabId = id;
       this.activeTabObject = options.object;
       $panel.focus();
@@ -276,6 +339,7 @@ morpheus.TabManager.prototype = {
     }
     this.getTabCount() <= 1 ? this.$nav.sortable('disable') : this.$nav.sortable('enable');
     this.adding = false;
+    this.trigger('add');
     return {
       $panel: $panel,
       id: id
@@ -292,9 +356,9 @@ morpheus.TabManager.prototype = {
     var obj = this.idToTabObject.remove(target);
     $('#' + target).remove(); // remove tab-pane
     this.activeTabObject = null;
-    this.$nav.find('[data-link=' + target + ']:first').parent().remove();
+    this.$nav.find('> li > a[data-link=' + target + ']:first').parent().remove();
     this.$tabContent.find(target).remove();
-    var $a = this.$nav.find('a[data-toggle="tab"]:last');
+    var $a = this.$nav.find('> li > a[data-toggle="tab"]:last');
     if ($a.length === 0) {
       // no content
       if (this.options.landingPage) {
@@ -330,7 +394,7 @@ morpheus.TabManager.prototype = {
   },
   setActiveTab: function (id) {
     if (id !== this.activeTabId) {
-      var $a = this.$nav.find('[data-link=' + id + ']');
+      var $a = this.$nav.find('> li > a[data-link=' + id + ']');
       // make sure it's enabled
       $a.parent().removeClass('disabled');
       $a.removeClass('btn disabled');
@@ -353,10 +417,10 @@ morpheus.TabManager.prototype = {
    *            The title (used to show tooltip)
    */
   setTabTitle: function (id, title) {
-    this.$nav.find('a').filter('[data-link=' + id + ']').attr('title', title);
+    this.$nav.find('> li > a').filter('a[data-link=' + id + ']').attr('title', title);
   },
   setTabEnabled: function (id, enabled) {
-    var $a = this.$nav.find('a').filter('[data-link=' + id + ']');
+    var $a = this.$nav.find('> li > a').filter('a[data-link=' + id + ']');
     if (enabled) {
       $a.parent().removeClass('disabled');
       $a.removeClass('btn disabled');

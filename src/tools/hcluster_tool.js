@@ -120,14 +120,14 @@ morpheus.HClusterTool.prototype = {
       value: morpheus.HClusterTool.Functions[4].toString(),
       type: 'select'
     }, {
-      name: 'cluster',
-      options: ['Columns', 'Rows', 'Rows and columns'],
-      value: 'Columns',
-      type: 'select'
-    }, {
       name: 'linkage_method',
       options: ['Average', 'Complete', 'Single'],
       value: 'Average',
+      type: 'select'
+    }, {
+      name: 'cluster',
+      options: ['Columns', 'Rows', 'Rows and columns'],
+      value: 'Columns',
       type: 'select'
     }, {
       name: 'group_columns_by',

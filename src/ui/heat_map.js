@@ -285,7 +285,7 @@ morpheus.HeatMap = function (options) {
       // var $img = $a.find('img');
 
       var $right = $('<li data-name="help" style="margin-right:2px;"' +
-        ' class="pull-right"></li>');
+        ' class="pull-right morpheus-tab-addon"></li>');
       // $a.appendTo($right);
       new morpheus.HelpMenu().$el.appendTo($right);
       $right.appendTo(this.tabManager.$nav);
