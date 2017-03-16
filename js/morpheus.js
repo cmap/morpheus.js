@@ -1059,7 +1059,7 @@ morpheus.Util.arrayToString = function (value, sep) {
 };
 morpheus.Util.removeTrailingZerosInFraction = function (str) {
   var index = str.lastIndexOf('.');
-  if (str === parseFloat(str).toExponential().toString()) {
+  if (str.lastIndexOf('e') !== -1) {
     return str;
   }
   if (index !== -1) {
@@ -14188,7 +14188,7 @@ morpheus.LimmaTool.prototype = {
             var ids = [];
             if (fieldNames != null) {
                 var vectors = morpheus.MetadataUtil.getVectors(project
-                    .getFullDataset().getColumnMetadata(), [fieldNames]);
+                    .getFullDataset().getColumnMetadata(), fieldNames);
                 var idToIndices = morpheus.VectorUtil
                     .createValuesToIndicesMap(vectors);
                 idToIndices.forEach(function (indices, id) {
@@ -14197,9 +14197,9 @@ morpheus.LimmaTool.prototype = {
             }
             ids.sort();
             form.setOptions('class_a', ids);
-            form.setValue('class_a', ids[0].array[0]);
+            //form.setValue('class_a', ids[0].array[0]);
             form.setOptions('class_b', ids);
-            form.setValue('class_b', ids[0].array[0]);
+           // form.setValue('class_b', ids[0].array[0]);
         };
         var $field = form.$form.find('[name=field]');
         $field.on('change', function(e) {
@@ -14212,26 +14212,27 @@ morpheus.LimmaTool.prototype = {
     },
     gui : function(project) {
         var dataset = project.getSortedFilteredDataset();
-        var fields = morpheus.MetadataUtil.getMetadataNames(dataset.getColumnMetadata());
+        var fields = morpheus.MetadataUtil.getMetadataNames(dataset
+            .getColumnMetadata());
         return [ {
             name : 'field',
             options : fields,
             type : 'select',
-            multiple : false
+            multiple : true
         }, {
             name : 'class_a',
             title : 'Class A',
             options : [],
             value : '',
-            type : 'select',
-            multiple : false
+            type : 'checkbox-list',
+            multiple : true
         }, {
             name : 'class_b',
             title : 'Class B',
             options : [],
             value : '',
-            type : 'select',
-            multiple : false
+            type : 'checkbox-list',
+            multiple : true
         }];
     },
     execute : function (options) {
@@ -14240,28 +14241,78 @@ morpheus.LimmaTool.prototype = {
         var classA = options.input.class_a;
         var classB = options.input.class_b;
 
+        if (classA.length == 0 || classB.length == 0) {
+            throw new Error("You must choose at least one option in each class");
+        }
+
+        console.log("field", field);
+        console.log("classA", classA);
+        console.log("classB", classB);
+
         var dataset = project.getSortedFilteredDataset();
+        console.log(project, dataset);
         var es = dataset.getESSession();
 
         var v = dataset.getColumnMetadata().getByName("Comparison");
         if (v == null) {
             v = dataset.getColumnMetadata().add("Comparison");
         }
-        var v1 = dataset.getColumnMetadata().getByName(field);
+        var vs = [];
+        field.forEach(function(name) {
+            vs.push(dataset.getColumnMetadata().getByName(name));
+        });
+
+        var checkCortege = function (vectors, curClass, curColumn) {
+            var columnInClass = false;
+            for (var j = 0; j < curClass.length; j++) {
+                var isEqual = true;
+                for (var k = 0; k < vectors.length; k++) {
+                    isEqual &= vectors[k].getValue(curColumn) == curClass[j].array[k];
+                }
+                columnInClass |= isEqual;
+            }
+            return columnInClass;
+        };
         for (var i = 0; i < dataset.getColumnCount(); i++) {
-            v.setValue(i, v1.getValue(i) == classA ? "A" : (v1.getValue(i) == classB ? "B" : ""));
+            var columnInA = checkCortege(vs, classA, i);
+            var columnInB = checkCortege(vs, classB, i);
+            if (columnInA && columnInB) {
+                var warning = "Chosen classes have intersection in column " + i;
+                throw new Error(warning);
+            }
+            v.setValue(i, columnInA ? "A" : (columnInB ? "B" : ""));
         }
+
+        /*for (var i = 0; i < dataset.getColumnCount(); i++) {
+            var a = true;
+            for (var j = 0; j < vs.length; j++) {
+                var oneof = false;
+                for (var k = 0; k < classA.length; k++) {
+                    oneof |= vs[j].getValue(i) == classA[k][j];
+                }
+            }
+            v.setValue(i, v1.getValue(i) == classA ? "A" : (v1.getValue(i) == classB ? "B" : ""));
+        }*/
         project.trigger('trackChanged', {
             vectors : [v],
             render : ['color'],
             columns : true
         });
+
+        var values = Array.apply(null, Array(project.getFullDataset().getColumnCount()))
+            .map(String.prototype.valueOf, "");
+
+        for (var j = 0; j < dataset.getColumnCount(); j++) {
+            values[dataset.columnIndices[j]] = v.getValue(j);
+        }
+
+        console.log(values);
+
         es.then(function(essession) {
             var args = {
                 es : essession,
-                field : field,
-                classA : classA,
-                classB : classB
+                fieldName : "Comparison",
+                fieldValues : values
             };
             console.log(args);
             var req = ocpu.call("limmaAnalysis", args, function(session) {

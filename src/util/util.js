@@ -1057,7 +1057,7 @@ morpheus.Util.arrayToString = function (value, sep) {
 };
 morpheus.Util.removeTrailingZerosInFraction = function (str) {
   var index = str.lastIndexOf('.');
-  if (str === parseFloat(str).toExponential().toString()) {
+  if (str.lastIndexOf('e') !== -1) {
     return str;
   }
   if (index !== -1) {
