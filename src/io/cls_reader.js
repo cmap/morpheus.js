@@ -36,58 +36,58 @@
 morpheus.ClsReader = function () {
 };
 morpheus.ClsReader.prototype = {
-    /**
-     * Parses the cls file.
-     *
-     * @param file
-     *            The file.
-     * @throw new Errors Exception If there is a problem with the data
-     */
-    read: function (lines) {
-        var regex = /[ ,]+/;
-        // header= <num_data> <num_classes> 1
-        var header = lines[0].split(regex);
-        if (header.length < 3) {
-            throw new Error('Header line needs three numbers');
-        }
-        var headerNumbers = [];
-        try {
-            for (var i = 0; i < 3; i++) {
-                headerNumbers[i] = parseInt($.trim(header[i]));
-            }
-        }
-        catch (e) {
-            throw new Error('Header line element ' + i + ' is not a number');
-        }
-        if (headerNumbers[0] <= 0) {
-            throw new Error(
-                'Header line missing first number, number of data points');
-        }
-        if (headerNumbers[1] <= 0) {
-            throw new Error(
-                'Header line missing second number, number of classes');
-        }
-        var numClasses = headerNumbers[1];
-        var numItems = headerNumbers[0];
-        var classDefinitionLine = lines[1];
-        classDefinitionLine = classDefinitionLine.substring(classDefinitionLine
-                .indexOf('#') + 1);
-        var classNames = $.trim(classDefinitionLine).split(regex);
-        if (classNames.length < numClasses) {
-            throw new Error('First line specifies ' + numClasses
-                + ' classes, but found ' + classNames.length + '.');
-        }
-        var dataLine = lines[2];
-        var assignments = dataLine.split(regex);
-        // convert the assignments to names
-        for (var i = 0; i < assignments.length; i++) {
-            var assignment = $.trim(assignments[i]);
-            var index = parseInt(assignment);
-            var tmp = classNames[index];
-            if (tmp !== undefined) {
-                assignments[i] = tmp;
-            }
-        }
-        return assignments;
+  /**
+   * Parses the cls file.
+   *
+   * @param file
+   *            The file.
+   * @throw new Errors Exception If there is a problem with the data
+   */
+  read: function (lines) {
+    var regex = /[ ,]+/;
+    // header= <num_data> <num_classes> 1
+    var header = lines[0].split(regex);
+    if (header.length < 3) {
+      throw new Error('Header line needs three numbers');
     }
+    var headerNumbers = [];
+    try {
+      for (var i = 0; i < 3; i++) {
+        headerNumbers[i] = parseInt($.trim(header[i]));
+      }
+    }
+    catch (e) {
+      throw new Error('Header line element ' + i + ' is not a number');
+    }
+    if (headerNumbers[0] <= 0) {
+      throw new Error(
+        'Header line missing first number, number of data points');
+    }
+    if (headerNumbers[1] <= 0) {
+      throw new Error(
+        'Header line missing second number, number of classes');
+    }
+    var numClasses = headerNumbers[1];
+    var numItems = headerNumbers[0];
+    var classDefinitionLine = lines[1];
+    classDefinitionLine = classDefinitionLine.substring(classDefinitionLine
+      .indexOf('#') + 1);
+    var classNames = $.trim(classDefinitionLine).split(regex);
+    if (classNames.length < numClasses) {
+      throw new Error('First line specifies ' + numClasses
+        + ' classes, but found ' + classNames.length + '.');
+    }
+    var dataLine = lines[2];
+    var assignments = dataLine.split(regex);
+    // convert the assignments to names
+    for (var i = 0; i < assignments.length; i++) {
+      var assignment = $.trim(assignments[i]);
+      var index = parseInt(assignment);
+      var tmp = classNames[index];
+      if (tmp !== undefined) {
+        assignments[i] = tmp;
+      }
+    }
+    return assignments;
+  }
 };

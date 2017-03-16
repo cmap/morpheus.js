@@ -465,7 +465,7 @@ morpheus.HeatMapKeyListener = function (heatMap) {
         heatMap);
     }
   });
-  if (heatMap.options.toolbar.openFile) {
+  if (heatMap.options == null || heatMap.options.toolbar.openFile) {
     shortcuts.push({
       which: [79],
       commandKey: true,
@@ -484,7 +484,7 @@ morpheus.HeatMapKeyListener = function (heatMap) {
       heatMap.getToolbar().toggleSearch();
     }
   });
-  if (heatMap.options.toolbar.tools) {
+  if (heatMap.options == null || heatMap.options.toolbar.tools) {
     shortcuts.push({
       which: [88], // x
       commandKey: true,
@@ -503,7 +503,7 @@ morpheus.HeatMapKeyListener = function (heatMap) {
     commandKey: true,
     name: 'Copy'
   });
-  if (heatMap.options.toolbar.openFile) {
+  if (heatMap.options == null || heatMap.options.toolbar.openFile) {
     shortcuts.push({
       which: [86], // V
       commandKey: true,

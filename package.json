@@ -1,14 +1,16 @@
 {
   "name": "morpheus.js",
+  "productName": "morpheus.js",
   "description": "morpheus.js JavaScript Library",
   "license": "MIT",
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/joshua-gould/morpheus.js.git"
+    "url": "https://github.com/baba-beda/morpheus.js.git"
   },
+  "homepage": "https://artyomovlab.wustl.edu/morpheus",
   "bugs": {
-    "url": "https://github.com/joshua-gould/morpheus.js/issues"
+    "url": "https://github.com/baba-beda/morpheus.js/issues"
   },
   "author": {
     "name": "Joshua Gould"
@@ -25,15 +27,16 @@
     "morpheus"
   ],
   "devDependencies": {
-    "grunt": "~0.4.5",
+    "grunt": "^1.0.1",
     "grunt-contrib-concat": "~1.0.0",
     "grunt-contrib-copy": "~1.0.0",
     "grunt-contrib-cssmin": "~1.0.1",
-    "grunt-contrib-jshint": "~1.0.0",
-    "grunt-contrib-uglify": "~1.0.1",
+    "grunt-contrib-jshint": "~1.1.0",
+    "grunt-contrib-uglify": "~2.0.0",
     "grunt-contrib-watch": "~1.0.0",
     "serve-static": "^1.10.2",
     "protobufjs": "~3.7",
-    "finalhandler": "^0.5.0"
+    "finalhandler": "^0.5.0",
+    "grunt-jsdoc": "^2.1.0"
   }
 }

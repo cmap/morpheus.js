@@ -572,6 +572,9 @@ morpheus.Util.autosuggest = function (options) {
       minLength: options.minLength,
       delay: options.delay,
       source: function (request, response) {
+        if (request.term.history && options.history) {
+          return options.history(response);
+        }
         // delegate back to autocomplete, but extract the
         // autocomplete term
         var terms = morpheus.Util
@@ -607,24 +610,25 @@ morpheus.Util.autosuggest = function (options) {
 
   // use html for label instead of default text, class for categories vs. items
   var instance = options.$el.autocomplete('instance');
-  instance._renderItem = function (ul, item) {
-    if (item.value == null) { // category
-      return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-category">')
+  if (instance != null) {
+    instance._renderItem = function (ul, item) {
+      if (item.value == null) { // category
+        return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-category">')
+        .append($('<div>').html(item.label))
+        .appendTo(ul);
+      }
+      return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-item">')
       .append($('<div>').html(item.label))
       .appendTo(ul);
-    }
-    return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-item">')
-    .append($('<div>').html(item.label))
-    .appendTo(ul);
-  };
-  instance._normalize = function (items) {
-    return items;
-  };
-  instance._resizeMenu = function () {
-    var ul = this.menu.element;
-    ul.outerWidth(instance.element.outerWidth());
-  };
-
+    };
+    instance._normalize = function (items) {
+      return items;
+    };
+    instance._resizeMenu = function () {
+      var ul = this.menu.element;
+      ul.outerWidth(instance.element.outerWidth());
+    };
+  }
   var menu = options.$el.autocomplete('widget');
   menu.menu('option', 'items', '> :not(.search-category)');
   if (menu) {
@@ -639,12 +643,10 @@ morpheus.Util.autosuggest = function (options) {
   options.$el.on('keyup', function (e) {
     if (e.which === 13 && !searching) {
       options.$el.autocomplete('close');
-
-    } else if (options.suggestWhenEmpty) {
-      if (options.$el.val() === '') {
-        options.$el.autocomplete('search', '');
-      }
-
+    } else if (e.which === 38 && options.history) { // up arrow
+      options.$el.autocomplete('search', {history: true});
+    } else if (options.suggestWhenEmpty && options.$el.val() === '') {
+      options.$el.autocomplete('search', '');
     }
   });
 
@@ -1300,7 +1302,7 @@ morpheus.Util.splitLines = function (lines) {
 /**
  * @param file
  *            a File or url
- * @return A deferred object that resolves to an array of arrays
+ * @return A deferred object that resolves to an array of strings
  */
 morpheus.Util.readLines = function (fileOrUrl, interactive) {
   var isFile = fileOrUrl instanceof File;
@@ -1346,9 +1348,15 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
     var reader = new FileReader();
     reader.onload = function (event) {
       if (ext === 'xlsx' || ext === 'xls') {
+        var data = new Uint8Array(event.target.result);
+        var arr = [];
+        for (var i = 0; i != data.length; ++i) {
+          arr[i] = String.fromCharCode(data[i]);
+        }
+        var bstr = arr.join('');
         morpheus.Util
         .xlsxTo1dArray({
-          data: event.target.result,
+          data: bstr,
           prompt: interactive
         }, function (err, lines) {
           deferred.resolve(lines);
@@ -1359,7 +1367,7 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
 
     };
     if (ext === 'xlsx' || ext === 'xls') {
-      reader.readAsBinaryString(fileOrUrl);
+      reader.readAsArrayBuffer(fileOrUrl);
     } else {
       reader.readAsText(fileOrUrl);
     }

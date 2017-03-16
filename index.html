@@ -18,7 +18,7 @@
     <script type="text/javascript"
             src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs"
             data-app-key="6xq3zgeoago5fhw"></script>
-    <script async src="js/jsme/jsme.nocache.js"></script>
+
 </head>
 <body>
 <noscript>
@@ -27,55 +27,57 @@
 <div id="vis"></div>
 
 <script type="text/javascript">
-    morpheus.Util.loadTrackingCode();
-    window.onerror = function () {
-        morpheus.FormBuilder.showInModal({
-            title: 'Error',
-            html: 'Oops, soomething went wrong. Please try again.'
-        });
-    };
+  morpheus.Util.loadTrackingCode();
+  window.onerror = function () {
+    morpheus.FormBuilder.showInModal({
+      title: 'Error',
+      html: 'Oops, soomething went wrong. Please try again.'
+    });
+  };
 
-    var searchString = window.location.search;
-    if (searchString.length === 0) {
-        searchString = window.location.hash;
+  var searchString = window.location.search;
+  if (searchString.length === 0) {
+    searchString = window.location.hash;
+  }
+  var landingPage = new morpheus.LandingPage();
+  landingPage.$el.prependTo($(document.body));
+  if (searchString.length === 0) {
+    landingPage.show();
+  } else {
+    searchString = searchString.substring(1);
+    var keyValuePairs = searchString.split('&');
+    var params = {};
+    for (var i = 0; i < keyValuePairs.length; i++) {
+      var pair = keyValuePairs[i].split('=');
+      params[pair[0]] = decodeURIComponent(pair[1]);
     }
-    var landingPage = new morpheus.LandingPage();
-    landingPage.$el.prependTo($(document.body));
-    if (searchString.length === 0) {
+    if (params.json) {
+      var options = JSON.parse(decodeURIComponent(params.json));
+      landingPage.open(options);
+    } else if (params.url) { // url to config
+      $.ajax({
+        url: params.url
+      }).done(function (json) {
+        landingPage.open(json);
+      }).fail(function () {
+        console.log('Unable to get config file');
         landingPage.show();
+      });
     } else {
-        searchString = searchString.substring(1);
-        var keyValuePairs = searchString.split('&');
-        var params = {};
-        for (var i = 0; i < keyValuePairs.length; i++) {
-            var pair = keyValuePairs[i].split('=');
-            params[pair[0]] = decodeURIComponent(pair[1]);
-        }
-        if (params.json) {
-            var options = JSON.parse(decodeURIComponent(params.json));
-            landingPage.open(options);
-        } else if (params.url) { // url to config
-            $.ajax({
-                url: params.url
-            }).done(function (json) {
-                landingPage.open(json);
-            }).fail(function () {
-                console.log('Unable to get config file');
-                landingPage.show();
-            });
-        } else {
-            landingPage.show();
-        }
+      landingPage.show();
     }
+  }
 </script>
 
 <script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker
-            .register('sw.js');
-    }
+  if ((window.location.protocol === 'https:' || window.location.protocol === 'http:') &&
+    'serviceWorker' in navigator) {
+    navigator.serviceWorker
+    .register('sw.js');
+  }
 
 </script>
 </body>
 
 </html>
+

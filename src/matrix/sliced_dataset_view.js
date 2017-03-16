@@ -1,13 +1,13 @@
-morpheus.SlicedDatasetView = function(dataset, rowIndices, columnIndices) {
-	morpheus.DatasetAdapter.call(this, dataset);
-	if (rowIndices == null) {
-		rowIndices = null;
-	}
-	if (columnIndices == null) {
-		columnIndices = null;
-	}
-	this.rowIndices = rowIndices;
-	this.columnIndices = columnIndices;
+morpheus.SlicedDatasetView = function (dataset, rowIndices, columnIndices) {
+  morpheus.DatasetAdapter.call(this, dataset);
+  if (rowIndices == null) {
+    rowIndices = null;
+  }
+  if (columnIndices == null) {
+    columnIndices = null;
+  }
+  this.rowIndices = rowIndices;
+  this.columnIndices = columnIndices;
 };
 morpheus.SlicedDatasetView.prototype = {
 	setESSession : function (session) {
