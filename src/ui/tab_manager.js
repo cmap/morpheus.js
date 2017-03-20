@@ -12,7 +12,7 @@ morpheus.TabManager = function (options) {
   this.activeTabObject = null;
   this.activeTabId = null;
   this.idToTabObject = new morpheus.Map();
-  this.$nav = $('<ul style="border-bottom:none;" class="nav nav-tabs compact morpheus-nav"></ul>');
+  this.$nav = $('<ul class="nav nav-tabs compact morpheus-nav"></ul>');
   this.$nav.sortable({
     containment: 'parent',
     axis: 'x',
@@ -30,14 +30,17 @@ morpheus.TabManager = function (options) {
       }
     }
   });
+  if (this.options.autohideTabBar) {
+    this.$nav.css('display', 'none');
+  }
   if (options.dropTab) {
     var html = [];
-    html.push('<li class="morpheus-tab-addon dropdown pull-right">');
+    html.push('<li class="morpheus-tab-addon dropdown pull-right tabdrop">');
     html.push('<div class="btn-group">');
     html.push('<button type="button" class="morpheus-drop-tab-toggle btn btn-link' +
       ' dropdown-toggle"' +
       ' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">');
-    html.push(' <span class="fa fa-caret-down"></span>');
+    html.push(' <span class="fa fa-angle-double-down"></span>');
     html.push('</button>');
     html
     .push('<ul class="dropdown-menu dropdown-menu-right" role="menu">');
@@ -45,10 +48,9 @@ morpheus.TabManager = function (options) {
     html.push('</div>');
     html.push('</li>');
     var $tabDrop = $(html.join(''));
-    var $tabDropList = $tabDrop.find('.dropdown-menu');
+    // $tabDrop.css('display', 'none');
+    var $tabDropMenu = $tabDrop.find('.dropdown-menu');
     $tabDrop.appendTo(this.$nav);
-    // hide all tab items that have offsetTop > 0
-
     var updateDropTab = function () {
       var totalWith = _this.$nav.width() - 17; // 17=width of dropdown
       var sum = 0;
@@ -70,8 +72,10 @@ morpheus.TabManager = function (options) {
           }
         }
       });
-      $tabDropList.html(tabDropItems.join(''));
+      $tabDrop.css('display', tabDropItems.length > 0 ? '' : 'none');
+      $tabDropMenu.html(tabDropItems.join(''));
     };
+    $tabDrop.css('display', 'none');
     this.$nav.on('sortstop', function (event, ui) {
       updateDropTab();
     });

@@ -82,7 +82,7 @@ morpheus.SortKey.prototype = {
           || morpheus.SortKey.ARRAY_MAX_SUMMARY_FUNCTION;
 
         this.c = this.sortOrder === morpheus.SortKey.SortOrder.ASCENDING ? morpheus.SortKey
-          .ARRAY_ASCENDING_COMPARATOR(summary)
+        .ARRAY_ASCENDING_COMPARATOR(summary)
           : morpheus.SortKey.ARRAY_DESCENDING_COMPARATOR(summary);
       } else {
         this.c = this.sortOrder === morpheus.SortKey.SortOrder.ASCENDING ? morpheus.SortKey.ASCENDING_COMPARATOR
@@ -269,7 +269,7 @@ morpheus.SortByValuesKey.prototype = {
   },
   getValue: function (i) {
     return this.modelIndexToValue ? this.modelIndexToValue[i] : this
-      .summaryFunction(this.rowView.setIndex(i));
+    .summaryFunction(this.rowView.setIndex(i));
   },
   setSortOrder: function (sortOrder) {
     if (typeof sortOrder === 'string') {
@@ -312,9 +312,8 @@ morpheus.SpecifiedModelSortOrder = function (modelIndices, nvisible, name, colum
   this.modelIndices = modelIndices;
   this.modelIndexToValue = modelIndexToValue;
   this.name = name;
-  this.c = morpheus.SortKey.ASCENDING_COMPARATOR;
+  this.c = morpheus.SortKey.NUMBER_ASCENDING_COMPARATOR;
   this.columns = columns;
-
 };
 morpheus.SpecifiedModelSortOrder.prototype = {
   isColumns: function () {
@@ -537,7 +536,7 @@ morpheus.SortKey.BOX_PLOT_SUMMARY_FUNCTION = function (array) {
     var v = morpheus.VectorUtil.arrayAsVector(array);
     box = morpheus
     .BoxPlotItem(this.indices != null ? new morpheus.SlicedVector(
-        v, this.indices) : v);
+      v, this.indices) : v);
     array.box = box;
   }
 

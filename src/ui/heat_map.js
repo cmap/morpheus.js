@@ -487,7 +487,7 @@ morpheus.HeatMap = function (options) {
     });
   } else {
     var deferred = options.dataset.file ? morpheus.DatasetUtil.read(
-        options.dataset.file, options.dataset.options)
+      options.dataset.file, options.dataset.options)
       : morpheus.DatasetUtil.read(options.dataset);
     deferred.done(function (dataset) {
       _this.options.dataset = dataset;
@@ -496,8 +496,8 @@ morpheus.HeatMap = function (options) {
       _this.options.$loadingImage.remove();
       var message = ['Error opening '
       + (options.dataset.file ? morpheus.Util
-        .getFileName(options.dataset.file) : morpheus.Util
-        .getFileName(options.dataset)) + '.'];
+      .getFileName(options.dataset.file) : morpheus.Util
+      .getFileName(options.dataset)) + '.'];
 
       if (err.message) {
         message.push('<br />Cause: ');
@@ -515,7 +515,7 @@ morpheus.HeatMap = function (options) {
     var datasetOverlay = null;
     if (options.datasetOverlay) {
       var d = options.datasetOverlay.file ? morpheus.DatasetUtil.read(
-          options.datasetOverlay.file, options.datasetOverlay.options)
+        options.datasetOverlay.file, options.datasetOverlay.options)
         : morpheus.DatasetUtil.read(options.datasetOverlay);
       d.done(function (dataset) {
         datasetOverlay = dataset;
@@ -745,7 +745,7 @@ morpheus.HeatMap.createGroupBySpaces = function (dataset, groupByKeys, gapSize, 
 };
 morpheus.HeatMap.isDendrogramVisible = function (project, isColumns) {
   var sortKeys = isColumns ? project.getColumnSortKeys() : project
-    .getRowSortKeys();
+  .getRowSortKeys();
   // var filter = isColumns ? this.project.getColumnFilter()
   //   : this.project.getRowFilter();
   // // FIXME compare filters
@@ -961,7 +961,7 @@ morpheus.HeatMap.prototype = {
     var sortKeys;
     if (append) {
       sortKeys = !isColumns ? project.getColumnSortKeys() : project
-        .getRowSortKeys();
+      .getRowSortKeys();
 
       if (priorSortKeyIndex !== -1) {
         if (sortOrder === morpheus.SortKey.SortOrder.UNSORTED) {
@@ -981,7 +981,7 @@ morpheus.HeatMap.prototype = {
 
       sortKeys = morpheus.SortKey.keepExistingSortKeys(sortKeys,
         !isColumns ? project.getColumnSortKeys() : project
-          .getRowSortKeys());
+        .getRowSortKeys());
 
     } else {
       var newSortKeys = sortOrder === morpheus.SortKey.SortOrder.UNSORTED ? []
@@ -989,7 +989,7 @@ morpheus.HeatMap.prototype = {
           !isColumns)];
       sortKeys = morpheus.SortKey.keepExistingSortKeys(newSortKeys,
         !isColumns ? project.getColumnSortKeys() : project
-          .getRowSortKeys());
+        .getRowSortKeys());
     }
 
     if (!isColumns) { // sort columns by selected rows
@@ -1038,34 +1038,20 @@ morpheus.HeatMap.prototype = {
       dendrogram = null;
     }
     if (tree != null) {
-
       //  var modelIndexSet = new morpheus.Set();
       var size = isColumns ? this.project.getFullDataset()
-        .getColumnCount() : this.project.getFullDataset()
-        .getRowCount();
-      // for (var i = 0; i < size; i++) {
-      //   modelIndexSet.add(i);
-      // }
-      // for (var i = 0, nindices = modelOrder.length; i < nindices; i++) {
-      //   modelIndexSet.remove(modelOrder[i]);
-      // }
-      var nvisible = modelOrder.length;
-      // add model indices that weren't visible when clustering
-      // if (modelIndexSet.size() > 0) {
-      //   var indices = modelIndexSet.values();
-      //   for (var i = 0, length = indices.length; i < length; i++) {
-      //     modelOrder.push(indices[i]);
-      //   }
-      // }
+      .getColumnCount() : this.project.getFullDataset()
+      .getRowCount();
       if (isColumns) {
         dendrogram = new morpheus.ColumnDendrogram(this, tree,
           this.heatmap.getColumnPositions(), this.project);
         dendrogram.filter = this.project.getColumnFilter()
         .shallowClone();
         this.columnDendrogram = dendrogram;
+        // modelIndices, nvisible, name, columns
         this.project.setColumnSortKeys(
           [new morpheus.SpecifiedModelSortOrder(modelOrder,
-            nvisible, 'dendrogram')], true);
+            modelOrder.length, 'dendrogram', true)], true);
       } else {
         dendrogram = new morpheus.RowDendrogram(this, tree,
           this.heatmap.getRowPositions(), this.project);
@@ -1073,7 +1059,7 @@ morpheus.HeatMap.prototype = {
         this.rowDendrogram = dendrogram;
         this.project.setRowSortKeys(
           [new morpheus.SpecifiedModelSortOrder(modelOrder,
-            nvisible, 'dendrogram')], true);
+            modelOrder.length, 'dendrogram', false)], true);
       }
       dendrogram.appendTo(this.$parent);
       dendrogram.$label.appendTo(this.$parent);
@@ -1191,7 +1177,7 @@ morpheus.HeatMap.prototype = {
       _.each(filters, function (filter) {
         if (filter.values) {
           if ((isColumns ? _this.project.getFullDataset()
-              .getColumnMetadata().getByName(filter.name)
+            .getColumnMetadata().getByName(filter.name)
               : _this.project.getFullDataset().getRowMetadata()
               .getByName(filter.name)) != null) {
             var set = new morpheus.Set();
@@ -1616,7 +1602,7 @@ morpheus.HeatMap.prototype = {
           continue;
         }
         var count = isColumns ? dataset.getColumnCount() : dataset
-          .getRowCount();
+        .getRowCount();
         if (!option && !displaySpecified && count > 1
           && !morpheus.VectorUtil.containsMoreThanOneValue(v)) {
           continue;
@@ -1726,7 +1712,7 @@ morpheus.HeatMap.prototype = {
 
       nameOrderPairs.sort(function (a, b) {
         return (a.order === b.order ? 0 : (a.order < b.order ? -1
-            : 1));
+          : 1));
       });
       for (var i = 0, counter = 0; i < nameOrderPairs.length; i++) {
         var index = _this.getTrackIndex(nameOrderPairs[i].name,
@@ -3152,6 +3138,7 @@ morpheus.HeatMap.prototype = {
         arguments: arguments
       });
     }
+    return pos;
   }
   ,
   scrollLeft: function (pos) {
@@ -3174,6 +3161,7 @@ morpheus.HeatMap.prototype = {
       });
       this.hscroll.setValue(pos, true);
     }
+    return pos;
   }
   ,
   isSelectedTrackColumns: function () {
@@ -3458,11 +3446,11 @@ morpheus.HeatMap.prototype = {
       columnTrackLegendSize.height);
 
     var heatmapY = this.isDendrogramVisible(true) ? (this.columnDendrogram
-      .getUnscaledHeight() + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS) : 0;
+    .getUnscaledHeight() + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS) : 0;
     heatmapY += legendHeight;
     var columnTrackY = heatmapY;
     var heatmapX = this.isDendrogramVisible(false) ? (this.rowDendrogram
-      .getUnscaledWidth() + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS) : 0;
+    .getUnscaledWidth() + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS) : 0;
     var isColumnTrackVisible = false;
     for (var i = 0, length = this.columnTracks.length; i < length; i++) {
       var track = this.columnTracks[i];
@@ -3857,10 +3845,10 @@ morpheus.HeatMap.prototype = {
     this.hscroll.setExtent(heatMapWidth, heatmapPrefSize.width,
       options.scrollLeft !== undefined ? options.scrollLeft
         : (heatmapPrefSize.width === this.hscroll
-        .getTotalExtent() ? this.hscroll.getValue()
-          : heatmapPrefSize.width
-          * this.hscroll.getValue()
-          / this.hscroll.getMaxValue()));
+      .getTotalExtent() ? this.hscroll.getValue()
+        : heatmapPrefSize.width
+        * this.hscroll.getValue()
+        / this.hscroll.getMaxValue()));
     this.hscroll.setBounds({
       left: xpos,
       top: ypos + heatMapHeight + 2
@@ -3922,10 +3910,10 @@ morpheus.HeatMap.prototype = {
     this.vscroll.setExtent(heatMapHeight, heatmapPrefSize.height,
       options.scrollTop !== undefined ? options.scrollTop
         : (heatmapPrefSize.height === this.vscroll
-        .getTotalExtent() ? this.vscroll.getValue()
-          : heatmapPrefSize.height
-          * this.vscroll.getValue()
-          / this.vscroll.getMaxValue()));
+      .getTotalExtent() ? this.vscroll.getValue()
+        : heatmapPrefSize.height
+        * this.vscroll.getValue()
+        / this.vscroll.getMaxValue()));
     xpos += 2;
     this.vscroll.setBounds({
       left: xpos,

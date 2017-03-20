@@ -1537,11 +1537,21 @@ morpheus.VectorTrack.prototype = {
           }
 
         } else if (item === MOVE_TO_TOP) {
-          var selectionModel = !_this.isColumns ? heatmap
-            .getProject().getRowSelectionModel()
-            : heatmap.getProject()
+          var selectionModel = !_this.isColumns ? _this.project.getRowSelectionModel()
+            : _this.project
             .getColumnSelectionModel();
-          var sortKey = new morpheus.MatchesOnTopSortKey(_this.project, selectionModel.toModelIndices(), 'selection on' +
+          var viewIndices = selectionModel.getViewIndices().values();
+          viewIndices.sort(function (a, b) {
+            return (a === b ? 0 : (a < b ? -1 : 1));
+          });
+          var converter = _this.isColumns ? _this.project.convertViewColumnIndexToModel
+            : _this.project.convertViewRowIndexToModel;
+          converter = _.bind(converter, project);
+          var modelIndices = [];
+          for (var i = 0, n = viewIndices.length; i < n; i++) {
+            modelIndices.push(converter(viewIndices[i]));
+          }
+          var sortKey = new morpheus.MatchesOnTopSortKey(_this.project, modelIndices, 'selection on' +
             ' top', _this.isColumns);
           if (_this.isColumns) {
             _this.project

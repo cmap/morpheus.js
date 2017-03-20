@@ -594,21 +594,32 @@ morpheus.HeatMapKeyListener = function (heatMap) {
   $keyelement.on('mousewheel', function (e) {
     var scrolly = e.deltaY * e.deltaFactor;
     var scrollx = e.deltaX * e.deltaFactor;
+    var stop = false;
     if (e.altKey) {
       heatMap.zoom(scrolly > 0, {
         rows: true,
         columns: true
       });
+      stop = true;
     } else {
       if (scrolly !== 0) {
-        heatMap.scrollTop(heatMap.scrollTop() - scrolly);
+        var scrollTop = heatMap.scrollTop();
+        if (heatMap.scrollTop(scrollTop - scrolly) !== scrollTop) {
+          stop = true;
+        }
       }
       if (scrollx !== 0) {
-        heatMap.scrollLeft(heatMap.scrollLeft() + scrollx);
+        var scrollLeft = heatMap.scrollLeft();
+        if (heatMap.scrollLeft(scrollLeft + scrollx) !== scrollLeft) {
+          stop = true;
+        }
       }
     }
-    e.preventDefault();
-    e.stopPropagation();
+    if (stop) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
   });
   function shortcutToString(sc) {
     var s = ['<b>'];
