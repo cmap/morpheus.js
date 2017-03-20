@@ -1048,7 +1048,6 @@ morpheus.HeatMap.prototype = {
         dendrogram.filter = this.project.getColumnFilter()
         .shallowClone();
         this.columnDendrogram = dendrogram;
-        // modelIndices, nvisible, name, columns
         this.project.setColumnSortKeys(
           [new morpheus.SpecifiedModelSortOrder(modelOrder,
             modelOrder.length, 'dendrogram', true)], true);

@@ -1042,8 +1042,8 @@ morpheus.HeatMapToolBar.prototype = {
     }
     if (options.onTop) {
       options.isColumns ? this.columnSearchObject.$matchesToTop
-        .addClass('btn-primary') : this.rowSearchObject.$matchesToTop
-        .addClass('btn-primary');
+      .addClass('btn-primary') : this.rowSearchObject.$matchesToTop
+      .addClass('btn-primary');
 
     }
     $tf.val(existing + options.text);
@@ -1099,7 +1099,7 @@ morpheus.HeatMapToolBar.prototype = {
     }
     if (matches <= 0) {
       var positions = isColumns ? this.controller
-        .getHeatMapElementComponent().getColumnPositions()
+      .getHeatMapElementComponent().getColumnPositions()
         : this.controller.getHeatMapElementComponent()
         .getRowPositions();
       positions.setSquishedIndices(null);
@@ -1121,31 +1121,24 @@ morpheus.HeatMapToolBar.prototype = {
   search: function (isRows) {
     this.searching = true;
     var isMatchesOnTop = isRows ? this.rowSearchObject.$matchesToTop
-      .hasClass('btn-primary') : this.columnSearchObject.$matchesToTop
-      .hasClass('btn-primary');
+    .hasClass('btn-primary') : this.columnSearchObject.$matchesToTop
+    .hasClass('btn-primary');
     var controller = this.controller;
     var project = controller.getProject();
 
     var sortKeys = isRows ? project.getRowSortKeys() : project
-      .getColumnSortKeys();
-    var keyIndex = -1;
-    for (var i = 0; i < sortKeys.length; i++) {
-      if (sortKeys[i].toString() === 'matches on top') {
-        keyIndex = i;
-        break;
-      }
-    }
-    if (keyIndex !== -1) {
-      sortKeys.splice(keyIndex, 1);
-    }
+    .getColumnSortKeys();
+    sortKeys = sortKeys.filter(function (key) {
+      return !(key instanceof morpheus.MatchesOnTopSortKey && key.toString() === 'matches on top');
+    });
 
     var dataset = project.getSortedFilteredDataset();
     var $searchResultsLabel = isRows ? this.rowSearchObject.$searchResults : this.columnSearchObject.$searchResults;
     var searchText = !isRows ? $.trim(this.columnSearchObject.$search.val()) : $
-      .trim(this.rowSearchObject.$search.val());
+    .trim(this.rowSearchObject.$search.val());
 
     var metadata = isRows ? dataset.getRowMetadata() : dataset
-      .getColumnMetadata();
+    .getColumnMetadata();
     var visibleIndices = [];
     controller.getVisibleTrackNames(!isRows).forEach(function (name) {
       visibleIndices.push(morpheus.MetadataUtil.indexOf(metadata, name));
@@ -1187,17 +1180,15 @@ morpheus.HeatMapToolBar.prototype = {
       for (var i = 0, length = searchResultViewIndices.length; i < length; i++) {
         var viewIndex = searchResultViewIndices[i];
         searchResultsModelIndices.push(isRows ? project
-          .convertViewRowIndexToModel(viewIndex) : project
-          .convertViewColumnIndexToModel(viewIndex));
+        .convertViewRowIndexToModel(viewIndex) : project
+        .convertViewColumnIndexToModel(viewIndex));
       }
     }
 
     if (searchResultViewIndices !== null && isMatchesOnTop) {
       var key = new morpheus.MatchesOnTopSortKey(project,
-        searchResultsModelIndices, 'matches on top');
-      sortKeys = sortKeys.filter(function (key) {
-        return !(key instanceof morpheus.MatchesOnTopSortKey);
-      });
+        searchResultsModelIndices, 'matches on top', !isRows);
+      // keep other sort keys
       searchResultViewIndices = key.indices; // matching indices
       // are now on top
       // add to beginning of sort keys
@@ -1234,11 +1225,10 @@ morpheus.HeatMapToolBar.prototype = {
         return a < b ? -1 : 1;
       });
       this.currentColumnSearchIndex = -1;
-
     }
     // update selection
     (!isRows ? project.getColumnSelectionModel() : project
-      .getRowSelectionModel()).setViewIndices(
+    .getRowSelectionModel()).setViewIndices(
       searchResultsViewIndicesSet, true);
 
     if (isMatchesOnTop) { // resort
@@ -1271,10 +1261,10 @@ morpheus.HeatMapToolBar.prototype = {
     }
     var project = this.controller.getProject();
     var sortKeys = options.isColumns ? project.getColumnSortKeys() : project.getRowSortKeys();
-    // clear existing sort keys except dendrogram
+    // remove existing matches on top key
     sortKeys = sortKeys
     .filter(function (key) {
-      return (key instanceof morpheus.SpecifiedModelSortOrder && key.name === 'dendrogram');
+      return !(key instanceof morpheus.MatchesOnTopSortKey && key.name === 'matches on top');
     });
     if (options.isOnTop) { // bring to top
       var key = new morpheus.MatchesOnTopSortKey(project,
