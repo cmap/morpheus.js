@@ -47,7 +47,7 @@ morpheus.HClusterTool.execute = function (dataset, input) {
     || input.cluster == 'Rows and columns';
   var doCluster = function (d, groupByFields) {
     return (groupByFields && groupByFields.length > 0) ? new morpheus.HClusterGroupBy(
-        d, groupByFields, f, linkageMethod)
+      d, groupByFields, f, linkageMethod)
       : new morpheus.HCluster(morpheus.HCluster
       .computeDistanceMatrix(d, f), linkageMethod);
   };
@@ -58,14 +58,14 @@ morpheus.HClusterTool.execute = function (dataset, input) {
   if (rows) {
     rowsHcl = doCluster(
       input.selectedColumnsToUseForClusteringRows ? new morpheus.SlicedDatasetView(dataset,
-          null, input.selectedColumnsToUseForClusteringRows) : dataset,
+        null, input.selectedColumnsToUseForClusteringRows) : dataset,
       input.group_rows_by);
   }
   if (columns) {
     columnsHcl = doCluster(
       morpheus.DatasetUtil
       .transposedView(input.selectedRowsToUseForClusteringColumns ? new morpheus.SlicedDatasetView(
-          dataset, input.selectedRowsToUseForClusteringColumns, null)
+        dataset, input.selectedRowsToUseForClusteringColumns, null)
         : dataset), input.group_columns_by);
 
   }
@@ -120,14 +120,14 @@ morpheus.HClusterTool.prototype = {
       value: morpheus.HClusterTool.Functions[4].toString(),
       type: 'select'
     }, {
-      name: 'cluster',
-      options: ['Columns', 'Rows', 'Rows and columns'],
-      value: 'Columns',
-      type: 'select'
-    }, {
       name: 'linkage_method',
       options: ['Average', 'Complete', 'Single'],
       value: 'Average',
+      type: 'select'
+    }, {
+      name: 'cluster',
+      options: ['Columns', 'Rows', 'Rows and columns'],
+      value: 'Columns',
       type: 'select'
     }, {
       name: 'group_columns_by',
@@ -151,13 +151,13 @@ morpheus.HClusterTool.prototype = {
     var project = options.project;
     var heatmap = options.controller;
     var selectedRowsToUseForClusteringColumns = options.input.cluster_columns_in_space_of_selected_rows_only ? project
-      .getRowSelectionModel().getViewIndices().values()
+    .getRowSelectionModel().getViewIndices().values()
       : null;
     if (selectedRowsToUseForClusteringColumns != null && selectedRowsToUseForClusteringColumns.length === 0) {
       selectedRowsToUseForClusteringColumns = null;
     }
     var selectedColumnsToUseForClusteringRows = options.input.cluster_rows_in_space_of_selected_columns_only ? project
-      .getColumnSelectionModel().getViewIndices().values()
+    .getColumnSelectionModel().getViewIndices().values()
       : null;
     if (selectedColumnsToUseForClusteringRows != null && selectedColumnsToUseForClusteringRows.length === 0) {
       selectedColumnsToUseForClusteringRows = null;
@@ -195,15 +195,14 @@ morpheus.HClusterTool.prototype = {
           modelOrder[i] = rowModelOrder[result.rowsHcl.reorderedIndices[i]];
         }
         heatmap.setDendrogram(result.rowsHcl.tree, false,
-          result.rowsHcl.reorderedIndices);
+          modelOrder);
       }
       if (result.columnsHcl) {
         var modelOrder = [];
         for (var i = 0; i < result.columnsHcl.reorderedIndices.length; i++) {
           modelOrder[i] = columnModelOrder[result.columnsHcl.reorderedIndices[i]];
         }
-        heatmap.setDendrogram(result.columnsHcl.tree, true,
-          result.columnsHcl.reorderedIndices);
+        heatmap.setDendrogram(result.columnsHcl.tree, true, modelOrder);
       }
     } else {
       var subtitle = ['clustering '];

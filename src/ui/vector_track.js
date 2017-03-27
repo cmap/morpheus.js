@@ -859,6 +859,7 @@ morpheus.VectorTrack.prototype = {
     var SORT_ASC = 'Sort Ascending';
     var SORT_DESC = 'Sort Descending';
     var FILTER = 'Filter...';
+    var MOVE_TO_TOP = 'Move To Top';
     var SORT_SEL_ASC = 'Sort Heat Map Ascending \u2191';
     var SORT_SEL_DESC = 'Sort Heat Map Descending \u2193';
     var SORT_SEL_TOP_N = 'Sort Heat Map Descending/Ascending';
@@ -908,7 +909,15 @@ morpheus.VectorTrack.prototype = {
         separator: true
       });
     }
+    sectionToItems.Selection.push({
+      name: MOVE_TO_TOP
+    });
 
+    if (sectionToItems.Selection.length > 0) {
+      sectionToItems.Selection.push({
+        separator: true
+      });
+    }
     sectionToItems.Selection.push({
       name: 'Copy',
       class: 'copy'
@@ -1527,6 +1536,42 @@ morpheus.VectorTrack.prototype = {
               'focus', {});
           }
 
+        } else if (item === MOVE_TO_TOP) {
+          var selectionModel = !_this.isColumns ? _this.project.getRowSelectionModel()
+            : _this.project
+            .getColumnSelectionModel();
+          var viewIndices = selectionModel.getViewIndices().values();
+          viewIndices.sort(function (a, b) {
+            return (a === b ? 0 : (a < b ? -1 : 1));
+          });
+          var converter = _this.isColumns ? _this.project.convertViewColumnIndexToModel
+            : _this.project.convertViewRowIndexToModel;
+          converter = _.bind(converter, project);
+          var modelIndices = [];
+          for (var i = 0, n = viewIndices.length; i < n; i++) {
+            modelIndices.push(converter(viewIndices[i]));
+          }
+          var sortKey = new morpheus.MatchesOnTopSortKey(_this.project, modelIndices, 'selection on' +
+            ' top', _this.isColumns);
+          if (_this.isColumns) {
+            _this.project
+            .setColumnSortKeys(
+              morpheus.SortKey
+              .keepExistingSortKeys(
+                [sortKey],
+                project
+                .getColumnSortKeys()),
+              true);
+          } else {
+            _this.project
+            .setRowSortKeys(
+              morpheus.SortKey
+              .keepExistingSortKeys(
+                [sortKey],
+                project
+                .getRowSortKeys()),
+              true);
+          }
         } else if (item === SORT_ASC || item === SORT_DESC) {
           var sortKey = new morpheus.SortKey(
             _this.name,
