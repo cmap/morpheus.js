@@ -1689,3 +1689,73 @@ morpheus.Util.getFilePath = function(session, str) {
   var fileName = splitted[splitted.length - 1].substring(0, splitted[splitted.length - 1].length - 2);
   return session.getLoc() + "files/" + fileName;
 };
+
+morpheus.Util.getTrueIndices = function(dataset) {
+  console.log('TrueIndices', dataset, dataset.dataset, dataset.dataset === undefined);
+  var rowIndices = dataset.rowIndices;
+  var rows = morpheus.Util.getConsNumbers(dataset.rowIndices.length);
+  var columnIndices = dataset.columnIndices;
+  var columns = morpheus.Util.getConsNumbers(dataset.columnIndices.length);
+  var iter = 0;
+  while (dataset.dataset && dataset.rowIndices && dataset.columnIndices) {
+      rowIndices = dataset.rowIndices;
+      columnIndices = dataset.columnIndices;
+
+      console.log(iter, rows, columns);
+      console.log(dataset.rowIndices);
+
+      var newRows = Array.apply(null, Array(rows.length)).map(Number.prototype.valueOf,0);
+      for (var i = 0; i < rows.length; i++) {
+          newRows[i] = dataset.rowIndices[rows[i]];
+      }
+      rows = newRows;
+      console.log(dataset.columnIndices);
+      var newCols = Array.apply(null, Array(columns.length)).map(Number.prototype.valueOf,0)
+      for (i = 0; i < columns.length; i++) {
+          newCols[i] = dataset.columnIndices[columns[i]];
+      }
+      columns = newCols;
+
+      dataset = dataset.dataset;
+      iter++;
+  }
+
+  console.log("res", rows, columns);
+  var conseqRows = morpheus.Util.getConsNumbers(dataset.rows);
+  var conseqCols = morpheus.Util.getConsNumbers(dataset.columns);
+  console.log(conseqCols);
+  var ans = {};
+  if (morpheus.Util.equalArrays(rows, conseqRows) || rows.length == 0 && morpheus.Util.equalArrays(conseqRows, rowIndices)) {
+    ans.rows = [];
+  }
+  else {
+    ans.rows = rows.length > 0 ? rows : rowIndices;
+  }
+    if (morpheus.Util.equalArrays(columns, conseqCols) || columns.length == 0 && morpheus.Util.equalArrays(conseqCols, columnIndices)) {
+        ans.columns = [];
+    }
+    else {
+        ans.columns = columns.length > 0 ? columns : columnIndices;
+    }
+  return ans;
+};
+
+morpheus.Util.getConsNumbers = function(n) {
+  var ar = [];
+  for (var i = 0; i < n; i++) {
+    ar.push(i);
+  }
+  return ar;
+};
+
+morpheus.Util.equalArrays = function (a, b) {
+    if (a.length != b.length || a == null || b == null) {
+      return false;
+    }
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) {
+        return false;
+      }
+    }
+    return true;
+};

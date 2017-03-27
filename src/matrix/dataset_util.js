@@ -1015,14 +1015,29 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 
 	var rowMeta = dataset.getRowMetadata();
 	var rowNames = [];
-	var rowNamesVec = rowMeta.getByName("id") ? rowMeta.getByName("id") : rowMeta.getByName("symbol");
+	var rowNamesVec = rowMeta.getByName("id");
 	for (j = 0; j < dataset.getRowCount(); j++) {
 		rowNames.push({
 			strval : rowNamesVec.getValue(j),
 			isNA : false
 		});
 	}
-	return {pdata : pDataArray, participants : participantID, labels : labelDescription, rownames : rowNames};
+	var symbolNames = rowMeta.getByName("symbol");
+	console.log(symbolNames);
+	var symbol = [];
+
+	if (symbolNames) {
+        for (j = 0; j < dataset.getRowCount(); j++) {
+            symbol.push({
+                strval: symbolNames.getValue(j),
+                isNA: false
+            });
+        }
+    }
+    else {
+	  symbol = rowNames;
+    }
+	return {pdata : pDataArray, participants : participantID, labels : labelDescription, rownames : rowNames, symbol : symbol};
 };
 
 morpheus.DatasetUtil.toESSessionPromise = function (options) {
@@ -1047,6 +1062,7 @@ morpheus.DatasetUtil.toESSessionPromise = function (options) {
 		var array = morpheus.DatasetUtil.getContentArray(dataset);
 		var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
 
+		console.log(array, meta);
 		var messageJSON = {
 			rclass : "LIST",
 			rexpValue : [{
@@ -1074,7 +1090,10 @@ morpheus.DatasetUtil.toESSessionPromise = function (options) {
 			}, {
 				rclass : "STRING",
 				stringValue : meta.rownames
-			}],
+			}, {
+			    rclass : "STRING",
+                stringValue : meta.symbol
+            }],
 			attrName : "names",
 			attrValue : {
 				rclass : "STRING",
@@ -1093,7 +1112,10 @@ morpheus.DatasetUtil.toESSessionPromise = function (options) {
 				}, {
 					strval : "rowNames",
 					isNA : false
-				}]
+				}, {
+				    strval : "symbol",
+                    isNA : false
+                }]
 			}
 		};
 		var ProtoBuf = dcodeIO.ProtoBuf;
