@@ -1,21 +1,21 @@
 morpheus.MatchesOnTopSortKey = function (project, modelIndices, name, columns) {
-  var modelHighlight = {};
+  var highlightedModelIndices = {};
   var p = project;
   var viewIndices = [];
   for (var i = 0, j = modelIndices.length, length = modelIndices.length; i < length; i++, j--) {
-    modelHighlight[modelIndices[i]] = j;
+    highlightedModelIndices[modelIndices[i]] = -1; // tie
     viewIndices.push(i);
   }
   this.comparator = function (i1, i2) {
-    var a = modelHighlight[i1];
+    var a = highlightedModelIndices[i1];
     if (a === undefined) {
       a = 0;
     }
-    var b = modelHighlight[i2];
+    var b = highlightedModelIndices[i2];
     if (b === undefined) {
       b = 0;
     }
-    return (a > b ? -1 : (a === b ? 0 : 1));
+    return (a === b ? 0 : (a < b ? -1 : 1));
   };
   this.indices = viewIndices;
   this.name = name;
@@ -82,7 +82,7 @@ morpheus.SortKey.prototype = {
           || morpheus.SortKey.ARRAY_MAX_SUMMARY_FUNCTION;
 
         this.c = this.sortOrder === morpheus.SortKey.SortOrder.ASCENDING ? morpheus.SortKey
-          .ARRAY_ASCENDING_COMPARATOR(summary)
+        .ARRAY_ASCENDING_COMPARATOR(summary)
           : morpheus.SortKey.ARRAY_DESCENDING_COMPARATOR(summary);
       } else {
         this.c = this.sortOrder === morpheus.SortKey.SortOrder.ASCENDING ? morpheus.SortKey.ASCENDING_COMPARATOR
@@ -269,7 +269,7 @@ morpheus.SortByValuesKey.prototype = {
   },
   getValue: function (i) {
     return this.modelIndexToValue ? this.modelIndexToValue[i] : this
-      .summaryFunction(this.rowView.setIndex(i));
+    .summaryFunction(this.rowView.setIndex(i));
   },
   setSortOrder: function (sortOrder) {
     if (typeof sortOrder === 'string') {
@@ -312,9 +312,8 @@ morpheus.SpecifiedModelSortOrder = function (modelIndices, nvisible, name, colum
   this.modelIndices = modelIndices;
   this.modelIndexToValue = modelIndexToValue;
   this.name = name;
-  this.c = morpheus.SortKey.ASCENDING_COMPARATOR;
+  this.c = morpheus.SortKey.NUMBER_ASCENDING_COMPARATOR;
   this.columns = columns;
-
 };
 morpheus.SpecifiedModelSortOrder.prototype = {
   isColumns: function () {
@@ -388,10 +387,13 @@ morpheus.SortKey.SortOrder = {
   CUSTOM: 3,
   TOP_N: 4
 };
+/**
+ * Comparator to sort ascending using lowercase string comparison
+ */
 morpheus.SortKey.ASCENDING_COMPARATOR = function (a, b) {
   // we want NaNs to end up at the bottom
-  var aNaN = (a == null || _.isNumber(a) && isNaN(a) || a.length === 0);
-  var bNaN = (b == null || _.isNumber(b) && isNaN(b) || b.length === 0);
+  var aNaN = (a == null);
+  var bNaN = (b == null);
   if (aNaN && bNaN) {
     return 0;
   }
@@ -401,20 +403,16 @@ morpheus.SortKey.ASCENDING_COMPARATOR = function (a, b) {
   if (bNaN) {
     return -1;
   }
-  if (a.toLowerCase) {
-    a = a.toLowerCase();
-  }
-  if (b.toLowerCase) {
-    b = b.toLowerCase();
-  }
-
+  a = ('' + a).toLowerCase();
+  b = ('' + b).toLowerCase();
   return (a === b ? 0 : (a < b ? -1 : 1));
 };
-
+/**
+ * Comparator to sort descending using lowercase string comparison
+ */
 morpheus.SortKey.DESCENDING_COMPARATOR = function (a, b) {
-
-  var aNaN = (a == null || _.isNumber(a) && isNaN(a) || a.length === 0);
-  var bNaN = (b == null || _.isNumber(b) && isNaN(b)) || b.length === 0;
+  var aNaN = (a == null);
+  var bNaN = (b == null);
   if (aNaN && bNaN) {
     return 0;
   }
@@ -424,12 +422,8 @@ morpheus.SortKey.DESCENDING_COMPARATOR = function (a, b) {
   if (bNaN) {
     return -1;
   }
-  if (a.toLowerCase) {
-    a = a.toLowerCase();
-  }
-  if (b.toLowerCase) {
-    b = b.toLowerCase();
-  }
+  a = ('' + a).toLowerCase();
+  b = ('' + b).toLowerCase();
   return (a === b ? 0 : (a < b ? 1 : -1));
 };
 
@@ -546,7 +540,7 @@ morpheus.SortKey.BOX_PLOT_SUMMARY_FUNCTION = function (array) {
     var v = morpheus.VectorUtil.arrayAsVector(array);
     box = morpheus
     .BoxPlotItem(this.indices != null ? new morpheus.SlicedVector(
-        v, this.indices) : v);
+      v, this.indices) : v);
     array.box = box;
   }
 
@@ -644,38 +638,23 @@ morpheus.SortKey.reverseComparator = function (c) {
   };
 };
 morpheus.SortKey.keepExistingSortKeys = function (newSortKeys, existingSortKeys) {
-  // keep MatchesOnTopSortKey and dendrogram
-  // var existingOnTopSortKey = null;
-  var existingSpecifiedSortKey = null;
+  var dendrogramSortKey = null;
+  var matchesOnTopSortKey = null;
   for (var i = 0, length = existingSortKeys.length; i < length; i++) {
     var key = existingSortKeys[i];
-    // if (key instanceof morpheus.MatchesOnTopSortKey) {
-    // existingOnTopSortKey = key;
-    // }
+    if (key instanceof morpheus.MatchesOnTopSortKey && key.toString() === 'matches on top') {
+      matchesOnTopSortKey = key;
+    }
     if (key instanceof morpheus.SpecifiedModelSortOrder
       && key.name === 'dendrogram') {
-      existingSpecifiedSortKey = key;
+      dendrogramSortKey = key;
     }
   }
-  if (existingSpecifiedSortKey) {
-    var newSortKeysHasTopSortKey = false;
-    var newSortKeysHasSpecifiedSortKey = false;
-    for (var i = 0, length = newSortKeys.length; i < length; i++) {
-      var key = newSortKeys[i];
-      // if (key instanceof morpheus.MatchesOnTopSortKey) {
-      // newSortKeysHasTopSortKey = true;
-      // }
-      if (key instanceof morpheus.SpecifiedModelSortOrder
-        && key.name === 'dendrogram') {
-        newSortKeysHasSpecifiedSortKey = true;
-      }
-    }
-    // if (existingOnTopSortKey && !newSortKeysHasTopSortKey) {
-    // newSortKeys.splice(0, 0, existingOnTopSortKey);
-    // }
-    if (existingSpecifiedSortKey && !newSortKeysHasSpecifiedSortKey) {
-      newSortKeys.splice(newSortKeys.length, 0, existingSpecifiedSortKey);
-    }
+  if (matchesOnTopSortKey) {
+    newSortKeys.splice(0, 0, matchesOnTopSortKey);
+  }
+  if (dendrogramSortKey) {
+    newSortKeys.splice(newSortKeys.length, 0, dendrogramSortKey);
   }
   return newSortKeys;
 };
