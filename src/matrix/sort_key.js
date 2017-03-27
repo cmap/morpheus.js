@@ -206,7 +206,6 @@ morpheus.SortByValuesKey.prototype = {
       };
     if (this.sortOrder === morpheus.SortKey.SortOrder.TOP_N) {
       var pairs = [];
-
       var missingIndices = [];
       for (var i = 0, nrows = visibleModelIndices.length; i < nrows; i++) {
         var index = visibleModelIndices[i];
@@ -302,6 +301,7 @@ morpheus.SortByValuesKey.prototype = {
  *            shown.
  * @param name
  *            This sort key name
+ * @param columns Whether column sort
  */
 morpheus.SpecifiedModelSortOrder = function (modelIndices, nvisible, name, columns) {
   this.nvisible = nvisible;
@@ -309,6 +309,7 @@ morpheus.SpecifiedModelSortOrder = function (modelIndices, nvisible, name, colum
   for (var i = 0, length = modelIndices.length; i < length; i++) {
     modelIndexToValue[modelIndices[i]] = i;
   }
+  this.modelIndices = modelIndices;
   this.modelIndexToValue = modelIndexToValue;
   this.name = name;
   this.c = morpheus.SortKey.ASCENDING_COMPARATOR;

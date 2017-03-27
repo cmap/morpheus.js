@@ -150,13 +150,6 @@ morpheus.VectorColorModel.prototype = {
     return cs;
 
   },
-  getContinuousMappedValue: function (vector, value) {
-    var cs = this.vectorNameToColorScheme.get(vector.getName());
-    if (cs === undefined) {
-      cs = this.createContinuousColorMap(vector);
-    }
-    return cs.getColor(0, 0, value);
-  },
   _getColorForValue: function (value) {
     var color = morpheus.VectorColorModel.getStandardColor(value);
     if (color == null) { // try to reuse existing color map
@@ -170,6 +163,13 @@ morpheus.VectorColorModel.prototype = {
       }
     }
     return color;
+  },
+  getContinuousMappedValue: function (vector, value) {
+    var cs = this.vectorNameToColorScheme.get(vector.getName());
+    if (cs === undefined) {
+      cs = this.createContinuousColorMap(vector);
+    }
+    return cs.getColor(0, 0, value);
   },
   getMappedValue: function (vector, value) {
     var metadataValueToColorMap = this.vectorNameToColorMap.get(vector

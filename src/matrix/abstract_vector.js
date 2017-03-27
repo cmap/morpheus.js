@@ -10,22 +10,22 @@
  * @constructor
  */
 morpheus.AbstractVector = function (name, size) {
-    this.name = name;
-    this.n = size;
-    this.properties = new morpheus.Map();
+  this.name = name;
+  this.n = size;
+  this.properties = new morpheus.Map();
 };
 
 morpheus.AbstractVector.prototype = {
-    getValue: function (index) {
-        throw new Error('Not implemented');
-    },
-    getProperties: function () {
-        return this.properties;
-    },
-    size: function () {
-        return this.n;
-    },
-    getName: function () {
-        return this.name;
-    }
+  getValue: function (index) {
+    throw new Error('Not implemented');
+  },
+  getProperties: function () {
+    return this.properties;
+  },
+  size: function () {
+    return this.n;
+  },
+  getName: function () {
+    return this.name;
+  }
 };

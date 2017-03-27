@@ -92,9 +92,9 @@ morpheus.KmeansTool.prototype = {
         //console.log(project.getRowSelectionModel());
         var number = parseInt(options.input.number_of_clusters);
         if (isNaN(number)) {
-            alert("Enter the expected number of clusters");
+
             console.log("KMeans :: Enter the expected number of clusters");
-            return;
+            throw new Error("Enter the expected number of clusters");
         }
         var replacena = options.input.replace_NA_with;
         //console.log(number);
@@ -102,7 +102,8 @@ morpheus.KmeansTool.prototype = {
         esPromise.then(function(essession) {
             var args = {
                 es : essession,
-                k : number
+                k : number,
+                replacena : replacena
             };
             if (columnIndices && columnIndices.length > 0 && columnIndices.length < dataset.columnIndices.length) {
                 args.cols = columnIndices;

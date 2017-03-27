@@ -38,10 +38,10 @@ morpheus.HeatMapOptions = function (controller) {
         name: 'fixed (-1.5, -0.1, 0.1, 1.5)',
         value: 'cn'
       }, {
-        name: 'fixed (-100, -98, -95, 95, 98, 100)',
+        name: 'fixed ' + morpheus.HeatMapColorScheme.Predefined.SUMMLY2().name,
         value: '100scale2'
       }, {
-        name: 'fixed (-100, -98, 98, 100)',
+        name: 'fixed ' + morpheus.HeatMapColorScheme.Predefined.SUMMLY().name,
         value: '100scale1'
       }]
     }, {
@@ -88,7 +88,7 @@ morpheus.HeatMapOptions = function (controller) {
       required: true,
       type: 'checkbox',
       col: 'col-xs-4',
-      value: controller.getProject().__symmetricProjectListener != null
+      value: controller.getProject().isSymmetric()
     },
     {
       name: 'show_grid',
@@ -192,7 +192,8 @@ morpheus.HeatMapOptions = function (controller) {
     .getColorScheme()
   });
   var updatingSizer = false;
-  colorSchemeChooser.on('change', function () {
+
+  function colorSchemeChooserUpdated() {
     if (controller.heatmap.getColorScheme().getSizer
       && controller.heatmap.getColorScheme().getSizer() != null) {
       colorSchemeFormBuilder.setValue('size_by', controller.heatmap
@@ -210,8 +211,11 @@ morpheus.HeatMapOptions = function (controller) {
         colorSchemeFormBuilder.setValue('size_by_maximum',
           controller.heatmap.getColorScheme().getSizer().getMax());
       }
-
     }
+  }
+
+  colorSchemeChooser.on('change', function () {
+    colorSchemeChooserUpdated();
     // repaint the heat map when color scheme changes
     controller.heatmap.setInvalid(true);
     controller.heatmap.repaint();
@@ -355,11 +359,9 @@ morpheus.HeatMapOptions = function (controller) {
     function (e) {
       var checked = $(this).prop('checked');
       if (checked) {
-        var l = new morpheus.SymmetricProjectListener(controller.getProject(), controller.vscroll, controller.hscroll);
-        controller.getProject().__symmetricProjectListener = l;
+        controller.getProject().setSymmetric(controller);
       } else {
-        controller.getProject().__symmetricProjectListener.dispose();
-        delete controller.getProject().__symmetricProjectListener;
+        controller.getProject().setSymmetric(null);
       }
     });
 
@@ -653,7 +655,7 @@ morpheus.HeatMapOptions = function (controller) {
   $tab.appendTo($div);
   // set current scheme
   colorSchemeChooser.setColorScheme(controller.heatmap.getColorScheme());
-  colorSchemeChooser.trigger('change');
+  colorSchemeChooserUpdated();
   $ul.find('[role=tab]:eq(1)').tab('show');
   morpheus.FormBuilder.showInModal({
     title: 'Options',

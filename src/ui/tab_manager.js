@@ -13,6 +13,14 @@ morpheus.TabManager = function (options) {
   this.activeTabId = null;
   this.idToTabObject = new morpheus.Map();
   this.$nav = $('<ul style="border-bottom:none;" class="nav nav-tabs compact"></ul>');
+  this.$nav.sortable({
+    containment: 'parent',
+    axis: 'x',
+    helper: 'clone',
+    cancel: 'li:not(.morpheus-sortable)',
+    items: 'li.morpheus-sortable'
+  });
+  this.$nav.sortable('disable');
   this.$nav.on('click', 'li > a', function (e) {
     var tabId = $(this).data('link');
     e.preventDefault();
@@ -22,7 +30,6 @@ morpheus.TabManager = function (options) {
   });
 
   function rename($a) {
-
     var builder = new morpheus.FormBuilder();
     builder.append({
       name: 'name',
@@ -35,7 +42,9 @@ morpheus.TabManager = function (options) {
       okCallback: function () {
         var name = $.trim(builder.getValue('name'));
         if (name !== '') {
-          _this.activeTabObject.setName(name);
+          if (_this.activeTabObject != null && _this.activeTabObject.setName) {
+            _this.activeTabObject.setName(name);
+          }
           $a.contents().first().replaceWith(name + '&nbsp;');
         }
       }
@@ -57,14 +66,42 @@ morpheus.TabManager = function (options) {
     e.stopPropagation();
     e.stopImmediatePropagation();
     var $a = $(this);
+    var menuItems = [];
     if ($a.data('morpheus-rename') && _this.options.rename) {
-      morpheus.Popup.showPopup([{
-        name: 'Rename'
-      }], {
+      menuItems.push({name: 'Rename'});
+    }
+    if ($a.data('morpheus-pin')) { // pinned
+      menuItems.push({name: 'Unpin tab'});
+    } else {
+      menuItems.push({name: 'Pin tab'});
+    }
+
+    if (menuItems.length > 0) {
+      morpheus.Popup.showPopup(menuItems, {
         x: e.pageX,
         y: e.pageY
       }, e.target, function (event, item) {
-        rename($a);
+        if (item === 'Rename') {
+          rename($a);
+        } else if (item === 'Pin tab') {
+          $a.data('morpheus-pin', true);
+          var $li = $a.parent('li');
+          $li.removeClass('morpheus-sortable');
+          $li.detach();
+          _this.$nav.prepend($li);
+          $a.find('.close').hide();    // hide close button
+          _this.$nav.sortable('option', 'items', 'li.morpheus-sortable');
+          _this.$nav.sortable('refresh');
+
+        } else if (item === 'Unpin tab') {
+          $a.data('morpheus-pin', false);
+          var $li = $a.parent('li');
+          $li.addClass('morpheus-sortable');
+          $a.find('.close').show(); // show close button
+          _this.$nav.sortable('option', 'items', 'li.morpheus-sortable');
+          _this.$nav.sortable('refresh');
+
+        }
       });
     }
     return false;
@@ -88,11 +125,11 @@ morpheus.TabManager = function (options) {
       return;
     }
     // triggered when clicking tab
-    var previous = _this.activeTabObject;
+    var previous = _this.activeTabId;
     _this.activeTabId = $(e.target).data('link');
     _this.activeTabObject = _this.idToTabObject.get(_this.activeTabId);
     _this.trigger('change', {
-      tab: _this.activeTabObject,
+      tab: _this.activeTabId,
       previous: previous
     });
   });
@@ -200,7 +237,7 @@ morpheus.TabManager.prototype = {
 
     this.idToTabObject.set(id, options.object);
     var li = [];
-    li.push('<li role="presentation">');
+    li.push('<li class="morpheus-sortable" role="presentation">');
     li.push('<a data-morpheus-rename="' + options.rename
       + '" data-toggle="tab" data-link="' + id + '" href="#' + id + '">');
     li.push(options.title);
@@ -237,6 +274,7 @@ morpheus.TabManager.prototype = {
       this.$nav.css('display', this.idToTabObject.size() > 1 ? ''
         : 'none');
     }
+    this.getTabCount() <= 1 ? this.$nav.sortable('disable') : this.$nav.sortable('enable');
     this.adding = false;
     return {
       $panel: $panel,
@@ -269,12 +307,11 @@ morpheus.TabManager.prototype = {
       this.$nav.css('display', this.idToTabObject.size() > 1 ? ''
         : 'none');
     }
+    this.getTabCount() <= 1 ? this.$nav.sortable('disable') : this.$nav.sortable('enable');
     if (this.idToTabObject.size() > 0) {
       $($a.attr('href')).focus();
-
     }
-
-    if (obj.onRemove) {
+    if (obj != null && obj.onRemove) {
       obj.onRemove();
     }
     this.trigger('remove', {
@@ -292,17 +329,20 @@ morpheus.TabManager.prototype = {
     return this.options;
   },
   setActiveTab: function (id) {
-    if (id === this.activeTabId) {
+    if (id !== this.activeTabId) {
+      var $a = this.$nav.find('[data-link=' + id + ']');
+      // make sure it's enabled
+      $a.parent().removeClass('disabled');
+      $a.removeClass('btn disabled');
+      $a.tab('show');
+      var previous = this.activeTabId;
+      this.activeTabId = id;
+      this.activeTabObject = this.idToTabObject.get(this.activeTabId);
       this.trigger('change', {
-        tab: this.activeTabObject,
-        previous: null
+        tab: this.activeTabId,
+        previous: previous
       });
     }
-    var $a = this.$nav.find('[data-link=' + id + ']');
-    // make sure it's enabled
-    $a.parent().removeClass('disabled');
-    $a.removeClass('btn disabled');
-    $a.tab('show');
 
   },
   /**
@@ -325,6 +365,9 @@ morpheus.TabManager.prototype = {
       $a.addClass('btn disabled');
     }
 
+  },
+  getIdToTabObject: function () {
+    return this.idToTabObject;
   },
   getTabObject: function (id) {
     return this.idToTabObject.get(id);

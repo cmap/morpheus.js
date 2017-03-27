@@ -72,7 +72,7 @@ morpheus.LimmaTool.prototype = {
         console.log("classB", classB);
 
         var dataset = project.getSortedFilteredDataset();
-        console.log(project, dataset);
+        console.log(dataset);
         var es = dataset.getESSession();
 
         var v = dataset.getColumnMetadata().getByName("Comparison");
@@ -130,12 +130,19 @@ morpheus.LimmaTool.prototype = {
 
         console.log(values);
 
+        var trueIndices = morpheus.Util.getTrueIndices(dataset);
+
         es.then(function(essession) {
             var args = {
                 es : essession,
-                fieldName : "Comparison",
                 fieldValues : values
             };
+            if (trueIndices.rows.length > 0) {
+                args.rows = trueIndices.rows;
+            }
+            if (trueIndices.columns.length > 0) {
+                args.columns = trueIndices.columns;
+            }
             console.log(args);
             var req = ocpu.call("limmaAnalysis", args, function(session) {
                 session.getObject(function(success) {
@@ -159,17 +166,28 @@ morpheus.LimmaTool.prototype = {
                             var data = morpheus.Util.getRexpData(res, rclass);
                             var names = morpheus.Util.getFieldNames(res, rclass);
                             var vs = [];
+                            var rows = trueIndices.rows.length > 0 ? trueIndices.rows : dataset.rowIndices;
+                            console.log(trueIndices.rows);
+                            if (trueIndices.rows.length > 0) {
+                                var backRows = Array.apply(null, Array(dataset.rowIndices.length)).map(Number.prototype.valueOf,0);
+                                for (var i = 0; i < trueIndices.rows.length; i++) {
+                                    backRows[rows[i]] = i;
+                                }
+                                rows = backRows;
+                            }
+                            console.log("rows", rows);
                             names.forEach(function (name) {
                                 if (name !== "symbol") {
                                     console.log(name, data[name]);
                                     var v = dataset.getRowMetadata().add(name);
                                     for (var i = 0; i < dataset.getRowCount(); i++) {
-                                        v.setValue(i, data[name].values[dataset.rowIndices[i]]);
+                                        v.setValue(i, data[name].values[i]);
                                     }
                                     vs.push(v);
                                 }
 
                             });
+                            alert("Limma finished successfully");
                             project.trigger('trackChanged', {
                                 vectors : vs,
                                 render : []

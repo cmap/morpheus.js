@@ -27,16 +27,23 @@ morpheus.HeatMapColorScheme = function (project, scheme) {
 morpheus.HeatMapColorScheme.Predefined = {};
 morpheus.HeatMapColorScheme.Predefined.SUMMLY = function () {
   return {
+    name: '(-100, -97.5, -95, 95, 97.5, 100)',
     type: 'fixed',
     map: [{
       value: -100,
       color: '#0000ff'
     }, {
-      value: -98,
+      value: -97.5,
+      color: '#abdda4'
+    }, {
+      value: -95,
       color: '#ffffff'
     }, {
-      value: 98,
+      value: 95,
       color: '#ffffff'
+    }, {
+      value: 97.5,
+      color: '#fdae61'
     }, {
       value: 100,
       color: '#ff0000'
@@ -46,21 +53,22 @@ morpheus.HeatMapColorScheme.Predefined.SUMMLY = function () {
 
 morpheus.HeatMapColorScheme.Predefined.SUMMLY2 = function () {
   return {
+    name: '(-100, -95, -90, 90, 95, 100)',
     type: 'fixed',
     map: [{
       value: -100,
       color: '#0000ff'
     }, {
-      value: -98,
+      value: -95,
       color: '#abdda4'
     }, {
-      value: -95,
+      value: -90,
+      color: '#ffffff'
+    }, {
+      value: 90,
       color: '#ffffff'
     }, {
       value: 95,
-      color: '#ffffff'
-    }, {
-      value: 98,
       color: '#fdae61'
     }, {
       value: 100,
@@ -500,19 +508,6 @@ morpheus.HeatMapColorScheme.prototype = {
     }
     this.cachedRowStats = new morpheus.RowStats(dataset);
   },
-  /**
-   * @private
-   */
-  _ensureColorSupplierExists: function () {
-    this.currentColorSupplier = this.rowValueToColorSupplier[this.value];
-    if (this.currentColorSupplier === undefined) {
-      var cs = morpheus.HeatMapColorScheme.createColorSupplier({
-        type: 'relative'
-      });
-      this.rowValueToColorSupplier[this.value] = cs;
-      this.currentColorSupplier = cs;
-    }
-  },
   setColorSupplierForCurrentValue: function (colorSupplier) {
     this.rowValueToColorSupplier[this.value] = colorSupplier;
     this.currentColorSupplier = colorSupplier;
@@ -544,6 +539,19 @@ morpheus.HeatMapColorScheme.prototype = {
       val = (val - this.cachedRowStats.rowCachedMean) / this.cachedRowStats.rowCachedStandardDeviation;
     }
     return this.currentColorSupplier.getColor(row, column, val);
+  },
+  /**
+   * @private
+   */
+  _ensureColorSupplierExists: function () {
+    this.currentColorSupplier = this.rowValueToColorSupplier[this.value];
+    if (this.currentColorSupplier === undefined) {
+      var cs = morpheus.HeatMapColorScheme.createColorSupplier({
+        type: 'relative'
+      });
+      this.rowValueToColorSupplier[this.value] = cs;
+      this.currentColorSupplier = cs;
+    }
   }
 };
 morpheus.RowStats = function (dataset) {

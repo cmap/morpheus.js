@@ -572,6 +572,9 @@ morpheus.Util.autosuggest = function (options) {
       minLength: options.minLength,
       delay: options.delay,
       source: function (request, response) {
+        if (request.term.history && options.history) {
+          return options.history(response);
+        }
         // delegate back to autocomplete, but extract the
         // autocomplete term
         var terms = morpheus.Util
@@ -607,24 +610,25 @@ morpheus.Util.autosuggest = function (options) {
 
   // use html for label instead of default text, class for categories vs. items
   var instance = options.$el.autocomplete('instance');
-  instance._renderItem = function (ul, item) {
-    if (item.value == null) { // category
-      return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-category">')
+  if (instance != null) {
+    instance._renderItem = function (ul, item) {
+      if (item.value == null) { // category
+        return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-category">')
+        .append($('<div>').html(item.label))
+        .appendTo(ul);
+      }
+      return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-item">')
       .append($('<div>').html(item.label))
       .appendTo(ul);
-    }
-    return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-item">')
-    .append($('<div>').html(item.label))
-    .appendTo(ul);
-  };
-  instance._normalize = function (items) {
-    return items;
-  };
-  instance._resizeMenu = function () {
-    var ul = this.menu.element;
-    ul.outerWidth(instance.element.outerWidth());
-  };
-
+    };
+    instance._normalize = function (items) {
+      return items;
+    };
+    instance._resizeMenu = function () {
+      var ul = this.menu.element;
+      ul.outerWidth(instance.element.outerWidth());
+    };
+  }
   var menu = options.$el.autocomplete('widget');
   menu.menu('option', 'items', '> :not(.search-category)');
   if (menu) {
@@ -639,12 +643,10 @@ morpheus.Util.autosuggest = function (options) {
   options.$el.on('keyup', function (e) {
     if (e.which === 13 && !searching) {
       options.$el.autocomplete('close');
-
-    } else if (options.suggestWhenEmpty) {
-      if (options.$el.val() === '') {
-        options.$el.autocomplete('search', '');
-      }
-
+    } else if (e.which === 38 && options.history) { // up arrow
+      options.$el.autocomplete('search', {history: true});
+    } else if (options.suggestWhenEmpty && options.$el.val() === '') {
+      options.$el.autocomplete('search', '');
     }
   });
 
@@ -1300,7 +1302,7 @@ morpheus.Util.splitLines = function (lines) {
 /**
  * @param file
  *            a File or url
- * @return A deferred object that resolves to an array of arrays
+ * @return A deferred object that resolves to an array of strings
  */
 morpheus.Util.readLines = function (fileOrUrl, interactive) {
   var isFile = fileOrUrl instanceof File;
@@ -1346,9 +1348,15 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
     var reader = new FileReader();
     reader.onload = function (event) {
       if (ext === 'xlsx' || ext === 'xls') {
+        var data = new Uint8Array(event.target.result);
+        var arr = [];
+        for (var i = 0; i != data.length; ++i) {
+          arr[i] = String.fromCharCode(data[i]);
+        }
+        var bstr = arr.join('');
         morpheus.Util
         .xlsxTo1dArray({
-          data: event.target.result,
+          data: bstr,
           prompt: interactive
         }, function (err, lines) {
           deferred.resolve(lines);
@@ -1359,7 +1367,7 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
 
     };
     if (ext === 'xlsx' || ext === 'xls') {
-      reader.readAsBinaryString(fileOrUrl);
+      reader.readAsArrayBuffer(fileOrUrl);
     } else {
       reader.readAsText(fileOrUrl);
     }
@@ -1680,4 +1688,74 @@ morpheus.Util.getFilePath = function(session, str) {
   var splitted = str.split("/");
   var fileName = splitted[splitted.length - 1].substring(0, splitted[splitted.length - 1].length - 2);
   return session.getLoc() + "files/" + fileName;
+};
+
+morpheus.Util.getTrueIndices = function(dataset) {
+  console.log('TrueIndices', dataset, dataset.dataset, dataset.dataset === undefined);
+  var rowIndices = dataset.rowIndices;
+  var rows = morpheus.Util.getConsNumbers(dataset.rowIndices.length);
+  var columnIndices = dataset.columnIndices;
+  var columns = morpheus.Util.getConsNumbers(dataset.columnIndices.length);
+  var iter = 0;
+  while (dataset.dataset && dataset.rowIndices && dataset.columnIndices) {
+      rowIndices = dataset.rowIndices;
+      columnIndices = dataset.columnIndices;
+
+      console.log(iter, rows, columns);
+      console.log(dataset.rowIndices);
+
+      var newRows = Array.apply(null, Array(rows.length)).map(Number.prototype.valueOf,0);
+      for (var i = 0; i < rows.length; i++) {
+          newRows[i] = dataset.rowIndices[rows[i]];
+      }
+      rows = newRows;
+      console.log(dataset.columnIndices);
+      var newCols = Array.apply(null, Array(columns.length)).map(Number.prototype.valueOf,0)
+      for (i = 0; i < columns.length; i++) {
+          newCols[i] = dataset.columnIndices[columns[i]];
+      }
+      columns = newCols;
+
+      dataset = dataset.dataset;
+      iter++;
+  }
+
+  console.log("res", rows, columns);
+  var conseqRows = morpheus.Util.getConsNumbers(dataset.rows);
+  var conseqCols = morpheus.Util.getConsNumbers(dataset.columns);
+  console.log(conseqCols);
+  var ans = {};
+  if (morpheus.Util.equalArrays(rows, conseqRows) || rows.length == 0 && morpheus.Util.equalArrays(conseqRows, rowIndices)) {
+    ans.rows = [];
+  }
+  else {
+    ans.rows = rows.length > 0 ? rows : rowIndices;
+  }
+    if (morpheus.Util.equalArrays(columns, conseqCols) || columns.length == 0 && morpheus.Util.equalArrays(conseqCols, columnIndices)) {
+        ans.columns = [];
+    }
+    else {
+        ans.columns = columns.length > 0 ? columns : columnIndices;
+    }
+  return ans;
+};
+
+morpheus.Util.getConsNumbers = function(n) {
+  var ar = [];
+  for (var i = 0; i < n; i++) {
+    ar.push(i);
+  }
+  return ar;
+};
+
+morpheus.Util.equalArrays = function (a, b) {
+    if (a.length != b.length || a == null || b == null) {
+      return false;
+    }
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) {
+        return false;
+      }
+    }
+    return true;
 };
