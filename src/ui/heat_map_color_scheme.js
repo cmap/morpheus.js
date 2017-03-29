@@ -12,9 +12,13 @@ morpheus.HeatMapColorScheme = function (project, scheme) {
   this.rowValueToColorSupplier = {};
   this.value = null;
   if (scheme) {
-    this.rowValueToColorSupplier[null] = morpheus.HeatMapColorScheme
-    .createColorSupplier(scheme);
-    this.currentColorSupplier = this.rowValueToColorSupplier[this.value];
+    if (scheme.valueToColorScheme) { // json representation
+      this.fromJson(scheme);
+    } else {
+      this.rowValueToColorSupplier[null] = morpheus.HeatMapColorScheme
+      .createColorSupplier(scheme);
+      this.currentColorSupplier = this.rowValueToColorSupplier[this.value];
+    }
   }
   project
   .on(
@@ -359,7 +363,7 @@ morpheus.HeatMapColorScheme.prototype = {
   },
   getHiddenValues: function () {
     return this.currentColorSupplier.getHiddenValues ? this.currentColorSupplier
-      .getHiddenValues()
+    .getHiddenValues()
       : null;
   },
   getMissingColor: function () {
@@ -430,13 +434,13 @@ morpheus.HeatMapColorScheme.prototype = {
     if (this.separateColorSchemeForRowMetadataField != null) {
       json.separateColorSchemeForRowMetadataField = this.separateColorSchemeForRowMetadataField;
     }
-    json.colorSchemes = {};
+    json.valueToColorScheme = {};
     _.each(_.keys(this.rowValueToColorSupplier), function (key) {
       // save each scheme
-      json.colorSchemes[key] = morpheus.AbstractColorSupplier.toJson(_this.rowValueToColorSupplier[key]);
+      json.valueToColorScheme[key] = morpheus.AbstractColorSupplier.toJson(_this.rowValueToColorSupplier[key]);
     });
 
-    return JSON.stringify(json);
+    return json;
   },
   fromJson: function (json) {
     var _this = this;
@@ -447,9 +451,10 @@ morpheus.HeatMapColorScheme.prototype = {
         this.separateColorSchemeForRowMetadataField);
     }
     this.rowValueToColorSupplier = {};
-    _.each(_.keys(json.colorSchemes), function (key) {
+    var obj = json.valueToColorScheme || json.colorSchemes;
+    _.each(_.keys(obj), function (key) {
       var colorSupplier = morpheus.AbstractColorSupplier
-      .fromJson(json.colorSchemes[key]);
+      .fromJson(obj[key]);
       _this.rowValueToColorSupplier[key] = colorSupplier;
     });
     this._ensureColorSupplierExists();
