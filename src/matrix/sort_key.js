@@ -22,6 +22,10 @@ morpheus.MatchesOnTopSortKey = function (project, modelIndices, name, columns) {
   this.columns = columns;
 };
 morpheus.MatchesOnTopSortKey.prototype = {
+  /**
+   * Indicates whether this key is sorting rows or columns.
+   * @return {*}
+   */
   isColumns: function () {
     return this.columns;
   },
@@ -659,3 +663,65 @@ morpheus.SortKey.keepExistingSortKeys = function (newSortKeys, existingSortKeys)
   return newSortKeys;
 };
 
+morpheus.SortKey.fromJson = function (project, json) {
+  var sortKeys = [];
+  json.forEach(function (key) {
+    if (key.type === 'annotation') {
+      sortKeys.push(new morpheus.SortKey(key.field, key.order, key.isColumns));
+    } else if (key.type === 'byValues') {
+      sortKeys.push(new morpheus.SortByValuesKey(key.modelIndices, key.order, key.isColumns));
+    } else if (key.type === 'specified') {
+      sortKeys.push(new morpheus.SpecifiedModelSortOrder(key.modelIndices, key.nvisible, key.name, key.isColumns));
+    } else if (key.type === 'matchesOnTop') {
+      sortKeys.push(new morpheus.MatchesOnTopSortKey(project, key.modelIndices, key.name, key.isColumns));
+    } else {
+      if (key.field != null) {
+        sortKeys.push(new morpheus.SortKey(key.field, key.order));
+      } else {
+        console.log('Unknown key: ' + key);
+      }
+    }
+  });
+  return sortKeys;
+};
+
+morpheus.SortKey.toJson = function (sortKeys) {
+  var json = [];
+  sortKeys.forEach(function (key) {
+    if (key instanceof morpheus.SortKey) {
+      json.push({
+        isColumns: key.isColumns(),
+        order: key.getSortOrder(),
+        type: 'annotation',
+        field: '' + key,
+      });
+    } else if (key instanceof morpheus.SortByValuesKey) {
+      json.push({
+        isColumns: key.isColumns(),
+        order: key.getSortOrder(),
+        type: 'byValues',
+        modelIndices: key.modelIndices
+      });
+    } else if (key instanceof morpheus.SpecifiedModelSortOrder) {
+      json.push({
+        isColumns: key.isColumns(),
+        order: key.getSortOrder(),
+        type: 'specified',
+        modelIndices: key.modelIndices,
+        name: key.name,
+        nvisible: key.nvisible
+      });
+    } else if (key instanceof morpheus.MatchesOnTopSortKey) {
+      json.push({
+        isColumns: key.isColumns(),
+        order: key.getSortOrder(),
+        type: 'matchesOnTop',
+        modelIndices: key.modelIndices,
+        name: key.name
+      });
+    } else {
+      console.log('Unknown sort key type');
+    }
+  });
+  return json;
+};
