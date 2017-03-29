@@ -181,6 +181,11 @@ morpheus.HeatMapToolBar = function (controller) {
       + morpheus.Util.COMMAND_KEY
       + 'Shift+S)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-floppy-o"></span></button>');
   }
+  if (controller.options.toolbar.saveSession) {
+    toolbarHtml
+    .push('<button name="saveSession" data-toggle="tooltip" title="Save Session" type="button"' +
+      ' class="btn btn-default btn-xxs"><span class="fa fa-anchor"></span></button>');
+  }
 
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
   if (controller.options.toolbar.filter) {
@@ -383,6 +388,10 @@ morpheus.HeatMapToolBar = function (controller) {
   $el.find('[name=saveDataset]').on('click', function () {
     morpheus.HeatMap.showTool(new morpheus.SaveDatasetTool(), controller);
   });
+  $el.find('[name=saveSession]').on('click', function () {
+    morpheus.HeatMap.showTool(new morpheus.SaveSessionTool(), controller);
+  });
+
   $el.find('[name=chart]').on(
     'click',
     function () {
@@ -582,7 +591,14 @@ morpheus.HeatMapToolBar = function (controller) {
     }
     $next.click();
   };
-  $($searchToggle.filter(':visible')[0]).click();
+  for (var i = 0; i < $searchToggle.length; i++) {
+    var $button = $($searchToggle[i]);
+    if ($button.css('display') === 'block') {
+      $button.click();
+      break;
+    }
+  }
+
   controller.on('dendrogramAnnotated', function (e) {
     if (e.isColumns) { // show buttons
       _this.rowDendrogramSearchObject.$toggleButton.show();
@@ -1033,6 +1049,17 @@ morpheus.HeatMapToolBar.prototype = {
         this.rowSearchResultViewIndicesSorted[this.currentRowSearchIndex]));
     }
   },
+  getSearchField: function (type) {
+    if (type === morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD) {
+      return this.columnSearchObject.$search;
+    } else if (type === morpheus.HeatMapToolBar.ROW_SEARCH_FIELD) {
+      return this.rowSearchObject.$search;
+    } else if (type === morpheus.HeatMapToolBar.COLUMN_DENDROGRAM_SEARCH_FIELD) {
+      return this.columnDendrogramSearchObject.$search;
+    } else if (type === morpheus.HeatMapToolBar.ROW_DENDROGRAM_SEARCH_FIELD) {
+      return this.rowDendrogramSearchObject.$search;
+    }
+  },
   setSearchText: function (options) {
     var $tf = options.isColumns ? this.columnSearchObject.$search
       : this.rowSearchObject.$search;
@@ -1288,3 +1315,7 @@ morpheus.HeatMapToolBar.prototype = {
 
   }
 };
+morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD = 'column';
+morpheus.HeatMapToolBar.ROW_SEARCH_FIELD = 'column';
+morpheus.HeatMapToolBar.COLUMN_DENDROGRAM_SEARCH_FIELD = 'column_dendrogram';
+morpheus.HeatMapToolBar.ROW_DENDROGRAM_SEARCH_FIELD = 'row_dendrogram';
