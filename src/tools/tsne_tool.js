@@ -99,7 +99,11 @@ morpheus.TsneTool.prototype = {
 
     worker.postMessage({
       scripts: [morpheus.Util.getScriptPath()],
-      dataset: morpheus.Dataset.toJson(dataset, {}),
+      dataset: morpheus.Dataset.toJson(dataset, {
+        columnFields: [],
+        rowFields: [],
+        seriesIndices: [0]
+      }),
       input: options.input
     });
 

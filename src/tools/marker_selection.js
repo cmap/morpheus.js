@@ -338,7 +338,8 @@ morpheus.MarkerSelection.prototype = {
           scripts: morpheus.Util.getScriptPath(),
           dataset: morpheus.Dataset.toJson(subset, {
             columnFields: [],
-            rowFields: []
+            rowFields: [],
+            seriesIndices: [0]
           }),
           input: options.input
         });

@@ -229,7 +229,8 @@ morpheus.HClusterTool.prototype = {
         scripts: morpheus.Util.getScriptPath(),
         dataset: morpheus.Dataset.toJson(dataset, {
           columnFields: options.input.group_columns_by || [],
-          rowFields: options.input.group_rows_by || []
+          rowFields: options.input.group_rows_by || [],
+          seriesIndices: [0]
         }),
         input: options.input
       });

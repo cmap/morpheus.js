@@ -58,7 +58,8 @@ morpheus.SimilarityMatrixTool.prototype = {
       scripts: morpheus.Util.getScriptPath(),
       dataset: morpheus.Dataset.toJson(dataset, {
         columnFields: [],
-        rowFields: []
+        rowFields: [],
+        seriesIndices: [0]
       }),
       input: options.input
     });
@@ -67,7 +68,7 @@ morpheus.SimilarityMatrixTool.prototype = {
       var name = controller.getName();
       var matrix = e.data;
       var n = isColumnMatrix ? dataset.getColumnCount() : dataset
-        .getRowCount();
+      .getRowCount();
       var d = new morpheus.Dataset({
         name: name,
         rows: n,
