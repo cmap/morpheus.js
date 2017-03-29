@@ -1,6 +1,8 @@
 /*
  * 
- * @param tree An object with maxHeight, rootNode, leafNodes, nLeafNodes. Each node has an id (integer), name (string), children, height, minIndex, maxIndex, parent. Leaf nodes also have an index.
+ * @param tree An object with maxHeight, rootNode, leafNodes, nLeafNodes. Each node has an id
+ * (integer), name (string), children, depth, height, minIndex, maxIndex, parent. Leaf nodes also
+ * have an index.
  The root has the largest height, leaves the smallest height.
 
  */
@@ -122,7 +124,28 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
           },
           e.target,
           function (menuItem, item) {
-            if (item === 'Flip') {
+            if (item === 'Save') {
+              var formBuilder = new morpheus.FormBuilder();
+              formBuilder.append({
+                name: 'file_name',
+                type: 'text',
+                required: true,
+              });
+              morpheus.FormBuilder.showOkCancel({
+                title: 'Save Dendrogram',
+                content: formBuilder.$form,
+                okCallback: function () {
+                  var fileName = formBuilder.getValue('file_name');
+                  if (fileName === '') {
+                    fileName = 'dendrogram.txt';
+                  }
+                  var out = [];
+                  morpheus.DendrogramUtil.writeNewick(tree.rootNode, out);
+                  var blob = new Blob([out.join('')], {type: 'text/plain;charset=charset=utf-8'});
+                  saveAs(blob, fileName, true);
+                }
+              });
+            } else if (item === 'Flip') {
               if (selectedNode != null) {
                 var isColumns = morpheus.AbstractDendrogram.Type.COLUMN === _this.type;
                 var min = selectedNode.minIndex;
@@ -361,7 +384,7 @@ morpheus.AbstractDendrogram.prototype = {
     var _this = this;
     var viewIndices;
     var selectionModel = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? this.project
-      .getColumnSelectionModel()
+    .getColumnSelectionModel()
       : this.project.getRowSelectionModel();
     if (node == null) {
       // clear selection
@@ -444,7 +467,7 @@ morpheus.AbstractDendrogram.prototype = {
     this.$squishedLabel.text('');
     var dataset = this.project.getSortedFilteredDataset();
     var clusterIdVector = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? dataset
-      .getColumnMetadata().getByName('dendrogram_cut')
+    .getColumnMetadata().getByName('dendrogram_cut')
       : dataset.getRowMetadata().getByName('dendrogram_cut');
     if (clusterIdVector) {
       for (var i = 0, size = clusterIdVector.size(); i < size; i++) {
@@ -463,7 +486,7 @@ morpheus.AbstractDendrogram.prototype = {
       this.cutHeight);
     var dataset = this.project.getSortedFilteredDataset();
     var clusterIdVector = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? dataset
-      .getColumnMetadata().add('dendrogram_cut')
+    .getColumnMetadata().add('dendrogram_cut')
       : dataset.getRowMetadata().add('dendrogram_cut');
     for (var i = 0, nroots = roots.length; i < nroots; i++) {
       var root = roots[i];
