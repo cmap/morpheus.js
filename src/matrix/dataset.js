@@ -18,18 +18,38 @@ morpheus.Dataset = function (options) {
 
   this.seriesNames.push(options.name);
   this.seriesArrays.push(options.array ? options.array : morpheus.Dataset
-    .createArray(options));
+  .createArray(options));
   this.seriesDataTypes.push(options.dataType);
 };
+/**
+ *
+ * @param dataset
+ * @param options.rowFields
+ * @param options.columnFields
+ * @param options.seriesIndices
+ * @return JSON representation of a dataset
+ */
 morpheus.Dataset.toJson = function (dataset, options) {
   options = options || {};
-
-  var data = [];
-  for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-    var row = [];
-    data.push(row);
-    for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-      row[j] = dataset.getValue(i, j);
+  var seriesArrays = [];
+  var seriesDataTypes = [];
+  var seriesNames = [];
+  var seriesIndices = options.seriesIndices;
+  if (seriesIndices == null) {
+    seriesIndices = morpheus.Util.sequ32(dataset.getSeriesCount());
+  }
+  for (var series = 0; series < seriesIndices.length; series++) {
+    var seriesIndex = seriesIndices[series];
+    seriesNames.push(dataset.getName(seriesIndex));
+    seriesDataTypes.push(dataset.getDataType(seriesIndex));
+    var data = [];
+    seriesArrays.push(data);
+    for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+      var row = [];
+      data.push(row);
+      for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+        row[j] = dataset.getValue(i, j, seriesIndex);
+      }
     }
   }
   var vectorToJson = function (vector) {
@@ -66,9 +86,9 @@ morpheus.Dataset.toJson = function (dataset, options) {
   return {
     rows: dataset.getRowCount(),
     columns: dataset.getColumnCount(),
-    seriesArrays: [data],
-    seriesDataTypes: [dataset.getDataType(0)],
-    seriesNames: [dataset.getName()],
+    seriesArrays: seriesArrays,
+    seriesDataTypes: seriesDataTypes,
+    seriesNames: seriesNames,
     rowMetadataModel: {
       vectors: metadataToJson(dataset.getRowMetadata(),
         options.rowFields)
