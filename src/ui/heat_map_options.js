@@ -228,8 +228,8 @@ morpheus.HeatMapOptions = function (controller) {
       value[name] = true;
     });
     _.each(morpheus.MetadataUtil.getMetadataNames(isColumns ? controller
-        .getProject().getFullDataset().getColumnMetadata() : controller
-        .getProject().getFullDataset().getRowMetadata()),
+      .getProject().getFullDataset().getColumnMetadata() : controller
+      .getProject().getFullDataset().getRowMetadata()),
       function (name) {
         options.push(name);
       });
@@ -436,7 +436,7 @@ morpheus.HeatMapOptions = function (controller) {
 
   colorSchemeFormBuilder.find('save_color_scheme').on('click', function (e) {
     e.preventDefault();
-    var blob = new Blob([controller.heatmap.getColorScheme().toJson()], {
+    var blob = new Blob([JSON.stringify(controller.heatmap.getColorScheme().toJson())], {
       type: 'application/json'
     });
     saveAs(blob, 'color_scheme.json');
