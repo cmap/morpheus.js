@@ -236,7 +236,7 @@ morpheus.HeatMap = function (options) {
         options: true,
         saveImage: true,
         saveDataset: true,
-        saveSession: true,
+        saveSession: false,
         openFile: true,
         filter: true,
         colorKey: true,
