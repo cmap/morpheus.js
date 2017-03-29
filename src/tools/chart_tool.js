@@ -320,7 +320,7 @@ morpheus.ChartTool.getPlotlyDefaults2 = function () {
   return plotly;
 };
 
-morpheus.ChartTool.BUTTONS_TO_REMOVE_FOR_STATIC_CHART = ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'];
+morpheus.ChartTool.BUTTONS_TO_REMOVE_FOR_STATIC_CHART = ['select2d', 'lasso2d']; // ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'];
 morpheus.ChartTool.getPlotlyDefaults = function () {
   var layout = {
     hovermode: 'closest',
