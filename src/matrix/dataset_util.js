@@ -24,7 +24,7 @@ morpheus.DatasetUtil.slicedView = function (dataset, rows, columns) {
 };
 morpheus.DatasetUtil.transposedView = function (dataset) {
   return dataset instanceof morpheus.TransposedDatasetView ? dataset
-    .getDataset() : new morpheus.TransposedDatasetView(dataset);
+  .getDataset() : new morpheus.TransposedDatasetView(dataset);
 };
 morpheus.DatasetUtil.max = function (dataset, seriesIndex) {
   seriesIndex = seriesIndex || 0;
@@ -439,11 +439,10 @@ morpheus.DatasetUtil.getSeriesNames = function (dataset) {
  *      The dataset
  * @param options.text
  *            Search text
- * @param options.cb
- *            Callback to add a match
  * @param options.defaultMatchMode
  *            'exact' or 'contains'
  * @param options.matchAllPredicates Whether to match all predicates
+ * @return Set of matching indices.
  *
  */
 morpheus.DatasetUtil.searchValues = function (options) {
@@ -452,7 +451,6 @@ morpheus.DatasetUtil.searchValues = function (options) {
   }
   var dataset = options.dataset;
   var text = options.text;
-  var cb = options.cb;
   var tokens = morpheus.Util.getAutocompleteTokens(text);
   if (tokens.length == 0) {
     return;
@@ -890,7 +888,8 @@ morpheus.DatasetUtil.copy = function (dataset) {
     columns: dataset.getColumnCount(),
     dataType: dataset.getDataType(0)
   });
-  for (var seriesIndex = 0, nseries = dataset.getSeriesCount(); seriesIndex < nseries; seriesIndex++) {
+  for (var seriesIndex = 0,
+         nseries = dataset.getSeriesCount(); seriesIndex < nseries; seriesIndex++) {
     if (seriesIndex > 0) {
       newDataset.addSeries({
         name: dataset.getName(seriesIndex),
