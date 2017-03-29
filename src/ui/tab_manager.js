@@ -203,6 +203,9 @@ morpheus.TabManager = function (options) {
 
 };
 morpheus.TabManager.prototype = {
+  getTabText: function (id) {
+    return this.$nav.find('> li > a').filter('a[data-link=' + id + ']').contents().first().text();
+  },
   getTabCount: function () {
     return this.idToTabObject.size();
   },
