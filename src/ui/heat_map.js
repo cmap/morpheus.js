@@ -2414,16 +2414,16 @@ morpheus.HeatMap.prototype = {
       this.$tipInfoWindow.html(tipText.join(''));
     }
 
-    if (tipFollowText.length > 0) {
+    if (tipFollowText != null) {
       this.tipFollowHidden = false;
-      this.$tipFollow.html('<span style="max-width:400px;">' + tipFollowText.join('') + '</span>');
+      this.$tipFollow.html(tipFollowText);
       this._updateTipFollowPosition(options);
     } else {
       this.tipFollowHidden = true;
-      this.$tipFollow.html('').css({
-        left: -1000,
-        top: -1000,
-        width: 0
+      this.$tipFollow.empty().css({
+        left: '-1000px',
+        top: '-1000px',
+        width: '0px'
       });
     }
     this.trigger('change', {
@@ -2525,8 +2525,8 @@ morpheus.HeatMap.prototype = {
           var rect = this.$parent[0].getBoundingClientRect();
           this.$tipFollow.html($wrapper).css({
             width: '',
-            left: parseFloat(this.heatmap.canvas.style.left) - 1,
-            top: options.event.clientY - rect.top - wrapperHeight / 2
+            left: Math.round(parseFloat(this.heatmap.canvas.style.left) - 1) + 'px',
+            top: (options.event.clientY - rect.top - wrapperHeight / 2) + 'px'
           });
           return;
         } else {
@@ -2542,7 +2542,8 @@ morpheus.HeatMap.prototype = {
 
             }
           }
-          this._setTipText(tipText, tipFollowText, options);
+          var text = tipFollowText.join('');
+          this._setTipText(tipText, text.length === 0 ? null : '<span style="max-width:400px;">' + text + '</span>', options);
         }
       }
       if (columnIndex != null && columnIndex.length > 0) {
@@ -2643,7 +2644,8 @@ morpheus.HeatMap.prototype = {
                 options, '<br />', true, tipFollowText);
             }
           }
-          this._setTipText(tipText, tipFollowText, options);
+          var text = tipFollowText.join('');
+          this._setTipText(tipText, text === '' ? null : '<span style="max-width:400px;">' + text + '</span>', options);
         }
       }
 
@@ -2664,13 +2666,17 @@ morpheus.HeatMap.prototype = {
 
       if (this.options.tooltip && rowIndex !== -1 && columnIndex !== -1) {
         tipFollowText.push('<div data-name="tip"></div>');
-
       }
     }
-    this._setTipText(tipText, tipFollowText, options);
+
+    var text = tipFollowText.join('');
+    var $tipFollowText = $('<span style="max-width:400px;">' + text + '</span>');
+    var customToolTip = false;
     if (this.options.tooltip && rowIndex !== -1 && columnIndex !== -1) {
-      this.options.tooltip(this, rowIndex, columnIndex, this.$tipFollow.find('[data-name=tip]'));
+      this.options.tooltip(this, rowIndex, columnIndex, $tipFollowText.find('[data-name=tip]'));
+      customToolTip = true;
     }
+    this._setTipText(tipText, text.length > 0 || customToolTip ? $tipFollowText : null, options);
 
   }
   ,
@@ -2695,11 +2701,13 @@ morpheus.HeatMap.prototype = {
       // on top
       top = options.event.clientY - parentRect.top - offset - tipHeight;
     }
-    this.$tipFollow.css({
-      left: left,
-      top: top,
-      width: ''
-    });
+    if (Math.abs(left - parseFloat(this.$tipFollow[0].style.left)) >= 1 || Math.abs(top - parseFloat(this.$tipFollow[0].style.top)) >= 1) {
+      this.$tipFollow.css({
+        left: left + 'px',
+        top: top + 'px',
+        width: ''
+      });
+    }
   }
   ,
   setTrackVisibility: function (tracks) {

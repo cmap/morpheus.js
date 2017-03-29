@@ -304,7 +304,6 @@ morpheus.TabManager.prototype = {
   add: function (options) {
     this.adding = true;
     var id = _.uniqueId('morpheus-tab');
-
     this.idToTabObject.set(id, options.object);
     var li = [];
     li.push('<li class="morpheus-sortable" role="presentation">');
@@ -424,6 +423,9 @@ morpheus.TabManager.prototype = {
    *            The title (used to show tooltip)
    */
   setTabTitle: function (id, title) {
+    if (id[0] === '#') {
+      id = id.substring(1);
+    }
     this.$nav.find('> li > a').filter('a[data-link=' + id + ']').attr('title', title);
   },
   setTabEnabled: function (id, enabled) {
