@@ -13,7 +13,7 @@ morpheus.HeatMapColorScheme = function (project, scheme) {
   this.value = null;
   if (scheme) {
     if (scheme.valueToColorScheme) { // json representation
-      this.fromJson(scheme);
+      this.fromJSON(scheme);
     } else {
       this.rowValueToColorSupplier[null] = morpheus.HeatMapColorScheme
       .createColorSupplier(scheme);
@@ -352,7 +352,7 @@ morpheus.HeatMapColorScheme.createColorSupplier = function (options) {
   if (options.size != null) {
     json.size = options.size;
   }
-  return morpheus.AbstractColorSupplier.fromJson(json);
+  return morpheus.AbstractColorSupplier.fromJSON(json);
 };
 morpheus.HeatMapColorScheme.prototype = {
   getColors: function () {
@@ -428,7 +428,7 @@ morpheus.HeatMapColorScheme.prototype = {
     this.currentColorSupplier = newColorSupplier;
     this.rowValueToColorSupplier[this.value] = this.currentColorSupplier;
   },
-  toJson: function () {
+  toJSON: function () {
     var json = {};
     var _this = this;
     if (this.separateColorSchemeForRowMetadataField != null) {
@@ -437,12 +437,12 @@ morpheus.HeatMapColorScheme.prototype = {
     json.valueToColorScheme = {};
     _.each(_.keys(this.rowValueToColorSupplier), function (key) {
       // save each scheme
-      json.valueToColorScheme[key] = morpheus.AbstractColorSupplier.toJson(_this.rowValueToColorSupplier[key]);
+      json.valueToColorScheme[key] = morpheus.AbstractColorSupplier.toJSON(_this.rowValueToColorSupplier[key]);
     });
 
     return json;
   },
-  fromJson: function (json) {
+  fromJSON: function (json) {
     var _this = this;
     if (json.separateColorSchemeForRowMetadataField) {
       this.separateColorSchemeForRowMetadataField = json.separateColorSchemeForRowMetadataField;
@@ -454,7 +454,7 @@ morpheus.HeatMapColorScheme.prototype = {
     var obj = json.valueToColorScheme || json.colorSchemes;
     _.each(_.keys(obj), function (key) {
       var colorSupplier = morpheus.AbstractColorSupplier
-      .fromJson(obj[key]);
+      .fromJSON(obj[key]);
       _this.rowValueToColorSupplier[key] = colorSupplier;
     });
     this._ensureColorSupplierExists();

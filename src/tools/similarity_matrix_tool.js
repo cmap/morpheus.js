@@ -48,7 +48,7 @@ morpheus.SimilarityMatrixTool.prototype = {
     var blob = new Blob(
       ['self.onmessage = function(e) {'
       + 'importScripts(e.data.scripts);'
-      + 'self.postMessage(morpheus.SimilarityMatrixTool.execute(morpheus.Dataset.fromJson(e.data.dataset), e.data.input));'
+      + 'self.postMessage(morpheus.SimilarityMatrixTool.execute(morpheus.Dataset.fromJSON(e.data.dataset), e.data.input));'
       + '}']);
 
     var url = window.URL.createObjectURL(blob);
@@ -56,7 +56,7 @@ morpheus.SimilarityMatrixTool.prototype = {
 
     worker.postMessage({
       scripts: morpheus.Util.getScriptPath(),
-      dataset: morpheus.Dataset.toJson(dataset, {
+      dataset: morpheus.Dataset.toJSON(dataset, {
         columnFields: [],
         rowFields: [],
         seriesIndices: [0]

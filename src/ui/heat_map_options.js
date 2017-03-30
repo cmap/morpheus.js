@@ -436,7 +436,7 @@ morpheus.HeatMapOptions = function (controller) {
 
   colorSchemeFormBuilder.find('save_color_scheme').on('click', function (e) {
     e.preventDefault();
-    var blob = new Blob([JSON.stringify(controller.heatmap.getColorScheme().toJson())], {
+    var blob = new Blob([JSON.stringify(controller.heatmap.getColorScheme().toJSON())], {
       type: 'application/json'
     });
     saveAs(blob, 'color_scheme.json');
@@ -447,7 +447,7 @@ morpheus.HeatMapOptions = function (controller) {
         morpheus.Util.getText(e.value).done(
           function (text) {
             var json = JSON.parse($.trim(text));
-            controller.heatmap.getColorScheme().fromJson(json);
+            controller.heatmap.getColorScheme().fromJSON(json);
             colorSchemeChooser
             .setColorScheme(controller.heatmap
             .getColorScheme());

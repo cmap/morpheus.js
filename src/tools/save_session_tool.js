@@ -29,8 +29,18 @@ morpheus.SaveSessionTool.prototype = {
     }
     var controller = options.controller;
     var options = {dataset: options.input.include_dataset};
-    var json = controller.toJson(options);
-    var blob = new Blob([JSON.stringify(json)], {type: 'application/json;charset=charset=utf-8'});
+    var json = controller.toJSON(options);
+    var nativeArrayToArray = Array.from || function (typedArray) {
+        var normalArray = Array.prototype.slice.call(typedArray);
+        normalArray.length === typedArray.length;
+        normalArray.constructor === Array;
+      };
+    var blob = new Blob([JSON.stringify(json, function (key, value) {
+      if (morpheus.Util.isArray(value)) {
+        return value instanceof Array ? value : nativeArrayToArray(value);
+      }
+      return value;
+    })], {type: 'application/json;charset=charset=utf-8'});
     saveAs(blob, fileName, true);
   }
 };

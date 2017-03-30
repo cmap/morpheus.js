@@ -207,7 +207,7 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
       var blobURL = window.URL.createObjectURL(blob);
       var worker = new Worker(blobURL);
       worker.addEventListener('message', function (e) {
-        deferred.resolve(morpheus.Dataset.fromJson(e.data));
+        deferred.resolve(morpheus.Dataset.fromJSON(e.data));
         window.URL.revokeObjectURL(blobURL);
       }, false);
       // start the worker
@@ -236,7 +236,11 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
     return fileOrUrl;
   } else { // it's already a dataset?
     var deferred = $.Deferred();
-    deferred.resolve(fileOrUrl);
+    if (fileOrUrl.getRowCount) {
+      deferred.resolve(fileOrUrl);
+    } else {
+      deferred.resolve(morpheus.Dataset.fromJSON(fileOrUrl));
+    }
     return deferred.promise();
   }
 
@@ -692,7 +696,7 @@ morpheus.DatasetUtil.autocompleteValues = function (dataset) {
 // json.push(']');
 // }
 // json.push(']'); // end v
-// var metadataToJson = function(model) {
+// var metadatatoJSON = function(model) {
 // json.push('[');
 // for (var i = 0, count = model.getMetadataCount(); i < count; i++) {
 // var v = model.get(i);
@@ -714,9 +718,9 @@ morpheus.DatasetUtil.autocompleteValues = function (dataset) {
 // json.push(']');
 // };
 // json.push(', "cols":');
-// metadataToJson(dataset.getColumnMetadata());
+// metadatatoJSON(dataset.getColumnMetadata());
 // json.push(', "rows":');
-// metadataToJson(dataset.getRowMetadata());
+// metadatatoJSON(dataset.getRowMetadata());
 // json.push('}'); // end json object
 // return json.join('');
 // };

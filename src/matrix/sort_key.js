@@ -663,7 +663,7 @@ morpheus.SortKey.keepExistingSortKeys = function (newSortKeys, existingSortKeys)
   return newSortKeys;
 };
 
-morpheus.SortKey.fromJson = function (project, json) {
+morpheus.SortKey.fromJSON = function (project, json) {
   var sortKeys = [];
   json.forEach(function (key) {
     if (key.type === 'annotation') {
@@ -685,7 +685,7 @@ morpheus.SortKey.fromJson = function (project, json) {
   return sortKeys;
 };
 
-morpheus.SortKey.toJson = function (sortKeys) {
+morpheus.SortKey.toJSON = function (sortKeys) {
   var json = [];
   sortKeys.forEach(function (key) {
     if (key instanceof morpheus.SortKey) {

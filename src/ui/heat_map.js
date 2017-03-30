@@ -236,7 +236,7 @@ morpheus.HeatMap = function (options) {
         options: true,
         saveImage: true,
         saveDataset: true,
-        saveSession: false,
+        saveSession: true,
         openFile: true,
         filter: true,
         colorKey: true,
@@ -1041,15 +1041,18 @@ morpheus.HeatMap.prototype = {
   getDendrogram: function (isColumns) {
     return isColumns ? this.columnDendrogram : this.rowDendrogram;
   },
-  toJson: function () {
+  toJSON: function (options) {
     var json = {};
     // color scheme
-    json.colorScheme = this.heatmap.getColorScheme().toJson();
+    json.colorScheme = this.heatmap.getColorScheme().toJSON();
 
     json.name = this.options.name;
 
-    // TODO annotation colors,shapes
+    // TODO shapes
 
+    // annotation colors
+    json.rowColorModel = this.getProject().getRowColorModel().toJSON();
+    json.columnColorModel = this.getProject().getColumnColorModel().toJSON();
     // annotation display
     json.rows = this.rowTracks.map(function (track) {
       return {
@@ -1064,16 +1067,16 @@ morpheus.HeatMap.prototype = {
       };
     });
     // sort
-    json.rowSortBy = morpheus.SortKey.toJson(this.getProject().getRowSortKeys());
-    json.columnSortBy = morpheus.SortKey.toJson(this.getProject().getColumnSortKeys());
+    json.rowSortBy = morpheus.SortKey.toJSON(this.getProject().getRowSortKeys());
+    json.columnSortBy = morpheus.SortKey.toJSON(this.getProject().getColumnSortKeys());
 
     // group
-    json.rowGroupBy = morpheus.SortKey.toJson(this.getProject().getGroupRows());
-    json.columnGroupBy = morpheus.SortKey.toJson(this.getProject().getGroupColumns());
+    json.rowGroupBy = morpheus.SortKey.toJSON(this.getProject().getGroupRows());
+    json.columnGroupBy = morpheus.SortKey.toJSON(this.getProject().getGroupColumns());
 
     // filter
-    json.rowFilter = morpheus.CombinedFilter.toJson(this.getProject().getRowFilter());
-    json.columnFilter = morpheus.CombinedFilter.toJson(this.getProject().getColumnFilter());
+    json.rowFilter = morpheus.CombinedFilter.toJSON(this.getProject().getRowFilter());
+    json.columnFilter = morpheus.CombinedFilter.toJSON(this.getProject().getColumnFilter());
 
     // element size, symmetric
     // TODO add grid, show values
@@ -1101,6 +1104,10 @@ morpheus.HeatMap.prototype = {
       json.columnDendrogram = out.join('');
       json.columnDendrogramField = null;
     }
+    if (options.dataset) {
+      json.dataset = morpheus.Dataset.toJSON(this.getProject().getSortedFilteredDataset());
+    }
+
     return json;
   },
   /**
@@ -1248,11 +1255,11 @@ morpheus.HeatMap.prototype = {
 
     // filter ui will be initialized automatically
     if (this.options.rowFilter) {
-      morpheus.CombinedFilter.fromJson(_this.project.getRowFilter(), this.options.rowFilter);
+      morpheus.CombinedFilter.fromJSON(_this.project.getRowFilter(), this.options.rowFilter);
       _this.project.setRowFilter(_this.project.getRowFilter(), true);
     }
     if (this.options.columnFilter) {
-      morpheus.CombinedFilter.fromJson(_this.project.getColumnFilter(), this.options.columnFilter);
+      morpheus.CombinedFilter.fromJSON(_this.project.getColumnFilter(), this.options.columnFilter);
       _this.project.setColumnFilter(_this.project.getColumnFilter(), true);
     }
     this.whenLoaded = null;
@@ -1559,19 +1566,19 @@ morpheus.HeatMap.prototype = {
       this.project.setColumnSortKeys([columnDendrogramSortKey]);
     }
     if (this.options.rowSortBy && this.options.rowSortBy.length > 0) {
-      this.project.setRowSortKeys(morpheus.SortKey.fromJson(this.project, this.options.rowSortBy), false);
+      this.project.setRowSortKeys(morpheus.SortKey.fromJSON(this.project, this.options.rowSortBy), false);
     }
     if (this.options.columnSortBy && this.options.columnSortBy.length > 0) {
-      this.project.setColumnSortKeys(morpheus.SortKey.fromJson(this.project, this.options.columnSortBy), false);
+      this.project.setColumnSortKeys(morpheus.SortKey.fromJSON(this.project, this.options.columnSortBy), false);
     }
     if (this.options.rowGroupBy != null && this.options.rowGroupBy.length > 0) {
-      var keys = morpheus.SortKey.fromJson(this.project, this.options.rowGroupBy);
+      var keys = morpheus.SortKey.fromJSON(this.project, this.options.rowGroupBy);
       for (var i = 0; i < keys.length; i++) {
         this.project.groupRows.push(keys[i]);
       }
     }
     if (this.options.columnGroupBy != null && this.options.columnGroupBy.length > 0) {
-      var keys = morpheus.SortKey.fromJson(this.project, this.options.columnGroupBy);
+      var keys = morpheus.SortKey.fromJSON(this.project, this.options.columnGroupBy);
       for (var i = 0; i < keys.length; i++) {
         this.project.groupColumns.push(keys[i]);
       }
@@ -1908,6 +1915,12 @@ morpheus.HeatMap.prototype = {
           paint: false
         });
       }
+      if (this.options.rowColorModel) {
+        this.getProject().getRowColorModel().fromJSON(this.options.rowColorModel);
+      }
+      if (this.options.columnColorModel) {
+        this.getProject().getColumnColorModel().fromJSON(this.options.columnColorModel);
+      }
       if (this.options.rowSize === 'fit') {
         this.heatmap.getRowPositions().setSize(this.getFitRowSize());
         this.revalidate({
@@ -2036,15 +2049,18 @@ morpheus.HeatMap.prototype = {
             });
             var vector = selectedDataset.getColumnMetadata().getByName(track.getName());
             var f = vector.getProperties().get(morpheus.VectorKeys.FUNCTION);
-            // iterate over each column
-            var view = new morpheus.DatasetColumnView(selectedDataset);
-            // TODO only set values that are currently visible
-            for (var j = 0, size = vector.size(); j < size; j++) {
-              view.setIndex(j);
-              vector.setValue(j, f(view, selectedDataset, j));
+            if (typeof f === 'function') {
+
+              // iterate over each column
+              var view = new morpheus.DatasetColumnView(selectedDataset);
+              // TODO only set values that are currently visible
+              for (var j = 0, size = vector.size(); j < size; j++) {
+                view.setIndex(j);
+                vector.setValue(j, f(view, selectedDataset, j));
+              }
+              track.setInvalid(true);
+              track.repaint();
             }
-            track.setInvalid(true);
-            track.repaint();
           }
         }
         _this.verticalSearchBar.update();

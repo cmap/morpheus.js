@@ -29,7 +29,7 @@ morpheus.Dataset = function (options) {
  * @param options.seriesIndices
  * @return JSON representation of a dataset
  */
-morpheus.Dataset.toJson = function (dataset, options) {
+morpheus.Dataset.toJSON = function (dataset, options) {
   options = options || {};
   var seriesArrays = [];
   var seriesDataTypes = [];
@@ -52,17 +52,24 @@ morpheus.Dataset.toJson = function (dataset, options) {
       }
     }
   }
-  var vectorToJson = function (vector) {
+  var vectortoJSON = function (vector) {
     var array = [];
     for (var i = 0, size = vector.size(); i < size; i++) {
       array[i] = vector.getValue(i);
     }
+    var properties = new morpheus.Map();
+    vector.getProperties().forEach(function (value, key) {
+      if (morpheus.VectorKeys.JSON_WHITELIST.has(key)) {
+        properties.set(key, value);
+      }
+    });
     return {
+      properties: properties,
       name: vector.getName(),
       array: array
     };
   };
-  var metadataToJson = function (metadata, fields) {
+  var metadatatoJSON = function (metadata, fields) {
     var vectors = [];
     var filter;
     if (fields) {
@@ -75,10 +82,10 @@ morpheus.Dataset.toJson = function (dataset, options) {
       var v = metadata.get(i);
       if (filter) {
         if (filter.has(v.getName())) {
-          vectors.push(vectorToJson(v));
+          vectors.push(vectortoJSON(v));
         }
       } else {
-        vectors.push(vectorToJson(v));
+        vectors.push(vectortoJSON(v));
       }
     }
     return vectors;
@@ -90,16 +97,16 @@ morpheus.Dataset.toJson = function (dataset, options) {
     seriesDataTypes: seriesDataTypes,
     seriesNames: seriesNames,
     rowMetadataModel: {
-      vectors: metadataToJson(dataset.getRowMetadata(),
+      vectors: metadatatoJSON(dataset.getRowMetadata(),
         options.rowFields)
     },
     columnMetadataModel: {
-      vectors: metadataToJson(dataset.getColumnMetadata(),
+      vectors: metadatatoJSON(dataset.getColumnMetadata(),
         options.columnFields)
     }
   };
 };
-morpheus.Dataset.fromJson = function (options) {
+morpheus.Dataset.fromJSON = function (options) {
   // Object {seriesNames:
   // Array[1], seriesArrays:
   // Array[1], rows:
@@ -161,6 +168,7 @@ morpheus.Dataset.fromJson = function (options) {
     options.rowMetadataModel.vectors.forEach(function (v) {
       var vector = new morpheus.Vector(v.name, dataset.getRowCount());
       vector.array = v.array;
+      vector.properties = morpheus.Map.fromJSON(v.properties);
       dataset.rowMetadataModel.vectors.push(vector);
     });
   }
@@ -168,11 +176,12 @@ morpheus.Dataset.fromJson = function (options) {
     options.columnMetadataModel.vectors.forEach(function (v) {
       var vector = new morpheus.Vector(v.name, dataset.getColumnCount());
       vector.array = v.array;
+      vector.properties = morpheus.Map.fromJSON(v.properties);
       dataset.columnMetadataModel.vectors.push(vector);
+
     });
   }
   for (var i = 1; i < options.seriesArrays.length; i++) {
-
     dataset.addSeries({
       name: options.seriesNames[i],
       dataType: options.seriesDataTypes[i],

@@ -416,7 +416,7 @@ morpheus.AlwaysTrueFilter.prototype = {
   }
 };
 
-morpheus.CombinedFilter.fromJson = function (combinedFilter, json) {
+morpheus.CombinedFilter.fromJSON = function (combinedFilter, json) {
   combinedFilter.setAnd(json.isAnd);
   json.filters.forEach(function (filter) {
     if (filter.type === 'set') {
@@ -460,7 +460,7 @@ morpheus.CombinedFilter.fromJson = function (combinedFilter, json) {
   });
 };
 
-morpheus.CombinedFilter.toJson = function (filter) {
+morpheus.CombinedFilter.toJSON = function (filter) {
   var json = {
     isAnd: filter.isAnd(),
     filters: []
