@@ -2405,9 +2405,9 @@ morpheus.HeatMap.prototype = {
     this.$tipInfoWindow.html('');
     this.toolbar.$tip.html('');
     this.$tipFollow.html('').css({
-      left: -1000,
-      top: -1000,
-      width: 0
+      left: '-1000px',
+      top: '-1000px',
+      width: '0px'
 
     });
     this.toolbar.$tip.css('display', mode === 0 ? '' : 'none');
@@ -2699,23 +2699,28 @@ morpheus.HeatMap.prototype = {
     if (this.tipFollowHidden) {
       return;
     }
+    // top, bottom are negative when scrolled
     var parentRect = this.$parent[0].getBoundingClientRect();
-    var tipWidth = this.$tipFollow.width();
-    var tipHeight = this.$tipFollow.height();
-    var offset = 12;
+    var tipRect = this.$tipFollow[0].getBoundingClientRect();
+    var tipWidth = tipRect.width;
+    var tipHeight = tipRect.height;
+    var offset = 10;
     var left = options.event.clientX - parentRect.left + offset;
     var top = options.event.clientY - parentRect.top + offset;
     // default is bottom-right
     var scrollBarSize = 18;
-    if ((left + tipWidth) >= parentRect.right - scrollBarSize) { // offscreen right, place tip on left
+    if ((left + tipWidth) >= ( parentRect.right - parentRect.left - scrollBarSize)) { // offscreen
+      // right, place tip on
+      // left
       left = options.event.clientX - parentRect.left - offset - tipWidth;
     }
-
-    if ((top + tipHeight) >= (parentRect.bottom - parentRect.top - scrollBarSize)) { // offscreen bottom,
+    if ((top + tipHeight) >= (parentRect.bottom - parentRect.top - scrollBarSize)) { // offscreen
+      // bottom,
       // place tip
       // on top
       top = options.event.clientY - parentRect.top - offset - tipHeight;
     }
+
     if (Math.abs(left - parseFloat(this.$tipFollow[0].style.left)) >= 1 || Math.abs(top - parseFloat(this.$tipFollow[0].style.top)) >= 1) {
       this.$tipFollow.css({
         left: left + 'px',
