@@ -236,7 +236,7 @@ morpheus.HeatMap = function (options) {
         options: true,
         saveImage: true,
         saveDataset: true,
-        saveSession: true,
+        saveSession: false,
         openFile: true,
         filter: true,
         colorKey: true,
@@ -2048,9 +2048,8 @@ morpheus.HeatMap.prototype = {
               emptyToAll: false
             });
             var vector = selectedDataset.getColumnMetadata().getByName(track.getName());
-            var f = vector.getProperties().get(morpheus.VectorKeys.FUNCTION);
+            var f = morpheus.VectorUtil.jsonToFunction(vector, morpheus.VectorKeys.FUNCTION);
             if (typeof f === 'function') {
-
               // iterate over each column
               var view = new morpheus.DatasetColumnView(selectedDataset);
               // TODO only set values that are currently visible

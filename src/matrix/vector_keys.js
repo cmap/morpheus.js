@@ -22,7 +22,7 @@ morpheus.VectorKeys.SELECTION = 'morpheus.selection';
 /** Whether to recompute a function when creating a new heat map */
 morpheus.VectorKeys.RECOMPUTE_FUNCTION = 'morpheus.recompute.funct';
 
-/** Whether to recompute a function when heat map selection changes */
+/** Boolean, whether to recompute a function when heat map selection changes */
 morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION = 'morpheus.recompute.funct.selection';
 
 morpheus.VectorKeys.COPY_IGNORE = new morpheus.Set();
