@@ -107,11 +107,15 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
             {
               name: 'Annotate...'
             }, {
+            name: 'Save'
+          }, {
+            separator: true
+          }, {
             name: 'Enrichment...'
           }, {
             separator: true
           }, {
-            name: 'Squish',
+            name: 'Squish Singleton Clusters',
             checked: _this.squishEnabled
           }, {
             separator: true
@@ -250,7 +254,7 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
                 new morpheus.DendrogramEnrichmentTool(
                   type === morpheus.AbstractDendrogram.Type.COLUMN),
                 _this.controller);
-            } else if (item === 'Squish') {
+            } else if (item === 'Squish Singleton Clusters') {
               _this.squishEnabled = !_this.squishEnabled;
               if (!_this.squishEnabled) {
                 _this.positions
