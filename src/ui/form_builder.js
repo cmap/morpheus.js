@@ -221,7 +221,7 @@ morpheus.FormBuilder.showInModal = function (options) {
     title: options.title,
     html: options.html,
     footer: options.close ? ('<button type="button" class="btn btn-default" data-dismiss="modal">'
-      + options.close + '</button>')
+    + options.close + '</button>')
       : null,
     onClose: options.callback,
     backdrop: options.backdrop,
@@ -235,6 +235,16 @@ morpheus.FormBuilder.showInModal = function (options) {
   // }
 };
 
+/**
+ *
+ * @param options.ok
+ * @param options.cancel
+ * @param options.apply
+ * @param options.title
+ * @param options.content
+ * @param options.okCallback
+ *
+ */
 morpheus.FormBuilder.showOkCancel = function (options) {
   options = $.extend({}, {
     ok: true,
@@ -548,7 +558,7 @@ morpheus.FormBuilder.prototype = {
     } else if ('custom' === type) {
       html.push(value);
     } else if ('file' === type) {
-      var isMultiple = field.multiple;
+      var isMultiple = field.multiple == null ? false : field.multiple;
       html
       .push('<select data-multiple="'
         + isMultiple

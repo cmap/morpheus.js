@@ -91,7 +91,7 @@ morpheus.TsneTool.prototype = {
     var blob = new Blob(
       ['self.onmessage = function(e) {'
       + 'e.data.scripts.forEach(function (s) { importScripts(s); });'
-      + 'self.postMessage(morpheus.TsneTool.execute(morpheus.Dataset.fromJson(e.data.dataset), e.data.input));'
+      + 'self.postMessage(morpheus.TsneTool.execute(morpheus.Dataset.fromJSON(e.data.dataset), e.data.input));'
       + '}']);
 
     var url = URL.createObjectURL(blob);
@@ -99,7 +99,11 @@ morpheus.TsneTool.prototype = {
 
     worker.postMessage({
       scripts: [morpheus.Util.getScriptPath()],
-      dataset: morpheus.Dataset.toJson(dataset, {}),
+      dataset: morpheus.Dataset.toJSON(dataset, {
+        columnFields: [],
+        rowFields: [],
+        seriesIndices: [0]
+      }),
       input: options.input
     });
 

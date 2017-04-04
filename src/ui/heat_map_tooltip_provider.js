@@ -74,7 +74,7 @@ morpheus.HeatMapTooltipProvider = function (heatMap, rowIndex, columnIndex, opti
     var track = heatMap.getTrack(options.name, columnIndex !== -1);
     var colorByName = track != null ? track.settings.colorByField : null;
     var additionalVector = colorByName != null ? metadata
-      .getByName(colorByName) : null;
+    .getByName(colorByName) : null;
     morpheus.HeatMapTooltipProvider.vectorToString(vector,
       rowIndex !== -1 ? rowIndex : columnIndex, tipText, separator,
       additionalVector);
@@ -258,10 +258,10 @@ morpheus.HeatMapTooltipProvider.vectorToString = function (vector, index, tipTex
           .seq(primaryFields.length);
         }
         var additionalFieldNames = additionalVector != null ? additionalVector
-          .getProperties().get(morpheus.VectorKeys.FIELDS)
+        .getProperties().get(morpheus.VectorKeys.FIELDS)
           : null;
         var additionalVal = additionalFieldNames != null ? additionalVector
-          .getValue(index)
+        .getValue(index)
           : null;
         if (tipText.length > 0) {
           tipText.push(separator);
@@ -383,6 +383,7 @@ morpheus.HeatMapTooltipProvider._nodesToString = function (tipText, nodes, color
         renderField(name, value);
       }
     }
+    renderField('height', node.height);
     renderField('depth', node.depth);
     var nLeafNodes = 1 + Math.abs(node.maxIndex - node.minIndex);
     if (nLeafNodes > 0) {

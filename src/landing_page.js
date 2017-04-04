@@ -1,5 +1,4 @@
 morpheus.LandingPage = function (pageOptions) {
-
   pageOptions = $.extend({}, {
     el: $('#vis')
   }, pageOptions);
@@ -56,6 +55,14 @@ morpheus.LandingPage = function (pageOptions) {
   };
   setTimeout(step, 300);
   this.tabManager = new morpheus.TabManager({landingPage: this});
+  this.tabManager.on('change rename add remove', function (e) {
+    var title = _this.tabManager.getTabText(_this.tabManager.getActiveTabId());
+    if (title == null || title === '') {
+      title = 'Morpheus';
+    }
+    document.title = title;
+  });
+
   this.tabManager.$nav.appendTo($(this.pageOptions.el));
   this.tabManager.$tabContent.appendTo($(this.pageOptions.el));
   // for (var i = 0; i < brands.length; i++) {

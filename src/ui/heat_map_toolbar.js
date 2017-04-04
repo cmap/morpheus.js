@@ -181,6 +181,11 @@ morpheus.HeatMapToolBar = function (controller) {
       + morpheus.Util.COMMAND_KEY
       + 'Shift+S)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-floppy-o"></span></button>');
   }
+  if (controller.options.toolbar.saveSession) {
+    toolbarHtml
+    .push('<button name="saveSession" data-toggle="tooltip" title="Save Session" type="button"' +
+      ' class="btn btn-default btn-xxs"><span class="fa fa-anchor"></span></button>');
+  }
 
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
   if (controller.options.toolbar.filter) {
@@ -417,6 +422,10 @@ morpheus.HeatMapToolBar = function (controller) {
   $el.find('[name=saveDataset]').on('click', function () {
     morpheus.HeatMap.showTool(new morpheus.SaveDatasetTool(), controller);
   });
+  $el.find('[name=saveSession]').on('click', function () {
+    morpheus.HeatMap.showTool(new morpheus.SaveSessionTool(), controller);
+  });
+
   $el.find('[name=chart]').on(
     'click',
     function () {
@@ -608,33 +617,40 @@ morpheus.HeatMapToolBar = function (controller) {
         }
     });
 
-    this.toggleSearch = function () {
-        var $visible = $searchToggle.filter(':visible');
-        var $checked = $searchToggle.filter(':checked');
-        var $next = $visible.eq($visible.index($checked) + 1);
-        if (!$next.length) {
-            $next = $visible.first();
-        }
-        $next.click();
-    };
-    $($searchToggle.filter(':visible')[0]).click();
-    controller.on('dendrogramAnnotated', function (e) {
-        if (e.isColumns) { // show buttons
-            _this.rowDendrogramSearchObject.$toggleButton.show();
-        } else {
-            _this.columnDendrogramSearchObject.$toggleButton.show();
-        }
-    });
-    controller.on('dendrogramChanged', function (e) {
-        if (e.isColumns) {
-            _this.rowDendrogramSearchObject.$group.hide();
-            _this.rowDendrogramSearchObject.$toggleButton.hide();
-        } else {
-            _this.columnDendrogramSearchObject.$group.hide();
-            _this.columnDendrogramSearchObject.$toggleButton.hide();
-        }
-    });
-    var project = controller.getProject();
+  this.toggleSearch = function () {
+    var $visible = $searchToggle.filter(':visible');
+    var $checked = $searchToggle.filter(':checked');
+    var $next = $visible.eq($visible.index($checked) + 1);
+    if (!$next.length) {
+      $next = $visible.first();
+    }
+    $next.click();
+  };
+  for (var i = 0; i < $searchToggle.length; i++) {
+    var $button = $($searchToggle[i]);
+    if ($button.css('display') === 'block') {
+      $button.click();
+      break;
+    }
+  }
+
+  controller.on('dendrogramAnnotated', function (e) {
+    if (e.isColumns) { // show buttons
+      _this.rowDendrogramSearchObject.$toggleButton.show();
+    } else {
+      _this.columnDendrogramSearchObject.$toggleButton.show();
+    }
+  });
+  controller.on('dendrogramChanged', function (e) {
+    if (e.isColumns) {
+      _this.rowDendrogramSearchObject.$group.hide();
+      _this.rowDendrogramSearchObject.$toggleButton.hide();
+    } else {
+      _this.columnDendrogramSearchObject.$group.hide();
+      _this.columnDendrogramSearchObject.$toggleButton.hide();
+    }
+  });
+  var project = controller.getProject();
 
     morpheus.Util.autosuggest({
         $el: this.rowSearchObject.$search,
@@ -1005,80 +1021,91 @@ morpheus.HeatMapToolBar.FILTER_SEARCH_MODE = 1;
 morpheus.HeatMapToolBar.MATCHES_TO_TOP_SEARCH_MODE = 2;
 morpheus.HeatMapToolBar.SELECT_MATCHES_SEARCH_MODE = 3;
 morpheus.HeatMapToolBar.prototype = {
-    quickColumnFilter: false,
-    searching: false,
-    rowSearchMode: morpheus.HeatMapToolBar.SELECT_MATCHES_SEARCH_MODE,
-    columnSearchMode: morpheus.HeatMapToolBar.SELECT_MATCHES_SEARCH_MODE,
-    _updateSearchIndices: function (isColumns) {
-        var project = this.controller.getProject();
-        if (isColumns) {
-            var viewIndices = [];
-            var modelIndices = this.columnSearchResultModelIndices;
-            for (var i = 0, length = modelIndices.length; i < length; i++) {
-                var index = project
-                    .convertModelColumnIndexToView(modelIndices[i]);
-                if (index !== -1) {
-                    viewIndices.push(index);
-                }
-            }
-            viewIndices.sort(function (a, b) {
-                return a < b ? -1 : 1;
-            });
-            this.columnSearchResultViewIndicesSorted = viewIndices;
-            this.currentColumnSearchIndex = -1;
-        } else {
-            var viewIndices = [];
-            var modelIndices = this.rowSearchResultModelIndices;
-            for (var i = 0, length = modelIndices.length; i < length; i++) {
-                var index = project.convertModelRowIndexToView(modelIndices[i]);
-                if (index !== -1) {
-                    viewIndices.push(index);
-                }
-            }
-            viewIndices.sort(function (a, b) {
-                return a < b ? -1 : 1;
-            });
-            this.rowSearchResultViewIndicesSorted = viewIndices;
-            this.currentRowSearchIndex = -1;
+  quickColumnFilter: false,
+  searching: false,
+  rowSearchMode: morpheus.HeatMapToolBar.SELECT_MATCHES_SEARCH_MODE,
+  columnSearchMode: morpheus.HeatMapToolBar.SELECT_MATCHES_SEARCH_MODE,
+  _updateSearchIndices: function (isColumns) {
+    var project = this.controller.getProject();
+    if (isColumns) {
+      var viewIndices = [];
+      var modelIndices = this.columnSearchResultModelIndices;
+      for (var i = 0, length = modelIndices.length; i < length; i++) {
+        var index = project
+        .convertModelColumnIndexToView(modelIndices[i]);
+        if (index !== -1) {
+          viewIndices.push(index);
         }
-    },
-    next: function (isColumns) {
-        var controller = this.controller;
-        if (isColumns) {
-            this.currentColumnSearchIndex++;
-            if (this.currentColumnSearchIndex >= this.columnSearchResultViewIndicesSorted.length) {
-                this.currentColumnSearchIndex = 0;
-            }
-            controller
-                .scrollLeft(controller
-                    .getHeatMapElementComponent()
-                    .getColumnPositions()
-                    .getPosition(
-                        this.columnSearchResultViewIndicesSorted[this.currentColumnSearchIndex]));
-        } else {
-            this.currentRowSearchIndex++;
-            if (this.currentRowSearchIndex >= this.rowSearchResultViewIndicesSorted.length) {
-                this.currentRowSearchIndex = 0;
-            }
-            controller
-                .scrollTop(controller
-                    .getHeatMapElementComponent()
-                    .getRowPositions()
-                    .getPosition(
-                        this.rowSearchResultViewIndicesSorted[this.currentRowSearchIndex]));
+      }
+      viewIndices.sort(function (a, b) {
+        return a < b ? -1 : 1;
+      });
+      this.columnSearchResultViewIndicesSorted = viewIndices;
+      this.currentColumnSearchIndex = -1;
+    } else {
+      var viewIndices = [];
+      var modelIndices = this.rowSearchResultModelIndices;
+      for (var i = 0, length = modelIndices.length; i < length; i++) {
+        var index = project.convertModelRowIndexToView(modelIndices[i]);
+        if (index !== -1) {
+          viewIndices.push(index);
         }
-    },
-    setSearchText: function (options) {
-        var $tf = options.isColumns ? this.columnSearchObject.$search
-            : this.rowSearchObject.$search;
-        var existing = options.append ? $.trim($tf.val()) : '';
-        if (existing !== '') {
-            existing += ' ';
-        }
-        if (options.onTop) {
-            options.isColumns ? this.columnSearchObject.$matchesToTop
-                .addClass('btn-primary') : this.rowSearchObject.$matchesToTop
-                .addClass('btn-primary');
+      }
+      viewIndices.sort(function (a, b) {
+        return a < b ? -1 : 1;
+      });
+      this.rowSearchResultViewIndicesSorted = viewIndices;
+      this.currentRowSearchIndex = -1;
+    }
+  },
+  next: function (isColumns) {
+    var controller = this.controller;
+    if (isColumns) {
+      this.currentColumnSearchIndex++;
+      if (this.currentColumnSearchIndex >= this.columnSearchResultViewIndicesSorted.length) {
+        this.currentColumnSearchIndex = 0;
+      }
+      controller
+      .scrollLeft(controller
+      .getHeatMapElementComponent()
+      .getColumnPositions()
+      .getPosition(
+        this.columnSearchResultViewIndicesSorted[this.currentColumnSearchIndex]));
+    } else {
+      this.currentRowSearchIndex++;
+      if (this.currentRowSearchIndex >= this.rowSearchResultViewIndicesSorted.length) {
+        this.currentRowSearchIndex = 0;
+      }
+      controller
+      .scrollTop(controller
+      .getHeatMapElementComponent()
+      .getRowPositions()
+      .getPosition(
+        this.rowSearchResultViewIndicesSorted[this.currentRowSearchIndex]));
+    }
+  },
+  getSearchField: function (type) {
+    if (type === morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD) {
+      return this.columnSearchObject.$search;
+    } else if (type === morpheus.HeatMapToolBar.ROW_SEARCH_FIELD) {
+      return this.rowSearchObject.$search;
+    } else if (type === morpheus.HeatMapToolBar.COLUMN_DENDROGRAM_SEARCH_FIELD) {
+      return this.columnDendrogramSearchObject.$search;
+    } else if (type === morpheus.HeatMapToolBar.ROW_DENDROGRAM_SEARCH_FIELD) {
+      return this.rowDendrogramSearchObject.$search;
+    }
+  },
+  setSearchText: function (options) {
+    var $tf = options.isColumns ? this.columnSearchObject.$search
+      : this.rowSearchObject.$search;
+    var existing = options.append ? $.trim($tf.val()) : '';
+    if (existing !== '') {
+      existing += ' ';
+    }
+    if (options.onTop) {
+      options.isColumns ? this.columnSearchObject.$matchesToTop
+      .addClass('btn-primary') : this.rowSearchObject.$matchesToTop
+      .addClass('btn-primary');
 
         }
         $tf.val(existing + options.text);
@@ -1323,4 +1350,8 @@ morpheus.HeatMapToolBar.prototype = {
 
     }
 };
+morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD = 'column';
+morpheus.HeatMapToolBar.ROW_SEARCH_FIELD = 'column';
+morpheus.HeatMapToolBar.COLUMN_DENDROGRAM_SEARCH_FIELD = 'column_dendrogram';
+morpheus.HeatMapToolBar.ROW_DENDROGRAM_SEARCH_FIELD = 'row_dendrogram';
 

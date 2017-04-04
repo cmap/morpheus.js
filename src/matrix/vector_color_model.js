@@ -83,6 +83,27 @@ morpheus.VectorColorModel.getColorMapForNumber = function (length) {
   return colors ? colors : morpheus.VectorColorModel.TWENTY_COLORS;
 };
 morpheus.VectorColorModel.prototype = {
+  toJSON: function () {
+    var json = {};
+    this.vectorNameToColorScheme.forEach(function (colorScheme, name) {
+      var colorSchemeJSON = morpheus.AbstractColorSupplier.toJSON(colorScheme);
+      colorSchemeJSON.continuous = true;
+      json[name] = colorSchemeJSON;
+    });
+    this.vectorNameToColorMap.forEach(function (colorMap, name) {
+      json[name] = colorMap;
+    });
+    return json;
+  },
+  fromJSON: function (json) {
+    for (var name in json) {
+      if (json.continuous) {
+        this.vectorNameToColorScheme.set(name, morpheus.AbstractColorSupplier.fromJSON());
+      } else {
+        this.vectorNameToColorMap.set(name, morpheus.Map.fromJSON(json[name]));
+      }
+    }
+  },
   clear: function (vector) {
     this.vectorNameToColorMap.remove(vector.getName());
     this.vectorNameToColorScheme.remove(vector.getName());

@@ -5,13 +5,12 @@
 }
 
 .ui-dialog .ui-dialog-title {
-    color:white;
+    color: white;
 }
 
 .ui-widget {
     font-family: unset;
 }
-
 
 .ui-autocomplete {
     max-height: 600px;
@@ -61,10 +60,10 @@
     z-index: 10000;
     position: absolute;
     background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgb(0, 0, 0);
     color: black;
     text-align: left;
     padding: 1px;
-    border: 1px solid rgb(0, 0, 0);
     /*border-radius: 6px;*/
     /*box-shadow: rgba(0, 0, 0, 0.498039) 0px 5px 15px;*/
     overflow: hidden;

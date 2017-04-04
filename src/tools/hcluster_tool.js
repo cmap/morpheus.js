@@ -219,7 +219,7 @@ morpheus.HClusterTool.prototype = {
       var blob = new Blob(
         ['self.onmessage = function(e) {'
         + 'importScripts(e.data.scripts);'
-        + 'self.postMessage(morpheus.HClusterTool.execute(morpheus.Dataset.fromJson(e.data.dataset), e.data.input));'
+        + 'self.postMessage(morpheus.HClusterTool.execute(morpheus.Dataset.fromJSON(e.data.dataset), e.data.input));'
         + '}']);
 
       var url = window.URL.createObjectURL(blob);
@@ -227,9 +227,10 @@ morpheus.HClusterTool.prototype = {
 
       worker.postMessage({
         scripts: morpheus.Util.getScriptPath(),
-        dataset: morpheus.Dataset.toJson(dataset, {
+        dataset: morpheus.Dataset.toJSON(dataset, {
           columnFields: options.input.group_columns_by || [],
-          rowFields: options.input.group_rows_by || []
+          rowFields: options.input.group_rows_by || [],
+          seriesIndices: [0]
         }),
         input: options.input
       });

@@ -415,3 +415,95 @@ morpheus.AlwaysTrueFilter.prototype = {
     return true;
   }
 };
+
+morpheus.CombinedFilter.fromJSON = function (combinedFilter, json) {
+  combinedFilter.setAnd(json.isAnd);
+  json.filters.forEach(function (filter) {
+    if (filter.type === 'set') {
+      var set = new morpheus.Set();
+      filter.values.forEach(function (value) {
+        set.add(value);
+      });
+      combinedFilter.add(new morpheus.VectorFilter(
+        set,
+        filter.maxSetSize,
+        filter.name,
+        filter.isColumns
+      ));
+    } else if (filter.type === 'range') {
+      combinedFilter.add(new morpheus.RangeFilter(
+        filter.min,
+        filter.max,
+        filter.name,
+        filter.isColumns
+      ));
+    } else if (filter.type === 'top') {
+      combinedFilter.add(new morpheus.TopNFilter(
+        filter.n,
+        filter.direction,
+        filter.name,
+        filter.isColumns
+      ));
+    } else if (filter.type === 'index') {
+      var set = new morpheus.Set();
+      filter.indices.forEach(function (value) {
+        set.add(value);
+      });
+      combinedFilter.add(new morpheus.IndexFilter(
+        set,
+        filter.name,
+        filter.isColumns
+      ));
+    } else {
+      console.log('Unknown filter type');
+    }
+  });
+};
+
+morpheus.CombinedFilter.toJSON = function (filter) {
+  var json = {
+    isAnd: filter.isAnd(),
+    filters: []
+  };
+  filter.getFilters().forEach(function (filter) {
+    if (filter.isEnabled()) {
+      if (filter instanceof morpheus.VectorFilter) {
+        // morpheus.VectorFilter = function (set, maxSetSize, name, isColumns)
+        json.filters.push({
+          name: filter.name,
+          isColumns: filter.isColumns(),
+          values: filter.set.values(),
+          maxSetSize: filter.maxSetSize,
+          type: 'set'
+        });
+      } else if (filter instanceof morpheus.RangeFilter) {
+        // morpheus.RangeFilter = function (min, max, name, isColumns)
+        json.filters.push({
+          name: filter.name,
+          isColumns: filter.isColumns(),
+          min: filter.min,
+          max: filter.max,
+          type: 'range'
+        });
+      } else if (filter instanceof morpheus.TopNFilter) {
+        // morpheus.TopNFilter = function (n, direction, name, isColumns)
+        json.filters.push({
+          name: filter.name,
+          isColumns: filter.isColumns(),
+          min: filter.n,
+          max: filter.direction,
+          type: 'top'
+        });
+      } else if (filter instanceof morpheus.IndexFilter) {
+        // morpheus.IndexFilter = function (acceptIndicesSet, name, isColumns
+        json.filters.push({
+          name: filter.name,
+          isColumns: filter.isColumns(),
+          indices: filter.acceptIndicesSet.values(),
+          type: 'index'
+        });
+      }
+    }
+  });
+  return json;
+};
