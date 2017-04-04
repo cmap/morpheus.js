@@ -23,6 +23,7 @@ morpheus.Project = function (dataset) {
   morpheus.Project
   ._recomputeCalculatedFields(new morpheus.TransposedDatasetView(
     this.originalDataset));
+  this.history = [];
 };
 morpheus.Project.Events = {
   DATASET_CHANGED: 'datasetChanged',

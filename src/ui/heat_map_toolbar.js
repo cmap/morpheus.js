@@ -263,6 +263,7 @@ morpheus.HeatMapToolBar = function (controller) {
     toolbarHtml.push('<div class="morpheus-button-divider"></div>');
     toolbarHtml.push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="PCAPlot" name="pca">PCA</button>');
     toolbarHtml.push('<div class="morpheus-button-divider"></div>');
+    toolbarHtml.push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="History" name="history">History</button>')
 
     $buttons.on('click', '[name=pca]', function () {
         //console.log("test button clicked");
@@ -281,6 +282,9 @@ morpheus.HeatMapToolBar = function (controller) {
             alert("Not allowed to plot PCA on this dataset's modification");
             //console.log("morpheus.HeatMapToolBar ::", controller.getProject(), "Problems occured");
         }
+    });
+    $buttons.on('click', '[name=history]', function () {
+
     });
 
   var $lineOneColumn = $el.find('[data-name=lineOneColumn]');
