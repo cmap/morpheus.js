@@ -24,10 +24,6 @@ morpheus.AdjustDataTool.prototype = {
       type: 'checkbox',
       help: 'Subtract median, divide by median absolute deviation'
     }, {
-        name: 'extended_normalization',
-        type: 'checkbox',
-        help: 'Add 1, take log2, then apply quantile normalization'
-    }, {
       name: 'use_selected_rows_and_columns_only',
       type: 'checkbox'
     }];
@@ -37,8 +33,7 @@ morpheus.AdjustDataTool.prototype = {
     var controller = options.controller;
 
     if (options.input.log_2 || options.input.inverse_log_2
-      || options.input['z-score'] || options.input['robust_z-score'] || options.input.quantile_normalize
-        || options.input['quantile_normalization']) {
+      || options.input['z-score'] || options.input['robust_z-score'] || options.input.quantile_normalize) {
       // clone the values 1st
       var sortedFilteredDataset = morpheus.DatasetUtil.copy(project
       .getSortedFilteredDataset());
@@ -105,63 +100,6 @@ morpheus.AdjustDataTool.prototype = {
           }
         }
       }
-        if (options.input['quantile_normalization']) {
-            var es = dataset.getESSession();
-            es.then(function(session) {
-                var args = {
-                    es : session
-                };
-                if (rowIndices && rowIndices.size()) {
-                    args.rows = rowIndices.values();
-                }
-                if (columnIndices && columnIndices.size()) {
-                    args.cols = columnIndices.values();
-                }
-                var req = ocpu.call('quantileNormalization', args, function(resSession) {
-                    resSession.getObject(function(success) {
-                        console.log("Quantile Normalization :: ", success);
-                        var r = new FileReader();
-                        var filePath = morpheus.Util.getFilePath(resSession, success);
-                        r.onload = function (e) {
-                            var contents = e.target.result;
-                            var ProtoBuf = dcodeIO.ProtoBuf;
-                            ProtoBuf.protoFromFile("./message.proto", function(error, success) {
-                                if (error) {
-                                    alert(error);
-                                    console.log("Quantile Normalization ::", "ProtoBuilder failed", error);
-                                }
-                                var builder = success,
-                                    rexp = builder.build("rexp"),
-                                    REXP = rexp.REXP,
-                                    rclass = REXP.RClass;
-                                var res = REXP.decode(contents);
-                                var data = morpheus.Util.getRexpData(res, rclass).data;
-                                console.log(data);
-
-                                for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-                                    for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-                                        var value = data.values[i + j * data.dim[0]];
-                                        dataset.setValue(i, j, value);
-
-                                    }
-                                }
-                                alert("Quantile normalization finished successfully")
-                            })
-                        };
-                        morpheus.BlobFromPath.getFileObject(filePath, function (file) {
-                            r.readAsArrayBuffer(file);
-                        });
-                    });
-                    dataset.setESSession(new Promise(function(resolve, reject) {
-                        resolve(resSession);
-                    }));
-                }, false, "::es");
-                req.fail(function() {
-                    console.log(req.responseText);
-                })
-            })
-
-        }
 
       return new morpheus.HeatMap({
         name: controller.getName(),
