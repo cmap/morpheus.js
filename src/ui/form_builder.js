@@ -243,6 +243,7 @@ morpheus.FormBuilder.showInModal = function (options) {
  * @param options.title
  * @param options.content
  * @param options.okCallback
+ * @param options.cancelCallback
  *
  */
 morpheus.FormBuilder.showOkCancel = function (options) {

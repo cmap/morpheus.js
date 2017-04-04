@@ -162,21 +162,32 @@ morpheus.LandingPage.prototype = {
   },
   openFile: function (value) {
     var _this = this;
-    var options = {
-      dataset: {
-        file: value,
-        options: {interactive: true}
-      }
-    };
     var fileName = morpheus.Util.getFileName(value);
-    morpheus.OpenDatasetTool.fileExtensionPrompt(fileName, function (readOptions) {
-      if (readOptions) {
-        for (var key in readOptions) {
-          options.dataset.options[key] = readOptions[key];
+    if (fileName.toLowerCase().indexOf('.json') === fileName.length - 5) {
+      morpheus.Util.getText(value).done(function (text) {
+        _this.open(JSON.parse(text));
+      }).fail(function (err) {
+        morpheus.FormBuilder.showMessageModal({
+          title: 'Error',
+          message: 'Unable to load session'
+        });
+      });
+    } else {
+      var options = {
+        dataset: {
+          file: value,
+          options: {interactive: true}
         }
-      }
-      _this.open(options);
-    });
+      };
 
+      morpheus.OpenDatasetTool.fileExtensionPrompt(fileName, function (readOptions) {
+        if (readOptions) {
+          for (var key in readOptions) {
+            options.dataset.options[key] = readOptions[key];
+          }
+        }
+        _this.open(options);
+      });
+    }
   }
 };

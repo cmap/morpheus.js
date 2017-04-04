@@ -236,7 +236,7 @@ morpheus.HeatMap = function (options) {
         options: true,
         saveImage: true,
         saveDataset: true,
-        saveSession: false,
+        saveSession: true,
         openFile: true,
         filter: true,
         colorKey: true,
@@ -255,6 +255,29 @@ morpheus.HeatMap = function (options) {
   if (!options.landingPage) {
     options.landingPage = new morpheus.LandingPage();
     options.landingPage.$el.prependTo(this.$el);
+  }
+  if (this.options.dataset == null) {
+    var datasetFormBuilder = new morpheus.FormBuilder();
+    datasetFormBuilder.append({
+      name: 'file',
+      type: 'file'
+    });
+    this.options.dataset = $.Deferred();
+    morpheus.FormBuilder.showOkCancel({
+      title: 'Dataset',
+      content: datasetFormBuilder.$form,
+      okCallback: function () {
+        var file = datasetFormBuilder.getValue('file');
+        morpheus.DatasetUtil.read(file).done(function (dataset) {
+          _this.options.dataset.resolve(dataset);
+        }).fail(function (err) {
+          _this.options.dataset.reject(err);
+        });
+      },
+      cancelCallback: function () {
+        _this.options.dataset.reject('Session cancelled.');
+      }
+    });
   }
   if (this.options.name == null) {
     this.options.name = morpheus.Util
@@ -1079,10 +1102,13 @@ morpheus.HeatMap.prototype = {
     json.columnFilter = morpheus.CombinedFilter.toJSON(this.getProject().getColumnFilter());
 
     // element size, symmetric
-    // TODO add grid, show values
     json.symmetric = this.options.symmetric;
     json.rowSize = this.heatmap.getRowPositions().getSize();
-    json.columnSize = this.heatmap.getColumnPositions().getSize();
+    json.drawGrid = this.heatmap.isDrawGrid();
+    json.gridColor = this.heatmap.getGridColor();
+    json.gridThickness = this.heatmap.getGridThickness();
+    json.drawValues = this.heatmap.isDrawValues();
+
     // selection
     json.rowSelection = this.getProject().getRowSelectionModel().toModelIndices();
     json.columnSelection = this.getProject().getColumnSelectionModel().toModelIndices();
@@ -1105,7 +1131,7 @@ morpheus.HeatMap.prototype = {
       json.columnDendrogramField = null;
     }
     if (options.dataset) {
-      json.dataset = morpheus.Dataset.toJSON(this.getProject().getSortedFilteredDataset());
+      json.dataset = morpheus.Dataset.toJSON(this.getProject().getFullDataset());
     }
 
     return json;
@@ -1557,8 +1583,21 @@ morpheus.HeatMap.prototype = {
         columnDendrogramSortKey = new morpheus.SpecifiedModelSortOrder(
           columnIndices, columnIndices.length, 'dendrogram');
       }
-
     }
+
+    if (this.options.drawGrid != null) {
+      this.heatmap.setDrawGrid(this.options.drawGrid);
+    }
+    if (this.options.gridColor != null) {
+      this.heatmap.setGridColor(this.options.gridColor);
+    }
+    if (this.options.gridThickness != null) {
+      this.heatmap.setGridThickness(this.options.gridThickness);
+    }
+    if (this.options.drawValues != null) {
+      this.heatmap.setDrawValues(this.options.drawValues);
+    }
+
     if (rowDendrogramSortKey !== null) {
       this.project.setRowSortKeys([rowDendrogramSortKey]);
     }
