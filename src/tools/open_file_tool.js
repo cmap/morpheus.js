@@ -11,6 +11,9 @@ morpheus.OpenFileTool.prototype = {
       value: 'open',
       type: 'bootstrap-select',
       options: [{
+        name: 'Open session',
+        value: 'Open session'
+      }, {divider: true}, {
         name: 'Annotate columns',
         value: 'Annotate Columns'
       }, {
@@ -106,12 +109,27 @@ morpheus.OpenFileTool.prototype = {
   execute: function (options) {
     var that = this;
     var isInteractive = this.options.file == null;
+    var controller = options.controller;
     if (!isInteractive) {
       options.input.file = this.options.file;
     }
 
     var project = options.project;
-    if (options.input.open_file_action === 'append columns'
+    if (options.input.open_file_action === 'Open session') {
+      morpheus.Util.getText(options.input.file).done(function (text) {
+        var options = JSON.parse(text);
+        options.tabManager = controller.getTabManager();
+        options.focus = true;
+        options.inheritFromParent = false;
+        options.landingPage = controller.options.landingPage;
+        new morpheus.HeatMap(options);
+      }).fail(function (err) {
+        morpheus.FormBuilder.showMessageModal({
+          title: 'Error',
+          message: 'Unable to load session'
+        });
+      });
+    } else if (options.input.open_file_action === 'append columns'
       || options.input.open_file_action === 'append'
       || options.input.open_file_action === 'open'
       || options.input.open_file_action === 'overlay') {
@@ -120,7 +138,7 @@ morpheus.OpenFileTool.prototype = {
       morpheus.HeatMap.showTool(new morpheus.OpenDendrogramTool(
         options.input.file), options.controller);
     } else { // annotate rows or columns
-      var controller = options.controller;
+
       var isAnnotateColumns = options.input.open_file_action == 'Annotate Columns';
       var fileOrUrl = options.input.file;
       var dataset = project.getFullDataset();
@@ -329,7 +347,7 @@ morpheus.OpenFileTool.prototype = {
         name: 'dataset_field_name',
         options: morpheus.MetadataUtil
         .getMetadataNames(isColumns ? dataset
-          .getColumnMetadata() : dataset.getRowMetadata()),
+        .getColumnMetadata() : dataset.getRowMetadata()),
         type: 'select',
         value: 'id',
         required: true
@@ -378,7 +396,7 @@ morpheus.OpenFileTool.prototype = {
         name: 'dataset_field_name',
         options: morpheus.MetadataUtil
         .getMetadataNames(isColumns ? dataset
-          .getColumnMetadata() : dataset.getRowMetadata()),
+        .getColumnMetadata() : dataset.getRowMetadata()),
         type: 'select',
         required: true
       }];
