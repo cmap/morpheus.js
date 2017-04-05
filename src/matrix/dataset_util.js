@@ -397,6 +397,14 @@ morpheus.DatasetUtil.DATASET_FILE_FORMATS = '<a target="_blank" href="https://cl
   + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
   + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
   + ' a tab-delimited text file, or an Excel spreadsheet';
+morpheus.DatasetUtil.SESSION_FILE_FORMAT = 'a saved Morpheus session';
+
+morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS = '<a target="_blank"' +
+  ' href="https://clue.io/help#datasets">GCT 1.3</a>, '
+  + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
+  + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
+  + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
+  + ' a tab-delimited text file, an Excel spreadsheet, or a saved Morpheus session';
 morpheus.DatasetUtil.BASIC_DATASET_FILE_FORMATS = '<a target="_blank" href="https://clue.io/help#datasets">GCT 1.3</a>, '
   + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
   + ' or a tab-delimited text file';

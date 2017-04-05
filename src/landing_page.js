@@ -40,7 +40,7 @@ morpheus.LandingPage = function (pageOptions) {
     value: '',
     type: 'file',
     required: true,
-    help: morpheus.DatasetUtil.DATASET_FILE_FORMATS + '<br />All data is processed in the' +
+    help: morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS + '<br />All data is processed in the' +
     ' browser and never sent to any server'
   });
   formBuilder.$form.appendTo($el.find('[data-name=formRow]'));
