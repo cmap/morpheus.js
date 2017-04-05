@@ -58,6 +58,7 @@ morpheus.OpenFileTool.prototype = {
     return array;
   },
   init: function (project, form, initOptions) {
+    var $preloaded = $('<div></div>');
     form.$form.find('[name=open_file_action]').on(
       'change',
       function (e) {
@@ -66,12 +67,18 @@ morpheus.OpenFileTool.prototype = {
           || action === 'open' || action === 'overlay') {
           form.setHelpText('file',
             morpheus.DatasetUtil.DATASET_FILE_FORMATS);
+          $preloaded.show();
         } else if (action === 'Open dendrogram') {
           form.setHelpText('file',
             morpheus.DatasetUtil.DENDROGRAM_FILE_FORMATS);
+          $preloaded.hide();
+        } else if (action === 'Open session') {
+          form.setHelpText('file', morpheus.DatasetUtil.SESSION_FILE_FORMAT);
+          $preloaded.hide();
         } else {
           form.setHelpText('file',
             morpheus.DatasetUtil.ANNOTATION_FILE_FORMATS);
+          $preloaded.hide();
         }
       });
     if (this.options.file == null) {
@@ -79,20 +86,19 @@ morpheus.OpenFileTool.prototype = {
         form.$form.find('.form-group:first'));
       var _this = this;
       var id = _.uniqueId('morpheus');
-      form.$form
-      .append('<h4><a role="button" data-toggle="collapse" href="#'
-        + id
-        + '" aria-expanded="false" aria-controls="'
-        + id + '">Or select a preloaded dataset</a></h4>');
       var $sampleDatasets = $('<div class="collapse" id="' + id
         + '" style="overflow:auto;"></div>');
-      form.$form.append($sampleDatasets);
+      $('<h4><a role="button" data-toggle="collapse" href="#'
+        + id
+        + '" aria-expanded="false" aria-controls="'
+        + id + '">Or select a preloaded dataset</a></h4>').appendTo($preloaded);
+      $sampleDatasets.append($preloaded);
+      $preloaded.appendTo(form.$form);
       var sampleDatasets = new morpheus.SampleDatasets({
         $el: $sampleDatasets,
         callback: function (heatMapOptions) {
           form.setValue('file', heatMapOptions.dataset);
           _this.ok();
-
         }
       });
     }
