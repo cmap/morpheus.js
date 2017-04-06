@@ -47,7 +47,7 @@ morpheus.CollapseDatasetTool.prototype = {
   },
   execute: function (options) {
     var project = options.project;
-    var controller = options.controller;
+    var heatMap = options.heatMap;
     var f = morpheus.CollapseDatasetTool.Functions
     .fromString(options.input.collapse_method);
     var collapseToFields = options.input.collapse_to_fields;
@@ -74,7 +74,7 @@ morpheus.CollapseDatasetTool.prototype = {
     });
     // hide fields that were not part of collapse to
     set.forEach(function (val, name) {
-      controller.setTrackVisible(name, false, !rows);
+      heatMap.setTrackVisible(name, false, !rows);
     });
     project.setFullDataset(dataset, true);
   }

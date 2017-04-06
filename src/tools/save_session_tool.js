@@ -23,10 +23,10 @@ morpheus.SaveSessionTool.prototype = {
     if (!morpheus.Util.endsWith(fileName.toLowerCase(), '.json')) {
       fileName += '.json';
     }
-    var controller = options.controller;
+    var heatMap = options.heatMap;
     // var options = {dataset: options.input.include_dataset};
     var options = {dataset: true};
-    var json = controller.toJSON(options);
+    var json = heatMap.toJSON(options);
     var nativeArrayToArray = Array.from || function (typedArray) {
         var normalArray = Array.prototype.slice.call(typedArray);
         normalArray.length === typedArray.length;

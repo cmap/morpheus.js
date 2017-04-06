@@ -88,37 +88,15 @@ morpheus.TabManager = function (options) {
 
     });
   }
-  function rename($a) {
-    var builder = new morpheus.FormBuilder();
-    builder.append({
-      name: 'name',
-      type: 'text',
-      value: $.trim($a.contents().first().text())
-    });
-    morpheus.FormBuilder.showOkCancel({
-      title: 'Rename Tab',
-      content: builder.$form,
-      okCallback: function () {
-        var name = $.trim(builder.getValue('name'));
-        if (name !== '') {
-          if (_this.activeTabObject != null && _this.activeTabObject.setName) {
-            _this.activeTabObject.setName(name);
-          }
-          $a.contents().first().replaceWith(name + '&nbsp;');
-          _this.trigger('rename');
-        }
-      }
-    });
-    // edit tab name
-  }
-
-  // rename
 
   this.$nav.on('dblclick', 'li > a', function (e) {
     e.preventDefault();
-    if ($(this).data('morpheus-rename') && _this.options.rename) {
-      rename($(this));
+    var $a = $(this);
+    var $li = $a.parent('li');
+    if ($li.hasClass('morpheus-tab-addon')) {
+      return;
     }
+    _this.rename($a.xxx);
 
   });
   this.$nav.on('contextmenu.morpheus', 'li > a', function (e) {
@@ -251,7 +229,7 @@ morpheus.TabManager.prototype = {
     $i.addClass('fa fa-spinner fa-spin');
   },
   removeTask: function (task) {
-    var $a = this.$nav.find('> li > a[data-link=' + task.tabId + ']');
+    var $a = this._getA(task.tabId);
     var $i = $a.find('i');
     var tasks = $i.data('tasks');
     if (!tasks) {
@@ -362,7 +340,7 @@ morpheus.TabManager.prototype = {
     var obj = this.idToTabObject.remove(target);
     $('#' + target).remove(); // remove tab-pane
     this.activeTabObject = null;
-    this.$nav.find('> li > a[data-link=' + target + ']:first').parent().remove();
+    this._getA(target).parent().remove();
     this.$tabContent.find(target).remove();
     var $a = this.$nav.find('> li > a[data-toggle="tab"]:last');
     if ($a.length === 0) {
@@ -400,7 +378,7 @@ morpheus.TabManager.prototype = {
   },
   setActiveTab: function (id) {
     if (id !== this.activeTabId) {
-      var $a = this.$nav.find('> li > a[data-link=' + id + ']');
+      var $a = this._getA(id);
       // make sure it's enabled
       $a.parent().removeClass('disabled');
       $a.removeClass('btn disabled');
@@ -423,13 +401,16 @@ morpheus.TabManager.prototype = {
    *            The title (used to show tooltip)
    */
   setTabTitle: function (id, title) {
+    this._getA(id).attr('title', title);
+  },
+  _getA: function (id) {
     if (id[0] === '#') {
       id = id.substring(1);
     }
-    this.$nav.find('> li > a').filter('a[data-link=' + id + ']').attr('title', title);
+    return this.$nav.find('> li > a[data-link=' + id + ']:first');
   },
   setTabEnabled: function (id, enabled) {
-    var $a = this.$nav.find('> li > a').filter('a[data-link=' + id + ']');
+    var $a = this._getA(id);
     if (enabled) {
       $a.parent().removeClass('disabled');
       $a.removeClass('btn disabled');
@@ -444,6 +425,38 @@ morpheus.TabManager.prototype = {
   },
   getTabObject: function (id) {
     return this.idToTabObject.get(id);
+  },
+  rename: function (id) {
+    var $a = this._getA(id);
+    var $li = $a.parent();
+    if ($li.hasClass('morpheus-tab-addon')) {
+      return;
+    }
+    if (!$a.data('morpheus-rename') || !this.options.rename) {
+      return;
+    }
+    var _this = this;
+    var builder = new morpheus.FormBuilder();
+    builder.append({
+      name: 'name',
+      type: 'text',
+      value: $.trim($a.contents().first().text())
+    });
+    morpheus.FormBuilder.showOkCancel({
+      title: 'Rename Tab',
+      content: builder.$form,
+      okCallback: function () {
+        var name = $.trim(builder.getValue('name'));
+        if (name !== '') {
+          if (_this.activeTabObject != null && _this.activeTabObject.setName) {
+            _this.activeTabObject.setName(name);
+          }
+          $a.contents().first().replaceWith(name + '&nbsp;');
+          _this.trigger('rename');
+        }
+      }
+    });
+    // edit tab name
   }
 };
 morpheus.Util.extend(morpheus.TabManager, morpheus.Events);

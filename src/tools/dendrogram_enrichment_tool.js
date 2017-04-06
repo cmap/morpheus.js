@@ -32,13 +32,13 @@ morpheus.DendrogramEnrichmentTool.prototype = {
   },
   execute: function (options) {
     var project = options.project;
-    var controller = options.controller;
+    var heatMap = options.heatMap;
     var pValue = options.input['min_p-value_for_enrichment'];
     var minTotalGroupSize = options.input.minimum_number_of_total_members_in_group;
     var minGroupSize = options.input.minimum_number_of_members_in_group;
     var dataset = project.getSortedFilteredDataset();
-    var dendrogram = this.isColumns ? controller.columnDendrogram
-      : controller.rowDendrogram;
+    var dendrogram = this.isColumns ? heatMap.columnDendrogram
+      : heatMap.rowDendrogram;
     var vector = this.isColumns ? dataset.getColumnMetadata().getByName(
         options.input.field) : dataset.getRowMetadata().getByName(
         options.input.field);

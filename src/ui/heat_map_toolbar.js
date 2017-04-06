@@ -1,5 +1,5 @@
-morpheus.HeatMapToolBar = function (controller) {
-  this.controller = controller;
+morpheus.HeatMapToolBar = function (heatMap) {
+  this.heatMap = heatMap;
   this.rowSearchResultModelIndices = [];
   this.columnSearchResultModelIndices = [];
   var _this = this;
@@ -10,8 +10,11 @@ morpheus.HeatMapToolBar = function (controller) {
     + '<div class="row"><div class="col-xs-12"><div data-name="tip" style="white-space:nowrap; border-top: thin solid #e7e7e7;margin-bottom:2px;height: 14px; font-size: 10px;overflow:hidden;"></div></div></div>'
     + '</div>');
   var searchHtml = [];
-  var $search = $('<form name="searchForm" class="form form-inline form-compact" role="search"></form>');
-  $search.on('submit', function (e) {
+  var $searchForm = $('<form style="display:inline-block;" name="searchForm" class="form' +
+    ' form-inline' +
+    ' form-compact"' +
+    ' role="search"></form>');
+  $searchForm.on('submit', function (e) {
     e.preventDefault();
   });
 
@@ -105,21 +108,21 @@ morpheus.HeatMapToolBar = function (controller) {
     searchHtml.push('</div>');
   }
 
-  if (controller.options.toolbar.searchRows) {
+  if (heatMap.options.toolbar.searchRows) {
     createSearchMenu('searchRowsGroup', true);
   }
-  if (controller.options.toolbar.searchColumns) {
+  if (heatMap.options.toolbar.searchColumns) {
     createSearchMenu('searchColumnsGroup', true);
   }
 
-  if (controller.options.toolbar.searchValues) {
+  if (heatMap.options.toolbar.searchValues) {
     createSearchMenu('searchValuesGroup', false);
   }
   createSearchMenu('searchRowDendrogramGroup', false);
   createSearchMenu('searchColumnDendrogramGroup', false);
 
   // dimensions
-  if (controller.options.toolbar.dimensions) {
+  if (heatMap.options.toolbar.dimensions) {
     searchHtml.push('<div class="form-group">');
     searchHtml
     .push('<h6 style="display: inline; margin-left:10px;" data-name="dim"></h6>');
@@ -128,127 +131,178 @@ morpheus.HeatMapToolBar = function (controller) {
       ' data-name="selection"></h6>');
     searchHtml.push('</div>');
   }
-  searchHtml.push('<div data-name="buttons" style="margin-left:10px;" class="form-group"></div>');
 
-  $(searchHtml.join('')).appendTo($search);
+  var $menus = $('<div style="display: inline-block;margin-right:14px;"></div>');
 
-  var $buttons = $search.find('[data-name=buttons]');
+  function createMenu(menuName, actions, minWidth) {
+    if (!minWidth) {
+      minWidth = '0px';
+    }
+    var menu = [];
+    var dropdownId = _.uniqueId('morpheus');
+    menu.push('<div class="dropdown morpheus-menu">');
+    menu.push('<a class="dropdown-toggle morpheus-black-link morpheus-black-link-background" type="button"' +
+      ' id="' + dropdownId + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">');
+    menu.push(menuName);
 
-  var $tools = $('<form name="tools" class="form-inline" role="form"></form>');
-  $tools.on('submit', function (e) {
+    menu.push('</a>');
+    menu.push('<ul style="min-width:' + minWidth + ';" class="dropdown-menu" aria-labelledby="' + dropdownId + '">');
+    actions.forEach(function (name) {
+      if (name == null) {
+        menu.push('<li role="separator" class="divider"></li>');
+      } else {
+        var action = heatMap.getActionManager().getAction(name);
+        menu.push('<li>');
+        menu.push('<a class="morpheus-menu-item" data-action="' + action.name + '" href="#">');
+        menu.push(action.name);
+        if (action.icon) {
+          menu.push('<span class="' + action.icon + ' morpheus-menu-item-icon"></span> ');
+        }
+        if (action.which) {
+          menu.push('<span class="pull-right">');
+          if (action.commandKey) {
+            menu.push(morpheus.Util.COMMAND_KEY);
+          }
+          if (action.shiftKey) {
+            menu.push('Shift+');
+          }
+          menu.push(morpheus.KeyboardCharMap[action.which[0]]);
+          menu.push('</span>');
+        }
+
+        menu.push('</a>');
+        menu.push('</li>');
+      }
+    });
+
+    menu.push('</ul>');
+    menu.push('</div>');
+    $(menu.join('')).appendTo($menus);
+  }
+
+  if (heatMap.options.menu) {
+    if (heatMap.options.menu.File) {
+      createMenu('File', heatMap.options.menu.File, '240px');
+    }
+    if (heatMap.options.menu.View) {
+      createMenu('View', heatMap.options.menu.View);
+    }
+    if (heatMap.options.menu.Tools) {
+      createMenu('Tools', heatMap.options.menu.Tools);
+    }
+    if (heatMap.options.menu.Help) {
+      createMenu('Help', heatMap.options.menu.Help, '200px');
+    }
+  }
+  $menus.on('click', 'li > a', function (e) {
     e.preventDefault();
+    heatMap.getActionManager().execute($(this).data('action'));
   });
-
-  var toolbarHtml = [];
+  $(searchHtml.join('')).appendTo($searchForm);
+  var $lineOneColumn = $el.find('[data-name=lineOneColumn]');
+  $menus.appendTo($lineOneColumn);
+  $searchForm.appendTo($lineOneColumn);
+  var toolbarHtml = ['<div style="display: inline;">'];
+  toolbarHtml.push('<div class="morpheus-button-divider"></div>');
   // zoom
-  if (controller.options.toolbar.zoom) {
+  if (heatMap.options.toolbar.zoom) {
+    // toolbarHtml
+    // .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip"' +
+    //   ' title="Zoom Out (-)" name="Zoom Out"><span class="fa fa-minus"></span></button>');
+    // toolbarHtml
+    // .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip"' +
+    //   ' title="Zoom In (+)" name="Zoom In"><span class="fa fa-plus"></span></button>');
+    // toolbarHtml
+    // .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip"' +
+    //   ' title="Fit To Window" name="Fit To Window"><span class="fa fa-compress"></span></button>');
+    // toolbarHtml
+    // .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip"' +
+    //   ' title="Reset Zoom" name="Reset Zoom">100%</button>');
+
+    var dropdownId = _.uniqueId('morpheus');
+    toolbarHtml.push('<div style="display:inline-block;" class="dropdown">');
+    toolbarHtml.push('<a class="dropdown-toggle morpheus-black-link" type="button" id="' + dropdownId + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">');
+    // toolbarHtml.push('<input style="width:2em;height:21px;" id="' + dropdownId + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">');
+    toolbarHtml.push('<button type="button"' +
+      ' class="btn btn-default btn-xxs"><span class="fa' +
+      ' fa-search-plus"></span>');
+    toolbarHtml.push(' <span class="caret"></span>');
+    toolbarHtml.push('</button>');
+    toolbarHtml.push('<ul class="dropdown-menu" aria-labelledby="' + dropdownId + '">');
     toolbarHtml
-    .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Zoom Out (-)" name="out"><span class="fa fa-minus"></span></button>');
+    .push('<li><a class="morpheus-menu-item" href="#" data-action="Zoom Out">Zoom' +
+      ' Out<span' +
+      ' class="fa' +
+      ' fa-minus morpheus-menu-item-icon"></span><span class="pull-right">-</span></a></li>');
     toolbarHtml
-    .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Zoom In (+)" name="in"><span class="fa fa-plus"></span></button>');
+    .push('<li><a class="morpheus-menu-item" href="#" data-action="Zoom In">Zoom In<span class="fa' +
+      ' fa-plus morpheus-menu-item-icon"></span><span class="pull-right">+</span></a></li>');
     toolbarHtml
-    .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Fit To Window" name="fit"><span class="fa fa-compress"></span></button>');
+    .push('<li role="separator" class="divider"></li>');
     toolbarHtml
-    .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip" title="Reset Zoom" name="resetZoom">100%</button>');
+    .push('<li><a class="morpheus-menu-item" href="#" data-action="Fit To Window">Fit To Window<span' +
+      ' class="fa' +
+      ' fa-compress morpheus-menu-item-icon"></span></a></li>');
+    toolbarHtml
+    .push('<li role="separator" class="divider"></li>');
+    toolbarHtml
+    .push('<li><a class="morpheus-menu-item" href="#" data-action="Reset Zoom">100%</a></li>');
+    toolbarHtml.push('</ul>');
+    toolbarHtml.push('</div>');
   }
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
-  if (controller.options.toolbar.sort) {
+  if (heatMap.options.toolbar.sort) {
     toolbarHtml
-    .push('<button data-toggle="tooltip" title="Sort" name="sort" type="button" class="btn btn-default btn-xxs"><span class="fa fa-sort-alpha-asc"></span></button>');
+    .push('<button data-toggle="tooltip" title="Sort" name="Sort" type="button" class="btn' +
+      ' btn-default btn-xxs"><span class="fa fa-sort-alpha-asc"></span></button>');
   }
-  if (controller.options.toolbar.options) {
+  if (heatMap.options.toolbar.options) {
     toolbarHtml
-    .push('<button name="options" data-toggle="tooltip" title="Options" type="button" class="btn btn-default btn-xxs"><span class="fa fa-cog"></span></button>');
+    .push('<button data-action="Options" data-toggle="tooltip" title="Options" type="button"' +
+      ' class="btn btn-default btn-xxs"><span class="fa fa-cog"></span></button>');
 
   }
 
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
-  if (controller.options.toolbar.openFile) {
+  if (heatMap.options.toolbar.openFile) {
     toolbarHtml
-    .push('<button name="openFile" data-toggle="tooltip" title="Open File ('
+    .push('<button data-action="Open File" data-toggle="tooltip" title="Open File ('
       + morpheus.Util.COMMAND_KEY
       + 'O)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-folder-open-o"></span></button>');
   }
-  if (controller.options.toolbar.saveImage) {
+  if (heatMap.options.toolbar.saveImage) {
     toolbarHtml
-    .push('<button name="saveImage" data-toggle="tooltip" title="Save Image ('
+    .push('<button data-action="Save Image" data-toggle="tooltip" title="Save Image ('
       + morpheus.Util.COMMAND_KEY
       + 'S)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-file-image-o"></span></button>');
   }
-  if (controller.options.toolbar.saveDataset) {
+  if (heatMap.options.toolbar.saveDataset) {
     toolbarHtml
-    .push('<button name="saveDataset" data-toggle="tooltip" title="Save Dataset ('
+    .push('<button data-action="Save Dataset" data-toggle="tooltip" title="Save Dataset ('
       + morpheus.Util.COMMAND_KEY
       + 'Shift+S)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-floppy-o"></span></button>');
   }
-  if (controller.options.toolbar.saveSession) {
+  if (heatMap.options.toolbar.saveSession) {
     toolbarHtml
-    .push('<button name="saveSession" data-toggle="tooltip" title="Save Session" type="button"' +
+    .push('<button data-action="Save Session" data-toggle="tooltip" title="Save Session" type="button"' +
       ' class="btn btn-default btn-xxs"><span class="fa fa-anchor"></span></button>');
   }
 
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
-  if (controller.options.toolbar.filter) {
+  if (heatMap.options.toolbar.filter) {
     toolbarHtml
-    .push('<button name="filterButton" data-toggle="tooltip" title="Filter" type="button" class="btn btn-default btn-xxs"><span class="fa fa-filter"></span></button>');
+    .push('<button data-action="Filter" data-toggle="tooltip" title="Filter" type="button"' +
+      ' class="btn btn-default btn-xxs"><span class="fa fa-filter"></span></button>');
   }
-  if (controller.options.toolbar.chart && typeof Plotly !== 'undefined') {
+  if (heatMap.options.toolbar.chart && typeof Plotly !== 'undefined') {
     toolbarHtml
-    .push('<button name="chart" data-toggle="tooltip" title="Chart" type="button" class="btn btn-default btn-xxs"><span class="fa fa-line-chart"></span></button>');
+    .push('<button data-action="Chart" data-toggle="tooltip" title="Chart" type="button" class="btn' +
+      ' btn-default btn-xxs"><span class="fa fa-line-chart"></span></button>');
 
   }
-  var tools = [{
-    tool: new morpheus.HClusterTool()
-  }, {
-    tool: new morpheus.MarkerSelection()
-  }, {
-    tool: new morpheus.NearestNeighbors()
-  }, {
-    tool: new morpheus.NewHeatMapTool(),
-  }, null, {
-    tool: new morpheus.AdjustDataTool()
-  }, {
-    tool: new morpheus.CollapseDatasetTool()
-  }, {
-    tool: new morpheus.CreateAnnotation()
-  }, {
-    tool: new morpheus.SimilarityMatrixTool()
-  }, {
-    tool: new morpheus.TransposeTool()
-  }, {tool: new morpheus.TsneTool()}, null, {tool: new morpheus.DevAPI()}];
-  this.getToolByName = function (name) {
-    for (var i = 0; i < tools.length; i++) {
-      if (tools[i] && tools[i].tool.toString
-        && tools[i].tool.toString() === name) {
-        return tools[i].tool;
-      }
-    }
-    throw name + ' not found';
-  };
-  if (controller.options.toolbar.tools) {
-    toolbarHtml.push('<div class="btn-group">');
-    toolbarHtml
-    .push('<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown"><span title="Tools" data-toggle="tooltip" class="fa fa-wrench"></span> <span class="caret"></span></button>');
-    toolbarHtml.push('<ul data-name="tools" class="dropdown-menu" role="menu">');
-
-    for (var i = 0; i < tools.length; i++) {
-      if (tools[i] == null) {
-        toolbarHtml
-        .push('<li role="presentation" class="divider"></li>');
-      } else if (tools[i].action) {
-        toolbarHtml.push('<li><a data-name="' + i + '" href="#">'
-          + tools[i].name + '</a></li>');
-      } else {
-        toolbarHtml.push('<li><a data-name="' + i + '" href="#">'
-          + tools[i].tool.toString() + '</a></li>');
-      }
-    }
-    toolbarHtml.push('</ul></div>');
-  }
-
-  toolbarHtml.push('<div class="morpheus-button-divider"></div>');
   // legend
-  if (controller.options.toolbar.colorKey) {
+  if (heatMap.options.toolbar.colorKey) {
+    toolbarHtml.push('<div class="morpheus-button-divider"></div>');
     toolbarHtml.push('<div class="btn-group">');
     toolbarHtml
     .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="dropdown"><span title="Color Key" data-toggle="tooltip" class="fa fa-key"></span></button>');
@@ -257,110 +311,21 @@ morpheus.HeatMapToolBar = function (controller) {
     toolbarHtml.push('</ul>');
     toolbarHtml.push('</div>');
   }
+  toolbarHtml.push('</div>');
+  var $toolbar = $(toolbarHtml.join(''));
 
-  var $lineOneColumn = $el.find('[data-name=lineOneColumn]');
-  $search.appendTo($lineOneColumn);
-  var $toolbarForm = $(toolbarHtml.join(''));
-  $toolbarForm.appendTo($buttons);
-  if (controller.options.toolbar.$customButtons) {
-    controller.options.toolbar.$customButtons.appendTo($buttons);
+  $toolbar.find('[data-action]').on('click', function (e) {
+    e.preventDefault();
+    heatMap.getActionManager().execute($(this).data('action'));
+  });
+  if (heatMap.options.toolbar.$customButtons) {
+    heatMap.options.toolbar.$customButtons.appendTo($toolbar);
   }
-  if (controller.options.$help) {
-    controller.options.$help.appendTo($buttons);
-  }
-
+  $toolbar.appendTo($lineOneColumn);
   // $hide.appendTo($el.find('[data-name=toggleEl]'));
-  $el.prependTo(controller.$content);
-  var $tools = $el.find('[data-name=tools]');
+  $el.prependTo(heatMap.$content);
   this.$tip = $el.find('[data-name=tip]');
-  $tools.on('click', 'li > a', function (e) {
-    e.preventDefault();
-    var index = parseInt($(this).attr('data-name'));
-    if (tools[index].tool) {
-      morpheus.HeatMap.showTool(tools[index].tool, controller);
-    } else {
-      tools[index].action();
-    }
-  });
 
-  var filterModal = [];
-  var filterLabelId = _.uniqueId('morpheus');
-  filterModal
-  .push('<div class="modal fade" tabindex="1" role="dialog" aria-labelledby="'
-    + filterLabelId + '">');
-  filterModal.push('<div class="modal-dialog" role="document">');
-  filterModal.push('<div class="modal-content">');
-  filterModal.push('<div class="modal-header">');
-  filterModal
-  .push('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
-  filterModal.push('<h4 class="modal-title" id="' + filterLabelId
-    + '">Filter</h4>');
-  filterModal.push('</div>');
-  filterModal.push('<div class="modal-body"></div>');
-  filterModal.push('<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>');
-  filterModal.push('</div>');
-  filterModal.push('</div>');
-  filterModal.push('</div>');
-  var $filterModal = $(filterModal.join(''));
-  $filterModal.on('mousewheel', function (e) {
-    e.stopPropagation();
-  });
-  var $filter = $('<div style="padding-bottom:30px;"></div>');
-  $filter.appendTo($filterModal.find('.modal-body'));
-  $filterModal.appendTo($el);
-  var filterHtml = [];
-  filterHtml
-  .push('<div class="radio"><label><input type="radio" name="rowsOrColumns" value="rows" checked>Rows</label></div> ');
-  filterHtml
-  .push('<div class="radio"><label><input type="radio" name="rowsOrColumns" value="columns">Columns</label></div>');
-
-  var $filterChooser = $(filterHtml.join(''));
-  $filterChooser.appendTo($filter);
-  var columnFilterUI = new morpheus.FilterUI(controller.getProject(), true);
-  var rowFilterUI = new morpheus.FilterUI(controller.getProject(), false);
-  controller.getProject().getRowFilter().on('focus', function (e) {
-    $filterChooser.find('[value=rows]').prop('checked', true);
-    columnFilterUI.$div.hide();
-    rowFilterUI.$div.show();
-    $filterModal.modal('show');
-    morpheus.Util.trackEvent({
-      eventCategory: 'ToolBar',
-      eventAction: 'rowFilter'
-    });
-
-  });
-  controller.getProject().getColumnFilter().on('focus', function (e) {
-    $filterChooser.find('[value=columns]').prop('checked', true);
-    columnFilterUI.$div.show();
-    rowFilterUI.$div.hide();
-    $filterModal.modal('show');
-    morpheus.Util.trackEvent({
-      eventCategory: 'ToolBar',
-      eventAction: 'columnFilter'
-    });
-  });
-  rowFilterUI.$div.appendTo($filter);
-  columnFilterUI.$div.appendTo($filter);
-  columnFilterUI.$div.css('display', 'none');
-  var $filterRadio = $filterChooser.find('[name=rowsOrColumns]');
-  $filterRadio.on('change', function (e) {
-    var val = $filterRadio.filter(':checked').val();
-    if (val === 'columns') {
-      columnFilterUI.$div.show();
-      rowFilterUI.$div.hide();
-    } else {
-      columnFilterUI.$div.hide();
-      rowFilterUI.$div.show();
-    }
-    e.preventDefault();
-  });
-  $el.find('[name=filterButton]').on('click', function () {
-    $filterModal.modal('show');
-    morpheus.Util.trackEvent({
-      eventCategory: 'ToolBar',
-      eventAction: 'filter'
-    });
-  });
   $el.find('[data-toggle="tooltip"]').tooltip({
     placement: 'bottom',
     container: 'body',
@@ -371,54 +336,12 @@ morpheus.HeatMapToolBar = function (controller) {
   var $key = $el.find('[data-name=key]');
   var $keyContent = $el.find('[data-name=keyContent]');
   $key.dropdown().parent().on('show.bs.dropdown', function () {
-    new morpheus.HeatMapColorSchemeLegend(controller, $keyContent);
+    new morpheus.HeatMapColorSchemeLegend(heatMap, $keyContent);
     morpheus.Util.trackEvent({
       eventCategory: 'ToolBar',
       eventAction: 'colorKey'
     });
   });
-  $el.find('[name=openFile]').on('click', function () {
-    morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
-      customUrls: controller._customUrls
-    }), controller);
-  });
-  $el.find('[name=saveImage]').on('click', function () {
-    morpheus.HeatMap.showTool(new morpheus.SaveImageTool(), controller);
-  });
-  $el.find('[name=saveDataset]').on('click', function () {
-    morpheus.HeatMap.showTool(new morpheus.SaveDatasetTool(), controller);
-  });
-  $el.find('[name=saveSession]').on('click', function () {
-    morpheus.HeatMap.showTool(new morpheus.SaveSessionTool(), controller);
-  });
-
-  $el.find('[name=chart]').on(
-    'click',
-    function () {
-      new morpheus.ChartTool({
-        project: controller.getProject(),
-        getVisibleTrackNames: _.bind(
-          controller.getVisibleTrackNames, controller)
-      });
-      morpheus.Util.trackEvent({
-        eventCategory: 'ToolBar',
-        eventAction: 'chart'
-      });
-    });
-
-  var _this = this;
-  $el
-  .find('[name=tutorial]')
-  .on(
-    'click',
-    function () {
-      window
-      .open('http://www.broadinstitute.org/cancer/software/morpheus/tutorial.html');
-      morpheus.Util.trackEvent({
-        eventCategory: 'ToolBar',
-        eventAction: 'tutorial'
-      });
-    });
 
   var searchHelpHtml = [];
   searchHelpHtml.push('<h4>Symbols</h4>');
@@ -461,16 +384,16 @@ morpheus.HeatMapToolBar = function (controller) {
       html: $searchHelp
     });
   });
-  var $searchRowsGroup = $search.find('[data-name=searchRowsGroup]');
-  var $searchColumnsGroup = $search.find('[data-name=searchColumnsGroup]');
-  var $searchValuesGroup = $search.find('[data-name=searchValuesGroup]');
-  var $searchRowDendrogramGroup = $search.find('[data-name=searchRowDendrogramGroup]');
-  var $searchColumnDendrogramGroup = $search.find('[data-name=searchColumnDendrogramGroup]');
+  var $searchRowsGroup = $searchForm.find('[data-name=searchRowsGroup]');
+  var $searchColumnsGroup = $searchForm.find('[data-name=searchColumnsGroup]');
+  var $searchValuesGroup = $searchForm.find('[data-name=searchValuesGroup]');
+  var $searchRowDendrogramGroup = $searchForm.find('[data-name=searchRowDendrogramGroup]');
+  var $searchColumnDendrogramGroup = $searchForm.find('[data-name=searchColumnDendrogramGroup]');
 
   this.$searchRowDendrogramGroup = $searchRowDendrogramGroup;
   this.$searchColumnDendrogramGroup = $searchColumnDendrogramGroup;
 
-  var $searchToggle = $search.find('[name=searchToggle]'); // buttons
+  var $searchToggle = $searchForm.find('[name=searchToggle]'); // buttons
   var nameToSearchObject = {};
 
   function getSearchElements($group, searchName, cb) {
@@ -530,16 +453,16 @@ morpheus.HeatMapToolBar = function (controller) {
   });
 
   // set button and search controls visibility
-  if (!controller.options.toolbar.searchRows) {
+  if (!heatMap.options.toolbar.searchRows) {
     this.rowSearchObject.$toggleButton.hide();
     this.rowSearchObject.$group.css('display', 'none');
   }
 
-  if (!controller.options.toolbar.searchColumns) {
+  if (!heatMap.options.toolbar.searchColumns) {
     this.columnSearchObject.$toggleButton.hide();
     this.columnSearchObject.$group.css('display', 'none');
   }
-  if (!controller.options.toolbar.searchValues) {
+  if (!heatMap.options.toolbar.searchValues) {
     this.valueSearchObject.$toggleButton.hide();
   }
   this.rowDendrogramSearchObject.$toggleButton.hide();
@@ -599,14 +522,14 @@ morpheus.HeatMapToolBar = function (controller) {
     }
   }
 
-  controller.on('dendrogramAnnotated', function (e) {
+  heatMap.on('dendrogramAnnotated', function (e) {
     if (e.isColumns) { // show buttons
       _this.rowDendrogramSearchObject.$toggleButton.show();
     } else {
       _this.columnDendrogramSearchObject.$toggleButton.show();
     }
   });
-  controller.on('dendrogramChanged', function (e) {
+  heatMap.on('dendrogramChanged', function (e) {
     if (e.isColumns) {
       _this.rowDendrogramSearchObject.$group.hide();
       _this.rowDendrogramSearchObject.$toggleButton.hide();
@@ -615,14 +538,14 @@ morpheus.HeatMapToolBar = function (controller) {
       _this.columnDendrogramSearchObject.$toggleButton.hide();
     }
   });
-  var project = controller.getProject();
+  var project = heatMap.getProject();
 
   morpheus.Util.autosuggest({
     $el: this.rowSearchObject.$search,
     filter: function (terms, cb) {
       var indices = [];
       var meta = project.getSortedFilteredDataset().getRowMetadata();
-      controller.getVisibleTrackNames(false).forEach(function (name) {
+      heatMap.getVisibleTrackNames(false).forEach(function (name) {
         indices.push(morpheus.MetadataUtil.indexOf(meta, name));
       });
       meta = new morpheus.MetadataModelColumnView(meta, indices);
@@ -648,7 +571,7 @@ morpheus.HeatMapToolBar = function (controller) {
     filter: function (terms, cb) {
       var indices = [];
       var meta = project.getSortedFilteredDataset().getColumnMetadata();
-      controller.getVisibleTrackNames(true).forEach(function (name) {
+      heatMap.getVisibleTrackNames(true).forEach(function (name) {
         indices.push(morpheus.MetadataUtil.indexOf(meta, name));
       });
       meta = new morpheus.MetadataModelColumnView(meta, indices);
@@ -674,7 +597,7 @@ morpheus.HeatMapToolBar = function (controller) {
   morpheus.Util.autosuggest({
     $el: this.rowDendrogramSearchObject.$search,
     filter: function (tokens, cb) {
-      var d = controller.getDendrogram(false);
+      var d = heatMap.getDendrogram(false);
       if (!d.searchTerms) {
         cb([]);
       } else {
@@ -707,7 +630,7 @@ morpheus.HeatMapToolBar = function (controller) {
   morpheus.Util.autosuggest({
     $el: this.columnDendrogramSearchObject.$search,
     filter: function (tokens, cb) {
-      var d = controller.getDendrogram(true);
+      var d = heatMap.getDendrogram(true);
       if (!d.searchTerms) {
         cb([]);
       } else {
@@ -777,70 +700,19 @@ morpheus.HeatMapToolBar = function (controller) {
     searchValues();
   }, 500));
 
-  $toolbarForm.on('submit', function (e) {
-    e.preventDefault();
-  });
-  $buttons.on('click', '[name=in]', function (e) {
-    e.preventDefault();
-    controller.zoom(true);
-    morpheus.Util.trackEvent({
-      eventCategory: 'ToolBar',
-      eventAction: 'zoomIn'
-    });
-  });
-  $buttons.on('click', '[name=out]', function (e) {
-    e.preventDefault();
-    controller.zoom(false);
-    morpheus.Util.trackEvent({
-      eventCategory: 'ToolBar',
-      eventAction: 'zoomOut'
-    });
-  });
-  $buttons.on('click', '[name=options]', function (e) {
-    e.preventDefault();
-    controller.showOptions();
-    morpheus.Util.trackEvent({
-      eventCategory: 'ToolBar',
-      eventAction: 'options'
-    });
-  });
-  $buttons.on('click', '[name=sort]', function (e) {
-    e.preventDefault();
-    new morpheus.SortDialog(project);
-    morpheus.Util.trackEvent({
-      eventCategory: 'ToolBar',
-      eventAction: 'sort'
-    });
-  });
-  $buttons.on('click', '[name=fit]', function (e) {
-    e.preventDefault();
-    controller.fitToWindow(true);
-    morpheus.Util.trackEvent({
-      eventCategory: 'ToolBar',
-      eventAction: 'fit'
-    });
-  });
-  $buttons.on('click', '[name=resetZoom]', function (e) {
-    e.preventDefault();
-    controller.resetZoom();
-    morpheus.Util.trackEvent({
-      eventCategory: 'ToolBar',
-      eventAction: 'resetZoom'
-    });
-  });
   this.toggleControls = function () {
     if ($lineOneColumn.css('display') === 'none') {
       $lineOneColumn.css('display', '');
       _this.rowSearchObject.$search.focus();
     } else {
       $lineOneColumn.css('display', 'none');
-      $(_this.controller.heatmap.canvas).focus();
+      $(_this.heatMap.heatmap.canvas).focus();
     }
   };
   this.$el = $el;
   var updateFilterStatus = function () {
-    if (controller.getProject().getRowFilter().isEnabled()
-      || controller.getProject().getColumnFilter().isEnabled()) {
+    if (heatMap.getProject().getRowFilter().isEnabled()
+      || heatMap.getProject().getColumnFilter().isEnabled()) {
       _this.$el.find('[name=filterButton]').addClass('btn-primary');
     } else {
       _this.$el.find('[name=filterButton]').removeClass('btn-primary');
@@ -899,24 +771,24 @@ morpheus.HeatMapToolBar = function (controller) {
     _this.columnSearchObject.$matchesToTop.removeClass('btn-primary');
   });
 
-  controller.getProject().on('rowFilterChanged.morpheus', function (e) {
+  heatMap.getProject().on('rowFilterChanged.morpheus', function (e) {
     _this.search(true);
     updateFilterStatus();
   });
-  controller.getProject().on('columnFilterChanged.morpheus', function (e) {
+  heatMap.getProject().on('columnFilterChanged.morpheus', function (e) {
     _this.search(false);
     updateFilterStatus();
   });
-  controller.getProject().on('datasetChanged.morpheus', function () {
+  heatMap.getProject().on('datasetChanged.morpheus', function () {
     _this.search(true);
     _this.search(false);
     updateFilterStatus();
   });
-  controller.getProject().getRowSelectionModel().on(
+  heatMap.getProject().getRowSelectionModel().on(
     'selectionChanged.morpheus', function () {
       _this.updateSelectionLabel();
     });
-  controller.getProject().getColumnSelectionModel().on(
+  heatMap.getProject().getColumnSelectionModel().on(
     'selectionChanged.morpheus', function () {
       _this.updateSelectionLabel();
     });
@@ -932,8 +804,8 @@ morpheus.HeatMapToolBar = function (controller) {
       if (_this.currentColumnSearchIndex < 0) {
         _this.currentColumnSearchIndex = _this.columnSearchResultViewIndicesSorted.length - 1;
       }
-      controller
-      .scrollLeft(controller
+      heatMap
+      .scrollLeft(heatMap
       .getHeatMapElementComponent()
       .getColumnPositions()
       .getPosition(
@@ -951,8 +823,8 @@ morpheus.HeatMapToolBar = function (controller) {
       if (_this.currentRowSearchIndex < 0) {
         _this.currentRowSearchIndex = _this.rowSearchResultViewIndicesSorted.length - 1;
       }
-      controller
-      .scrollTop(controller
+      heatMap
+      .scrollTop(heatMap
       .getHeatMapElementComponent()
       .getRowPositions()
       .getPosition(
@@ -991,7 +863,7 @@ morpheus.HeatMapToolBar.prototype = {
   rowSearchMode: morpheus.HeatMapToolBar.SELECT_MATCHES_SEARCH_MODE,
   columnSearchMode: morpheus.HeatMapToolBar.SELECT_MATCHES_SEARCH_MODE,
   _updateSearchIndices: function (isColumns) {
-    var project = this.controller.getProject();
+    var project = this.heatMap.getProject();
     if (isColumns) {
       var viewIndices = [];
       var modelIndices = this.columnSearchResultModelIndices;
@@ -1024,14 +896,14 @@ morpheus.HeatMapToolBar.prototype = {
     }
   },
   next: function (isColumns) {
-    var controller = this.controller;
+    var heatMap = this.heatMap;
     if (isColumns) {
       this.currentColumnSearchIndex++;
       if (this.currentColumnSearchIndex >= this.columnSearchResultViewIndicesSorted.length) {
         this.currentColumnSearchIndex = 0;
       }
-      controller
-      .scrollLeft(controller
+      heatMap
+      .scrollLeft(heatMap
       .getHeatMapElementComponent()
       .getColumnPositions()
       .getPosition(
@@ -1041,8 +913,8 @@ morpheus.HeatMapToolBar.prototype = {
       if (this.currentRowSearchIndex >= this.rowSearchResultViewIndicesSorted.length) {
         this.currentRowSearchIndex = 0;
       }
-      controller
-      .scrollTop(controller
+      heatMap
+      .scrollTop(heatMap
       .getHeatMapElementComponent()
       .getRowPositions()
       .getPosition(
@@ -1081,7 +953,7 @@ morpheus.HeatMapToolBar.prototype = {
     }
   },
   updateDimensionsLabel: function () {
-    var p = this.controller.getProject();
+    var p = this.heatMap.getProject();
     var d = p.getFullDataset();
     var f = p.getSortedFilteredDataset();
     var text = 'showing ' + morpheus.Util.intFormat(f.getRowCount())
@@ -1091,8 +963,8 @@ morpheus.HeatMapToolBar.prototype = {
     this.$dimensionsLabel.html(text);
   },
   updateSelectionLabel: function () {
-    var nc = this.controller.getProject().getColumnSelectionModel().count();
-    var nr = this.controller.getProject().getRowSelectionModel().count();
+    var nc = this.heatMap.getProject().getColumnSelectionModel().count();
+    var nr = this.heatMap.getProject().getRowSelectionModel().count();
     var text = [];
     text.push(morpheus.Util.intFormat(nr) + ' row');
     if (nr !== 1) {
@@ -1109,8 +981,8 @@ morpheus.HeatMapToolBar.prototype = {
   searchDendrogram: function (isColumns) {
     var searchObject = isColumns ? this.columnDendrogramSearchObject : this.rowDendrogramSearchObject;
     var text = $.trim(searchObject.$search.val());
-    var dendrogram = isColumns ? this.controller.columnDendrogram
-      : this.controller.rowDendrogram;
+    var dendrogram = isColumns ? this.heatMap.columnDendrogram
+      : this.heatMap.rowDendrogram;
     var $searchResults = searchObject.$searchResults;
     var matches = morpheus.DendrogramUtil.search({
       rootNode: dendrogram.tree.rootNode,
@@ -1125,33 +997,33 @@ morpheus.HeatMapToolBar.prototype = {
         + (matches === 1 ? '' : 'es'));
     }
     if (matches <= 0) {
-      var positions = isColumns ? this.controller
+      var positions = isColumns ? this.heatMap
       .getHeatMapElementComponent().getColumnPositions()
-        : this.controller.getHeatMapElementComponent()
+        : this.heatMap.getHeatMapElementComponent()
         .getRowPositions();
       positions.setSquishedIndices(null);
       if (isColumns) {
-        this.controller.getProject().setGroupColumns([], true);
+        this.heatMap.getProject().setGroupColumns([], true);
       } else {
-        this.controller.getProject().setGroupRows([], true);
+        this.heatMap.getProject().setGroupRows([], true);
       }
-      positions.setSize(isColumns ? this.controller.getFitColumnSize()
-        : this.controller.getFitRowSize());
+      positions.setSize(isColumns ? this.heatMap.getFitColumnSize()
+        : this.heatMap.getFitRowSize());
     } else {
-      morpheus.DendrogramUtil.squishNonSearchedNodes(this.controller,
+      morpheus.DendrogramUtil.squishNonSearchedNodes(this.heatMap,
         isColumns);
     }
-    this.controller.updateDataset(); // need to update spaces for group
+    this.heatMap.updateDataset(); // need to update spaces for group
     // by
-    this.controller.revalidate();
+    this.heatMap.revalidate();
   },
   search: function (isRows) {
     this.searching = true;
     var isMatchesOnTop = isRows ? this.rowSearchObject.$matchesToTop
     .hasClass('btn-primary') : this.columnSearchObject.$matchesToTop
     .hasClass('btn-primary');
-    var controller = this.controller;
-    var project = controller.getProject();
+    var heatMap = this.heatMap;
+    var project = heatMap.getProject();
 
     var sortKeys = isRows ? project.getRowSortKeys() : project
     .getColumnSortKeys();
@@ -1167,7 +1039,7 @@ morpheus.HeatMapToolBar.prototype = {
     var metadata = isRows ? dataset.getRowMetadata() : dataset
     .getColumnMetadata();
     var visibleIndices = [];
-    controller.getVisibleTrackNames(!isRows).forEach(function (name) {
+    heatMap.getVisibleTrackNames(!isRows).forEach(function (name) {
       visibleIndices.push(morpheus.MetadataUtil.indexOf(metadata, name));
     });
     var fullModel = metadata;
@@ -1286,7 +1158,7 @@ morpheus.HeatMapToolBar.prototype = {
         $btn.removeClass('btn-primary');
       }
     }
-    var project = this.controller.getProject();
+    var project = this.heatMap.getProject();
     var sortKeys = options.isColumns ? project.getColumnSortKeys() : project.getRowSortKeys();
     // remove existing matches on top key
     sortKeys = sortKeys
@@ -1299,9 +1171,9 @@ morpheus.HeatMapToolBar.prototype = {
         'matches on top');
       sortKeys.splice(0, 0, key);
       if (options.isColumns) {
-        this.controller.scrollLeft(0);
+        this.heatMap.scrollLeft(0);
       } else {
-        this.controller.scrollTop(0);
+        this.heatMap.scrollTop(0);
       }
     }
     this.searching = true;

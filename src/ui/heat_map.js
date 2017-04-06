@@ -224,23 +224,25 @@ morpheus.HeatMap = function (options) {
       keyboard: true,
       inlineTooltip: true,
       $loadingImage: morpheus.Util.createLoadingEl(),
+      menu: {
+        File: ['Open File', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close', 'Rename'],
+        Tools: ['New Heat Map', 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors', 'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API'],
+        View: ['Zoom In', 'Zoom Out', 'Fit To Window', 'Reset Zoom', null, 'Options'],
+        Help: ['Find Action', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keymap' +
+        ' Reference']
+      },
+      // toolbar: ['Search Rows', 'Search Columns', 'Dimensions', null, 'Save Image', 'Color Key']
       toolbar: {
-        help: true,
-        chart: true,
         dimensions: true,
         zoom: true,
         tools: true,
         searchRows: true,
         searchColumns: true,
-        sort: true,
+        searchValues: false,
         options: true,
         saveImage: true,
-        saveDataset: true,
-        saveSession: true,
-        openFile: true,
         filter: true,
-        colorKey: true,
-        searchValues: false
+        colorKey: true
       }
     }, options);
   options.parent = parent;
@@ -251,11 +253,14 @@ morpheus.HeatMap = function (options) {
   } else {
     this.$el = $(options.el);
   }
+  this.actionManager = new morpheus.ActionManager();
+  this.actionManager.heatMap = this;
   this.$el.addClass('morpheus');
   if (!options.landingPage) {
     options.landingPage = new morpheus.LandingPage();
     options.landingPage.$el.prependTo(this.$el);
   }
+
   if (this.options.dataset == null) {
     var datasetFormBuilder = new morpheus.FormBuilder();
     datasetFormBuilder.append({
@@ -285,6 +290,7 @@ morpheus.HeatMap = function (options) {
     .getFileName(this.options.dataset.file ? this.options.dataset.file
       : this.options.dataset));
   }
+
   var isPrimary = this.options.parent == null;
   if (this.options.parent == null) {
 
@@ -294,28 +300,6 @@ morpheus.HeatMap = function (options) {
         autohideTabBar: this.options.autohideTabBar
       });
 
-    if (this.options.toolbar.help && !morpheus.HelpMenu.ADDED) { // only show once per page
-      morpheus.HelpMenu.ADDED = true;
-      // var $a = $('<a data-name="ignore" title="Produced with Morpheus"' +
-      // 	' style="display:inline;font-size:85%;margin-right:2px;margin-top:2px;" href="'
-      // 	+ morpheus.Util.URL
-      // 	+ '" target="_blank"><img alt="Morpheus Icon" style="width:16px;height:16px;" src="'
-      // 	+ morpheus.Util.URL + 'images/icon.svg"></a>');
-      // $a.tooltip({
-      // 	placement: 'auto'
-      // }).on('click', function (e) {
-      // 	// prevent handling by navbar click handler
-      // 	e.stopImmediatePropagation();
-      // 	e.stopPropagation();
-      // });
-      // var $img = $a.find('img');
-
-      var $right = $('<li data-name="help" style="margin-right:2px;"' +
-        ' class="pull-right morpheus-tab-addon"></li>');
-      // $a.appendTo($right);
-      new morpheus.HelpMenu().$el.appendTo($right);
-      $right.appendTo(this.tabManager.$nav);
-    }
     if (!this.options.tabManager) {
       this.tabManager.appendTo(this.$el);
     }
@@ -586,9 +570,9 @@ morpheus.HeatMap = function (options) {
 
 morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS = 6;
 
-morpheus.HeatMap.showTool = function (tool, controller, callback) {
+morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
   if (tool.gui) {
-    var gui = tool.gui(controller.getProject());
+    var gui = tool.gui(heatMap.getProject());
     var formBuilder = new morpheus.FormBuilder();
     // if (tool.quickHelp) {
     // 	formBuilder.appendContent(tool.quickHelp());
@@ -596,13 +580,13 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
     _.each(gui, function (item) {
       formBuilder.append(item);
     });
-    var tabId = controller.getTabManager().getActiveTabId();
+    var tabId = heatMap.getTabManager().getActiveTabId();
     if (tool.init) {
-      tool.init(controller.getProject(), formBuilder, {
-        controller: controller
+      tool.init(heatMap.getProject(), formBuilder, {
+        heatMap: heatMap
       });
     }
-    controller.trigger('beforeToolShown', {
+    heatMap.trigger('beforeToolShown', {
       tool: tool,
       formBuilder: formBuilder
     });
@@ -612,7 +596,7 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
         name: tool.toString(),
         tabId: tabId
       };
-      controller.getTabManager().addTask(task);
+      heatMap.getTabManager().addTask(task);
       var input = {};
       _.each(gui, function (item) {
         input[item.name] = formBuilder.getValue(item.name);
@@ -621,8 +605,8 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
       setTimeout(function () {
         try {
           var value = tool.execute({
-            controller: controller,
-            project: controller.getProject(),
+            heatMap: heatMap,
+            project: heatMap.getProject(),
             input: input
           });
           if (value instanceof Worker) {
@@ -642,7 +626,7 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
             value.terminate = function () {
               terminate();
               try {
-                controller.getTabManager().removeTask(task);
+                heatMap.getTabManager().removeTask(task);
               }
               catch (x) {
                 console.log('Error removing task');
@@ -670,7 +654,7 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
         finally {
           if (task.worker === undefined) {
             try {
-              controller.getTabManager().removeTask(task);
+              heatMap.getTabManager().removeTask(task);
             }
             catch (x) {
               console.log('Error removing task');
@@ -704,8 +688,8 @@ morpheus.HeatMap.showTool = function (tool, controller, callback) {
   } else { // run headless
     try {
       var value = tool.execute({
-        controller: controller,
-        project: controller.getProject(),
+        heatMap: heatMap,
+        project: heatMap.getProject(),
         input: {}
       });
       if (callback) {
@@ -800,6 +784,9 @@ morpheus.HeatMap.prototype = {
   updatingScroll: false,
   getWhitespaceEl: function () {
     return this.$whitespace;
+  },
+  getActionManager: function () {
+    return this.actionManager;
   },
   autoDisplay: function (options) {
     if (options.filename == null) {
@@ -2360,46 +2347,36 @@ morpheus.HeatMap.prototype = {
     };
     $(_this.heatmap.canvas).on('mouseout', heatMapMouseMoved).on(
       'mousemove', heatMapMouseMoved);
+    // tools to run at load time
     _.each(this.options.tools, function (item) {
-
-      var tool = _this.toolbar.getToolByName(item.name);
-      if (tool == null) {
+      var action = _this.getActionManager.getAction(item.name);
+      if (action == null) {
         console.log(item.name + ' not found.');
       } else {
-        try {
-          var gui = tool.gui(_this.getProject());
-          var formBuilder = new morpheus.FormBuilder();
-          _.each(gui, function (item) {
-            formBuilder.append(item);
-          });
-          var input = {};
-          _.each(gui, function (item) {
-            input[item.name] = formBuilder.getValue(item.name);
-          });
-          if (item.params) {
-            // overide default values
-            for (var key in item.params) {
-              input[key] = item.params[key];
-            }
-          }
 
-          tool.execute({
-            controller: _this,
-            project: _this.getProject(),
-            input: input
-          });
-        }
-        catch (x) {
-          if (x.stack) {
-            console.log(x.stack);
+        var actionGui = action.gui();
+        var gui = actionGui.gui(_this.getProject());
+        var formBuilder = new morpheus.FormBuilder();
+        _.each(gui, function (item) {
+          formBuilder.append(item);
+        });
+        var input = {};
+        _.each(gui, function (item) {
+          input[item.name] = formBuilder.getValue(item.name);
+        });
+        if (item.params) {
+          // overide default values
+          for (var key in item.params) {
+            input[key] = item.params[key];
           }
-          console.log('Error running ' + item.name);
         }
-        finally {
-          if (tool.dispose) {
-            tool.dispose();
-          }
-        }
+
+        actionGui.execute({
+          heatMap: _this,
+          project: _this.getProject(),
+          input: input
+        });
+
       }
 
     });

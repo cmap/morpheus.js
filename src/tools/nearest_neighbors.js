@@ -85,7 +85,7 @@ morpheus.NearestNeighbors.prototype = {
     var project = options.project;
     var isColumns = options.input.compute_nearest_neighbors_of == 'selected columns' || options.input.compute_nearest_neighbors_of == 'row annotation';
     var isAnnotation = options.input.compute_nearest_neighbors_of == 'column annotation' || options.input.compute_nearest_neighbors_of == 'row annotation';
-    var controller = options.controller;
+    var heatMap = options.heatMap;
     var f = morpheus.NearestNeighbors.Functions
     .fromString(options.input.metric);
     var dataset = project.getSortedFilteredDataset();

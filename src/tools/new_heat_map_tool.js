@@ -2,7 +2,7 @@ morpheus.NewHeatMapTool = function () {
 };
 morpheus.NewHeatMapTool.prototype = {
   toString: function () {
-    return 'New Heat Map (' + morpheus.Util.COMMAND_KEY + 'X)';
+    return 'New Heat Map';
   },
   // gui : function() {
   // return [ {
@@ -20,7 +20,7 @@ morpheus.NewHeatMapTool.prototype = {
   // },
   execute: function (options) {
     var project = options.project;
-    var controller = options.controller;
+    var heatMap = options.heatMap;
     var dataset = project.getSelectedDataset({
       selectedRows: true,
       selectedColumns: true
@@ -29,18 +29,18 @@ morpheus.NewHeatMapTool.prototype = {
 
     // TODO see if we can subset dendrograms
     // only handle contiguous selections for now
-    // if (controller.columnDendrogram != null) {
+    // if (heatMap.columnDendrogram != null) {
     // var indices = project.getColumnSelectionModel().getViewIndices()
     // .toArray();
     // morpheus.DendrogramUtil.leastCommonAncestor();
     // }
-    // if (controller.rowDendrogram != null) {
+    // if (heatMap.rowDendrogram != null) {
     //
     // }
     var heatmap = new morpheus.HeatMap({
-      name: controller.getName(),
+      name: heatMap.getName(),
       dataset: dataset,
-      parent: controller,
+      parent: heatMap,
       symmetric: project.isSymmetric() && dataset.getColumnCount() === dataset.getRowCount()
     });
 

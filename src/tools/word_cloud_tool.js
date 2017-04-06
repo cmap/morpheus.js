@@ -161,7 +161,7 @@ morpheus.WordCloudTool.prototype = {
   execute: function (options) {
     var project = options.project;
     var isColumns = options.input.generate_word_cloud_for == 'selected columns';
-    var controller = options.controller;
+    var heatMap = options.heatMap;
     var field = options.input.field;
     var selectedDataset = project.getSortedFilteredDataset();
     var fullDataset = project.getFullDataset();
@@ -229,7 +229,7 @@ morpheus.WordCloudTool.prototype = {
       minSize: minSize,
       maxSize: maxSize,
       isColumns: isColumns,
-      heatMap: controller,
+      heatMap: heatMap,
       el: $dialog[0],
       width: width,
       height: height,
@@ -240,7 +240,7 @@ morpheus.WordCloudTool.prototype = {
       minSize: minSize,
       maxSize: maxSize,
       isColumns: isColumns,
-      heatMap: controller,
+      heatMap: heatMap,
       el: $dialog[0],
       width: width,
       words: words

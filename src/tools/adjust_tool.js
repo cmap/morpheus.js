@@ -30,7 +30,7 @@ morpheus.AdjustDataTool.prototype = {
   },
   execute: function (options) {
     var project = options.project;
-    var controller = options.controller;
+    var heatMap = options.heatMap;
 
     if (options.input.log_2 || options.input.inverse_log_2
       || options.input['z-score'] || options.input['robust_z-score'] || options.input.quantile_normalize) {
@@ -102,9 +102,9 @@ morpheus.AdjustDataTool.prototype = {
       }
 
       return new morpheus.HeatMap({
-        name: controller.getName(),
+        name: heatMap.getName(),
         dataset: dataset,
-        parent: controller,
+        parent: heatMap,
         symmetric: project.isSymmetric() && dataset.getColumnCount() === dataset.getRowCount()
       });
     }
