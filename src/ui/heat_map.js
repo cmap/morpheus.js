@@ -225,7 +225,7 @@ morpheus.HeatMap = function (options) {
       inlineTooltip: true,
       $loadingImage: morpheus.Util.createLoadingEl(),
       menu: {
-        File: ['Open File', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close', 'Rename'],
+        File: ['Open File', 'Save Image', 'Save Dataset', 'Save Session', null, 'Copy Image', null, 'Close Tab', 'Rename Tab'],
         Tools: ['New Heat Map', 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors', 'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API'],
         View: ['Zoom In', 'Zoom Out', 'Fit To Window', 'Reset Zoom', null, 'Options'],
         Help: ['Find Action', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keymap' +
@@ -572,11 +572,9 @@ morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS = 6;
 
 morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
   if (tool.gui) {
+    var activeElement = document.activeElement;
     var gui = tool.gui(heatMap.getProject());
     var formBuilder = new morpheus.FormBuilder();
-    // if (tool.quickHelp) {
-    // 	formBuilder.appendContent(tool.quickHelp());
-    // }
     _.each(gui, function (item) {
       formBuilder.append(item);
     });
@@ -590,7 +588,6 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       tool: tool,
       formBuilder: formBuilder
     });
-
     var okCallback = function () {
       var task = {
         name: tool.toString(),
@@ -601,76 +598,42 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       _.each(gui, function (item) {
         input[item.name] = formBuilder.getValue(item.name);
       });
-      // give a chance for ui to update
-      setTimeout(function () {
-        try {
-          var value = tool.execute({
-            heatMap: heatMap,
-            project: heatMap.getProject(),
-            input: input
-          });
-          if (value instanceof Worker) {
-            value.onerror = function (e) {
-              task.worker.terminate();
-              morpheus.FormBuilder.showInModal({
-                title: 'Error',
-                html: e,
-                close: 'Close'
-              });
-              if (e.stack) {
-                console.log(e.stack);
-              }
-            };
-            var terminate = _.bind(value.terminate, value);
-            task.worker = value;
-            value.terminate = function () {
-              terminate();
-              try {
-                heatMap.getTabManager().removeTask(task);
-              }
-              catch (x) {
-                console.log('Error removing task');
-              }
-              if (callback) {
-                callback(input);
-              }
-            };
-          } else {
-            if (callback) {
-              callback(input);
-            }
-          }
-        }
-        catch (e) {
+      var value = tool.execute({
+        heatMap: heatMap,
+        project: heatMap.getProject(),
+        input: input
+      });
+      if (value instanceof Worker) {
+        value.onerror = function (e) {
+          task.worker.terminate();
           morpheus.FormBuilder.showInModal({
             title: 'Error',
             html: e,
-            close: 'Close'
+            close: 'Close',
+            focus: activeElement
           });
           if (e.stack) {
             console.log(e.stack);
           }
-        }
-        finally {
-          if (task.worker === undefined) {
-            try {
-              heatMap.getTabManager().removeTask(task);
-            }
-            catch (x) {
-              console.log('Error removing task');
-            }
+        };
+        var terminate = _.bind(value.terminate, value);
+        task.worker = value;
+        value.terminate = function () {
+          terminate();
+          heatMap.getTabManager().removeTask(task);
+          if (callback) {
+            callback(input);
           }
-          if (tool.dispose) {
-            tool.dispose();
-          }
-
+        };
+      } else {
+        if (callback) {
+          callback(input);
         }
-      }, 0);
-    };
+      }
+    }
     var $formDiv;
     tool.ok = function () {
       okCallback();
-      $formDiv.modal('hide');
     };
     var guiOptions = $.extend({}, {
       ok: true
@@ -683,45 +646,22 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       draggable: true,
       content: formBuilder.$form,
       align: 'right',
-      okCallback: okCallback
+      okCallback: okCallback,
+      focus: activeElement
     });
-  } else { // run headless
-    try {
-      var value = tool.execute({
-        heatMap: heatMap,
-        project: heatMap.getProject(),
-        input: {}
-      });
-      if (callback) {
-        callback({});
-      }
-    }
-    catch (e) {
-      morpheus.FormBuilder.showInModal({
-        title: 'Error',
-        html: e,
-        close: 'Close'
-      });
-      if (e.stack) {
-        console.log(e.stack);
-      }
-    }
-    finally {
-      if (tool.dispose) {
-        tool.dispose();
-      }
+  }
+  else { // run headless
+    var value = tool.execute({
+      heatMap: heatMap,
+      project: heatMap.getProject(),
+      input: {}
+    });
+    if (callback) {
+      callback({});
     }
   }
-  var toolName = tool.toString();
-  var parenIndex = toolName.indexOf('(');
-  if (parenIndex !== -1) {
-    toolName = toolName.substring(0, parenIndex).trim();
-  }
-  morpheus.Util.trackEvent({
-    eventCategory: 'Tool',
-    eventAction: toolName
-  });
 };
+
 morpheus.HeatMap.getSpaces = function (groupByKeys, length, gapSize) {
   var previousArray = [];
   var nkeys = groupByKeys.length;
@@ -1405,10 +1345,7 @@ morpheus.HeatMap.prototype = {
             if (item === 'Show Inline Tooltip') {
               _this.options.inlineTooltip = !_this.options.inlineTooltip;
             } else if (item === ('Save Image (' + morpheus.Util.COMMAND_KEY + 'S)')) {
-              morpheus.HeatMap
-              .showTool(
-                new morpheus.SaveImageTool(),
-                _this);
+              _this.getActionManager().execute('Save Image');
             } else if (item === 'Copy Selection') {
               var text = _this
               .getSelectedElementsText();
@@ -1419,31 +1356,7 @@ morpheus.HeatMap.prototype = {
                   text);
               }
             } else if (item === 'Copy Image') {
-              var bounds = _this.getTotalSize();
-              var height = bounds.height;
-              var width = bounds.width;
-              var canvas = $('<canvas></canvas>')[0];
-              var backingScale = morpheus.CanvasUtil.BACKING_SCALE;
-              canvas.height = backingScale * height;
-              canvas.style.height = height + 'px';
-              canvas.width = backingScale * width;
-              canvas.style.width = width + 'px';
-              var context = canvas.getContext('2d');
-              morpheus.CanvasUtil.resetTransform(context);
-              _this.snapshot(context);
-              var url = canvas.toDataURL();
-              // canvas.toBlob(function (blob) {
-              // 	url = URL.createObjectURL(blob);
-              // 	event.clipboardData
-              // 	.setData(
-              // 		'text/html',
-              // 		'<img src="' + url + '">');
-              // });
-              event.clipboardData
-              .setData(
-                'text/html',
-                '<img src="' + url + '">');
-
+              _this.getActionManager().execute('Copy Image', {event: event});
             } else {
               console.log(item + ' unknown.');
             }
@@ -2349,7 +2262,7 @@ morpheus.HeatMap.prototype = {
       'mousemove', heatMapMouseMoved);
     // tools to run at load time
     _.each(this.options.tools, function (item) {
-      var action = _this.getActionManager.getAction(item.name);
+      var action = _this.getActionManager().getAction(item.name);
       if (action == null) {
         console.log(item.name + ' not found.');
       } else {
