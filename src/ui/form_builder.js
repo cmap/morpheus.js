@@ -211,6 +211,10 @@ morpheus.FormBuilder._showInModal = function (options) {
     if (options.onClose) {
       options.onClose();
     }
+    if (options.focus) {
+      $(options.focus).focus();
+      console.log(options.focus);
+    }
   });
   return $div;
 };
@@ -268,9 +272,9 @@ morpheus.FormBuilder.showOkCancel = function (options) {
     title: options.title,
     html: options.content,
     footer: footer.join(''),
-    onClose: options.hiddenCallback,
     size: options.size,
-    close: options.close
+    close: options.close,
+    onClose: options.onClose
   });
   // if (options.align === 'right') {
   // $div.css('left', $(window).width()
