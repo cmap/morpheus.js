@@ -427,10 +427,7 @@ morpheus.HeatMapOptions = function (controller) {
         title: 'Conditional Rendering',
         html: conditionalRenderingUI.$div,
         close: 'Close',
-        z: 1051,
-        callback: function () {
-
-        }
+        modalClass: 'morpheus-sub-modal'
       });
     });
 
@@ -661,7 +658,7 @@ morpheus.HeatMapOptions = function (controller) {
     title: 'Options',
     html: $div,
     close: 'Close',
-    callback: function () {
+    onClose: function () {
       $div.find('input').off('keyup');
       $ca.off('change');
       $ra.off('change');

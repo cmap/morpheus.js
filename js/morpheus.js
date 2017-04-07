@@ -12336,6 +12336,7 @@ morpheus.AdjustDataTool.prototype = {
                 }
             }
 
+
             return new morpheus.HeatMap({
                 name: heatMap.getName(),
                 dataset: dataset,
@@ -15589,7 +15590,7 @@ morpheus.OpenDatasetTool._promptMaf = function (promptCallback) {
     title: 'Gene Symbols',
     html: formBuilder.$form,
     close: 'OK',
-    callback: function () {
+    onClose: function () {
       var text = formBuilder.getValue('MAF_gene_symbols');
       var lines = morpheus.Util.splitOnNewLine(text);
       var mafGeneFilter = new morpheus.Map();
@@ -15600,8 +15601,8 @@ morpheus.OpenDatasetTool._promptMaf = function (promptCallback) {
         }
       }
       var readOptions = mafGeneFilter.size() > 0 ? {
-          mafGeneFilter: mafGeneFilter
-        } : null;
+        mafGeneFilter: mafGeneFilter
+      } : null;
       promptCallback(readOptions);
     }
   });
@@ -15621,7 +15622,7 @@ morpheus.OpenDatasetTool._promptSegtab = function (promptCallback) {
     title: 'Regions',
     html: formBuilder.$form,
     close: 'OK',
-    callback: function () {
+    onClose: function () {
       var text = formBuilder.getValue('regions');
       var lines = morpheus.Util.splitOnNewLine(text);
       var regions = [];
@@ -15642,8 +15643,8 @@ morpheus.OpenDatasetTool._promptSegtab = function (promptCallback) {
         }
       }
       var readOptions = regions.length > 0 ? {
-          regions: regions
-        } : null;
+        regions: regions
+      } : null;
       promptCallback(readOptions);
     }
   });
@@ -15707,12 +15708,12 @@ morpheus.OpenDatasetTool.prototype = {
         }
         var currentDatasetMetadataNames = morpheus.MetadataUtil
         .getMetadataNames(!appendRows ? dataset
-          .getRowMetadata() : dataset
-          .getColumnMetadata());
+        .getRowMetadata() : dataset
+        .getColumnMetadata());
         var newDatasetMetadataNames = morpheus.MetadataUtil
         .getMetadataNames(!appendRows ? newDataset
-          .getRowMetadata() : newDataset
-          .getColumnMetadata());
+        .getRowMetadata() : newDataset
+        .getColumnMetadata());
 
         if (currentDatasetMetadataNames.length > 1
           || newDatasetMetadataNames.length > 1) {
@@ -15727,18 +15728,18 @@ morpheus.OpenDatasetTool.prototype = {
               .getProject()
               .setFullDataset(
                 appendRows ? new morpheus.JoinedDataset(
-                    dataset,
-                    newDataset,
-                    appendOptions.current_dataset_annotation_name,
-                    appendOptions.new_dataset_annotation_name)
+                  dataset,
+                  newDataset,
+                  appendOptions.current_dataset_annotation_name,
+                  appendOptions.new_dataset_annotation_name)
                   : new morpheus.TransposedDatasetView(
-                    new morpheus.JoinedDataset(
-                      new morpheus.TransposedDatasetView(
-                        dataset),
-                      new morpheus.TransposedDatasetView(
-                        newDataset),
-                      appendOptions.current_dataset_annotation_name,
-                      appendOptions.new_dataset_annotation_name)),
+                  new morpheus.JoinedDataset(
+                    new morpheus.TransposedDatasetView(
+                      dataset),
+                    new morpheus.TransposedDatasetView(
+                      newDataset),
+                    appendOptions.current_dataset_annotation_name,
+                    appendOptions.new_dataset_annotation_name)),
                 true);
 
               if (controller.options.renderReady) {
@@ -15802,18 +15803,18 @@ morpheus.OpenDatasetTool.prototype = {
           .getProject()
           .setFullDataset(
             appendRows ? new morpheus.JoinedDataset(
-                dataset,
-                newDataset,
-                currentDatasetMetadataNames[0],
-                newDatasetMetadataNames[0])
+              dataset,
+              newDataset,
+              currentDatasetMetadataNames[0],
+              newDatasetMetadataNames[0])
               : new morpheus.TransposedDatasetView(
-                new morpheus.JoinedDataset(
-                  new morpheus.TransposedDatasetView(
-                    dataset),
-                  new morpheus.TransposedDatasetView(
-                    newDataset),
-                  currentDatasetMetadataNames[0],
-                  newDatasetMetadataNames[0])),
+              new morpheus.JoinedDataset(
+                new morpheus.TransposedDatasetView(
+                  dataset),
+                new morpheus.TransposedDatasetView(
+                  newDataset),
+                currentDatasetMetadataNames[0],
+                newDatasetMetadataNames[0])),
             true);
           if (controller.options.renderReady) {
             controller.options.renderReady(controller);
@@ -18555,7 +18556,8 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
                 morpheus.FormBuilder.showInModal({
                   title: 'Color',
                   close: 'Close',
-                  html: formBuilder.$form
+                  html: formBuilder.$form,
+                  focus: document.activeElement
                 });
 
               }
@@ -21362,13 +21364,14 @@ morpheus.FormBuilder.showInDraggableDiv = function (options) {
 morpheus.FormBuilder.showMessageModal = function (options) {
   var $div = morpheus.FormBuilder
   ._showInModal({
-    z: options.z,
+    modalClass: options.modalClass,
     title: options.title,
     html: options.html,
     footer: ('<button type="button" class="btn btn-default"' +
     ' data-dismiss="modal">OK</button>'),
     backdrop: options.backdrop,
-    size: options.size
+    size: options.size,
+    focus: options.focus
   });
   $div.find('button').focus();
   return $div;
@@ -21384,9 +21387,11 @@ morpheus.FormBuilder._showInModal = function (options) {
   var html = [];
   options = $.extend({}, {
     size: '',
-    close: true
+    close: true,
+    modalClass: ''
   }, options);
-  html.push('<div tabindex="-1" class="modal" role="dialog" aria-hidden="false"');
+  html.push('<div tabindex="-1" class="modal' + (options.modalClass ? (' ' + options.modalClass) : '') + '" role="dialog"' +
+    ' aria-hidden="false"');
   if (options.z) {
     html.push(' style="z-index: ' + options.z + ' !important;"');
   }
@@ -21426,23 +21431,38 @@ morpheus.FormBuilder._showInModal = function (options) {
     if (options.onClose) {
       options.onClose();
     }
+    if (options.focus) {
+      $(options.focus).focus();
+    }
   });
   return $div;
 };
+/**
+ *
+ * @param options.z Modal z-index
+ * @param options.title Modal title
+ * @param options.html Model content
+ * @param options.close Whether to show a close button in the footer
+ * @param options.onClose {Function} Funtion to invoke when modal is hidden
+ * @param options.backdrop Whether to show backdrop
+ * @param.options Modal size
+ * @param options.focus Element to return focus to when modal is hidden
+ * @param options.modalClass
+ */
 morpheus.FormBuilder.showInModal = function (options) {
-  var $div = morpheus.FormBuilder
+  return morpheus.FormBuilder
   ._showInModal({
-    z: options.z,
+    modalClass: options.modalClass,
     title: options.title,
     html: options.html,
     footer: options.close ? ('<button type="button" class="btn btn-default" data-dismiss="modal">'
     + options.close + '</button>')
       : null,
-    onClose: options.callback,
+    onClose: options.onClose,
     backdrop: options.backdrop,
-    size: options.size
+    size: options.size,
+    focus: options.focus
   });
-  return $div;
   // if (options.draggable) {
   // $div.draggable({
   // handle : $div.find(".modal-header")
@@ -21458,6 +21478,7 @@ morpheus.FormBuilder.showInModal = function (options) {
  * @param options.title
  * @param options.content
  * @param options.okCallback
+ * @param options.cancelCallback
  *
  */
 morpheus.FormBuilder.showOkCancel = function (options) {
@@ -21482,9 +21503,10 @@ morpheus.FormBuilder.showOkCancel = function (options) {
     title: options.title,
     html: options.content,
     footer: footer.join(''),
-    onClose: options.hiddenCallback,
     size: options.size,
-    close: options.close
+    close: options.close,
+    onClose: options.onClose,
+    focus: options.focus
   });
   // if (options.align === 'right') {
   // $div.css('left', $(window).width()
@@ -21540,27 +21562,6 @@ morpheus.FormBuilder.getValue = function ($element) {
   return $element.attr('type') === 'checkbox' ? $element.prop('checked') : $element.val();
 };
 
-// morpheus.FormBuilder._showInModal = function(title, stuff, footer,
-// hiddenCallback) {
-// var html = [];
-// var id = _.uniqueId('dialog');
-// html.push('<div id="' + id + '">');
-// $(document.body).prepend(html.join(''));
-// $('#' + id).html(stuff);
-// $('#' + id).dialog({
-// modal : true,
-// resizable : true,
-// height : 'auto',
-// width : 400
-// }).on('close', function(e) {
-// $(this).dialog('destroy');
-// $(this).remove();
-// if (hiddenCallback) {
-// hiddenCallback();
-// }
-// });
-// return id;
-// };
 morpheus.FormBuilder.prototype = {
   appendContent: function ($content) {
     this.$form.append($content);
@@ -25533,10 +25534,7 @@ morpheus.HeatMapOptions = function (controller) {
         title: 'Conditional Rendering',
         html: conditionalRenderingUI.$div,
         close: 'Close',
-        z: 1051,
-        callback: function () {
-
-        }
+        modalClass: 'morpheus-sub-modal'
       });
     });
 
@@ -25767,7 +25765,7 @@ morpheus.HeatMapOptions = function (controller) {
     title: 'Options',
     html: $div,
     close: 'Close',
-    callback: function () {
+    onClose: function () {
       $div.find('input').off('keyup');
       $ca.off('change');
       $ra.off('change');
@@ -28170,6 +28168,7 @@ morpheus.HeatMap = function (options) {
   }
 
   var heatMapLoaded = function () {
+    console.log("new HeatMap ::", "heatMapLoaded()", "dataset:", options.dataset, "dataset.esSession:", options.dataset.getESSession());
     options.dataset.setESSession();
     if (typeof window !== 'undefined') {
       $(window).on('orientationchange.morpheus resize.morpheus', _this.resizeListener = function () {
@@ -32263,7 +32262,7 @@ morpheus.Popup.init = function () {
   morpheus.Popup.client = client;
   morpheus.Popup.initted = true;
   morpheus.Popup.$popupDiv = $(document.createElement('div'));
-  morpheus.Popup.$popupDiv.css('position', 'absolute').css('zIndex', 10001).css('overflow', 'auto').addClass('dropdown clearfix');
+  morpheus.Popup.$popupDiv.css('position', 'absolute').css('zIndex', 1050).css('overflow', 'auto').addClass('dropdown clearfix');
   morpheus.Popup.$contextMenu = $(document.createElement('ul'));
   morpheus.Popup.$contextMenu.addClass('dropdown-menu').css('display',
     'block').css('position', 'static').css('margin-bottom', '5px');
@@ -33854,7 +33853,8 @@ morpheus.TabManager.prototype = {
     li.push('</a></li>');
     var $link = $(li.join(''));
     $link.appendTo(this.$nav);
-    var $panel = $('<div tabIndex="-1" style="outline:0;cursor:default;" role="tabpanel" class="tab-pane" id="'
+    var $panel = $('<div tabIndex="-1" style="outline:0;cursor:default;" role="tabpanel"' +
+      ' class="tab-pane" id="'
       + id + '"></div>');
     options.$el.appendTo($panel);
     $panel.appendTo(this.$tabContent);
@@ -37383,7 +37383,7 @@ morpheus.VectorTrack.prototype = {
             title: 'Edit Colors',
             html: colorSchemeChooser.$div,
             close: 'Close',
-            callback: function () {
+            onClose: function () {
               colorSchemeChooser.dispose();
             }
           });
