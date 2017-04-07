@@ -4,6 +4,13 @@ morpheus.Map = function () {
   this.n = 0;
 };
 morpheus.Map.prototype = {
+  toJSON: function () {
+    var json = {};
+    this.forEach(function (value, key) {
+      json[key] = value;
+    });
+    return json;
+  },
   toString: function () {
     var s = [];
     this.forEach(function (value, key) {
@@ -108,4 +115,12 @@ morpheus.Map.prototype = {
     var skey = '\0' + key;
     return this.map[skey] !== undefined;
   }
+};
+
+morpheus.Map.fromJSON = function (json) {
+  var map = new morpheus.Map();
+  for (var key in json) {
+    map.set(key, json[key]);
+  }
+  return map;
 };

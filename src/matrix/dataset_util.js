@@ -24,7 +24,7 @@ morpheus.DatasetUtil.slicedView = function (dataset, rows, columns) {
 };
 morpheus.DatasetUtil.transposedView = function (dataset) {
   return dataset instanceof morpheus.TransposedDatasetView ? dataset
-    .getDataset() : new morpheus.TransposedDatasetView(dataset);
+  .getDataset() : new morpheus.TransposedDatasetView(dataset);
 };
 morpheus.DatasetUtil.max = function (dataset, seriesIndex) {
   seriesIndex = seriesIndex || 0;
@@ -213,7 +213,7 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
       var blobURL = window.URL.createObjectURL(blob);
       var worker = new Worker(blobURL);
       worker.addEventListener('message', function (e) {
-        deferred.resolve(morpheus.Dataset.fromJson(e.data));
+        deferred.resolve(morpheus.Dataset.fromJSON(e.data));
         window.URL.revokeObjectURL(blobURL);
       }, false);
       // start the worker
@@ -223,32 +223,33 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
         options: options
       });
 
-		} else {
-			datasetReader.read(fileOrUrl, function (err, dataset) {
-				if (err) {
-					deferred.reject(err);
-				} else {
-					deferred.resolve(dataset);
-					console.log(dataset);
-					morpheus.DatasetUtil.toESSessionPromise({dataset : dataset, isGEO : isGSE});
-				}
-			});
-
-		}
-		var pr = deferred.promise();
-		pr.toString = function () {
-			return '' + fileOrUrl;
-		};
-		//console.log("morpheus.DatasetUtil.read ::", pr);
-		return pr;
-	} else if (typeof fileOrUrl.done === 'function') { // assume it's a
-		// deferred
-		return fileOrUrl;
-	} else { // it's already a dataset?
-		var deferred = $.Deferred();
-		deferred.resolve(fileOrUrl);
-		return deferred.promise();
-	}
+    } else {
+      datasetReader.read(fileOrUrl, function (err, dataset) {
+        if (err) {
+          deferred.reject(err);
+        } else {
+          deferred.resolve(dataset);
+            morpheus.DatasetUtil.toESSessionPromise({dataset : dataset, isGEO : isGSE});
+        }
+      });
+    }
+    var pr = deferred.promise();
+    pr.toString = function () {
+      return '' + fileOrUrl;
+    };
+    return pr;
+  } else if (typeof fileOrUrl.done === 'function') { // assume it's a
+    // deferred
+    return fileOrUrl;
+  } else { // it's already a dataset?
+    var deferred = $.Deferred();
+    if (fileOrUrl.getRowCount) {
+      deferred.resolve(fileOrUrl);
+    } else {
+      deferred.resolve(morpheus.Dataset.fromJSON(fileOrUrl));
+    }
+    return deferred.promise();
+  }
 
 };
 
@@ -449,11 +450,10 @@ morpheus.DatasetUtil.getSeriesNames = function (dataset) {
  *      The dataset
  * @param options.text
  *            Search text
- * @param options.cb
- *            Callback to add a match
  * @param options.defaultMatchMode
  *            'exact' or 'contains'
  * @param options.matchAllPredicates Whether to match all predicates
+ * @return Set of matching indices.
  *
  */
 morpheus.DatasetUtil.searchValues = function (options) {
@@ -462,7 +462,6 @@ morpheus.DatasetUtil.searchValues = function (options) {
   }
   var dataset = options.dataset;
   var text = options.text;
-  var cb = options.cb;
   var tokens = morpheus.Util.getAutocompleteTokens(text);
   if (tokens.length == 0) {
     return;
@@ -704,7 +703,7 @@ morpheus.DatasetUtil.autocompleteValues = function (dataset) {
 // json.push(']');
 // }
 // json.push(']'); // end v
-// var metadataToJson = function(model) {
+// var metadatatoJSON = function(model) {
 // json.push('[');
 // for (var i = 0, count = model.getMetadataCount(); i < count; i++) {
 // var v = model.get(i);
@@ -726,9 +725,9 @@ morpheus.DatasetUtil.autocompleteValues = function (dataset) {
 // json.push(']');
 // };
 // json.push(', "cols":');
-// metadataToJson(dataset.getColumnMetadata());
+// metadatatoJSON(dataset.getColumnMetadata());
 // json.push(', "rows":');
-// metadataToJson(dataset.getRowMetadata());
+// metadatatoJSON(dataset.getRowMetadata());
 // json.push('}'); // end json object
 // return json.join('');
 // };
@@ -900,7 +899,8 @@ morpheus.DatasetUtil.copy = function (dataset) {
     columns: dataset.getColumnCount(),
     dataType: dataset.getDataType(0)
   });
-  for (var seriesIndex = 0, nseries = dataset.getSeriesCount(); seriesIndex < nseries; seriesIndex++) {
+  for (var seriesIndex = 0,
+         nseries = dataset.getSeriesCount(); seriesIndex < nseries; seriesIndex++) {
     if (seriesIndex > 0) {
       newDataset.addSeries({
         name: dataset.getName(seriesIndex),

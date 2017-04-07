@@ -6,7 +6,7 @@ morpheus.HistogramLegend = function (dataset, colorScheme, metadataValue) {
   this.binNumberToOccurences = null;
   this.setBounds({
     width: 250,
-    height: 80
+    height: 70
   });
   this.name = null;
   this.canvas.style.position = '';
@@ -28,10 +28,8 @@ morpheus.HistogramLegend.prototype = {
     var dataset = this.dataset;
     var metadataValue = this.metadataValue;
     var colorScheme = this.colorScheme;
-
     var min = colorScheme.getMin();
     var max = colorScheme.getMax();
-
     if (min === max) {
       min -= 0.5;
       max += 0.5;
@@ -43,7 +41,8 @@ morpheus.HistogramLegend.prototype = {
     var numberOfBins = Math.ceil((max - min) / binSize);
     var binNumberToOccurences = new Uint32Array(numberOfBins);
     this.binNumberToOccurences = binNumberToOccurences;
-    var values = new Float32Array(dataset.getRowCount() * dataset.getColumnCount());
+    //var values = new Float32Array(dataset.getRowCount() * dataset.getColumnCount()); // for
+    // boxplot
     var index = 0;
     for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
       if (vector == null || vector.getValue(i) === metadataValue) {
@@ -52,7 +51,7 @@ morpheus.HistogramLegend.prototype = {
           if (isNaN(value)) {
             continue;
           }
-          values[index++] = value;
+          //    values[index++] = value;
           var bin = Math.floor(((value - min) / binSize));
           if (bin < 0) {
             bin = 0;
@@ -63,26 +62,9 @@ morpheus.HistogramLegend.prototype = {
         }
       }
     }
-    values = values.slice(0, index);
-    values.sort();
-    this.median = morpheus.ArrayPercentile(values, 50, true);
-    this.q25 = morpheus.ArrayPercentile(values, 25, true);
-    this.q75 = morpheus.ArrayPercentile(values, 75, true);
-    var upperOutlier = this.q75 + 1.5 * (this.q75 - this.q25);
-    var lowerOutlier = this.q25 - 1.5 * (this.q75 - this.q25);
-    var upperAdjacentValue = -Number.MAX_VALUE;
-    var lowerAdjacentValue = Number.MAX_VALUE;
-    for (var i = 0, n = values.length; i < n; i++) {
-      var value = values[i];
-      if (value <= upperOutlier) {
-        upperAdjacentValue = Math.max(upperAdjacentValue, value);
-      }
-      if (value >= lowerOutlier) {
-        lowerAdjacentValue = Math.min(lowerAdjacentValue, value);
-      }
-    }
-    this.upperAdjacentValue = upperAdjacentValue;
-    this.lowerAdjacentValue = lowerAdjacentValue;
+    // values = values.slice(0, index);
+    // values.sort();
+
     var maxCount = 0;
     var total = 0;
     for (var i = 0; i < numberOfBins; i++) {
@@ -136,30 +118,28 @@ morpheus.HistogramLegend.prototype = {
         context.stroke();
       }
     }
-
-    var q25 = valueToPosition(this.q25);
-    var q75 = valueToPosition(this.q75);
-    var median = valueToPosition(this.median);
-    var lav = valueToPosition(this.lowerAdjacentValue);
-    var uav = valueToPosition(this.upperAdjacentValue);
+    // boxplot
+    // var q25 = valueToPosition(this.q25);
+    // var q75 = valueToPosition(this.q75);
+    // var median = valueToPosition(this.median);
+    // var lav = valueToPosition(this.lowerAdjacentValue);
+    // var uav = valueToPosition(this.upperAdjacentValue);
+    // context.translate(0, histogramHeight + 1);
+    // context.fillStyle = 'black';
+    //  var boxPlotHeight = 8;
+    // context.fillRect(q25, 0, q75 - q25, boxPlotHeight);
+    //
+    // context.fillRect(lav, boxPlotHeight / 2 - 1, q25 - lav, 2);
+    //
+    // context.fillRect(q75, boxPlotHeight / 2 - 1, uav - q75, 2);
+    //
+    // context.fillStyle = 'white';
+    // context.fillRect(median - 1, 0.5, 2, boxPlotHeight - 0.5);
+    //
     context.translate(0, histogramHeight + 1);
-    context.fillStyle = 'black';
-    //'#43a2ca';
-    var boxPlotHeight = 8;
-    context.fillRect(q25, 0, q75 - q25, boxPlotHeight);
-
-    context.fillRect(lav, boxPlotHeight / 2 - 1, q25 - lav, 2);
-
-    context.fillRect(q75, boxPlotHeight / 2 - 1, uav - q75, 2);
-
-    context.fillStyle = 'white';
-    context.fillRect(median - 1, 0.5, 2, boxPlotHeight - 0.5);
-
-    context.translate(0, boxPlotHeight + 1);
     morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
       this.colorScheme, canvasWidth, false, false, 6);
   }
-
 }
 ;
 

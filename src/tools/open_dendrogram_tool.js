@@ -9,10 +9,10 @@ morpheus.OpenDendrogramTool.prototype = {
     var setValue = function (val) {
       var isRows = val === 'Rows';
       var names = morpheus.MetadataUtil.getMetadataNames(isRows ? project
-        .getFullDataset().getRowMetadata() : project
-        .getFullDataset().getColumnMetadata());
+      .getFullDataset().getRowMetadata() : project
+      .getFullDataset().getColumnMetadata());
       names.unshift('Newick file does not contain node ids');
-      form.setOptions('match_node_id_to', names);
+      form.setOptions('match_leaf_node_ids_to', names);
     };
     form.$form.find('[name=orientation]').on('change', function (e) {
       setValue($(this).val());
@@ -26,7 +26,7 @@ morpheus.OpenDendrogramTool.prototype = {
       value: 'Columns',
       type: 'radio'
     }, {
-      name: 'match_node_id_to',
+      name: 'match_leaf_node_ids_to',
       options: [],
       type: 'select'
     }];
@@ -34,11 +34,10 @@ morpheus.OpenDendrogramTool.prototype = {
   execute: function (options) {
     var fileOrUrl = this._file;
     var isColumns = options.input.orientation === 'Columns';
-    var dendrogramField = options.input.match_node_id_to;
-    if (dendrogramField === 'Newick file does not contain node ids') {
+    var dendrogramField = options.input.match_leaf_node_ids_to;
+    if (dendrogramField == '' || dendrogramField === 'Newick file does not contain node ids') {
       dendrogramField = null;
     }
-    // prompt for annotation in dataset to match node ids on
     var controller = options.controller;
     var dendrogramDeferred = morpheus.Util.getText(fileOrUrl);
     dendrogramDeferred
@@ -53,28 +52,41 @@ morpheus.OpenDendrogramTool.prototype = {
           + tree.leafNodes.length + ' != '
           + dataset.getRowCount());
       }
-      var indices = [];
+      var modelIndices = [];
       if (dendrogramField != null) {
         var vector = dataset.getRowMetadata().getByName(
           dendrogramField);
-        var valueToIndex = morpheus.VectorUtil
-        .createValueToIndexMap(vector);
+        var valueToIndex = morpheus.VectorUtil.createValueToIndexMap(vector);
         for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-          var index = valueToIndex
-          .get(tree.leafNodes[i].name);
+          var newickId = tree.leafNodes[i].name;
+          var index = valueToIndex.get(newickId);
           if (index === undefined) {
             throw new Error('Unable to find dendrogram id '
               + tree.leafNodes[i].name
               + ' in annotations');
           }
-          indices.push(index);
+          modelIndices.push(index);
         }
       } else {
+        // see if leaf node ids are indices
         for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-          indices.push(i);
+          var newickId = tree.leafNodes[i].name;
+          newickId = parseInt(newickId);
+          if (!isNaN(newickId)) {
+            modelIndices.push(newickId);
+          } else {
+            break;
+          }
+        }
+
+        if (modelIndices.length !== tree.leafNodes.length) {
+          modelIndices = [];
+          for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
+            modelIndices.push(i);
+          }
         }
       }
-      controller.setDendrogram(tree, isColumns, indices);
+      controller.setDendrogram(tree, isColumns, modelIndices);
     });
   }
 };

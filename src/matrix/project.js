@@ -23,6 +23,7 @@ morpheus.Project = function (dataset) {
   morpheus.Project
   ._recomputeCalculatedFields(new morpheus.TransposedDatasetView(
     this.originalDataset));
+  this.history = [];
 };
 morpheus.Project.Events = {
   DATASET_CHANGED: 'datasetChanged',
@@ -37,15 +38,17 @@ morpheus.Project.Events = {
 };
 
 morpheus.Project._recomputeCalculatedFields = function (dataset) {
-  var metadata = dataset.getRowMetadata();
-  var view = new morpheus.DatasetRowView(dataset);
-  for (var metadataIndex = 0, count = metadata.getMetadataCount(); metadataIndex < count; metadataIndex++) {
-    var v = metadata.get(metadataIndex);
-    var f = v.getProperties().get(morpheus.VectorKeys.FUNCTION);
-    if (f != null
-      && v.getProperties().get(morpheus.VectorKeys.RECOMPUTE_FUNCTION)) {
-      for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-        v.setValue(i, f(view.setIndex(i)));
+  var metadata = dataset.getColumnMetadata();
+  var view = new morpheus.DatasetColumnView(dataset);
+  for (var metadataIndex = 0,
+         count = metadata.getMetadataCount(); metadataIndex < count; metadataIndex++) {
+    var vector = metadata.get(metadataIndex);
+    if (vector.getProperties().get(morpheus.VectorKeys.FUNCTION) != null
+      && vector.getProperties().get(morpheus.VectorKeys.RECOMPUTE_FUNCTION)) {
+      var f = morpheus.VectorUtil.jsonToFunction(vector, morpheus.VectorKeys.FUNCTION);
+      for (var j = 0, size = vector.size(); j < size; j++) {
+        view.setIndex(j);
+        vector.setValue(j, f(view, dataset, j));
       }
     }
   }

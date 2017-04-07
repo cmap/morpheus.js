@@ -15,6 +15,9 @@ module.exports = {
     "no-unused-vars": 0
   },
   "globals": {
+    "describe": true,
+    "expect": true,
+    "it": true,
     "Math": true,
     "isNaN": true,
     "saveAs": true,

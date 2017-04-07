@@ -26,28 +26,55 @@ morpheus.Dataset = function (options) {
     this.seriesDataTypes.push(options.dataType);
     //console.log(this);
 };
-morpheus.Dataset.toJson = function (dataset, options) {
+/**
+ *
+ * @param dataset
+ * @param options.rowFields
+ * @param options.columnFields
+ * @param options.seriesIndices
+ * @return JSON representation of a dataset
+ */
+morpheus.Dataset.toJSON = function (dataset, options) {
   options = options || {};
-
-  var data = [];
-  for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-    var row = [];
-    data.push(row);
-    for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-      row[j] = dataset.getValue(i, j);
+  var seriesArrays = [];
+  var seriesDataTypes = [];
+  var seriesNames = [];
+  var seriesIndices = options.seriesIndices;
+  if (seriesIndices == null) {
+    seriesIndices = morpheus.Util.sequ32(dataset.getSeriesCount());
+  }
+  for (var series = 0; series < seriesIndices.length; series++) {
+    var seriesIndex = seriesIndices[series];
+    seriesNames.push(dataset.getName(seriesIndex));
+    seriesDataTypes.push(dataset.getDataType(seriesIndex));
+    var data = [];
+    seriesArrays.push(data);
+    for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+      var row = [];
+      data.push(row);
+      for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+        row[j] = dataset.getValue(i, j, seriesIndex);
+      }
     }
   }
-  var vectorToJson = function (vector) {
+  var vectortoJSON = function (vector) {
     var array = [];
     for (var i = 0, size = vector.size(); i < size; i++) {
       array[i] = vector.getValue(i);
     }
+    var properties = new morpheus.Map();
+    vector.getProperties().forEach(function (value, key) {
+      if (morpheus.VectorKeys.JSON_WHITELIST.has(key)) {
+        properties.set(key, value);
+      }
+    });
     return {
+      properties: properties,
       name: vector.getName(),
       array: array
     };
   };
-  var metadataToJson = function (metadata, fields) {
+  var metadatatoJSON = function (metadata, fields) {
     var vectors = [];
     var filter;
     if (fields) {
@@ -60,10 +87,10 @@ morpheus.Dataset.toJson = function (dataset, options) {
       var v = metadata.get(i);
       if (filter) {
         if (filter.has(v.getName())) {
-          vectors.push(vectorToJson(v));
+          vectors.push(vectortoJSON(v));
         }
       } else {
-        vectors.push(vectorToJson(v));
+        vectors.push(vectortoJSON(v));
       }
     }
     return vectors;
@@ -71,45 +98,45 @@ morpheus.Dataset.toJson = function (dataset, options) {
   return {
     rows: dataset.getRowCount(),
     columns: dataset.getColumnCount(),
-    seriesArrays: [data],
-    seriesDataTypes: [dataset.getDataType(0)],
-    seriesNames: [dataset.getName()],
+    seriesArrays: seriesArrays,
+    seriesDataTypes: seriesDataTypes,
+    seriesNames: seriesNames,
     rowMetadataModel: {
-      vectors: metadataToJson(dataset.getRowMetadata(),
+      vectors: metadatatoJSON(dataset.getRowMetadata(),
         options.rowFields)
     },
     columnMetadataModel: {
-      vectors: metadataToJson(dataset.getColumnMetadata(),
+      vectors: metadatatoJSON(dataset.getColumnMetadata(),
         options.columnFields)
     }
   };
 };
-morpheus.Dataset.fromJson = function (options) {
-    // Object {seriesNames:
-    // Array[1], seriesArrays:
-    // Array[1], rows:
-    // 6238, columns: 7251,
-    // rowMetadataModel: Object…}
-    // columnMetadataModel: Object
-    // itemCount: 7251
-    // vectors: Array[3]
-    // array: Array[7251]
-    // n: 7251
-    // name: "pert_id"
-    // properties: Object
-    // columns: 7251
-    // rowMetadataModel: Object
-    // rows: 6238
-    // seriesArrays: Array[1]
-    // seriesNames: Array[1]
-    // var array = morpheus.Dataset.createArray(options);
-    // for (var i = 0; i < options.rows; i++) {
-    // var row = array[i];
-    // var jsonRow = options.array[i];
-    // for (var j = 0; j < options.columns; j++) {
-    // row[j] = jsonRow[j];
-    // }
-    // }
+morpheus.Dataset.fromJSON = function (options) {
+  // Object {seriesNames:
+  // Array[1], seriesArrays:
+  // Array[1], rows:
+  // 6238, columns: 7251,
+  // rowMetadataModel: Object…}
+  // columnMetadataModel: Object
+  // itemCount: 7251
+  // vectors: Array[3]
+  // array: Array[7251]
+  // n: 7251
+  // name: "pert_id"
+  // properties: Object
+  // columns: 7251
+  // rowMetadataModel: Object
+  // rows: 6238
+  // seriesArrays: Array[1]
+  // seriesNames: Array[1]
+  // var array = morpheus.Dataset.createArray(options);
+  // for (var i = 0; i < options.rows; i++) {
+  // var row = array[i];
+  // var jsonRow = options.array[i];
+  // for (var j = 0; j < options.columns; j++) {
+  // row[j] = jsonRow[j];
+  // }
+  // }
 
     if (options.seriesMappings) {
         for (var seriesIndex = 0; seriesIndex < options.seriesMappings.length; seriesIndex++) {
@@ -142,29 +169,31 @@ morpheus.Dataset.fromJson = function (options) {
         columns: options.columns
     });
 
-    if (options.rowMetadataModel) {
-        options.rowMetadataModel.vectors.forEach(function (v) {
-            var vector = new morpheus.Vector(v.name, dataset.getRowCount());
-            vector.array = v.array;
-            dataset.rowMetadataModel.vectors.push(vector);
-        });
-    }
-    if (options.columnMetadataModel) {
-        options.columnMetadataModel.vectors.forEach(function (v) {
-            var vector = new morpheus.Vector(v.name, dataset.getColumnCount());
-            vector.array = v.array;
-            dataset.columnMetadataModel.vectors.push(vector);
-        });
-    }
-    for (var i = 1; i < options.seriesArrays.length; i++) {
+  if (options.rowMetadataModel) {
+    options.rowMetadataModel.vectors.forEach(function (v) {
+      var vector = new morpheus.Vector(v.name, dataset.getRowCount());
+      vector.array = v.array;
+      vector.properties = morpheus.Map.fromJSON(v.properties);
+      dataset.rowMetadataModel.vectors.push(vector);
+    });
+  }
+  if (options.columnMetadataModel) {
+    options.columnMetadataModel.vectors.forEach(function (v) {
+      var vector = new morpheus.Vector(v.name, dataset.getColumnCount());
+      vector.array = v.array;
+      vector.properties = morpheus.Map.fromJSON(v.properties);
+      dataset.columnMetadataModel.vectors.push(vector);
 
-        dataset.addSeries({
-            name: options.seriesNames[i],
-            dataType: options.seriesDataTypes[i],
-            array: options.seriesArrays[i]
-        });
-    }
-    return dataset;
+    });
+  }
+  for (var i = 1; i < options.seriesArrays.length; i++) {
+    dataset.addSeries({
+      name: options.seriesNames[i],
+      dataType: options.seriesDataTypes[i],
+      array: options.seriesArrays[i]
+    });
+  }
+  return dataset;
 };
 morpheus.Dataset.createArray = function (options) {
   var array = [];

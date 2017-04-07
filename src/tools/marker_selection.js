@@ -326,7 +326,7 @@ morpheus.MarkerSelection.prototype = {
         var blob = new Blob(
           ['self.onmessage = function(e) {'
           + 'importScripts(e.data.scripts);'
-          + 'self.postMessage(morpheus.MarkerSelection.execute(morpheus.Dataset.fromJson(e.data.dataset), e.data.input));'
+          + 'self.postMessage(morpheus.MarkerSelection.execute(morpheus.Dataset.fromJSON(e.data.dataset), e.data.input));'
           + '}']);
 
         var url = window.URL.createObjectURL(blob);
@@ -336,9 +336,10 @@ morpheus.MarkerSelection.prototype = {
 
         worker.postMessage({
           scripts: morpheus.Util.getScriptPath(),
-          dataset: morpheus.Dataset.toJson(subset, {
+          dataset: morpheus.Dataset.toJSON(subset, {
             columnFields: [],
-            rowFields: []
+            rowFields: [],
+            seriesIndices: [0]
           }),
           input: options.input
         });
