@@ -416,7 +416,10 @@ morpheus.HeatMap = function (options) {
     }
 
   }
+
   var heatMapLoaded = function () {
+    console.log("new HeatMap ::", "heatMapLoaded()", "dataset:", options.dataset, "dataset.esSession:", options.dataset.getESSession());
+    options.dataset.setESSession();
     if (typeof window !== 'undefined') {
       $(window).on('orientationchange.morpheus resize.morpheus', _this.resizeListener = function () {
         _this.revalidate();
@@ -556,6 +559,7 @@ morpheus.HeatMap = function (options) {
           newColumnAnnotationName: 'id'
         });
       }
+
       heatMapLoaded();
     });
   }
