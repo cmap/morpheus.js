@@ -228,7 +228,7 @@ morpheus.HeatMap = function (options) {
         File: ['Open File', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
         Tools: ['New Heat Map', 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors', 'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API'],
         View: ['Zoom In', 'Zoom Out', 'Fit To Window', 'Reset Zoom', null, 'Options'],
-        Edit: ['Copy Image', null, 'Copy Selected Dataset', null, 'Move Selected Rows To Top', 'Invert' +
+        Edit: ['Copy Image', null, 'Move Selected Rows To Top', 'Invert' +
         ' Selected Rows', 'Copy Selected Rows', 'Select All Rows', null, 'Move Selected Columns' +
         ' To Top', 'Invert Selected Columns', 'Copy Selected Columns', 'Select All Columns'],
         Help: ['Find Action', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keymap' +

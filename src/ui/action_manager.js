@@ -639,6 +639,9 @@ morpheus.ActionManager = function () {
       : project
       .getColumnSelectionModel();
     var viewIndices = selectionModel.getViewIndices().values();
+    if (viewIndices.length === 0) {
+      return;
+    }
     viewIndices.sort(function (a, b) {
       return (a === b ? 0 : (a < b ? -1 : 1));
     });
@@ -736,7 +739,10 @@ morpheus.ActionManager = function () {
         text.push(morpheus.Util.toString(v
         .getValue(index)));
       });
-    morpheus.Util.setClipboardData(text.join('\n'));
+    setTimeout(function () {
+      morpheus.Util.setClipboardData(text.join('<br>'));
+    }, 20);
+
   };
   this.add({
     name: 'Copy Selected Rows',
@@ -791,7 +797,10 @@ morpheus.ActionManager = function () {
       var text = new morpheus.GctWriter()
       .write(dataset);
       if (text.length > 0) {
-        morpheus.Util.setClipboardData(text);
+        setTimeout(function () {
+          text = text.replace(/\t/g, '&emsp;').replace(/\n/g, '<br>');
+          morpheus.Util.setClipboardData(text);
+        }, 20);
       }
     }
   });
