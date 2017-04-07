@@ -10,7 +10,8 @@ morpheus.HeatMapToolBar = function (heatMap) {
     + '<div class="row"><div class="col-xs-12"><div data-name="tip" style="white-space:nowrap; border-top: thin solid #e7e7e7;margin-bottom:2px;height: 14px; font-size: 10px;overflow:hidden;"></div></div></div>'
     + '</div>');
   var searchHtml = [];
-  var $searchForm = $('<form style="display:inline-block;" name="searchForm" class="form' +
+  var $searchForm = $('<form style="display:inline-block;margin-right:14px;" name="searchForm"' +
+    ' class="form' +
     ' form-inline' +
     ' form-compact"' +
     ' role="search"></form>');
