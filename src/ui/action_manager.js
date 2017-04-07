@@ -11,10 +11,9 @@
 morpheus.ActionManager = function () {
   this.actionNameToAction = new morpheus.Map();
   this.actions = [];
-  // TODO selection-invert, all, clear, all, move to top, copy
+  // TODO copy all row/column metadata
   // pin/unpin tab,
-  // header stuff-display, etc.
-  var activeElement;
+  // header stuff-display, delete.
   this.add({
     name: 'Sort',
     cb: function (options) {
@@ -100,10 +99,9 @@ morpheus.ActionManager = function () {
         });
         $filterModal.appendTo(options.heatMap.$content);
         $filterModal.on('hidden.bs.modal', function () {
-          $(activeElement).focus();
+          options.heatMap.focus();
         });
       }
-      activeElement = document.activeElement;
       $filterModal.modal('show');
     },
     icon: 'fa fa-filter',
@@ -472,8 +470,7 @@ morpheus.ActionManager = function () {
         findModal.push('<h4 class="modal-title" id="' + id
           + '">Enter action</h4>');
         findModal.push('</div>');
-        findModal.push('<div class="modal-body ui-front"><input class="form-control input-sm"' +
-          ' autofocus></div>');
+        findModal.push('<div class="modal-body ui-front"><input class="form-control input-sm"></div>');
         findModal.push('</div>');
         findModal.push('</div>');
         findModal.push('</div>');
@@ -533,10 +530,9 @@ morpheus.ActionManager = function () {
           }
         });
         $findModal.on('hidden.bs.modal', function () {
-          $(activeElement).focus();
+          options.heatMap.focus();
         });
       }
-      activeElement = document.activeElement;
       $findModal.modal('show');
       $search.focus();
     }
@@ -560,11 +556,11 @@ morpheus.ActionManager = function () {
   this.add({
     name: 'Contact',
     icon: 'fa fa-envelope-o',
-    cb: function () {
+    cb: function (options) {
       morpheus.FormBuilder.showInModal({
         title: 'Contact',
         html: 'Please email us at morpheus@broadinstitute.org',
-        focus: document.activeElement
+        focus: options.heatMap.getFocusEl()
       });
     }
   });
@@ -594,6 +590,211 @@ morpheus.ActionManager = function () {
     }
   });
 
+  var invertAction = function (options, isColumns) {
+    var model = isColumns ? options.heatMap.getProject().getColumnSelectionModel() : options.heatMap.getProject().getRowSelectionModel();
+    var viewIndices = model.getViewIndices();
+    var inverse = new morpheus.Set();
+    var n = n = isColumns ? options.heatMap.getProject().getSortedFilteredDataset().getColumnCount() : options.heatMap.getProject().getSortedFilteredDataset().getRowCount();
+    for (var i = 0; i < n; i++) {
+      if (!viewIndices.has(i)) {
+        inverse.add(i);
+      }
+    }
+    model.setViewIndices(inverse, true);
+  };
+  this.add({
+    name: 'Invert Selected Rows',
+    cb: function (options) {
+      invertAction(options, false);
+    }
+  });
+  this.add({
+    name: 'Invert Selected Columns',
+    cb: function (options) {
+      invertAction(options, true);
+    }
+  });
+  var clearAction = function (options, isColumns) {
+    var model = isColumns ? options.heatMap.getProject()
+    .getColumnSelectionModel() : options.heatMap.getProject()
+    .getRowSelectionModel();
+    model.setViewIndices(new morpheus.Set(), true);
+  };
+  this.add({
+    name: 'Clear Selected Rows',
+    cb: function (options) {
+      clearAction(options, false);
+    }
+  });
+  this.add({
+    name: 'Clear Selected Columns',
+    cb: function (options) {
+      clearAction(options, true);
+    }
+  });
+
+  var moveToTop = function (options, isColumns) {
+    var project = options.heatMap.getProject();
+    var selectionModel = !isColumns ? project.getRowSelectionModel()
+      : project
+      .getColumnSelectionModel();
+    var viewIndices = selectionModel.getViewIndices().values();
+    viewIndices.sort(function (a, b) {
+      return (a === b ? 0 : (a < b ? -1 : 1));
+    });
+    var converter = isColumns ? project.convertViewColumnIndexToModel
+      : project.convertViewRowIndexToModel;
+    converter = _.bind(converter, project);
+    var modelIndices = [];
+    for (var i = 0, n = viewIndices.length; i < n; i++) {
+      modelIndices.push(converter(viewIndices[i]));
+    }
+    var sortKey = new morpheus.MatchesOnTopSortKey(project, modelIndices, 'selection on' +
+      ' top', isColumns);
+    if (isColumns) {
+      project
+      .setColumnSortKeys(
+        morpheus.SortKey
+        .keepExistingSortKeys(
+          [sortKey],
+          project
+          .getColumnSortKeys()),
+        true);
+    } else {
+      project
+      .setRowSortKeys(
+        morpheus.SortKey
+        .keepExistingSortKeys(
+          [sortKey],
+          project
+          .getRowSortKeys()),
+        true);
+    }
+  };
+  this.add({
+    name: 'Move Selected Rows To Top',
+    cb: function (options) {
+      moveToTop(options, false);
+    }
+  });
+  this.add({
+    name: 'Move Selected Columns To Top',
+    cb: function (options) {
+      moveToTop(options, true);
+    }
+  });
+  var selectAll = function (options, isColumns) {
+    var project = options.heatMap.getProject();
+    var selectionModel = !isColumns ? project.getRowSelectionModel()
+      : project
+      .getColumnSelectionModel();
+    var count = !isColumns ? project
+    .getSortedFilteredDataset()
+    .getRowCount() : project
+    .getSortedFilteredDataset()
+    .getColumnCount();
+    var indices = new morpheus.Set();
+    for (var i = 0; i < count; i++) {
+      indices.add(i);
+    }
+    selectionModel.setViewIndices(indices, true);
+  };
+  this.add({
+    name: 'Select All Rows',
+    cb: function (options) {
+      selectAll(options, false);
+    }
+  });
+  this.add({
+    name: 'Select All Columns',
+    cb: function (options) {
+      selectAll(options, true);
+    }
+  });
+  var copySelection = function (options, isColumns) {
+    var project = options.heatMap.getProject();
+    var dataset = project
+    .getSortedFilteredDataset();
+    var activeTrackName = options.heatMap.getSelectedTrackName(isColumns);
+    var v;
+    if (activeTrackName == null) {
+      v = isColumns ? dataset.getColumnMetadata()
+      .get(0) : dataset
+      .getRowMetadata().get(0);
+    } else {
+      v = isColumns ? dataset.getColumnMetadata()
+      .getByName(activeTrackName) : dataset
+      .getRowMetadata().getByName(activeTrackName);
+    }
+
+    var selectionModel = isColumns ? project
+    .getColumnSelectionModel() : project
+    .getRowSelectionModel();
+    var text = [];
+    selectionModel.getViewIndices().forEach(
+      function (index) {
+        text.push(morpheus.Util.toString(v
+        .getValue(index)));
+      });
+    morpheus.Util.setClipboardData(text.join('\n'));
+  };
+  this.add({
+    name: 'Copy Selected Rows',
+    cb: function (options) {
+      copySelection(options, false);
+    }
+  });
+  this.add({
+    name: 'Copy Selected Columns',
+    cb: function (options) {
+      copySelection(options, true);
+    }
+  });
+  this.add({
+    name: 'Copy Selected Dataset',
+    cb: function (options) {
+      var project = options.heatMap.getProject();
+      var dataset = project.getSelectedDataset({
+        emptyToAll: false
+      });
+      var columnMetadata = dataset
+      .getColumnMetadata();
+      var rowMetadata = dataset.getRowMetadata();
+      // only copy visible tracks
+      var visibleColumnFields = options.heatMap
+      .getVisibleTrackNames(true);
+      var columnFieldIndices = [];
+      _.each(visibleColumnFields, function (name) {
+        var index = morpheus.MetadataUtil.indexOf(
+          columnMetadata, name);
+        if (index !== -1) {
+          columnFieldIndices.push(index);
+        }
+      });
+      columnMetadata = new morpheus.MetadataModelColumnView(
+        columnMetadata, columnFieldIndices);
+      var rowMetadata = dataset.getRowMetadata();
+      // only copy visible tracks
+      var visibleRowFields = options.heatMap
+      .getVisibleTrackNames(false);
+      var rowFieldIndices = [];
+      _.each(visibleRowFields, function (name) {
+        var index = morpheus.MetadataUtil.indexOf(
+          rowMetadata, name);
+        if (index !== -1) {
+          rowFieldIndices.push(index);
+        }
+      });
+      rowMetadata = new morpheus.MetadataModelColumnView(
+        rowMetadata, rowFieldIndices);
+
+      var text = new morpheus.GctWriter()
+      .write(dataset);
+      if (text.length > 0) {
+        morpheus.Util.setClipboardData(text);
+      }
+    }
+  });
   var _this = this;
   [new morpheus.HClusterTool(), new morpheus.MarkerSelection(), new morpheus.NearestNeighbors(), new morpheus.AdjustDataTool(), new morpheus.CollapseDatasetTool(), new morpheus.CreateAnnotation(), new morpheus.SimilarityMatrixTool(), new morpheus.TransposeTool(), new morpheus.TsneTool(), new morpheus.DevAPI()].forEach(function (tool) {
     _this.add({

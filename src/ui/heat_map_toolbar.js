@@ -153,6 +153,9 @@ morpheus.HeatMapToolBar = function (heatMap) {
         menu.push('<li role="separator" class="divider"></li>');
       } else {
         var action = heatMap.getActionManager().getAction(name);
+        if (action == null) {
+          throw name;
+        }
         menu.push('<li>');
         menu.push('<a class="morpheus-menu-item" data-action="' + action.name + '" href="#">');
         menu.push(action.name);
@@ -186,6 +189,9 @@ morpheus.HeatMapToolBar = function (heatMap) {
       createMenu('File', heatMap.options.menu.File, '240px');
     }
     if (heatMap.options.menu.View) {
+      createMenu('Edit', heatMap.options.menu.Edit);
+    }
+    if (heatMap.options.menu.View) {
       createMenu('View', heatMap.options.menu.View);
     }
     if (heatMap.options.menu.Tools) {
@@ -195,10 +201,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
       createMenu('Help', heatMap.options.menu.Help, '200px');
     }
   }
-  $menus.on('click', 'li > a', function (e) {
-    e.preventDefault();
-    heatMap.getActionManager().execute($(this).data('action'));
-  });
+
   $(searchHtml.join('')).appendTo($searchForm);
   var $lineOneColumn = $el.find('[data-name=lineOneColumn]');
   $menus.appendTo($lineOneColumn);
@@ -316,8 +319,19 @@ morpheus.HeatMapToolBar = function (heatMap) {
   var $toolbar = $(toolbarHtml.join(''));
 
   $toolbar.find('[data-action]').on('click', function (e) {
+    heatMap.getActionManager().execute($(this).data('action'));
+  }).on('blur', function (e) {
+    if (document.activeElement === document.body) {
+      heatMap.focus();
+    }
+  });
+  $menus.on('click', 'li > a', function (e) {
     e.preventDefault();
     heatMap.getActionManager().execute($(this).data('action'));
+  }).on('blur', function (e) {
+    if (document.activeElement === document.body) {
+      heatMap.focus();
+    }
   });
   if (heatMap.options.toolbar.$customButtons) {
     heatMap.options.toolbar.$customButtons.appendTo($toolbar);
@@ -382,7 +396,8 @@ morpheus.HeatMapToolBar = function (heatMap) {
     e.preventDefault();
     morpheus.FormBuilder.showInModal({
       title: 'Search Help',
-      html: $searchHelp
+      html: $searchHelp,
+      appendTo: heatMap.getContentEl()
     });
   });
   var $searchRowsGroup = $searchForm.find('[data-name=searchRowsGroup]');

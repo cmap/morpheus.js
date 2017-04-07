@@ -48,6 +48,7 @@ morpheus.Map.prototype = {
       });
     }
     catch (e) {
+      // catch break out of loop
     }
     return ret;
   },
