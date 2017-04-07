@@ -2,6 +2,13 @@ morpheus.Set = function () {
   this._map = new morpheus.Map();
 };
 morpheus.Set.prototype = {
+  toJSON: function () {
+    var json = [];
+    this.forEach(function (value) {
+      json.push(value);
+    });
+    return json;
+  },
   toString: function () {
     var s = [];
     this.forEach(function (key) {
@@ -42,4 +49,12 @@ morpheus.Set.prototype = {
   has: function (key) {
     return this._map.has(key);
   }
+};
+
+morpheus.Set.fromJSON = function (json) {
+  var set = new morpheus.Set();
+  for (var i = 0, length = json.length; i < length; i++) {
+    set.add(json[i]);
+  }
+  return set;
 };

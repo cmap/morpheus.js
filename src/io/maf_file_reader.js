@@ -299,7 +299,7 @@ morpheus.MafFileReader.prototype = {
             }
             f2 = f2.valueOf();
             var returnVal = (f1 === f2 ? 0 : (f1 < f2 ? 1
-                : -1));
+              : -1));
             if (returnVal !== 0) {
               return returnVal;
             }
@@ -345,20 +345,25 @@ morpheus.MafFileReader.prototype = {
     mutationSummarySelectionVector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, '[number]');
     mutationSummarySelectionVector.getProperties().set(morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION, true);
     var datasetName = dataset.getName();
-    mutationSummarySelectionVector.getProperties().set(morpheus.VectorKeys.FUNCTION, function (view, selectedDataset, columnIndex) {
-      var sourceVector = selectedDataset.getRowMetadata().getByName('Source');
-      var bins = new Int32Array(numUniqueValues); // 1-7
-      for (var i = 0, nrows = selectedDataset.getRowCount(); i < nrows; i++) {
-        var source = sourceVector.getValue(i);
-        if (source == null || source === datasetName) {
-          var value = selectedDataset.getValue(i, columnIndex);
-          if (value > 0) {
-            bins[value - 1]++;
-          }
-        }
-      }
-      return bins;
+    mutationSummarySelectionVector.getProperties().set(morpheus.VectorKeys.FUNCTION, {
+      binSize: 1,
+      domain: [1, 8],
+      cumulative: false
     });
+    // mutationSummarySelectionVector.getProperties().set(morpheus.VectorKeys.FUNCTION, function (view, selectedDataset, columnIndex) {
+    //   var sourceVector = selectedDataset.getRowMetadata().getByName('Source');
+    //   var bins = new Int32Array(numUniqueValues); // 1-7
+    //   for (var i = 0, nrows = selectedDataset.getRowCount(); i < nrows; i++) {
+    //     var source = sourceVector.getValue(i);
+    //     if (source == null || source === datasetName) {
+    //       var value = selectedDataset.getValue(i, columnIndex);
+    //       if (value > 0) {
+    //         bins[value - 1]++;
+    //       }
+    //     }
+    //   }
+    //   return bins;
+    // });
 
     return dataset;
   },

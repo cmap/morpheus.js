@@ -24,7 +24,7 @@ morpheus.DatasetUtil.slicedView = function (dataset, rows, columns) {
 };
 morpheus.DatasetUtil.transposedView = function (dataset) {
   return dataset instanceof morpheus.TransposedDatasetView ? dataset
-    .getDataset() : new morpheus.TransposedDatasetView(dataset);
+  .getDataset() : new morpheus.TransposedDatasetView(dataset);
 };
 morpheus.DatasetUtil.max = function (dataset, seriesIndex) {
   seriesIndex = seriesIndex || 0;
@@ -213,7 +213,7 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
       var blobURL = window.URL.createObjectURL(blob);
       var worker = new Worker(blobURL);
       worker.addEventListener('message', function (e) {
-        deferred.resolve(morpheus.Dataset.fromJson(e.data));
+        deferred.resolve(morpheus.Dataset.fromJSON(e.data));
         window.URL.revokeObjectURL(blobURL);
       }, false);
       // start the worker
@@ -245,9 +245,13 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
 		// deferred
 		return fileOrUrl;
 	} else { // it's already a dataset?
-		var deferred = $.Deferred();
-		deferred.resolve(fileOrUrl);
-		return deferred.promise();
+        var deferred = $.Deferred();
+        if (fileOrUrl.getRowCount) {
+            deferred.resolve(fileOrUrl);
+        } else {
+            deferred.resolve(morpheus.Dataset.fromJSON(fileOrUrl));
+        }
+        return deferred.promise();
 	}
 
 };
@@ -403,6 +407,14 @@ morpheus.DatasetUtil.DATASET_FILE_FORMATS = '<a target="_blank" href="https://cl
   + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
   + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
   + ' a tab-delimited text file, or an Excel spreadsheet';
+morpheus.DatasetUtil.SESSION_FILE_FORMAT = 'a saved Morpheus session';
+
+morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS = '<a target="_blank"' +
+  ' href="https://clue.io/help#datasets">GCT 1.3</a>, '
+  + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
+  + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
+  + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
+  + ' a tab-delimited text file, an Excel spreadsheet, or a saved Morpheus session';
 morpheus.DatasetUtil.BASIC_DATASET_FILE_FORMATS = '<a target="_blank" href="https://clue.io/help#datasets">GCT 1.3</a>, '
   + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
   + ' or a tab-delimited text file';
@@ -449,11 +461,10 @@ morpheus.DatasetUtil.getSeriesNames = function (dataset) {
  *      The dataset
  * @param options.text
  *            Search text
- * @param options.cb
- *            Callback to add a match
  * @param options.defaultMatchMode
  *            'exact' or 'contains'
  * @param options.matchAllPredicates Whether to match all predicates
+ * @return Set of matching indices.
  *
  */
 morpheus.DatasetUtil.searchValues = function (options) {
@@ -462,7 +473,6 @@ morpheus.DatasetUtil.searchValues = function (options) {
   }
   var dataset = options.dataset;
   var text = options.text;
-  var cb = options.cb;
   var tokens = morpheus.Util.getAutocompleteTokens(text);
   if (tokens.length == 0) {
     return;
@@ -704,7 +714,7 @@ morpheus.DatasetUtil.autocompleteValues = function (dataset) {
 // json.push(']');
 // }
 // json.push(']'); // end v
-// var metadataToJson = function(model) {
+// var metadatatoJSON = function(model) {
 // json.push('[');
 // for (var i = 0, count = model.getMetadataCount(); i < count; i++) {
 // var v = model.get(i);
@@ -726,9 +736,9 @@ morpheus.DatasetUtil.autocompleteValues = function (dataset) {
 // json.push(']');
 // };
 // json.push(', "cols":');
-// metadataToJson(dataset.getColumnMetadata());
+// metadatatoJSON(dataset.getColumnMetadata());
 // json.push(', "rows":');
-// metadataToJson(dataset.getRowMetadata());
+// metadatatoJSON(dataset.getRowMetadata());
 // json.push('}'); // end json object
 // return json.join('');
 // };
@@ -900,7 +910,8 @@ morpheus.DatasetUtil.copy = function (dataset) {
     columns: dataset.getColumnCount(),
     dataType: dataset.getDataType(0)
   });
-  for (var seriesIndex = 0, nseries = dataset.getSeriesCount(); seriesIndex < nseries; seriesIndex++) {
+  for (var seriesIndex = 0,
+         nseries = dataset.getSeriesCount(); seriesIndex < nseries; seriesIndex++) {
     if (seriesIndex > 0) {
       newDataset.addSeries({
         name: dataset.getName(seriesIndex),

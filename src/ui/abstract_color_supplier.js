@@ -14,8 +14,8 @@ morpheus.AbstractColorSupplier = function () {
 morpheus.AbstractColorSupplier.Z_SCORE = 1;
 morpheus.AbstractColorSupplier.ROBUST_Z_SCORE = 2;
 
-morpheus.AbstractColorSupplier.toJson = function (cs) {
-  return {
+morpheus.AbstractColorSupplier.toJSON = function (cs) {
+  var json = {
     fractions: cs.fractions,
     colors: cs.colors,
     names: cs.names,
@@ -24,17 +24,21 @@ morpheus.AbstractColorSupplier.toJson = function (cs) {
     missingColor: cs.missingColor,
     scalingMode: cs.scalingMode,
     stepped: cs.stepped,
-    transformValues: cs.transformValues,
-    conditions: cs.conditions.array,
-    size: {
+    transformValues: cs.transformValues
+  };
+  if (cs.conditions) {
+    json.conditions = cs.conditions.array;
+  }
+  if (cs.sizer) {
+    json.size = {
       seriesName: cs.sizer.seriesName,
       min: cs.sizer.min,
       max: cs.sizer.max
-    }
-  };
-
+    };
+  }
+  return json;
 };
-morpheus.AbstractColorSupplier.fromJson = function (json) {
+morpheus.AbstractColorSupplier.fromJSON = function (json) {
   var cs = json.stepped ? new morpheus.SteppedColorSupplier()
     : new morpheus.GradientColorSupplier();
   cs.setScalingMode(json.scalingMode);
@@ -91,18 +95,18 @@ morpheus.AbstractColorSupplier.fromJson = function (json) {
       };
       if (condition.v1 != null && !isNaN(condition.v1)) {
         gtf = condition.v1Op === 'gt' ? function (val) {
-            return val > condition.v1;
-          } : function (val) {
-            return val >= condition.v1;
-          };
+          return val > condition.v1;
+        } : function (val) {
+          return val >= condition.v1;
+        };
       }
 
       if (condition.v2 != null && !isNaN(condition.v2)) {
         ltf = condition.v2Op === 'lt' ? function (val) {
-            return val < condition.v2;
-          } : function (val) {
-            return val <= condition.v2;
-          };
+          return val < condition.v2;
+        } : function (val) {
+          return val <= condition.v2;
+        };
       }
       condition.accept = function (val) {
         return gtf(val) && ltf(val);
@@ -215,6 +219,6 @@ morpheus.AbstractColorSupplier.prototype = {
     this.fractions = morpheus.Util.reorderArray(options.fractions, index);
     this.colors = morpheus.Util.reorderArray(options.colors, index);
     this.names = options.names ? morpheus.Util.reorderArray(options.names,
-        index) : null;
+      index) : null;
   }
 };

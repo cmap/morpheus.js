@@ -1,6 +1,56 @@
 morpheus.VectorUtil = function () {
 };
 
+morpheus.VectorUtil.jsonToFunction = function (vector, key) {
+  var f = vector.getProperties().get(key);
+  if (typeof f === 'object') {
+    var binSize = f.binSize;
+    var min = f.domain[0];
+    var max = f.domain[1];
+    var numberOfBins = Math.ceil((max - min) / binSize);
+    var percent = f.percent;
+    var cumulative = f.cumulative;
+    var histogramFunction = function (view, selectedDataset, columnIndex) {
+      var total = 0;
+      var binNumberToOccurences = new Uint32Array(numberOfBins);
+      for (var i = 0, nrows = selectedDataset.getRowCount(); i < nrows; i++) {
+        var value = selectedDataset.getValue(i, columnIndex);
+        if (!isNaN(value)) {
+          if (value >= min && value <= max) {
+            var bin = Math.floor(((value - min) / binSize));
+            if (bin < 0) {
+              bin = 0;
+            } else if (bin >= numberOfBins) {
+              bin = numberOfBins - 1;
+            }
+            binNumberToOccurences[bin]++;
+          }
+          total++;
+        }
+      }
+      if (cumulative) {
+        for (var i = numberOfBins - 2; i >= 0; i--) {
+          binNumberToOccurences[i] += binNumberToOccurences[i + 1];
+        }
+      }
+      if (percent) {
+        var percents = new Float32Array(numberOfBins);
+        for (var i = 0; i < numberOfBins; i++) {
+          percents[i] = 100 * (binNumberToOccurences[i] / total);
+        }
+        return percents;
+      }
+      return binNumberToOccurences;
+    };
+    vector.getProperties().set(key, histogramFunction);
+    var jsonSpec = f;
+    f = histogramFunction;
+    f.toJSON = function () {
+      return jsonSpec;
+    };
+  }
+  return f;
+};
 morpheus.VectorUtil.createValueToIndexMap = function (vector, splitArrayValues) {
   var map = new morpheus.Map();
   var isArray = splitArrayValues && morpheus.VectorUtil.getDataType(vector)[0] === '[';

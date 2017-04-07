@@ -1,10 +1,12 @@
 /*
  * 
- * @param tree An object with maxHeight, rootNode, leafNodes, nLeafNodes. Each node has an id (integer), name (string), children, height, minIndex, maxIndex, parent. Leaf nodes also have an index.
+ * @param tree An object with maxHeight, rootNode, leafNodes, nLeafNodes. Each node has an id
+ * (integer), name (string), children, depth, height, minIndex, maxIndex, parent. Leaf nodes also
+ * have an index.
  The root has the largest height, leaves the smallest height.
 
  */
-morpheus.AbstractDendrogram = function (controller, tree, positions, project,
+morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
                                         type) {
   morpheus.AbstractCanvas.call(this, true);
 
@@ -15,7 +17,7 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
   this.tree = tree;
   this.type = type;
   this.squishEnabled = false;
-  this.controller = controller;
+  this.heatMap = heatMap;
   this.positions = positions;
   this.project = project;
   var $label = $('<span></span>');
@@ -62,10 +64,10 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
           };
           tipOptions[type === morpheus.AbstractDendrogram.Type.COLUMN ? 'columnNodes'
             : 'rowNodes'] = nodes;
-          _this.controller.setToolTip(-1, -1, tipOptions);
+          _this.heatMap.setToolTip(-1, -1, tipOptions);
           _this.canvas.style.cursor = 'pointer';
         } else {
-          _this.controller.setToolTip(-1, -1);
+          _this.heatMap.setToolTip(-1, -1);
           _this.canvas.style.cursor = 'default';
         }
       }
@@ -105,11 +107,15 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
             {
               name: 'Annotate...'
             }, {
+            name: 'Save'
+          }, {
+            separator: true
+          }, {
             name: 'Enrichment...'
           }, {
             separator: true
           }, {
-            name: 'Squish',
+            name: 'Squish Singleton Clusters',
             checked: _this.squishEnabled
           }, {
             separator: true
@@ -122,7 +128,28 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
           },
           e.target,
           function (menuItem, item) {
-            if (item === 'Flip') {
+            if (item === 'Save') {
+              var formBuilder = new morpheus.FormBuilder();
+              formBuilder.append({
+                name: 'file_name',
+                type: 'text',
+                required: true,
+              });
+              morpheus.FormBuilder.showOkCancel({
+                title: 'Save Dendrogram',
+                content: formBuilder.$form,
+                okCallback: function () {
+                  var fileName = formBuilder.getValue('file_name');
+                  if (fileName === '') {
+                    fileName = 'dendrogram.txt';
+                  }
+                  var out = [];
+                  morpheus.DendrogramUtil.writeNewick(tree.rootNode, out);
+                  var blob = new Blob([out.join('')], {type: 'text/plain;charset=charset=utf-8'});
+                  saveAs(blob, fileName, true);
+                }
+              });
+            } else if (item === 'Flip') {
               if (selectedNode != null) {
                 var isColumns = morpheus.AbstractDendrogram.Type.COLUMN === _this.type;
                 var min = selectedNode.minIndex;
@@ -170,7 +197,7 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
                 setIndex(selectedNode);
 
                 var currentOrder = [];
-                var count = isColumns ? controller.getProject().getSortedFilteredDataset().getColumnCount() : controller.getProject().getSortedFilteredDataset().getRowCount();
+                var count = isColumns ? heatMap.getProject().getSortedFilteredDataset().getColumnCount() : heatMap.getProject().getSortedFilteredDataset().getRowCount();
                 for (var i = 0; i < count; i++) {
                   currentOrder.push(isColumns ? project.convertViewColumnIndexToModel(i) : project.convertViewRowIndexToModel(i));
                 }
@@ -181,11 +208,11 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
                 }
                 var key = new morpheus.SpecifiedModelSortOrder(currentOrder, currentOrder.length, 'dendrogram', isColumns);
                 if (isColumns) {
-                  controller.getProject().setColumnSortKeys([key], true);
+                  heatMap.getProject().setColumnSortKeys([key], true);
                 } else {
-                  controller.getProject().setRowSortKeys([key], true);
+                  heatMap.getProject().setRowSortKeys([key], true);
                 }
-                controller.revalidate();
+                heatMap.revalidate();
               }
 
             } else if (item === 'Branch Color') {
@@ -211,7 +238,8 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
                 morpheus.FormBuilder.showInModal({
                   title: 'Color',
                   close: 'Close',
-                  html: formBuilder.$form
+                  html: formBuilder.$form,
+                  focus: document.activeElement
                 });
 
               }
@@ -220,14 +248,14 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
               .showTool(
                 new morpheus.AnnotateDendrogramTool(
                   type === morpheus.AbstractDendrogram.Type.COLUMN),
-                _this.controller);
+                _this.heatMap);
             } else if (item === 'Enrichment...') {
               morpheus.HeatMap
               .showTool(
                 new morpheus.DendrogramEnrichmentTool(
                   type === morpheus.AbstractDendrogram.Type.COLUMN),
-                _this.controller);
-            } else if (item === 'Squish') {
+                _this.heatMap);
+            } else if (item === 'Squish Singleton Clusters') {
               _this.squishEnabled = !_this.squishEnabled;
               if (!_this.squishEnabled) {
                 _this.positions
@@ -235,7 +263,7 @@ morpheus.AbstractDendrogram = function (controller, tree, positions, project,
               }
             } else if (item === 'Delete') {
               _this.resetCutHeight();
-              _this.controller
+              _this.heatMap
               .setDendrogram(
                 null,
                 type === morpheus.AbstractDendrogram.Type.COLUMN);
@@ -361,7 +389,7 @@ morpheus.AbstractDendrogram.prototype = {
     var _this = this;
     var viewIndices;
     var selectionModel = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? this.project
-      .getColumnSelectionModel()
+    .getColumnSelectionModel()
       : this.project.getRowSelectionModel();
     if (node == null) {
       // clear selection
@@ -444,7 +472,7 @@ morpheus.AbstractDendrogram.prototype = {
     this.$squishedLabel.text('');
     var dataset = this.project.getSortedFilteredDataset();
     var clusterIdVector = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? dataset
-      .getColumnMetadata().getByName('dendrogram_cut')
+    .getColumnMetadata().getByName('dendrogram_cut')
       : dataset.getRowMetadata().getByName('dendrogram_cut');
     if (clusterIdVector) {
       for (var i = 0, size = clusterIdVector.size(); i < size; i++) {
@@ -463,7 +491,7 @@ morpheus.AbstractDendrogram.prototype = {
       this.cutHeight);
     var dataset = this.project.getSortedFilteredDataset();
     var clusterIdVector = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? dataset
-      .getColumnMetadata().add('dendrogram_cut')
+    .getColumnMetadata().add('dendrogram_cut')
       : dataset.getRowMetadata().add('dendrogram_cut');
     for (var i = 0, nroots = roots.length; i < nroots; i++) {
       var root = roots[i];
@@ -495,7 +523,7 @@ morpheus.AbstractDendrogram.prototype = {
     if (squishEnabled) {
       this.positions.setSquishedIndices(squishedIndices);
     }
-    if (this.controller.getTrackIndex(clusterIdVector.getName(),
+    if (this.heatMap.getTrackIndex(clusterIdVector.getName(),
         this.type === morpheus.AbstractDendrogram.Type.COLUMN) === -1) {
       var settings = {
         discrete: true,
@@ -503,7 +531,7 @@ morpheus.AbstractDendrogram.prototype = {
         render: {}
       };
       settings.render[morpheus.VectorTrack.RENDER.COLOR] = true;
-      this.controller.addTrack(clusterIdVector.getName(),
+      this.heatMap.addTrack(clusterIdVector.getName(),
         this.type === morpheus.AbstractDendrogram.Type.COLUMN,
         settings);
     }

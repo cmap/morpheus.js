@@ -9,14 +9,14 @@ morpheus.JsonDatasetReader.prototype = {
     var isString = typeof fileOrUrl === 'string' || fileOrUrl instanceof String;
     if (isString) {
       $.ajax(fileOrUrl).done(function (json) {
-        callback(null, morpheus.Dataset.fromJson(json));
+        callback(null, morpheus.Dataset.fromJSON(json));
       }).fail(function (err) {
         callback(err);
       });
     } else {
       var reader = new FileReader();
       reader.onload = function (event) {
-        callback(null, morpheus.Dataset.fromJson(JSON.parse(event.target.result)));
+        callback(null, morpheus.Dataset.fromJSON(JSON.parse(event.target.result)));
       };
       reader.onerror = function (event) {
         callback(event);

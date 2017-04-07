@@ -53,9 +53,11 @@ morpheus.DendrogramUtil.convertEdgeLengthsToHeights = function (rootNode) {
     }
     node.height = newHeight;
     maxHeight = Math.max(maxHeight, node.height);
-    _.each(node.children, function (child) {
-      setHeights(child, newHeight);
-    });
+    if (node.children != null) {
+      node.children.forEach(function (child) {
+        setHeights(child, newHeight);
+      });
+    }
   }
 
   setHeights(rootNode, 0);
@@ -70,6 +72,24 @@ morpheus.DendrogramUtil.convertEdgeLengthsToHeights = function (rootNode) {
     maxHeight: maxHeight,
     n: counter
   };
+};
+morpheus.DendrogramUtil.writeNewick = function (node, out) {
+  if (node.children != null && node.children.length > 0) {
+    // indent
+    out.push('(');
+    for (var i = 0; i < node.children.length; i++) {
+      if (i > 0) {
+        out.push(',');
+      }
+      morpheus.DendrogramUtil.writeNewick(node.children[i], out);
+    }
+    out.push(')');
+  }
+  out.push(node.index != null ? node.index : ''); // leaf nodes have index
+  out.push(':');
+  var parentHeight = node.parent ? node.parent.height : node.height;
+  out.push(parentHeight - node.height);
+
 };
 morpheus.DendrogramUtil.parseNewick = function (text) {
   var rootNode = Newick.parse(text);
@@ -266,7 +286,7 @@ morpheus.DendrogramUtil.sortDendrogram = function (root, vectorToSortBy,
     if (node.children) {
       node.children.sort(function (a, b) {
         return (a.weight === b.weight ? 0 : (a.weight < b.weight ? -1
-            : 1));
+          : 1));
       });
     }
     return true;

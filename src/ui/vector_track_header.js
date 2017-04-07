@@ -1,10 +1,10 @@
-morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
+morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
   morpheus.AbstractCanvas.call(this);
   this.project = project;
   this.name = name;
   this.isColumns = isColumns;
   var canvas = this.canvas;
-  this.controller = controller;
+  this.heatMap = heatMap;
   var vector = (isColumns ? project.getFullDataset().getColumnMetadata()
     : project.getFullDataset().getRowMetadata()).getByName(name);
   if (vector && vector.getProperties().has(morpheus.VectorKeys.TITLE)) {
@@ -75,8 +75,8 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
     _this.repaint();
   };
   var showPopup = function (e) {
-    controller.setSelectedTrack(_this.name, isColumns);
-    var track = controller.getTrack(_this.name, isColumns);
+    heatMap.setSelectedTrack(_this.name, isColumns);
+    var track = heatMap.getTrack(_this.name, isColumns);
     if (!track) {
       throw _this.name + ' track not found';
     }
@@ -115,8 +115,8 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
   .hammer(canvas, ['pan', 'tap', 'longpress'])
   .on('longpress', this.longpress = function (event) {
     event.preventDefault();
-    controller.setSelectedTrack(_this.name, isColumns);
-    var track = controller.getTrack(_this.name, isColumns);
+    heatMap.setSelectedTrack(_this.name, isColumns);
+    var track = heatMap.getTrack(_this.name, isColumns);
     track.showPopup(event.srcEvent, true);
   })
   .on(
@@ -125,16 +125,16 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
       _this.isMouseOver = false;
       morpheus.CanvasUtil.dragging = false;
       canvas.style.cursor = 'default';
-      var index = controller.getTrackIndex(_this.name,
+      var index = heatMap.getTrackIndex(_this.name,
         isColumns);
-      var header = controller.getTrackHeaderByIndex(index,
+      var header = heatMap.getTrackHeaderByIndex(index,
         isColumns);
-      var track = controller
+      var track = heatMap
       .getTrackByIndex(index, isColumns);
       var $canvas = $(track.canvas);
       $canvas.css('z-index', '0');
       $(header.canvas).css('z-index', '0');
-      controller.revalidate();
+      heatMap.revalidate();
     })
   .on(
     'panstart',
@@ -150,13 +150,13 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
         morpheus.CanvasUtil.dragging = true;
         canvas.style.cursor = resizeCursor.cursor;
         if (resizeCursor.isPrevious) {
-          var index = controller.getTrackIndex(_this.name,
+          var index = heatMap.getTrackIndex(_this.name,
             isColumns);
           index--; // FIXME index = -1
           if (index === -1) {
             index = 0;
           }
-          var header = controller.getTrackHeaderByIndex(
+          var header = heatMap.getTrackHeaderByIndex(
             index, isColumns);
           dragStartWidth = header.getUnscaledWidth();
           dragStartHeight = header.getUnscaledHeight();
@@ -169,16 +169,16 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
         event.preventDefault();
         reorderingTrack = false;
       } else {
-        var index = controller.getTrackIndex(_this.name,
+        var index = heatMap.getTrackIndex(_this.name,
           isColumns);
         if (index == -1) {
           throw _this.name + ' not found';
         }
-        var header = controller.getTrackHeaderByIndex(
+        var header = heatMap.getTrackHeaderByIndex(
           index, isColumns);
-        var track = controller.getTrackByIndex(index,
+        var track = heatMap.getTrackByIndex(index,
           isColumns);
-        controller.setSelectedTrack(_this.name, isColumns);
+        heatMap.setSelectedTrack(_this.name, isColumns);
         var $canvas = $(track.canvas);
         dragStartPosition = $canvas.position();
         $canvas.css('z-index', '100');
@@ -205,16 +205,16 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
           height = Math.max(8, dragStartHeight + dy);
         }
 
-        controller.resizeTrack(resizeTrackName == null ? _this.name : resizeTrackName, width, height,
+        heatMap.resizeTrack(resizeTrackName == null ? _this.name : resizeTrackName, width, height,
           isColumns);
       } else if (reorderingTrack) { // reorder
-        var index = controller.getTrackIndex(_this.name,
+        var index = heatMap.getTrackIndex(_this.name,
           isColumns);
-        var header = controller.getTrackHeaderByIndex(
+        var header = heatMap.getTrackHeaderByIndex(
           index, isColumns);
-        var track = controller.getTrackByIndex(index,
+        var track = heatMap.getTrackByIndex(index,
           isColumns);
-        var ntracks = controller.getNumTracks(isColumns);
+        var ntracks = heatMap.getNumTracks(isColumns);
         var delta = isColumns ? event.deltaY : event.deltaX;
         var newIndex = index + (delta > 0 ? 1 : -1);
         newIndex = Math.min(Math.max(0, newIndex),
@@ -226,7 +226,7 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
         trackBounds[prop] = dragStartPosition[prop] + delta;
         track.setBounds(trackBounds);
         header.setBounds(trackBounds);
-        var dragOverTrack = controller.getTrackByIndex(
+        var dragOverTrack = heatMap.getTrackByIndex(
           newIndex, isColumns);
         var dragOverWidth = dragOverTrack[w]();
         var dragOverLeft = $(dragOverTrack.canvas)
@@ -238,12 +238,12 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
           || (delta < 0 && dragleft <= dragOverLeft
           + dragOverWidth / 2)) {
           if (index !== newIndex) {
-            controller.moveTrack(index, newIndex,
+            heatMap.moveTrack(index, newIndex,
               isColumns);
-            var otherHeader = controller
+            var otherHeader = heatMap
             .getTrackHeaderByIndex(index,
               isColumns);
-            var otherTrack = controller
+            var otherTrack = heatMap
             .getTrackByIndex(index, isColumns);
             var $movedCanvas = $(otherTrack.canvas);
             var newLeft = $movedCanvas.position()[prop];
@@ -267,11 +267,11 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, controller) {
         return;
       }
       _this.isMouseOver = false;
-      controller.setSelectedTrack(_this.name, isColumns);
-      if (isColumns && !controller.options.columnsSortable) {
+      heatMap.setSelectedTrack(_this.name, isColumns);
+      if (isColumns && !heatMap.options.columnsSortable) {
         return;
       }
-      if (!isColumns && !controller.options.rowsSortable) {
+      if (!isColumns && !heatMap.options.rowsSortable) {
         return;
       }
 
@@ -499,7 +499,7 @@ morpheus.VectorTrackHeader.prototype = {
     var fontHeight = Math.min(this.defaultFontHeight, this
       .getUnscaledHeight()
       - morpheus.VectorTrackHeader.FONT_OFFSET);
-    var squished = this.controller.getTrack(this.name, this.isColumns).settings.squished;
+    var squished = this.heatMap.getTrack(this.name, this.isColumns).settings.squished;
     context.font = (squished ? 'Italic ' : '') + fontHeight + 'px '
       + morpheus.CanvasUtil.FONT_NAME;
     var textWidth = context.measureText(name).width;
@@ -536,7 +536,7 @@ morpheus.VectorTrackHeader.prototype = {
     // morpheus.VectorKeys.SHOW_HEADER_SUMMARY)) {
     // var summary = vector.getProperties().get(
     // morpheus.VectorKeys.HEADER_SUMMARY);
-    // var track = this.controller.getTrack(this.name, this.isColumns);
+    // var track = this.heatMap.getTrack(this.name, this.isColumns);
     // if (summary == null) {
     // var visibleFieldIndices = vector.getProperties().get(
     // morpheus.VectorKeys.VISIBLE_FIELDS);
