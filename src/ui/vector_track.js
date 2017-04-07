@@ -856,7 +856,6 @@ morpheus.VectorTrack.prototype = {
     var REMOVE_SHOW_SELECTION_ONLY = 'Show All';
     var SORT_ASC = 'Sort Ascending';
     var SORT_DESC = 'Sort Descending';
-    var FILTER = 'Filter...';
     var MOVE_TO_TOP = 'Move To Top';
     var SORT_SEL_ASC = 'Sort Heat Map Ascending \u2191';
     var SORT_SEL_DESC = 'Sort Heat Map Descending \u2193';
@@ -880,19 +879,6 @@ morpheus.VectorTrack.prototype = {
       'Selection': [],
       'Display': []
     };
-    if (isHeader) {
-      if (this.heatmap.options.toolbar.filter) {
-        sectionToItems.Sort.push({
-          name: FILTER
-        });
-      }
-      // sectionToItems['Sort'].push({
-      // name : SORT_ASC
-      // });
-      // sectionToItems['Sort'].push({
-      // name : SORT_DESC
-      // });
-    }
 
     var customItems = this.heatmap.getPopupItems();
     if (customItems && customItems.length > 0) {
@@ -1489,51 +1475,6 @@ morpheus.VectorTrack.prototype = {
             }
           }
           model.setViewIndices(inverse, true);
-        } else if (item === FILTER) {
-          var vector = _this.getFullVector();
-          var filter;
-          var index = _this.isColumns ? _this.project
-          .getColumnFilter().indexOf(
-            vector.getName())
-            : _this.project.getRowFilter().indexOf(
-              vector.getName());
-          if (index === -1) {
-            if (morpheus.VectorUtil.isNumber(vector)
-              && morpheus.VectorUtil
-              .containsMoreThanNValues(
-                vector, 9)) {
-              filter = new morpheus.RangeFilter(NaN,
-                NaN, vector.getName());
-
-            } else {
-              var set = morpheus.VectorUtil
-              .getSet(vector);
-              var array = set.values();
-              array
-              .sort(morpheus.SortKey.ASCENDING_COMPARATOR);
-              filter = new morpheus.VectorFilter(set,
-                set.size(), vector.getName());
-            }
-            if (filter) {
-              if (_this.isColumns) {
-                _this.project.getColumnFilter()
-                .add(filter, true);
-              } else {
-                _this.project.getRowFilter().add(
-                  filter, true);
-              }
-            }
-
-          }
-
-          if (_this.isColumns) {
-            _this.project.getColumnFilter().trigger(
-              'focus', {});
-          } else {
-            _this.project.getRowFilter().trigger(
-              'focus', {});
-          }
-
         } else if (item === MOVE_TO_TOP) {
           var selectionModel = !_this.isColumns ? _this.project.getRowSelectionModel()
             : _this.project
