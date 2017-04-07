@@ -1,5 +1,5 @@
-morpheus.HeatMapColorSchemeLegend = function (controller, $keyContent) {
-  var colorScheme = controller.heatmap.getColorScheme();
+morpheus.HeatMapColorSchemeLegend = function (heatMap, $keyContent) {
+  var colorScheme = heatMap.heatmap.getColorScheme();
   var colorByValues = colorScheme.getColorByValues();
   var totalHeight;
   $keyContent.empty();
@@ -19,16 +19,16 @@ morpheus.HeatMapColorSchemeLegend = function (controller, $keyContent) {
       $(trackLegend.canvas).css('position', '');
       trackLegend.repaint();
       trackLegend.on('selectionChanged', function () {
-        controller.heatmap.setInvalid(true);
-        controller.heatmap.repaint();
+        heatMap.heatmap.setInvalid(true);
+        heatMap.heatmap.repaint();
       });
       $keyContent.append($(trackLegend.canvas));
       totalHeight += trackLegend.getUnscaledHeight();
     }
   });
-  if (controller.options.$key) {
-    $keyContent.append(controller.options.$key);
-    totalHeight += controller.options.$key.height();
+  if (heatMap.options.$key) {
+    $keyContent.append(heatMap.options.$key);
+    totalHeight += heatMap.options.$key.height();
 
   }
   var $edit = $('<div style="padding-left:4px; display:inline;"><a data-name="options"' +
@@ -36,7 +36,7 @@ morpheus.HeatMapColorSchemeLegend = function (controller, $keyContent) {
 
   $edit.find('[data-name=options]').on('click', function (e) {
     e.preventDefault();
-    controller.showOptions();
+    heatMap.showOptions();
     morpheus.Util.trackEvent({
       eventCategory: 'ToolBar',
       eventAction: 'options'

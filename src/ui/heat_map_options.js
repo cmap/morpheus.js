@@ -1,4 +1,4 @@
-morpheus.HeatMapOptions = function (controller) {
+morpheus.HeatMapOptions = function (heatMap) {
   var items = [
     {
       name: 'color_by',
@@ -6,9 +6,9 @@ morpheus.HeatMapOptions = function (controller) {
       help: 'Use a different color scheme for distinct row annotation values',
       type: 'select',
       options: ['(None)'].concat(morpheus.MetadataUtil
-      .getMetadataNames(controller.getProject()
+      .getMetadataNames(heatMap.getProject()
       .getFullDataset().getRowMetadata())),
-      value: controller.heatmap.getColorScheme()
+      value: heatMap.heatmap.getColorScheme()
       .getSeparateColorSchemeForRowMetadataField()
     }, {
       name: 'color_by_value',
@@ -57,7 +57,7 @@ morpheus.HeatMapOptions = function (controller) {
     required: true,
     type: 'select',
     options: ['(None)'].concat(morpheus.DatasetUtil
-    .getSeriesNames(controller.getProject().getFullDataset()))
+    .getSeriesNames(heatMap.getProject().getFullDataset()))
   });
   items.push({
     name: 'size_by_minimum',
@@ -83,39 +83,39 @@ morpheus.HeatMapOptions = function (controller) {
 
   var displayItems = [
     {
-      disabled: controller.getProject().getFullDataset().getColumnCount() !== controller.getProject().getFullDataset().getRowCount(),
+      disabled: heatMap.getProject().getFullDataset().getColumnCount() !== heatMap.getProject().getFullDataset().getRowCount(),
       name: 'link_rows_and_columns',
       required: true,
       type: 'checkbox',
       col: 'col-xs-4',
-      value: controller.getProject().isSymmetric()
+      value: heatMap.getProject().isSymmetric()
     },
     {
       name: 'show_grid',
       required: true,
       type: 'checkbox',
-      value: controller.heatmap.isDrawGrid()
+      value: heatMap.heatmap.isDrawGrid()
     },
     {
       name: 'grid_thickness',
       required: true,
       type: 'text',
       col: 'col-xs-4',
-      value: morpheus.Util.nf(controller.heatmap.getGridThickness())
+      value: morpheus.Util.nf(heatMap.heatmap.getGridThickness())
     },
     {
       name: 'grid_color',
       required: true,
       type: 'color',
       col: 'col-xs-2',
-      value: controller.heatmap.getGridColor()
+      value: heatMap.heatmap.getGridColor()
     },
     {
       name: 'row_size',
       required: true,
       type: 'text',
       col: 'col-xs-4',
-      value: morpheus.Util.nf(controller.heatmap.getRowPositions()
+      value: morpheus.Util.nf(heatMap.heatmap.getRowPositions()
       .getSize())
     },
     {
@@ -123,15 +123,15 @@ morpheus.HeatMapOptions = function (controller) {
       required: true,
       type: 'text',
       col: 'col-xs-4',
-      value: morpheus.Util.nf(controller.heatmap
+      value: morpheus.Util.nf(heatMap.heatmap
       .getColumnPositions().getSize())
     }, {
       name: 'show_values',
       required: true,
       type: 'checkbox',
-      value: controller.heatmap.isDrawValues()
+      value: heatMap.heatmap.isDrawValues()
     }];
-  if (controller.rowDendrogram) {
+  if (heatMap.rowDendrogram) {
     displayItems
     .push({
       name: 'row_dendrogram_line_thickness',
@@ -139,11 +139,11 @@ morpheus.HeatMapOptions = function (controller) {
       type: 'text',
       col: 'col-xs-4',
       value: morpheus.Util
-      .nf(controller.rowDendrogram ? controller.rowDendrogram.lineWidth
+      .nf(heatMap.rowDendrogram ? heatMap.rowDendrogram.lineWidth
         : 1)
     });
   }
-  if (controller.columnDendrogram) {
+  if (heatMap.columnDendrogram) {
     displayItems
     .push({
       name: 'column_dendrogram_line_thickness',
@@ -151,7 +151,7 @@ morpheus.HeatMapOptions = function (controller) {
       type: 'text',
       col: 'col-xs-4',
       value: morpheus.Util
-      .nf(controller.columnDendrogram ? controller.columnDendrogram.lineWidth
+      .nf(heatMap.columnDendrogram ? heatMap.columnDendrogram.lineWidth
         : 1)
     });
   }
@@ -168,14 +168,14 @@ morpheus.HeatMapOptions = function (controller) {
       name: 'New Window',
       value: 1
     }],
-    value: controller.tooltipMode
+    value: heatMap.tooltipMode
   });
 
   displayItems.push({
     name: 'inline_tooltip',
     required: true,
     type: 'checkbox',
-    value: controller.options.inlineTooltip
+    value: heatMap.options.inlineTooltip
   });
 
   var colorSchemeFormBuilder = new morpheus.FormBuilder();
@@ -188,28 +188,28 @@ morpheus.HeatMapOptions = function (controller) {
   });
   var colorSchemeChooser = new morpheus.HeatMapColorSchemeChooser({
     showRelative: true,
-    colorScheme: controller.heatmap
+    colorScheme: heatMap.heatmap
     .getColorScheme()
   });
   var updatingSizer = false;
 
   function colorSchemeChooserUpdated() {
-    if (controller.heatmap.getColorScheme().getSizer
-      && controller.heatmap.getColorScheme().getSizer() != null) {
-      colorSchemeFormBuilder.setValue('size_by', controller.heatmap
+    if (heatMap.heatmap.getColorScheme().getSizer
+      && heatMap.heatmap.getColorScheme().getSizer() != null) {
+      colorSchemeFormBuilder.setValue('size_by', heatMap.heatmap
       .getColorScheme().getSizer().getSeriesName());
       colorSchemeFormBuilder.setEnabled('size_by_minimum',
-        controller.heatmap.getColorScheme().getSizer()
+        heatMap.heatmap.getColorScheme().getSizer()
         .getSeriesName() != null);
       colorSchemeFormBuilder.setEnabled('size_by_maximum',
-        controller.heatmap.getColorScheme().getSizer()
+        heatMap.heatmap.getColorScheme().getSizer()
         .getSeriesName() != null);
 
       if (!updatingSizer) {
         colorSchemeFormBuilder.setValue('size_by_minimum',
-          controller.heatmap.getColorScheme().getSizer().getMin());
+          heatMap.heatmap.getColorScheme().getSizer().getMin());
         colorSchemeFormBuilder.setValue('size_by_maximum',
-          controller.heatmap.getColorScheme().getSizer().getMax());
+          heatMap.heatmap.getColorScheme().getSizer().getMax());
       }
     }
   }
@@ -217,18 +217,18 @@ morpheus.HeatMapOptions = function (controller) {
   colorSchemeChooser.on('change', function () {
     colorSchemeChooserUpdated();
     // repaint the heat map when color scheme changes
-    controller.heatmap.setInvalid(true);
-    controller.heatmap.repaint();
+    heatMap.heatmap.setInvalid(true);
+    heatMap.heatmap.repaint();
     colorSchemeChooser.restoreCurrentValue();
   });
   function createMetadataField(isColumns) {
     var options = [];
     var value = {};
-    _.each(controller.getVisibleTrackNames(isColumns), function (name) {
+    _.each(heatMap.getVisibleTrackNames(isColumns), function (name) {
       value[name] = true;
     });
-    _.each(morpheus.MetadataUtil.getMetadataNames(isColumns ? controller
-      .getProject().getFullDataset().getColumnMetadata() : controller
+    _.each(morpheus.MetadataUtil.getMetadataNames(isColumns ? heatMap
+      .getProject().getFullDataset().getColumnMetadata() : heatMap
       .getProject().getFullDataset().getRowMetadata()),
       function (name) {
         options.push(name);
@@ -251,7 +251,7 @@ morpheus.HeatMapOptions = function (controller) {
   annotationsBuilder.append(createMetadataField(true));
   function annotationsListener($select, isColumns) {
     var names = [];
-    _.each(controller.getVisibleTrackNames(isColumns), function (name) {
+    _.each(heatMap.getVisibleTrackNames(isColumns), function (name) {
       names.push(name);
     });
     var values = $select.val();
@@ -272,7 +272,7 @@ morpheus.HeatMapOptions = function (controller) {
         visible: false
       });
     });
-    controller.setTrackVisibility(tracks);
+    heatMap.setTrackVisibility(tracks);
     colorSchemeChooser.restoreCurrentValue();
   }
 
@@ -298,34 +298,34 @@ morpheus.HeatMapOptions = function (controller) {
   var $displayDiv = $('<div class="tab-pane" id="' + displayOptionsTabId
     + '"></div>');
   $displayDiv.append($(displayFormBuilder.$form));
-  displayFormBuilder.setEnabled('grid_thickness', controller.heatmap.isDrawGrid());
-  displayFormBuilder.setEnabled('grid_color', controller.heatmap.isDrawGrid());
+  displayFormBuilder.setEnabled('grid_thickness', heatMap.heatmap.isDrawGrid());
+  displayFormBuilder.setEnabled('grid_color', heatMap.heatmap.isDrawGrid());
 
   displayFormBuilder.$form.find('[name=show_grid]').on('click', function (e) {
     var grid = $(this).prop('checked');
     displayFormBuilder.setEnabled('grid_thickness', grid);
     displayFormBuilder.setEnabled('grid_color', grid);
-    controller.heatmap.setDrawGrid(grid);
-    controller.revalidate();
+    heatMap.heatmap.setDrawGrid(grid);
+    heatMap.revalidate();
     colorSchemeChooser.restoreCurrentValue();
   });
   displayFormBuilder.$form.find('[name=show_values]').on('click', function (e) {
-    controller.heatmap.setDrawValues($(this).prop('checked'));
-    controller.revalidate();
+    heatMap.heatmap.setDrawValues($(this).prop('checked'));
+    heatMap.revalidate();
     colorSchemeChooser.restoreCurrentValue();
   });
   displayFormBuilder.$form.find('[name=inline_tooltip]').on('click',
     function (e) {
-      controller.options.inlineTooltip = $(this).prop('checked');
+      heatMap.options.inlineTooltip = $(this).prop('checked');
     });
 
   displayFormBuilder.$form.find('[name=grid_color]').on(
     'change',
     function (e) {
       var value = $(this).val();
-      controller.heatmap.setGridColor(value);
-      controller.heatmap.setInvalid(true);
-      controller.heatmap.repaint();
+      heatMap.heatmap.setGridColor(value);
+      heatMap.heatmap.setInvalid(true);
+      heatMap.heatmap.repaint();
     });
 
   displayFormBuilder.$form.find('[name=grid_thickness]').on(
@@ -333,9 +333,9 @@ morpheus.HeatMapOptions = function (controller) {
     _.debounce(function (e) {
       var value = parseFloat($(this).val());
       if (!isNaN(value)) {
-        controller.heatmap.setGridThickness(value);
-        controller.heatmap.setInvalid(true);
-        controller.heatmap.repaint();
+        heatMap.heatmap.setGridThickness(value);
+        heatMap.heatmap.setInvalid(true);
+        heatMap.heatmap.repaint();
       }
     }, 100));
 
@@ -344,45 +344,45 @@ morpheus.HeatMapOptions = function (controller) {
     _.debounce(function (e) {
       var value = parseFloat($(this).val());
       if (!isNaN(value)) {
-        controller.heatmap.getRowPositions().setSize(
+        heatMap.heatmap.getRowPositions().setSize(
           value);
-        controller.revalidate();
+        heatMap.revalidate();
         colorSchemeChooser.restoreCurrentValue();
       }
 
     }, 100));
   displayFormBuilder.$form.find('[name=info_window]').on('change',
     function (e) {
-      controller.setTooltipMode(parseInt($(this).val()));
+      heatMap.setTooltipMode(parseInt($(this).val()));
     });
   displayFormBuilder.find('link_rows_and_columns').on('click',
     function (e) {
       var checked = $(this).prop('checked');
       if (checked) {
-        controller.getProject().setSymmetric(controller);
+        heatMap.getProject().setSymmetric(heatMap);
       } else {
-        controller.getProject().setSymmetric(null);
+        heatMap.getProject().setSymmetric(null);
       }
     });
 
   var $colorByValue = colorSchemeFormBuilder.$form
   .find('[name=color_by_value]');
-  var separateSchemesField = controller.heatmap.getColorScheme()
+  var separateSchemesField = heatMap.heatmap.getColorScheme()
   .getSeparateColorSchemeForRowMetadataField();
   if (separateSchemesField != null) {
     $colorByValue.html(morpheus.Util.createOptions(morpheus.VectorUtil
     .createValueToIndexMap(
-      controller.project.getFullDataset().getRowMetadata()
+      heatMap.project.getFullDataset().getRowMetadata()
       .getByName(separateSchemesField)).keys()));
   }
 
   if (separateSchemesField != null) {
     colorSchemeChooser.setCurrentValue($colorByValue.val());
   }
-  if (controller.heatmap.getColorScheme().getSizer
-    && controller.heatmap.getColorScheme().getSizer() != null
-    && controller.heatmap.getColorScheme().getSizer().getSeriesName()) {
-    colorSchemeFormBuilder.setValue('size_by', controller.heatmap
+  if (heatMap.heatmap.getColorScheme().getSizer
+    && heatMap.heatmap.getColorScheme().getSizer() != null
+    && heatMap.heatmap.getColorScheme().getSizer().getSeriesName()) {
+    colorSchemeFormBuilder.setValue('size_by', heatMap.heatmap
     .getColorScheme().getSizer().getSeriesName());
   }
   colorSchemeFormBuilder.$form.find('[name=size_by]')
@@ -422,7 +422,7 @@ morpheus.HeatMapOptions = function (controller) {
     function (e) {
       e.preventDefault();
       var conditionalRenderingUI = new morpheus.ConditionalRenderingUI(
-        controller);
+        heatMap);
       morpheus.FormBuilder.showInModal({
         title: 'Conditional Rendering',
         html: conditionalRenderingUI.$div,
@@ -433,7 +433,7 @@ morpheus.HeatMapOptions = function (controller) {
 
   colorSchemeFormBuilder.find('save_color_scheme').on('click', function (e) {
     e.preventDefault();
-    var blob = new Blob([JSON.stringify(controller.heatmap.getColorScheme().toJSON())], {
+    var blob = new Blob([JSON.stringify(heatMap.heatmap.getColorScheme().toJSON())], {
       type: 'application/json'
     });
     saveAs(blob, 'color_scheme.json');
@@ -444,12 +444,12 @@ morpheus.HeatMapOptions = function (controller) {
         morpheus.Util.getText(e.value).done(
           function (text) {
             var json = JSON.parse($.trim(text));
-            controller.heatmap.getColorScheme().fromJSON(json);
+            heatMap.heatmap.getColorScheme().fromJSON(json);
             colorSchemeChooser
-            .setColorScheme(controller.heatmap
+            .setColorScheme(heatMap.heatmap
             .getColorScheme());
-            controller.heatmap.setInvalid(true);
-            controller.heatmap.repaint();
+            heatMap.heatmap.setInvalid(true);
+            heatMap.heatmap.repaint();
 
           }).fail(function () {
           morpheus.FormBuilder.showInModal({
@@ -470,21 +470,21 @@ morpheus.HeatMapOptions = function (controller) {
       var val = $(this).val();
       if (val !== '') {
         if (val === 'gene') {
-          controller.heatmap
+          heatMap.heatmap
           .getColorScheme()
           .setColorSupplierForCurrentValue(
             morpheus.HeatMapColorScheme
             .createColorSupplier(morpheus.HeatMapColorScheme.Predefined
             .RELATIVE()));
         } else if (val === 'cn') {
-          controller.heatmap
+          heatMap.heatmap
           .getColorScheme()
           .setColorSupplierForCurrentValue(
             morpheus.HeatMapColorScheme
             .createColorSupplier(morpheus.HeatMapColorScheme.Predefined
             .CN()));
         } else if (val === 'wtcs') {
-          controller.heatmap.getColorScheme()
+          heatMap.heatmap.getColorScheme()
           .setColorSupplierForCurrentValue(
             morpheus.HeatMapColorScheme
             .createColorSupplier({
@@ -504,21 +504,21 @@ morpheus.HeatMapOptions = function (controller) {
               }]
             }));
         } else if (val === 'MAF') {
-          controller.heatmap
+          heatMap.heatmap
           .getColorScheme()
           .setColorSupplierForCurrentValue(
             morpheus.HeatMapColorScheme
             .createColorSupplier(morpheus.HeatMapColorScheme.Predefined
             .MAF()));
         } else if (val === 'binary') {
-          controller.heatmap
+          heatMap.heatmap
           .getColorScheme()
           .setColorSupplierForCurrentValue(
             morpheus.HeatMapColorScheme
             .createColorSupplier(morpheus.HeatMapColorScheme.Predefined
             .BINARY()));
         } else if (val === '100scale1') {
-          controller.heatmap
+          heatMap.heatmap
           .getColorScheme()
           .setColorSupplierForCurrentValue(
             morpheus.HeatMapColorScheme
@@ -526,7 +526,7 @@ morpheus.HeatMapOptions = function (controller) {
             .SUMMLY()));
 
         } else if (val === '100scale2') {
-          controller.heatmap
+          heatMap.heatmap
           .getColorScheme()
           .setColorSupplierForCurrentValue(
             morpheus.HeatMapColorScheme
@@ -537,10 +537,10 @@ morpheus.HeatMapOptions = function (controller) {
           console.log('not found');
         }
         colorSchemeChooser
-        .setColorScheme(controller.heatmap
+        .setColorScheme(heatMap.heatmap
         .getColorScheme());
-        controller.heatmap.setInvalid(true);
-        controller.heatmap.repaint();
+        heatMap.heatmap.setInvalid(true);
+        heatMap.heatmap.repaint();
         $(this).val('');
       } else {
         console.log('empty option selected');
@@ -557,7 +557,7 @@ morpheus.HeatMapOptions = function (controller) {
         colorByField = null;
       }
       var colorByValue = null;
-      controller.heatmap.getColorScheme()
+      heatMap.heatmap.getColorScheme()
       .setSeparateColorSchemeForRowMetadataField(
         colorByField);
       if (colorByField != null) {
@@ -565,7 +565,7 @@ morpheus.HeatMapOptions = function (controller) {
         .html(morpheus.Util
         .createOptions(morpheus.VectorUtil
         .createValueToIndexMap(
-          controller.project
+          heatMap.project
           .getFullDataset()
           .getRowMetadata()
           .getByName(
@@ -576,54 +576,54 @@ morpheus.HeatMapOptions = function (controller) {
         $colorByValue.html('');
       }
 
-      controller.heatmap.getColorScheme().setCurrentValue(
+      heatMap.heatmap.getColorScheme().setCurrentValue(
         colorByValue);
       colorSchemeChooser.setCurrentValue(colorByValue);
-      controller.heatmap.setInvalid(true);
-      controller.heatmap.repaint();
-      colorSchemeChooser.setColorScheme(controller.heatmap
+      heatMap.heatmap.setInvalid(true);
+      heatMap.heatmap.repaint();
+      colorSchemeChooser.setColorScheme(heatMap.heatmap
       .getColorScheme());
     });
   $colorByValue.on('change', function (e) {
-    if (controller.heatmap.getColorScheme()
+    if (heatMap.heatmap.getColorScheme()
       .getSeparateColorSchemeForRowMetadataField() == null) {
       colorSchemeChooser.setCurrentValue(null);
-      controller.heatmap.getColorScheme().setCurrentValue(null);
-      colorSchemeChooser.setColorScheme(controller.heatmap
+      heatMap.heatmap.getColorScheme().setCurrentValue(null);
+      colorSchemeChooser.setColorScheme(heatMap.heatmap
       .getColorScheme());
     } else {
       colorSchemeChooser.setCurrentValue($colorByValue.val());
-      colorSchemeChooser.setColorScheme(controller.heatmap
+      colorSchemeChooser.setColorScheme(heatMap.heatmap
       .getColorScheme());
     }
   });
   displayFormBuilder.$form.find('[name=column_size]').on(
     'keyup',
     _.debounce(function (e) {
-      controller.heatmap.getColumnPositions().setSize(
+      heatMap.heatmap.getColumnPositions().setSize(
         parseFloat($(this).val()));
-      controller.revalidate();
+      heatMap.revalidate();
       colorSchemeChooser.restoreCurrentValue();
 
     }, 100));
   displayFormBuilder.$form.find('[name=gap_size]').on('keyup',
     _.debounce(function (e) {
-      controller.gapSize = parseFloat($(this).val());
-      controller.revalidate();
+      heatMap.gapSize = parseFloat($(this).val());
+      heatMap.revalidate();
       colorSchemeChooser.restoreCurrentValue();
     }, 100));
   displayFormBuilder.$form.find('[name=squish_factor]').on('keyup',
     _.debounce(function (e) {
       var f = parseFloat($(this).val());
-      controller.heatmap.getColumnPositions().setSquishFactor(f);
-      controller.heatmap.getRowPositions().setSquishFactor(f);
-      controller.revalidate();
+      heatMap.heatmap.getColumnPositions().setSquishFactor(f);
+      heatMap.heatmap.getRowPositions().setSquishFactor(f);
+      heatMap.revalidate();
       colorSchemeChooser.restoreCurrentValue();
     }, 100));
   displayFormBuilder.$form.find('[name=row_dendrogram_line_thickness]').on(
     'keyup', _.debounce(function (e) {
-      controller.rowDendrogram.lineWidth = parseFloat($(this).val());
-      controller.revalidate();
+      heatMap.rowDendrogram.lineWidth = parseFloat($(this).val());
+      heatMap.revalidate();
       colorSchemeChooser.restoreCurrentValue();
 
     }, 100));
@@ -631,9 +631,9 @@ morpheus.HeatMapOptions = function (controller) {
   .on(
     'keyup',
     _.debounce(function (e) {
-      controller.columnDendrogram.lineWidth = parseFloat($(
+      heatMap.columnDendrogram.lineWidth = parseFloat($(
         this).val());
-      controller.revalidate();
+      heatMap.revalidate();
       colorSchemeChooser.restoreCurrentValue();
     }, 100));
   var $tab = $('<div class="tab-content"></div>');
@@ -651,7 +651,7 @@ morpheus.HeatMapOptions = function (controller) {
   $ul.appendTo($div);
   $tab.appendTo($div);
   // set current scheme
-  colorSchemeChooser.setColorScheme(controller.heatmap.getColorScheme());
+  colorSchemeChooser.setColorScheme(heatMap.heatmap.getColorScheme());
   colorSchemeChooserUpdated();
   $ul.find('[role=tab]:eq(1)').tab('show');
   morpheus.FormBuilder.showInModal({

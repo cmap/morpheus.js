@@ -83,7 +83,7 @@ morpheus.TsneTool.prototype = {
   },
   execute: function (options) {
     var project = options.project;
-    var controller = options.controller;
+    var heatMap = options.heatMap;
     var rows = options.input.project == 'Rows';
     var dataset = project.getSortedFilteredDataset();
     options.input.epsilon = parseInt(options.input.epsilon);
@@ -133,7 +133,7 @@ morpheus.TsneTool.prototype = {
         inheritFromParentOptions: {transpose: !rows},
         name: 't-SNE',
         dataset: newDataset,
-        parent: controller,
+        parent: heatMap,
         columns: [{
           field: 'id',
           display: 'text'

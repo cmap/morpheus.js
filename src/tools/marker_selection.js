@@ -224,7 +224,7 @@ morpheus.MarkerSelection.prototype = {
         name);
       if (index !== -1) {
         dataset.getRowMetadata().remove(index);
-        options.controller.removeTrack(name, false);
+        options.heatMap.removeTrack(name, false);
       }
     });
     var v = dataset.getRowMetadata().add(f.toString());

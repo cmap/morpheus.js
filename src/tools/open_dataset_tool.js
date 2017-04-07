@@ -96,7 +96,7 @@ morpheus.OpenDatasetTool.prototype = {
   _read: function (options, deferred) {
     var _this = this;
     var project = options.project;
-    var controller = options.controller;
+    var heatMap = options.heatMap;
     var file = options.input.file;
     var action = options.input.open_file_action;
     var dataset = project.getSortedFilteredDataset();
@@ -124,7 +124,7 @@ morpheus.OpenDatasetTool.prototype = {
         // "append": append rows to current dataset
         var appendRows = action === 'append';
         // rename fields?
-        _.each(controller.options.rows, function (item) {
+        _.each(heatMap.options.rows, function (item) {
           if (item.renameTo) {
             var v = newDataset.getRowMetadata().getByName(
               item.field);
@@ -133,7 +133,7 @@ morpheus.OpenDatasetTool.prototype = {
             }
           }
         });
-        _.each(controller.options.columns, function (item) {
+        _.each(heatMap.options.columns, function (item) {
           if (item.renameTo) {
             var v = newDataset.getColumnMetadata()
             .getByName(item.field);
@@ -143,8 +143,8 @@ morpheus.OpenDatasetTool.prototype = {
           }
         });
 
-        if (controller.options.datasetReady) {
-          controller.options.datasetReady(newDataset);
+        if (heatMap.options.datasetReady) {
+          heatMap.options.datasetReady(newDataset);
         }
         var currentDatasetMetadataNames = morpheus.MetadataUtil
         .getMetadataNames(!appendRows ? dataset
@@ -162,9 +162,9 @@ morpheus.OpenDatasetTool.prototype = {
           ._matchAppend(
             newDatasetMetadataNames,
             currentDatasetMetadataNames,
-            controller,
+            heatMap,
             function (appendOptions) {
-              controller
+              heatMap
               .getProject()
               .setFullDataset(
                 appendRows ? new morpheus.JoinedDataset(
@@ -182,20 +182,20 @@ morpheus.OpenDatasetTool.prototype = {
                     appendOptions.new_dataset_annotation_name)),
                 true);
 
-              if (controller.options.renderReady) {
-                controller.options
-                .renderReady(controller);
-                controller.updateDataset();
+              if (heatMap.options.renderReady) {
+                heatMap.options
+                .renderReady(heatMap);
+                heatMap.updateDataset();
               }
               if (appendRows) {
-                controller
+                heatMap
                 .getHeatMapElementComponent()
                 .getColorScheme()
                 .setSeparateColorSchemeForRowMetadataField(
                   'Source');
 
                 var sourcesSet = morpheus.VectorUtil
-                .getSet(controller
+                .getSet(heatMap
                 .getProject()
                 .getFullDataset()
                 .getRowMetadata()
@@ -203,7 +203,7 @@ morpheus.OpenDatasetTool.prototype = {
                   'Source'));
                 sourcesSet
                 .forEach(function (source) {
-                  controller
+                  heatMap
                   .autoDisplay({
                     extension: morpheus.Util
                     .getExtension(source),
@@ -212,34 +212,34 @@ morpheus.OpenDatasetTool.prototype = {
                 });
               }
 
-              controller.tabManager
+              heatMap.tabManager
               .setTabTitle(
-                controller.tabId,
-                controller
+                heatMap.tabId,
+                heatMap
                 .getProject()
                 .getFullDataset()
                 .getRowCount()
                 + ' row'
                 + morpheus.Util
-                .s(controller
+                .s(heatMap
                 .getProject()
                 .getFullDataset()
                 .getRowCount())
                 + ' x '
-                + controller
+                + heatMap
                 .getProject()
                 .getFullDataset()
                 .getColumnCount()
                 + ' column'
                 + morpheus.Util
-                .s(controller
+                .s(heatMap
                 .getProject()
                 .getFullDataset()
                 .getColumnCount()));
-              controller.revalidate();
+              heatMap.revalidate();
             });
         } else { // no need to prompt
-          controller
+          heatMap
           .getProject()
           .setFullDataset(
             appendRows ? new morpheus.JoinedDataset(
@@ -256,47 +256,47 @@ morpheus.OpenDatasetTool.prototype = {
                 currentDatasetMetadataNames[0],
                 newDatasetMetadataNames[0])),
             true);
-          if (controller.options.renderReady) {
-            controller.options.renderReady(controller);
-            controller.updateDataset();
+          if (heatMap.options.renderReady) {
+            heatMap.options.renderReady(heatMap);
+            heatMap.updateDataset();
           }
           if (appendRows) {
-            controller
+            heatMap
             .getHeatMapElementComponent()
             .getColorScheme()
             .setSeparateColorSchemeForRowMetadataField(
               'Source');
             var sourcesSet = morpheus.VectorUtil
-            .getSet(controller.getProject()
+            .getSet(heatMap.getProject()
             .getFullDataset()
             .getRowMetadata().getByName(
               'Source'));
             sourcesSet.forEach(function (source) {
-              controller.autoDisplay({
+              heatMap.autoDisplay({
                 extension: morpheus.Util
                 .getExtension(source),
                 filename: source
               });
             });
           }
-          controller.tabManager.setTabTitle(controller.tabId,
-            controller.getProject().getFullDataset()
+          heatMap.tabManager.setTabTitle(heatMap.tabId,
+            heatMap.getProject().getFullDataset()
             .getRowCount()
             + ' row'
-            + morpheus.Util.s(controller
+            + morpheus.Util.s(heatMap
             .getProject()
             .getFullDataset()
             .getRowCount())
             + ' x '
-            + controller.getProject()
+            + heatMap.getProject()
             .getFullDataset()
             .getColumnCount()
             + ' column'
-            + morpheus.Util.s(controller
+            + morpheus.Util.s(heatMap
             .getProject()
             .getFullDataset()
             .getColumnCount()));
-          controller.revalidate();
+          heatMap.revalidate();
         }
 
       } else if (action === 'overlay') {
@@ -314,7 +314,7 @@ morpheus.OpenDatasetTool.prototype = {
           morpheus.MetadataUtil
           .getMetadataNames(dataset
           .getRowMetadata()),
-          controller,
+          heatMap,
           function (appendOptions) {
             morpheus.DatasetUtil.overlay({
               dataset: dataset,
@@ -328,7 +328,7 @@ morpheus.OpenDatasetTool.prototype = {
       } else if (action === 'open') { // new tab
         new morpheus.HeatMap({
           dataset: newDataset,
-          parent: controller,
+          parent: heatMap,
           inheritFromParent: false
         });
 
@@ -336,7 +336,7 @@ morpheus.OpenDatasetTool.prototype = {
         console.log('Unknown action: ' + action);
       }
 
-      controller.revalidate();
+      heatMap.revalidate();
     });
   },
   execute: function (options) {
@@ -356,7 +356,7 @@ morpheus.OpenDatasetTool.prototype = {
 
   }, // prompt for metadata field name in dataset and in file
   _matchAppend: function (newDatasetMetadataNames,
-                          currentDatasetMetadataNames, controller, callback) {
+                          currentDatasetMetadataNames, heatMap, callback) {
     var tool = {};
     tool.execute = function (options) {
       return options.input;
@@ -381,11 +381,11 @@ morpheus.OpenDatasetTool.prototype = {
       });
       return items;
     };
-    morpheus.HeatMap.showTool(tool, controller, callback);
+    morpheus.HeatMap.showTool(tool, heatMap, callback);
   },
   _matchOverlay: function (newDatasetColumnMetadataNames,
                            currentDatasetColumnMetadataNames, newDatasetRowMetadataNames,
-                           currentDatasetRowMetadataNames, controller, callback) {
+                           currentDatasetRowMetadataNames, heatMap, callback) {
     var tool = {};
     tool.execute = function (options) {
       return options.input;
@@ -425,6 +425,6 @@ morpheus.OpenDatasetTool.prototype = {
       });
       return items;
     };
-    morpheus.HeatMap.showTool(tool, controller, callback);
+    morpheus.HeatMap.showTool(tool, heatMap, callback);
   }
 };

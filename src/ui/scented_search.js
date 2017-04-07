@@ -2,13 +2,13 @@
  * @param model{morpheus.SelectionModel}
  */
 morpheus.ScentedSearch = function (model, positions, isVertical, scrollbar,
-                                   controller) {
+                                   heatMap) {
   morpheus.AbstractCanvas.call(this, false);
   this.model = model;
   this.positions = positions;
   this.isVertical = isVertical;
   this.scrollbar = scrollbar;
-  this.controller = controller;
+  this.heatMap = heatMap;
   this.searchIndices = [];
   scrollbar.decorator = this;
   var _this = this;
@@ -22,10 +22,10 @@ morpheus.ScentedSearch = function (model, positions, isVertical, scrollbar,
       heatMapLens: indices.length >= 0
     };
     if (isVertical) {
-      controller.setToolTip(indices.length >= 0 ? indices : null,
+      heatMap.setToolTip(indices.length >= 0 ? indices : null,
         -1, tipOptions);
     } else {
-      controller.setToolTip(-1, indices.length >= 0 ? indices
+      heatMap.setToolTip(-1, indices.length >= 0 ? indices
         : null, tipOptions);
     }
 
@@ -35,7 +35,7 @@ morpheus.ScentedSearch = function (model, positions, isVertical, scrollbar,
     // but the canvas cursor has no effect
     document.body.style.cursor = 'default';
     scrollbar.canvas.style.cursor = 'default';
-    controller.setToolTip(-1, -1, {event: e});
+    heatMap.setToolTip(-1, -1, {event: e});
   };
   var showPopup = function (e) {
     e.preventDefault();
@@ -51,9 +51,9 @@ morpheus.ScentedSearch = function (model, positions, isVertical, scrollbar,
 
         {
           name: 'Selection To Top',
-          checked: controller.getToolbar().isSelectionOnTop(!isVertical),
-          disabled: isVertical ? controller.getProject().getRowSelectionModel()
-            .count() === 0 : controller.getProject().getColumnSelectionModel()
+          checked: heatMap.getToolbar().isSelectionOnTop(!isVertical),
+          disabled: isVertical ? heatMap.getProject().getRowSelectionModel()
+            .count() === 0 : heatMap.getProject().getColumnSelectionModel()
             .count() === 0
         },
         {
@@ -66,14 +66,14 @@ morpheus.ScentedSearch = function (model, positions, isVertical, scrollbar,
       e.target,
       function (event, item) {
         if (item === 'Selection To Top') {
-          controller.getToolbar().setSelectionOnTop({
+          heatMap.getToolbar().setSelectionOnTop({
             isColumns: !isVertical,
-            isOnTop: !controller.getToolbar().isSelectionOnTop(!isVertical),
+            isOnTop: !heatMap.getToolbar().isSelectionOnTop(!isVertical),
             updateButtonStatus: true
           });
         } else {
           morpheus.HeatMap.showTool(new morpheus.NewHeatMapTool(),
-            controller);
+            heatMap);
         }
       });
     return false;
@@ -156,10 +156,10 @@ morpheus.ScentedSearch.prototype = {
     this.scrollbar.canvas.style.cursor = index < 0 ? 'default' : 'pointer';
     if (index >= 0) {
       if (this.isVertical) {
-        this.controller.scrollTop(this.positions
+        this.heatMap.scrollTop(this.positions
         .getPosition(this.searchIndices[index]));
       } else {
-        this.controller.scrollLeft(this.positions
+        this.heatMap.scrollLeft(this.positions
         .getPosition(this.searchIndices[index]));
       }
       return true;
@@ -187,7 +187,7 @@ morpheus.ScentedSearch.prototype = {
     this.drawHoverMatchingValues(context);
   },
   drawHoverMatchingValues: function (context) {
-    var heatmap = this.controller;
+    var heatmap = this.heatMap;
     context.fillStyle = 'black';
     if (heatmap.mousePositionOptions
       && heatmap.mousePositionOptions.name != null) {

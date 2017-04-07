@@ -11,6 +11,9 @@ morpheus.OpenFileTool.prototype = {
       value: 'open',
       type: 'bootstrap-select',
       options: [{
+        name: 'Open session',
+        value: 'Open session'
+      }, {divider: true}, {
         name: 'Annotate columns',
         value: 'Annotate Columns'
       }, {
@@ -55,6 +58,7 @@ morpheus.OpenFileTool.prototype = {
     return array;
   },
   init: function (project, form, initOptions) {
+    var $preloaded = $('<div></div>');
     form.$form.find('[name=open_file_action]').on(
       'change',
       function (e) {
@@ -63,12 +67,18 @@ morpheus.OpenFileTool.prototype = {
           || action === 'open' || action === 'overlay') {
           form.setHelpText('file',
             morpheus.DatasetUtil.DATASET_FILE_FORMATS);
+          $preloaded.show();
         } else if (action === 'Open dendrogram') {
           form.setHelpText('file',
             morpheus.DatasetUtil.DENDROGRAM_FILE_FORMATS);
+          $preloaded.hide();
+        } else if (action === 'Open session') {
+          form.setHelpText('file', morpheus.DatasetUtil.SESSION_FILE_FORMAT);
+          $preloaded.hide();
         } else {
           form.setHelpText('file',
             morpheus.DatasetUtil.ANNOTATION_FILE_FORMATS);
+          $preloaded.hide();
         }
       });
     if (this.options.file == null) {
@@ -76,20 +86,19 @@ morpheus.OpenFileTool.prototype = {
         form.$form.find('.form-group:first'));
       var _this = this;
       var id = _.uniqueId('morpheus');
-      form.$form
-      .append('<h4><a role="button" data-toggle="collapse" href="#'
-        + id
-        + '" aria-expanded="false" aria-controls="'
-        + id + '">Or select a preloaded dataset</a></h4>');
       var $sampleDatasets = $('<div class="collapse" id="' + id
         + '" style="overflow:auto;"></div>');
-      form.$form.append($sampleDatasets);
+      $('<h4><a role="button" data-toggle="collapse" href="#'
+        + id
+        + '" aria-expanded="false" aria-controls="'
+        + id + '">Or select a preloaded dataset</a></h4>').appendTo($preloaded);
+      $sampleDatasets.append($preloaded);
+      $preloaded.appendTo(form.$form);
       var sampleDatasets = new morpheus.SampleDatasets({
         $el: $sampleDatasets,
         callback: function (heatMapOptions) {
           form.setValue('file', heatMapOptions.dataset);
           _this.ok();
-
         }
       });
     }
@@ -106,21 +115,36 @@ morpheus.OpenFileTool.prototype = {
   execute: function (options) {
     var that = this;
     var isInteractive = this.options.file == null;
+    var heatMap = options.heatMap;
     if (!isInteractive) {
       options.input.file = this.options.file;
     }
 
     var project = options.project;
-    if (options.input.open_file_action === 'append columns'
+    if (options.input.open_file_action === 'Open session') {
+      morpheus.Util.getText(options.input.file).done(function (text) {
+        var options = JSON.parse(text);
+        options.tabManager = heatMap.getTabManager();
+        options.focus = true;
+        options.inheritFromParent = false;
+        options.landingPage = heatMap.options.landingPage;
+        new morpheus.HeatMap(options);
+      }).fail(function (err) {
+        morpheus.FormBuilder.showMessageModal({
+          title: 'Error',
+          message: 'Unable to load session'
+        });
+      });
+    } else if (options.input.open_file_action === 'append columns'
       || options.input.open_file_action === 'append'
       || options.input.open_file_action === 'open'
       || options.input.open_file_action === 'overlay') {
       new morpheus.OpenDatasetTool().execute(options);
     } else if (options.input.open_file_action === 'Open dendrogram') {
       morpheus.HeatMap.showTool(new morpheus.OpenDendrogramTool(
-        options.input.file), options.controller);
+        options.input.file), options.heatMap);
     } else { // annotate rows or columns
-      var controller = options.controller;
+
       var isAnnotateColumns = options.input.open_file_action == 'Annotate Columns';
       var fileOrUrl = options.input.file;
       var dataset = project.getFullDataset();
@@ -128,7 +152,7 @@ morpheus.OpenFileTool.prototype = {
       if (morpheus.Util.endsWith(fileName, '.cls')) {
         var result = morpheus.Util.readLines(fileOrUrl);
         result.done(function (lines) {
-          that.annotateCls(controller, dataset, fileName,
+          that.annotateCls(heatMap, dataset, fileName,
             isAnnotateColumns, lines);
         });
       } else if (morpheus.Util.endsWith(fileName, '.gmt')) {
@@ -140,21 +164,21 @@ morpheus.OpenFileTool.prototype = {
           var sets = new morpheus.GmtReader()
           .read(new morpheus.ArrayBufferReader(new Uint8Array(
             buf)));
-          that.promptSets(dataset, controller, isAnnotateColumns,
+          that.promptSets(dataset, heatMap, isAnnotateColumns,
             sets, morpheus.Util.getBaseFileName(morpheus.Util.getFileName(fileOrUrl)));
         });
 
       } else {
         var result = morpheus.Util.readLines(fileOrUrl);
         result.done(function (lines) {
-          that.prompt(lines, dataset, controller, isAnnotateColumns);
+          that.prompt(lines, dataset, heatMap, isAnnotateColumns);
         });
 
       }
 
     }
   },
-  annotateCls: function (controller, dataset, fileName, isColumns, lines) {
+  annotateCls: function (heatMap, dataset, fileName, isColumns, lines) {
     if (isColumns) {
       dataset = morpheus.DatasetUtil.transposedView(dataset);
     }
@@ -168,8 +192,8 @@ morpheus.OpenFileTool.prototype = {
     for (var i = 0; i < assignments.length; i++) {
       vector.setValue(i, assignments[i]);
     }
-    if (controller) {
-      controller.getProject().trigger('trackChanged', {
+    if (heatMap) {
+      heatMap.getProject().trigger('trackChanged', {
         vectors: [vector],
         render: ['color'],
         columns: isColumns
@@ -307,7 +331,7 @@ morpheus.OpenFileTool.prototype = {
     return vectors;
   },
   // prompt for metadata field name in dataset
-  promptSets: function (dataset, controller, isColumns, sets, setSourceFileName) {
+  promptSets: function (dataset, heatMap, isColumns, sets, setSourceFileName) {
     var promptTool = {};
     var _this = this;
     promptTool.execute = function (options) {
@@ -315,7 +339,7 @@ morpheus.OpenFileTool.prototype = {
       var vector = _this.annotateSets(dataset, isColumns, sets,
         metadataName, setSourceFileName);
 
-      controller.getProject().trigger('trackChanged', {
+      heatMap.getProject().trigger('trackChanged', {
         vectors: [vector],
         render: ['text'],
         columns: isColumns
@@ -329,17 +353,17 @@ morpheus.OpenFileTool.prototype = {
         name: 'dataset_field_name',
         options: morpheus.MetadataUtil
         .getMetadataNames(isColumns ? dataset
-          .getColumnMetadata() : dataset.getRowMetadata()),
+        .getColumnMetadata() : dataset.getRowMetadata()),
         type: 'select',
         value: 'id',
         required: true
       }];
 
     };
-    morpheus.HeatMap.showTool(promptTool, controller);
+    morpheus.HeatMap.showTool(promptTool, heatMap);
 
   },
-  prompt: function (lines, dataset, controller, isColumns) {
+  prompt: function (lines, dataset, heatMap, isColumns) {
     var promptTool = {};
     var _this = this;
     var header = lines != null ? lines[0].split('\t') : null;
@@ -356,7 +380,7 @@ morpheus.OpenFileTool.prototype = {
         nameToIndex.set(vectors[i].getName(), i);
       }
       if (lines.colors) {
-        var colorModel = isColumns ? controller.getProject().getColumnColorModel() : controller.getProject().getRowColorModel();
+        var colorModel = isColumns ? heatMap.getProject().getColumnColorModel() : heatMap.getProject().getRowColorModel();
         lines.colors.forEach(function (item) {
           var index = nameToIndex.get(item.header);
           var vector = vectors[index];
@@ -364,7 +388,7 @@ morpheus.OpenFileTool.prototype = {
           colorModel.setMappedValue(vector, item.value, item.color);
         });
       }
-      controller.getProject().trigger('trackChanged', {
+      heatMap.getProject().trigger('trackChanged', {
         vectors: vectors,
         render: render,
         columns: isColumns
@@ -378,7 +402,7 @@ morpheus.OpenFileTool.prototype = {
         name: 'dataset_field_name',
         options: morpheus.MetadataUtil
         .getMetadataNames(isColumns ? dataset
-          .getColumnMetadata() : dataset.getRowMetadata()),
+        .getColumnMetadata() : dataset.getRowMetadata()),
         type: 'select',
         required: true
       }];
@@ -397,6 +421,6 @@ morpheus.OpenFileTool.prototype = {
       }
       return items;
     };
-    morpheus.HeatMap.showTool(promptTool, controller);
+    morpheus.HeatMap.showTool(promptTool, heatMap);
   }
 };

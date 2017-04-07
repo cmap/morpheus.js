@@ -14,7 +14,7 @@ morpheus.DevAPI.prototype = {
     }];
   },
   execute: function (options) {
-    var heatMap = options.controller;
+    var heatMap = options.heatMap;
     var code = options.input.code;
     eval(code);
     // force a repaint of everything

@@ -257,260 +257,15 @@ morpheus.KeyboardCharMap = [
   '' // [255]
 ];
 morpheus.HeatMapKeyListener = function (heatMap) {
-  /**
-   * Shortcut object contains
-   * @param options.which Array of key codes
-   * @param options.shift Whether shift key is required
-   * @param options.commandKey Whether command key is required
-   * @param options.name Shortcut name
-   * @param options.cb Function callback
-   * @param options.accept Additional function to test whether to accept shortcut
-   */
-  var shortcutsWhenNotInInputField = [];
-  var shortcuts = [];
-  shortcutsWhenNotInInputField.push({
-    which: [107, 61, 187],
-    name: 'Zoom In',
-    cb: function () {
-      heatMap.zoom(true);
-    }
+  var allActions = heatMap.getActionManager().getActions();
+  var actions = allActions.filter(function (a) {
+    return a.cb != null && a.which != null;
   });
-  shortcutsWhenNotInInputField.push({
-    which: [173, 189, 109],
-    name: 'Zoom Out',
-    cb: function () {
-      heatMap.zoom(false);
-    }
+  allActions.sort(function (a, b) {
+    a = a.name.toLowerCase();
+    b = b.name.toLowerCase();
+    return (a === b ? 0 : (a < b ? -1 : 1));
   });
-  shortcutsWhenNotInInputField.push({
-    which: [35],
-    name: 'Go To End',
-    cb: function () {
-      heatMap.scrollLeft(heatMap.heatmap.getPreferredSize().width);
-      heatMap.scrollTop(heatMap.heatmap.getPreferredSize().height);
-    }
-  });
-  shortcutsWhenNotInInputField.push({
-    which: [36], // home key
-    name: 'Go To Start',
-    cb: function () {
-      heatMap.scrollLeft(0);
-      heatMap.scrollTop(0);
-    }
-  });
-  shortcutsWhenNotInInputField.push({
-    which: [34], // page down
-    commandKey: true,
-    name: 'Go To Bottom',
-    cb: function () {
-      heatMap
-      .scrollTop(heatMap.heatmap.getPreferredSize().height);
-    }
-  });
-  shortcutsWhenNotInInputField.push({
-    which: [34], // page down
-    commandKey: false,
-    name: 'Scroll Page Down',
-    cb: function () {
-      var pos = heatMap.scrollTop();
-      heatMap.scrollTop(pos + heatMap.heatmap.getUnscaledHeight()
-        - 2);
-    }
-  });
-
-  shortcutsWhenNotInInputField.push({
-    which: [33], // page up
-    commandKey: true,
-    name: 'Go To Top',
-    cb: function () {
-      heatMap
-      .scrollTop(0);
-    }
-  });
-  shortcutsWhenNotInInputField.push({
-    which: [33], // page up
-    commandKey: false,
-    name: 'Scroll Page Up',
-    cb: function () {
-      var pos = heatMap.scrollTop();
-      heatMap.scrollTop(pos - heatMap.heatmap.getUnscaledHeight()
-        + 2);
-    }
-  });
-
-  shortcutsWhenNotInInputField.push({
-    which: [38], // up arrow
-    commandKey: true,
-    name: 'Zoom Out Rows',
-    cb: function () {
-      heatMap.zoom(false, {
-        columns: false,
-        rows: true
-      });
-    }
-  });
-  shortcutsWhenNotInInputField.push({
-    which: [38], // up arrow
-    commandKey: false,
-    name: 'Scroll Up',
-    cb: function () {
-      heatMap.scrollTop(heatMap.scrollTop() - 8);
-    }
-  });
-
-  shortcutsWhenNotInInputField.push({
-    which: [40], // down arrow
-    commandKey: true,
-    name: 'Zoom In Rows',
-    cb: function () {
-      heatMap.zoom(true, {
-        columns: false,
-        rows: true
-      });
-    }
-  });
-  shortcutsWhenNotInInputField.push({
-    which: [40], // down arrow
-    commandKey: false,
-    name: 'Scroll Down',
-    cb: function () {
-      heatMap.scrollTop(heatMap.scrollTop() + 8);
-    }
-  });
-
-  shortcutsWhenNotInInputField.push({
-    which: [37], // left arrow
-    commandKey: true,
-    name: 'Zoom Out Columns',
-    cb: function () {
-      heatMap.zoom(false, {
-        columns: true,
-        rows: false
-      });
-    }
-  });
-  shortcutsWhenNotInInputField.push({
-    which: [37], // left arrow
-    commandKey: false,
-    name: 'Scroll Left',
-    cb: function () {
-      heatMap.scrollLeft(heatMap.scrollLeft() - 8);
-    }
-  });
-
-  shortcutsWhenNotInInputField.push({
-    which: [39], // right arrow
-    commandKey: true,
-    name: 'Zoom In Columns',
-    cb: function () {
-      heatMap.zoom(true, {
-        columns: true,
-        rows: false
-      });
-    }
-  });
-  shortcutsWhenNotInInputField.push({
-    which: [39], // right arrow
-    commandKey: false,
-    name: 'Scroll Right',
-    cb: function () {
-      heatMap.scrollLeft(heatMap.scrollLeft() + 8);
-    }
-  });
-  shortcutsWhenNotInInputField.push({
-    which: [65], // a
-    commandKey: true,
-    name: 'Select All',
-    accept: function () {
-      var active = heatMap.getActiveComponent();
-      return (active === 'rowTrack' || active === 'columnTrack');
-    },
-    cb: function () {
-      var active = heatMap.getActiveComponent();
-
-      var selectionModel = active === 'rowTrack' ? heatMap.getProject()
-        .getRowSelectionModel() : heatMap.getProject()
-        .getColumnSelectionModel();
-      var count = active === 'rowTrack' ? heatMap.getProject()
-        .getSortedFilteredDataset().getRowCount() : heatMap
-        .getProject().getSortedFilteredDataset()
-        .getColumnCount();
-      var indices = new morpheus.Set();
-      for (var i = 0; i < count; i++) {
-        indices.add(i);
-      }
-      selectionModel.setViewIndices(indices, true);
-
-    }
-  });
-
-  shortcuts.push({
-    which: [83],
-    shiftKey: true,
-    commandKey: true,
-    name: 'Save Dataset',
-    cb: function () {
-      morpheus.HeatMap.showTool(new morpheus.SaveDatasetTool(),
-        heatMap);
-    }
-  });
-
-  shortcuts.push({
-    which: [83],
-    shiftKey: false,
-    commandKey: true,
-    name: 'Save Image',
-    cb: function () {
-      morpheus.HeatMap.showTool(new morpheus.SaveImageTool(),
-        heatMap);
-    }
-  });
-  if (heatMap.options == null || heatMap.options.toolbar.openFile) {
-    shortcuts.push({
-      which: [79],
-      commandKey: true,
-      name: 'Open File',
-      cb: function () {
-        morpheus.HeatMap.showTool(new morpheus.OpenFileTool(),
-          heatMap);
-      }
-    });
-  }
-  shortcuts.push({
-    which: [191], // slash
-    commandKey: true,
-    name: 'Toggle Search',
-    cb: function () {
-      heatMap.getToolbar().toggleSearch();
-    }
-  });
-  if (heatMap.options == null || heatMap.options.toolbar.tools) {
-    shortcuts.push({
-      which: [88], // x
-      commandKey: true,
-      name: 'New Heat Map',
-      accept: function (options) {
-        return (!options.isInputField || window.getSelection().toString() === '');
-      },
-      cb: function () {
-        morpheus.HeatMap.showTool(new morpheus.NewHeatMapTool(),
-          heatMap);
-      }
-    });
-  }
-  shortcuts.push({
-    which: [67], // C
-    commandKey: true,
-    name: 'Copy'
-  });
-  if (heatMap.options == null || heatMap.options.toolbar.openFile) {
-    shortcuts.push({
-      which: [86], // V
-      commandKey: true,
-      name: 'Paste Dataset'
-    });
-  }
-
   var keydown = function (e) {
     var tagName = e.target.tagName;
     var found = false;
@@ -518,32 +273,36 @@ morpheus.HeatMapKeyListener = function (heatMap) {
     var altKey = e.altKey;
     var shiftKey = e.shiftKey;
     var which = e.which;
-    var isInputField = (tagName == 'INPUT' || tagName == 'SELECT' || tagName == 'TEXTAREA');
-    var acceptOptions = {isInputField: isInputField};
+    var isInputField = (tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA');
+    var acceptOptions = {
+      isInputField: isInputField,
+      heatMap: heatMap
+    };
     var shortcutMatches = function (sc) {
-      if (sc.cb !== undefined && sc.which.indexOf(which) !== -1 && (sc.commandKey === undefined || commandKey === sc.commandKey) && (sc.shiftKey === undefined || shiftKey === sc.shiftKey) && (sc.accept == undefined || sc.accept(acceptOptions))) {
-        sc.cb();
+      if (sc.which.indexOf(which) !== -1 && (sc.commandKey === undefined || commandKey === sc.commandKey) && (sc.shiftKey === undefined || shiftKey === sc.shiftKey) && (sc.accept == undefined || sc.accept(acceptOptions))) {
+        sc.cb({heatMap: heatMap});
         return true;
       }
     };
+
     if (!isInputField) {
-      for (var i = 0, n = shortcutsWhenNotInInputField.length; i < n; i++) {
-        var sc = shortcutsWhenNotInInputField[i];
+      for (var i = 0, n = actions.length; i < n; i++) {
+        var sc = actions[i];
         if (shortcutMatches(sc)) {
           found = true;
           break;
         }
       }
-    }
-    if (!found) {
-      for (var i = 0, n = shortcuts.length; i < n; i++) {
-        var sc = shortcuts[i];
-        if (shortcutMatches(sc)) {
+    } else { // only search global shortcuts
+      for (var i = 0, n = actions.length; i < n; i++) {
+        var sc = actions[i];
+        if (sc.global && shortcutMatches(sc)) {
           found = true;
           break;
         }
       }
     }
+
     if (found) {
       e.preventDefault();
       e.stopPropagation();
@@ -639,10 +398,14 @@ morpheus.HeatMapKeyListener = function (heatMap) {
   this.showKeyMapReference = function () {
     var html = [];
     html.push('<table class="table table-condensed">');
-    shortcutsWhenNotInInputField.concat(shortcuts).forEach(function (sc) {
+    allActions.forEach(function (sc) {
       html.push('<tr><td>');
       html.push(shortcutToString(sc));
       html.push('</td><td>');
+      if (sc.icon) {
+        html.push('<span class="' + sc.icon + '"></span> ');
+      }
+
       html.push(sc.name);
       html.push('</td></tr>');
     });
@@ -650,7 +413,8 @@ morpheus.HeatMapKeyListener = function (heatMap) {
     html.push('</table>');
     morpheus.FormBuilder.showInModal({
       title: 'Keymap Reference',
-      html: html.join('')
+      html: html.join(''),
+      focus: document.activeElement
     });
   };
 };

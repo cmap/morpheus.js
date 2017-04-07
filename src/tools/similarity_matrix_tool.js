@@ -40,7 +40,7 @@ morpheus.SimilarityMatrixTool.prototype = {
   },
   execute: function (options) {
     var project = options.project;
-    var controller = options.controller;
+    var heatMap = options.heatMap;
     var isColumnMatrix = options.input.compute_matrix_for == 'Columns';
     var f = morpheus.SimilarityMatrixTool.Functions
     .fromString(options.input.metric);
@@ -65,7 +65,7 @@ morpheus.SimilarityMatrixTool.prototype = {
     });
 
     worker.onmessage = function (e) {
-      var name = controller.getName();
+      var name = heatMap.getName();
       var matrix = e.data;
       var n = isColumnMatrix ? dataset.getColumnCount() : dataset
       .getRowCount();
@@ -126,7 +126,7 @@ morpheus.SimilarityMatrixTool.prototype = {
         colorScheme: colorScheme,
         name: name,
         dataset: d,
-        parent: controller,
+        parent: heatMap,
         inheritFromParentOptions: {
           rows: !isColumnMatrix,
           columns: isColumnMatrix

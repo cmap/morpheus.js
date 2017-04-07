@@ -17,11 +17,11 @@ morpheus.AnnotateDendrogramTool.prototype = {
   execute: function (options) {
     var fileOrUrl = options.input.file;
     var isColumns = this._isColumns;
-    var controller = options.controller;
+    var heatMap = options.heatMap;
     var result = morpheus.Util.readLines(fileOrUrl);
     var fileName = morpheus.Util.getFileName(fileOrUrl);
-    var dendrogram = isColumns ? controller.columnDendrogram
-      : controller.rowDendrogram;
+    var dendrogram = isColumns ? heatMap.columnDendrogram
+      : heatMap.rowDendrogram;
     var nameToNode = new morpheus.Map();
     morpheus.DendrogramUtil.dfs(dendrogram.tree.rootNode,
       function (node) {
@@ -57,7 +57,7 @@ morpheus.AnnotateDendrogramTool.prototype = {
             }
           }
         }
-        controller.trigger('dendrogramAnnotated', {
+        heatMap.trigger('dendrogramAnnotated', {
           isColumns: isColumns
         });
         dendrogram.setInvalid(true);
@@ -79,7 +79,7 @@ morpheus.AnnotateDendrogramTool.prototype = {
           required: true
         }];
       };
-      morpheus.HeatMap.showTool(promptTool, controller);
+      morpheus.HeatMap.showTool(promptTool, heatMap);
     });
   }
 };

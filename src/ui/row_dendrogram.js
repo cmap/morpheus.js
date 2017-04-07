@@ -1,5 +1,5 @@
-morpheus.RowDendrogram = function (controller, tree, positions, project) {
-  morpheus.AbstractDendrogram.call(this, controller, tree, positions,
+morpheus.RowDendrogram = function (heatMap, tree, positions, project) {
+  morpheus.AbstractDendrogram.call(this, heatMap, tree, positions,
     project, morpheus.AbstractDendrogram.Type.ROW);
 };
 morpheus.RowDendrogram.prototype = {

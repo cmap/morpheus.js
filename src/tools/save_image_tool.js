@@ -31,7 +31,7 @@ morpheus.SaveImageTool.prototype = {
     if (!morpheus.Util.endsWith(fileName.toLowerCase(), '.' + format)) {
       fileName += '.' + format;
     }
-    var controller = options.controller;
-    controller.saveImage(fileName, format);
+    var heatMap = options.heatMap;
+    heatMap.saveImage(fileName, format);
   }
 };

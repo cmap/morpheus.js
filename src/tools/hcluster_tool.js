@@ -149,7 +149,7 @@ morpheus.HClusterTool.prototype = {
   },
   execute: function (options) {
     var project = options.project;
-    var heatmap = options.controller;
+    var heatmap = options.heatMap;
     var selectedRowsToUseForClusteringColumns = options.input.cluster_columns_in_space_of_selected_rows_only ? project
     .getRowSelectionModel().getViewIndices().values()
       : null;
