@@ -55,9 +55,15 @@
     color: #777;
 }
 
+.morpheus-sub-modal {
+    // modal has z-index: 1050;
+    // open dropdown has z-index: 1000;
+    z-index: 1051;
+}
+
 .morpheus-tip-inline {
     font-size: 12px;
-    z-index: 10000;
+    z-index: 999;
     position: absolute;
     background-color: rgba(255, 255, 255, 0.9);
     border: 1px solid rgb(0, 0, 0);

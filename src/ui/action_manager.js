@@ -563,7 +563,8 @@ morpheus.ActionManager = function () {
     cb: function () {
       morpheus.FormBuilder.showInModal({
         title: 'Contact',
-        html: 'Please email us at morpheus@broadinstitute.org'
+        html: 'Please email us at morpheus@broadinstitute.org',
+        focus: document.activeElement
       });
     }
   });

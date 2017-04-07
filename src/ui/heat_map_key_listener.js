@@ -273,7 +273,7 @@ morpheus.HeatMapKeyListener = function (heatMap) {
     var altKey = e.altKey;
     var shiftKey = e.shiftKey;
     var which = e.which;
-    var isInputField = (tagName == 'INPUT' || tagName == 'SELECT' || tagName == 'TEXTAREA');
+    var isInputField = (tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA');
     var acceptOptions = {
       isInputField: isInputField,
       heatMap: heatMap
@@ -413,7 +413,8 @@ morpheus.HeatMapKeyListener = function (heatMap) {
     html.push('</table>');
     morpheus.FormBuilder.showInModal({
       title: 'Keymap Reference',
-      html: html.join('')
+      html: html.join(''),
+      focus: document.activeElement
     });
   };
 };

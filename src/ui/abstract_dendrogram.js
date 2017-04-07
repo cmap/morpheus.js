@@ -238,7 +238,8 @@ morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
                 morpheus.FormBuilder.showInModal({
                   title: 'Color',
                   close: 'Close',
-                  html: formBuilder.$form
+                  html: formBuilder.$form,
+                  focus: document.activeElement
                 });
 
               }

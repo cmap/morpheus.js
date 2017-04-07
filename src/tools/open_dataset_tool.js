@@ -30,7 +30,7 @@ morpheus.OpenDatasetTool._promptMaf = function (promptCallback) {
     title: 'Gene Symbols',
     html: formBuilder.$form,
     close: 'OK',
-    callback: function () {
+    onClose: function () {
       var text = formBuilder.getValue('MAF_gene_symbols');
       var lines = morpheus.Util.splitOnNewLine(text);
       var mafGeneFilter = new morpheus.Map();
@@ -41,8 +41,8 @@ morpheus.OpenDatasetTool._promptMaf = function (promptCallback) {
         }
       }
       var readOptions = mafGeneFilter.size() > 0 ? {
-          mafGeneFilter: mafGeneFilter
-        } : null;
+        mafGeneFilter: mafGeneFilter
+      } : null;
       promptCallback(readOptions);
     }
   });
@@ -62,7 +62,7 @@ morpheus.OpenDatasetTool._promptSegtab = function (promptCallback) {
     title: 'Regions',
     html: formBuilder.$form,
     close: 'OK',
-    callback: function () {
+    onClose: function () {
       var text = formBuilder.getValue('regions');
       var lines = morpheus.Util.splitOnNewLine(text);
       var regions = [];
@@ -83,8 +83,8 @@ morpheus.OpenDatasetTool._promptSegtab = function (promptCallback) {
         }
       }
       var readOptions = regions.length > 0 ? {
-          regions: regions
-        } : null;
+        regions: regions
+      } : null;
       promptCallback(readOptions);
     }
   });
@@ -148,12 +148,12 @@ morpheus.OpenDatasetTool.prototype = {
         }
         var currentDatasetMetadataNames = morpheus.MetadataUtil
         .getMetadataNames(!appendRows ? dataset
-          .getRowMetadata() : dataset
-          .getColumnMetadata());
+        .getRowMetadata() : dataset
+        .getColumnMetadata());
         var newDatasetMetadataNames = morpheus.MetadataUtil
         .getMetadataNames(!appendRows ? newDataset
-          .getRowMetadata() : newDataset
-          .getColumnMetadata());
+        .getRowMetadata() : newDataset
+        .getColumnMetadata());
 
         if (currentDatasetMetadataNames.length > 1
           || newDatasetMetadataNames.length > 1) {
@@ -168,18 +168,18 @@ morpheus.OpenDatasetTool.prototype = {
               .getProject()
               .setFullDataset(
                 appendRows ? new morpheus.JoinedDataset(
-                    dataset,
-                    newDataset,
-                    appendOptions.current_dataset_annotation_name,
-                    appendOptions.new_dataset_annotation_name)
+                  dataset,
+                  newDataset,
+                  appendOptions.current_dataset_annotation_name,
+                  appendOptions.new_dataset_annotation_name)
                   : new morpheus.TransposedDatasetView(
-                    new morpheus.JoinedDataset(
-                      new morpheus.TransposedDatasetView(
-                        dataset),
-                      new morpheus.TransposedDatasetView(
-                        newDataset),
-                      appendOptions.current_dataset_annotation_name,
-                      appendOptions.new_dataset_annotation_name)),
+                  new morpheus.JoinedDataset(
+                    new morpheus.TransposedDatasetView(
+                      dataset),
+                    new morpheus.TransposedDatasetView(
+                      newDataset),
+                    appendOptions.current_dataset_annotation_name,
+                    appendOptions.new_dataset_annotation_name)),
                 true);
 
               if (heatMap.options.renderReady) {
@@ -243,18 +243,18 @@ morpheus.OpenDatasetTool.prototype = {
           .getProject()
           .setFullDataset(
             appendRows ? new morpheus.JoinedDataset(
-                dataset,
-                newDataset,
-                currentDatasetMetadataNames[0],
-                newDatasetMetadataNames[0])
+              dataset,
+              newDataset,
+              currentDatasetMetadataNames[0],
+              newDatasetMetadataNames[0])
               : new morpheus.TransposedDatasetView(
-                new morpheus.JoinedDataset(
-                  new morpheus.TransposedDatasetView(
-                    dataset),
-                  new morpheus.TransposedDatasetView(
-                    newDataset),
-                  currentDatasetMetadataNames[0],
-                  newDatasetMetadataNames[0])),
+              new morpheus.JoinedDataset(
+                new morpheus.TransposedDatasetView(
+                  dataset),
+                new morpheus.TransposedDatasetView(
+                  newDataset),
+                currentDatasetMetadataNames[0],
+                newDatasetMetadataNames[0])),
             true);
           if (heatMap.options.renderReady) {
             heatMap.options.renderReady(heatMap);

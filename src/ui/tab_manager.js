@@ -300,7 +300,8 @@ morpheus.TabManager.prototype = {
     li.push('</a></li>');
     var $link = $(li.join(''));
     $link.appendTo(this.$nav);
-    var $panel = $('<div tabIndex="-1" style="outline:0;cursor:default;" role="tabpanel" class="tab-pane" id="'
+    var $panel = $('<div tabIndex="-1" style="outline:0;cursor:default;" role="tabpanel"' +
+      ' class="tab-pane" id="'
       + id + '"></div>');
     options.$el.appendTo($panel);
     $panel.appendTo(this.$tabContent);
