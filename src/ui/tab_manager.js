@@ -96,7 +96,7 @@ morpheus.TabManager = function (options) {
     if ($li.hasClass('morpheus-tab-addon')) {
       return;
     }
-    _this.rename($a.xxx);
+    _this.rename($a.data('link'));
 
   });
   this.$nav.on('contextmenu.morpheus', 'li > a', function (e) {
@@ -124,7 +124,7 @@ morpheus.TabManager = function (options) {
         y: e.pageY
       }, e.target, function (event, item) {
         if (item === 'Rename') {
-          rename($a);
+          _this.rename($a.data('link'));
         } else if (item === 'Pin tab') {
           $a.data('morpheus-pin', true);
           $li.removeClass('morpheus-sortable');
@@ -133,7 +133,6 @@ morpheus.TabManager = function (options) {
           $a.find('.close').hide();    // hide close button
           _this.$nav.sortable('option', 'items', 'li.morpheus-sortable');
           _this.$nav.sortable('refresh');
-
         } else if (item === 'Unpin tab') {
           $a.data('morpheus-pin', false);
           $li.addClass('morpheus-sortable');
@@ -203,7 +202,7 @@ morpheus.TabManager.prototype = {
    *            Tab id for task
    */
   addTask: function (task) {
-    var $a = this.$nav.find('> li > a[data-link=' + task.tabId + ']');
+    var $a = this._getA(task.tabId);
     if ($a.length === 0) {
       console.log(task.tabId + ' not found.');
       return;
