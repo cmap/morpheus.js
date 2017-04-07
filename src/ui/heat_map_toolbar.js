@@ -227,7 +227,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     toolbarHtml.push('<button type="button"' +
       ' class="btn btn-default btn-xxs"><span class="fa' +
       ' fa-search-plus"></span>');
-    toolbarHtml.push(' <span class="caret"></span>');
+    toolbarHtml.push(' <span style="font-size: .8em;" class="fa fa-caret-down"></span>');
     toolbarHtml.push('</button>');
     toolbarHtml.push('<ul class="dropdown-menu" aria-labelledby="' + dropdownId + '">');
     toolbarHtml
