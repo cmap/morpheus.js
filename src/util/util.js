@@ -472,6 +472,33 @@ morpheus.Util.autocompleteArrayMatcher = function (token, cb, array, fields, max
   cb(matches);
 };
 
+morpheus.Util.setClipboardData = function (html) {
+  var isRTL = document.documentElement.getAttribute('dir') == 'rtl';
+  var fakeElem = document.createElement('div');
+  //   fakeElem.contentEditable = true;
+  // Prevent zooming on iOS
+  fakeElem.style.fontSize = '12pt';
+  // Reset box model
+  fakeElem.style.border = '0';
+  fakeElem.style.padding = '0';
+  fakeElem.style.margin = '0';
+  // Move element out of screen horizontally
+  fakeElem.style.position = 'absolute';
+  fakeElem.style[isRTL ? 'right' : 'left'] = '-999999px';
+  // Move element to the same position vertically
+  fakeElem.style.top = (window.pageYOffset || document.documentElement.scrollTop) + 'px';
+  fakeElem.setAttribute('readonly', '');
+  fakeElem.innerHTML = html;
+  document.body.appendChild(fakeElem);
+  var selection = window.getSelection();
+  var range = document.createRange();
+  range.selectNodeContents(fakeElem);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  var successful = document.execCommand('copy');
+  document.body.removeChild(fakeElem);
+};
+
 /**
  * @param {Number}
  *            [options.delay=500] - Delay to short autosuggestions.
@@ -1009,11 +1036,11 @@ morpheus.Util.intFormat = function (n) {
   return morpheus.Util._intFormat(n);
 };
 morpheus.Util._nf = typeof d3 !== 'undefined' ? d3.format('.4f') : function (d) {
-    return '' + d;
-  };
+  return '' + d;
+};
 morpheus.Util.nf = function (n) {
   var str = (n < 1 && n > -1 && n.toPrecision !== undefined) ? n
-    .toPrecision(4) : morpheus.Util._nf(n);
+  .toPrecision(4) : morpheus.Util._nf(n);
   return morpheus.Util.removeTrailingZerosInFraction(str);
 };
 morpheus.Util.createNumberFormat = function (nfractionDigits) {
@@ -1232,13 +1259,13 @@ morpheus.Util.createSearchPredicates = function (options) {
       predicate = new morpheus.Util.RegexPredicate(field, token);
     } else {
       predicate = defaultIsExactMatch ? new morpheus.Util.ExactTermPredicate(
-          field, token)
+        field, token)
         : new morpheus.Util.RegexPredicate(field, token);
 
     }
     if (predicate != null) {
       predicates.push(isNot ? new morpheus.Util.NotPredicate(
-          predicate) : predicate);
+        predicate) : predicate);
     }
 
   });
