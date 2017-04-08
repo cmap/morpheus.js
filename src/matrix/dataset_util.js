@@ -223,33 +223,36 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
         options: options
       });
 
-    } else {
-      datasetReader.read(fileOrUrl, function (err, dataset) {
-        if (err) {
-          deferred.reject(err);
+		} else {
+			datasetReader.read(fileOrUrl, function (err, dataset) {
+				if (err) {
+					deferred.reject(err);
+				} else {
+					deferred.resolve(dataset);
+					console.log(dataset);
+					morpheus.DatasetUtil.toESSessionPromise({dataset : dataset, isGEO : isGSE});
+				}
+			});
+
+		}
+		var pr = deferred.promise();
+		pr.toString = function () {
+			return '' + fileOrUrl;
+		};
+		//console.log("morpheus.DatasetUtil.read ::", pr);
+		return pr;
+	} else if (typeof fileOrUrl.done === 'function') { // assume it's a
+		// deferred
+		return fileOrUrl;
+	} else { // it's already a dataset?
+        var deferred = $.Deferred();
+        if (fileOrUrl.getRowCount) {
+            deferred.resolve(fileOrUrl);
         } else {
-          deferred.resolve(dataset);
-            morpheus.DatasetUtil.toESSessionPromise({dataset : dataset, isGEO : isGSE});
+            deferred.resolve(morpheus.Dataset.fromJSON(fileOrUrl));
         }
-      });
-    }
-    var pr = deferred.promise();
-    pr.toString = function () {
-      return '' + fileOrUrl;
-    };
-    return pr;
-  } else if (typeof fileOrUrl.done === 'function') { // assume it's a
-    // deferred
-    return fileOrUrl;
-  } else { // it's already a dataset?
-    var deferred = $.Deferred();
-    if (fileOrUrl.getRowCount) {
-      deferred.resolve(fileOrUrl);
-    } else {
-      deferred.resolve(morpheus.Dataset.fromJSON(fileOrUrl));
-    }
-    return deferred.promise();
-  }
+        return deferred.promise();
+	}
 
 };
 
@@ -1050,7 +1053,7 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 
 morpheus.DatasetUtil.toESSessionPromise = function (options) {
 	var dataset = options.dataset ? options.dataset : options;
-	//console.log("ENTERED TO_ESSESSION_PROMISE", dataset);
+	console.log("ENTERED TO_ESSESSION_PROMISE", dataset);
 	dataset.setESSession(new Promise(function (resolve, reject) {
 		//console.log("morpheus.DatasetUtil.toESSessionPromise ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
 		if (dataset instanceof morpheus.SlicedDatasetView) {
@@ -1061,12 +1064,6 @@ morpheus.DatasetUtil.toESSessionPromise = function (options) {
 			resolve(dataset.getESSession());
 			return;
         }
-		if (dataset.getESSession()) {
-			resolve(dataset.getESSession());
-			//console.log("resolved with old value");
-			return;
-		}
-
 		var array = morpheus.DatasetUtil.getContentArray(dataset);
 		var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
 
