@@ -77,5 +77,6 @@ morpheus.CollapseDatasetTool.prototype = {
       heatMap.setTrackVisible(name, false, !rows);
     });
     project.setFullDataset(dataset, true);
+    morpheus.DatasetUtil.toESSessionPromise(dataset);
   }
 };
