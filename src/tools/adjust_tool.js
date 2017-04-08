@@ -106,9 +106,9 @@ morpheus.AdjustDataTool.prototype = {
         changed = true;
       }
 
-      if (changed) {
-          morpheus.DatasetUtil().toESSessionPromise(dataset);
-      }
+     /* if (changed) {
+          morpheus.DatasetUtil.toESSessionPromise(dataset);
+      }*/
       return new morpheus.HeatMap({
         name: heatMap.getName(),
         dataset: dataset,

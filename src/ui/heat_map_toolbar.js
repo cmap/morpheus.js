@@ -136,7 +136,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
   var $menus = $('<div style="display: inline-block;margin-right:14px;"></div>');
 
   function createMenu(menuName, actions, minWidth) {
-      console.log("HeatMapToolbar.createMenu::", menuName, actions, minWidth);
+      //console.log("HeatMapToolbar.createMenu::", menuName, actions, minWidth);
     if (!minWidth) {
       minWidth = '0px';
     }
@@ -306,22 +306,13 @@ morpheus.HeatMapToolBar = function (heatMap) {
       ' btn-default btn-xxs"><span class="fa fa-line-chart"></span></button>');
 
   }
-  if (heatMap.options.toolbar.tools && heatMap.options.menu.Tools) {
-      toolbarHtml.push('<div class="morpheus-button-divider"></div>');
-      toolbarHtml.push('<div class="btn-group">');
-      toolbarHtml
-          .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="dropdown"><span title="Tools" data-toggle="tooltip" class="fa fa-wrench"></span></button>');
-      toolbarHtml.push('<ul data-name="key" class="dropdown-menu" role="menu">');
-      toolbarHtml.push('<li data-name="keyContent"></li>');
-      toolbarHtml.push('</ul>');
-  }
   // legend
   if (heatMap.options.toolbar.colorKey) {
     toolbarHtml.push('<div class="morpheus-button-divider"></div>');
     toolbarHtml.push('<div class="btn-group">');
     toolbarHtml
     .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="dropdown"><span title="Color Key" data-toggle="tooltip" class="fa fa-key"></span></button>');
-    toolbarHtml.push('<')
+    //toolbarHtml.push('<')
     toolbarHtml.push('</div>');
     toolbarHtml.push('<div class="morpheus-button-divider"></div>');
   }
