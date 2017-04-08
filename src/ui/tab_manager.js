@@ -168,6 +168,7 @@ morpheus.TabManager = function (options) {
     _this.$nav.find('[data-link=' + _this.activeTabId + ']').each(function () {
       $(this).parent().addClass('active');// not added via droptab
     });
+    $('#' + _this.activeTabId).focus();
     if (_this.adding) {
       return;
     }
@@ -300,7 +301,7 @@ morpheus.TabManager.prototype = {
     li.push('</a></li>');
     var $link = $(li.join(''));
     $link.appendTo(this.$nav);
-    var $panel = $('<div tabIndex="-1" style="outline:0;cursor:default;" role="tabpanel"' +
+    var $panel = $('<div tabIndex="0" style="outline:0;cursor:default;" role="tabpanel"' +
       ' class="tab-pane" id="'
       + id + '"></div>');
     options.$el.appendTo($panel);

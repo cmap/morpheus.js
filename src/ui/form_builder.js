@@ -140,7 +140,7 @@ morpheus.FormBuilder.showInDraggableDiv = function (options) {
     containment: 'document'
   });
   // $div.resizable();
-  $div.appendTo($(document.body));
+  $div.appendTo(options.appendTo != null ? options.appendTo : $(document.body));
   return $div;
 };
 
@@ -154,7 +154,8 @@ morpheus.FormBuilder.showMessageModal = function (options) {
     ' data-dismiss="modal">OK</button>'),
     backdrop: options.backdrop,
     size: options.size,
-    focus: options.focus
+    focus: options.focus,
+    appendTo: options.appendTo
   });
   $div.find('button').focus();
   return $div;
@@ -205,7 +206,7 @@ morpheus.FormBuilder._showInModal = function (options) {
     e.stopPropagation();
   });
   $div.find('.modal-body').html(options.html);
-  $div.prependTo($(document.body));
+  $div.prependTo(options.appendTo != null ? options.appendTo : $(document.body));
   $div.modal({
     keyboard: true,
     backdrop: options.backdrop === true ? true : false,
@@ -218,6 +219,7 @@ morpheus.FormBuilder._showInModal = function (options) {
       $(options.focus).focus();
     }
   });
+
   return $div;
 };
 /**
@@ -242,6 +244,7 @@ morpheus.FormBuilder.showInModal = function (options) {
     + options.close + '</button>')
       : null,
     onClose: options.onClose,
+    appendTo: options.appendTo,
     backdrop: options.backdrop,
     size: options.size,
     focus: options.focus
@@ -261,7 +264,8 @@ morpheus.FormBuilder.showInModal = function (options) {
  * @param options.title
  * @param options.content
  * @param options.okCallback
- * @param options.cancelCallback
+ * @param options.cancelCallba
+ * @param options.okFocus
  *
  */
 morpheus.FormBuilder.showOkCancel = function (options) {
@@ -289,7 +293,8 @@ morpheus.FormBuilder.showOkCancel = function (options) {
     size: options.size,
     close: options.close,
     onClose: options.onClose,
-    focus: options.focus
+    focus: options.focus,
+    appendTo: options.appendTo
   });
   // if (options.align === 'right') {
   // $div.css('left', $(window).width()
@@ -306,7 +311,7 @@ morpheus.FormBuilder.showOkCancel = function (options) {
     }
     $div.modal('hide');
   });
-  if (options.focus) {
+  if (options.okFocus) {
     $ok.focus();
   }
 

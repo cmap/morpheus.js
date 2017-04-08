@@ -475,10 +475,12 @@ morpheus.Util.autocompleteArrayMatcher = function (token, cb, array, fields, max
 morpheus.Util.setClipboardData = function (html) {
   var isRTL = document.documentElement.getAttribute('dir') == 'rtl';
   var fakeElem = document.createElement('div');
-  //   fakeElem.contentEditable = true;
+  fakeElem.contentEditable = true;
+
   // Prevent zooming on iOS
   fakeElem.style.fontSize = '12pt';
   // Reset box model
+
   fakeElem.style.border = '0';
   fakeElem.style.padding = '0';
   fakeElem.style.margin = '0';
@@ -490,6 +492,9 @@ morpheus.Util.setClipboardData = function (html) {
   fakeElem.setAttribute('readonly', '');
   fakeElem.innerHTML = html;
   document.body.appendChild(fakeElem);
+  if (fakeElem.hasAttribute('contenteditable')) {
+    fakeElem.focus();
+  }
   var selection = window.getSelection();
   var range = document.createRange();
   range.selectNodeContents(fakeElem);

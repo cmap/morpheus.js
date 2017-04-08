@@ -225,9 +225,12 @@ morpheus.HeatMap = function (options) {
       inlineTooltip: true,
       $loadingImage: morpheus.Util.createLoadingEl(),
       menu: {
-        File: ['Open File', 'Save Image', 'Save Dataset', 'Save Session', null, 'Copy Image', null, 'Close Tab', 'Rename Tab'],
-        Tools: ['New Heat Map', 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors', 'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API', 'k-means'],
+        File: ['Open File', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
+        Tools: ['New Heat Map', 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors', 'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API'],
         View: ['Zoom In', 'Zoom Out', 'Fit To Window', 'Reset Zoom', null, 'Options'],
+        Edit: ['Copy Image', null, 'Move Selected Rows To Top', 'Invert' +
+        ' Selected Rows', 'Copy Selected Rows', 'Select All Rows', null, 'Move Selected Columns' +
+        ' To Top', 'Invert Selected Columns', 'Copy Selected Columns', 'Select All Columns'],
         Help: ['Find Action', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keymap' +
         ' Reference']
       },
@@ -274,6 +277,7 @@ morpheus.HeatMap = function (options) {
     this.options.dataset = $.Deferred();
     morpheus.FormBuilder.showOkCancel({
       title: 'Dataset',
+      appendTo: this.getContentEl(),
       content: datasetFormBuilder.$form,
       okCallback: function () {
         var file = datasetFormBuilder.getValue('file');
@@ -320,7 +324,6 @@ morpheus.HeatMap = function (options) {
   this.$content = $('<div></div>');
   this.$content.css({
     'width': '100%',
-
     'user-select': 'none',
 
     '-webkit-user-select': 'none',
@@ -342,6 +345,7 @@ morpheus.HeatMap = function (options) {
     'overflow-x': 'visible',
     'overflow-y': 'visible'
   });
+
   this.$content.on('remove.morpheus', function () {
     _this.$content.off('remove.morpheus');
     _this.dispose();
@@ -440,7 +444,7 @@ morpheus.HeatMap = function (options) {
 
     if (_this.options.focus) {
       _this.tabManager.setActiveTab(tab.id);
-      $(_this.heatmap.canvas).focus();
+      _this.focus();
     } else if (_this.tabManager.getTabCount() === 1) {
       _this.tabManager.setActiveTab(tab.id);
     }
@@ -454,7 +458,8 @@ morpheus.HeatMap = function (options) {
       }
       morpheus.FormBuilder.showInModal({
         title: 'Error',
-        html: message
+        html: message,
+        appendTo: _this.getContentEl()
       });
     });
     d
@@ -533,7 +538,8 @@ morpheus.HeatMap = function (options) {
 
       morpheus.FormBuilder.showInModal({
         title: 'Error',
-        html: message.join('')
+        html: message.join(''),
+        appendTo: _this.getContentEl()
       });
     });
 
@@ -576,7 +582,6 @@ morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS = 6;
 
 morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
   if (tool.gui) {
-    var activeElement = document.activeElement;
     var gui = tool.gui(heatMap.getProject());
     var formBuilder = new morpheus.FormBuilder();
     _.each(gui, function (item) {
@@ -614,7 +619,8 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
             title: 'Error',
             html: e,
             close: 'Close',
-            focus: activeElement
+            focus: heatMap.getFocusEl(),
+            appendTo: heatMap.getContentEl()
           });
           if (e.stack) {
             console.log(e.stack);
@@ -634,7 +640,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
           callback(input);
         }
       }
-    }
+    };
     var $formDiv;
     tool.ok = function () {
       okCallback();
@@ -649,13 +655,14 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       size: guiOptions.size,
       draggable: true,
       content: formBuilder.$form,
+      appendTo: heatMap.getContentEl(),
       align: 'right',
       okCallback: okCallback,
-      focus: activeElement
+      focus: heatMap.getFocusEl()
     });
   }
   else { // run headless
-    var value = tool.execute({
+    tool.execute({
       heatMap: heatMap,
       project: heatMap.getProject(),
       input: {}
@@ -2088,6 +2095,8 @@ morpheus.HeatMap.prototype = {
         var dataset = project.getSelectedDataset({
           emptyToAll: false
         });
+        var rowsSelected = dataset.getRowCount() > 0;
+        var columnsSelected = dataset.getColumnCount() > 0;
         var columnMetadata = dataset
         .getColumnMetadata();
         var rowMetadata = dataset.getRowMetadata();
@@ -2119,8 +2128,7 @@ morpheus.HeatMap.prototype = {
         rowMetadata = new morpheus.MetadataModelColumnView(
           rowMetadata, rowFieldIndices);
         var text = [];
-        var rowsSelected = dataset.getRowCount() > 0;
-        var columnsSelected = dataset.getColumnCount() > 0;
+
         if (rowsSelected && columnsSelected) { // copy
           // as
           // gct
@@ -2326,6 +2334,15 @@ morpheus.HeatMap.prototype = {
       source: this,
       arguments: arguments
     });
+  },
+  getContentEl: function () {
+    return this.$content;
+  },
+  focus: function () {
+    this.$tabPanel.focus();
+  },
+  getFocusEl: function () {
+    return this.$tabPanel;
   },
   /**
    Set where the tooltip is shown
@@ -3197,24 +3214,26 @@ morpheus.HeatMap.prototype = {
     return pos;
   }
   ,
-  isSelectedTrackColumns: function () {
-    return this.selectedTrackIsColumns;
+  getSelectedTrackName: function (isColumns) {
+    return isColumns ? this.selectedColumnTrackName : this.selectedRowTrackName;
   },
   setSelectedTrack: function (name, isColumns) {
-    if (name !== this.selectedTrackName
-      || isColumns !== this.selectedTrackIsColumns) {
-      var index = this.getTrackIndex(this.selectedTrackName,
-        this.selectedTrackIsColumns);
+    var previousName = isColumns ? this.selectedColumnTrackName : this.selectedRowTrackName;
+    if (name !== previousName) {
+      var index = this.getTrackIndex(previousName, isColumns); // de-select previous
       if (index !== -1) {
-        this.getTrackHeaderByIndex(index, this.selectedTrackIsColumns)
+        this.getTrackHeaderByIndex(index, isColumns)
         .setSelected(false);
       }
-      this.selectedTrackName = name;
-      this.selectedTrackIsColumns = isColumns;
-      var index = this.getTrackIndex(this.selectedTrackName,
-        this.selectedTrackIsColumns);
+      if (isColumns) {
+        this.selectedColumnTrackName = name;
+      } else {
+        this.selectedRowTrackName = name;
+      }
+
+      var index = this.getTrackIndex(name, isColumns);
       if (index !== -1) {
-        this.getTrackHeaderByIndex(index, this.selectedTrackIsColumns)
+        this.getTrackHeaderByIndex(index, isColumns)
         .setSelected(true);
       }
       this.trigger('change', {
@@ -3226,6 +3245,7 @@ morpheus.HeatMap.prototype = {
   }
   ,
   saveImage: function (file, format) {
+    var _this = this;
     var bounds = this.getTotalSize();
     if (format === 'pdf') {
       // var context = new morpheus.PdfGraphics();
@@ -3301,7 +3321,8 @@ morpheus.HeatMap.prototype = {
         if (blob == null || blob.size === 0) {
           morpheus.FormBuilder.showInModal({
             title: 'Save Image',
-            html: 'Image is too large to save.'
+            html: 'Image is too large to save.',
+            appendTo: _this.getContentEl()
           });
           return;
         }
