@@ -4,6 +4,8 @@
   "description": "morpheus.js JavaScript Library",
   "license": "MIT",
   "version": "0.0.1",
+
+
   "repository": {
     "type": "git",
     "url": "https://github.com/baba-beda/morpheus.js.git"
@@ -37,7 +39,6 @@
     "grunt-jsdoc": "^2.1.0",
     "protobufjs": "~3.7",
     "serve-static": "^1.12.1",
-    "protobufjs": "~3.7",
     "finalhandler": "^1.0.1"
   }
 }

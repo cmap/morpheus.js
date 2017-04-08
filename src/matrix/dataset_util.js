@@ -1027,12 +1027,14 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 	var rowMeta = dataset.getRowMetadata();
 	var rowNames = [];
 	var rowNamesVec = rowMeta.getByName("id");
-	for (j = 0; j < dataset.getRowCount(); j++) {
-		rowNames.push({
-			strval : rowNamesVec.getValue(j),
-			isNA : false
-		});
-	}
+	if (rowNamesVec) {
+        for (j = 0; j < dataset.getRowCount(); j++) {
+            rowNames.push({
+                strval: rowNamesVec.getValue(j),
+                isNA: false
+            });
+        }
+    }
 	var symbolNames = rowMeta.getByName("symbol");
 	console.log(symbolNames);
 	var symbol = [];
