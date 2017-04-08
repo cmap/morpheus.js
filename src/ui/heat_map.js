@@ -171,9 +171,9 @@ morpheus.HeatMap = function (options) {
        *      class_a : [ 'A' ], class_b : [ 'B' ] }} ]</code>
        */
       tools: undefined,
-      /*
-       * Optional array of {name:string, values:[]}
-       */
+        /*
+         * Optional array of {name:string, values:[]}
+         */
       rowFilter: undefined,
       columnFilter: undefined,
       /*
@@ -226,7 +226,7 @@ morpheus.HeatMap = function (options) {
       $loadingImage: morpheus.Util.createLoadingEl(),
       menu: {
         File: ['Open File', 'Save Image', 'Save Dataset', 'Save Session', null, 'Copy Image', null, 'Close Tab', 'Rename Tab'],
-        Tools: ['New Heat Map', 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors', 'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API'],
+        Tools: ['New Heat Map', 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors', 'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API', 'k-means'],
         View: ['Zoom In', 'Zoom Out', 'Fit To Window', 'Reset Zoom', null, 'Options'],
         Help: ['Find Action', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keymap' +
         ' Reference']
@@ -240,8 +240,12 @@ morpheus.HeatMap = function (options) {
         searchColumns: true,
         searchValues: false,
         options: true,
+          openFile: true,
         saveImage: true,
+          saveDataset: true,
+          saveSession: true,
         filter: true,
+          chart: true,
         colorKey: true
       }
     }, options);

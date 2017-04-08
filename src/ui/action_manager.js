@@ -595,7 +595,7 @@ morpheus.ActionManager = function () {
   });
 
   var _this = this;
-  [new morpheus.HClusterTool(), new morpheus.MarkerSelection(), new morpheus.NearestNeighbors(), new morpheus.AdjustDataTool(), new morpheus.CollapseDatasetTool(), new morpheus.CreateAnnotation(), new morpheus.SimilarityMatrixTool(), new morpheus.TransposeTool(), new morpheus.TsneTool(), new morpheus.DevAPI()].forEach(function (tool) {
+  [new morpheus.HClusterTool(), new morpheus.MarkerSelection(), new morpheus.NearestNeighbors(), new morpheus.AdjustDataTool(), new morpheus.CollapseDatasetTool(), new morpheus.CreateAnnotation(), new morpheus.SimilarityMatrixTool(), new morpheus.TransposeTool(), new morpheus.TsneTool(), new morpheus.DevAPI(), new morpheus.KmeansTool()].forEach(function (tool) {
     _this.add({
       name: tool.toString(),
       gui: function () {
