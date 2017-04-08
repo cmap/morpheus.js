@@ -10,10 +10,6 @@ morpheus.SaveSessionTool.prototype = {
   gui: function () {
     return [
       {
-        name: 'include_dataset',
-        type: 'checkbox',
-        value: true
-      }, {
         name: 'file_name',
         type: 'text',
         required: true
@@ -27,9 +23,10 @@ morpheus.SaveSessionTool.prototype = {
     if (!morpheus.Util.endsWith(fileName.toLowerCase(), '.json')) {
       fileName += '.json';
     }
-    var controller = options.controller;
-    var options = {dataset: options.input.include_dataset};
-    var json = controller.toJSON(options);
+    var heatMap = options.heatMap;
+    // var options = {dataset: options.input.include_dataset};
+    var options = {dataset: true};
+    var json = heatMap.toJSON(options);
     var nativeArrayToArray = Array.from || function (typedArray) {
         var normalArray = Array.prototype.slice.call(typedArray);
         normalArray.length === typedArray.length;

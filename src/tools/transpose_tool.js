@@ -6,7 +6,7 @@ morpheus.TransposeTool.prototype = {
   },
   execute: function (options) {
     var project = options.project;
-    var controller = options.controller;
+    var heatMap = options.heatMap;
     var dataset = new morpheus.TransposedDatasetView(project
     .getSortedFilteredDataset());
     // make a shallow copy of the dataset, metadata is immutable via the UI
@@ -23,22 +23,22 @@ morpheus.TransposeTool.prototype = {
 
     // TODO see if we can subset dendrograms
     // only handle contiguous selections for now
-    // if (controller.columnDendrogram != null) {
+    // if (heatMap.columnDendrogram != null) {
     // var indices = project.getColumnSelectionModel().getViewIndices()
     // .toArray();
     // morpheus.DendrogramUtil.leastCommonAncestor();
     // }
-    // if (controller.rowDendrogram != null) {
+    // if (heatMap.rowDendrogram != null) {
     //
     // }
-    var name = options.input.name || controller.getName();
+    var name = options.input.name || heatMap.getName();
     new morpheus.HeatMap({
       name: name,
       dataset: dataset,
       inheritFromParentOptions: {
         transpose: true
       },
-      parent: controller
+      parent: heatMap
     });
 
   }

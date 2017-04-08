@@ -30,7 +30,7 @@ morpheus.AdjustDataTool.prototype = {
   },
   execute: function (options) {
     var project = options.project;
-    var controller = options.controller;
+    var heatMap = options.heatMap;
 
     if (options.input.log_2 || options.input.inverse_log_2
       || options.input['z-score'] || options.input['robust_z-score'] || options.input.quantile_normalize) {
@@ -57,6 +57,7 @@ morpheus.AdjustDataTool.prototype = {
         : sortedFilteredDataset;
       var rowView = new morpheus.DatasetRowView(dataset);
       var functions = [];
+      var changed = false;
       if (options.input.log_2) {
         for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
           for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
@@ -64,6 +65,7 @@ morpheus.AdjustDataTool.prototype = {
               i, j)));
           }
         }
+        changed = true;
       }
       if (options.input.inverse_log_2) {
         for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
@@ -74,9 +76,11 @@ morpheus.AdjustDataTool.prototype = {
             }
           }
         }
+        changed = true;
       }
       if (options.input.quantile_normalize) {
         morpheus.QNorm.execute(dataset);
+        changed = true;
       }
       if (options.input['z-score']) {
         for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
@@ -99,12 +103,16 @@ morpheus.AdjustDataTool.prototype = {
               (dataset.getValue(i, j) - median) / mad);
           }
         }
+        changed = true;
       }
 
+     /* if (changed) {
+          morpheus.DatasetUtil.toESSessionPromise(dataset);
+      }*/
       return new morpheus.HeatMap({
-        name: controller.getName(),
+        name: heatMap.getName(),
         dataset: dataset,
-        parent: controller,
+        parent: heatMap,
         symmetric: project.isSymmetric() && dataset.getColumnCount() === dataset.getRowCount()
       });
     }

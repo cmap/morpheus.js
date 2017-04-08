@@ -140,20 +140,22 @@ morpheus.FormBuilder.showInDraggableDiv = function (options) {
     containment: 'document'
   });
   // $div.resizable();
-  $div.appendTo($(document.body));
+  $div.appendTo(options.appendTo != null ? options.appendTo : $(document.body));
   return $div;
 };
 
 morpheus.FormBuilder.showMessageModal = function (options) {
   var $div = morpheus.FormBuilder
   ._showInModal({
-    z: options.z,
+    modalClass: options.modalClass,
     title: options.title,
     html: options.html,
     footer: ('<button type="button" class="btn btn-default"' +
     ' data-dismiss="modal">OK</button>'),
     backdrop: options.backdrop,
-    size: options.size
+    size: options.size,
+    focus: options.focus,
+    appendTo: options.appendTo
   });
   $div.find('button').focus();
   return $div;
@@ -169,9 +171,11 @@ morpheus.FormBuilder._showInModal = function (options) {
   var html = [];
   options = $.extend({}, {
     size: '',
-    close: true
+    close: true,
+    modalClass: ''
   }, options);
-  html.push('<div tabindex="-1" class="modal" role="dialog" aria-hidden="false"');
+  html.push('<div tabindex="-1" class="modal' + (options.modalClass ? (' ' + options.modalClass) : '') + '" role="dialog"' +
+    ' aria-hidden="false"');
   if (options.z) {
     html.push(' style="z-index: ' + options.z + ' !important;"');
   }
@@ -202,7 +206,7 @@ morpheus.FormBuilder._showInModal = function (options) {
     e.stopPropagation();
   });
   $div.find('.modal-body').html(options.html);
-  $div.prependTo($(document.body));
+  $div.prependTo(options.appendTo != null ? options.appendTo : $(document.body));
   $div.modal({
     keyboard: true,
     backdrop: options.backdrop === true ? true : false,
@@ -211,23 +215,40 @@ morpheus.FormBuilder._showInModal = function (options) {
     if (options.onClose) {
       options.onClose();
     }
+    if (options.focus) {
+      $(options.focus).focus();
+    }
   });
+
   return $div;
 };
+/**
+ *
+ * @param options.z Modal z-index
+ * @param options.title Modal title
+ * @param options.html Model content
+ * @param options.close Whether to show a close button in the footer
+ * @param options.onClose {Function} Funtion to invoke when modal is hidden
+ * @param options.backdrop Whether to show backdrop
+ * @param.options Modal size
+ * @param options.focus Element to return focus to when modal is hidden
+ * @param options.modalClass
+ */
 morpheus.FormBuilder.showInModal = function (options) {
-  var $div = morpheus.FormBuilder
+  return morpheus.FormBuilder
   ._showInModal({
-    z: options.z,
+    modalClass: options.modalClass,
     title: options.title,
     html: options.html,
     footer: options.close ? ('<button type="button" class="btn btn-default" data-dismiss="modal">'
     + options.close + '</button>')
       : null,
-    onClose: options.callback,
+    onClose: options.onClose,
+    appendTo: options.appendTo,
     backdrop: options.backdrop,
-    size: options.size
+    size: options.size,
+    focus: options.focus
   });
-  return $div;
   // if (options.draggable) {
   // $div.draggable({
   // handle : $div.find(".modal-header")
@@ -243,6 +264,8 @@ morpheus.FormBuilder.showInModal = function (options) {
  * @param options.title
  * @param options.content
  * @param options.okCallback
+ * @param options.cancelCallba
+ * @param options.okFocus
  *
  */
 morpheus.FormBuilder.showOkCancel = function (options) {
@@ -267,9 +290,11 @@ morpheus.FormBuilder.showOkCancel = function (options) {
     title: options.title,
     html: options.content,
     footer: footer.join(''),
-    onClose: options.hiddenCallback,
     size: options.size,
-    close: options.close
+    close: options.close,
+    onClose: options.onClose,
+    focus: options.focus,
+    appendTo: options.appendTo
   });
   // if (options.align === 'right') {
   // $div.css('left', $(window).width()
@@ -286,7 +311,7 @@ morpheus.FormBuilder.showOkCancel = function (options) {
     }
     $div.modal('hide');
   });
-  if (options.focus) {
+  if (options.okFocus) {
     $ok.focus();
   }
 
@@ -325,27 +350,6 @@ morpheus.FormBuilder.getValue = function ($element) {
   return $element.attr('type') === 'checkbox' ? $element.prop('checked') : $element.val();
 };
 
-// morpheus.FormBuilder._showInModal = function(title, stuff, footer,
-// hiddenCallback) {
-// var html = [];
-// var id = _.uniqueId('dialog');
-// html.push('<div id="' + id + '">');
-// $(document.body).prepend(html.join(''));
-// $('#' + id).html(stuff);
-// $('#' + id).dialog({
-// modal : true,
-// resizable : true,
-// height : 'auto',
-// width : 400
-// }).on('close', function(e) {
-// $(this).dialog('destroy');
-// $(this).remove();
-// if (hiddenCallback) {
-// hiddenCallback();
-// }
-// });
-// return id;
-// };
 morpheus.FormBuilder.prototype = {
   appendContent: function ($content) {
     this.$form.append($content);

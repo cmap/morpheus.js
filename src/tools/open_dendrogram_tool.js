@@ -38,7 +38,7 @@ morpheus.OpenDendrogramTool.prototype = {
     if (dendrogramField == '' || dendrogramField === 'Newick file does not contain node ids') {
       dendrogramField = null;
     }
-    var controller = options.controller;
+    var heatMap = options.heatMap;
     var dendrogramDeferred = morpheus.Util.getText(fileOrUrl);
     dendrogramDeferred
     .done(function (text) {
@@ -86,7 +86,7 @@ morpheus.OpenDendrogramTool.prototype = {
           }
         }
       }
-      controller.setDendrogram(tree, isColumns, modelIndices);
+      heatMap.setDendrogram(tree, isColumns, modelIndices);
     });
   }
 };

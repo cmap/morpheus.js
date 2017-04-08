@@ -16,11 +16,11 @@ morpheus.HeatMapSynchronizer.prototype = {
   revalidate: function () {
     this.controllers[0].revalidate.apply(this.controllers[0], arguments);
   },
-  add: function (controller) {
+  add: function (heatMap) {
     var that = this;
-    this.controllers.push(controller);
+    this.controllers.push(heatMap);
     // setQuickSearchField, setTrackVisible, removeTrack, updateDataset, zoom, moveTrack, resizeTrack, paintAll, fitToWindow, revalidate, setToolTip, setMousePosition
-    controller.on('change', function (event) {
+    heatMap.on('change', function (event) {
       if (!that.firing) {
         var source = event.source;
         var method = event.name;

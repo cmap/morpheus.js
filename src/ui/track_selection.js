@@ -1,5 +1,5 @@
 morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
-                                    controller) {
+                                    heatMap) {
   var canvas = track.canvas;
   var startIndex = -1;
   var coord = isColumns ? 'x' : 'y';
@@ -19,7 +19,7 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
 
     } else {
       return morpheus.CanvasUtil.getMousePosWithScroll(event.target,
-        event, controller.scrollLeft(), controller.scrollTop(),
+        event, heatMap.scrollLeft(), heatMap.scrollTop(),
         useDelta);
     }
 
@@ -33,7 +33,7 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
     event.preventDefault();
     event.srcEvent.stopImmediatePropagation();
     event.srcEvent.stopPropagation();
-    controller.setSelectedTrack(track.name, isColumns);
+    heatMap.setSelectedTrack(track.name, isColumns);
     track.showPopup(event.srcEvent);
   }).on('panend', this.panend = function (event) {
     panning = false;
@@ -59,22 +59,22 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
       }
       selectionModel.setViewIndices(viewIndices, true);
       if (!isColumns) {
-        var scrollTop = controller.scrollTop();
+        var scrollTop = heatMap.scrollTop();
         var scrollBottom = scrollTop
-          + controller.heatmap.getUnscaledHeight();
+          + heatMap.heatmap.getUnscaledHeight();
         if (position.y > scrollBottom) {
-          controller.scrollTop(scrollTop + 8);
+          heatMap.scrollTop(scrollTop + 8);
         } else if (position.y < scrollTop) {
-          controller.scrollTop(scrollTop - 8);
+          heatMap.scrollTop(scrollTop - 8);
         }
       } else {
-        var scrollLeft = controller.scrollLeft();
+        var scrollLeft = heatMap.scrollLeft();
         var scrollRight = scrollLeft
-          + controller.heatmap.getUnscaledWidth();
+          + heatMap.heatmap.getUnscaledWidth();
         if (position.x > scrollRight) {
-          controller.scrollLeft(scrollLeft + 8);
+          heatMap.scrollLeft(scrollLeft + 8);
         } else if (position.x < scrollLeft) {
-          controller.scrollLeft(scrollLeft - 8);
+          heatMap.scrollLeft(scrollLeft - 8);
         }
       }
       event.preventDefault();
@@ -82,7 +82,7 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
       event.srcEvent.stopImmediatePropagation();
     })
   .on('panstart', this.panstart = function (event) {
-    controller.setSelectedTrack(track.name, isColumns);
+    heatMap.setSelectedTrack(track.name, isColumns);
     var position = getPosition(event, true);
     startIndex = positions.getIndex(position[coord], false);
     panning = true;
@@ -93,14 +93,14 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
       var position = getPosition(event);
       var index = positions.getIndex(position[coord], false);
       if (event.tapCount > 1) {
-        if ((isColumns && !controller.options.columnsSortable)
-          || (!isColumns && !controller.options.rowsSortable)) {
+        if ((isColumns && !heatMap.options.columnsSortable)
+          || (!isColumns && !heatMap.options.rowsSortable)) {
           return;
         }
-        controller.sortBasedOnSelection(null, isColumns,
+        heatMap.sortBasedOnSelection(null, isColumns,
           event.srcEvent.shiftKey);
       } else {
-        controller.setSelectedTrack(track.name, isColumns);
+        heatMap.setSelectedTrack(track.name, isColumns);
         var commandKey = morpheus.Util.IS_MAC ? event.srcEvent.metaKey
           : event.srcEvent.ctrlKey;
         if (morpheus.Util.IS_MAC && event.srcEvent.ctrlKey) { // right-click

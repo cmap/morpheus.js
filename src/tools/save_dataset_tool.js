@@ -52,7 +52,7 @@ morpheus.SaveDatasetTool.prototype = {
       fileName = 'dataset';
     }
     var series = options.input.series;
-    var controller = options.controller;
+    var heatMap = options.heatMap;
     var dataset = options.input.save_selection_only ? project.getSelectedDataset() : project.getSortedFilteredDataset();
     var writer;
     if (format === '1.2') {

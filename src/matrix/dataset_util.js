@@ -223,33 +223,36 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
         options: options
       });
 
-    } else {
-      datasetReader.read(fileOrUrl, function (err, dataset) {
-        if (err) {
-          deferred.reject(err);
+		} else {
+			datasetReader.read(fileOrUrl, function (err, dataset) {
+				if (err) {
+					deferred.reject(err);
+				} else {
+					deferred.resolve(dataset);
+					console.log(dataset);
+					morpheus.DatasetUtil.toESSessionPromise({dataset : dataset, isGEO : isGSE});
+				}
+			});
+
+		}
+		var pr = deferred.promise();
+		pr.toString = function () {
+			return '' + fileOrUrl;
+		};
+		//console.log("morpheus.DatasetUtil.read ::", pr);
+		return pr;
+	} else if (typeof fileOrUrl.done === 'function') { // assume it's a
+		// deferred
+		return fileOrUrl;
+	} else { // it's already a dataset?
+        var deferred = $.Deferred();
+        if (fileOrUrl.getRowCount) {
+            deferred.resolve(fileOrUrl);
         } else {
-          deferred.resolve(dataset);
-            morpheus.DatasetUtil.toESSessionPromise({dataset : dataset, isGEO : isGSE});
+            deferred.resolve(morpheus.Dataset.fromJSON(fileOrUrl));
         }
-      });
-    }
-    var pr = deferred.promise();
-    pr.toString = function () {
-      return '' + fileOrUrl;
-    };
-    return pr;
-  } else if (typeof fileOrUrl.done === 'function') { // assume it's a
-    // deferred
-    return fileOrUrl;
-  } else { // it's already a dataset?
-    var deferred = $.Deferred();
-    if (fileOrUrl.getRowCount) {
-      deferred.resolve(fileOrUrl);
-    } else {
-      deferred.resolve(morpheus.Dataset.fromJSON(fileOrUrl));
-    }
-    return deferred.promise();
-  }
+        return deferred.promise();
+	}
 
 };
 
@@ -404,6 +407,14 @@ morpheus.DatasetUtil.DATASET_FILE_FORMATS = '<a target="_blank" href="https://cl
   + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
   + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
   + ' a tab-delimited text file, or an Excel spreadsheet';
+morpheus.DatasetUtil.SESSION_FILE_FORMAT = 'a saved Morpheus session';
+
+morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS = '<a target="_blank"' +
+  ' href="https://clue.io/help#datasets">GCT 1.3</a>, '
+  + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
+  + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
+  + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
+  + ' a tab-delimited text file, an Excel spreadsheet, or a saved Morpheus session';
 morpheus.DatasetUtil.BASIC_DATASET_FILE_FORMATS = '<a target="_blank" href="https://clue.io/help#datasets">GCT 1.3</a>, '
   + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
   + ' or a tab-delimited text file';
@@ -1042,7 +1053,7 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 
 morpheus.DatasetUtil.toESSessionPromise = function (options) {
 	var dataset = options.dataset ? options.dataset : options;
-	//console.log("ENTERED TO_ESSESSION_PROMISE", dataset);
+	console.log("ENTERED TO_ESSESSION_PROMISE", dataset);
 	dataset.setESSession(new Promise(function (resolve, reject) {
 		//console.log("morpheus.DatasetUtil.toESSessionPromise ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
 		if (dataset instanceof morpheus.SlicedDatasetView) {
@@ -1053,12 +1064,6 @@ morpheus.DatasetUtil.toESSessionPromise = function (options) {
 			resolve(dataset.getESSession());
 			return;
         }
-		if (dataset.getESSession()) {
-			resolve(dataset.getESSession());
-			//console.log("resolved with old value");
-			return;
-		}
-
 		var array = morpheus.DatasetUtil.getContentArray(dataset);
 		var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
 

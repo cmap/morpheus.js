@@ -856,7 +856,6 @@ morpheus.VectorTrack.prototype = {
     var REMOVE_SHOW_SELECTION_ONLY = 'Show All';
     var SORT_ASC = 'Sort Ascending';
     var SORT_DESC = 'Sort Descending';
-    var FILTER = 'Filter...';
     var MOVE_TO_TOP = 'Move To Top';
     var SORT_SEL_ASC = 'Sort Heat Map Ascending \u2191';
     var SORT_SEL_DESC = 'Sort Heat Map Descending \u2193';
@@ -880,19 +879,6 @@ morpheus.VectorTrack.prototype = {
       'Selection': [],
       'Display': []
     };
-    if (isHeader) {
-      if (this.heatmap.options.toolbar.filter) {
-        sectionToItems.Sort.push({
-          name: FILTER
-        });
-      }
-      // sectionToItems['Sort'].push({
-      // name : SORT_ASC
-      // });
-      // sectionToItems['Sort'].push({
-      // name : SORT_DESC
-      // });
-    }
 
     var customItems = this.heatmap.getPopupItems();
     if (customItems && customItems.length > 0) {
@@ -1166,24 +1152,8 @@ morpheus.VectorTrack.prototype = {
       function (event, item) {
         var customItem;
         if (item === 'Copy') {
-          var dataset = project
-          .getSortedFilteredDataset();
-          var v = isColumns ? dataset.getColumnMetadata()
-          .getByName(_this.name) : dataset
-          .getRowMetadata().getByName(_this.name);
-          var selectionModel = isColumns ? project
-          .getColumnSelectionModel() : project
-          .getRowSelectionModel();
-          var text = [];
-          selectionModel.getViewIndices().forEach(
-            function (index) {
-              text.push(morpheus.Util.toString(v
-              .getValue(index)));
-            });
-          event.clipboardData.setData('text/plain', text
-          .join('\n'));
-          event.clipboardData.setData('text/html', text
-          .join('<br />'));
+          heatmap.getActionManager().execute(isColumns ? 'Copy Selected Columns' : 'Copy' +
+            ' Selected Rows');
         } else if (item === FIELDS) {
           var visibleFieldIndices = _this
           .getFullVector()
@@ -1473,103 +1443,14 @@ morpheus.VectorTrack.prototype = {
             }
           });
         } else if (item === CLEAR_SELECTION) {
-          var model = isColumns ? project
-          .getColumnSelectionModel() : project
-          .getRowSelectionModel();
-          model.setViewIndices(new morpheus.Set(), true);
+          heatmap.getActionManager().execute(isColumns ? 'Clear Selected Columns' : 'Clear' +
+            ' Selected Rows');
         } else if (item === INVERT_SELECTION) {
-          var model = isColumns ? project
-          .getColumnSelectionModel() : project
-          .getRowSelectionModel();
-          var viewIndices = model.getViewIndices();
-          var inverse = new morpheus.Set();
-          for (var i = 0, n = positions.getLength(); i < n; i++) {
-            if (!viewIndices.has(i)) {
-              inverse.add(i);
-            }
-          }
-          model.setViewIndices(inverse, true);
-        } else if (item === FILTER) {
-          var vector = _this.getFullVector();
-          var filter;
-          var index = _this.isColumns ? _this.project
-          .getColumnFilter().indexOf(
-            vector.getName())
-            : _this.project.getRowFilter().indexOf(
-              vector.getName());
-          if (index === -1) {
-            if (morpheus.VectorUtil.isNumber(vector)
-              && morpheus.VectorUtil
-              .containsMoreThanNValues(
-                vector, 9)) {
-              filter = new morpheus.RangeFilter(NaN,
-                NaN, vector.getName());
-
-            } else {
-              var set = morpheus.VectorUtil
-              .getSet(vector);
-              var array = set.values();
-              array
-              .sort(morpheus.SortKey.ASCENDING_COMPARATOR);
-              filter = new morpheus.VectorFilter(set,
-                set.size(), vector.getName());
-            }
-            if (filter) {
-              if (_this.isColumns) {
-                _this.project.getColumnFilter()
-                .add(filter, true);
-              } else {
-                _this.project.getRowFilter().add(
-                  filter, true);
-              }
-            }
-
-          }
-
-          if (_this.isColumns) {
-            _this.project.getColumnFilter().trigger(
-              'focus', {});
-          } else {
-            _this.project.getRowFilter().trigger(
-              'focus', {});
-          }
-
+          heatmap.getActionManager().execute(isColumns ? 'Invert Selected Columns' : 'Invert' +
+            ' Selected Rows');
         } else if (item === MOVE_TO_TOP) {
-          var selectionModel = !_this.isColumns ? _this.project.getRowSelectionModel()
-            : _this.project
-            .getColumnSelectionModel();
-          var viewIndices = selectionModel.getViewIndices().values();
-          viewIndices.sort(function (a, b) {
-            return (a === b ? 0 : (a < b ? -1 : 1));
-          });
-          var converter = _this.isColumns ? _this.project.convertViewColumnIndexToModel
-            : _this.project.convertViewRowIndexToModel;
-          converter = _.bind(converter, project);
-          var modelIndices = [];
-          for (var i = 0, n = viewIndices.length; i < n; i++) {
-            modelIndices.push(converter(viewIndices[i]));
-          }
-          var sortKey = new morpheus.MatchesOnTopSortKey(_this.project, modelIndices, 'selection on' +
-            ' top', _this.isColumns);
-          if (_this.isColumns) {
-            _this.project
-            .setColumnSortKeys(
-              morpheus.SortKey
-              .keepExistingSortKeys(
-                [sortKey],
-                project
-                .getColumnSortKeys()),
-              true);
-          } else {
-            _this.project
-            .setRowSortKeys(
-              morpheus.SortKey
-              .keepExistingSortKeys(
-                [sortKey],
-                project
-                .getRowSortKeys()),
-              true);
-          }
+          heatmap.getActionManager().execute(isColumns ? 'Move Selected Columns To Top' : 'Move' +
+            ' Selected Rows To Top');
         } else if (item === SORT_ASC || item === SORT_DESC) {
           var sortKey = new morpheus.SortKey(
             _this.name,
@@ -1608,20 +1489,7 @@ morpheus.VectorTrack.prototype = {
           heatmap.sortBasedOnSelection(sortOrder,
             isColumns, e && e.shiftKey);
         } else if (item === SELECT_ALL) {
-          var selectionModel = !isColumns ? heatmap
-          .getProject().getRowSelectionModel()
-            : heatmap.getProject()
-            .getColumnSelectionModel();
-          var count = !isColumns ? heatmap.getProject()
-          .getSortedFilteredDataset()
-          .getRowCount() : heatmap.getProject()
-          .getSortedFilteredDataset()
-          .getColumnCount();
-          var indices = new morpheus.Set();
-          for (var i = 0; i < count; i++) {
-            indices.add(i);
-          }
-          selectionModel.setViewIndices(indices, true);
+          heatmap.getActionManager().execute(isColumns ? 'Select All Columns' : 'Select All Rows');
         } else if (item === 'Auto Range') {
           delete _this.settings.min;
           delete _this.settings.max;
@@ -1756,7 +1624,7 @@ morpheus.VectorTrack.prototype = {
             title: 'Edit Colors',
             html: colorSchemeChooser.$div,
             close: 'Close',
-            callback: function () {
+            onClose: function () {
               colorSchemeChooser.dispose();
             }
           });
