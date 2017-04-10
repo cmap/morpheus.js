@@ -180,15 +180,14 @@ morpheus.ScentedSearch.prototype = {
     this.scale = availableLength
       / (this.positions.getPosition(this.positions.getLength() - 1) + this.positions
       .getItemSize(this.positions.getLength() - 1));
-    context.strokeStyle = 'rgb(106,137,177)';
-    context.fillStyle = 'rgb(182,213,253)';
+    context.fillStyle = morpheus.ScentedSearch.TICK_COLOR;
     context.lineWidth = 1;
     this.drawIndices(context, this.searchIndices);
     this.drawHoverMatchingValues(context);
   },
   drawHoverMatchingValues: function (context) {
     var heatmap = this.heatMap;
-    context.fillStyle = 'black';
+    context.fillStyle = morpheus.ScentedSearch.MATCHING_VALUES_TICK_COLOR;
     if (heatmap.mousePositionOptions
       && heatmap.mousePositionOptions.name != null) {
       var isColumns = !this.isVertical;
@@ -199,8 +198,8 @@ morpheus.ScentedSearch.prototype = {
       }
       if (track.settings.highlightMatchingValues) {
         var hoverIndex = isColumns ? heatmap.getProject()
-          .getHoverColumnIndex() : heatmap.getProject()
-          .getHoverRowIndex();
+        .getHoverColumnIndex() : heatmap.getProject()
+        .getHoverRowIndex();
         if (hoverIndex === -1) {
           return;
         }
@@ -224,16 +223,16 @@ morpheus.ScentedSearch.prototype = {
         }
         var scale = this.scale;
         var lineLength = !this.isVertical ? this.scrollbar
-          .getUnscaledHeight() : this.scrollbar
-          .getUnscaledWidth();
+        .getUnscaledHeight() : this.scrollbar
+        .getUnscaledWidth();
         var isVertical = this.isVertical;
         var positions = this.positions;
         var project = heatmap.getProject();
         for (var i = 0, length = modelIndices.length; i < length; i++) {
           var modelIndex = modelIndices[i];
           var index = isVertical ? project
-            .convertModelRowIndexToView(modelIndex) : project
-            .convertModelColumnIndexToView(modelIndex);
+          .convertModelRowIndexToView(modelIndex) : project
+          .convertModelColumnIndexToView(modelIndex);
           if (index === -1) {
             continue;
           }
@@ -266,17 +265,19 @@ morpheus.ScentedSearch.prototype = {
         context.rect(0, pix, lineLength,
           morpheus.ScentedSearch.LINE_HEIGHT);
         context.fill();
-        context.stroke();
+        //  context.stroke();
 
       } else {
         context.beginPath();
         context.rect(pix, 0, morpheus.ScentedSearch.LINE_HEIGHT,
           lineLength);
         context.fill();
-        context.stroke();
+        //context.stroke();
       }
     }
 
   }
 };
 morpheus.Util.extend(morpheus.ScentedSearch, morpheus.AbstractCanvas);
+morpheus.ScentedSearch.MATCHING_VALUES_TICK_COLOR = 'black';
+morpheus.ScentedSearch.TICK_COLOR = '#3182bd';
