@@ -1882,7 +1882,7 @@ morpheus.HeatMap.prototype = {
     }
 
     this.options.parent = null; // avoid memory leak
-    this.$tipFollow = $('<div style="left:-1000px; top:-1000px;width:0px"' +
+    this.$tipFollow = $('<div style="display:none;"' +
       ' class="morpheus-tip-inline"></div>');
     this.$tipFollow.appendTo(this.$parent);
 
@@ -2351,9 +2351,7 @@ morpheus.HeatMap.prototype = {
     this.$tipInfoWindow.html('');
     this.toolbar.$tip.html('');
     this.$tipFollow.html('').css({
-      left: '-1000px',
-      top: '-1000px',
-      width: '0px'
+      display: 'none'
 
     });
     this.toolbar.$tip.css('display', mode === 0 ? '' : 'none');
@@ -2382,9 +2380,7 @@ morpheus.HeatMap.prototype = {
     } else {
       this.tipFollowHidden = true;
       this.$tipFollow.empty().css({
-        left: '-1000px',
-        top: '-1000px',
-        width: '0px'
+        display: 'none'
       });
     }
     this.trigger('change', {
@@ -2485,7 +2481,7 @@ morpheus.HeatMap.prototype = {
 
           var rect = this.$parent[0].getBoundingClientRect();
           this.$tipFollow.html($wrapper).css({
-            width: '',
+            display: '',
             left: Math.round(parseFloat(this.heatmap.canvas.style.left) - 1) + 'px',
             top: (options.event.clientY - rect.top - wrapperHeight / 2) + 'px'
           });
@@ -2590,7 +2586,7 @@ morpheus.HeatMap.prototype = {
           this.$tipFollow.html($wrapper).css({
             top: parseFloat(this.heatmap.canvas.style.top) - trackHeight - morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS - 1,
             left: (options.event.clientX - rect.left) - (wrapperWidth / 2),
-            width: ''
+            display: ''
           });
           return;
         } else {
@@ -2671,7 +2667,7 @@ morpheus.HeatMap.prototype = {
       this.$tipFollow.css({
         left: left + 'px',
         top: top + 'px',
-        width: ''
+        display: ''
       });
     }
   }
