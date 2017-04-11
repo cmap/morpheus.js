@@ -658,6 +658,7 @@ morpheus.HeatMapOptions = function (heatMap) {
     title: 'Options',
     html: $div,
     close: 'Close',
+    focus: heatMap.getFocusEl(),
     onClose: function () {
       $div.find('input').off('keyup');
       $ca.off('change');

@@ -85,22 +85,22 @@ morpheus.OpenFileTool.prototype = {
       $('<h4>Use your own file</h4>').insertAfter(
         form.$form.find('.form-group:first'));
       var _this = this;
-      var id = _.uniqueId('morpheus');
-      var $sampleDatasets = $('<div class="collapse" id="' + id
-        + '" style="overflow:auto;"></div>');
+      var collapseId = _.uniqueId('morpheus');
       $('<h4><a role="button" data-toggle="collapse" href="#'
-        + id
+        + collapseId
         + '" aria-expanded="false" aria-controls="'
-        + id + '">Or select a preloaded dataset</a></h4>').appendTo($preloaded);
-      $sampleDatasets.append($preloaded);
+        + collapseId + '">Or select a preloaded dataset</a></h4>').appendTo($preloaded);
+      var $sampleDatasets = $('<div data-name="sampleData" id="' + collapseId + '" class="collapse"' +
+        ' id="' + collapseId + '" style="overflow:auto;"></div>');
       $preloaded.appendTo(form.$form);
       var sampleDatasets = new morpheus.SampleDatasets({
         $el: $sampleDatasets,
         callback: function (heatMapOptions) {
-          form.setValue('file', heatMapOptions.dataset);
+          _this.options.file = heatMapOptions.dataset;
           _this.ok();
         }
       });
+      $sampleDatasets.appendTo($preloaded);
     }
     form.on('change', function (e) {
       var value = e.value;

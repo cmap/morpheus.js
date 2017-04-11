@@ -62,8 +62,7 @@ module.exports = function (grunt) {
           'js/canvg.js', 'js/rgbcolor.js',
           'js/jquery-ui.min.js', 'js/parser.js',
           'js/FileSaver.min.js', 'js/colorbrewer.js',
-          'js/jquery.event.drag-2.2.js',
-          'js/clipboard.min.js', 'js/slick.min.js', 'js/canvas-toBlob.js',
+          'js/jquery.event.drag-2.2.js', 'js/slick.min.js', 'js/canvas-toBlob.js',
           'js/js.cookie.js']
       },
       morpheus: {

@@ -225,20 +225,21 @@ morpheus.HeatMap = function (options) {
       inlineTooltip: true,
       $loadingImage: morpheus.Util.createLoadingEl(),
       menu: {
-        File: ['Open File', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
+        File: ['Open', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
         Tools: ['New Heat Map', 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors', 'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API'],
         View: ['Zoom In', 'Zoom Out', 'Fit To Window', 'Reset Zoom', null, 'Options'],
-        Edit: ['Copy Image', null, 'Move Selected Rows To Top', 'Invert' +
+        Edit: ['Copy Image', 'Copy Selected Dataset', null, 'Move Selected Rows To Top', 'Annotate Selected Rows', 'Invert' +
         ' Selected Rows', 'Copy Selected Rows', 'Select All Rows', null, 'Move Selected Columns' +
-        ' To Top', 'Invert Selected Columns', 'Copy Selected Columns', 'Select All Columns'],
+        ' To Top', 'Annotate Selected Columns', 'Invert Selected Columns', 'Copy Selected' +
+        ' Columns', 'Select' +
+        ' All' +
+        ' Columns'],
         Help: ['Find Action', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keymap' +
         ' Reference']
       },
-      // toolbar: ['Search Rows', 'Search Columns', 'Dimensions', null, 'Save Image', 'Color Key']
       toolbar: {
         dimensions: true,
         zoom: true,
-        tools: true,
         searchRows: true,
         searchColumns: true,
         searchValues: false,
@@ -639,6 +640,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
     };
     var $formDiv;
     tool.ok = function () {
+      $formDiv.modal('hide');
       okCallback();
     };
     var guiOptions = $.extend({}, {
@@ -2352,7 +2354,6 @@ morpheus.HeatMap.prototype = {
     this.toolbar.$tip.html('');
     this.$tipFollow.html('').css({
       display: 'none'
-
     });
     this.toolbar.$tip.css('display', mode === 0 ? '' : 'none');
     this.setToolTip(-1, -1);
@@ -2662,14 +2663,12 @@ morpheus.HeatMap.prototype = {
       // on top
       top = options.event.clientY - parentRect.top - offset - tipHeight;
     }
+    this.$tipFollow.css({
+      left: left + 'px',
+      top: top + 'px',
+      display: ''
+    });
 
-    if (Math.abs(left - parseFloat(this.$tipFollow[0].style.left)) >= 1 || Math.abs(top - parseFloat(this.$tipFollow[0].style.top)) >= 1) {
-      this.$tipFollow.css({
-        left: left + 'px',
-        top: top + 'px',
-        display: ''
-      });
-    }
   }
   ,
   setTrackVisibility: function (tracks) {

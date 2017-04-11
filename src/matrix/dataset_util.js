@@ -176,6 +176,9 @@ morpheus.DatasetUtil.annotate = function (options) {
  * @return A promise that resolves to morpheus.DatasetInterface
  */
 morpheus.DatasetUtil.read = function (fileOrUrl, options) {
+  if (fileOrUrl == null) {
+    throw 'File is null';
+  }
   if (options == null) {
     options = {};
   }
@@ -235,10 +238,13 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
     // deferred
     return fileOrUrl;
   } else { // it's already a dataset?
+    if (fileOrUrl.promise) { // it's a promise
+      return fileOrUrl;
+    }
     var deferred = $.Deferred();
-    if (fileOrUrl.getRowCount) {
+    if (fileOrUrl.getRowCount) { // it's a dataset
       deferred.resolve(fileOrUrl);
-    } else {
+    } else { // JSON
       deferred.resolve(morpheus.Dataset.fromJSON(fileOrUrl));
     }
     return deferred.promise();
