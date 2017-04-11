@@ -30202,7 +30202,7 @@ morpheus.HeatMap.prototype = {
     }
 
     this.options.parent = null; // avoid memory leak
-    this.$tipFollow = $('<div style="left:-1000px; top:-1000px;width:0px"' +
+    this.$tipFollow = $('<div style="display:none;"' +
       ' class="morpheus-tip-inline"></div>');
     this.$tipFollow.appendTo(this.$parent);
 
@@ -30671,9 +30671,7 @@ morpheus.HeatMap.prototype = {
     this.$tipInfoWindow.html('');
     this.toolbar.$tip.html('');
     this.$tipFollow.html('').css({
-      left: '-1000px',
-      top: '-1000px',
-      width: '0px'
+      display: 'none'
 
     });
     this.toolbar.$tip.css('display', mode === 0 ? '' : 'none');
@@ -30702,9 +30700,7 @@ morpheus.HeatMap.prototype = {
     } else {
       this.tipFollowHidden = true;
       this.$tipFollow.empty().css({
-        left: '-1000px',
-        top: '-1000px',
-        width: '0px'
+        display: 'none'
       });
     }
     this.trigger('change', {
@@ -30805,7 +30801,7 @@ morpheus.HeatMap.prototype = {
 
           var rect = this.$parent[0].getBoundingClientRect();
           this.$tipFollow.html($wrapper).css({
-            width: '',
+            display: '',
             left: Math.round(parseFloat(this.heatmap.canvas.style.left) - 1) + 'px',
             top: (options.event.clientY - rect.top - wrapperHeight / 2) + 'px'
           });
@@ -30910,7 +30906,7 @@ morpheus.HeatMap.prototype = {
           this.$tipFollow.html($wrapper).css({
             top: parseFloat(this.heatmap.canvas.style.top) - trackHeight - morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS - 1,
             left: (options.event.clientX - rect.left) - (wrapperWidth / 2),
-            width: ''
+            display: ''
           });
           return;
         } else {
@@ -30991,7 +30987,7 @@ morpheus.HeatMap.prototype = {
       this.$tipFollow.css({
         left: left + 'px',
         top: top + 'px',
-        width: ''
+        display: ''
       });
     }
   }
@@ -33141,15 +33137,14 @@ morpheus.ScentedSearch.prototype = {
     this.scale = availableLength
       / (this.positions.getPosition(this.positions.getLength() - 1) + this.positions
       .getItemSize(this.positions.getLength() - 1));
-    context.strokeStyle = 'rgb(106,137,177)';
-    context.fillStyle = 'rgb(182,213,253)';
+    context.fillStyle = morpheus.ScentedSearch.TICK_COLOR;
     context.lineWidth = 1;
     this.drawIndices(context, this.searchIndices);
     this.drawHoverMatchingValues(context);
   },
   drawHoverMatchingValues: function (context) {
     var heatmap = this.heatMap;
-    context.fillStyle = 'black';
+    context.fillStyle = morpheus.ScentedSearch.MATCHING_VALUES_TICK_COLOR;
     if (heatmap.mousePositionOptions
       && heatmap.mousePositionOptions.name != null) {
       var isColumns = !this.isVertical;
@@ -33160,8 +33155,8 @@ morpheus.ScentedSearch.prototype = {
       }
       if (track.settings.highlightMatchingValues) {
         var hoverIndex = isColumns ? heatmap.getProject()
-          .getHoverColumnIndex() : heatmap.getProject()
-          .getHoverRowIndex();
+        .getHoverColumnIndex() : heatmap.getProject()
+        .getHoverRowIndex();
         if (hoverIndex === -1) {
           return;
         }
@@ -33185,16 +33180,16 @@ morpheus.ScentedSearch.prototype = {
         }
         var scale = this.scale;
         var lineLength = !this.isVertical ? this.scrollbar
-          .getUnscaledHeight() : this.scrollbar
-          .getUnscaledWidth();
+        .getUnscaledHeight() : this.scrollbar
+        .getUnscaledWidth();
         var isVertical = this.isVertical;
         var positions = this.positions;
         var project = heatmap.getProject();
         for (var i = 0, length = modelIndices.length; i < length; i++) {
           var modelIndex = modelIndices[i];
           var index = isVertical ? project
-            .convertModelRowIndexToView(modelIndex) : project
-            .convertModelColumnIndexToView(modelIndex);
+          .convertModelRowIndexToView(modelIndex) : project
+          .convertModelColumnIndexToView(modelIndex);
           if (index === -1) {
             continue;
           }
@@ -33227,20 +33222,22 @@ morpheus.ScentedSearch.prototype = {
         context.rect(0, pix, lineLength,
           morpheus.ScentedSearch.LINE_HEIGHT);
         context.fill();
-        context.stroke();
+        //  context.stroke();
 
       } else {
         context.beginPath();
         context.rect(pix, 0, morpheus.ScentedSearch.LINE_HEIGHT,
           lineLength);
         context.fill();
-        context.stroke();
+        //context.stroke();
       }
     }
 
   }
 };
 morpheus.Util.extend(morpheus.ScentedSearch, morpheus.AbstractCanvas);
+morpheus.ScentedSearch.MATCHING_VALUES_TICK_COLOR = 'black';
+morpheus.ScentedSearch.TICK_COLOR = '#3182bd';
 
 morpheus.ScrollBar = function (isVertical) {
   morpheus.AbstractCanvas.call(this);
@@ -34192,52 +34189,10 @@ morpheus.TabManager.prototype = {
    *            Tab id for task
    */
   addTask: function (task) {
-    var $a = this._getA(task.tabId);
-    if ($a.length === 0) {
-      console.log(task.tabId + ' not found.');
-      return;
 
-    }
-    var $i = $a.find('i');
-    var tasks = $i.data('tasks');
-    if (!tasks) {
-      tasks = [];
-    }
-    task.id = _.uniqueId('task');
-    tasks.push(task);
-    $i.data('tasks', tasks);
-    $a
-    .removeClass('animated flash')
-    .addClass('animated flash')
-    .one(
-      'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend',
-      function () {
-        $(this).removeClass('animated flash');
-      });
-
-    $i.addClass('fa fa-spinner fa-spin');
   },
   removeTask: function (task) {
-    var $a = this._getA(task.tabId);
-    var $i = $a.find('i');
-    var tasks = $i.data('tasks');
-    if (!tasks) {
-      tasks = [];
-    }
-    var index = -1;
-    for (var i = 0; i < tasks.length; i++) {
-      if (tasks[i].id === task.id) {
-        index = i;
-        break;
-      }
-    }
-    if (index !== -1) {
-      tasks.splice(index, 1);
-      $i.data('tasks', tasks);
-      if (tasks.length === 0) {
-        $i.removeClass('fa fa-spinner fa-spin');
-      }
-    }
+
   },
   getWidth: function () {
     return this.$tabContent.outerWidth() || $(window).width();

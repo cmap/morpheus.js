@@ -203,52 +203,10 @@ morpheus.TabManager.prototype = {
    *            Tab id for task
    */
   addTask: function (task) {
-    var $a = this._getA(task.tabId);
-    if ($a.length === 0) {
-      console.log(task.tabId + ' not found.');
-      return;
 
-    }
-    var $i = $a.find('i');
-    var tasks = $i.data('tasks');
-    if (!tasks) {
-      tasks = [];
-    }
-    task.id = _.uniqueId('task');
-    tasks.push(task);
-    $i.data('tasks', tasks);
-    $a
-    .removeClass('animated flash')
-    .addClass('animated flash')
-    .one(
-      'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend',
-      function () {
-        $(this).removeClass('animated flash');
-      });
-
-    $i.addClass('fa fa-spinner fa-spin');
   },
   removeTask: function (task) {
-    var $a = this._getA(task.tabId);
-    var $i = $a.find('i');
-    var tasks = $i.data('tasks');
-    if (!tasks) {
-      tasks = [];
-    }
-    var index = -1;
-    for (var i = 0; i < tasks.length; i++) {
-      if (tasks[i].id === task.id) {
-        index = i;
-        break;
-      }
-    }
-    if (index !== -1) {
-      tasks.splice(index, 1);
-      $i.data('tasks', tasks);
-      if (tasks.length === 0) {
-        $i.removeClass('fa fa-spinner fa-spin');
-      }
-    }
+
   },
   getWidth: function () {
     return this.$tabContent.outerWidth() || $(window).width();
