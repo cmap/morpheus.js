@@ -242,6 +242,7 @@ morpheus.VectorColorModel.prototype = {
       }
       metadataValueToColorMap.set(value, color);
     }
+    console.log(value, color);
     return color;
   },
   setMappedValue: function (vector, value, color) {
