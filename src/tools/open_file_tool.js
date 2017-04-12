@@ -3,7 +3,7 @@ morpheus.OpenFileTool = function (options) {
 };
 morpheus.OpenFileTool.prototype = {
   toString: function () {
-    return 'Open File';
+    return 'Open';
   },
   gui: function () {
     var array = [{
