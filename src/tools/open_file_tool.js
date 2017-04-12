@@ -106,6 +106,7 @@ morpheus.OpenFileTool.prototype = {
       var value = e.value;
       if (value !== '' && value != null) {
         form.setValue('file', value);
+        _this.options.file = value;
         _this.ok();
       }
     });
