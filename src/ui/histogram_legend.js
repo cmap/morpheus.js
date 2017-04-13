@@ -88,10 +88,13 @@ morpheus.HistogramLegend.prototype = {
     var min = colorScheme.getMin();
     var binSize = this.binSize;
     var y0 = countToPosition(0);
-    context.font = '11px ' + morpheus.CanvasUtil.FONT_NAME;
+
     if (this.name != null) {
-      context.textBaseline = 'top';
-      context.fillText(this.name, 0, 0);
+      context.font = '11px ' + morpheus.CanvasUtil.FONT_NAME;
+      context.fillStyle = 'black';
+      context.lineWidth = 1;
+    //  context.textBaseline = 'top';
+      context.fillText(this.name, 0, 12);
       context.translate(0, 14);
     }
     context.lineWidth = 0.2;
@@ -137,6 +140,7 @@ morpheus.HistogramLegend.prototype = {
     // context.fillRect(median - 1, 0.5, 2, boxPlotHeight - 0.5);
     //
     context.translate(0, histogramHeight + 1);
+    context.fillStyle = 'black';
     morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
       this.colorScheme, canvasWidth, false, false, 6);
   }
