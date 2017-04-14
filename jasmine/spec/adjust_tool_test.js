@@ -10,7 +10,7 @@ describe('adjust_tool_test', function () {
     });
 
     var newHeatMap = new morpheus.AdjustDataTool().execute({
-      controller: heatmap,
+      heatMap: heatmap,
       project: heatmap.getProject(),
       input: {
         log_2: true
@@ -24,7 +24,7 @@ describe('adjust_tool_test', function () {
       }), 0.00001);
 
     newHeatMap = new morpheus.AdjustDataTool().execute({
-      controller: newHeatMap,
+      heatMap: newHeatMap,
       project: newHeatMap.getProject(),
       input: {
         inverse_log_2: true
@@ -49,7 +49,7 @@ describe('adjust_tool_test', function () {
     });
 
     var newHeatMap = new morpheus.AdjustDataTool().execute({
-      controller: heatmap,
+      heatMap: heatmap,
       project: heatmap.getProject(),
       input: {
         log_2: true
@@ -76,7 +76,7 @@ describe('adjust_tool_test', function () {
     // var r_sd = [ 4.932883, 6.658328 ];
     // var r_mean = [ 4.333333, 7.333333 ];
     var newHeatMap = new morpheus.AdjustDataTool().execute({
-      controller: heatmap,
+      heatMap: heatmap,
       project: heatmap.getProject(),
       input: {
         'z-score': true
@@ -104,7 +104,7 @@ describe('adjust_tool_test', function () {
     // var r_mad = [ 1.4826, 1.4826 ];
     // var r_median = [ 2, 4];
     var newHeatMap = new morpheus.AdjustDataTool().execute({
-      controller: heatmap,
+      heatMap: heatmap,
       project: heatmap.getProject(),
       input: {
         'robust_z-score': true

@@ -1,7 +1,7 @@
-describe("dataset_test", function() {
+describe('dataset_test', function() {
 
-	describe("transpose", function() {
-		it("transposes a square matrix", function() {
+	describe('transpose', function() {
+		it('transposes a square matrix', function() {
 			expect(new morpheus.TransposedDatasetView(new morpheus.Dataset({
 				array : [ [ 1, 2 ], [ 3, 4 ] ],
 				rows : 2,
@@ -14,7 +14,7 @@ describe("dataset_test", function() {
 
 		});
 
-		it("transposes a non-square matrix", function() {
+		it('transposes a non-square matrix', function() {
 			expect(new morpheus.TransposedDatasetView(new morpheus.Dataset({
 				array : [ [ 1, 2, 3, 4, 5 ], [ 2, 4, 6, 8, 10 ] ],
 				rows : 2,
@@ -26,7 +26,7 @@ describe("dataset_test", function() {
 			}));
 
 		});
-		it("transposes a single-row matrix", function() {
+		it('transposes a single-row matrix', function() {
 			expect(new morpheus.TransposedDatasetView(new morpheus.Dataset({
 				array : [ [ 1, 2, 3, 4, 5 ] ],
 				rows : 1,
@@ -41,8 +41,8 @@ describe("dataset_test", function() {
 
 	});
 
-	describe("slice", function() {
-		it("slice rows", function() {
+	describe('slice', function() {
+		it('slice rows', function() {
 			expect(new morpheus.SlicedDatasetView(new morpheus.Dataset({
 				array : [ [ 1, 2 ], [ 3, 4 ] ],
 				rows : 2,
@@ -55,7 +55,7 @@ describe("dataset_test", function() {
 
 		});
 
-		it("slice columns", function() {
+		it('slice columns', function() {
 			expect(new morpheus.SlicedDatasetView(new morpheus.Dataset({
 				array : [ [ 1, 2 ], [ 3, 4 ] ],
 				rows : 2,
