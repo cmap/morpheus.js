@@ -23,8 +23,16 @@ morpheus.KMeansTool.execute = function (dataset, input) {
       }
       arrayOfArrays.push(array);
     }
-    var kmeans = new morpheus.KMeansPlusPlusClusterer(f, input.number_of_clusters, input.maximum_iterations);
-    return kmeans.execute(arrayOfArrays);
+    var kmeans = new morpheus.KMeansPlusPlusClusterer(input.number_of_clusters, input.maximum_iterations, f);
+    var clusters = kmeans.execute(arrayOfArrays);
+    // need to return in JSON
+    var assignments = [];
+    for (var i = 0; i < clusters.length; i++) {
+      clusters[i].getPoints().forEach(function (p) {
+        assignments[p.i] = i + 1;
+      });
+    }
+    return assignments;
   };
   var rowAssignments;
   var columnAssignments;
@@ -41,6 +49,7 @@ morpheus.KMeansTool.execute = function (dataset, input) {
         : dataset));
 
   }
+
   return {
     rowAssignments: rowAssignments,
     columnAssignments: columnAssignments
@@ -129,16 +138,14 @@ morpheus.KMeansTool.prototype = {
     options.input.selectedColumnsToUseForClusteringRows = selectedColumnsToUseForClusteringRows;
     var dataset = project.getSortedFilteredDataset();
     if (options.input.background === undefined) {
-      options.input.background = false;
+      options.input.background = true;
     }
     options.input.background = options.input.background && typeof Worker !== 'undefined';
 
     function addAssignments(d, assignments, k) {
       var v = d.getColumnMetadata().add('k_means_' + k);
       for (var i = 0; i < assignments.length; i++) {
-        assignments[i].getPoints().forEach(function (p) {
-          v.setValue(p.i, i + 1);
-        });
+        v.setValue(i, assignments[i]);
       }
     }
 
@@ -148,6 +155,7 @@ morpheus.KMeansTool.prototype = {
         addAssignments(dataset, result.columnAssignments, options.input.number_of_clusters);
         heatmap.addTrack('k_means_' + options.input.number_of_clusters, true, {
           highlightMatchingValues: true,
+          discreteAutoDetermined: true,
           render: {color: true}
         });
       }
@@ -155,13 +163,12 @@ morpheus.KMeansTool.prototype = {
         addAssignments(new morpheus.TransposedDatasetView(dataset), result.rowAssignments, options.input.number_of_clusters);
         heatmap.addTrack('k_means_' + options.input.number_of_clusters, false, {
           highlightMatchingValues: true,
+          discreteAutoDetermined: true,
           render: {color: true}
         });
       }
       heatmap.revalidate();
-
     } else {
-
       var blob = new Blob(
         ['self.onmessage = function(e) {'
         + 'importScripts(e.data.scripts);'
@@ -170,7 +177,6 @@ morpheus.KMeansTool.prototype = {
 
       var url = window.URL.createObjectURL(blob);
       var worker = new Worker(url);
-
       worker.postMessage({
         scripts: morpheus.Util.getScriptPath(),
         dataset: morpheus.Dataset.toJSON(dataset, {
@@ -183,10 +189,12 @@ morpheus.KMeansTool.prototype = {
 
       worker.onmessage = function (e) {
         var result = e.data;
+        console.log(result);
         if (result.columnAssignments) {
           addAssignments(dataset, result.columnAssignments, options.input.number_of_clusters);
           heatmap.addTrack('k_means_' + options.input.number_of_clusters, true, {
             highlightMatchingValues: true,
+            discreteAutoDetermined: true,
             render: {color: true}
           });
         }
@@ -194,6 +202,7 @@ morpheus.KMeansTool.prototype = {
           addAssignments(new morpheus.TransposedDatasetView(dataset), result.rowAssignments, options.input.number_of_clusters);
           heatmap.addTrack('k_means_' + options.input.number_of_clusters, false, {
             highlightMatchingValues: true,
+            discreteAutoDetermined: true,
             render: {color: true}
           });
         }
