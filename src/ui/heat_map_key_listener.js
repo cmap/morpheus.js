@@ -319,7 +319,7 @@ morpheus.HeatMapKeyListener = function (heatMap) {
   }).on(
     'drop.morpheus',
     function (e) {
-      if (heatMap.options.menu.File.indexOf('Open') !== -1 && e.originalEvent.dataTransfer
+      if (heatMap.options.menu.File && heatMap.options.menu.File.indexOf('Open') !== -1 && e.originalEvent.dataTransfer
         && e.originalEvent.dataTransfer.files.length) {
         e.preventDefault();
         e.stopPropagation();

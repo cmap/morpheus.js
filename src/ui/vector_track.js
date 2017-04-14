@@ -909,7 +909,8 @@ morpheus.VectorTrack.prototype = {
     sectionToItems.Selection.push({
       separator: true
     });
-    if (this.heatmap.options.menu.Edit.indexOf('Annotate Selected Rows') !== -1) {
+    if (this.heatmap.options.menu.Edit && this.heatmap.options.menu.Edit.indexOf('Annotate' +
+        ' Selected Rows') !== -1) {
       sectionToItems.Selection.push({
         name: ANNOTATE_SELECTION
       });

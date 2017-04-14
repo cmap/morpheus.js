@@ -215,14 +215,14 @@ morpheus.WeightedMean = function (weights, values) {
   for (var i = 0, size = values.size(); i < size; i++) {
     var value = values.getValue(i);
     if (!isNaN(value)) {
-      var weight = weights.getValue(i);
+      var weight = Math.abs(weights.getValue(i));
       if (!isNaN(weight)) {
         numerator += (weight * value);
         denom += weight;
       }
     }
   }
-  return denom == 0 ? NaN : numerator / denom;
+  return denom === 0 ? NaN : numerator / denom;
 };
 morpheus.WeightedMean.toString = function () {
   return 'Weighted average';
