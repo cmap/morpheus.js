@@ -2724,11 +2724,11 @@ morpheus.HeatMap.prototype = {
     // see if already visible
     var existingIndex = this.getTrackIndex(name, isColumns);
     if (existingIndex !== -1) {
-      return;
+      return tracks[existingIndex];
     }
     if (renderSettings == null) {
-      renderSettings = morpheus.VectorUtil.getDataType(this.project
-      .getFullDataset().getColumnMetadata().getByName(name)) === '[number]' ? 'bar'
+      var metadata = isColumns ? this.project.getFullDataset().getColumnMetadata() : this.project.getFullDataset().getRowMetadata()
+      renderSettings = morpheus.VectorUtil.getDataType(metadata.getByName(name)) === '[number]' ? 'bar'
         : morpheus.VectorTrack.RENDER.TEXT;
     }
 
