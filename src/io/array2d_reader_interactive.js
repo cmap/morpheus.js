@@ -134,7 +134,7 @@ morpheus.Array2dReaderInteractive.prototype = {
       .push('<button name="cancel" type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>');
       var $footer = $(footer.join(''));
       morpheus.FormBuilder.showOkCancel({
-        title: 'Open File',
+        title: 'Open',
         content: $el,
         close: false,
         cancelCallback: function () {

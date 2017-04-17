@@ -150,10 +150,11 @@ morpheus.ActionManager = function () {
       // 		'text/html',
       // 		'<img src="' + url + '">');
       // });
-      setTimeout(function () {
-        morpheus.Util.setClipboardData('<img src="' + url + '">');
-      }, 20);
 
+      morpheus.Util.setClipboardData([{
+        format: 'text/html',
+        data: '<img src="' + url + '">'
+      }], true);
     }
   });
 
@@ -199,7 +200,7 @@ morpheus.ActionManager = function () {
 
   this.add({
     global: true,
-    name: 'Open File',
+    name: 'Open',
     cb: function (options) {
       morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
         customUrls: options.heatMap._customUrls
@@ -748,10 +749,10 @@ morpheus.ActionManager = function () {
         text.push(morpheus.Util.toString(v
         .getValue(index)));
       });
-    setTimeout(function () {
-      morpheus.Util.setClipboardData(text.join('<br>'));
-    }, 20);
-
+    morpheus.Util.setClipboardData([{
+      format: 'text/plain',
+      data: text.join('\n')
+    }]);
   };
   this.add({
     name: 'Copy Selected Rows',
@@ -763,6 +764,98 @@ morpheus.ActionManager = function () {
     name: 'Copy Selected Columns',
     cb: function (options) {
       copySelection(options, true);
+    }
+  });
+
+  var annotateSelection = function (options, isColumns) {
+
+    var project = options.heatMap.getProject();
+    var selectionModel = isColumns ? project
+    .getColumnSelectionModel()
+      : project
+      .getRowSelectionModel();
+    if (selectionModel.count() === 0) {
+      morpheus.FormBuilder
+      .showMessageModal({
+        title: 'Annotate Selection',
+        html: 'No ' + (isColumns ? 'columns' : 'rows') + ' selected.',
+        focus: options.heatMap.getFocusEl()
+      });
+      return;
+    }
+    var formBuilder = new morpheus.FormBuilder();
+    formBuilder.append({
+      name: 'annotation_name',
+      type: 'text',
+      required: true
+    });
+    formBuilder.append({
+      name: 'annotation_value',
+      type: 'text',
+      required: true
+    });
+    morpheus.FormBuilder
+    .showOkCancel({
+      title: 'Annotate',
+      content: formBuilder.$form,
+      focus: options.heatMap.getFocusEl(),
+      okCallback: function () {
+        var value = formBuilder
+        .getValue('annotation_value');
+        var annotationName = formBuilder
+        .getValue('annotation_name');
+        var dataset = project
+        .getSortedFilteredDataset();
+        var fullDataset = project
+        .getFullDataset();
+        if (isColumns) {
+          dataset = morpheus.DatasetUtil
+          .transposedView(dataset);
+          fullDataset = morpheus.DatasetUtil
+          .transposedView(fullDataset);
+        }
+
+        var existingVector = fullDataset
+        .getRowMetadata()
+        .getByName(
+          annotationName);
+        var v = dataset
+        .getRowMetadata().add(
+          annotationName);
+
+        selectionModel
+        .getViewIndices()
+        .forEach(
+          function (index) {
+            v
+            .setValue(
+              index,
+              value);
+          });
+        morpheus.VectorUtil
+        .maybeConvertStringToNumber(v);
+        project
+        .trigger(
+          'trackChanged',
+          {
+            vectors: [v],
+            render: existingVector != null ? []
+              : [morpheus.VectorTrack.RENDER.TEXT],
+            columns: isColumns
+          });
+      }
+    });
+  };
+  this.add({
+    name: 'Annotate Selected Rows',
+    cb: function (options) {
+      annotateSelection(options, false);
+    }
+  });
+  this.add({
+    name: 'Annotate Selected Columns',
+    cb: function (options) {
+      annotateSelection(options, true);
     }
   });
   this.add({
@@ -805,12 +898,11 @@ morpheus.ActionManager = function () {
 
       var text = new morpheus.GctWriter()
       .write(dataset);
-      if (text.length > 0) {
-        setTimeout(function () {
-          text = text.replace(/\t/g, '&emsp;').replace(/\n/g, '<br>');
-          morpheus.Util.setClipboardData(text);
-        }, 20);
-      }
+      morpheus.Util.setClipboardData([{
+        format: 'text/plain',
+        data: text
+      }]);
+
     }
   });
   var _this = this;

@@ -24,15 +24,15 @@ morpheus.SampleDatasets = function (options) {
     $this.parents('tr').find('input:checked').each(function (i, c) {
       obj[$(c).data('type')] = true;
     });
-    var options;
+    var disease;
     for (var i = 0; i < _this.diseases.length; i++) {
       if (_this.diseases[i].type === type) {
-        options = _this.diseases[i];
+        disease = _this.diseases[i];
         break;
       }
     }
     obj.type = type;
-    obj.name = options.name;
+    obj.name = disease.name;
     _this.openTcga(obj);
   });
   $el

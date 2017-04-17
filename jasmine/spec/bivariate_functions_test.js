@@ -1,7 +1,7 @@
-describe("bivariate_functions_test", function () {
+describe('bivariate_functions_test', function () {
 
-	describe("fisher exact", function () {
-		it("R", function () {
+	describe('fisher exact', function () {
+		it('R', function () {
 			expect(morpheus.FisherExact.fisherTest(3, 1, 1, 3)).toBeCloseTo(
 				0.4857, 0.0001);
 			expect(morpheus.FisherExact.fisherTest(2, 15, 10, 3)).toBeCloseTo(
@@ -13,13 +13,13 @@ describe("bivariate_functions_test", function () {
 		});
 	});
 
-	describe("distance", function () {
+	describe('distance', function () {
 		var x = [[-0.1820998, 0.5415669, -0.5733746, -1.0036722],
 			[0.5544853, 0.5796843, -1.1233269, -0.9878692],
 			[0.8157908, -0.2502708, 0.2957403, 0.3238394],
 			[0.4107834, 0.2916730, 0.3306524, -0.3502162],
 			[0.1891520, -0.7958767, 1.0416021, 0.8332562]];
-		describe("kendalls", function () {
+		describe('kendalls', function () {
 
 			function createRealMatrix(data, nRows, nCols) {
 				var matrixData = [];
@@ -95,7 +95,7 @@ describe("bivariate_functions_test", function () {
 
 
 		});
-		it("euclidean", function () {
+		it('euclidean', function () {
 			var x = [[-0.1820998, 0.5415669, -0.5733746, -1.0036722],
 				[0.5544853, 0.5796843, -1.1233269, -0.9878692],
 				[0.8157908, -0.2502708, 0.2957403, 0.3238394],
@@ -120,7 +120,7 @@ describe("bivariate_functions_test", function () {
 				}
 			}
 		});
-		it("pearson",
+		it('pearson',
 			function () {
 
 				var r_result = [
@@ -151,7 +151,7 @@ describe("bivariate_functions_test", function () {
 					}
 				}
 			});
-		it("spearman", function () {
+		it('spearman', function () {
 			var r_result = [[1.0, 0.8, -0.4, 0.4, -0.8],
 				[0.8, 1.0, -0.2, 0.0, -1.0],
 				[-0.4, -0.2, 1.0, 0.4, 0.2], [0.4, 0.0, 0.4, 1.0, 0.0],

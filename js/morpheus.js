@@ -474,7 +474,11 @@ morpheus.Util.autocompleteArrayMatcher = function (token, cb, array, fields, max
   cb(matches);
 };
 
-morpheus.Util.setClipboardData = function (html) {
+/**
+ *
+ * @param array. Array of format,data
+ */
+morpheus.Util.setClipboardData = function (clipboardData, delay) {
   var isRTL = document.documentElement.getAttribute('dir') == 'rtl';
   var fakeElem = document.createElement('div');
   fakeElem.contentEditable = true;
@@ -492,18 +496,41 @@ morpheus.Util.setClipboardData = function (html) {
   // Move element to the same position vertically
   fakeElem.style.top = (window.pageYOffset || document.documentElement.scrollTop) + 'px';
   fakeElem.setAttribute('readonly', '');
-  fakeElem.innerHTML = html;
+  //fakeElem.innerHTML = html;
+  var f = function (e) {
+    clipboardData.forEach(function (elem) {
+      e.clipboardData.setData(elem.format, elem.data);
+    });
+
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    fakeElem.removeEventListener('copy', f);
+  };
+  fakeElem.addEventListener('copy', f);
+
   document.body.appendChild(fakeElem);
-  if (fakeElem.hasAttribute('contenteditable')) {
-    fakeElem.focus();
-  }
+  // if (fakeElem.hasAttribute('contenteditable')) {
+  fakeElem.focus();
+  // }
   var selection = window.getSelection();
   var range = document.createRange();
   range.selectNodeContents(fakeElem);
   selection.removeAllRanges();
   selection.addRange(range);
-  var successful = document.execCommand('copy');
-  document.body.removeChild(fakeElem);
+  if (delay) {
+    setTimeout(function () {
+      if (!document.execCommand('copy')) {
+        console.log('copy failed');
+      }
+      document.body.removeChild(fakeElem);
+    }, 20);
+  } else {
+    if (!document.execCommand('copy')) {
+      console.log('copy failed');
+    }
+    document.body.removeChild(fakeElem);
+  }
 };
 
 /**
@@ -2397,7 +2424,7 @@ morpheus.Array2dReaderInteractive.prototype = {
       .push('<button name="cancel" type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>');
       var $footer = $(footer.join(''));
       morpheus.FormBuilder.showOkCancel({
-        title: 'Open File',
+        title: 'Open',
         content: $el,
         close: false,
         cancelCallback: function () {
@@ -5181,14 +5208,14 @@ morpheus.WeightedMean = function (weights, values) {
   for (var i = 0, size = values.size(); i < size; i++) {
     var value = values.getValue(i);
     if (!isNaN(value)) {
-      var weight = weights.getValue(i);
+      var weight = Math.abs(weights.getValue(i));
       if (!isNaN(weight)) {
         numerator += (weight * value);
         denom += weight;
       }
     }
   }
-  return denom == 0 ? NaN : numerator / denom;
+  return denom === 0 ? NaN : numerator / denom;
 };
 morpheus.WeightedMean.toString = function () {
   return 'Weighted average';
@@ -5925,39 +5952,42 @@ morpheus.DatasetUtil.annotate = function (options) {
  * @return A promise that resolves to morpheus.DatasetInterface
  */
 morpheus.DatasetUtil.read = function (fileOrUrl, options) {
-    if (options == null) {
-        options = {};
-    }
-	var isFile = fileOrUrl instanceof File;
-	var isString = morpheus.Util.isString(fileOrUrl);
-	var ext = options && options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
-	var datasetReader;
-	var str = fileOrUrl.toString();
+  if (fileOrUrl == null) {
+    throw 'File is null';
+  }
+  if (options == null) {
+    options = {};
+  }
+  var isFile = fileOrUrl instanceof File;
+  var isString = morpheus.Util.isString(fileOrUrl);
+  var ext = options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
+  var datasetReader;
+  var str = fileOrUrl.toString();
 
     var isGSE = isString && (fileOrUrl.substring(0, 3) === 'GSE' || fileOrUrl.substring(0, 3) === 'GDS');
 
-	if (isGSE) {
-		datasetReader = new morpheus.GseReader({type : fileOrUrl.substring(0, 3)});
-	}
-	else if (ext === '' && str != null && str.indexOf('blob:') === 0) {
-		datasetReader = new morpheus.TxtReader(); // copy from clipboard
-	} else {
-		datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
-	}
-	if (isString || isFile) { // URL or file
-		var deferred = $.Deferred();
-		// override toString so can determine file name
-		if (options.background) {
-			var path = morpheus.Util.getScriptPath();
-			var blob = new Blob(
-				['self.onmessage = function(e) {'
-				+ 'importScripts(e.data.path);'
-				+ 'var ext = morpheus.Util.getExtension(morpheus.Util'
-				+ '.getFileName(e.data.fileOrUrl));'
-				+ 'var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext,'
-				+ '	e.data.options);'
-				+ 'datasetReader.read(e.data.fileOrUrl, function(err,dataset) {'
-				+ '	self.postMessage(dataset);' + '	});' + '}']);
+    if (isGSE) {
+        datasetReader = new morpheus.GseReader({type : fileOrUrl.substring(0, 3)});
+    }
+    else if (ext === '' && str != null && str.indexOf('blob:') === 0) {
+        datasetReader = new morpheus.TxtReader(); // copy from clipboard
+    } else {
+        datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
+    }
+    if (isString || isFile) { // URL or file
+        var deferred = $.Deferred();
+        // override toString so can determine file name
+        if (options.background) {
+            var path = morpheus.Util.getScriptPath();
+            var blob = new Blob(
+                ['self.onmessage = function(e) {'
+                + 'importScripts(e.data.path);'
+                + 'var ext = morpheus.Util.getExtension(morpheus.Util'
+                + '.getFileName(e.data.fileOrUrl));'
+                + 'var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext,'
+                + '	e.data.options);'
+                + 'datasetReader.read(e.data.fileOrUrl, function(err,dataset) {'
+                + '	self.postMessage(dataset);' + '	});' + '}']);
 
       var blobURL = window.URL.createObjectURL(blob);
       var worker = new Worker(blobURL);
@@ -11913,15 +11943,15 @@ morpheus.SampleDatasets = function (options) {
     $this.parents('tr').find('input:checked').each(function (i, c) {
       obj[$(c).data('type')] = true;
     });
-    var options;
+    var disease;
     for (var i = 0; i < _this.diseases.length; i++) {
       if (_this.diseases[i].type === type) {
-        options = _this.diseases[i];
+        disease = _this.diseases[i];
         break;
       }
     }
     obj.type = type;
-    obj.name = options.name;
+    obj.name = disease.name;
     _this.openTcga(obj);
   });
   $el
@@ -16156,7 +16186,7 @@ morpheus.OpenFileTool = function (options) {
 };
 morpheus.OpenFileTool.prototype = {
   toString: function () {
-    return 'Open File';
+    return 'Open';
   },
   gui: function () {
     var array = [{
@@ -16238,27 +16268,28 @@ morpheus.OpenFileTool.prototype = {
       $('<h4>Use your own file</h4>').insertAfter(
         form.$form.find('.form-group:first'));
       var _this = this;
-      var id = _.uniqueId('morpheus');
-      var $sampleDatasets = $('<div class="collapse" id="' + id
-        + '" style="overflow:auto;"></div>');
+      var collapseId = _.uniqueId('morpheus');
       $('<h4><a role="button" data-toggle="collapse" href="#'
-        + id
+        + collapseId
         + '" aria-expanded="false" aria-controls="'
-        + id + '">Or select a preloaded dataset</a></h4>').appendTo($preloaded);
-      $sampleDatasets.append($preloaded);
+        + collapseId + '">Or select a preloaded dataset</a></h4>').appendTo($preloaded);
+      var $sampleDatasets = $('<div data-name="sampleData" id="' + collapseId + '" class="collapse"' +
+        ' id="' + collapseId + '" style="overflow:auto;"></div>');
       $preloaded.appendTo(form.$form);
       var sampleDatasets = new morpheus.SampleDatasets({
         $el: $sampleDatasets,
         callback: function (heatMapOptions) {
-          form.setValue('file', heatMapOptions.dataset);
+          _this.options.file = heatMapOptions.dataset;
           _this.ok();
         }
       });
+      $sampleDatasets.appendTo($preloaded);
     }
     form.on('change', function (e) {
       var value = e.value;
       if (value !== '' && value != null) {
         form.setValue('file', value);
+        _this.options.file = value;
         _this.ok();
       }
     });
@@ -19302,10 +19333,11 @@ morpheus.ActionManager = function () {
       // 		'text/html',
       // 		'<img src="' + url + '">');
       // });
-      setTimeout(function () {
-        morpheus.Util.setClipboardData('<img src="' + url + '">');
-      }, 20);
 
+      morpheus.Util.setClipboardData([{
+        format: 'text/html',
+        data: '<img src="' + url + '">'
+      }], true);
     }
   });
 
@@ -19351,7 +19383,7 @@ morpheus.ActionManager = function () {
 
   this.add({
     global: true,
-    name: 'Open File',
+    name: 'Open',
     cb: function (options) {
       morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
         customUrls: options.heatMap._customUrls
@@ -19900,10 +19932,10 @@ morpheus.ActionManager = function () {
         text.push(morpheus.Util.toString(v
         .getValue(index)));
       });
-    setTimeout(function () {
-      morpheus.Util.setClipboardData(text.join('<br>'));
-    }, 20);
-
+    morpheus.Util.setClipboardData([{
+      format: 'text/plain',
+      data: text.join('\n')
+    }]);
   };
   this.add({
     name: 'Copy Selected Rows',
@@ -19915,6 +19947,98 @@ morpheus.ActionManager = function () {
     name: 'Copy Selected Columns',
     cb: function (options) {
       copySelection(options, true);
+    }
+  });
+
+  var annotateSelection = function (options, isColumns) {
+
+    var project = options.heatMap.getProject();
+    var selectionModel = isColumns ? project
+    .getColumnSelectionModel()
+      : project
+      .getRowSelectionModel();
+    if (selectionModel.count() === 0) {
+      morpheus.FormBuilder
+      .showMessageModal({
+        title: 'Annotate Selection',
+        html: 'No ' + (isColumns ? 'columns' : 'rows') + ' selected.',
+        focus: options.heatMap.getFocusEl()
+      });
+      return;
+    }
+    var formBuilder = new morpheus.FormBuilder();
+    formBuilder.append({
+      name: 'annotation_name',
+      type: 'text',
+      required: true
+    });
+    formBuilder.append({
+      name: 'annotation_value',
+      type: 'text',
+      required: true
+    });
+    morpheus.FormBuilder
+    .showOkCancel({
+      title: 'Annotate',
+      content: formBuilder.$form,
+      focus: options.heatMap.getFocusEl(),
+      okCallback: function () {
+        var value = formBuilder
+        .getValue('annotation_value');
+        var annotationName = formBuilder
+        .getValue('annotation_name');
+        var dataset = project
+        .getSortedFilteredDataset();
+        var fullDataset = project
+        .getFullDataset();
+        if (isColumns) {
+          dataset = morpheus.DatasetUtil
+          .transposedView(dataset);
+          fullDataset = morpheus.DatasetUtil
+          .transposedView(fullDataset);
+        }
+
+        var existingVector = fullDataset
+        .getRowMetadata()
+        .getByName(
+          annotationName);
+        var v = dataset
+        .getRowMetadata().add(
+          annotationName);
+
+        selectionModel
+        .getViewIndices()
+        .forEach(
+          function (index) {
+            v
+            .setValue(
+              index,
+              value);
+          });
+        morpheus.VectorUtil
+        .maybeConvertStringToNumber(v);
+        project
+        .trigger(
+          'trackChanged',
+          {
+            vectors: [v],
+            render: existingVector != null ? []
+              : [morpheus.VectorTrack.RENDER.TEXT],
+            columns: isColumns
+          });
+      }
+    });
+  };
+  this.add({
+    name: 'Annotate Selected Rows',
+    cb: function (options) {
+      annotateSelection(options, false);
+    }
+  });
+  this.add({
+    name: 'Annotate Selected Columns',
+    cb: function (options) {
+      annotateSelection(options, true);
     }
   });
   this.add({
@@ -19957,12 +20081,11 @@ morpheus.ActionManager = function () {
 
       var text = new morpheus.GctWriter()
       .write(dataset);
-      if (text.length > 0) {
-        setTimeout(function () {
-          text = text.replace(/\t/g, '&emsp;').replace(/\n/g, '<br>');
-          morpheus.Util.setClipboardData(text);
-        }, 20);
-      }
+      morpheus.Util.setClipboardData([{
+        format: 'text/plain',
+        data: text
+      }]);
+
     }
   });
   var _this = this;
@@ -25729,7 +25852,7 @@ morpheus.HeatMapKeyListener = function (heatMap) {
   }).on(
     'drop.morpheus',
     function (e) {
-      if (heatMap.options.toolbar.openFile && e.originalEvent.dataTransfer
+      if (heatMap.options.menu.File && heatMap.options.menu.File.indexOf('Open') !== -1 && e.originalEvent.dataTransfer
         && e.originalEvent.dataTransfer.files.length) {
         e.preventDefault();
         e.stopPropagation();
@@ -26457,46 +26580,47 @@ morpheus.HeatMapOptions = function (heatMap) {
             heatMap.revalidate();
             colorSchemeChooser.restoreCurrentValue();
 
-        }, 100));
-    displayFormBuilder.$form.find('[name=column_dendrogram_line_thickness]')
-        .on(
-            'keyup',
-            _.debounce(function (e) {
-                heatMap.columnDendrogram.lineWidth = parseFloat($(
-                    this).val());
-                heatMap.revalidate();
-                colorSchemeChooser.restoreCurrentValue();
-            }, 100));
-    var $tab = $('<div class="tab-content"></div>');
-    $metadataDiv.appendTo($tab);
-    $heatMapDiv.appendTo($tab);
-    $displayDiv.appendTo($tab);
-    var $div = $('<div></div>');
-    var $ul = $('<ul class="nav nav-tabs" role="tablist">' + '<li><a href="#'
-        + annotationOptionsTabId
-        + '" role="tab" data-toggle="tab">Annotations</a></li>'
-        + '<li><a href="#' + heatMapOptionsTabId
-        + '" role="tab" data-toggle="tab">Color Scheme</a></li>'
-        + '<li><a href="#' + displayOptionsTabId
-        + '" role="tab" data-toggle="tab">Display</a></li>' + '</ul>');
-    $ul.appendTo($div);
-    $tab.appendTo($div);
-    // set current scheme
-    colorSchemeChooser.setColorScheme(heatMap.heatmap.getColorScheme());
-    colorSchemeChooserUpdated();
-    $ul.find('[role=tab]:eq(1)').tab('show');
-    morpheus.FormBuilder.showInModal({
-        title: 'Options',
-        html: $div,
-        close: 'Close',
-        onClose: function () {
-            $div.find('input').off('keyup');
-            $ca.off('change');
-            $ra.off('change');
-            $div.remove();
-            colorSchemeChooser.dispose();
-        }
-    });
+    }, 100));
+  displayFormBuilder.$form.find('[name=column_dendrogram_line_thickness]')
+  .on(
+    'keyup',
+    _.debounce(function (e) {
+      heatMap.columnDendrogram.lineWidth = parseFloat($(
+        this).val());
+      heatMap.revalidate();
+      colorSchemeChooser.restoreCurrentValue();
+    }, 100));
+  var $tab = $('<div class="tab-content"></div>');
+  $metadataDiv.appendTo($tab);
+  $heatMapDiv.appendTo($tab);
+  $displayDiv.appendTo($tab);
+  var $div = $('<div></div>');
+  var $ul = $('<ul class="nav nav-tabs" role="tablist">' + '<li><a href="#'
+    + annotationOptionsTabId
+    + '" role="tab" data-toggle="tab">Annotations</a></li>'
+    + '<li><a href="#' + heatMapOptionsTabId
+    + '" role="tab" data-toggle="tab">Color Scheme</a></li>'
+    + '<li><a href="#' + displayOptionsTabId
+    + '" role="tab" data-toggle="tab">Display</a></li>' + '</ul>');
+  $ul.appendTo($div);
+  $tab.appendTo($div);
+  // set current scheme
+  colorSchemeChooser.setColorScheme(heatMap.heatmap.getColorScheme());
+  colorSchemeChooserUpdated();
+  $ul.find('[role=tab]:eq(1)').tab('show');
+  morpheus.FormBuilder.showInModal({
+    title: 'Options',
+    html: $div,
+    close: 'Close',
+    focus: heatMap.getFocusEl(),
+    onClose: function () {
+      $div.find('input').off('keyup');
+      $ca.off('change');
+      $ra.off('change');
+      $div.remove();
+      colorSchemeChooser.dispose();
+    }
+  });
 };
 
 morpheus.HeatMapSizer = function () {
@@ -28553,21 +28677,22 @@ morpheus.HeatMap = function (options) {
       $loadingImage: morpheus.Util.createLoadingEl(),
       menu: {
         File: ['Open File', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
-        Tools: ['New Heat Map', 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors',
+        Tools: ['New Heat Map', null, 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors',
             'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose',
             't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API', null, 'k-means', 'limma', 'PCA Plot'],
         View: ['Zoom In', 'Zoom Out', 'Fit To Window', 'Reset Zoom', null, 'Options'],
-        Edit: ['Copy Image', null, 'Move Selected Rows To Top', 'Invert' +
+        Edit: ['Copy Image', 'Copy Selected Dataset', null, 'Move Selected Rows To Top', 'Annotate Selected Rows', 'Invert' +
         ' Selected Rows', 'Copy Selected Rows', 'Select All Rows', null, 'Move Selected Columns' +
-        ' To Top', 'Invert Selected Columns', 'Copy Selected Columns', 'Select All Columns'],
+        ' To Top', 'Annotate Selected Columns', 'Invert Selected Columns', 'Copy Selected' +
+        ' Columns', 'Select' +
+        ' All' +
+        ' Columns'],
         Help: ['Find Action', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keymap' +
         ' Reference']
       },
-      // toolbar: ['Search Rows', 'Search Columns', 'Dimensions', null, 'Save Image', 'Color Key']
       toolbar: {
         dimensions: true,
         zoom: true,
-        tools: true,
         searchRows: true,
         searchColumns: true,
         searchValues: false,
@@ -28578,6 +28703,9 @@ morpheus.HeatMap = function (options) {
       }
     }, options);
   options.parent = parent;
+  if (options.menu == null) {
+    options.menu = {};
+  }
   this.options = options;
   this.tooltipProvider = morpheus.HeatMapTooltipProvider;
   if (!options.el) {
@@ -28971,6 +29099,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
     };
     var $formDiv;
     tool.ok = function () {
+      $formDiv.modal('hide');
       okCallback();
     };
     var guiOptions = $.extend({}, {
@@ -29976,8 +30105,7 @@ morpheus.HeatMap.prototype = {
             }
           }
           isFirst = false;
-          var track = isColumns ? _this.addColumnTrack(name, display)
-            : _this.addRowTrack(name, display);
+          var track = _this.addTrack(name, isColumns, display);
           if (track.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
             && option.color) {
             var m = isColumns ? _this.project.getColumnColorModel()
@@ -30285,11 +30413,7 @@ morpheus.HeatMap.prototype = {
       _.each(e.vectors, function (v, i) {
         var index = _this.getTrackIndex(v.getName(), columns);
         if (index === -1) {
-          if (columns) {
-            _this.addColumnTrack(v.getName(), e.render[i]);
-          } else {
-            _this.addRowTrack(v.getName(), e.render[i]);
-          }
+          _this.addTrack(v.getName(), columns, e.render[i]);
         } else {
           // repaint
           var track = _this.getTrackByIndex(index, columns);
@@ -30684,7 +30808,6 @@ morpheus.HeatMap.prototype = {
     this.toolbar.$tip.html('');
     this.$tipFollow.html('').css({
       display: 'none'
-
     });
     this.toolbar.$tip.css('display', mode === 0 ? '' : 'none');
     this.setToolTip(-1, -1);
@@ -30994,14 +31117,12 @@ morpheus.HeatMap.prototype = {
       // on top
       top = options.event.clientY - parentRect.top - offset - tipHeight;
     }
+    this.$tipFollow.css({
+      left: left + 'px',
+      top: top + 'px',
+      display: ''
+    });
 
-    if (Math.abs(left - parseFloat(this.$tipFollow[0].style.left)) >= 1 || Math.abs(top - parseFloat(this.$tipFollow[0].style.top)) >= 1) {
-      this.$tipFollow.css({
-        left: left + 'px',
-        top: top + 'px',
-        display: ''
-      });
-    }
   }
   ,
   setTrackVisibility: function (tracks) {
@@ -31028,11 +31149,7 @@ morpheus.HeatMap.prototype = {
       if (!visible) {
         return;
       }
-      if (!isColumns) {
-        this.addRowTrack(name);
-      } else {
-        this.addColumnTrack(name);
-      }
+      this.addTrack(name, isColumns);
     } else {
       var track = isColumns ? this.columnTracks[trackIndex]
         : this.rowTracks[trackIndex];
@@ -31050,65 +31167,38 @@ morpheus.HeatMap.prototype = {
       source: this,
       arguments: arguments
     });
-  }
-  ,
-  addRowTrack: function (name, renderSettings) {
-    if (name === undefined) {
-      throw 'Name not specified';
-    }
-    if ('None' === renderSettings) {
-      return;
-    }
-    if (renderSettings == null) {
-      renderSettings = morpheus.VectorUtil.getDataType(this.project
-      .getFullDataset().getRowMetadata().getByName(name)) === '[number]' ? 'bar'
-        : morpheus.VectorTrack.RENDER.TEXT;
-    }
-    var track = new morpheus.VectorTrack(this.project, name, this.heatmap
-    .getRowPositions(), false, this);
-    track.settingFromConfig(renderSettings);
-    this.rowTracks.push(track);
-    track.appendTo(this.$parent);
-    $(track.canvas).css('z-index', '0');
-    var header = new morpheus.VectorTrackHeader(this.project, name, false,
-      this);
-    this.rowTrackHeaders.push(header);
-    header.appendTo(this.$parent);
-    $(header.canvas).css('z-index', '0');
-    track._selection = new morpheus.TrackSelection(track, this.heatmap
-      .getRowPositions(), this.project.getRowSelectionModel(), false,
-      this);
-    return track;
-  }
-  ,
+  },
   addTrack: function (name, isColumns, renderSettings) {
-    return isColumns ? this.addColumnTrack(name, renderSettings) : this.addRowTrack(name, renderSettings);
-  }
-  ,
-  addColumnTrack: function (name, renderSettings) {
     if (name === undefined) {
       throw 'Name not specified';
     }
     if ('None' === renderSettings) {
       return;
     }
+    var tracks = isColumns ? this.columnTracks : this.rowTracks;
+    var headers = isColumns ? this.columnTrackHeaders : this.rowTrackHeaders;
+    // see if already visible
+    var existingIndex = this.getTrackIndex(name, isColumns);
+    if (existingIndex !== -1) {
+      return tracks[existingIndex];
+    }
     if (renderSettings == null) {
-      renderSettings = morpheus.VectorUtil.getDataType(this.project
-      .getFullDataset().getColumnMetadata().getByName(name)) === '[number]' ? 'bar'
+      var metadata = isColumns ? this.project.getFullDataset().getColumnMetadata() : this.project.getFullDataset().getRowMetadata()
+      renderSettings = morpheus.VectorUtil.getDataType(metadata.getByName(name)) === '[number]' ? 'bar'
         : morpheus.VectorTrack.RENDER.TEXT;
     }
-    var track = new morpheus.VectorTrack(this.project, name, this.heatmap
-    .getColumnPositions(), true, this);
+
+    var positions = isColumns ? this.heatmap.getColumnPositions() : this.heatmap.getRowPositions();
+    var track = new morpheus.VectorTrack(this.project, name, positions, isColumns, this);
     track.settingFromConfig(renderSettings);
-    this.columnTracks.push(track);
+    tracks.push(track);
     track.appendTo(this.$parent);
-    var header = new morpheus.VectorTrackHeader(this.project, name, true,
+    var header = new morpheus.VectorTrackHeader(this.project, name, isColumns,
       this);
-    this.columnTrackHeaders.push(header);
+    headers.push(header);
     header.appendTo(this.$parent);
-    track._selection = new morpheus.TrackSelection(track, this.heatmap
-      .getColumnPositions(), this.project.getColumnSelectionModel(),
-      true, this);
+    track._selection = new morpheus.TrackSelection(track, positions, isColumns ? this.project.getColumnSelectionModel() : this.project.getRowSelectionModel(),
+      isColumns, this);
     return track;
   }
   ,
@@ -32514,10 +32604,13 @@ morpheus.HistogramLegend.prototype = {
     var min = colorScheme.getMin();
     var binSize = this.binSize;
     var y0 = countToPosition(0);
-    context.font = '11px ' + morpheus.CanvasUtil.FONT_NAME;
+
     if (this.name != null) {
-      context.textBaseline = 'top';
-      context.fillText(this.name, 0, 0);
+      context.font = '11px ' + morpheus.CanvasUtil.FONT_NAME;
+      context.fillStyle = 'black';
+      context.lineWidth = 1;
+    //  context.textBaseline = 'top';
+      context.fillText(this.name, 0.5, 12);
       context.translate(0, 14);
     }
     context.lineWidth = 0.2;
@@ -32563,6 +32656,7 @@ morpheus.HistogramLegend.prototype = {
     // context.fillRect(median - 1, 0.5, 2, boxPlotHeight - 0.5);
     //
     context.translate(0, histogramHeight + 1);
+    context.fillStyle = 'black';
     morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
       this.colorScheme, canvasWidth, false, false, 6);
   }
@@ -32706,27 +32800,7 @@ morpheus.Popup.init = function () {
   if (morpheus.Popup.initted) {
     return;
   }
-  var client = new Clipboard('a.copy', {
-    text: function (trigger) {
-      var event = {
-        clipboardData: {
-          setData: function (dataType, data) {
-            this.data = data;
-          }
-        }
-      };
-      morpheus.Popup.popupCallback(event, $(trigger).data('name'));
-      morpheus.Popup.hide();
-      return event.clipboardData.data;
-    }
-  });
-  client.on('error', function (e) {
-    console.log('Copy error');
-    console.error('Action:', e.action);
-    console.error('Trigger:', e.trigger);
-  });
 
-  morpheus.Popup.client = client;
   morpheus.Popup.initted = true;
   morpheus.Popup.$popupDiv = $(document.createElement('div'));
   morpheus.Popup.$popupDiv.css('position', 'absolute').css('zIndex', 1050).css('overflow', 'auto').addClass('dropdown clearfix');
@@ -32737,10 +32811,10 @@ morpheus.Popup.init = function () {
   morpheus.Popup.$contextMenu.on('click', 'a', function (e) {
     e.preventDefault();
     var $this = $(this);
-    if (!$this.hasClass('copy')) {
-      morpheus.Popup.popupCallback(e, $this.data('name'));
-      morpheus.Popup.hide();
-    }
+    // if (!$this.hasClass('copy')) {
+    morpheus.Popup.popupCallback(e, $this.data('name'));
+    morpheus.Popup.hide();
+    // }
 
   });
 };
@@ -32758,7 +32832,6 @@ morpheus.Popup.hide = function () {
   $(document.body).off('mousedown', morpheus.Popup.hidePopupMenu);
   morpheus.Popup.popupCallback = null;
   morpheus.Popup.component = null;
-  // morpheus.Popup.client.unclip();
 };
 
 morpheus.Popup.showPopup = function (menuItems, position, component, callback) {
@@ -36975,7 +37048,8 @@ morpheus.VectorTrack.prototype = {
     sectionToItems.Selection.push({
       separator: true
     });
-    if (this.heatmap.options.toolbar.openFile) {
+    if (this.heatmap.options.menu.Edit && this.heatmap.options.menu.Edit.indexOf('Annotate' +
+        ' Selected Rows') !== -1) {
       sectionToItems.Selection.push({
         name: ANNOTATE_SELECTION
       });
@@ -37004,21 +37078,19 @@ morpheus.VectorTrack.prototype = {
     }
 
     if (!isHeader) {
-      if (this.heatmap.options.toolbar.sort) {
-        sectionToItems['Sort'].push({
-          name: SORT_SEL_ASC,
-          disabled: !hasSelection
-        });
-        sectionToItems['Sort'].push({
-          name: SORT_SEL_DESC,
-          disabled: !hasSelection
-        });
+      sectionToItems['Sort'].push({
+        name: SORT_SEL_ASC,
+        disabled: !hasSelection
+      });
+      sectionToItems['Sort'].push({
+        name: SORT_SEL_DESC,
+        disabled: !hasSelection
+      });
 
-        sectionToItems['Sort'].push({
-          name: SORT_SEL_TOP_N,
-          disabled: !hasSelection
-        });
-      }
+      sectionToItems['Sort'].push({
+        name: SORT_SEL_TOP_N,
+        disabled: !hasSelection
+      });
     }
     var dataType = morpheus.VectorUtil.getDataType(this.getFullVector());
     var arrayFields = this.getFullVector().getProperties().get(
@@ -37358,71 +37430,8 @@ morpheus.VectorTrack.prototype = {
             html: formBuilder.$form
           });
         } else if (item === ANNOTATE_SELECTION) {
-          var formBuilder = new morpheus.FormBuilder();
-          formBuilder.append({
-            name: 'annotation_name',
-            type: 'text',
-            required: true
-          });
-          formBuilder.append({
-            name: 'annotation_value',
-            type: 'text',
-            required: true
-          });
-          morpheus.FormBuilder
-          .showOkCancel({
-            title: ANNOTATE_SELECTION,
-            content: formBuilder.$form,
-            okCallback: function () {
-              var value = formBuilder
-              .getValue('annotation_value');
-              var annotationName = formBuilder
-              .getValue('annotation_name');
-              var dataset = project
-              .getSortedFilteredDataset();
-              var fullDataset = project
-              .getFullDataset();
-              if (isColumns) {
-                dataset = morpheus.DatasetUtil
-                .transposedView(dataset);
-                fullDataset = morpheus.DatasetUtil
-                .transposedView(fullDataset);
-              }
-
-              var existingVector = fullDataset
-              .getRowMetadata()
-              .getByName(
-                annotationName);
-              var v = dataset
-              .getRowMetadata().add(
-                annotationName);
-
-              var selectionModel = isColumns ? project
-              .getColumnSelectionModel()
-                : project
-                .getRowSelectionModel();
-              selectionModel
-              .getViewIndices()
-              .forEach(
-                function (index) {
-                  v
-                  .setValue(
-                    index,
-                    value);
-                });
-              morpheus.VectorUtil
-              .maybeConvertStringToNumber(v);
-              project
-              .trigger(
-                'trackChanged',
-                {
-                  vectors: [v],
-                  render: existingVector != null ? []
-                    : [morpheus.VectorTrack.RENDER.TEXT],
-                  columns: isColumns
-                });
-            }
-          });
+          heatmap.getActionManager().execute(isColumns ? 'Annotate Selected Columns' : 'Annotate' +
+            ' Selected Rows');
         } else if (item === DELETE) {
           morpheus.FormBuilder
           .showOkCancel({
@@ -38926,6 +38935,387 @@ morpheus.HCluster.treeSort = function (nNodes, order, nodeorder, nodecounts,
     }
   }
   return morpheus.Util.indexSort(neworder, true);
+};
+
+/**
+ * Clustering algorithm based on David Arthur and Sergei Vassilvitski k-means++ algorithm.
+ * @param <T> type of the points to cluster
+ * @see <a href="http://en.wikipedia.org/wiki/K-means%2B%2B">K-means++ (wikipedia)</a>
+ * @since 3.2
+ */
+
+/**
+ * @param dataset The dataset to cluster the rows of
+ * @param distance
+ * @param k The number of clusters
+ * @param maxIterations The maximum number of iterations
+ * @constructor
+ */
+morpheus.KMeansPlusPlusClusterer = function (k, maxIterations, distanceFunction) {
+
+  var distance = function (points1, points2) {
+    return distanceFunction(morpheus.VectorUtil.arrayAsVector(points1.getPoint()), morpheus.VectorUtil.arrayAsVector(points2.getPoint()));
+  };
+
+  function nextInt(upperBound) {
+    return (Math.floor(Math.random() * upperBound)) | 0;
+  }
+
+  function nextDouble() {
+    return Math.random();
+  }
+
+  function DoublePoint(point) {
+    this.getPoint = function () {
+      return point;
+    };
+  }
+
+  function CentroidCluster(center) {
+    var centroidPoints = [];
+    this.addPoint = function (p) {
+      centroidPoints.push(p);
+    };
+    this.getPoints = function () {
+      return centroidPoints;
+    };
+    this.getCenter = function () {
+      return center;
+    };
+  }
+
+  /**
+   * Runs the K-means++ clustering algorithm.
+   *
+   * @param points the points to cluster
+   * @return a list of clusters containing the points
+   */
+  function cluster(points) {
+    // number of clusters has to be smaller or equal the number of data points
+    if (points.length < k) {
+      throw 'Too many clusters';
+    }
+
+    // create the initial clusters
+    var clusters = chooseInitialCenters(points);
+
+    // create an array containing the latest assignment of a point to a cluster
+    // no need to initialize the array, as it will be filled with the first assignment
+    var assignments = new Int32Array(points.length);
+    assignPointsToClusters(clusters, points, assignments);
+    // iterate through updating the centers until we're done
+    var max = (maxIterations < 0) ? Number.MAX_VALUE : maxIterations;
+    for (var count = 0; count < max; count++) {
+      var emptyCluster = false;
+      var newClusters = [];
+      for (var clusterIndex = 0; clusterIndex < clusters.length; clusterIndex++) {
+        var cluster = clusters[clusterIndex];
+        var newCenter;
+        if (cluster.getPoints().length === 0) {
+          newCenter = getPointFromLargestVarianceCluster(clusters);
+          emptyCluster = true;
+        } else {
+          newCenter = centroidOf(cluster.getPoints(), cluster.getCenter().getPoint().length);
+        }
+        newClusters.push(new CentroidCluster(newCenter));
+      }
+      var changes = assignPointsToClusters(newClusters, points, assignments);
+      clusters = newClusters;
+
+      // if there were no more changes in the point-to-cluster assignment
+      // and there are no empty clusters left, return the current clusters
+      if (changes === 0 && !emptyCluster) {
+        return clusters;
+      }
+    }
+    return clusters;
+  }
+
+  /**
+   * Adds the given points to the closest {@link Cluster}.
+   *
+   * @param clusters the {@link Cluster}s to add the points to
+   * @param points the points to add to the given {@link Cluster}s
+   * @param assignments points assignments to clusters
+   * @return the number of points assigned to different clusters as the iteration before
+   */
+  function assignPointsToClusters(clusters, points, assignments) {
+    var assignedDifferently = 0;
+    var pointIndex = 0;
+    for (var i = 0; i < points.length; i++) {
+      var p = points[i];
+      var clusterIndex = getNearestCluster(clusters, p);
+      if (clusterIndex != assignments[pointIndex]) {
+        assignedDifferently++;
+      }
+
+      var cluster = clusters[clusterIndex];
+      cluster.addPoint(p);
+      assignments[pointIndex++] = clusterIndex;
+    }
+
+    return assignedDifferently;
+  }
+
+  /**
+   * Use K-means++ to choose the initial centers.
+   *
+   * @param points the points to choose the initial centers from
+   * @return the initial centers
+   */
+  function chooseInitialCenters(points) {
+
+    // Convert to list for indexed access. Make it unmodifiable, since removal of items
+    // would screw up the logic of this method.
+    var pointList = points.slice(0);
+
+    // The number of points in the list.
+    var numPoints = pointList.length;
+
+    // Set the corresponding element in this array to indicate when
+    // elements of pointList are no longer available.
+    var taken = new Array(numPoints);
+    for (var i = 0; i < taken.length; i++) {
+      taken[i] = false;
+    }
+
+    // The resulting list of initial centers.
+    var resultSet = [];
+
+    // Choose one center uniformly at random from among the data points.
+    var firstPointIndex = nextInt(numPoints);
+    var firstPoint = pointList[firstPointIndex];
+    resultSet.push(new CentroidCluster(firstPoint));
+    // Must mark it as taken
+    taken[firstPointIndex] = true;
+
+    // To keep track of the minimum distance squared of elements of
+    // pointList to elements of resultSet.
+
+    var minDistSquared = new Float64Array(numPoints);
+
+    // Initialize the elements.  Since the only point in resultSet is firstPoint,
+    // this is very easy.
+    for (var i = 0; i < numPoints; i++) {
+      if (i !== firstPointIndex) { // That point isn't considered
+        var d = distance(firstPoint, pointList[i]);
+        minDistSquared[i] = d * d;
+      }
+    }
+
+    while (resultSet.length < k) {
+      // Sum up the squared distances for the points in pointList not
+      // already taken.
+      var distSqSum = 0.0;
+
+      for (var i = 0; i < numPoints; i++) {
+        if (!taken[i]) {
+          distSqSum += minDistSquared[i];
+        }
+      }
+
+      // Add one new data point as a center. Each point x is chosen with
+      // probability proportional to D(x)2
+      var r = nextDouble() * distSqSum;
+
+      // The index of the next point to be added to the resultSet.
+      var nextPointIndex = -1;
+
+      // Sum through the squared min distances again, stopping when
+      // sum >= r.
+      var sum = 0.0;
+      for (var i = 0; i < numPoints; i++) {
+        if (!taken[i]) {
+          sum += minDistSquared[i];
+          if (sum >= r) {
+            nextPointIndex = i;
+            break;
+          }
+        }
+      }
+
+      // If it's not set to >= 0, the point wasn't found in the previous
+      // for loop, probably because distances are extremely small.  Just pick
+      // the last available point.
+      if (nextPointIndex === -1) {
+        for (var i = numPoints - 1; i >= 0; i--) {
+          if (!taken[i]) {
+            nextPointIndex = i;
+            break;
+          }
+        }
+      }
+
+      // We found one.
+      if (nextPointIndex >= 0) {
+
+        var p = pointList[nextPointIndex];
+
+        resultSet.push(new CentroidCluster(p));
+
+        // Mark it as taken.
+        taken[nextPointIndex] = true;
+
+        if (resultSet.length < k) {
+          // Now update elements of minDistSquared.  We only have to compute
+          // the distance to the new center to do this.
+          for (var j = 0; j < numPoints; j++) {
+            // Only have to worry about the points still not taken.
+            if (!taken[j]) {
+              var d = distance(p, pointList[j]);
+              var d2 = d * d;
+              if (d2 < minDistSquared[j]) {
+                minDistSquared[j] = d2;
+              }
+            }
+          }
+        }
+
+      } else {
+        // None found --
+        // Break from the while loop to prevent
+        // an infinite loop.
+        break;
+      }
+    }
+    return resultSet;
+  }
+
+  /**
+   * Get a random point from the {@link Cluster} with the largest distance variance.
+   *
+   * @param clusters the {@link Cluster}s to search
+   * @return a random point from the selected cluster
+   * @throws ConvergenceException if clusters are all empty
+   */
+  function getPointFromLargestVarianceCluster(clusters) {
+    var maxVariance = -Number.MAX_VALUE;
+    var selected = null;
+    for (var clusterIndex = 0; clusterIndex < clusters.length; clusterIndex++) {
+      var cluster = clusters[clusterIndex];
+      if (cluster.getPoints().length > 0) {
+        // compute the distance variance of the current cluster
+        var center = cluster.getCenter();
+        var points = cluster.getPoints();
+        var distances = new Float32Array(points.length);
+        for (var i = 0; i < points.length; i++) {
+          distances[i] = distance(points[i], center);
+        }
+
+        var variance = morpheus.Variance(morpheus.VectorUtil.arrayAsVector(distances));
+        // select the cluster with the largest variance
+        if (variance > maxVariance) {
+          maxVariance = variance;
+          selected = cluster;
+        }
+      }
+    }
+
+    // did we find at least one non-empty cluster ?
+    if (selected == null) {
+      throw 'Empty cluster';
+    }
+
+    // extract a random point from the cluster
+    var selectedPoints = selected.getPoints();
+    return selectedPoints.splice(nextInt(selectedPoints.length), 1);
+
+  }
+
+  // /**
+  //  * Get the point farthest to its cluster center
+  //  *
+  //  * @param clusters the {@link Cluster}s to search
+  //  * @return point farthest to its cluster center
+  //  * @throws ConvergenceException if clusters are all empty
+  //  */
+  // function getFarthestPoint(clusters) {
+  //
+  //   var maxDistance = Number.NEGATIVE_INFINITY;
+  //   var selectedCluster = null;
+  //   var selectedPoint = -1;
+  //   for (var clusterIndex = 0; clusterIndex < clusters.length; clusterIndex++) {
+  //     var c = clusters[clusterIndex];
+  //     // get the farthest point
+  //     var center = cluster.getCenter();
+  //     var points = cluster.getPoints();
+  //     for (var i = 0; i < points.length; ++i) {
+  //       var d = distance(points[i], center);
+  //       if (d > maxDistance) {
+  //         maxDistance = d;
+  //         selectedCluster = cluster;
+  //         selectedPoint = i;
+  //       }
+  //     }
+  //
+  //   }
+  //
+  //   // did we find at least one non-empty cluster ?
+  //   if (selectedCluster == null) {
+  //     throw 'Empty cluster';
+  //   }
+  //
+  //   return selectedCluster.getPoints().splice(selectedPoint, 1);
+  //
+  // }
+
+  /**
+   * Returns the nearest {@link Cluster} to the given point
+   *
+   * @param clusters the {@link Cluster}s to search
+   * @param point the point to find the nearest {@link Cluster} for
+   * @return the index of the nearest {@link Cluster} to the given point
+   */
+  function getNearestCluster(clusters, point) {
+    var minDistance = Number.MAX_VALUE;
+    var clusterIndex = 0;
+    var minCluster = 0;
+    for (var i = 0; i < clusters.length; i++) {
+      var c = clusters[i];
+      var d = distance(point, c.getCenter());
+      if (d < minDistance) {
+        minDistance = d;
+        minCluster = clusterIndex;
+      }
+      clusterIndex++;
+    }
+    return minCluster;
+  }
+
+  /**
+   * Computes the centroid for a set of points.
+   *
+   * @param points the set of points
+   * @param dimension the point dimension
+   * @return the computed centroid for the set of points
+   */
+  function centroidOf(points, dimension) {
+    var centroid = new Float32Array(dimension);
+    for (var pointIndex = 0; pointIndex < points.length; pointIndex++) {
+      var p = points[pointIndex];
+      var point = p.getPoint();
+      for (var i = 0; i < centroid.length; i++) {
+        centroid[i] += point[i];
+      }
+    }
+    for (var i = 0; i < centroid.length; i++) {
+      centroid[i] /= points.length;
+    }
+    return new DoublePoint(centroid);
+  }
+
+  this.execute = function (arrayOfArraysToCluster) {
+    var points = [];
+    // cluster rows
+    var npoints = arrayOfArraysToCluster.length;
+    for (var i = 0; i < npoints; i++) {
+      var p = new DoublePoint(arrayOfArraysToCluster[i]);
+      p.i = i;
+      points.push(p);
+    }
+    return cluster(points);
+  };
+  this.cluster = cluster;
 };
 
 morpheus.PermutationPValues = function (dataset, aIndices, bIndices,

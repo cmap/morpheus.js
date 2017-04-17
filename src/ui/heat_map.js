@@ -226,21 +226,22 @@ morpheus.HeatMap = function (options) {
       $loadingImage: morpheus.Util.createLoadingEl(),
       menu: {
         File: ['Open File', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
-        Tools: ['New Heat Map', 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors',
+        Tools: ['New Heat Map', null, 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors',
             'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose',
             't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API', null, 'k-means', 'limma', 'PCA Plot'],
         View: ['Zoom In', 'Zoom Out', 'Fit To Window', 'Reset Zoom', null, 'Options'],
-        Edit: ['Copy Image', null, 'Move Selected Rows To Top', 'Invert' +
+        Edit: ['Copy Image', 'Copy Selected Dataset', null, 'Move Selected Rows To Top', 'Annotate Selected Rows', 'Invert' +
         ' Selected Rows', 'Copy Selected Rows', 'Select All Rows', null, 'Move Selected Columns' +
-        ' To Top', 'Invert Selected Columns', 'Copy Selected Columns', 'Select All Columns'],
+        ' To Top', 'Annotate Selected Columns', 'Invert Selected Columns', 'Copy Selected' +
+        ' Columns', 'Select' +
+        ' All' +
+        ' Columns'],
         Help: ['Find Action', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keymap' +
         ' Reference']
       },
-      // toolbar: ['Search Rows', 'Search Columns', 'Dimensions', null, 'Save Image', 'Color Key']
       toolbar: {
         dimensions: true,
         zoom: true,
-        tools: true,
         searchRows: true,
         searchColumns: true,
         searchValues: false,
@@ -251,6 +252,9 @@ morpheus.HeatMap = function (options) {
       }
     }, options);
   options.parent = parent;
+  if (options.menu == null) {
+    options.menu = {};
+  }
   this.options = options;
   this.tooltipProvider = morpheus.HeatMapTooltipProvider;
   if (!options.el) {
@@ -644,6 +648,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
     };
     var $formDiv;
     tool.ok = function () {
+      $formDiv.modal('hide');
       okCallback();
     };
     var guiOptions = $.extend({}, {
@@ -1649,8 +1654,7 @@ morpheus.HeatMap.prototype = {
             }
           }
           isFirst = false;
-          var track = isColumns ? _this.addColumnTrack(name, display)
-            : _this.addRowTrack(name, display);
+          var track = _this.addTrack(name, isColumns, display);
           if (track.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
             && option.color) {
             var m = isColumns ? _this.project.getColumnColorModel()
@@ -1958,11 +1962,7 @@ morpheus.HeatMap.prototype = {
       _.each(e.vectors, function (v, i) {
         var index = _this.getTrackIndex(v.getName(), columns);
         if (index === -1) {
-          if (columns) {
-            _this.addColumnTrack(v.getName(), e.render[i]);
-          } else {
-            _this.addRowTrack(v.getName(), e.render[i]);
-          }
+          _this.addTrack(v.getName(), columns, e.render[i]);
         } else {
           // repaint
           var track = _this.getTrackByIndex(index, columns);
@@ -2357,7 +2357,6 @@ morpheus.HeatMap.prototype = {
     this.toolbar.$tip.html('');
     this.$tipFollow.html('').css({
       display: 'none'
-
     });
     this.toolbar.$tip.css('display', mode === 0 ? '' : 'none');
     this.setToolTip(-1, -1);
@@ -2667,14 +2666,12 @@ morpheus.HeatMap.prototype = {
       // on top
       top = options.event.clientY - parentRect.top - offset - tipHeight;
     }
+    this.$tipFollow.css({
+      left: left + 'px',
+      top: top + 'px',
+      display: ''
+    });
 
-    if (Math.abs(left - parseFloat(this.$tipFollow[0].style.left)) >= 1 || Math.abs(top - parseFloat(this.$tipFollow[0].style.top)) >= 1) {
-      this.$tipFollow.css({
-        left: left + 'px',
-        top: top + 'px',
-        display: ''
-      });
-    }
   }
   ,
   setTrackVisibility: function (tracks) {
@@ -2701,11 +2698,7 @@ morpheus.HeatMap.prototype = {
       if (!visible) {
         return;
       }
-      if (!isColumns) {
-        this.addRowTrack(name);
-      } else {
-        this.addColumnTrack(name);
-      }
+      this.addTrack(name, isColumns);
     } else {
       var track = isColumns ? this.columnTracks[trackIndex]
         : this.rowTracks[trackIndex];
@@ -2723,65 +2716,38 @@ morpheus.HeatMap.prototype = {
       source: this,
       arguments: arguments
     });
-  }
-  ,
-  addRowTrack: function (name, renderSettings) {
-    if (name === undefined) {
-      throw 'Name not specified';
-    }
-    if ('None' === renderSettings) {
-      return;
-    }
-    if (renderSettings == null) {
-      renderSettings = morpheus.VectorUtil.getDataType(this.project
-      .getFullDataset().getRowMetadata().getByName(name)) === '[number]' ? 'bar'
-        : morpheus.VectorTrack.RENDER.TEXT;
-    }
-    var track = new morpheus.VectorTrack(this.project, name, this.heatmap
-    .getRowPositions(), false, this);
-    track.settingFromConfig(renderSettings);
-    this.rowTracks.push(track);
-    track.appendTo(this.$parent);
-    $(track.canvas).css('z-index', '0');
-    var header = new morpheus.VectorTrackHeader(this.project, name, false,
-      this);
-    this.rowTrackHeaders.push(header);
-    header.appendTo(this.$parent);
-    $(header.canvas).css('z-index', '0');
-    track._selection = new morpheus.TrackSelection(track, this.heatmap
-      .getRowPositions(), this.project.getRowSelectionModel(), false,
-      this);
-    return track;
-  }
-  ,
+  },
   addTrack: function (name, isColumns, renderSettings) {
-    return isColumns ? this.addColumnTrack(name, renderSettings) : this.addRowTrack(name, renderSettings);
-  }
-  ,
-  addColumnTrack: function (name, renderSettings) {
     if (name === undefined) {
       throw 'Name not specified';
     }
     if ('None' === renderSettings) {
       return;
     }
+    var tracks = isColumns ? this.columnTracks : this.rowTracks;
+    var headers = isColumns ? this.columnTrackHeaders : this.rowTrackHeaders;
+    // see if already visible
+    var existingIndex = this.getTrackIndex(name, isColumns);
+    if (existingIndex !== -1) {
+      return tracks[existingIndex];
+    }
     if (renderSettings == null) {
-      renderSettings = morpheus.VectorUtil.getDataType(this.project
-      .getFullDataset().getColumnMetadata().getByName(name)) === '[number]' ? 'bar'
+      var metadata = isColumns ? this.project.getFullDataset().getColumnMetadata() : this.project.getFullDataset().getRowMetadata()
+      renderSettings = morpheus.VectorUtil.getDataType(metadata.getByName(name)) === '[number]' ? 'bar'
         : morpheus.VectorTrack.RENDER.TEXT;
     }
-    var track = new morpheus.VectorTrack(this.project, name, this.heatmap
-    .getColumnPositions(), true, this);
+
+    var positions = isColumns ? this.heatmap.getColumnPositions() : this.heatmap.getRowPositions();
+    var track = new morpheus.VectorTrack(this.project, name, positions, isColumns, this);
     track.settingFromConfig(renderSettings);
-    this.columnTracks.push(track);
+    tracks.push(track);
     track.appendTo(this.$parent);
-    var header = new morpheus.VectorTrackHeader(this.project, name, true,
+    var header = new morpheus.VectorTrackHeader(this.project, name, isColumns,
       this);
-    this.columnTrackHeaders.push(header);
+    headers.push(header);
     header.appendTo(this.$parent);
-    track._selection = new morpheus.TrackSelection(track, this.heatmap
-      .getColumnPositions(), this.project.getColumnSelectionModel(),
-      true, this);
+    track._selection = new morpheus.TrackSelection(track, positions, isColumns ? this.project.getColumnSelectionModel() : this.project.getRowSelectionModel(),
+      isColumns, this);
     return track;
   }
   ,

@@ -626,44 +626,45 @@ morpheus.HeatMapOptions = function (heatMap) {
             heatMap.revalidate();
             colorSchemeChooser.restoreCurrentValue();
 
-        }, 100));
-    displayFormBuilder.$form.find('[name=column_dendrogram_line_thickness]')
-        .on(
-            'keyup',
-            _.debounce(function (e) {
-                heatMap.columnDendrogram.lineWidth = parseFloat($(
-                    this).val());
-                heatMap.revalidate();
-                colorSchemeChooser.restoreCurrentValue();
-            }, 100));
-    var $tab = $('<div class="tab-content"></div>');
-    $metadataDiv.appendTo($tab);
-    $heatMapDiv.appendTo($tab);
-    $displayDiv.appendTo($tab);
-    var $div = $('<div></div>');
-    var $ul = $('<ul class="nav nav-tabs" role="tablist">' + '<li><a href="#'
-        + annotationOptionsTabId
-        + '" role="tab" data-toggle="tab">Annotations</a></li>'
-        + '<li><a href="#' + heatMapOptionsTabId
-        + '" role="tab" data-toggle="tab">Color Scheme</a></li>'
-        + '<li><a href="#' + displayOptionsTabId
-        + '" role="tab" data-toggle="tab">Display</a></li>' + '</ul>');
-    $ul.appendTo($div);
-    $tab.appendTo($div);
-    // set current scheme
-    colorSchemeChooser.setColorScheme(heatMap.heatmap.getColorScheme());
-    colorSchemeChooserUpdated();
-    $ul.find('[role=tab]:eq(1)').tab('show');
-    morpheus.FormBuilder.showInModal({
-        title: 'Options',
-        html: $div,
-        close: 'Close',
-        onClose: function () {
-            $div.find('input').off('keyup');
-            $ca.off('change');
-            $ra.off('change');
-            $div.remove();
-            colorSchemeChooser.dispose();
-        }
-    });
+    }, 100));
+  displayFormBuilder.$form.find('[name=column_dendrogram_line_thickness]')
+  .on(
+    'keyup',
+    _.debounce(function (e) {
+      heatMap.columnDendrogram.lineWidth = parseFloat($(
+        this).val());
+      heatMap.revalidate();
+      colorSchemeChooser.restoreCurrentValue();
+    }, 100));
+  var $tab = $('<div class="tab-content"></div>');
+  $metadataDiv.appendTo($tab);
+  $heatMapDiv.appendTo($tab);
+  $displayDiv.appendTo($tab);
+  var $div = $('<div></div>');
+  var $ul = $('<ul class="nav nav-tabs" role="tablist">' + '<li><a href="#'
+    + annotationOptionsTabId
+    + '" role="tab" data-toggle="tab">Annotations</a></li>'
+    + '<li><a href="#' + heatMapOptionsTabId
+    + '" role="tab" data-toggle="tab">Color Scheme</a></li>'
+    + '<li><a href="#' + displayOptionsTabId
+    + '" role="tab" data-toggle="tab">Display</a></li>' + '</ul>');
+  $ul.appendTo($div);
+  $tab.appendTo($div);
+  // set current scheme
+  colorSchemeChooser.setColorScheme(heatMap.heatmap.getColorScheme());
+  colorSchemeChooserUpdated();
+  $ul.find('[role=tab]:eq(1)').tab('show');
+  morpheus.FormBuilder.showInModal({
+    title: 'Options',
+    html: $div,
+    close: 'Close',
+    focus: heatMap.getFocusEl(),
+    onClose: function () {
+      $div.find('input').off('keyup');
+      $ca.off('change');
+      $ra.off('change');
+      $div.remove();
+      colorSchemeChooser.dispose();
+    }
+  });
 };

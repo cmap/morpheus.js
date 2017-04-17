@@ -176,39 +176,42 @@ morpheus.DatasetUtil.annotate = function (options) {
  * @return A promise that resolves to morpheus.DatasetInterface
  */
 morpheus.DatasetUtil.read = function (fileOrUrl, options) {
-    if (options == null) {
-        options = {};
-    }
-	var isFile = fileOrUrl instanceof File;
-	var isString = morpheus.Util.isString(fileOrUrl);
-	var ext = options && options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
-	var datasetReader;
-	var str = fileOrUrl.toString();
+  if (fileOrUrl == null) {
+    throw 'File is null';
+  }
+  if (options == null) {
+    options = {};
+  }
+  var isFile = fileOrUrl instanceof File;
+  var isString = morpheus.Util.isString(fileOrUrl);
+  var ext = options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
+  var datasetReader;
+  var str = fileOrUrl.toString();
 
     var isGSE = isString && (fileOrUrl.substring(0, 3) === 'GSE' || fileOrUrl.substring(0, 3) === 'GDS');
 
-	if (isGSE) {
-		datasetReader = new morpheus.GseReader({type : fileOrUrl.substring(0, 3)});
-	}
-	else if (ext === '' && str != null && str.indexOf('blob:') === 0) {
-		datasetReader = new morpheus.TxtReader(); // copy from clipboard
-	} else {
-		datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
-	}
-	if (isString || isFile) { // URL or file
-		var deferred = $.Deferred();
-		// override toString so can determine file name
-		if (options.background) {
-			var path = morpheus.Util.getScriptPath();
-			var blob = new Blob(
-				['self.onmessage = function(e) {'
-				+ 'importScripts(e.data.path);'
-				+ 'var ext = morpheus.Util.getExtension(morpheus.Util'
-				+ '.getFileName(e.data.fileOrUrl));'
-				+ 'var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext,'
-				+ '	e.data.options);'
-				+ 'datasetReader.read(e.data.fileOrUrl, function(err,dataset) {'
-				+ '	self.postMessage(dataset);' + '	});' + '}']);
+    if (isGSE) {
+        datasetReader = new morpheus.GseReader({type : fileOrUrl.substring(0, 3)});
+    }
+    else if (ext === '' && str != null && str.indexOf('blob:') === 0) {
+        datasetReader = new morpheus.TxtReader(); // copy from clipboard
+    } else {
+        datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
+    }
+    if (isString || isFile) { // URL or file
+        var deferred = $.Deferred();
+        // override toString so can determine file name
+        if (options.background) {
+            var path = morpheus.Util.getScriptPath();
+            var blob = new Blob(
+                ['self.onmessage = function(e) {'
+                + 'importScripts(e.data.path);'
+                + 'var ext = morpheus.Util.getExtension(morpheus.Util'
+                + '.getFileName(e.data.fileOrUrl));'
+                + 'var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext,'
+                + '	e.data.options);'
+                + 'datasetReader.read(e.data.fileOrUrl, function(err,dataset) {'
+                + '	self.postMessage(dataset);' + '	});' + '}']);
 
       var blobURL = window.URL.createObjectURL(blob);
       var worker = new Worker(blobURL);

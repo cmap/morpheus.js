@@ -909,7 +909,8 @@ morpheus.VectorTrack.prototype = {
     sectionToItems.Selection.push({
       separator: true
     });
-    if (this.heatmap.options.toolbar.openFile) {
+    if (this.heatmap.options.menu.Edit && this.heatmap.options.menu.Edit.indexOf('Annotate' +
+        ' Selected Rows') !== -1) {
       sectionToItems.Selection.push({
         name: ANNOTATE_SELECTION
       });
@@ -938,21 +939,19 @@ morpheus.VectorTrack.prototype = {
     }
 
     if (!isHeader) {
-      if (this.heatmap.options.toolbar.sort) {
-        sectionToItems['Sort'].push({
-          name: SORT_SEL_ASC,
-          disabled: !hasSelection
-        });
-        sectionToItems['Sort'].push({
-          name: SORT_SEL_DESC,
-          disabled: !hasSelection
-        });
+      sectionToItems['Sort'].push({
+        name: SORT_SEL_ASC,
+        disabled: !hasSelection
+      });
+      sectionToItems['Sort'].push({
+        name: SORT_SEL_DESC,
+        disabled: !hasSelection
+      });
 
-        sectionToItems['Sort'].push({
-          name: SORT_SEL_TOP_N,
-          disabled: !hasSelection
-        });
-      }
+      sectionToItems['Sort'].push({
+        name: SORT_SEL_TOP_N,
+        disabled: !hasSelection
+      });
     }
     var dataType = morpheus.VectorUtil.getDataType(this.getFullVector());
     var arrayFields = this.getFullVector().getProperties().get(
@@ -1292,71 +1291,8 @@ morpheus.VectorTrack.prototype = {
             html: formBuilder.$form
           });
         } else if (item === ANNOTATE_SELECTION) {
-          var formBuilder = new morpheus.FormBuilder();
-          formBuilder.append({
-            name: 'annotation_name',
-            type: 'text',
-            required: true
-          });
-          formBuilder.append({
-            name: 'annotation_value',
-            type: 'text',
-            required: true
-          });
-          morpheus.FormBuilder
-          .showOkCancel({
-            title: ANNOTATE_SELECTION,
-            content: formBuilder.$form,
-            okCallback: function () {
-              var value = formBuilder
-              .getValue('annotation_value');
-              var annotationName = formBuilder
-              .getValue('annotation_name');
-              var dataset = project
-              .getSortedFilteredDataset();
-              var fullDataset = project
-              .getFullDataset();
-              if (isColumns) {
-                dataset = morpheus.DatasetUtil
-                .transposedView(dataset);
-                fullDataset = morpheus.DatasetUtil
-                .transposedView(fullDataset);
-              }
-
-              var existingVector = fullDataset
-              .getRowMetadata()
-              .getByName(
-                annotationName);
-              var v = dataset
-              .getRowMetadata().add(
-                annotationName);
-
-              var selectionModel = isColumns ? project
-              .getColumnSelectionModel()
-                : project
-                .getRowSelectionModel();
-              selectionModel
-              .getViewIndices()
-              .forEach(
-                function (index) {
-                  v
-                  .setValue(
-                    index,
-                    value);
-                });
-              morpheus.VectorUtil
-              .maybeConvertStringToNumber(v);
-              project
-              .trigger(
-                'trackChanged',
-                {
-                  vectors: [v],
-                  render: existingVector != null ? []
-                    : [morpheus.VectorTrack.RENDER.TEXT],
-                  columns: isColumns
-                });
-            }
-          });
+          heatmap.getActionManager().execute(isColumns ? 'Annotate Selected Columns' : 'Annotate' +
+            ' Selected Rows');
         } else if (item === DELETE) {
           morpheus.FormBuilder
           .showOkCancel({

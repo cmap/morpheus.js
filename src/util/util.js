@@ -472,7 +472,11 @@ morpheus.Util.autocompleteArrayMatcher = function (token, cb, array, fields, max
   cb(matches);
 };
 
-morpheus.Util.setClipboardData = function (html) {
+/**
+ *
+ * @param array. Array of format,data
+ */
+morpheus.Util.setClipboardData = function (clipboardData, delay) {
   var isRTL = document.documentElement.getAttribute('dir') == 'rtl';
   var fakeElem = document.createElement('div');
   fakeElem.contentEditable = true;
@@ -490,18 +494,41 @@ morpheus.Util.setClipboardData = function (html) {
   // Move element to the same position vertically
   fakeElem.style.top = (window.pageYOffset || document.documentElement.scrollTop) + 'px';
   fakeElem.setAttribute('readonly', '');
-  fakeElem.innerHTML = html;
+  //fakeElem.innerHTML = html;
+  var f = function (e) {
+    clipboardData.forEach(function (elem) {
+      e.clipboardData.setData(elem.format, elem.data);
+    });
+
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    fakeElem.removeEventListener('copy', f);
+  };
+  fakeElem.addEventListener('copy', f);
+
   document.body.appendChild(fakeElem);
-  if (fakeElem.hasAttribute('contenteditable')) {
-    fakeElem.focus();
-  }
+  // if (fakeElem.hasAttribute('contenteditable')) {
+  fakeElem.focus();
+  // }
   var selection = window.getSelection();
   var range = document.createRange();
   range.selectNodeContents(fakeElem);
   selection.removeAllRanges();
   selection.addRange(range);
-  var successful = document.execCommand('copy');
-  document.body.removeChild(fakeElem);
+  if (delay) {
+    setTimeout(function () {
+      if (!document.execCommand('copy')) {
+        console.log('copy failed');
+      }
+      document.body.removeChild(fakeElem);
+    }, 20);
+  } else {
+    if (!document.execCommand('copy')) {
+      console.log('copy failed');
+    }
+    document.body.removeChild(fakeElem);
+  }
 };
 
 /**

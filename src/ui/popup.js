@@ -4,27 +4,7 @@ morpheus.Popup.init = function () {
   if (morpheus.Popup.initted) {
     return;
   }
-  var client = new Clipboard('a.copy', {
-    text: function (trigger) {
-      var event = {
-        clipboardData: {
-          setData: function (dataType, data) {
-            this.data = data;
-          }
-        }
-      };
-      morpheus.Popup.popupCallback(event, $(trigger).data('name'));
-      morpheus.Popup.hide();
-      return event.clipboardData.data;
-    }
-  });
-  client.on('error', function (e) {
-    console.log('Copy error');
-    console.error('Action:', e.action);
-    console.error('Trigger:', e.trigger);
-  });
 
-  morpheus.Popup.client = client;
   morpheus.Popup.initted = true;
   morpheus.Popup.$popupDiv = $(document.createElement('div'));
   morpheus.Popup.$popupDiv.css('position', 'absolute').css('zIndex', 1050).css('overflow', 'auto').addClass('dropdown clearfix');
@@ -35,10 +15,10 @@ morpheus.Popup.init = function () {
   morpheus.Popup.$contextMenu.on('click', 'a', function (e) {
     e.preventDefault();
     var $this = $(this);
-    if (!$this.hasClass('copy')) {
-      morpheus.Popup.popupCallback(e, $this.data('name'));
-      morpheus.Popup.hide();
-    }
+    // if (!$this.hasClass('copy')) {
+    morpheus.Popup.popupCallback(e, $this.data('name'));
+    morpheus.Popup.hide();
+    // }
 
   });
 };
@@ -56,7 +36,6 @@ morpheus.Popup.hide = function () {
   $(document.body).off('mousedown', morpheus.Popup.hidePopupMenu);
   morpheus.Popup.popupCallback = null;
   morpheus.Popup.component = null;
-  // morpheus.Popup.client.unclip();
 };
 
 morpheus.Popup.showPopup = function (menuItems, position, component, callback) {
