@@ -386,6 +386,7 @@ morpheus.HeatMap = function (options) {
     promises.push(rowDef);
 
   }
+  console.log("HeatMap creation ::", options.columnAnnotations);
   if (options.columnAnnotations) {
     var columnDef = morpheus.DatasetUtil.annotate({
       annotations: options.columnAnnotations,
@@ -1590,7 +1591,8 @@ morpheus.HeatMap.prototype = {
       // see if default fields found
       if (!displaySpecified) {
         var defaultFieldsToShow = new morpheus.Set();
-        ['pert_iname', 'moa', 'target', 'description', 'cell_id', 'pert_type']
+        //['pert_iname', 'moa', 'target', 'description', 'cell_id', 'pert_type'
+        ['pert_iname', 'moa', 'target', 'cell_id', 'pert_type', 'condition', 'geo_accession', 'id', 'title', 'characteristics']
         .forEach(function (field) {
           defaultFieldsToShow.add(field);
         });
@@ -1603,7 +1605,6 @@ morpheus.HeatMap.prototype = {
             });
             displaySpecified = true;
           }
-
         }
 
       }
