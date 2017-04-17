@@ -304,8 +304,6 @@ morpheus.PcaPlotTool.prototype = {
 
 
         var project = this.project;
-
-
         this.formBuilder.$form.find('[name="draw"]').on('click', function () {
             _this.$chart.empty();
 
@@ -317,6 +315,7 @@ morpheus.PcaPlotTool.prototype = {
             console.log(project.getColumnSelectionModel());
             console.log(project.getRowSelectionModel());
             var fullDataset = _this.project.getFullDataset();
+            console.log(fullDataset);
             _this.dataset = dataset;
 
             var colorBy = _this.formBuilder.getValue('color');
@@ -429,13 +428,18 @@ morpheus.PcaPlotTool.prototype = {
             var rowIndices = [];
 
             if (fullDataset instanceof morpheus.Dataset ||
-                fullDataset instanceof morpheus.SlicedDatasetView && !(dataset.columnIndices.length == 0 && dataset.rowIndices.length == 0)) {
+                fullDataset instanceof morpheus.SlicedDatasetView && !(!dataset.columnIndices && dataset.rowIndices || dataset.columnIndices.length == 0 && dataset.rowIndices.length == 0)) {
                 columnIndices = dataset.columnIndices;
                 rowIndices = dataset.rowIndices;
             }
             else {
-                columnIndices = fullDataset.columnIndices;
-                rowIndices = fullDataset.rowIndices;
+                if (fullDataset.columnIndices) {
+                    columnIndices = fullDataset.columnsIndices;
+                }
+                if (fullDataset.rowIndices) {
+                    rowIndices = fullDataset.rowIndices;
+                }
+
             }
             if (columnIndices.length == 1) {
                 alert("Choose at least two columns");

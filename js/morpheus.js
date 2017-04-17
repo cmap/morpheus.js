@@ -6723,15 +6723,18 @@ morpheus.DatasetUtil.getNonEmptyRows = function (dataset) {
   return rowsToKeep;
 };
 morpheus.DatasetUtil.getContentArray = function (dataset) {
+
 	var array = [];
 	var nr = dataset.rows;
 	var nc = dataset.columns;
+	console.log("getContentArray ::", "dataset:", dataset, "rows:", nr, "columns:", nc);
 
 	for (var i = 0; i < nr; i++) {
 		for (var j = 0; j < nc; j++) {
 			array.push(dataset.getValue(i, j));
 		}
 	}
+	console.log("getContentArray ::", array);
 	return array;
 };
 morpheus.DatasetUtil.getMetadataArray = function (dataset) {
@@ -6804,17 +6807,21 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 
 morpheus.DatasetUtil.toESSessionPromise = function (options) {
 	var dataset = options.dataset ? options.dataset : options;
+	while (dataset.dataset) {
+	  dataset = dataset.dataset;
+    }
 	console.log("ENTERED TO_ESSESSION_PROMISE", dataset);
 	dataset.setESSession(new Promise(function (resolve, reject) {
 		//console.log("morpheus.DatasetUtil.toESSessionPromise ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
-		if (dataset instanceof morpheus.SlicedDatasetView) {
+/*		if (dataset.dataset) {
 			//console.log("morpheus.DatasetUtil.toESSessionPromise ::", "dataset in instanceof morpheus.SlicedDatasetView", "go deeper");
 			morpheus.DatasetUtil.toESSessionPromise(dataset.dataset);
-		}
+		}*/
         if (options.isGEO) {
 			resolve(dataset.getESSession());
 			return;
         }
+        console.log("inside promise creation ::", dataset);
 		var array = morpheus.DatasetUtil.getContentArray(dataset);
 		var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
 
@@ -16877,8 +16884,6 @@ morpheus.PcaPlotTool.prototype = {
 
 
         var project = this.project;
-
-
         this.formBuilder.$form.find('[name="draw"]').on('click', function () {
             _this.$chart.empty();
 
@@ -16890,6 +16895,7 @@ morpheus.PcaPlotTool.prototype = {
             console.log(project.getColumnSelectionModel());
             console.log(project.getRowSelectionModel());
             var fullDataset = _this.project.getFullDataset();
+            console.log(fullDataset);
             _this.dataset = dataset;
 
             var colorBy = _this.formBuilder.getValue('color');
@@ -17002,13 +17008,18 @@ morpheus.PcaPlotTool.prototype = {
             var rowIndices = [];
 
             if (fullDataset instanceof morpheus.Dataset ||
-                fullDataset instanceof morpheus.SlicedDatasetView && !(dataset.columnIndices.length == 0 && dataset.rowIndices.length == 0)) {
+                fullDataset instanceof morpheus.SlicedDatasetView && !(!dataset.columnIndices && dataset.rowIndices || dataset.columnIndices.length == 0 && dataset.rowIndices.length == 0)) {
                 columnIndices = dataset.columnIndices;
                 rowIndices = dataset.rowIndices;
             }
             else {
-                columnIndices = fullDataset.columnIndices;
-                rowIndices = fullDataset.rowIndices;
+                if (fullDataset.columnIndices) {
+                    columnIndices = fullDataset.columnsIndices;
+                }
+                if (fullDataset.rowIndices) {
+                    rowIndices = fullDataset.rowIndices;
+                }
+
             }
             if (columnIndices.length == 1) {
                 alert("Choose at least two columns");
@@ -29921,13 +29932,6 @@ morpheus.HeatMap.prototype = {
             });
             displaySpecified = true;
           }
-          /*if ((new RegExp("characteristics*").test(v.getName()))) {
-            nameToOption.set(v.getName(), {
-              display:'text'
-            });
-            displaySpecified = true;
-          }
-*/
         }
 
       }

@@ -974,15 +974,18 @@ morpheus.DatasetUtil.getNonEmptyRows = function (dataset) {
   return rowsToKeep;
 };
 morpheus.DatasetUtil.getContentArray = function (dataset) {
+
 	var array = [];
 	var nr = dataset.rows;
 	var nc = dataset.columns;
+	console.log("getContentArray ::", "dataset:", dataset, "rows:", nr, "columns:", nc);
 
 	for (var i = 0; i < nr; i++) {
 		for (var j = 0; j < nc; j++) {
 			array.push(dataset.getValue(i, j));
 		}
 	}
+	console.log("getContentArray ::", array);
 	return array;
 };
 morpheus.DatasetUtil.getMetadataArray = function (dataset) {
@@ -1055,17 +1058,21 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 
 morpheus.DatasetUtil.toESSessionPromise = function (options) {
 	var dataset = options.dataset ? options.dataset : options;
+	while (dataset.dataset) {
+	  dataset = dataset.dataset;
+    }
 	console.log("ENTERED TO_ESSESSION_PROMISE", dataset);
 	dataset.setESSession(new Promise(function (resolve, reject) {
 		//console.log("morpheus.DatasetUtil.toESSessionPromise ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
-		if (dataset instanceof morpheus.SlicedDatasetView) {
+/*		if (dataset.dataset) {
 			//console.log("morpheus.DatasetUtil.toESSessionPromise ::", "dataset in instanceof morpheus.SlicedDatasetView", "go deeper");
 			morpheus.DatasetUtil.toESSessionPromise(dataset.dataset);
-		}
+		}*/
         if (options.isGEO) {
 			resolve(dataset.getESSession());
 			return;
         }
+        console.log("inside promise creation ::", dataset);
 		var array = morpheus.DatasetUtil.getContentArray(dataset);
 		var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
 
