@@ -65,7 +65,7 @@ morpheus.Table = function (options) {
   };
   // add empty search filter
   this.grid
-  .getFilter().add(searchFilter);
+    .getFilter().add(searchFilter);
   var $header = $('<div class="slick-table-header"><div name="top"></div><div style="display: inline-block;" name="left" class="pad-bottom-8 pad-top-8"></div><div name="right" class="pull-right pad-bottom-8' +
     ' pad-top-8"></div></div>');
   this.$header = $header;
@@ -81,7 +81,7 @@ morpheus.Table = function (options) {
   if (options.columnPicker && visibleColumns.length !== this.columns.length) {
     var select = [];
     select
-    .push('<select data-width="90px" data-selected-text-format="static" title="Columns..." multiple class="pad-left-4 selectpicker show-tick">');
+      .push('<select data-width="90px" data-selected-text-format="static" title="Columns..." multiple class="pad-left-4 selectpicker show-tick">');
     // sort column names
     var sortedColumns = this.columns.slice().sort(function (a, b) {
       a = a.name.toLowerCase();
@@ -171,50 +171,50 @@ morpheus.Table = function (options) {
         * visibleColumns.length;
       // collapse
       _this.grid.grid
-      .setColumns([{
-        id: 0,
-        tooltip: function (item, value) {
-          var html = [];
-          for (var i = 0; i < visibleColumns.length; i++) {
-            var text = visibleColumns[i].tooltip(item, visibleColumns[i]
-            .getter(item));
-            if (text != null && text !== '') {
-              html.push(text);
+        .setColumns([{
+          id: 0,
+          tooltip: function (item, value) {
+            var html = [];
+            for (var i = 0; i < visibleColumns.length; i++) {
+              var text = visibleColumns[i].tooltip(item, visibleColumns[i]
+                .getter(item));
+              if (text != null && text !== '') {
+                html.push(text);
+              }
             }
-          }
-          return html.join('<br />');
-        },
-        collapsed: true,
-        getter: function (item) {
-          return item;
-        },
-        formatter: function (row, cell, value, columnDef,
-                             dataContext) {
-          var html = [];
-          html
-          .push('<div class="slick-table-wrapper"><div class="slick-cell-wrapper">');
-          if (options.rowHeader) { // e.g. render checkbox
-            html.push(options.rowHeader(dataContext));
-            html.push('<div style="height:4px;"></div>');
-          }
-          for (var i = 0; i < visibleColumns.length; i++) {
-            if (i > 0) {
+            return html.join('<br />');
+          },
+          collapsed: true,
+          getter: function (item) {
+            return item;
+          },
+          formatter: function (row, cell, value, columnDef,
+                               dataContext) {
+            var html = [];
+            html
+              .push('<div class="slick-table-wrapper"><div class="slick-cell-wrapper">');
+            if (options.rowHeader) { // e.g. render checkbox
+              html.push(options.rowHeader(dataContext));
               html.push('<div style="height:4px;"></div>');
             }
-            var c = visibleColumns[i];
-            html.push(c.name);
-            html.push(':');
-            var s = c.renderer(dataContext, c
-            .getter(dataContext));
-            html.push(s);
+            for (var i = 0; i < visibleColumns.length; i++) {
+              if (i > 0) {
+                html.push('<div style="height:4px;"></div>');
+              }
+              var c = visibleColumns[i];
+              html.push(c.name);
+              html.push(':');
+              var s = c.renderer(dataContext, c
+                .getter(dataContext));
+              html.push(s);
 
-          }
-          html.push('</div></div>');
-          return html.join('');
-        },
-        sortable: false,
-        name: ''
-      }]);
+            }
+            html.push('</div></div>');
+            return html.join('');
+          },
+          sortable: false,
+          name: ''
+        }]);
       $gridDiv.find('.slick-header').hide();
       _this.grid.grid.resizeCanvas();
       _this.grid.grid.invalidate();
@@ -230,7 +230,7 @@ morpheus.Table = function (options) {
       _this.grid.grid.resizeCanvas();
       if (options.select) {
         _this.grid.grid.setSelectedRows(_this.grid.grid
-        .getSelectedRows());
+          .getSelectedRows());
       }
       _this.grid.grid.invalidate();
     } else {
@@ -381,10 +381,10 @@ morpheus.Table.prototype = {
 
       }
       matches
-      .sort(function (a, b) {
-        return (a.value === b.value ? 0
-          : (a.value < b.value ? -1 : 1));
-      });
+        .sort(function (a, b) {
+          return (a.value === b.value ? 0
+            : (a.value < b.value ? -1 : 1));
+        });
       return response(matches);
     }
     var field = null;
@@ -463,17 +463,17 @@ morpheus.Table.prototype = {
             if (regex.test(val) && !set.has(val)) {
               set.add(val);
               matches
-              .push({
-                value: showField ? (field + ':' + val)
-                  : val,
-                label: showField ? ('<span style="font-weight:300;">'
+                .push({
+                  value: showField ? (field + ':' + val)
+                    : val,
+                  label: showField ? ('<span style="font-weight:300;">'
                   + field
                   + ':</span>'
                   + '<span style="font-weight:900;">'
                   + val + '</span>')
-                  : ('<span style="font-weight:900;">'
+                    : ('<span style="font-weight:900;">'
                   + val + '</span>')
-              });
+                });
             }
             if (matches.length === maxSize) {
               return response(matches);
@@ -483,17 +483,17 @@ morpheus.Table.prototype = {
           if (regex.test(value) && !set.has(value)) {
             set.add(value);
             matches
-            .push({
-              value: showField ? (field + ':' + value)
-                : value,
-              label: showField ? ('<span style="font-weight:300;">'
+              .push({
+                value: showField ? (field + ':' + value)
+                  : value,
+                label: showField ? ('<span style="font-weight:300;">'
                 + field
                 + ':</span>'
                 + '<span style="font-weight:900;">'
                 + value + '</span>')
-                : ('<span style="font-weight:900;">'
+                  : ('<span style="font-weight:900;">'
                 + value + '</span>')
-            });
+              });
             if (matches.length === maxSize) {
               return response(matches);
             }
@@ -509,8 +509,8 @@ morpheus.Table.prototype = {
     if (predicates == null || predicates.length === 0) {
       this.searchFunction = null;
       this.grid
-      .setFilter(this.grid
-      .getFilter());
+        .setFilter(this.grid
+          .getFilter());
       return;
     }
     var columns = this.columns.filter(function (c) {
@@ -573,15 +573,15 @@ morpheus.Table.prototype = {
     };
     this.searchFunction = f;
     this.grid
-    .setFilter(this.grid
-    .getFilter());
+      .setFilter(this.grid
+        .getFilter());
   },
   search: function (text) {
     if (text === '') {
       this.searchFunction = null;
       this.grid
-      .setFilter(this.grid
-      .getFilter());
+        .setFilter(this.grid
+          .getFilter());
     } else {
       var tokens = morpheus.Util.getAutocompleteTokens(text);
       var columns = this.columns.filter(function (c) {
@@ -719,10 +719,10 @@ morpheus.Table.createOptions = function (options) {
     }
     if (!column.getter) {
       column.getter = column.field == null ? function (item) {
-          return item;
-        } : function (item) {
-          return item[c.field];
-        };
+        return item;
+      } : function (item) {
+        return item[c.field];
+      };
     }
 
     columns.push(column);

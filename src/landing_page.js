@@ -11,7 +11,7 @@ morpheus.LandingPage = function (pageOptions) {
   html.push('<div data-name="help" class="pull-right"></div>');
 
   html
-  .push('<div style="margin-bottom:10px;"><svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg> <div data-name="brand" style="display:inline-block; vertical-align: top;font-size:24px;font-family:sans-serif;">');
+    .push('<div style="margin-bottom:10px;"><svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg> <div data-name="brand" style="display:inline-block; vertical-align: top;font-size:24px;font-family:sans-serif;">');
   html.push('<span>M</span>');
   html.push('<span>o</span>');
   html.push('<span>r</span>');
@@ -88,8 +88,8 @@ morpheus.LandingPage.prototype = {
     this.formBuilder.setValue('file', '');
     this.$el.hide();
     $(window)
-    .off(
-      'paste.morpheus drop.morpheus dragover.morpheus dragenter.morpheus');
+      .off(
+        'paste.morpheus drop.morpheus dragover.morpheus dragenter.morpheus');
     this.formBuilder.off('change');
   },
   show: function () {

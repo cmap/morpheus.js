@@ -229,7 +229,7 @@ morpheus.Grid.prototype = {
   },
   convertViewIndexToModel: function (viewIndex) {
     return this.viewOrder != null ? (viewIndex < this.viewOrder.length
-      && viewIndex >= 0 ? this.viewOrder[viewIndex] : -1) : viewIndex;
+    && viewIndex >= 0 ? this.viewOrder[viewIndex] : -1) : viewIndex;
   },
   _updateMappings: function () {
     var selectedViewIndices = this.grid.getSelectionModel() != null ? this.grid
@@ -239,7 +239,7 @@ morpheus.Grid.prototype = {
     if (selectedViewIndices) {
       for (var i = 0, length = selectedViewIndices.length; i < length; i++) {
         selectedModelIndices.push(this
-        .convertViewIndexToModel(selectedViewIndices[i]));
+          .convertViewIndexToModel(selectedViewIndices[i]));
       }
     }
     this.viewOrder = null;
@@ -292,7 +292,7 @@ morpheus.Grid.prototype = {
       var newSelectedViewIndices = [];
       for (var i = 0, length = selectedModelIndices.length; i < length; i++) {
         var index = this
-        .convertModelIndexToView(selectedModelIndices[i]);
+          .convertModelIndexToView(selectedModelIndices[i]);
         if (index !== undefined) {
           newSelectedViewIndices.push(index);
         }
@@ -352,7 +352,7 @@ morpheus.Grid.prototype = {
         } else {
           for (var i = 0, nrows = Math.min(items.length, 10); i < nrows; i++) {
             var html = column.formatter(i, null, column
-            .getter(items[i]), column, items[i]);
+              .getter(items[i]), column, items[i]);
             var $html = $(html);
             $html.find('.slick-cell-wrapper').attr('class', '');
             $cell.html($html);

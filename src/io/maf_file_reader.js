@@ -128,10 +128,10 @@ morpheus.MafFileReader.prototype = {
     }
     var chromosomeColumn = headerToIndex['Chromosome'.toLowerCase()];
     var startPositionColumn = headerToIndex['Start_position'
-    .toLowerCase()];
+      .toLowerCase()];
     var refAlleleColumn = headerToIndex['Reference_Allele'.toLowerCase()];
     var tumorAllelColumn = headerToIndex['Tumor_Seq_Allele2'
-    .toLowerCase()];
+      .toLowerCase()];
 
     var proteinChangeColumn = headerToIndex['Protein_Change'.toLowerCase()];
     if (proteinChangeColumn == null) {
@@ -146,10 +146,10 @@ morpheus.MafFileReader.prototype = {
       throw new Error('Gene symbol column not found.');
     }
     var variantColumnIndex = headerToIndex['Variant_Classification'
-    .toLowerCase()];
+      .toLowerCase()];
     if (variantColumnIndex == null) {
       variantColumnIndex = headerToIndex['variant'
-      .toLowerCase()];
+        .toLowerCase()];
     }
     if (variantColumnIndex == null) {
       throw new Error('Variant_Classification not found');
@@ -254,7 +254,7 @@ morpheus.MafFileReader.prototype = {
       rowIds.setValue(index, id);
     });
     for (var i = 0, nrows = dataset.getRowCount(), ncols = dataset
-    .getColumnCount(); i < nrows; i++) {
+      .getColumnCount(); i < nrows; i++) {
       for (var j = 0; j < ncols; j++) {
         if (variantMatrix[i][j] === undefined) {
           variantMatrix[i][j] = 0;
@@ -284,29 +284,29 @@ morpheus.MafFileReader.prototype = {
       project = new morpheus.Project(tmp);
       var columnIndices = morpheus.Util.seq(tmp.getColumnCount());
       columnIndices
-      .sort(function (a, b) {
-        for (var i = 0, nrows = tmp.getRowCount(); i < nrows; i++) {
-          for (var seriesIndex = 0, nseries = tmp
-          .getSeriesCount(); seriesIndex < nseries; seriesIndex++) {
-            var f1 = tmp.getValue(i, a, seriesIndex);
-            if (isNaN(f1)) {
-              f1 = Number.NEGATIVE_INFINITY;
-            }
-            f1 = f1.valueOf();
-            var f2 = tmp.getValue(i, b, seriesIndex);
-            if (isNaN(f2)) {
-              f2 = Number.NEGATIVE_INFINITY;
-            }
-            f2 = f2.valueOf();
-            var returnVal = (f1 === f2 ? 0 : (f1 < f2 ? 1
-              : -1));
-            if (returnVal !== 0) {
-              return returnVal;
+        .sort(function (a, b) {
+          for (var i = 0, nrows = tmp.getRowCount(); i < nrows; i++) {
+            for (var seriesIndex = 0, nseries = tmp
+              .getSeriesCount(); seriesIndex < nseries; seriesIndex++) {
+              var f1 = tmp.getValue(i, a, seriesIndex);
+              if (isNaN(f1)) {
+                f1 = Number.NEGATIVE_INFINITY;
+              }
+              f1 = f1.valueOf();
+              var f2 = tmp.getValue(i, b, seriesIndex);
+              if (isNaN(f2)) {
+                f2 = Number.NEGATIVE_INFINITY;
+              }
+              f2 = f2.valueOf();
+              var returnVal = (f1 === f2 ? 0 : (f1 < f2 ? 1
+                : -1));
+              if (returnVal !== 0) {
+                return returnVal;
+              }
             }
           }
-        }
-        return 0;
-      });
+          return 0;
+        });
       dataset = new morpheus.SlicedDatasetView(dataset, null,
         columnIndices);
     }
@@ -333,10 +333,10 @@ morpheus.MafFileReader.prototype = {
       fields: fieldNames
     });
     morpheus.MafFileReader
-    .summarizeMutations({
-      dataset: new morpheus.TransposedDatasetView(dataset),
-      fields: fieldNames
-    });
+      .summarizeMutations({
+        dataset: new morpheus.TransposedDatasetView(dataset),
+        fields: fieldNames
+      });
 
     var mutationSummarySelectionVector = dataset.getColumnMetadata().add('mutation_summary_selection');
     mutationSummarySelectionVector.getProperties().set(
@@ -370,7 +370,7 @@ morpheus.MafFileReader.prototype = {
   read: function (fileOrUrl, callback) {
     var _this = this;
     var name = morpheus.Util.getBaseFileName(morpheus.Util
-    .getFileName(fileOrUrl));
+      .getFileName(fileOrUrl));
     morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err, arrayBuffer) {
       if (err) {
         callback(err);

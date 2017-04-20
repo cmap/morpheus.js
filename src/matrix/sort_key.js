@@ -86,7 +86,7 @@ morpheus.SortKey.prototype = {
           || morpheus.SortKey.ARRAY_MAX_SUMMARY_FUNCTION;
 
         this.c = this.sortOrder === morpheus.SortKey.SortOrder.ASCENDING ? morpheus.SortKey
-        .ARRAY_ASCENDING_COMPARATOR(summary)
+          .ARRAY_ASCENDING_COMPARATOR(summary)
           : morpheus.SortKey.ARRAY_DESCENDING_COMPARATOR(summary);
       } else {
         this.c = this.sortOrder === morpheus.SortKey.SortOrder.ASCENDING ? morpheus.SortKey.ASCENDING_COMPARATOR
@@ -112,9 +112,9 @@ morpheus.SortKey.prototype = {
       var c = this.c;
       this.c = morpheus.SortKey.NUMBER_ASCENDING_COMPARATOR;
       pairs
-      .sort(function (pair1, pair2) {
-        return c(pair1.value, pair2.value);
-      });
+        .sort(function (pair1, pair2) {
+          return c(pair1.value, pair2.value);
+        });
 
       var modelIndexToValue = [];
       var nInGroup = Math.min(pairs.length, 10);
@@ -206,8 +206,8 @@ morpheus.SortByValuesKey.prototype = {
     this.rowView = new morpheus.DatasetRowView(this.dataset);
     this.summaryFunction = this.modelIndices.length > 1 ? morpheus.Median
       : function (row) {
-        return row.getValue(0);
-      };
+      return row.getValue(0);
+    };
     if (this.sortOrder === morpheus.SortKey.SortOrder.TOP_N) {
       var pairs = [];
       var missingIndices = [];
@@ -225,10 +225,10 @@ morpheus.SortByValuesKey.prototype = {
       }
       // sort values in descending order
       pairs
-      .sort(function (a, b) {
-        return (a.value < b.value ? 1
-          : (a.value === b.value ? 0 : -1));
-      });
+        .sort(function (a, b) {
+          return (a.value < b.value ? 1
+            : (a.value === b.value ? 0 : -1));
+        });
 
       var modelIndexToValue = [];
       var nInGroup = Math.min(pairs.length, this.bothCount);
@@ -273,7 +273,7 @@ morpheus.SortByValuesKey.prototype = {
   },
   getValue: function (i) {
     return this.modelIndexToValue ? this.modelIndexToValue[i] : this
-    .summaryFunction(this.rowView.setIndex(i));
+      .summaryFunction(this.rowView.setIndex(i));
   },
   setSortOrder: function (sortOrder) {
     if (typeof sortOrder === 'string') {
@@ -543,8 +543,8 @@ morpheus.SortKey.BOX_PLOT_SUMMARY_FUNCTION = function (array) {
   if (box == null) {
     var v = morpheus.VectorUtil.arrayAsVector(array);
     box = morpheus
-    .BoxPlotItem(this.indices != null ? new morpheus.SlicedVector(
-      v, this.indices) : v);
+      .BoxPlotItem(this.indices != null ? new morpheus.SlicedVector(
+        v, this.indices) : v);
     array.box = box;
   }
 

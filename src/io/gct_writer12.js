@@ -25,7 +25,7 @@ morpheus.GctWriter12.prototype = {
     pw.push('\n');
     var rowMetadata = morpheus.GctWriter.idFirst(dataset.getRowMetadata());
     var columnMetadata = morpheus.GctWriter.idFirst(dataset
-    .getColumnMetadata());
+      .getColumnMetadata());
     pw.push('Name');
     pw.push('\t');
     pw.push('Description');
@@ -42,7 +42,7 @@ morpheus.GctWriter12.prototype = {
       rowIds = rowMetadata.get(0);
     }
     var rowDescriptions = rowMetadata
-    .getByName(this.options.rowDescription);
+      .getByName(this.options.rowDescription);
     if (rowDescriptions == null && rowMetadata.getMetadataCount() > 1) {
       rowDescriptions = rowMetadata.get(1);
     }

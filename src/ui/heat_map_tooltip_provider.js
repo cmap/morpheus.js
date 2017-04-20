@@ -74,7 +74,7 @@ morpheus.HeatMapTooltipProvider = function (heatMap, rowIndex, columnIndex, opti
     var track = heatMap.getTrack(options.name, columnIndex !== -1);
     var colorByName = track != null ? track.settings.colorByField : null;
     var additionalVector = colorByName != null ? metadata
-    .getByName(colorByName) : null;
+      .getByName(colorByName) : null;
     morpheus.HeatMapTooltipProvider.vectorToString(vector,
       rowIndex !== -1 ? rowIndex : columnIndex, tipText, separator,
       additionalVector);
@@ -94,11 +94,11 @@ morpheus.HeatMapTooltipProvider = function (heatMap, rowIndex, columnIndex, opti
   if (!quick) {
     if (heatMap.rowDendrogram) {
       selectedRowNodes = _
-      .values(heatMap.rowDendrogram.selectedRootNodeIdToNode);
+        .values(heatMap.rowDendrogram.selectedRootNodeIdToNode);
     }
     if (heatMap.columnDendrogram) {
       selectedColumnNodes = _
-      .values(heatMap.columnDendrogram.selectedRootNodeIdToNode);
+        .values(heatMap.columnDendrogram.selectedRootNodeIdToNode);
     }
     if (selectedRowNodes.length > 0 && rowNodes.length > 0) {
       var nodeIds = {};
@@ -255,13 +255,13 @@ morpheus.HeatMapTooltipProvider.vectorToString = function (vector, index, tipTex
           morpheus.VectorKeys.VISIBLE_FIELDS);
         if (visibleFieldIndices === undefined) {
           visibleFieldIndices = morpheus.Util
-          .seq(primaryFields.length);
+            .seq(primaryFields.length);
         }
         var additionalFieldNames = additionalVector != null ? additionalVector
-        .getProperties().get(morpheus.VectorKeys.FIELDS)
+          .getProperties().get(morpheus.VectorKeys.FIELDS)
           : null;
         var additionalVal = additionalFieldNames != null ? additionalVector
-        .getValue(index)
+          .getValue(index)
           : null;
         if (tipText.length > 0) {
           tipText.push(separator);

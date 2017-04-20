@@ -198,7 +198,7 @@ morpheus.CheckBoxList = function (options) {
         });
       } else if (!options.select
         || ($target.is('[type=checkbox]') && $target
-        .attr('name') === 'toggle')) {
+          .attr('name') === 'toggle')) {
         if (set.has(value)) {
           set.remove(value);
         } else {

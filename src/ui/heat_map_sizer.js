@@ -1,7 +1,7 @@
 morpheus.HeatMapSizer = function () {
   this.seriesName = null;
   this.sizeByScale = d3.scale.linear().domain([this.min, this.max])
-  .range([0, 1]).clamp(true);
+    .range([0, 1]).clamp(true);
 };
 morpheus.HeatMapSizer.prototype = {
   min: 0,
@@ -20,12 +20,12 @@ morpheus.HeatMapSizer.prototype = {
   setMin: function (min) {
     this.min = min;
     this.sizeByScale = d3.scale.linear().domain([this.min, this.max])
-    .range([0, 1]).clamp(true);
+      .range([0, 1]).clamp(true);
   },
   setMax: function (max) {
     this.max = max;
     this.sizeByScale = d3.scale.linear().domain([this.min, this.max])
-    .range([0, 1]).clamp(true);
+      .range([0, 1]).clamp(true);
   },
   getMin: function () {
     return this.min;

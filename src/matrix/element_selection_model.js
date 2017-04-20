@@ -41,8 +41,8 @@ morpheus.ElementSelectionModel.prototype = {
     var modelIndices = [];
     this.viewIndices.forEach(function (id) {
       modelIndices.push(project
-      .convertViewRowIndexToModel(id.getArray()[0]), project
-      .convertViewColumnIndexToModel(id.getArray()[1]));
+        .convertViewRowIndexToModel(id.getArray()[0]), project
+        .convertViewColumnIndexToModel(id.getArray()[1]));
     });
     return modelIndices;
   },
@@ -54,9 +54,9 @@ morpheus.ElementSelectionModel.prototype = {
     this.viewIndices = new morpheus.Set();
     for (var i = 0, length = this.modelIndices.length; i < length; i++) {
       var rowIndex = project
-      .convertModelRowIndexToView(this.modelIndices[i][0]);
+        .convertModelRowIndexToView(this.modelIndices[i][0]);
       var columnIndex = project
-      .convertModelColumnIndexToView(this.modelIndices[i][1]);
+        .convertModelColumnIndexToView(this.modelIndices[i][1]);
       if (rowIndex !== -1 && columnIndex !== -1) {
         this.viewIndices.add(new morpheus.Identifier([rowIndex,
           columnIndex]));

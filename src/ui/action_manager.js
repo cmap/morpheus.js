@@ -30,13 +30,13 @@ morpheus.ActionManager = function () {
         var filterModal = [];
         var filterLabelId = _.uniqueId('morpheus');
         filterModal
-        .push('<div class="modal" tabindex="1" role="dialog" aria-labelledby="'
-          + filterLabelId + '">');
+          .push('<div class="modal" tabindex="1" role="dialog" aria-labelledby="'
+            + filterLabelId + '">');
         filterModal.push('<div class="modal-dialog" role="document">');
         filterModal.push('<div class="modal-content">');
         filterModal.push('<div class="modal-header">');
         filterModal
-        .push('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+          .push('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
         filterModal.push('<h4 class="modal-title" id="' + filterLabelId
           + '">Filter</h4>');
         filterModal.push('</div>');
@@ -53,9 +53,9 @@ morpheus.ActionManager = function () {
         $filter.appendTo($filterModal.find('.modal-body'));
         var filterHtml = [];
         filterHtml
-        .push('<div class="radio"><label><input type="radio" name="rowsOrColumns" value="rows" checked>Rows</label></div> ');
+          .push('<div class="radio"><label><input type="radio" name="rowsOrColumns" value="rows" checked>Rows</label></div> ');
         filterHtml
-        .push('<div class="radio"><label><input type="radio" name="rowsOrColumns" value="columns">Columns</label></div>');
+          .push('<div class="radio"><label><input type="radio" name="rowsOrColumns" value="columns">Columns</label></div>');
 
         var $filterChooser = $(filterHtml.join(''));
         $filterChooser.appendTo($filter);
@@ -268,9 +268,9 @@ morpheus.ActionManager = function () {
     this.add({
       name: 'PCA Plot',
       cb: function (options) {
-          new morpheus.PcaPlotTool({
-            project: options.heatMap.getProject()
-          });
+        new morpheus.PcaPlotTool({
+          project: options.heatMap.getProject()
+        });
       },
       icon: 'fa fa-line-chart'
     });
@@ -330,7 +330,7 @@ morpheus.ActionManager = function () {
     name: 'Go To Bottom',
     cb: function (options) {
       options.heatMap
-      .scrollTop(options.heatMap.heatmap.getPreferredSize().height);
+        .scrollTop(options.heatMap.heatmap.getPreferredSize().height);
     }
   });
   this.add({
@@ -350,7 +350,7 @@ morpheus.ActionManager = function () {
     name: 'Go To Top',
     cb: function (options) {
       options.heatMap
-      .scrollTop(0);
+        .scrollTop(0);
     }
   });
   this.add({
@@ -447,7 +447,7 @@ morpheus.ActionManager = function () {
     name: 'Tutorial',
     cb: function () {
       window
-      .open('https://clue.io/morpheus/tutorial.html');
+        .open('https://clue.io/morpheus/tutorial.html');
     }
   });
   this.add({
@@ -470,13 +470,13 @@ morpheus.ActionManager = function () {
         var findModal = [];
         var id = _.uniqueId('morpheus');
         findModal
-        .push('<div class="modal" tabindex="1" role="dialog" aria-labelledby="'
-          + id + '">');
+          .push('<div class="modal" tabindex="1" role="dialog" aria-labelledby="'
+            + id + '">');
         findModal.push('<div class="modal-dialog" role="document">');
         findModal.push('<div class="modal-content">');
         findModal.push('<div class="modal-header">');
         findModal
-        .push('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+          .push('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
         findModal.push('<h4 class="modal-title" id="' + id
           + '">Enter action</h4>');
         findModal.push('</div>');
@@ -560,7 +560,7 @@ morpheus.ActionManager = function () {
     name: 'Linking',
     cb: function () {
       window
-      .open('https://clue.io/morpheus/linking.html');
+        .open('https://clue.io/morpheus/linking.html');
     }
   });
   this.add({
@@ -586,12 +586,12 @@ morpheus.ActionManager = function () {
     cb: function (options) {
       var active = options.heatMap.getActiveComponent();
       var selectionModel = active === 'rowTrack' ? options.heatMap.getProject()
-      .getRowSelectionModel() : options.heatMap.getProject()
-      .getColumnSelectionModel();
+        .getRowSelectionModel() : options.heatMap.getProject()
+        .getColumnSelectionModel();
       var count = active === 'rowTrack' ? options.heatMap.getProject()
-      .getSortedFilteredDataset().getRowCount() : options.heatMap
-      .getProject().getSortedFilteredDataset()
-      .getColumnCount();
+        .getSortedFilteredDataset().getRowCount() : options.heatMap
+        .getProject().getSortedFilteredDataset()
+        .getColumnCount();
       var indices = new morpheus.Set();
       for (var i = 0; i < count; i++) {
         indices.add(i);
@@ -626,8 +626,8 @@ morpheus.ActionManager = function () {
   });
   var clearAction = function (options, isColumns) {
     var model = isColumns ? options.heatMap.getProject()
-    .getColumnSelectionModel() : options.heatMap.getProject()
-    .getRowSelectionModel();
+      .getColumnSelectionModel() : options.heatMap.getProject()
+      .getRowSelectionModel();
     model.setViewIndices(new morpheus.Set(), true);
   };
   this.add({
@@ -666,22 +666,22 @@ morpheus.ActionManager = function () {
       ' top', isColumns);
     if (isColumns) {
       project
-      .setColumnSortKeys(
-        morpheus.SortKey
-        .keepExistingSortKeys(
-          [sortKey],
-          project
-          .getColumnSortKeys()),
-        true);
+        .setColumnSortKeys(
+          morpheus.SortKey
+            .keepExistingSortKeys(
+              [sortKey],
+              project
+                .getColumnSortKeys()),
+          true);
     } else {
       project
-      .setRowSortKeys(
-        morpheus.SortKey
-        .keepExistingSortKeys(
-          [sortKey],
-          project
-          .getRowSortKeys()),
-        true);
+        .setRowSortKeys(
+          morpheus.SortKey
+            .keepExistingSortKeys(
+              [sortKey],
+              project
+                .getRowSortKeys()),
+          true);
     }
   };
   this.add({
@@ -702,10 +702,10 @@ morpheus.ActionManager = function () {
       : project
       .getColumnSelectionModel();
     var count = !isColumns ? project
-    .getSortedFilteredDataset()
-    .getRowCount() : project
-    .getSortedFilteredDataset()
-    .getColumnCount();
+      .getSortedFilteredDataset()
+      .getRowCount() : project
+      .getSortedFilteredDataset()
+      .getColumnCount();
     var indices = new morpheus.Set();
     for (var i = 0; i < count; i++) {
       indices.add(i);
@@ -727,27 +727,27 @@ morpheus.ActionManager = function () {
   var copySelection = function (options, isColumns) {
     var project = options.heatMap.getProject();
     var dataset = project
-    .getSortedFilteredDataset();
+      .getSortedFilteredDataset();
     var activeTrackName = options.heatMap.getSelectedTrackName(isColumns);
     var v;
     if (activeTrackName == null) {
       v = isColumns ? dataset.getColumnMetadata()
-      .get(0) : dataset
-      .getRowMetadata().get(0);
+        .get(0) : dataset
+        .getRowMetadata().get(0);
     } else {
       v = isColumns ? dataset.getColumnMetadata()
-      .getByName(activeTrackName) : dataset
-      .getRowMetadata().getByName(activeTrackName);
+        .getByName(activeTrackName) : dataset
+        .getRowMetadata().getByName(activeTrackName);
     }
 
     var selectionModel = isColumns ? project
-    .getColumnSelectionModel() : project
-    .getRowSelectionModel();
+      .getColumnSelectionModel() : project
+      .getRowSelectionModel();
     var text = [];
     selectionModel.getViewIndices().forEach(
       function (index) {
         text.push(morpheus.Util.toString(v
-        .getValue(index)));
+          .getValue(index)));
       });
     morpheus.Util.setClipboardData([{
       format: 'text/plain',
@@ -771,16 +771,16 @@ morpheus.ActionManager = function () {
 
     var project = options.heatMap.getProject();
     var selectionModel = isColumns ? project
-    .getColumnSelectionModel()
+      .getColumnSelectionModel()
       : project
       .getRowSelectionModel();
     if (selectionModel.count() === 0) {
       morpheus.FormBuilder
-      .showMessageModal({
-        title: 'Annotate Selection',
-        html: 'No ' + (isColumns ? 'columns' : 'rows') + ' selected.',
-        focus: options.heatMap.getFocusEl()
-      });
+        .showMessageModal({
+          title: 'Annotate Selection',
+          html: 'No ' + (isColumns ? 'columns' : 'rows') + ' selected.',
+          focus: options.heatMap.getFocusEl()
+        });
       return;
     }
     var formBuilder = new morpheus.FormBuilder();
@@ -795,56 +795,56 @@ morpheus.ActionManager = function () {
       required: true
     });
     morpheus.FormBuilder
-    .showOkCancel({
-      title: 'Annotate',
-      content: formBuilder.$form,
-      focus: options.heatMap.getFocusEl(),
-      okCallback: function () {
-        var value = formBuilder
-        .getValue('annotation_value');
-        var annotationName = formBuilder
-        .getValue('annotation_name');
-        var dataset = project
-        .getSortedFilteredDataset();
-        var fullDataset = project
-        .getFullDataset();
-        if (isColumns) {
-          dataset = morpheus.DatasetUtil
-          .transposedView(dataset);
-          fullDataset = morpheus.DatasetUtil
-          .transposedView(fullDataset);
+      .showOkCancel({
+        title: 'Annotate',
+        content: formBuilder.$form,
+        focus: options.heatMap.getFocusEl(),
+        okCallback: function () {
+          var value = formBuilder
+            .getValue('annotation_value');
+          var annotationName = formBuilder
+            .getValue('annotation_name');
+          var dataset = project
+            .getSortedFilteredDataset();
+          var fullDataset = project
+            .getFullDataset();
+          if (isColumns) {
+            dataset = morpheus.DatasetUtil
+              .transposedView(dataset);
+            fullDataset = morpheus.DatasetUtil
+              .transposedView(fullDataset);
+          }
+
+          var existingVector = fullDataset
+            .getRowMetadata()
+            .getByName(
+              annotationName);
+          var v = dataset
+            .getRowMetadata().add(
+              annotationName);
+
+          selectionModel
+            .getViewIndices()
+            .forEach(
+              function (index) {
+                v
+                  .setValue(
+                    index,
+                    value);
+              });
+          morpheus.VectorUtil
+            .maybeConvertStringToNumber(v);
+          project
+            .trigger(
+              'trackChanged',
+              {
+                vectors: [v],
+                render: existingVector != null ? []
+                  : [morpheus.VectorTrack.RENDER.TEXT],
+                columns: isColumns
+              });
         }
-
-        var existingVector = fullDataset
-        .getRowMetadata()
-        .getByName(
-          annotationName);
-        var v = dataset
-        .getRowMetadata().add(
-          annotationName);
-
-        selectionModel
-        .getViewIndices()
-        .forEach(
-          function (index) {
-            v
-            .setValue(
-              index,
-              value);
-          });
-        morpheus.VectorUtil
-        .maybeConvertStringToNumber(v);
-        project
-        .trigger(
-          'trackChanged',
-          {
-            vectors: [v],
-            render: existingVector != null ? []
-              : [morpheus.VectorTrack.RENDER.TEXT],
-            columns: isColumns
-          });
-      }
-    });
+      });
   };
   this.add({
     name: 'Annotate Selected Rows',
@@ -866,11 +866,11 @@ morpheus.ActionManager = function () {
         emptyToAll: false
       });
       var columnMetadata = dataset
-      .getColumnMetadata();
+        .getColumnMetadata();
       var rowMetadata = dataset.getRowMetadata();
       // only copy visible tracks
       var visibleColumnFields = options.heatMap
-      .getVisibleTrackNames(true);
+        .getVisibleTrackNames(true);
       var columnFieldIndices = [];
       _.each(visibleColumnFields, function (name) {
         var index = morpheus.MetadataUtil.indexOf(
@@ -884,7 +884,7 @@ morpheus.ActionManager = function () {
       var rowMetadata = dataset.getRowMetadata();
       // only copy visible tracks
       var visibleRowFields = options.heatMap
-      .getVisibleTrackNames(false);
+        .getVisibleTrackNames(false);
       var rowFieldIndices = [];
       _.each(visibleRowFields, function (name) {
         var index = morpheus.MetadataUtil.indexOf(
@@ -897,7 +897,7 @@ morpheus.ActionManager = function () {
         rowMetadata, rowFieldIndices);
 
       var text = new morpheus.GctWriter()
-      .write(dataset);
+        .write(dataset);
       morpheus.Util.setClipboardData([{
         format: 'text/plain',
         data: text
@@ -908,10 +908,10 @@ morpheus.ActionManager = function () {
   var _this = this;
   console.log(_this);
   [new morpheus.HClusterTool(), new morpheus.MarkerSelection(),
-      new morpheus.NearestNeighbors(), new morpheus.AdjustDataTool(),
-      new morpheus.CollapseDatasetTool(), new morpheus.CreateAnnotation(), new morpheus.SimilarityMatrixTool(),
-      new morpheus.TransposeTool(), new morpheus.TsneTool(), new morpheus.DevAPI(),
-      new morpheus.KmeansTool(), new morpheus.LimmaTool()].forEach(function (tool) {
+    new morpheus.NearestNeighbors(), new morpheus.AdjustDataTool(),
+    new morpheus.CollapseDatasetTool(), new morpheus.CreateAnnotation(), new morpheus.SimilarityMatrixTool(),
+    new morpheus.TransposeTool(), new morpheus.TsneTool(), new morpheus.DevAPI(),
+    new morpheus.KmeansTool(), new morpheus.LimmaTool()].forEach(function (tool) {
     _this.add({
 
       name: tool.toString(),

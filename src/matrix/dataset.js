@@ -17,14 +17,14 @@ morpheus.Dataset = function (options) {
     options.dataType = 'Float32';
   }
 
-    if (options.esSession) {
-        this.esSession = options.esSession;
-    }
-    this.seriesNames.push(options.name);
-    this.seriesArrays.push(options.array ? options.array : morpheus.Dataset
-        .createArray(options));
-    this.seriesDataTypes.push(options.dataType);
-    //console.log(this);
+  if (options.esSession) {
+    this.esSession = options.esSession;
+  }
+  this.seriesNames.push(options.name);
+  this.seriesArrays.push(options.array ? options.array : morpheus.Dataset
+    .createArray(options));
+  this.seriesDataTypes.push(options.dataType);
+  //console.log(this);
 };
 /**
  *
@@ -138,36 +138,36 @@ morpheus.Dataset.fromJSON = function (options) {
   // }
   // }
 
-    if (options.seriesMappings) {
-        for (var seriesIndex = 0; seriesIndex < options.seriesMappings.length; seriesIndex++) {
-            // map ordinal values
-            if (options.seriesMappings[seriesIndex]) {
+  if (options.seriesMappings) {
+    for (var seriesIndex = 0; seriesIndex < options.seriesMappings.length; seriesIndex++) {
+      // map ordinal values
+      if (options.seriesMappings[seriesIndex]) {
 
-                var map = options.seriesMappings[seriesIndex]; // e.g. foo:1, bar:3
-                var valueMap = new morpheus.Map();
-                for (var key in map) {
-                    var value = map[key];
-                    valueMap.set(value, morpheus.Util.wrapNumber(value, key));
-                }
-
-                var array = options.seriesArrays[seriesIndex];
-                for (var i = 0; i < options.rows; i++) {
-                    for (var j = 0; j < options.columns; j++) {
-                        var value = array[i][j];
-                        array[i][j] = valueMap.get(value);
-                    }
-                }
-                options.seriesDataTypes[seriesIndex] = 'Number';
-            }
+        var map = options.seriesMappings[seriesIndex]; // e.g. foo:1, bar:3
+        var valueMap = new morpheus.Map();
+        for (var key in map) {
+          var value = map[key];
+          valueMap.set(value, morpheus.Util.wrapNumber(value, key));
         }
+
+        var array = options.seriesArrays[seriesIndex];
+        for (var i = 0; i < options.rows; i++) {
+          for (var j = 0; j < options.columns; j++) {
+            var value = array[i][j];
+            array[i][j] = valueMap.get(value);
+          }
+        }
+        options.seriesDataTypes[seriesIndex] = 'Number';
+      }
     }
-    var dataset = new morpheus.Dataset({
-        name: options.seriesNames[0],
-        dataType: options.seriesDataTypes[0],
-        array: options.seriesArrays[0],
-        rows: options.rows,
-        columns: options.columns
-    });
+  }
+  var dataset = new morpheus.Dataset({
+    name: options.seriesNames[0],
+    dataType: options.seriesDataTypes[0],
+    array: options.seriesArrays[0],
+    rows: options.rows,
+    columns: options.columns
+  });
 
   if (options.rowMetadataModel) {
     options.rowMetadataModel.vectors.forEach(function (v) {
@@ -240,14 +240,14 @@ morpheus.Dataset.prototype = {
       : morpheus.Dataset.createArray(options));
     return this.seriesNames.length - 1;
   },
-    setESSession : function (session) {
-		//console.log("morpheus.Dataset.prototype.setESSession ::", this, session);
-		this.esSession = session;
-	},
-	getESSession : function () {
-		//console.log("morpheus.Dataset.prototype.getESSession ::", this);
-		return this.esSession;
-	}
+  setESSession: function (session) {
+    //console.log("morpheus.Dataset.prototype.setESSession ::", this, session);
+    this.esSession = session;
+  },
+  getESSession: function () {
+    //console.log("morpheus.Dataset.prototype.getESSession ::", this);
+    return this.esSession;
+  }
 
 };
 morpheus.Util.extend(morpheus.Dataset, morpheus.AbstractDataset);

@@ -10,247 +10,247 @@ morpheus.HeatMap = function (options) {
   var parent = options.parent;
   options.parent = null;
   options = $
-  .extend(
-    true,
-    {},
-    {
-      /*
-       * The element in which to render to the heat map.
-       */
-      el: null,
-      /*
-       * A File or URL to a <a target="_blank"
-       * href="http://support.lincscloud.org/hc/en-us/articles/202105453-GCT-Gene-Cluster-Text-Format-">GCT
-       * 1.3</a>, ' + '<a target="_blank"
-       * href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT
-       * 1.2</a>, ' + '<a target="_blank"
-       * href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, ' + '<a
-       * target="_blank",
-       * href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, ' + '
-       * or a tab-delimitted text file. Can also be an array
-       * of File or URLs in which case the datasets are
-       * combined by matching on column ids.
-       */
-      dataset: undefined,
-      /*
-       *
-       * @description Array of file, datasetField, fileField,
-       *              and include (optional fields to include
-       *              from file). File can be xlsx file,
-       *              tab-delimitted text file, or gmt file.
-       *              <p>
-       *              <b>Example:</b> Annotate rows matching
-       *              'name' field in dataset to 'id' field in
-       *              file.
-       *              </p>
-       *              <code>[{file:'https://MY_URL', datasetField:'name', fileField:'id'}]</code>
-       */
-      rowAnnotations: undefined,
-      /*
-       * Array of file, datasetField, fileField, and include
-       * (optional fields to include from file). File can be
-       * xlsx file, tab-delimitted text file, or gmt file.
-       */
-      columnAnnotations: undefined,
+    .extend(
+      true,
+      {},
+      {
+        /*
+         * The element in which to render to the heat map.
+         */
+        el: null,
+        /*
+         * A File or URL to a <a target="_blank"
+         * href="http://support.lincscloud.org/hc/en-us/articles/202105453-GCT-Gene-Cluster-Text-Format-">GCT
+         * 1.3</a>, ' + '<a target="_blank"
+         * href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT
+         * 1.2</a>, ' + '<a target="_blank"
+         * href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, ' + '<a
+         * target="_blank",
+         * href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, ' + '
+         * or a tab-delimitted text file. Can also be an array
+         * of File or URLs in which case the datasets are
+         * combined by matching on column ids.
+         */
+        dataset: undefined,
+        /*
+         *
+         * @description Array of file, datasetField, fileField,
+         *              and include (optional fields to include
+         *              from file). File can be xlsx file,
+         *              tab-delimitted text file, or gmt file.
+         *              <p>
+         *              <b>Example:</b> Annotate rows matching
+         *              'name' field in dataset to 'id' field in
+         *              file.
+         *              </p>
+         *              <code>[{file:'https://MY_URL', datasetField:'name', fileField:'id'}]</code>
+         */
+        rowAnnotations: undefined,
+        /*
+         * Array of file, datasetField, fileField, and include
+         * (optional fields to include from file). File can be
+         * xlsx file, tab-delimitted text file, or gmt file.
+         */
+        columnAnnotations: undefined,
 
-      /*
-       * Array of column metadata names to group the heat map
-       * by.
-       *
-       * <p>
-       * <b>Example:</b> Group by the type and gender
-       * metadata field.
-       * </p>
-       *
-       * <code>['type', 'gender']</code>
-       */
-      columnGroupBy: undefined,
-      /*
-       * Array of row metadata names to group the heat map by.
-       *
-       * <p>
-       * <b>Example:</b> Group by the gene metadata field.
-       * </p>
-       * <code>['gene']</code>
-       */
-      rowGroupBy: undefined,
-      /*
-       * Object that describes mapping of values to colors.
-       * Type can be 'fixed' or 'relative'. Stepped indicates
-       * whether color scheme is continuous (false) or
-       * discrete (true).
-       * <p>
-       * <b>Example:</b> Use a fixed color scheme with color
-       * stops at -100, -90, 90, and 100.
-       * <p>
-       * <code>{ type : 'fixed', stepped:false, map : [ { value : -100, color :
-       * 'blue' }, { value : -90, color : 'white' }, { value :
-       * 90, color : 'white' }, { value : 100, color : 'red' } ] };</code>
-       */
-      colorScheme: undefined,
-      /*
-       * Array of metadata names and sort order. Use 0 for
-       * ascending and 1 for descending. To sort by values use
-       * modelIndices.
-       *
-       * <p>
-       * <b>Example:</b> Sort ascending by gene, and then
-       * descending by stdev
-       * </p>
-       * <code>[{field:'gene', order:0}, {field:'stdev',
-       *              order:1}]</code>
-       */
-      rowSortBy: undefined,
-      /*
-       * Array of metadata names and sort order. Use 0 for
-       * ascending and 1 for descending.
-       *
-       * <p>
-       * <b>Example:</b> to sort ascending by gene, and then
-       * descending by stdev
-       * </p>
-       * <code> [{name:'gene',
-       *              order:0}, {name:'stdev', order:1}]</code>
-       */
-      columnSortBy: undefined,
-      /*
-       * URL to a dendrogram in <a target="_blank"
-       * href="https://en.wikipedia.org/wiki/Newick_format">Newick
-       * format</a>
-       */
-      rowDendrogram: undefined,
-      /*
-       * URL to a dendrogram in <a target="_blank"
-       * href="https://en.wikipedia.org/wiki/Newick_format">Newick
-       * format</a>
-       */
-      columnDendrogram: undefined,
+        /*
+         * Array of column metadata names to group the heat map
+         * by.
+         *
+         * <p>
+         * <b>Example:</b> Group by the type and gender
+         * metadata field.
+         * </p>
+         *
+         * <code>['type', 'gender']</code>
+         */
+        columnGroupBy: undefined,
+        /*
+         * Array of row metadata names to group the heat map by.
+         *
+         * <p>
+         * <b>Example:</b> Group by the gene metadata field.
+         * </p>
+         * <code>['gene']</code>
+         */
+        rowGroupBy: undefined,
+        /*
+         * Object that describes mapping of values to colors.
+         * Type can be 'fixed' or 'relative'. Stepped indicates
+         * whether color scheme is continuous (false) or
+         * discrete (true).
+         * <p>
+         * <b>Example:</b> Use a fixed color scheme with color
+         * stops at -100, -90, 90, and 100.
+         * <p>
+         * <code>{ type : 'fixed', stepped:false, map : [ { value : -100, color :
+         * 'blue' }, { value : -90, color : 'white' }, { value :
+         * 90, color : 'white' }, { value : 100, color : 'red' } ] };</code>
+         */
+        colorScheme: undefined,
+        /*
+         * Array of metadata names and sort order. Use 0 for
+         * ascending and 1 for descending. To sort by values use
+         * modelIndices.
+         *
+         * <p>
+         * <b>Example:</b> Sort ascending by gene, and then
+         * descending by stdev
+         * </p>
+         * <code>[{field:'gene', order:0}, {field:'stdev',
+         *              order:1}]</code>
+         */
+        rowSortBy: undefined,
+        /*
+         * Array of metadata names and sort order. Use 0 for
+         * ascending and 1 for descending.
+         *
+         * <p>
+         * <b>Example:</b> to sort ascending by gene, and then
+         * descending by stdev
+         * </p>
+         * <code> [{name:'gene',
+         *              order:0}, {name:'stdev', order:1}]</code>
+         */
+        columnSortBy: undefined,
+        /*
+         * URL to a dendrogram in <a target="_blank"
+         * href="https://en.wikipedia.org/wiki/Newick_format">Newick
+         * format</a>
+         */
+        rowDendrogram: undefined,
+        /*
+         * URL to a dendrogram in <a target="_blank"
+         * href="https://en.wikipedia.org/wiki/Newick_format">Newick
+         * format</a>
+         */
+        columnDendrogram: undefined,
 
-      /*
-       * Column metadata field in dataset used to match leaf
-       * node ids in column dendrogram Newick file
-       */
-      columnDendrogramField: 'id',
-      /*
-       * Row metadata field in dataset used to match leaf node
-       * ids in row dendrogram Newick file
-       */
-      rowDendrogramField: 'id',
-      /*
-       * Array of objects describing how to display row
-       * metadata fields. Each object in the array must have
-       * field, and optionally display, order, and renameTo.
-       * Field is the metadata field name. Display is a comma
-       * delimited string that describes how to render a
-       * metadata field. Options are text, color, stacked_bar,
-       * bar, highlight, shape, discrete, and continuous.
-       * Order is a number that indicates the order in which
-       * the field should appear in the heat map. RenameTo
-       * allows you to rename a field.
-       */
-      rows: [],
-      /*
-       * Array of objects describing how to display column
-       * metadata fields. Each object in the array must have
-       * field, and optionally display, order, and renameTo.
-       * Field is the metadata field name. Display is a comma
-       * delimited string that describes how to render a
-       * metadata field. Options are text, color, stacked_bar,
-       * bar, highlight, shape, discrete, and continuous.
-       * Order is a number that indicates the order in which
-       * the field should appear in the heat map. RenameTo
-       * allows you to rename a field.
-       */
-      columns: [],
-      /*
-       * Optional array of tools to run at load time. For
-       * example: <code>tools : [ {
-       * name : 'Marker Selection',
-       * params : {
-       * 		field : [ comparisonVector.getName() ],
-       *      class_a : [ 'A' ], class_b : [ 'B' ] }} ]</code>
-       */
-      tools: undefined,
+        /*
+         * Column metadata field in dataset used to match leaf
+         * node ids in column dendrogram Newick file
+         */
+        columnDendrogramField: 'id',
+        /*
+         * Row metadata field in dataset used to match leaf node
+         * ids in row dendrogram Newick file
+         */
+        rowDendrogramField: 'id',
+        /*
+         * Array of objects describing how to display row
+         * metadata fields. Each object in the array must have
+         * field, and optionally display, order, and renameTo.
+         * Field is the metadata field name. Display is a comma
+         * delimited string that describes how to render a
+         * metadata field. Options are text, color, stacked_bar,
+         * bar, highlight, shape, discrete, and continuous.
+         * Order is a number that indicates the order in which
+         * the field should appear in the heat map. RenameTo
+         * allows you to rename a field.
+         */
+        rows: [],
+        /*
+         * Array of objects describing how to display column
+         * metadata fields. Each object in the array must have
+         * field, and optionally display, order, and renameTo.
+         * Field is the metadata field name. Display is a comma
+         * delimited string that describes how to render a
+         * metadata field. Options are text, color, stacked_bar,
+         * bar, highlight, shape, discrete, and continuous.
+         * Order is a number that indicates the order in which
+         * the field should appear in the heat map. RenameTo
+         * allows you to rename a field.
+         */
+        columns: [],
+        /*
+         * Optional array of tools to run at load time. For
+         * example: <code>tools : [ {
+         * name : 'Marker Selection',
+         * params : {
+         * 		field : [ comparisonVector.getName() ],
+         *      class_a : [ 'A' ], class_b : [ 'B' ] }} ]</code>
+         */
+        tools: undefined,
         /*
          * Optional array of {name:string, values:[]}
          */
-      rowFilter: undefined,
-      columnFilter: undefined,
-      /*
-       * Whether to auto-hide the tab bar when only one tab is visible
-       */
-      autohideTabBar: false,
-      /*
-       * Whether this heat map tab can be closed
-       */
-      closeable: true,
-      /*
-       * Whether heat map tab can be renamed
-       */
-      rename: true,
-      rowSize: undefined,
-      columnSize: undefined,
-      customUrls: undefined, // Custom urls for File>Open.
-      height: 'window', // set the available height for the
-      // heat map. If not
-      // set, it will be determined automatically
-      width: undefined, // set the available width for the
-      // heat map. If not
-      // set, it will be determined automatically
-      /* Whether to focus this tab */
-      focus: true,
-      tooltipMode: 0, // 0=top status bar, 1=dialog, 2=follow
-      inheritFromParent: true,
-      inheritFromParentOptions: {
-        transpose: false
-      },
-      /** Callback function to invoke for customizing inline matrix tooltips. */
-      tooltip: undefined,
-      structureUrlProvider: undefined,
-      promises: undefined, // additional promises to wait
-      // for
-      // not inherited
-      renderReady: undefined,
-      // not inherited
-      datasetReady: undefined,
-      // inherited
-      tabOpened: undefined,
-      loadedCallback: undefined,
-      name: undefined,
-      rowsSortable: true,
-      columnsSortable: true,
-      popupEnabled: true,
-      symmetric: false,
-      keyboard: true,
-      inlineTooltip: true,
-      $loadingImage: morpheus.Util.createLoadingEl(),
-      menu: {
-        File: ['Open', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
-        Tools: ['New Heat Map', null, 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors',
+        rowFilter: undefined,
+        columnFilter: undefined,
+        /*
+         * Whether to auto-hide the tab bar when only one tab is visible
+         */
+        autohideTabBar: false,
+        /*
+         * Whether this heat map tab can be closed
+         */
+        closeable: true,
+        /*
+         * Whether heat map tab can be renamed
+         */
+        rename: true,
+        rowSize: undefined,
+        columnSize: undefined,
+        customUrls: undefined, // Custom urls for File>Open.
+        height: 'window', // set the available height for the
+        // heat map. If not
+        // set, it will be determined automatically
+        width: undefined, // set the available width for the
+        // heat map. If not
+        // set, it will be determined automatically
+        /* Whether to focus this tab */
+        focus: true,
+        tooltipMode: 0, // 0=top status bar, 1=dialog, 2=follow
+        inheritFromParent: true,
+        inheritFromParentOptions: {
+          transpose: false
+        },
+        /** Callback function to invoke for customizing inline matrix tooltips. */
+        tooltip: undefined,
+        structureUrlProvider: undefined,
+        promises: undefined, // additional promises to wait
+        // for
+        // not inherited
+        renderReady: undefined,
+        // not inherited
+        datasetReady: undefined,
+        // inherited
+        tabOpened: undefined,
+        loadedCallback: undefined,
+        name: undefined,
+        rowsSortable: true,
+        columnsSortable: true,
+        popupEnabled: true,
+        symmetric: false,
+        keyboard: true,
+        inlineTooltip: true,
+        $loadingImage: morpheus.Util.createLoadingEl(),
+        menu: {
+          File: ['Open', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
+          Tools: ['New Heat Map', null, 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors',
             'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose',
             't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API', null, 'k-means', 'limma', 'PCA Plot'],
-        View: ['Zoom In', 'Zoom Out', 'Fit To Window', 'Reset Zoom', null, 'Options'],
-        Edit: ['Copy Image', 'Copy Selected Dataset', null, 'Move Selected Rows To Top', 'Annotate Selected Rows', 'Invert' +
-        ' Selected Rows', 'Copy Selected Rows', 'Select All Rows', null, 'Move Selected Columns' +
-        ' To Top', 'Annotate Selected Columns', 'Invert Selected Columns', 'Copy Selected' +
-        ' Columns', 'Select' +
-        ' All' +
-        ' Columns'],
-        Help: ['Find Action', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keymap' +
-        ' Reference']
-      },
-      toolbar: {
-        dimensions: true,
-        zoom: true,
-        searchRows: true,
-        searchColumns: true,
-        searchValues: false,
-        options: true,
-        saveImage: true,
-        filter: true,
-        colorKey: true
-      }
-    }, options);
+          View: ['Zoom In', 'Zoom Out', 'Fit To Window', 'Reset Zoom', null, 'Options'],
+          Edit: ['Copy Image', 'Copy Selected Dataset', null, 'Move Selected Rows To Top', 'Annotate Selected Rows', 'Invert' +
+          ' Selected Rows', 'Copy Selected Rows', 'Select All Rows', null, 'Move Selected Columns' +
+          ' To Top', 'Annotate Selected Columns', 'Invert Selected Columns', 'Copy Selected' +
+          ' Columns', 'Select' +
+          ' All' +
+          ' Columns'],
+          Help: ['Find Action', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keymap' +
+          ' Reference']
+        },
+        toolbar: {
+          dimensions: true,
+          zoom: true,
+          searchRows: true,
+          searchColumns: true,
+          searchValues: false,
+          options: true,
+          saveImage: true,
+          filter: true,
+          colorKey: true
+        }
+      }, options);
   options.parent = parent;
   if (options.menu == null) {
     options.menu = {};
@@ -296,9 +296,9 @@ morpheus.HeatMap = function (options) {
   }
   if (this.options.name == null) {
     this.options.name = morpheus.Util
-    .getBaseFileName(morpheus.Util
-    .getFileName(this.options.dataset.file ? this.options.dataset.file
-      : this.options.dataset));
+      .getBaseFileName(morpheus.Util
+        .getFileName(this.options.dataset.file ? this.options.dataset.file
+          : this.options.dataset));
   }
 
   var isPrimary = this.options.parent == null;
@@ -306,9 +306,9 @@ morpheus.HeatMap = function (options) {
 
     this.tabManager = this.options.tabManager != null ? this.options.tabManager
       : new morpheus.TabManager({
-        landingPage: this.options.landingPage,
-        autohideTabBar: this.options.autohideTabBar
-      });
+      landingPage: this.options.landingPage,
+      autohideTabBar: this.options.autohideTabBar
+    });
 
     if (!this.options.tabManager) {
       this.tabManager.appendTo(this.$el);
@@ -406,13 +406,13 @@ morpheus.HeatMap = function (options) {
     && _.isString(options.rowDendrogram)) {
     if (options.rowDendrogram[0] === '(') {
       _this.options.rowDendrogram = morpheus.DendrogramUtil
-      .parseNewick(options.rowDendrogram);
+        .parseNewick(options.rowDendrogram);
     } else {
       var rowDendrogramDeferred = morpheus.Util
-      .getText(options.rowDendrogram);
+        .getText(options.rowDendrogram);
       rowDendrogramDeferred.done(function (text) {
         _this.options.rowDendrogram = morpheus.DendrogramUtil
-        .parseNewick(text);
+          .parseNewick(text);
       });
       promises.push(rowDendrogramDeferred);
     }
@@ -422,13 +422,13 @@ morpheus.HeatMap = function (options) {
     && _.isString(options.columnDendrogram)) {
     if (options.columnDendrogram[0] === '(') {
       _this.options.columnDendrogram = morpheus.DendrogramUtil
-      .parseNewick(options.columnDendrogram);
+        .parseNewick(options.columnDendrogram);
     } else {
       var columnDendrogramDeferred = morpheus.Util
-      .getText(options.columnDendrogram);
+        .getText(options.columnDendrogram);
       columnDendrogramDeferred.done(function (text) {
         _this.options.columnDendrogram = morpheus.DendrogramUtil
-        .parseNewick(text);
+          .parseNewick(text);
       });
       promises.push(columnDendrogramDeferred);
     }
@@ -467,59 +467,59 @@ morpheus.HeatMap = function (options) {
       });
     });
     d
-    .done(function (joined) {
-      if (_this.options.$loadingImage) {
-        _this.options.$loadingImage.remove();
-      }
+      .done(function (joined) {
+        if (_this.options.$loadingImage) {
+          _this.options.$loadingImage.remove();
+        }
 
-      _this.options.dataset = joined;
-      _this._init();
-      if (joined.getRowMetadata().getByName('Source') != null
-        && !_this.options.colorScheme) {
-        _this.heatmap.getColorScheme()
-        .setSeparateColorSchemeForRowMetadataField(
-          'Source');
-      }
+        _this.options.dataset = joined;
+        _this._init();
+        if (joined.getRowMetadata().getByName('Source') != null
+          && !_this.options.colorScheme) {
+          _this.heatmap.getColorScheme()
+            .setSeparateColorSchemeForRowMetadataField(
+              'Source');
+        }
 
-      _
-      .each(
-        options.dataset,
-        function (option) {
-          if (option.colorScheme) {
-            _this.heatmap
-            .getColorScheme()
-            .setCurrentValue(
-              morpheus.Util
-              .getBaseFileName(morpheus.Util
-              .getFileName(option.dataset)));
-            _this.heatmap
-            .getColorScheme()
-            .setColorSupplierForCurrentValue(
-              morpheus.HeatMapColorScheme
-              .createColorSupplier(option.colorScheme));
+        _
+          .each(
+            options.dataset,
+            function (option) {
+              if (option.colorScheme) {
+                _this.heatmap
+                  .getColorScheme()
+                  .setCurrentValue(
+                    morpheus.Util
+                      .getBaseFileName(morpheus.Util
+                        .getFileName(option.dataset)));
+                _this.heatmap
+                  .getColorScheme()
+                  .setColorSupplierForCurrentValue(
+                    morpheus.HeatMapColorScheme
+                      .createColorSupplier(option.colorScheme));
 
-          } else {
-            try {
-              _this
-              .autoDisplay({
-                extension: morpheus.Util
-                .getExtension(morpheus.Util
-                .getFileName(option.dataset)),
-                filename: morpheus.Util
-                .getBaseFileName(morpheus.Util
-                .getFileName(option.dataset))
-              });
-            }
-            catch (x) {
-              console
-              .log('Autodisplay errror');
-            }
+              } else {
+                try {
+                  _this
+                    .autoDisplay({
+                      extension: morpheus.Util
+                        .getExtension(morpheus.Util
+                          .getFileName(option.dataset)),
+                      filename: morpheus.Util
+                        .getBaseFileName(morpheus.Util
+                          .getFileName(option.dataset))
+                    });
+                }
+                catch (x) {
+                  console
+                    .log('Autodisplay errror');
+                }
 
-          }
-        });
+              }
+            });
 
-      heatMapLoaded();
-    });
+        heatMapLoaded();
+      });
   } else {
     var deferred = options.dataset.file ? morpheus.DatasetUtil.read(
       options.dataset.file, options.dataset.options)
@@ -531,8 +531,8 @@ morpheus.HeatMap = function (options) {
       _this.options.$loadingImage.remove();
       var message = ['Error opening '
       + (options.dataset.file ? morpheus.Util
-      .getFileName(options.dataset.file) : morpheus.Util
-      .getFileName(options.dataset)) + '.'];
+        .getFileName(options.dataset.file) : morpheus.Util
+        .getFileName(options.dataset)) + '.'];
 
       if (err.message) {
         message.push('<br />Cause: ');
@@ -585,7 +585,7 @@ morpheus.HeatMap = function (options) {
 morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS = 6;
 
 morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
-    console.log("HeatMap.showTool::", tool, heatMap);
+  console.log("HeatMap.showTool::", tool, heatMap);
   if (tool.gui) {
     var gui = tool.gui(heatMap.getProject());
     var formBuilder = new morpheus.FormBuilder();
@@ -700,7 +700,7 @@ morpheus.HeatMap.getSpaces = function (groupByKeys, length, gapSize) {
         isEqual = false;
         for (var keyIndex2 = 0; keyIndex2 < nkeys; keyIndex2++) {
           previousArray[keyIndex2] = groupByKeys[keyIndex2]
-          .getValue(i);
+            .getValue(i);
         }
         break;
       }
@@ -724,7 +724,7 @@ morpheus.HeatMap.createGroupBySpaces = function (dataset, groupByKeys, gapSize, 
 };
 morpheus.HeatMap.isDendrogramVisible = function (project, isColumns) {
   var sortKeys = isColumns ? project.getColumnSortKeys() : project
-  .getRowSortKeys();
+    .getRowSortKeys();
   // var filter = isColumns ? this.project.getColumnFilter()
   //   : this.project.getRowFilter();
   // // FIXME compare filters
@@ -754,18 +754,18 @@ morpheus.HeatMap.prototype = {
       colorScheme = {
         type: 'fixed',
         map: morpheus.HeatMapColorScheme.Predefined.CN().map
-        .map(function (item) {
-          return {
-            value: Math.pow(2, 1 + item.value),
-            color: item.color
-          };
-        })
+          .map(function (item) {
+            return {
+              value: Math.pow(2, 1 + item.value),
+              color: item.color
+            };
+          })
       };
     } else if (options.extension === 'maf') {
       colorScheme = morpheus.HeatMapColorScheme.Predefined.MAF();
       var colorMap = morpheus.HeatMapColorScheme.Predefined.MAF().map;
       var rowMutProfile = this.project.getFullDataset().getRowMetadata()
-      .getByName('mutation_summary');
+        .getByName('mutation_summary');
       var fieldNames = rowMutProfile.getProperties().get(morpheus.VectorKeys.FIELDS);
       var useMafColorMap = true;
       if (fieldNames.length !== morpheus.MafFileReader.FIELD_NAMES.length) {
@@ -801,9 +801,9 @@ morpheus.HeatMap.prototype = {
       for (var i = 0; i < columnMutationSummaryNames.length; i++) {
         var name = columnMutationSummaryNames[i];
         if (this.project.getFullDataset()
-          .getColumnMetadata().getByName(name)) {
+            .getColumnMetadata().getByName(name)) {
           columnMutationSummaryVectors.push(this.project.getFullDataset()
-          .getColumnMetadata().getByName(name));
+            .getColumnMetadata().getByName(name));
           track = this.getTrack(name, true);
           if (track) {
             track.settingFromConfig('stacked_bar');
@@ -884,7 +884,7 @@ morpheus.HeatMap.prototype = {
       this.heatmap.getColorScheme().setCurrentValue(options.filename);
       this.heatmap.getColorScheme().setColorSupplierForCurrentValue(
         morpheus.HeatMapColorScheme
-        .createColorSupplier(colorScheme));
+          .createColorSupplier(colorScheme));
     }
     return colorScheme;
   },
@@ -943,7 +943,7 @@ morpheus.HeatMap.prototype = {
     var sortKeys;
     if (append) {
       sortKeys = !isColumns ? project.getColumnSortKeys() : project
-      .getRowSortKeys();
+        .getRowSortKeys();
 
       if (priorSortKeyIndex !== -1) {
         if (sortOrder === morpheus.SortKey.SortOrder.UNSORTED) {
@@ -963,15 +963,15 @@ morpheus.HeatMap.prototype = {
 
       sortKeys = morpheus.SortKey.keepExistingSortKeys(sortKeys,
         !isColumns ? project.getColumnSortKeys() : project
-        .getRowSortKeys());
+          .getRowSortKeys());
 
     } else {
       var newSortKeys = sortOrder === morpheus.SortKey.SortOrder.UNSORTED ? []
         : [new morpheus.SortByValuesKey(modelIndices, sortOrder,
-          !isColumns)];
+        !isColumns)];
       sortKeys = morpheus.SortKey.keepExistingSortKeys(newSortKeys,
         !isColumns ? project.getColumnSortKeys() : project
-        .getRowSortKeys());
+          .getRowSortKeys());
     }
 
     if (!isColumns) { // sort columns by selected rows
@@ -1094,13 +1094,13 @@ morpheus.HeatMap.prototype = {
     if (tree != null) {
       //  var modelIndexSet = new morpheus.Set();
       var size = isColumns ? this.project.getFullDataset()
-      .getColumnCount() : this.project.getFullDataset()
-      .getRowCount();
+        .getColumnCount() : this.project.getFullDataset()
+        .getRowCount();
       if (isColumns) {
         dendrogram = new morpheus.ColumnDendrogram(this, tree,
           this.heatmap.getColumnPositions(), this.project);
         dendrogram.filter = this.project.getColumnFilter()
-        .shallowClone();
+          .shallowClone();
         this.columnDendrogram = dendrogram;
         this.project.setColumnSortKeys(
           [new morpheus.SpecifiedModelSortOrder(modelOrder,
@@ -1156,7 +1156,7 @@ morpheus.HeatMap.prototype = {
     var _this = this;
     var project = this.project;
     var selectedViewIndices = project.getElementSelectionModel()
-    .getViewIndices();
+      .getViewIndices();
     if (selectedViewIndices.size() > 0) {
       var tipText = [];
       var dataset = project.getSortedFilteredDataset();
@@ -1174,14 +1174,14 @@ morpheus.HeatMap.prototype = {
         rowTracks.forEach(function (track) {
           tipText.push('\t');
           tipText.push(morpheus.Util.toString(dataset
-          .getRowMetadata().getByName(track.name).getValue(
-            rowIndex)));
+            .getRowMetadata().getByName(track.name).getValue(
+              rowIndex)));
         });
         columnTracks.forEach(function (track) {
           tipText.push('\t');
           tipText.push(morpheus.Util.toString(dataset
-          .getColumnMetadata().getByName(track.name)
-          .getValue(columnIndex)));
+            .getColumnMetadata().getByName(track.name)
+            .getValue(columnIndex)));
         });
 
         tipText.push('\n');
@@ -1211,14 +1211,14 @@ morpheus.HeatMap.prototype = {
     this.project = new morpheus.Project(dataset);
 
     this.tabManager.setTabTitle(this.tabId, this.project.getFullDataset()
-      .getRowCount()
+        .getRowCount()
       + ' row'
       + morpheus.Util.s(this.project.getFullDataset().getRowCount())
       + ' x '
       + this.project.getFullDataset().getColumnCount()
       + ' column'
       + morpheus.Util.s(this.project.getFullDataset()
-      .getColumnCount()));
+        .getColumnCount()));
     if (this.options.inheritFromParent && this.options.parent != null) {
       morpheus.HeatMap.copyFromParent(this.project, this.options);
     }
@@ -1321,75 +1321,75 @@ morpheus.HeatMap.prototype = {
     }
 
     $(heatmap.canvas)
-    .on(
-      'contextmenu',
-      function (e) {
-        var items = [];
-        morpheus.Popup
-        .showPopup(
-          [
+      .on(
+        'contextmenu',
+        function (e) {
+          var items = [];
+          morpheus.Popup
+            .showPopup(
+              [
 
-            {
-              name: 'Copy Image',
-              class: 'copy'
-            },
-            {
-              name: 'Save Image (' + morpheus.Util.COMMAND_KEY + 'S)'
-            },
-            {
-              separator: true
-            },
-            {
-              name: 'Copy Selection',
-              disabled: _this.project
-              .getElementSelectionModel()
-              .count() === 0,
-              class: 'copy'
-            },
-            {
-              separator: true
-            },
-            {
-              name: 'Show Inline Tooltip',
-              checked: _this.options.inlineTooltip
-            }],
-          {
-            x: e.pageX,
-            y: e.pageY
-          },
-          e.target,
-          function (event, item) {
-            if (item === 'Show Inline Tooltip') {
-              _this.options.inlineTooltip = !_this.options.inlineTooltip;
-            } else if (item === ('Save Image (' + morpheus.Util.COMMAND_KEY + 'S)')) {
-              _this.getActionManager().execute('Save Image');
-            } else if (item === 'Copy Selection') {
-              var text = _this
-              .getSelectedElementsText();
-              if (text !== '') {
-                event.clipboardData
-                .setData(
-                  'text/plain',
-                  text);
-              }
-            } else if (item === 'Copy Image') {
-              _this.getActionManager().execute('Copy Image', {event: event});
-            } else {
-              console.log(item + ' unknown.');
-            }
-          });
+                {
+                  name: 'Copy Image',
+                  class: 'copy'
+                },
+                {
+                  name: 'Save Image (' + morpheus.Util.COMMAND_KEY + 'S)'
+                },
+                {
+                  separator: true
+                },
+                {
+                  name: 'Copy Selection',
+                  disabled: _this.project
+                    .getElementSelectionModel()
+                    .count() === 0,
+                  class: 'copy'
+                },
+                {
+                  separator: true
+                },
+                {
+                  name: 'Show Inline Tooltip',
+                  checked: _this.options.inlineTooltip
+                }],
+              {
+                x: e.pageX,
+                y: e.pageY
+              },
+              e.target,
+              function (event, item) {
+                if (item === 'Show Inline Tooltip') {
+                  _this.options.inlineTooltip = !_this.options.inlineTooltip;
+                } else if (item === ('Save Image (' + morpheus.Util.COMMAND_KEY + 'S)')) {
+                  _this.getActionManager().execute('Save Image');
+                } else if (item === 'Copy Selection') {
+                  var text = _this
+                    .getSelectedElementsText();
+                  if (text !== '') {
+                    event.clipboardData
+                      .setData(
+                        'text/plain',
+                        text);
+                  }
+                } else if (item === 'Copy Image') {
+                  _this.getActionManager().execute('Copy Image', {event: event});
+                } else {
+                  console.log(item + ' unknown.');
+                }
+              });
 
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-      });
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+        });
     heatmap.appendTo(this.$parent);
     this.heatmap = heatmap;
     var rowDendrogramSortKey = null;
     if (rowDendrogram != undefined) {
       var tree = rowDendrogram;
       if (tree.leafNodes.length !== this.project.getFullDataset()
-        .getRowCount()) {
+          .getRowCount()) {
         throw '# leaf nodes in row dendrogram ' + tree.leafNodes.length
         + ' != ' + this.project.getFullDataset().getRowCount();
       }
@@ -1435,7 +1435,7 @@ morpheus.HeatMap.prototype = {
         // }
       }
       this.rowDendrogram = new morpheus.RowDendrogram(this, tree, heatmap
-      .getRowPositions(), this.project, true);
+        .getRowPositions(), this.project, true);
       this.rowDendrogram.appendTo(this.$parent);
       this.rowDendrogram.$label.appendTo(this.$parent);
       this.rowDendrogram.$squishedLabel.appendTo(this.$parent);
@@ -1449,7 +1449,7 @@ morpheus.HeatMap.prototype = {
       var tree = columnDendrogram;
 
       if (tree.leafNodes.length !== this.project.getFullDataset()
-        .getColumnCount()) {
+          .getColumnCount()) {
         throw '# leaf nodes ' + tree.leafNodes.length + ' != '
         + this.project.getFullDataset().getColumnCount();
       }
@@ -1567,10 +1567,10 @@ morpheus.HeatMap.prototype = {
       this.project, false, heatmap.getColumnPositions());
     this.hSortByValuesIndicator.appendTo(this.$parent);
     this.verticalSearchBar = new morpheus.ScentedSearch(this.project
-      .getRowSelectionModel(), heatmap.getRowPositions(), true,
+        .getRowSelectionModel(), heatmap.getRowPositions(), true,
       this.vscroll, this);
     this.horizontalSearchBar = new morpheus.ScentedSearch(this.project
-      .getColumnSelectionModel(), heatmap.getColumnPositions(),
+        .getColumnSelectionModel(), heatmap.getColumnPositions(),
       false, this.hscroll, this);
     this.rowTracks = [];
     this.rowTrackHeaders = [];
@@ -1598,11 +1598,11 @@ morpheus.HeatMap.prototype = {
         var defaultFieldsToShow = new morpheus.Set();
         //['pert_iname', 'moa', 'target', 'description', 'cell_id', 'pert_type'
         ['pert_iname', 'moa', 'target', 'cell_id', 'pert_type', 'condition', 'geo_accession', 'id', 'title', 'characteristics']
-        .forEach(function (field) {
-          defaultFieldsToShow.add(field);
-        });
+          .forEach(function (field) {
+            defaultFieldsToShow.add(field);
+          });
         for (var i = 0, metadataCount = displayMetadata
-        .getMetadataCount(); i < metadataCount; i++) {
+          .getMetadataCount(); i < metadataCount; i++) {
           var v = displayMetadata.get(i);
           if (defaultFieldsToShow.has(v.getName())) {
             nameToOption.set(v.getName(), {
@@ -1624,7 +1624,7 @@ morpheus.HeatMap.prototype = {
           continue;
         }
         var count = isColumns ? dataset.getColumnCount() : dataset
-        .getRowCount();
+          .getRowCount();
         if (!option && !displaySpecified && count > 1
           && !morpheus.VectorUtil.containsMoreThanOneValue(v)) {
           continue;
@@ -1754,7 +1754,7 @@ morpheus.HeatMap.prototype = {
       var ext = '';
       if (this.options.dataSource) {
         ext = morpheus.Util.getExtension(morpheus.Util
-        .getFileName(this.options.dataSource));
+          .getFileName(this.options.dataSource));
       }
 
       var colorScheme = this.autoDisplay({
@@ -1781,7 +1781,7 @@ morpheus.HeatMap.prototype = {
 
       }
       if (morpheus.DatasetUtil.getSeriesIndex(this.project
-        .getFullDataset(), 'allelic_fraction') !== -1) {
+          .getFullDataset(), 'allelic_fraction') !== -1) {
         this.options.sizeBy = {
           seriesName: 'allelic_fraction',
           min: 0,
@@ -1796,17 +1796,17 @@ morpheus.HeatMap.prototype = {
     if (this.options.parent && this.options.inheritFromParent
       && !colorSchemeSpecified) {
       heatmap.setColorScheme(this.options.parent.heatmap.getColorScheme()
-      .copy(this.project));
+        .copy(this.project));
     } else {
       heatmap.setColorScheme(new morpheus.HeatMapColorScheme(
         this.project, this.options.colorScheme));
       if (this.options.dataset.getRowMetadata().getByName('Source') != null) {
         // separate color scheme for each source file
         var sourcesSet = morpheus.VectorUtil
-        .getSet(this.options.dataset.getRowMetadata()
-        .getByName('Source'));
+          .getSet(this.options.dataset.getRowMetadata()
+            .getByName('Source'));
         this.heatmap.getColorScheme()
-        .setSeparateColorSchemeForRowMetadataField('Source');
+          .setSeparateColorSchemeForRowMetadataField('Source');
         sourcesSet.forEach(function (source) {
           _this.autoDisplay({
             extension: morpheus.Util.getExtension(source),
@@ -1919,43 +1919,43 @@ morpheus.HeatMap.prototype = {
     });
     this.setTooltipMode(this.options.tooltipMode);
     this
-    .getProject()
-    .on(
-      'rowFilterChanged columnFilterChanged rowGroupByChanged columnGroupByChanged rowSortOrderChanged columnSortOrderChanged datasetChanged',
-      function (e) {
-        if (e.type === 'datasetChanged') { // remove
-          // tracks
-          // that are no
-          // longer in the
-          // dataset
+      .getProject()
+      .on(
+        'rowFilterChanged columnFilterChanged rowGroupByChanged columnGroupByChanged rowSortOrderChanged columnSortOrderChanged datasetChanged',
+        function (e) {
+          if (e.type === 'datasetChanged') { // remove
+            // tracks
+            // that are no
+            // longer in the
+            // dataset
 
-          var dataset = _this.getProject()
-          .getFullDataset();
-          for (var i = 0; i < _this.rowTracks.length; i++) {
-            var track = _this.rowTracks[i];
-            if (!dataset.getRowMetadata().getByName(
-                track.getName())) {
-              _this.removeTrack(track.getName(),
-                false);
-              i--;
+            var dataset = _this.getProject()
+              .getFullDataset();
+            for (var i = 0; i < _this.rowTracks.length; i++) {
+              var track = _this.rowTracks[i];
+              if (!dataset.getRowMetadata().getByName(
+                  track.getName())) {
+                _this.removeTrack(track.getName(),
+                  false);
+                i--;
+              }
             }
-          }
-          for (var i = 0; i < _this.columnTracks.length; i++) {
-            var track = _this.columnTracks[i];
-            if (!dataset.getColumnMetadata().getByName(
-                track.getName())) {
-              _this
-              .removeTrack(track.getName(),
-                true);
-              i--;
+            for (var i = 0; i < _this.columnTracks.length; i++) {
+              var track = _this.columnTracks[i];
+              if (!dataset.getColumnMetadata().getByName(
+                  track.getName())) {
+                _this
+                  .removeTrack(track.getName(),
+                    true);
+                i--;
+              }
             }
+
           }
 
-        }
-
-        _this.updateDataset();
-        _this.revalidate();
-      });
+          _this.updateDataset();
+          _this.revalidate();
+        });
 
     this.getProject().on('trackChanged', function (e) {
       var columns = e.columns;
@@ -1984,44 +1984,44 @@ morpheus.HeatMap.prototype = {
       _this.revalidate();
     });
     this
-    .getProject()
-    .getRowSelectionModel()
-    .on(
-      'selectionChanged',
-      function () {
-        // repaint tracks that indicate selection
-        for (var i = 0; i < _this.columnTracks.length; i++) {
-          var track = _this.columnTracks[i];
-          if (track.getFullVector().getProperties().get(morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION)) {
-            var selectedDataset = _this.getProject().getSelectedDataset({
-              selectedRows: true,
-              selectedColumns: false,
-              emptyToAll: false
-            });
-            var vector = selectedDataset.getColumnMetadata().getByName(track.getName());
-            var f = morpheus.VectorUtil.jsonToFunction(vector, morpheus.VectorKeys.FUNCTION);
-            if (typeof f === 'function') {
-              // iterate over each column
-              var view = new morpheus.DatasetColumnView(selectedDataset);
-              // TODO only set values that are currently visible
-              for (var j = 0, size = vector.size(); j < size; j++) {
-                view.setIndex(j);
-                vector.setValue(j, f(view, selectedDataset, j));
+      .getProject()
+      .getRowSelectionModel()
+      .on(
+        'selectionChanged',
+        function () {
+          // repaint tracks that indicate selection
+          for (var i = 0; i < _this.columnTracks.length; i++) {
+            var track = _this.columnTracks[i];
+            if (track.getFullVector().getProperties().get(morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION)) {
+              var selectedDataset = _this.getProject().getSelectedDataset({
+                selectedRows: true,
+                selectedColumns: false,
+                emptyToAll: false
+              });
+              var vector = selectedDataset.getColumnMetadata().getByName(track.getName());
+              var f = morpheus.VectorUtil.jsonToFunction(vector, morpheus.VectorKeys.FUNCTION);
+              if (typeof f === 'function') {
+                // iterate over each column
+                var view = new morpheus.DatasetColumnView(selectedDataset);
+                // TODO only set values that are currently visible
+                for (var j = 0, size = vector.size(); j < size; j++) {
+                  view.setIndex(j);
+                  vector.setValue(j, f(view, selectedDataset, j));
+                }
+                track.setInvalid(true);
+                track.repaint();
               }
-              track.setInvalid(true);
-              track.repaint();
             }
           }
-        }
-        _this.verticalSearchBar.update();
-        _this.heatmap.updateRowSelectionCache();
-        _this.paintAll({
-          paintRows: true,
-          paintColumns: false,
-          invalidateRows: false,
-          invalidateColumns: false
+          _this.verticalSearchBar.update();
+          _this.heatmap.updateRowSelectionCache();
+          _this.paintAll({
+            paintRows: true,
+            paintColumns: false,
+            invalidateRows: false,
+            invalidateColumns: false
+          });
         });
-      });
     this.getProject().getColumnSelectionModel().on('selectionChanged',
       function () {
         _this.horizontalSearchBar.update();
@@ -2037,7 +2037,7 @@ morpheus.HeatMap.prototype = {
     this.pasteListener = function (e) {
       if (_this.isActiveComponent()) {
         var text = e.originalEvent.clipboardData
-        .getData('text/plain');
+          .getData('text/plain');
         if (text != null && text.length > 0) {
           e.preventDefault();
           e.stopPropagation();
@@ -2065,7 +2065,7 @@ morpheus.HeatMap.prototype = {
     this.copyListener = function (ev) {
       if (_this.isActiveComponent()) {
         var activeComponent = _this
-        .getActiveComponent();
+          .getActiveComponent();
         var project = _this.project;
         if (activeComponent === 'heatMap' || ev.shiftKey) {
           // copy selected text or image
@@ -2085,9 +2085,9 @@ morpheus.HeatMap.prototype = {
           _this.snapshot(context);
           var url = canvas.toDataURL();
           ev.originalEvent.clipboardData
-          .setData(
-            'text/html',
-            '<img src="' + url + '">');
+            .setData(
+              'text/html',
+              '<img src="' + url + '">');
           ev.preventDefault();
           ev.stopImmediatePropagation();
           return;
@@ -2099,11 +2099,11 @@ morpheus.HeatMap.prototype = {
         var rowsSelected = dataset.getRowCount() > 0;
         var columnsSelected = dataset.getColumnCount() > 0;
         var columnMetadata = dataset
-        .getColumnMetadata();
+          .getColumnMetadata();
         var rowMetadata = dataset.getRowMetadata();
         // only copy visible tracks
         var visibleColumnFields = _this
-        .getVisibleTrackNames(true);
+          .getVisibleTrackNames(true);
         var columnFieldIndices = [];
         _.each(visibleColumnFields, function (name) {
           var index = morpheus.MetadataUtil.indexOf(
@@ -2117,7 +2117,7 @@ morpheus.HeatMap.prototype = {
         var rowMetadata = dataset.getRowMetadata();
         // only copy visible tracks
         var visibleRowFields = _this
-        .getVisibleTrackNames(false);
+          .getVisibleTrackNames(false);
         var rowFieldIndices = [];
         _.each(visibleRowFields, function (name) {
           var index = morpheus.MetadataUtil.indexOf(
@@ -2135,21 +2135,21 @@ morpheus.HeatMap.prototype = {
           // gct
           // 1.3
           text = new morpheus.GctWriter()
-          .write(dataset);
+            .write(dataset);
         } else {
           var text = [];
           var model = rowsSelected ? rowMetadata
             : columnMetadata;
           for (var i = 0, count = model
-          .getItemCount(); i < count; i++) {
+            .getItemCount(); i < count; i++) {
             for (var j = 0, nfields = model
-            .getMetadataCount(); j < nfields; j++) {
+              .getMetadataCount(); j < nfields; j++) {
               var v = model.get(j);
               if (j > 0) {
                 text.push('\t');
               }
               text.push(morpheus.Util.toString(v
-              .getValue(i)));
+                .getValue(i)));
             }
             text.push('\n');
           }
@@ -2165,9 +2165,9 @@ morpheus.HeatMap.prototype = {
 
     if (typeof window !== 'undefined') {
       $(window)
-      .on('paste.morpheus', this.pasteListener)
-      .on('beforecopy.morpheus', this.beforeCopyListener)
-      .on('copy.morpheus', this.copyListener);
+        .on('paste.morpheus', this.pasteListener)
+        .on('beforecopy.morpheus', this.beforeCopyListener)
+        .on('copy.morpheus', this.copyListener);
     }
     if (this.options.keyboard) {
       new morpheus.HeatMapKeyListener(this);
@@ -2178,81 +2178,81 @@ morpheus.HeatMap.prototype = {
     var dragStartScrollTop;
     var dragStartScrollLeft;
     this.hammer = morpheus.Util
-    .hammer(_this.heatmap.canvas, ['pan', 'pinch', 'tap'])
-    .on('panmove', this.panmove = function (event) {
-      _this.updatingScroll = true;
-      var rows = false;
-      var columns = false;
-      if (event.deltaY !== 0) {
-        var pos = dragStartScrollTop + event.deltaY;
-        _this.scrollTop(pos);
-        rows = true;
-      }
-      if (event.deltaX !== 0) {
-        var pos = dragStartScrollLeft + event.deltaX;
-        _this.scrollLeft(pos);
-        columns = true;
-      }
-      _this.updatingScroll = false;
-      _this.paintAll({
-        paintRows: rows,
-        paintColumns: rows,
-        invalidateRows: rows,
-        invalidateColumns: columns
-      });
-      event.preventDefault();
-    })
-    .on('panstart', this.panstart = function (event) {
-      dragStartScrollTop = _this.scrollTop();
-      dragStartScrollLeft = _this.scrollLeft();
-    })
-    .on(
-      'tap',
-      this.tap = function (event) {
-        var commandKey = morpheus.Util.IS_MAC ? event.srcEvent.metaKey
-          : event.srcEvent.ctrlKey;
-        if (morpheus.Util.IS_MAC && event.srcEvent.ctrlKey) { // right-click
-          // on
-          // Mac
-          return;
+      .hammer(_this.heatmap.canvas, ['pan', 'pinch', 'tap'])
+      .on('panmove', this.panmove = function (event) {
+        _this.updatingScroll = true;
+        var rows = false;
+        var columns = false;
+        if (event.deltaY !== 0) {
+          var pos = dragStartScrollTop + event.deltaY;
+          _this.scrollTop(pos);
+          rows = true;
         }
-        var position = morpheus.CanvasUtil
-        .getMousePosWithScroll(event.target, event,
-          _this.scrollLeft(), _this
-          .scrollTop());
-        var rowIndex = _this.heatmap.getRowPositions()
-        .getIndex(position.y, false);
-        var columnIndex = _this.heatmap
-        .getColumnPositions().getIndex(position.x,
-          false);
-        _this.project.getElementSelectionModel().click(
-          rowIndex, columnIndex,
-          event.srcEvent.shiftKey || commandKey);
-      })
-    .on(
-      'pinch',
-      this.pinch = function (event) {
-        var scale = event.scale;
-        _this.heatmap.getRowPositions().setSize(13 * scale);
-        _this.heatmap.getColumnPositions().setSize(
-          13 * scale);
-        var reval = {};
-        if (_this.project.getHoverRowIndex() !== -1) {
-          reval.scrollTop = this.heatmap
-          .getRowPositions()
-          .getPosition(
-            this.project.getHoverRowIndex());
+        if (event.deltaX !== 0) {
+          var pos = dragStartScrollLeft + event.deltaX;
+          _this.scrollLeft(pos);
+          columns = true;
         }
-        if (_this.project.getHoverColumnIndex() !== -1) {
-          reval.scrollLeft = this.heatmap
-          .getColumnPositions().getPosition(
-            this.project
-            .getHoverColumnIndex());
-        }
-
-        _this.revalidate(reval);
+        _this.updatingScroll = false;
+        _this.paintAll({
+          paintRows: rows,
+          paintColumns: rows,
+          invalidateRows: rows,
+          invalidateColumns: columns
+        });
         event.preventDefault();
-      });
+      })
+      .on('panstart', this.panstart = function (event) {
+        dragStartScrollTop = _this.scrollTop();
+        dragStartScrollLeft = _this.scrollLeft();
+      })
+      .on(
+        'tap',
+        this.tap = function (event) {
+          var commandKey = morpheus.Util.IS_MAC ? event.srcEvent.metaKey
+            : event.srcEvent.ctrlKey;
+          if (morpheus.Util.IS_MAC && event.srcEvent.ctrlKey) { // right-click
+            // on
+            // Mac
+            return;
+          }
+          var position = morpheus.CanvasUtil
+            .getMousePosWithScroll(event.target, event,
+              _this.scrollLeft(), _this
+                .scrollTop());
+          var rowIndex = _this.heatmap.getRowPositions()
+            .getIndex(position.y, false);
+          var columnIndex = _this.heatmap
+            .getColumnPositions().getIndex(position.x,
+              false);
+          _this.project.getElementSelectionModel().click(
+            rowIndex, columnIndex,
+            event.srcEvent.shiftKey || commandKey);
+        })
+      .on(
+        'pinch',
+        this.pinch = function (event) {
+          var scale = event.scale;
+          _this.heatmap.getRowPositions().setSize(13 * scale);
+          _this.heatmap.getColumnPositions().setSize(
+            13 * scale);
+          var reval = {};
+          if (_this.project.getHoverRowIndex() !== -1) {
+            reval.scrollTop = this.heatmap
+              .getRowPositions()
+              .getPosition(
+                this.project.getHoverRowIndex());
+          }
+          if (_this.project.getHoverColumnIndex() !== -1) {
+            reval.scrollLeft = this.heatmap
+              .getColumnPositions().getPosition(
+                this.project
+                  .getHoverColumnIndex());
+          }
+
+          _this.revalidate(reval);
+          event.preventDefault();
+        });
     var heatMapMouseMoved = function (event) {
       var mouseI, mouseJ;
       if (event.type === 'mouseout') {
@@ -2261,7 +2261,7 @@ morpheus.HeatMap.prototype = {
       } else {
         var position = morpheus.CanvasUtil.getMousePosWithScroll(
           event.target, event, _this.scrollLeft(), _this
-          .scrollTop());
+            .scrollTop());
         mouseI = _this.heatmap.getRowPositions().getIndex(position.y,
           false);
         mouseJ = _this.heatmap.getColumnPositions().getIndex(
@@ -2792,11 +2792,11 @@ morpheus.HeatMap.prototype = {
 
     this.heatmap.setDataset(dataset);
     this.heatmap.getRowPositions().spaces = morpheus.HeatMap
-    .createGroupBySpaces(dataset, this.project.getGroupRows(),
-      this.gapSize, false);
+      .createGroupBySpaces(dataset, this.project.getGroupRows(),
+        this.gapSize, false);
     this.heatmap.getColumnPositions().spaces = morpheus.HeatMap
-    .createGroupBySpaces(
-      dataset, this.project.getGroupColumns(), this.gapSize, true);
+      .createGroupBySpaces(
+        dataset, this.project.getGroupColumns(), this.gapSize, true);
     this.trigger('change', {
       name: 'updateDataset',
       source: this,
@@ -2964,9 +2964,9 @@ morpheus.HeatMap.prototype = {
     this.hammer.destroy();
     if (typeof window !== 'undefined') {
       $(window)
-      .off('paste.morpheus', this.pasteListener)
-      .off('beforecopy.morpheus', this.beforeCopyListener)
-      .off('copy.morpheus', this.copyListener).off('orientationchange.morpheus resize.morpheus', this.resizeListener);
+        .off('paste.morpheus', this.pasteListener)
+        .off('beforecopy.morpheus', this.beforeCopyListener)
+        .off('copy.morpheus', this.copyListener).off('orientationchange.morpheus resize.morpheus', this.resizeListener);
     }
   }
   ,
@@ -3018,7 +3018,7 @@ morpheus.HeatMap.prototype = {
     var dendrogram = isColumns ? this.columnDendrogram : this.rowDendrogram;
     if (dendrogram !== undefined) {
       return morpheus.HeatMap
-      .isDendrogramVisible(this.project, isColumns);
+        .isDendrogramVisible(this.project, isColumns);
     }
   }
   ,
@@ -3186,7 +3186,7 @@ morpheus.HeatMap.prototype = {
       var index = this.getTrackIndex(previousName, isColumns); // de-select previous
       if (index !== -1) {
         this.getTrackHeaderByIndex(index, isColumns)
-        .setSelected(false);
+          .setSelected(false);
       }
       if (isColumns) {
         this.selectedColumnTrackName = name;
@@ -3197,7 +3197,7 @@ morpheus.HeatMap.prototype = {
       var index = this.getTrackIndex(name, isColumns);
       if (index !== -1) {
         this.getTrackHeaderByIndex(index, isColumns)
-        .setSelected(true);
+          .setSelected(true);
       }
       this.trigger('change', {
         name: 'setSelected',
@@ -3317,7 +3317,7 @@ morpheus.HeatMap.prototype = {
       if (track.isVisible()) {
         var headerSize = this.rowTrackHeaders[i].getPrintSize();
         totalSize.width += Math.max(headerSize.width, track
-        .getPrintSize().width);
+          .getPrintSize().width);
         maxRowHeaderHeight = Math.max(maxRowHeaderHeight, headerSize.height);
       }
     }
@@ -3358,28 +3358,28 @@ morpheus.HeatMap.prototype = {
     }
     var trackLegendSize = new morpheus.HeatMapTrackColorLegend(
       _
-      .filter(
-        this.columnTracks,
-        function (track) {
-          return track.isVisible()
-            && (track
-            .isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || track
-            .isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR));
-        }), this.getProject().getColumnColorModel())
-    .getPreferredSize();
+        .filter(
+          this.columnTracks,
+          function (track) {
+            return track.isVisible()
+              && (track
+                .isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || track
+                .isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR));
+          }), this.getProject().getColumnColorModel())
+      .getPreferredSize();
     totalSize.height += trackLegendSize.height;
     totalSize.width = Math.max(totalSize.width, trackLegendSize.width);
     trackLegendSize = new morpheus.HeatMapTrackColorLegend(
       _
-      .filter(
-        this.rowTracks,
-        function (track) {
-          return track.isVisible()
-            && (track
-            .isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || track
-            .isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR));
-        }), this.getProject().getRowColorModel())
-    .getPreferredSize();
+        .filter(
+          this.rowTracks,
+          function (track) {
+            return track.isVisible()
+              && (track
+                .isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || track
+                .isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR));
+          }), this.getProject().getRowColorModel())
+      .getPreferredSize();
     totalSize.height += morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS + trackLegendSize.height;
     totalSize.width = morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS + Math.max(totalSize.width, trackLegendSize.width);
     return totalSize;
@@ -3433,14 +3433,14 @@ morpheus.HeatMap.prototype = {
     // column color legend
     var columnTrackLegend = new morpheus.HeatMapTrackColorLegend(
       _
-      .filter(
-        this.columnTracks,
-        function (track) {
-          return track.isVisible()
-            && (track
-            .isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || track
-            .isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR));
-        }), this.getProject().getColumnColorModel());
+        .filter(
+          this.columnTracks,
+          function (track) {
+            return track.isVisible()
+              && (track
+                .isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || track
+                .isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR));
+          }), this.getProject().getColumnColorModel());
     columnTrackLegend.draw({}, context);
     context.restore();
     // row color legend to the right of column color legend
@@ -3449,25 +3449,25 @@ morpheus.HeatMap.prototype = {
     context.translate(4 + columnTrackLegendSize.width, legendHeight);
     var rowTrackLegend = new morpheus.HeatMapTrackColorLegend(
       _
-      .filter(
-        this.rowTracks,
-        function (track) {
-          return track.isVisible()
-            && (track
-            .isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || track
-            .isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR));
-        }), this.getProject().getRowColorModel());
+        .filter(
+          this.rowTracks,
+          function (track) {
+            return track.isVisible()
+              && (track
+                .isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || track
+                .isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR));
+          }), this.getProject().getRowColorModel());
     rowTrackLegend.draw({}, context);
     context.restore();
     legendHeight += Math.max(rowTrackLegend.getPreferredSize().height,
       columnTrackLegendSize.height);
 
     var heatmapY = this.isDendrogramVisible(true) ? (this.columnDendrogram
-    .getUnscaledHeight() + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS) : 0;
+      .getUnscaledHeight() + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS) : 0;
     heatmapY += legendHeight;
     var columnTrackY = heatmapY;
     var heatmapX = this.isDendrogramVisible(false) ? (this.rowDendrogram
-    .getUnscaledWidth() + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS) : 0;
+      .getUnscaledWidth() + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS) : 0;
     var isColumnTrackVisible = false;
     for (var i = 0, length = this.columnTracks.length; i < length; i++) {
       var track = this.columnTracks[i];
@@ -3682,7 +3682,7 @@ morpheus.HeatMap.prototype = {
       }
       if (this.project.getHoverColumnIndex() !== -1) {
         reval.scrollLeft = this.heatmap.getColumnPositions()
-        .getPosition(this.project.getHoverColumnIndex());
+          .getPosition(this.project.getHoverColumnIndex());
       }
       this.revalidate(reval);
     }
@@ -3725,21 +3725,21 @@ morpheus.HeatMap.prototype = {
     var rowDendrogramWidth = 0;
     if (this.columnDendrogram) {
       columnDendrogramHeight = morpheus.CanvasUtil
-      .getPreferredSize(this.columnDendrogram).height;
+        .getPreferredSize(this.columnDendrogram).height;
     }
     if (this.rowDendrogram) {
       rowDendrogramWidth = morpheus.CanvasUtil
-      .getPreferredSize(this.rowDendrogram).width;
+        .getPreferredSize(this.rowDendrogram).width;
     }
     var rowTrackWidthSum = 0;
     for (var i = 0, length = this.rowTracks.length; i < length; i++) {
       if (this.rowTracks[i].isVisible()) {
         rowTrackWidthSum += Math
-        .max(
-          morpheus.CanvasUtil
-          .getPreferredSize(this.rowTrackHeaders[i]).width,
-          morpheus.CanvasUtil
-          .getPreferredSize(this.rowTracks[i]).width);
+          .max(
+            morpheus.CanvasUtil
+              .getPreferredSize(this.rowTrackHeaders[i]).width,
+            morpheus.CanvasUtil
+              .getPreferredSize(this.rowTracks[i]).width);
       }
     }
     var ypos = columnDendrogramHeight;
@@ -3747,7 +3747,7 @@ morpheus.HeatMap.prototype = {
     for (var i = 0, length = this.columnTracks.length; i < length; i++) {
       if (this.columnTracks[i].isVisible()) {
         var width = morpheus.CanvasUtil
-        .getPreferredSize(this.columnTrackHeaders[i]).width;
+          .getPreferredSize(this.columnTrackHeaders[i]).width;
         maxHeaderWidth = Math.max(maxHeaderWidth, width);
       }
     }
@@ -3800,7 +3800,7 @@ morpheus.HeatMap.prototype = {
       if (track.isVisible()) {
         var size = morpheus.CanvasUtil.getPreferredSize(track);
         var headerSize = morpheus.CanvasUtil
-        .getPreferredSize(this.columnTrackHeaders[i]);
+          .getPreferredSize(this.columnTrackHeaders[i]);
         size.height = Math.max(size.height, headerSize.height);
         track.setBounds({
           width: heatMapWidth,
@@ -3862,10 +3862,10 @@ morpheus.HeatMap.prototype = {
     this.hscroll.setExtent(heatMapWidth, heatmapPrefSize.width,
       options.scrollLeft !== undefined ? options.scrollLeft
         : (heatmapPrefSize.width === this.hscroll
-      .getTotalExtent() ? this.hscroll.getValue()
+        .getTotalExtent() ? this.hscroll.getValue()
         : heatmapPrefSize.width
-        * this.hscroll.getValue()
-        / this.hscroll.getMaxValue()));
+      * this.hscroll.getValue()
+      / this.hscroll.getMaxValue()));
     this.hscroll.setBounds({
       left: xpos,
       top: ypos + heatMapHeight + 2
@@ -3898,7 +3898,7 @@ morpheus.HeatMap.prototype = {
       if (track.isVisible()) {
         var size = morpheus.CanvasUtil.getPreferredSize(track);
         var headerSize = morpheus.CanvasUtil
-        .getPreferredSize(this.rowTrackHeaders[i]);
+          .getPreferredSize(this.rowTrackHeaders[i]);
         size.width = Math.max(headerSize.width, size.width);
         size.height = heatMapHeight;
         track.setBounds({
@@ -3918,7 +3918,7 @@ morpheus.HeatMap.prototype = {
       }
     }
     this.afterVerticalScrollBarDivider
-    .setVisible(nvisibleRowTracks > 0 ? true : false);
+      .setVisible(nvisibleRowTracks > 0 ? true : false);
     this.afterVerticalScrollBarDivider.setBounds({
       left: rowAnnotationXStart - 2,
       top: ypos - 18
@@ -3927,10 +3927,10 @@ morpheus.HeatMap.prototype = {
     this.vscroll.setExtent(heatMapHeight, heatmapPrefSize.height,
       options.scrollTop !== undefined ? options.scrollTop
         : (heatmapPrefSize.height === this.vscroll
-      .getTotalExtent() ? this.vscroll.getValue()
+        .getTotalExtent() ? this.vscroll.getValue()
         : heatmapPrefSize.height
-        * this.vscroll.getValue()
-        / this.vscroll.getMaxValue()));
+      * this.vscroll.getValue()
+      / this.vscroll.getMaxValue()));
     xpos += 2;
     this.vscroll.setBounds({
       left: xpos,
@@ -3972,14 +3972,14 @@ morpheus.HeatMap.copyFromParent = function (project, options) {
   // TODO persist sort order, grouping, dendrogram
 
   project.rowColorModel = options.parent.getProject().getRowColorModel()
-  .copy();
+    .copy();
   project.columnColorModel = options.parent.getProject()
-  .getColumnColorModel().copy();
+    .getColumnColorModel().copy();
 
   project.rowShapeModel = options.parent.getProject().getRowShapeModel()
-  .copy();
+    .copy();
   project.columnShapeModel = options.parent.getProject()
-  .getColumnShapeModel().copy();
+    .getColumnShapeModel().copy();
 
   var parentRowTracks = options.parent.rowTracks || [];
   var parentColumnTracks = options.parent.columnTracks || [];

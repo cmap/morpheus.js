@@ -15,8 +15,8 @@ morpheus.JoinedDataset = function (dataset1, dataset2, dataset1Field,
   if (dataset1Field) { // reorder dataset 2 to match dataset 1
     var v1 = dataset1.getColumnMetadata().getByName(dataset1Field);
     var dataset2ValueToIndex = morpheus.VectorUtil
-    .createValueToIndexMap(dataset2.getColumnMetadata().getByName(
-      dataset2Field));
+      .createValueToIndexMap(dataset2.getColumnMetadata().getByName(
+        dataset2Field));
     var dataset2ColumnIndices = [];
     for (var i = 0; i < v1.size(); i++) {
       dataset2ColumnIndices[i] = dataset2ValueToIndex.get(v1.getValue(i));
@@ -24,7 +24,7 @@ morpheus.JoinedDataset = function (dataset1, dataset2, dataset1Field,
     }
     dataset2 = new morpheus.SlicedDatasetWithNulls(dataset2,
       dataset2ColumnIndices, dataset1.getColumnCount(), dataset1
-      .getColumnMetadata());
+        .getColumnMetadata());
   }
 
   if (!dataset1.getRowMetadata().getByName(sourceFieldName)) {
@@ -74,7 +74,7 @@ morpheus.JoinedDataset = function (dataset1, dataset2, dataset1Field,
   this.dataset2 = dataset2;
   // TODO put series in same order
   var maxSeriesCount = Math.max(this.dataset1.getSeriesCount(), this.dataset2
-  .getSeriesCount());
+    .getSeriesCount());
   for (var i = this.dataset1.getSeriesCount(); i < maxSeriesCount; i++) {
     this.dataset1.addSeries({
       name: this.dataset2.getName(i)
@@ -87,9 +87,9 @@ morpheus.JoinedDataset = function (dataset1, dataset2, dataset1Field,
   }
 
   this.rowMetadata = new morpheus.JoinedMetadataModel(this.dataset1
-  .getRowMetadata(), !metadataInDifferentOrder ? this.dataset2
+    .getRowMetadata(), !metadataInDifferentOrder ? this.dataset2
     .getRowMetadata() : new morpheus.MetadataModelColumnView(
-      this.dataset2.getRowMetadata(), dataset2RowMetadataOrder));
+    this.dataset2.getRowMetadata(), dataset2RowMetadataOrder));
 };
 morpheus.JoinedDataset.prototype = {
   getName: function (seriesIndex) {
@@ -121,13 +121,13 @@ morpheus.JoinedDataset.prototype = {
   },
   getValue: function (i, j, seriesIndex) {
     return i < this.dataset1.getRowCount() ? this.dataset1.getValue(i, j,
-        seriesIndex) : this.dataset2.getValue(i
-        - this.dataset1.getRowCount(), j, seriesIndex);
+      seriesIndex) : this.dataset2.getValue(i
+      - this.dataset1.getRowCount(), j, seriesIndex);
   },
   setValue: function (i, j, value, seriesIndex) {
     i < this.dataset1.getRowCount() ? this.dataset1.setValue(i, j, value,
-        seriesIndex) : this.dataset2.setValue(i
-        - this.dataset1.getRowCount(), j, value, seriesIndex);
+      seriesIndex) : this.dataset2.setValue(i
+      - this.dataset1.getRowCount(), j, value, seriesIndex);
   },
   getSeriesCount: function () {
     return this.dataset1.getSeriesCount();
@@ -161,7 +161,7 @@ morpheus.SlicedDatasetWithNulls.prototype = {
   getValue: function (i, j, seriesIndex) {
     var index = this.columnIndices[j];
     return index === undefined ? undefined : this.dataset.getValue(i,
-        index, seriesIndex);
+      index, seriesIndex);
   },
   setValue: function (i, j, value, seriesIndex) {
     var index = this.columnIndices[j];
@@ -182,11 +182,11 @@ morpheus.JoinedVector = function (v1, v2) {
 morpheus.JoinedVector.prototype = {
   setValue: function (i, value) {
     i < this.v1.size() ? this.v1.setValue(i, value) : this.v2.setValue(i
-        - this.v1.size(), value);
+      - this.v1.size(), value);
   },
   getValue: function (i) {
     return i < this.v1.size() ? this.v1.getValue(i) : this.v2.getValue(i
-        - this.v1.size());
+      - this.v1.size());
   },
   size: function () {
     return this.v1.size() + this.v2.size();

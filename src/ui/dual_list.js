@@ -8,16 +8,16 @@ morpheus.DualList = function (leftOptions, rightOptions) {
   html.push('</div>'); // row
   html.push('<div class="row">');
   html
-  .push('<div class="col-xs-4"><select class="form-control" name="left" multiple></select></div>');
+    .push('<div class="col-xs-4"><select class="form-control" name="left" multiple></select></div>');
   html
-  .push('<div class="col-xs-2"><div class="btn-group-vertical" role="group">'
-    + '<button name="add" type="button" class="btn btn-xs btn-default">Add</button>'
-    + '<button name="remove" type="button" class="btn btn-xs btn-default">Remove</button>'
-    + '<button name="up" type="button" class="btn btn-xs btn-default">Move Up</button>'
-    + '<button name="down" type="button" class="btn btn-xs btn-default">Move Down</button>'
-    + '</div></div>');
+    .push('<div class="col-xs-2"><div class="btn-group-vertical" role="group">'
+      + '<button name="add" type="button" class="btn btn-xs btn-default">Add</button>'
+      + '<button name="remove" type="button" class="btn btn-xs btn-default">Remove</button>'
+      + '<button name="up" type="button" class="btn btn-xs btn-default">Move Up</button>'
+      + '<button name="down" type="button" class="btn btn-xs btn-default">Move Down</button>'
+      + '</div></div>');
   html
-  .push('<div class="col-xs-4"><select class="form-control" name="right" multiple></select></div>');
+    .push('<div class="col-xs-4"><select class="form-control" name="right" multiple></select></div>');
   html.push('</div>'); // row
   html.push('</div>');
   this.$el = $(html.join(''));

@@ -55,7 +55,7 @@ morpheus.HCluster = function (distmatrix, linkageAlgorithm) {
       counts1 = nodecounts[index1];
       ID1 = nodeID[index1];
       tree[i].distance = Math
-      .max(tree[i].distance, tree[index1].distance);
+        .max(tree[i].distance, tree[index1].distance);
     } else {
       order1 = order[min1];
       counts1 = 1;
@@ -67,7 +67,7 @@ morpheus.HCluster = function (distmatrix, linkageAlgorithm) {
       counts2 = nodecounts[index2];
       ID2 = nodeID[index2];
       tree[i].distance = Math
-      .max(tree[i].distance, tree[index2].distance);
+        .max(tree[i].distance, tree[index2].distance);
     } else {
       order2 = order[min2];
       counts2 = 1;

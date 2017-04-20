@@ -85,7 +85,7 @@ morpheus.Positions.prototype = {
   },
   getItemSize: function (index) {
     return this.squishedIndices[index] === true ? this.size
-      * this.squishFactor : this.size;
+    * this.squishFactor : this.size;
   },
   getSize: function () {
     return this.size;

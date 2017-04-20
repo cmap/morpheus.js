@@ -9,10 +9,10 @@ morpheus.FilterUI = function (project, isColumns) {
   $filterMode.on('change', function (e) {
     var isAndFilter = $filterMode.prop('checked');
     (isColumns ? project.getColumnFilter() : project.getRowFilter())
-    .setAnd(isAndFilter);
+      .setAnd(isAndFilter);
     isColumns ? _this.project.setColumnFilter(_this.project
       .getColumnFilter(), true) : _this.project.setRowFilter(
-        _this.project.getRowFilter(), true);
+      _this.project.getRowFilter(), true);
     e.preventDefault();
   });
 
@@ -23,7 +23,7 @@ morpheus.FilterUI = function (project, isColumns) {
     var index = $row.index();
     var newFilter = new morpheus.AlwaysTrueFilter();
     (isColumns ? project.getColumnFilter() : project.getRowFilter())
-    .insert(index, newFilter);
+      .insert(index, newFilter);
     $row.after(_this.add(newFilter));
     e.preventDefault();
   });
@@ -32,11 +32,11 @@ morpheus.FilterUI = function (project, isColumns) {
     var $row = $this.closest('.morpheus-entry');
     var index = $row.index() - 1;
     (isColumns ? project.getColumnFilter() : project.getRowFilter())
-    .remove(index);
+      .remove(index);
     $row.remove();
     isColumns ? _this.project.setColumnFilter(_this.project
       .getColumnFilter(), true) : _this.project.setRowFilter(
-        _this.project.getRowFilter(), true);
+      _this.project.getRowFilter(), true);
     e.preventDefault();
   });
   $div.on('submit', 'form', function (e) {
@@ -55,7 +55,7 @@ morpheus.FilterUI = function (project, isColumns) {
 
     isColumns ? _this.project.setColumnFilter(_this.project
       .getColumnFilter(), true) : _this.project.setRowFilter(
-        _this.project.getRowFilter(), true);
+      _this.project.getRowFilter(), true);
   });
   // show initial filters
   var combinedFilter = (isColumns ? project.getColumnFilter() : project
@@ -88,38 +88,38 @@ morpheus.FilterUI.rangeFilter = function (project, name, isColumns, $ui, filter)
   var html = [];
   html.push('<label>Range of values</label><br />');
   html
-  .push('<label>>= </label> <input style="max-width:200px;" class="form-control input-sm" name="min" type="text" />');
+    .push('<label>>= </label> <input style="max-width:200px;" class="form-control input-sm" name="min" type="text" />');
   html
-  .push('<label> and <= </label> <input style="max-width:200px;" class="form-control input-sm" name="max" type="text" />');
+    .push('<label> and <= </label> <input style="max-width:200px;" class="form-control input-sm" name="max" type="text" />');
   html.push('<br /><a data-name="switch" href="#">Switch to top filter</a>');
   var $form = $(html.join(''));
   $form.appendTo($ui);
   $ui.find('[data-name=switch]')
-  .on(
-    'click',
-    function (e) {
-      e.preventDefault();
-      var newFilter = morpheus.FilterUI.topFilter(project,
-        name, isColumns, $ui);
-      var index = -1;
-      var filters = isColumns ? project.getColumnFilter()
-        .getFilters() : project.getRowFilter()
-        .getFilters();
-      for (var i = 0; i < filters.length; i++) {
-        if (filters[i] === filter) {
-          index = i;
-          break;
+    .on(
+      'click',
+      function (e) {
+        e.preventDefault();
+        var newFilter = morpheus.FilterUI.topFilter(project,
+          name, isColumns, $ui);
+        var index = -1;
+        var filters = isColumns ? project.getColumnFilter()
+          .getFilters() : project.getRowFilter()
+          .getFilters();
+        for (var i = 0; i < filters.length; i++) {
+          if (filters[i] === filter) {
+            index = i;
+            break;
+          }
         }
-      }
-      if (index === -1) {
-        throw new Error('Filter not found.');
-      }
-      (isColumns ? project.getColumnFilter() : project
-        .getRowFilter()).set(index, newFilter);
-      isColumns ? project.setColumnFilter(project
-        .getColumnFilter(), true) : project
-        .setRowFilter(project.getRowFilter(), true);
-    });
+        if (index === -1) {
+          throw new Error('Filter not found.');
+        }
+        (isColumns ? project.getColumnFilter() : project
+          .getRowFilter()).set(index, newFilter);
+        isColumns ? project.setColumnFilter(project
+          .getColumnFilter(), true) : project
+          .setRowFilter(project.getRowFilter(), true);
+      });
   var $min = $ui.find('[name=min]');
   var $max = $ui.find('[name=max]');
   if (!filter) {
@@ -151,40 +151,40 @@ morpheus.FilterUI.topFilter = function (project, name, isColumns, $ui, filter) {
   var html = [];
   html.push('<label>Top</label><br />');
   html
-  .push('<select style="width:auto;" class="form-control input-sm" name="direction"><option value="Top">Top</option><option value="Bottom">Bottom</option><option value="TopBottom">Top/Bottom</option></select>');
+    .push('<select style="width:auto;" class="form-control input-sm" name="direction"><option value="Top">Top</option><option value="Bottom">Bottom</option><option value="TopBottom">Top/Bottom</option></select>');
   html
-  .push(' <label>N </label> <input style="max-width:200px;" class="form-control input-sm" name="n" type="text" />');
+    .push(' <label>N </label> <input style="max-width:200px;" class="form-control input-sm" name="n" type="text" />');
   html.push('<br /><a data-name="switch" href="#">Switch to range filter</a>');
   var $form = $(html.join(''));
   $form.appendTo($ui);
   var $n = $ui.find('[name=n]');
   var $direction = $ui.find('[name=direction]');
   $ui.find('[data-name=switch]')
-  .on(
-    'click',
-    function (e) {
-      e.preventDefault();
-      var newFilter = morpheus.FilterUI.rangeFilter(project,
-        name, isColumns, $ui);
-      var index = -1;
-      var filters = isColumns ? project.getColumnFilter()
-        .getFilters() : project.getRowFilter()
-        .getFilters();
-      for (var i = 0; i < filters.length; i++) {
-        if (filters[i] === filter) {
-          index = i;
-          break;
+    .on(
+      'click',
+      function (e) {
+        e.preventDefault();
+        var newFilter = morpheus.FilterUI.rangeFilter(project,
+          name, isColumns, $ui);
+        var index = -1;
+        var filters = isColumns ? project.getColumnFilter()
+          .getFilters() : project.getRowFilter()
+          .getFilters();
+        for (var i = 0; i < filters.length; i++) {
+          if (filters[i] === filter) {
+            index = i;
+            break;
+          }
         }
-      }
-      if (index === -1) {
-        throw new Error('Filter not found.');
-      }
-      (isColumns ? project.getColumnFilter() : project
-        .getRowFilter()).set(index, newFilter);
-      isColumns ? project.setColumnFilter(project
-        .getColumnFilter(), true) : project
-        .setRowFilter(project.getRowFilter(), true);
-    });
+        if (index === -1) {
+          throw new Error('Filter not found.');
+        }
+        (isColumns ? project.getColumnFilter() : project
+          .getRowFilter()).set(index, newFilter);
+        isColumns ? project.setColumnFilter(project
+          .getColumnFilter(), true) : project
+          .setRowFilter(project.getRowFilter(), true);
+      });
   if (!filter) {
     filter = new morpheus.TopNFilter(NaN, morpheus.TopNFilter.TOP, name, isColumns);
   } else {
@@ -272,7 +272,7 @@ morpheus.FilterUI.prototype = {
       array.sort(morpheus.SortKey.ASCENDING_COMPARATOR);
       if (!filter) {
         filter = new morpheus.VectorFilter(new morpheus.Set(), set
-        .size(), fieldName, isColumns);
+          .size(), fieldName, isColumns);
       } else {
         filter.maxSetSize = array.length;
       }
@@ -285,8 +285,8 @@ morpheus.FilterUI.prototype = {
       });
       checkBoxList.on('checkBoxSelectionChanged', function () {
         isColumns ? project.setColumnFilter(project.getColumnFilter(),
-            true) : project.setRowFilter(project.getRowFilter(),
-            true);
+          true) : project.setRowFilter(project.getRowFilter(),
+          true);
 
       });
     }
@@ -294,10 +294,10 @@ morpheus.FilterUI.prototype = {
       // set the filter index
       if (fieldName !== '') {
         (isColumns ? project.getColumnFilter() : project.getRowFilter())
-        .set(index, filter);
+          .set(index, filter);
       } else {
         (isColumns ? project.getColumnFilter() : project.getRowFilter())
-        .set(index, new morpheus.AlwaysTrueFilter());
+          .set(index, new morpheus.AlwaysTrueFilter());
       }
     }
     return filter;
@@ -306,18 +306,18 @@ morpheus.FilterUI.prototype = {
   addBase: function () {
     var html = [];
     html
-    .push('<div style="padding-bottom:2px;border-bottom:1px solid #eee" class="morpheus-entry">');
+      .push('<div style="padding-bottom:2px;border-bottom:1px solid #eee" class="morpheus-entry">');
     html.push('<div class="row">');
     html
-    .push('<div class="col-xs-12">'
-      + '<div class="checkbox"><label><input type="checkbox" name="filterMode">Pass all filters</label></div> '
+      .push('<div class="col-xs-12">'
+        + '<div class="checkbox"><label><input type="checkbox" name="filterMode">Pass all filters</label></div> '
 
-      + '</div>');
+        + '</div>');
     html.push('</div>');
     html.push('<div class="row">');
     html
-    .push('<div class="col-xs-8"><a class="btn btn-default btn-xs" role="button"' +
-      ' data-name="add" href="#">Add</a></div>');
+      .push('<div class="col-xs-8"><a class="btn btn-default btn-xs" role="button"' +
+        ' data-name="add" href="#">Add</a></div>');
 
     html.push('</div>');
     html.push('</div>');
@@ -337,7 +337,7 @@ morpheus.FilterUI.prototype = {
     // field
 
     html
-    .push('<select style="max-width:160px;overflow-x:hidden;" name="by" class="form-control input-sm">');
+      .push('<select style="max-width:160px;overflow-x:hidden;" name="by" class="form-control input-sm">');
     html.push('<option value=""></option>');
     var filterField = filter ? filter.toString() : null;
 
@@ -361,13 +361,13 @@ morpheus.FilterUI.prototype = {
 
     // add/delete
     html
-    .push('<div style="padding-bottom:6px; border-bottom:1px solid #eee" class="row">');
+      .push('<div style="padding-bottom:6px; border-bottom:1px solid #eee" class="row">');
 
     html.push('<div class="col-xs-11">');
 
     html
-    .push('<a class="btn btn-default btn-xs" role="button" data-name="delete"' +
-      ' href="#">Remove</a>');
+      .push('<a class="btn btn-default btn-xs" role="button" data-name="delete"' +
+        ' href="#">Remove</a>');
     html.push('</div>');
 
     html.push('</div>'); // row

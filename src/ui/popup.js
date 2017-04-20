@@ -67,7 +67,7 @@ morpheus.Popup.showPopup = function (menuItems, position, component, callback) {
       html.push('>');
       if (item.checked) {
         html
-        .push('<span class="dropdown-checkbox fa fa-check"></span>');
+          .push('<span class="dropdown-checkbox fa fa-check"></span>');
       }
 
       html.push(item.name);

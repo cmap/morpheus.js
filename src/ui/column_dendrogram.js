@@ -37,7 +37,7 @@ morpheus.ColumnDendrogram.prototype = {
       morpheus.CanvasUtil.resetTransform(context);
       context.translate(-clip.x, 0);
       this.drawColumnBorder(context, this.positions, this.project
-      .getHoverColumnIndex(), this.getUnscaledWidth());
+        .getHoverColumnIndex(), this.getUnscaledWidth());
     }
   },
   drawColumnBorder: function (context, positions, index, gridSize) {
@@ -62,9 +62,9 @@ morpheus.ColumnDendrogram.prototype = {
   getPreferredSize: function (context) {
     return {
       width: Math.ceil(this.positions.getPosition(this.positions
-          .getLength() - 1)
+            .getLength() - 1)
         + this.positions
-        .getItemSize(this.positions.getLength() - 1)),
+          .getItemSize(this.positions.getLength() - 1)),
       height: 100
     };
   },

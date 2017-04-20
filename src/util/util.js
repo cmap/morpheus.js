@@ -71,7 +71,7 @@ morpheus.Util.loadTrackingCode = function () {
 morpheus.Util.measureScrollbar = function () {
   var $c = $(
     '<div style=\'position:absolute; top:-10000px; left:-10000px; width:100px; height:100px; overflow:scroll;\'></div>')
-  .appendTo('body');
+    .appendTo('body');
   var dim = {
     width: Math.max(0, $c.width() - $c[0].clientWidth),
     height: $c.height() - $c[0].clientHeight
@@ -142,11 +142,11 @@ morpheus.Util.getWindowSearchObject = function () {
   var hashObject = {};
   if (window.location.search.length > 0) {
     searchObject = morpheus.Util.getQueryParams(window.location.search
-    .substring(1));
+      .substring(1));
   }
   if (window.location.hash.length > 0) {
     hashObject = morpheus.Util.getQueryParams(window.location.hash
-    .substring(1));
+      .substring(1));
   }
   return _.extend(hashObject, searchObject);
 };
@@ -565,12 +565,12 @@ morpheus.Util.autosuggest = function (options) {
     }
     if (options.multi) {
       var terms = morpheus.Util
-      .getAutocompleteTokens(
-        options.$el[0].value,
-        {
-          trim: false,
-          selectionStart: options.$el[0].selectionStart
-        });
+        .getAutocompleteTokens(
+          options.$el[0].value,
+          {
+            trim: false,
+            selectionStart: options.$el[0].selectionStart
+          });
 
       var field = (event.toElement && event.toElement.dataset) ? event.toElement.dataset.autocomplete : null;
       var value = field ? ui.item[field] : ui.item.value;
@@ -618,54 +618,54 @@ morpheus.Util.autosuggest = function (options) {
 
   options.$el
   // don't navigate away from the field on tab when selecting an item
-  .on(
-    'keydown',
-    function (event) {
-      if ((event.keyCode === $.ui.keyCode.TAB)
-        && $(this).data('ui-autocomplete').menu.active) {
-        event.preventDefault();
-      }
-    })
-  .autocomplete(
-    {
-      minLength: options.minLength,
-      delay: options.delay,
-      source: function (request, response) {
-        if (request.term.history && options.history) {
-          return options.history(response);
+    .on(
+      'keydown',
+      function (event) {
+        if ((event.keyCode === $.ui.keyCode.TAB)
+          && $(this).data('ui-autocomplete').menu.active) {
+          event.preventDefault();
         }
-        // delegate back to autocomplete, but extract the
-        // autocomplete term
-        var terms = morpheus.Util
-        .getAutocompleteTokens(
-          request.term,
-          {
-            trim: false,
-            selectionStart: options.$el[0].selectionStart
-          });
+      })
+    .autocomplete(
+      {
+        minLength: options.minLength,
+        delay: options.delay,
+        source: function (request, response) {
+          if (request.term.history && options.history) {
+            return options.history(response);
+          }
+          // delegate back to autocomplete, but extract the
+          // autocomplete term
+          var terms = morpheus.Util
+            .getAutocompleteTokens(
+              request.term,
+              {
+                trim: false,
+                selectionStart: options.$el[0].selectionStart
+              });
 
-        if (terms.selectionStartIndex === undefined
-          || terms.selectionStartIndex === -1) {
-          terms.selectionStartIndex = terms.length - 1;
+          if (terms.selectionStartIndex === undefined
+            || terms.selectionStartIndex === -1) {
+            terms.selectionStartIndex = terms.length - 1;
+          }
+          if (options.suggestWhenEmpty || terms.length > 0) {
+            options.filter(terms, response);
+          }
+        },
+        focus: function (event, ui) {
+          var original = event.originalEvent;
+          while (original.originalEvent != null) {
+            original = original.originalEvent;
+          }
+          if (original && /^key/.test(original.type)) {
+            return _select(original, ui, true);
+          }
+          return false;
+        },
+        select: function (event, ui) {
+          return _select(event, ui, false);
         }
-        if (options.suggestWhenEmpty || terms.length > 0) {
-          options.filter(terms, response);
-        }
-      },
-      focus: function (event, ui) {
-        var original = event.originalEvent;
-        while (original.originalEvent != null) {
-          original = original.originalEvent;
-        }
-        if (original && /^key/.test(original.type)) {
-          return _select(original, ui, true);
-        }
-        return false;
-      },
-      select: function (event, ui) {
-        return _select(event, ui, false);
-      }
-    });
+      });
 
   // use html for label instead of default text, class for categories vs. items
   var instance = options.$el.autocomplete('instance');
@@ -673,12 +673,12 @@ morpheus.Util.autosuggest = function (options) {
     instance._renderItem = function (ul, item) {
       if (item.value == null) { // category
         return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-category">')
-        .append($('<div>').html(item.label))
-        .appendTo(ul);
+          .append($('<div>').html(item.label))
+          .appendTo(ul);
       }
       return $('<li class="' + (item.class ? (' ' + item.class) : '') + ' search-item">')
-      .append($('<div>').html(item.label))
-      .appendTo(ul);
+        .append($('<div>').html(item.label))
+        .appendTo(ul);
     };
     instance._normalize = function (items) {
       return items;
@@ -1062,8 +1062,8 @@ morpheus.Util.arrayEquals = function (array1, array2, comparator) {
 };
 morpheus.Util._intFormat = typeof d3 !== 'undefined' ? d3.format(',i')
   : function (d) {
-    return '' + Math.round(d);
-  };
+  return '' + Math.round(d);
+};
 morpheus.Util.intFormat = function (n) {
   return morpheus.Util._intFormat(n);
 };
@@ -1072,7 +1072,7 @@ morpheus.Util._nf = typeof d3 !== 'undefined' ? d3.format('.4f') : function (d) 
 };
 morpheus.Util.nf = function (n) {
   var str = (n < 1 && n > -1 && n.toPrecision !== undefined) ? n
-  .toPrecision(4) : morpheus.Util._nf(n);
+    .toPrecision(4) : morpheus.Util._nf(n);
   return morpheus.Util.removeTrailingZerosInFraction(str);
 };
 morpheus.Util.createNumberFormat = function (nfractionDigits) {
@@ -1154,7 +1154,7 @@ morpheus.Util.create2dArray = function (rows, columns) {
 };
 morpheus.Util.escapeRegex = function (value) {
   return value.replace(/[*]/g, '.*')
-  .replace(/[-[\]{}()+?,\\^$|#\s]/g, '\\$&');
+    .replace(/[-[\]{}()+?,\\^$|#\s]/g, '\\$&');
 };
 
 morpheus.Util.createSearchPredicates = function (options) {
@@ -1181,129 +1181,129 @@ morpheus.Util.createSearchPredicates = function (options) {
   var defaultIsExactMatch = options.defaultMatchMode === 'exact';
 
   tokens
-  .forEach(function (token) {
-    var isNot = false;
-    if (token[0] === '-') { // not predicate
-      token = token.substring(1);
-      isNot = true;
-    }
-    var field = null;
-    var semi = token.indexOf(':');
-    if (semi > 0) { // field search?
-      if (!fieldSearchEnabled
-        || token.charCodeAt(semi - 1) === 92) { // \:
-        token = token.replace(fieldRegExp, ':');
-      } else { // only a field search if field matches
-        // one of available fields
-        var possibleToken = $.trim(token.substring(semi + 1));
-        // check for "field":"val" and "field:val"
-        var possibleField = $.trim(token.substring(0, semi)); // split
-        // on :
-        if (possibleField.length > 0
-          && possibleField[0] === '"'
-          && possibleField[possibleField.length - 1] === '"') {
-          possibleField = possibleField.substring(1,
-            possibleField.length - 1);
-        } else if (possibleField.length > 0
-          && possibleField[0] === '"'
-          && possibleToken[possibleToken.length - 1] === '"'
-          && possibleToken[0] !== '"') {
-          possibleField = possibleField.substring(1,
-            possibleField.length);
-          possibleToken = '"' + possibleToken;
+    .forEach(function (token) {
+      var isNot = false;
+      if (token[0] === '-') { // not predicate
+        token = token.substring(1);
+        isNot = true;
+      }
+      var field = null;
+      var semi = token.indexOf(':');
+      if (semi > 0) { // field search?
+        if (!fieldSearchEnabled
+          || token.charCodeAt(semi - 1) === 92) { // \:
+          token = token.replace(fieldRegExp, ':');
+        } else { // only a field search if field matches
+          // one of available fields
+          var possibleToken = $.trim(token.substring(semi + 1));
+          // check for "field":"val" and "field:val"
+          var possibleField = $.trim(token.substring(0, semi)); // split
+          // on :
+          if (possibleField.length > 0
+            && possibleField[0] === '"'
+            && possibleField[possibleField.length - 1] === '"') {
+            possibleField = possibleField.substring(1,
+              possibleField.length - 1);
+          } else if (possibleField.length > 0
+            && possibleField[0] === '"'
+            && possibleToken[possibleToken.length - 1] === '"'
+            && possibleToken[0] !== '"') {
+            possibleField = possibleField.substring(1,
+              possibleField.length);
+            possibleToken = '"' + possibleToken;
 
-        }
+          }
 
-        if (!validateFieldNames
-          || availableFields.indexOf(options.caseSensitive ? possibleField : possibleField.toLowerCase()) !== -1) {
-          token = possibleToken;
-          field = possibleField;
+          if (!validateFieldNames
+            || availableFields.indexOf(options.caseSensitive ? possibleField : possibleField.toLowerCase()) !== -1) {
+            token = possibleToken;
+            field = possibleField;
+          }
         }
       }
-    }
 
-    var predicate;
-    var rangeIndex = -1;
-    var rangeToken = null;
-    var rangeIndicators = ['..', '>=', '>', '<=', '<', '='];
-    for (var i = 0; i < rangeIndicators.length; i++) {
-      rangeIndex = token.indexOf(rangeIndicators[i]);
-      if (rangeIndex !== -1) {
-        rangeToken = rangeIndicators[i];
-        break;
+      var predicate;
+      var rangeIndex = -1;
+      var rangeToken = null;
+      var rangeIndicators = ['..', '>=', '>', '<=', '<', '='];
+      for (var i = 0; i < rangeIndicators.length; i++) {
+        rangeIndex = token.indexOf(rangeIndicators[i]);
+        if (rangeIndex !== -1) {
+          rangeToken = rangeIndicators[i];
+          break;
+        }
       }
-    }
 
-    if (rangeIndex !== -1) { // range query
-      if (rangeToken === '..') {
-        var start = parseFloat(token.substring(0, rangeIndex));
-        var end = parseFloat(token.substring(rangeIndex + 2));
-        if (!isNaN(start) && !isNaN(end)) {
-          predicate = new morpheus.Util.NumberRangePredicate(
-            field, start, end);
-        }
-      } else if (rangeToken === '>') {
-        var val = parseFloat(token.substring(rangeIndex + 1));
-        if (!isNaN(val)) {
-          predicate = new morpheus.Util.GreaterThanPredicate(
+      if (rangeIndex !== -1) { // range query
+        if (rangeToken === '..') {
+          var start = parseFloat(token.substring(0, rangeIndex));
+          var end = parseFloat(token.substring(rangeIndex + 2));
+          if (!isNaN(start) && !isNaN(end)) {
+            predicate = new morpheus.Util.NumberRangePredicate(
+              field, start, end);
+          }
+        } else if (rangeToken === '>') {
+          var val = parseFloat(token.substring(rangeIndex + 1));
+          if (!isNaN(val)) {
+            predicate = new morpheus.Util.GreaterThanPredicate(
+              field, val);
+          }
+        } else if (rangeToken === '>=') {
+          var val = parseFloat(token.substring(rangeIndex + 2));
+          if (!isNaN(val)) {
+            predicate = new morpheus.Util.GreaterThanOrEqualPredicate(
+              field, val);
+          }
+        } else if (rangeToken === '<') {
+          var val = parseFloat(token.substring(rangeIndex + 1));
+          if (!isNaN(val)) {
+            predicate = new morpheus.Util.LessThanPredicate(
+              field, val);
+          }
+        } else if (rangeToken === '<=') {
+          var val = parseFloat(token.substring(rangeIndex + 2));
+          if (!isNaN(val)) {
+            predicate = new morpheus.Util.LessThanOrEqualPredicate(
+              field, val);
+          }
+        } else if (rangeToken === '=') {
+          var val = parseFloat(token.substring(rangeIndex + 1));
+          predicate = new morpheus.Util.EqualsPredicate(
             field, val);
+        } else {
+          console.log('Unknown range token:' + rangeToken);
         }
-      } else if (rangeToken === '>=') {
-        var val = parseFloat(token.substring(rangeIndex + 2));
-        if (!isNaN(val)) {
-          predicate = new morpheus.Util.GreaterThanOrEqualPredicate(
-            field, val);
+      } else if (token[0] === '"' && token[token.length - 1] === '"') { // exact
+        token = token.substring(1, token.length - 1);
+        predicate = new morpheus.Util.ExactTermPredicate(field,
+          token);
+      } else if (token[0] === '(' && token[token.length - 1] === ')') { // exact terms
+        token = token.substring(1, token.length - 1);
+        var values = morpheus.Util.getAutocompleteTokens(token);
+
+        if (values.length > 0) {
+          predicate = new morpheus.Util.ExactTermsPredicate(field,
+            values.map(function (val) {
+              if (val[0] === '"' && val[val.length - 1] === '"') {
+                val = val.substring(1, val.length - 1);
+              }
+              return val.toLowerCase();
+            }));
         }
-      } else if (rangeToken === '<') {
-        var val = parseFloat(token.substring(rangeIndex + 1));
-        if (!isNaN(val)) {
-          predicate = new morpheus.Util.LessThanPredicate(
-            field, val);
-        }
-      } else if (rangeToken === '<=') {
-        var val = parseFloat(token.substring(rangeIndex + 2));
-        if (!isNaN(val)) {
-          predicate = new morpheus.Util.LessThanOrEqualPredicate(
-            field, val);
-        }
-      } else if (rangeToken === '=') {
-        var val = parseFloat(token.substring(rangeIndex + 1));
-        predicate = new morpheus.Util.EqualsPredicate(
-          field, val);
+      } else if (token.indexOf('*') !== -1) { // contains
+        predicate = new morpheus.Util.RegexPredicate(field, token);
       } else {
-        console.log('Unknown range token:' + rangeToken);
+        predicate = defaultIsExactMatch ? new morpheus.Util.ExactTermPredicate(
+          field, token)
+          : new morpheus.Util.RegexPredicate(field, token);
+
       }
-    } else if (token[0] === '"' && token[token.length - 1] === '"') { // exact
-      token = token.substring(1, token.length - 1);
-      predicate = new morpheus.Util.ExactTermPredicate(field,
-        token);
-    } else if (token[0] === '(' && token[token.length - 1] === ')') { // exact terms
-      token = token.substring(1, token.length - 1);
-      var values = morpheus.Util.getAutocompleteTokens(token);
-
-      if (values.length > 0) {
-        predicate = new morpheus.Util.ExactTermsPredicate(field,
-          values.map(function (val) {
-            if (val[0] === '"' && val[val.length - 1] === '"') {
-              val = val.substring(1, val.length - 1);
-            }
-            return val.toLowerCase();
-          }));
+      if (predicate != null) {
+        predicates.push(isNot ? new morpheus.Util.NotPredicate(
+          predicate) : predicate);
       }
-    } else if (token.indexOf('*') !== -1) { // contains
-      predicate = new morpheus.Util.RegexPredicate(field, token);
-    } else {
-      predicate = defaultIsExactMatch ? new morpheus.Util.ExactTermPredicate(
-        field, token)
-        : new morpheus.Util.RegexPredicate(field, token);
 
-    }
-    if (predicate != null) {
-      predicates.push(isNot ? new morpheus.Util.NotPredicate(
-        predicate) : predicate);
-    }
-
-  });
+    });
   return predicates;
 }
 ;
@@ -1414,12 +1414,12 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
         }
         var bstr = arr.join('');
         morpheus.Util
-        .xlsxTo1dArray({
-          data: bstr,
-          prompt: interactive
-        }, function (err, lines) {
-          deferred.resolve(lines);
-        });
+          .xlsxTo1dArray({
+            data: bstr,
+            prompt: interactive
+          }, function (err, lines) {
+            deferred.resolve(lines);
+          });
       } else {
         deferred.resolve(morpheus.Util.splitOnNewLine(event.target.result));
       }
@@ -1702,54 +1702,54 @@ morpheus.Util.NotPredicate.prototype = {
 };
 
 
-morpheus.Util.getFieldNames = function(rexp) {
-    var strValues = rexp.attrValue[0].stringValue;
-    var res = [];
-    strValues.forEach(function (v) {
-        res.push(v.strval);
-    });
-    return res;
+morpheus.Util.getFieldNames = function (rexp) {
+  var strValues = rexp.attrValue[0].stringValue;
+  var res = [];
+  strValues.forEach(function (v) {
+    res.push(v.strval);
+  });
+  return res;
 };
-morpheus.Util.getRexpData = function(rexp, rclass) {
-    var names = morpheus.Util.getFieldNames(rexp);
-    var data = {};
-    for (var i = 0; i < names.length; i++) {
-        var rexpV = rexp.rexpValue[i];
-        data[names[i]] = {};
-        if (rexpV.attrName.length > 0 && rexpV.attrName[0] == 'dim') {
-            data[names[i]].dim = rexpV.attrValue[0].intValue;
-        }
-        if (rexpV.rclass == rclass.INTEGER) {
-            if (rexpV.attrName.length > 0 && rexpV.attrName[0] == 'levels') {
-                data[names[i]].values = [];
-                rexpV.attrValue[0].stringValue.forEach(function(v) {
-                    data[names[i]].values.push(v.strval);
-                })
-            }
-            else {
-                data[names[i]].values = rexpV.intValue;
-            }
-        }
-        else if (rexpV.rclass == rclass.REAL) {
-            data[names[i]].values = rexpV.realValue;
-        }
-        else if (rexpV.rclass == rclass.STRING) {
-            data[names[i]].values = [];
-            rexpV.stringValue.forEach(function(v) {
-                data[names[i]].values.push(v.strval);
-            });
-        }
+morpheus.Util.getRexpData = function (rexp, rclass) {
+  var names = morpheus.Util.getFieldNames(rexp);
+  var data = {};
+  for (var i = 0; i < names.length; i++) {
+    var rexpV = rexp.rexpValue[i];
+    data[names[i]] = {};
+    if (rexpV.attrName.length > 0 && rexpV.attrName[0] == 'dim') {
+      data[names[i]].dim = rexpV.attrValue[0].intValue;
     }
-    return data;
+    if (rexpV.rclass == rclass.INTEGER) {
+      if (rexpV.attrName.length > 0 && rexpV.attrName[0] == 'levels') {
+        data[names[i]].values = [];
+        rexpV.attrValue[0].stringValue.forEach(function (v) {
+          data[names[i]].values.push(v.strval);
+        })
+      }
+      else {
+        data[names[i]].values = rexpV.intValue;
+      }
+    }
+    else if (rexpV.rclass == rclass.REAL) {
+      data[names[i]].values = rexpV.realValue;
+    }
+    else if (rexpV.rclass == rclass.STRING) {
+      data[names[i]].values = [];
+      rexpV.stringValue.forEach(function (v) {
+        data[names[i]].values.push(v.strval);
+      });
+    }
+  }
+  return data;
 };
 
-morpheus.Util.getFilePath = function(session, str) {
+morpheus.Util.getFilePath = function (session, str) {
   var splitted = str.split("/");
   var fileName = splitted[splitted.length - 1].substring(0, splitted[splitted.length - 1].length - 2);
   return session.getLoc() + "files/" + fileName;
 };
 
-morpheus.Util.getTrueIndices = function(dataset) {
+morpheus.Util.getTrueIndices = function (dataset) {
   console.log('TrueIndices', dataset, dataset.dataset, dataset.dataset === undefined);
   var rowIndices = dataset.rowIndices ? dataset.rowIndices : [];
   var rows = morpheus.Util.getConsNumbers(rowIndices.length);
@@ -1759,39 +1759,39 @@ morpheus.Util.getTrueIndices = function(dataset) {
   var savedDataset = dataset;
   console.log("rows processing");
   while (dataset.dataset) {
-      if (!dataset.rowIndices) {
-        dataset = dataset.dataset;
-        continue;
-      }
-      rowIndices = dataset.rowIndices;
-      console.log(iter, "rows:", rows.length, rows);
-      var newRows = Array.apply(null, Array(rows.length)).map(Number.prototype.valueOf,0);
-      for (var i = 0; i < rows.length; i++) {
-          newRows[i] = dataset.rowIndices[rows[i]];
-      }
-      rows = newRows;
+    if (!dataset.rowIndices) {
       dataset = dataset.dataset;
-      iter++;
+      continue;
+    }
+    rowIndices = dataset.rowIndices;
+    console.log(iter, "rows:", rows.length, rows);
+    var newRows = Array.apply(null, Array(rows.length)).map(Number.prototype.valueOf, 0);
+    for (var i = 0; i < rows.length; i++) {
+      newRows[i] = dataset.rowIndices[rows[i]];
+    }
+    rows = newRows;
+    dataset = dataset.dataset;
+    iter++;
   }
   iter = 0;
   console.log("columns processing");
   dataset = savedDataset;
   while (dataset.dataset) {
-      if (!dataset.columnIndices) {
-        dataset = dataset.dataset;
-        continue;
-      }
-      columnIndices = dataset.columnIndices;
-
-      console.log(iter, "columns:", columns.length, columns);
-      var newCols = Array.apply(null, Array(columns.length)).map(Number.prototype.valueOf,0)
-      for (i = 0; i < columns.length; i++) {
-          newCols[i] = dataset.columnIndices[columns[i]];
-      }
-      columns = newCols;
-
+    if (!dataset.columnIndices) {
       dataset = dataset.dataset;
-      iter++;
+      continue;
+    }
+    columnIndices = dataset.columnIndices;
+
+    console.log(iter, "columns:", columns.length, columns);
+    var newCols = Array.apply(null, Array(columns.length)).map(Number.prototype.valueOf, 0)
+    for (i = 0; i < columns.length; i++) {
+      newCols[i] = dataset.columnIndices[columns[i]];
+    }
+    columns = newCols;
+
+    dataset = dataset.dataset;
+    iter++;
   }
 
   console.log("res", rows, columns);
@@ -1807,17 +1807,17 @@ morpheus.Util.getTrueIndices = function(dataset) {
     ans.rows = rows.length > 0 ? rows : rowIndices;
   }
   console.log(morpheus.Util.equalArrays(columns, conseqCols));
-    if (morpheus.Util.equalArrays(columns, conseqCols) || columns.length == 0 && morpheus.Util.equalArrays(conseqCols, columnIndices)) {
-        ans.columns = [];
-    }
-    else {
-        ans.columns = columns.length > 0 ? columns : columnIndices;
-    }
-    console.log(ans);
+  if (morpheus.Util.equalArrays(columns, conseqCols) || columns.length == 0 && morpheus.Util.equalArrays(conseqCols, columnIndices)) {
+    ans.columns = [];
+  }
+  else {
+    ans.columns = columns.length > 0 ? columns : columnIndices;
+  }
+  console.log(ans);
   return ans;
 };
 
-morpheus.Util.getConsNumbers = function(n) {
+morpheus.Util.getConsNumbers = function (n) {
   var ar = [];
   for (var i = 0; i < n; i++) {
     ar.push(i);
@@ -1826,13 +1826,13 @@ morpheus.Util.getConsNumbers = function(n) {
 };
 
 morpheus.Util.equalArrays = function (a, b) {
-    if (a.length != b.length || a == null || b == null) {
+  if (a.length != b.length || a == null || b == null) {
+    return false;
+  }
+  for (var i = 0; i < a.length; i++) {
+    if (a[i] != b[i]) {
       return false;
     }
-    for (var i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) {
-        return false;
-      }
-    }
-    return true;
+  }
+  return true;
 };

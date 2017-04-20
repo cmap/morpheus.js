@@ -36,17 +36,17 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
       });
       _this.legend.selectedIndex = _this.getFractionIndex(e.fraction, color);
       var fractionToValue = d3.scale.linear().domain([0, 1])
-      .range(
-        [_this.colorScheme.getMin(),
-          _this.colorScheme.getMax()])
-      .clamp(true);
+        .range(
+          [_this.colorScheme.getMin(),
+            _this.colorScheme.getMax()])
+        .clamp(true);
       _this.formBuilder.setValue('selected_value',
         fractionToValue(fractions[_this.legend.selectedIndex]));
       _this.fireChanged();
     });
   var $row = $('<div></div>');
   $row.css('height', '50px').css('width', '300px').css('margin-left', 'auto')
-  .css('margin-right', 'auto');
+    .css('margin-right', 'auto');
   $row.appendTo(this.$div);
 
   $(this.legend.canvas).appendTo($row);
@@ -107,12 +107,12 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
     col: 'col-xs-2'
   });
   items
-  .push({
-    name: 'stepped_colors',
-    type: 'checkbox',
-    value: false,
-    help: 'Intervals include left end point and exclude right end point, except for the highest interval'
-  });
+    .push({
+      name: 'stepped_colors',
+      type: 'checkbox',
+      value: false,
+      help: 'Intervals include left end point and exclude right end point, except for the highest interval'
+    });
   _.each(items, function (item) {
     formBuilder.append(item);
   });
@@ -197,21 +197,21 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
 
   }, 100));
   formBuilder.$form
-  .on(
-    'change',
-    '[name=relative_color_scheme]',
-    _
-    .throttle(
-      function (e) {
-        _this.legend.selectedIndex = -1;
-        // FIXME set fixed min and max
-        var scalingMode = $(this).prop('checked') ? morpheus.HeatMapColorScheme.ScalingMode.RELATIVE
-          : morpheus.HeatMapColorScheme.ScalingMode.FIXED;
-        _this.colorScheme
-        .setScalingMode(scalingMode);
-        _this.setColorScheme(_this.colorScheme);
-        _this.fireChanged();
-      }, 100));
+    .on(
+      'change',
+      '[name=relative_color_scheme]',
+      _
+        .throttle(
+          function (e) {
+            _this.legend.selectedIndex = -1;
+            // FIXME set fixed min and max
+            var scalingMode = $(this).prop('checked') ? morpheus.HeatMapColorScheme.ScalingMode.RELATIVE
+              : morpheus.HeatMapColorScheme.ScalingMode.FIXED;
+            _this.colorScheme
+              .setScalingMode(scalingMode);
+            _this.setColorScheme(_this.colorScheme);
+            _this.fireChanged();
+          }, 100));
   this.formBuilder = formBuilder;
   // selection: delete, color, value
   // general: add, min, max, relative or global
@@ -234,7 +234,7 @@ morpheus.HeatMapColorSchemeChooser.prototype = {
   setSelectedValue: function (val) {
     var valueToFraction = d3.scale.linear().domain(
       [this.colorScheme.getMin(), this.colorScheme.getMax()])
-    .range([0, 1]).clamp(true);
+      .range([0, 1]).clamp(true);
     var fractions = this.colorScheme.getFractions();
     var fraction = valueToFraction(val);
     fractions[this.legend.selectedIndex] = fraction;
@@ -257,7 +257,7 @@ morpheus.HeatMapColorSchemeChooser.prototype = {
     if (this.legend.selectedIndex !== -1) {
       var fractionToValue = d3.scale.linear().domain([0, 1]).range(
         [this.colorScheme.getMin(), this.colorScheme.getMax()])
-      .clamp(true);
+        .clamp(true);
       formBuilder.setValue('selected_value',
         fractionToValue(fractions[this.legend.selectedIndex]));
       var context = this.legend.canvas.getContext('2d');
@@ -300,24 +300,24 @@ morpheus.HeatMapColorSchemeChooser.prototype = {
       colorScheme.setCurrentValue(this.currentValue);
     }
     this.formBuilder
-    .setValue(
-      'relative_color_scheme',
-      colorScheme.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE ? true
-        : false);
+      .setValue(
+        'relative_color_scheme',
+        colorScheme.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE ? true
+          : false);
     this.formBuilder.setValue('transform_values', colorScheme.getTransformValues());
     this.formBuilder.setEnabled('transform_values', colorScheme.getScalingMode() !== morpheus.HeatMapColorScheme.ScalingMode.RELATIVE);
 
     this.formBuilder.$form
-    .find('[name=minimum],[name=maximum]')
-    .prop(
-      'disabled',
-      colorScheme.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE);
+      .find('[name=minimum],[name=maximum]')
+      .prop(
+        'disabled',
+        colorScheme.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE);
     this.formBuilder.setValue('minimum', this.colorScheme.getMin());
     this.formBuilder.setValue('maximum', this.colorScheme.getMax());
     this.formBuilder.setValue('stepped_colors', this.colorScheme
-    .isStepped());
+      .isStepped());
     this.formBuilder.setValue('missing_color', this.colorScheme
-    .getMissingColor());
+      .getMissingColor());
     this.draw();
   },
   getFractionToStopPix: function () {

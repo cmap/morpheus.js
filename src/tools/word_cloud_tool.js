@@ -38,47 +38,47 @@ morpheus.WordCloudTool.draw = function (options) {
   g.style('font-weight', '900');
   var angle = d3.scale.linear().domain([0, 0]).range([0, 0]).clamp(true);
   d3.layout.cloud().spiral('archimedean').size([width, height])
-  .words(words).rotate(function () {
+    .words(words).rotate(function () {
     return angle(~~(Math.random() * 5));
   }).fontSize(function (d) {
     return d.size;
   }).on('end', draw).start();
   function draw(words) {
     var text = g.selectAll('text').data(words).enter().append('text')
-    .style('font-family', 'Impact').on(
-      'mouseover',
-      function (d) {
-        d3.select(this).transition().style('font-size',
-          2 * fontSizeScale(d.size) + 'px');
-      }).on(
-      'mouseout',
-      function (d) {
-        d3.select(this).transition().style('font-size',
-          fontSizeScale(d.size) + 'px');
-      }).on(
-      'click',
-      function (d) {
-        options.heatMap.getToolbar().setSearchText(
-          {
-            isColumns: options.isColumns,
-            text: d.text.indexOf(' ') ? ('"'
+      .style('font-family', 'Impact').on(
+        'mouseover',
+        function (d) {
+          d3.select(this).transition().style('font-size',
+            2 * fontSizeScale(d.size) + 'px');
+        }).on(
+        'mouseout',
+        function (d) {
+          d3.select(this).transition().style('font-size',
+            fontSizeScale(d.size) + 'px');
+        }).on(
+        'click',
+        function (d) {
+          options.heatMap.getToolbar().setSearchText(
+            {
+              isColumns: options.isColumns,
+              text: d.text.indexOf(' ') ? ('"'
               + d.text + '"') : d.text
-          });
+            });
 
-      }).style('fill', function (d, i) {
-      return fill(i);
-    }).attr('text-anchor', 'middle').attr(
-      'transform',
-      function (d) {
-        return 'translate(' + [d.x, d.y] + ')rotate('
-          + d.rotate + ')';
-      }).text(function (d) {
-      return d.text;
-    }).style('font-size', function (d) {
-      return '1px';
-    }).transition().duration(1000).style('font-size', function (d) {
-      return fontSizeScale(d.size) + 'px';
-    });
+        }).style('fill', function (d, i) {
+        return fill(i);
+      }).attr('text-anchor', 'middle').attr(
+        'transform',
+        function (d) {
+          return 'translate(' + [d.x, d.y] + ')rotate('
+            + d.rotate + ')';
+        }).text(function (d) {
+        return d.text;
+      }).style('font-size', function (d) {
+        return '1px';
+      }).transition().duration(1000).style('font-size', function (d) {
+        return fontSizeScale(d.size) + 'px';
+      });
 
   }
 };
@@ -131,7 +131,7 @@ morpheus.WordCloudTool.prototype = {
   },
   init: function (project, form) {
     form.setOptions('field', morpheus.MetadataUtil.getMetadataNames(project
-    .getFullDataset().getRowMetadata()));
+      .getFullDataset().getRowMetadata()));
     form.$form.find('[name=generate_word_cloud_for]').on(
       'change',
       function (e) {
@@ -139,11 +139,11 @@ morpheus.WordCloudTool.prototype = {
         form.setOptions('field',
           val === 'selected rows' ? morpheus.MetadataUtil
             .getMetadataNames(project.getFullDataset()
-            .getRowMetadata())
+              .getRowMetadata())
             : morpheus.MetadataUtil
             .getMetadataNames(project
-            .getFullDataset()
-            .getColumnMetadata()));
+              .getFullDataset()
+              .getColumnMetadata()));
       });
 
   },
@@ -167,7 +167,7 @@ morpheus.WordCloudTool.prototype = {
     var fullDataset = project.getFullDataset();
     if (isColumns) {
       selectedDataset = morpheus.DatasetUtil
-      .transposedView(selectedDataset);
+        .transposedView(selectedDataset);
       fullDataset = morpheus.DatasetUtil.transposedView(fullDataset);
     }
     var selectedIndices = (isColumns ? project.getColumnSelectionModel()
@@ -185,8 +185,8 @@ morpheus.WordCloudTool.prototype = {
       totalSelected += count;
     });
     var fullValueToCount = morpheus.VectorUtil
-    .createValueToCountMap(fullDataset.getRowMetadata().getByName(
-      field));
+      .createValueToCountMap(fullDataset.getRowMetadata().getByName(
+        field));
     var fullTotal = 0;
     fullValueToCount.forEach(function (count, value) {
       fullTotal += count;

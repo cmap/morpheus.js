@@ -49,7 +49,7 @@ morpheus.CollapseDatasetTool.prototype = {
     var project = options.project;
     var heatMap = options.heatMap;
     var f = morpheus.CollapseDatasetTool.Functions
-    .fromString(options.input.collapse_method);
+      .fromString(options.input.collapse_method);
     var collapseToFields = options.input.collapse_to_fields;
     if (collapseToFields.length === 0) {
       throw new Error('Please select one or more fields to collapse to');
@@ -60,7 +60,7 @@ morpheus.CollapseDatasetTool.prototype = {
       dataset = new morpheus.TransposedDatasetView(dataset);
     }
     var allFields = morpheus.MetadataUtil.getMetadataNames(dataset
-    .getRowMetadata());
+      .getRowMetadata());
     dataset = morpheus.CollapseDataset(dataset, collapseToFields, f, true);
     if (!rows) {
       dataset = new morpheus.TransposedDatasetView(dataset);
@@ -73,7 +73,7 @@ morpheus.CollapseDatasetTool.prototype = {
       set.remove(field);
     });
     // hide fields that were not part of collapse to
-      console.log("Collapse ", set);
+    console.log("Collapse ", set);
     set.forEach(function (val, name) {
       heatMap.setTrackVisible(name, false, !rows);
     });

@@ -16,16 +16,16 @@ morpheus.HeatMapColorScheme = function (project, scheme) {
       this.fromJSON(scheme);
     } else {
       this.rowValueToColorSupplier[null] = morpheus.HeatMapColorScheme
-      .createColorSupplier(scheme);
+        .createColorSupplier(scheme);
       this.currentColorSupplier = this.rowValueToColorSupplier[this.value];
     }
   }
   project
-  .on(
-    'rowFilterChanged columnFilterChanged rowSortOrderChanged columnSortOrderChanged datasetChanged',
-    function () {
-      that.projectUpdated();
-    });
+    .on(
+      'rowFilterChanged columnFilterChanged rowSortOrderChanged columnSortOrderChanged datasetChanged',
+      function () {
+        that.projectUpdated();
+      });
   this.projectUpdated();
 };
 morpheus.HeatMapColorScheme.Predefined = {};
@@ -363,7 +363,7 @@ morpheus.HeatMapColorScheme.prototype = {
   },
   getHiddenValues: function () {
     return this.currentColorSupplier.getHiddenValues ? this.currentColorSupplier
-    .getHiddenValues()
+      .getHiddenValues()
       : null;
   },
   getMissingColor: function () {
@@ -447,14 +447,14 @@ morpheus.HeatMapColorScheme.prototype = {
     if (json.separateColorSchemeForRowMetadataField) {
       this.separateColorSchemeForRowMetadataField = json.separateColorSchemeForRowMetadataField;
       this.vector = this.project.getSortedFilteredDataset()
-      .getRowMetadata().getByName(
-        this.separateColorSchemeForRowMetadataField);
+        .getRowMetadata().getByName(
+          this.separateColorSchemeForRowMetadataField);
     }
     this.rowValueToColorSupplier = {};
     var obj = json.valueToColorScheme || json.colorSchemes;
     _.each(_.keys(obj), function (key) {
       var colorSupplier = morpheus.AbstractColorSupplier
-      .fromJSON(obj[key]);
+        .fromJSON(obj[key]);
       _this.rowValueToColorSupplier[key] = colorSupplier;
     });
     this._ensureColorSupplierExists();
@@ -466,7 +466,7 @@ morpheus.HeatMapColorScheme.prototype = {
     c.separateColorSchemeForRowMetadataField = this.separateColorSchemeForRowMetadataField;
     if (c.separateColorSchemeForRowMetadataField != null) {
       c.vector = project.getSortedFilteredDataset().getRowMetadata()
-      .getByName(c.separateColorSchemeForRowMetadataField);
+        .getByName(c.separateColorSchemeForRowMetadataField);
 
     }
     if (c.vector == null) {
@@ -474,7 +474,7 @@ morpheus.HeatMapColorScheme.prototype = {
     }
     _.each(_.keys(this.rowValueToColorSupplier), function (key) {
       c.rowValueToColorSupplier[key] = _this.rowValueToColorSupplier[key]
-      .copy();
+        .copy();
     });
 
     c.value = this.value;
@@ -486,8 +486,8 @@ morpheus.HeatMapColorScheme.prototype = {
     if (separateColorSchemeForRowMetadataField != this.separateColorSchemeForRowMetadataField) {
       this.separateColorSchemeForRowMetadataField = separateColorSchemeForRowMetadataField;
       this.vector = this.project.getSortedFilteredDataset()
-      .getRowMetadata().getByName(
-        separateColorSchemeForRowMetadataField);
+        .getRowMetadata().getByName(
+          separateColorSchemeForRowMetadataField);
       var that = this;
       _.each(_.keys(this.rowValueToColorSupplier), function (key) {
         // remove old color schemes
@@ -508,8 +508,8 @@ morpheus.HeatMapColorScheme.prototype = {
     var dataset = this.project.getSortedFilteredDataset();
     if (this.separateColorSchemeForRowMetadataField != null) {
       this.vector = this.project.getSortedFilteredDataset()
-      .getRowMetadata().getByName(
-        this.separateColorSchemeForRowMetadataField);
+        .getRowMetadata().getByName(
+          this.separateColorSchemeForRowMetadataField);
     }
     this.cachedRowStats = new morpheus.RowStats(dataset);
   },
@@ -535,9 +535,9 @@ morpheus.HeatMapColorScheme.prototype = {
     if (this.currentColorSupplier.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE) {
       if (this.cachedRowStats.maybeUpdateRelative(row)) {
         this.currentColorSupplier
-        .setMin(this.cachedRowStats.rowCachedMin);
+          .setMin(this.cachedRowStats.rowCachedMin);
         this.currentColorSupplier
-        .setMax(this.cachedRowStats.rowCachedMax);
+          .setMax(this.cachedRowStats.rowCachedMax);
       }
     } else if (this.currentColorSupplier.getTransformValues() && this.cachedRowStats.cachedRow !== row) {
       this.cachedRowStats.cacheTransformValues(row, this.currentColorSupplier.getTransformValues());

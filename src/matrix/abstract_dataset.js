@@ -15,7 +15,6 @@ morpheus.AbstractDataset = function (rows, columns) {
   this.columns = columns;
   this.rowMetadataModel = new morpheus.MetadataModel(rows);
   this.columnMetadataModel = new morpheus.MetadataModel(columns);
-
 };
 morpheus.AbstractDataset.prototype = {
   /**

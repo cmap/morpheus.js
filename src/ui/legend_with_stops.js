@@ -6,48 +6,48 @@ morpheus.LegendWithStops = function () {
   });
   var that = this;
   this.hammer = morpheus.Util.hammer(this.canvas, ['pan', 'tap', 'press'])
-  .on(
-    'panmove',
-    this.panmove = function (event) {
-      if (that.panStartSelectedIndex !== -1) {
+    .on(
+      'panmove',
+      this.panmove = function (event) {
+        if (that.panStartSelectedIndex !== -1) {
+          var position = morpheus.CanvasUtil.getMousePos(
+            event.target, event);
+          var fraction = that.fractionToStopPix
+            .invert(position.x);
+          fraction = Math.max(0, fraction);
+          fraction = Math.min(1, fraction);
+          that.trigger('moved', {
+            fraction: fraction
+          });
+        }
+      }).on(
+      'panstart',
+      this.panstart = function (event) {
+        that.panStartSelectedIndex = that
+          .findIndexForPosition(morpheus.CanvasUtil
+            .getMousePos(event.target, event, true));
+      }).on('panend', this.panend = function (event) {
+      that.panStartSelectedIndex = -1;
+    }).on(
+      'tap',
+      this.tap = function (event) {
         var position = morpheus.CanvasUtil.getMousePos(
           event.target, event);
-        var fraction = that.fractionToStopPix
-        .invert(position.x);
-        fraction = Math.max(0, fraction);
-        fraction = Math.min(1, fraction);
-        that.trigger('moved', {
-          fraction: fraction
-        });
-      }
-    }).on(
-    'panstart',
-    this.panstart = function (event) {
-      that.panStartSelectedIndex = that
-      .findIndexForPosition(morpheus.CanvasUtil
-      .getMousePos(event.target, event, true));
-    }).on('panend', this.panend = function (event) {
-    that.panStartSelectedIndex = -1;
-  }).on(
-    'tap',
-    this.tap = function (event) {
-      var position = morpheus.CanvasUtil.getMousePos(
-        event.target, event);
-      if (event.tapCount > 1) {
-        // don't add on double-click
-        // var fraction = that.fractionToStopPix
-        // .invert(position.x);
-        // that.trigger('added', {
-        //   fraction: fraction
-        // });
-      } else {
-        that.selectedIndex = that
-        .findIndexForPosition(position);
-        that.trigger('selectedIndex', {
-          selectedIndex: that.selectedIndex
-        });
-      }
-    });
+        if (event.tapCount > 1) {
+          // don't add on double-click
+          // var fraction = that.fractionToStopPix
+          // .invert(position.x);
+          // that.trigger('added', {
+          //   fraction: fraction
+          // });
+        } else {
+          that.selectedIndex = that
+            .findIndexForPosition(position);
+          that.trigger('selectedIndex', {
+            selectedIndex: that.selectedIndex
+          });
+        }
+      });
   $(this.canvas).on('keydown', function (e) {
     // 8=backspace, 46=delete
     if ((e.which == 8 || e.which == 46) && that.selectedIndex !== -1) {
@@ -94,10 +94,10 @@ morpheus.LegendWithStops.prototype = {
     var context = this.canvas.getContext('2d');
     morpheus.CanvasUtil.resetTransform(context);
     context.clearRect(0, 0, this.getUnscaledWidth(), this
-    .getUnscaledHeight());
+      .getUnscaledHeight());
     context.translate(this.border, 0);
     morpheus.HeatMapColorSchemeLegend.draw(context, fractions, colors, this
-      .getUnscaledWidth()
+        .getUnscaledWidth()
       - 2 * this.border, this.getUnscaledHeight() - 20, stepped);
     context.translate(-this.border, 0);
     context.lineWidth = 1;

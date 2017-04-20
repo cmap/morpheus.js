@@ -336,8 +336,8 @@ morpheus.MetadataUtil.autocomplete = function (model) {
             value: quotedField + ':',
             label: '<span style="font-weight:300;">' + (regexMatch == null ? field : field.replace(regexMatch, '<b>$1</b>'))
             + ':</span>' + (dataType === 'number' ? ('<span' +
-              ' style="font-weight:300;font-size:85%;">.., >, <, >=, <=,' +
-              ' =</span>') : ''),
+            ' style="font-weight:300;font-size:85%;">.., >, <, >=, <=,' +
+            ' =</span>') : ''),
             show: true
           });
         }
@@ -403,7 +403,7 @@ morpheus.MetadataUtil.maybeConvertStrings = function (metadata,
   morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS.forEach(function (field) {
     if (metadata.getByName(field)) {
       morpheus.VectorUtil.maybeConvertToStringArray(metadata
-      .getByName(field), ',');
+        .getByName(field), ',');
     }
   });
 
@@ -438,9 +438,9 @@ morpheus.MetadataUtil.getMatchingIndices = function (metadataModel, tokens) {
   for (var itemIndex = 0, nitems = metadataModel.getItemCount(); itemIndex < nitems; itemIndex++) {
     var matches = false;
     for (var metadataIndex = 0, metadataCount = metadataModel
-    .getMetadataCount(); metadataIndex < metadataCount && !matches; metadataIndex++) {
+      .getMetadataCount(); metadataIndex < metadataCount && !matches; metadataIndex++) {
       var vector = metadataModel.get(metadataModel
-      .getColumnName(metadataIndex));
+        .getColumnName(metadataIndex));
       var value = vector.getValue(itemIndex);
       for (var i = 0, length = tokens.length; i < length; i++) {
         if (tokens[i] == value) {

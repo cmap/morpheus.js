@@ -71,7 +71,7 @@ morpheus.ClsReader.prototype = {
     var numItems = headerNumbers[0];
     var classDefinitionLine = lines[1];
     classDefinitionLine = classDefinitionLine.substring(classDefinitionLine
-      .indexOf('#') + 1);
+        .indexOf('#') + 1);
     var classNames = $.trim(classDefinitionLine).split(regex);
     if (classNames.length < numClasses) {
       throw new Error('First line specifies ' + numClasses

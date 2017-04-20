@@ -101,27 +101,27 @@ morpheus.VectorUtil.createValueToIndicesMap = function (vector, splitArrayValues
 };
 
 morpheus.VectorUtil.createValueToCountMap = function (vector) {
-	if (!vector) {
-		throw 'vector is null';
-	}
-	var map = new morpheus.Map();
-	var dataType = morpheus.VectorUtil.getDataType(vector);
-	var isArray = dataType[0] === '[';
-	for (var j = 0, size = vector.size(); j < size; j++) {
-		var val = vector.getValue(j);
-		if (val != null) {
-			if (isArray) {
-				for (var k = 0; k < val.length; k++) {
-					var count = map.get(val[k]) || 0;
-					map.set(val[k], count + 1);
-				}
-			} else {
-				var count = map.get(val) || 0;
-				map.set(val, count + 1);
-			}
-		}
-	}
-	return map;
+  if (!vector) {
+    throw 'vector is null';
+  }
+  var map = new morpheus.Map();
+  var dataType = morpheus.VectorUtil.getDataType(vector);
+  var isArray = dataType[0] === '[';
+  for (var j = 0, size = vector.size(); j < size; j++) {
+    var val = vector.getValue(j);
+    if (val != null) {
+      if (isArray) {
+        for (var k = 0; k < val.length; k++) {
+          var count = map.get(val[k]) || 0;
+          map.set(val[k], count + 1);
+        }
+      } else {
+        var count = map.get(val) || 0;
+        map.set(val, count + 1);
+      }
+    }
+  }
+  return map;
 };
 
 morpheus.VectorUtil.createValuesToIndicesMap = function (vectors) {

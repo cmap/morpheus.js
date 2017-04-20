@@ -21,8 +21,8 @@ morpheus.Project = function (dataset) {
   this.symmetricProjectListener = null;
   morpheus.Project._recomputeCalculatedFields(this.originalDataset);
   morpheus.Project
-  ._recomputeCalculatedFields(new morpheus.TransposedDatasetView(
-    this.originalDataset));
+    ._recomputeCalculatedFields(new morpheus.TransposedDatasetView(
+      this.originalDataset));
   this.history = [];
 };
 morpheus.Project.Events = {
@@ -176,7 +176,7 @@ morpheus.Project.prototype = {
   getSortedFilteredDataset: function () {
     return morpheus.DatasetUtil.slicedView(this.getFullDataset(),
       this.rowIndexMapper.convertToView(), this.columnIndexMapper
-      .convertToView());
+        .convertToView());
   },
   getSelectedDataset: function (options) {
     options = $.extend({}, {

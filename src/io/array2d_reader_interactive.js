@@ -129,9 +129,9 @@ morpheus.Array2dReaderInteractive.prototype = {
       $el.find('.slick-header').remove();
       var footer = [];
       footer
-      .push('<button name="ok" type="button" class="btn btn-default">OK</button>');
+        .push('<button name="ok" type="button" class="btn btn-default">OK</button>');
       footer
-      .push('<button name="cancel" type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>');
+        .push('<button name="cancel" type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>');
       var $footer = $(footer.join(''));
       morpheus.FormBuilder.showOkCancel({
         title: 'Open',

@@ -47,9 +47,9 @@ morpheus.MarkerSelection.prototype = {
       var ids = [];
       if (fieldNames != null) {
         var vectors = morpheus.MetadataUtil.getVectors(project
-        .getFullDataset().getColumnMetadata(), fieldNames);
+          .getFullDataset().getColumnMetadata(), fieldNames);
         var idToIndices = morpheus.VectorUtil
-        .createValuesToIndicesMap(vectors);
+          .createValuesToIndicesMap(vectors);
         idToIndices.forEach(function (indices, id) {
           ids.push(id);
         });
@@ -82,7 +82,7 @@ morpheus.MarkerSelection.prototype = {
   gui: function (project) {
     var dataset = project.getSortedFilteredDataset();
     var fields = morpheus.MetadataUtil.getMetadataNames(dataset
-    .getColumnMetadata());
+      .getColumnMetadata());
     return [
       {
         name: 'metric',
@@ -158,11 +158,11 @@ morpheus.MarkerSelection.prototype = {
     }
     var dataset = project.getSortedFilteredDataset();
     var vectors = morpheus.MetadataUtil.getVectors(dataset
-    .getColumnMetadata(), fieldNames);
+      .getColumnMetadata(), fieldNames);
 
     var idToIndices = morpheus.VectorUtil.createValuesToIndicesMap(vectors);
     var f = morpheus.MarkerSelection.Functions
-    .fromString(options.input.metric);
+      .fromString(options.input.metric);
 
     var aIndices = [];
     var bIndices = [];
@@ -255,7 +255,7 @@ morpheus.MarkerSelection.prototype = {
           new morpheus.TopNFilter(
             parseInt(options.input.number_of_markers),
             morpheus.TopNFilter.TOP_BOTTOM, vectors[0]
-            .getName()), true);
+              .getName()), true);
       }
 
       project.setRowFilter(project.getRowFilter(), true);
@@ -273,7 +273,7 @@ morpheus.MarkerSelection.prototype = {
       project.getColumnSelectionModel().setViewIndices(selectedColumnIndices, true);
 
       project.setColumnSortKeys([new morpheus.SortKey(comparisonVector
-      .getName(), morpheus.SortKey.SortOrder.ASCENDING)], true);
+        .getName(), morpheus.SortKey.SortOrder.ASCENDING)], true);
 
       project.trigger('trackChanged', {
         vectors: vectors,

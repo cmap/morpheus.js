@@ -299,23 +299,23 @@ morpheus.TcgaUtil.getDataset = function (options) {
         'id');
       for (var j = 0, size = idVector.size(); j < size; j++) {
         clusterIdVector.setValue(j, sampleIdToClusterId
-        .get(idVector.getValue(j)));
+          .get(idVector.getValue(j)));
       }
       // view in space of mutation sample ids only
       if (options.mutation) {
         var sourceToIndices = morpheus.VectorUtil
-        .createValueToIndicesMap(datasetToReturn
-        .getRowMetadata().getByName('Source'));
+          .createValueToIndicesMap(datasetToReturn
+            .getRowMetadata().getByName('Source'));
         var mutationDataset = new morpheus.SlicedDatasetView(
           datasetToReturn, sourceToIndices
-          .get('mutations_merged.maf'));
+            .get('mutations_merged.maf'));
         new morpheus.OpenFileTool()
-        .annotate(sigGenesLines, mutationDataset, false,
-          null, 'id', 'gene', ['q']);
+          .annotate(sigGenesLines, mutationDataset, false,
+            null, 'id', 'gene', ['q']);
         var qVector = mutationDataset.getRowMetadata().getByName(
           'q');
         var qValueVector = mutationDataset.getRowMetadata()
-        .getByName('q_value');
+          .getByName('q_value');
         if (qValueVector == null) {
           qValueVector = mutationDataset.getRowMetadata().add(
             'q_value');
@@ -326,7 +326,7 @@ morpheus.TcgaUtil.getDataset = function (options) {
 
         mutationDataset.getRowMetadata().remove(
           morpheus.MetadataUtil.indexOf(mutationDataset
-          .getRowMetadata(), 'q'));
+            .getRowMetadata(), 'q'));
       }
       if (annotationDef) {
         annotationCallbacks.forEach(function (f) {

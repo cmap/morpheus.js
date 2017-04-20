@@ -24,7 +24,7 @@ morpheus.DatasetUtil.slicedView = function (dataset, rows, columns) {
 };
 morpheus.DatasetUtil.transposedView = function (dataset) {
   return dataset instanceof morpheus.TransposedDatasetView ? dataset
-  .getDataset() : new morpheus.TransposedDatasetView(dataset);
+    .getDataset() : new morpheus.TransposedDatasetView(dataset);
 };
 morpheus.DatasetUtil.max = function (dataset, seriesIndex) {
   seriesIndex = seriesIndex || 0;
@@ -86,7 +86,7 @@ morpheus.DatasetUtil.readDatasetArray = function (datasets) {
     });
     p.fail(function (err) {
       var message = ['Error opening ' + morpheus.Util
-      .getFileName(url) + '.'];
+        .getFileName(url) + '.'];
       if (err.message) {
         message.push('<br />Cause: ');
         message.push(err.message);
@@ -101,11 +101,11 @@ morpheus.DatasetUtil.readDatasetArray = function (datasets) {
   }
 
   $.when
-  .apply($, promises)
-  .then(
-    function () {
-      retDef.resolve(morpheus.DatasetUtil.join(loadedDatasets, 'id'));
-    });
+    .apply($, promises)
+    .then(
+      function () {
+        retDef.resolve(morpheus.DatasetUtil.join(loadedDatasets, 'id'));
+      });
   return retDef;
 };
 /**
@@ -188,30 +188,30 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
   var datasetReader;
   var str = fileOrUrl.toString();
 
-    var isGSE = isString && (fileOrUrl.substring(0, 3) === 'GSE' || fileOrUrl.substring(0, 3) === 'GDS');
+  var isGSE = isString && (fileOrUrl.substring(0, 3) === 'GSE' || fileOrUrl.substring(0, 3) === 'GDS');
 
-    if (isGSE) {
-        datasetReader = new morpheus.GseReader({type : fileOrUrl.substring(0, 3)});
-    }
-    else if (ext === '' && str != null && str.indexOf('blob:') === 0) {
-        datasetReader = new morpheus.TxtReader(); // copy from clipboard
-    } else {
-        datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
-    }
-    if (isString || isFile) { // URL or file
-        var deferred = $.Deferred();
-        // override toString so can determine file name
-        if (options.background) {
-            var path = morpheus.Util.getScriptPath();
-            var blob = new Blob(
-                ['self.onmessage = function(e) {'
-                + 'importScripts(e.data.path);'
-                + 'var ext = morpheus.Util.getExtension(morpheus.Util'
-                + '.getFileName(e.data.fileOrUrl));'
-                + 'var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext,'
-                + '	e.data.options);'
-                + 'datasetReader.read(e.data.fileOrUrl, function(err,dataset) {'
-                + '	self.postMessage(dataset);' + '	});' + '}']);
+  if (isGSE) {
+    datasetReader = new morpheus.GseReader({type: fileOrUrl.substring(0, 3)});
+  }
+  else if (ext === '' && str != null && str.indexOf('blob:') === 0) {
+    datasetReader = new morpheus.TxtReader(); // copy from clipboard
+  } else {
+    datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
+  }
+  if (isString || isFile) { // URL or file
+    var deferred = $.Deferred();
+    // override toString so can determine file name
+    if (options.background) {
+      var path = morpheus.Util.getScriptPath();
+      var blob = new Blob(
+        ['self.onmessage = function(e) {'
+        + 'importScripts(e.data.path);'
+        + 'var ext = morpheus.Util.getExtension(morpheus.Util'
+        + '.getFileName(e.data.fileOrUrl));'
+        + 'var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext,'
+        + '	e.data.options);'
+        + 'datasetReader.read(e.data.fileOrUrl, function(err,dataset) {'
+        + '	self.postMessage(dataset);' + '	});' + '}']);
 
       var blobURL = window.URL.createObjectURL(blob);
       var worker = new Worker(blobURL);
@@ -226,36 +226,36 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
         options: options
       });
 
-		} else {
-			datasetReader.read(fileOrUrl, function (err, dataset) {
-				if (err) {
-					deferred.reject(err);
-				} else {
-					deferred.resolve(dataset);
-					console.log(dataset);
-					morpheus.DatasetUtil.toESSessionPromise({dataset : dataset, isGEO : isGSE});
-				}
-			});
-
-		}
-		var pr = deferred.promise();
-		pr.toString = function () {
-			return '' + fileOrUrl;
-		};
-		//console.log("morpheus.DatasetUtil.read ::", pr);
-		return pr;
-	} else if (typeof fileOrUrl.done === 'function') { // assume it's a
-		// deferred
-		return fileOrUrl;
-	} else { // it's already a dataset?
-        var deferred = $.Deferred();
-        if (fileOrUrl.getRowCount) {
-            deferred.resolve(fileOrUrl);
+    } else {
+      datasetReader.read(fileOrUrl, function (err, dataset) {
+        if (err) {
+          deferred.reject(err);
         } else {
-            deferred.resolve(morpheus.Dataset.fromJSON(fileOrUrl));
+          deferred.resolve(dataset);
+          console.log(dataset);
+          morpheus.DatasetUtil.toESSessionPromise({dataset: dataset, isGEO: isGSE});
         }
-        return deferred.promise();
-	}
+      });
+
+    }
+    var pr = deferred.promise();
+    pr.toString = function () {
+      return '' + fileOrUrl;
+    };
+    //console.log("morpheus.DatasetUtil.read ::", pr);
+    return pr;
+  } else if (typeof fileOrUrl.done === 'function') { // assume it's a
+    // deferred
+    return fileOrUrl;
+  } else { // it's already a dataset?
+    var deferred = $.Deferred();
+    if (fileOrUrl.getRowCount) {
+      deferred.resolve(fileOrUrl);
+    } else {
+      deferred.resolve(morpheus.Dataset.fromJSON(fileOrUrl));
+    }
+    return deferred.promise();
+  }
 
 };
 
@@ -555,8 +555,8 @@ morpheus.DatasetUtil.searchValues = function (options) {
 
       if (matches) {
         viewIndices
-        .add(new morpheus.Identifier(
-          [i, j]));
+          .add(new morpheus.Identifier(
+            [i, j]));
       }
     }
   }
@@ -748,7 +748,7 @@ morpheus.DatasetUtil.autocompleteValues = function (dataset) {
 morpheus.DatasetUtil.fill = function (dataset, value, seriesIndex) {
   seriesIndex = seriesIndex || 0;
   for (var i = 0, nrows = dataset.getRowCount(), ncols = dataset
-  .getColumnCount(); i < nrows; i++) {
+    .getColumnCount(); i < nrows; i++) {
     for (var j = 0; j < ncols; j++) {
       dataset.setValue(i, j, value, seriesIndex);
     }
@@ -774,55 +774,55 @@ morpheus.DatasetUtil.overlay = function (options) {
   var new_dataset_column_annotation_name = options.newColumnAnnotationName;
 
   var rowValueToIndexMap = morpheus.VectorUtil
-  .createValueToIndexMap(dataset
-  .getRowMetadata()
-  .getByName(
-    current_dataset_row_annotation_name));
+    .createValueToIndexMap(dataset
+      .getRowMetadata()
+      .getByName(
+        current_dataset_row_annotation_name));
   var columnValueToIndexMap = morpheus.VectorUtil
-  .createValueToIndexMap(dataset
-  .getColumnMetadata()
-  .getByName(
-    current_dataset_column_annotation_name));
+    .createValueToIndexMap(dataset
+      .getColumnMetadata()
+      .getByName(
+        current_dataset_column_annotation_name));
   var seriesIndex = dataset
-  .addSeries({
-    name: newDataset
-    .getName(),
-    dataType: newDataset.getDataType(0)
-  });
+    .addSeries({
+      name: newDataset
+        .getName(),
+      dataType: newDataset.getDataType(0)
+    });
 
   var rowVector = newDataset
-  .getRowMetadata()
-  .getByName(
-    new_dataset_row_annotation_name);
+    .getRowMetadata()
+    .getByName(
+      new_dataset_row_annotation_name);
   var rowIndices = [];
   var newDatasetRowIndicesSubset = [];
   for (var i = 0, size = rowVector
-  .size(); i < size; i++) {
+    .size(); i < size; i++) {
     var index = rowValueToIndexMap
-    .get(rowVector
-    .getValue(i));
+      .get(rowVector
+        .getValue(i));
     if (index !== undefined) {
       rowIndices.push(index);
       newDatasetRowIndicesSubset
-      .push(i);
+        .push(i);
     }
   }
 
   var columnVector = newDataset
-  .getColumnMetadata()
-  .getByName(
-    new_dataset_column_annotation_name);
+    .getColumnMetadata()
+    .getByName(
+      new_dataset_column_annotation_name);
   var columnIndices = [];
   var newDatasetColumnIndicesSubset = [];
   for (var i = 0, size = columnVector
-  .size(); i < size; i++) {
+    .size(); i < size; i++) {
     var index = columnValueToIndexMap
-    .get(columnVector
-    .getValue(i));
+      .get(columnVector
+        .getValue(i));
     if (index !== undefined) {
       columnIndices.push(index);
       newDatasetColumnIndicesSubset
-      .push(i);
+        .push(i);
     }
   }
   newDataset = new morpheus.SlicedDatasetView(
@@ -830,16 +830,16 @@ morpheus.DatasetUtil.overlay = function (options) {
     newDatasetRowIndicesSubset,
     newDatasetColumnIndicesSubset);
   for (var i = 0, nrows = newDataset
-  .getRowCount(); i < nrows; i++) {
+    .getRowCount(); i < nrows; i++) {
     for (var j = 0, ncols = newDataset
-    .getColumnCount(); j < ncols; j++) {
+      .getColumnCount(); j < ncols; j++) {
       dataset.setValue(
         rowIndices[i],
         columnIndices[j],
         newDataset
-        .getValue(
-          i,
-          j),
+          .getValue(
+            i,
+            j),
         seriesIndex);
 
     }
@@ -894,9 +894,9 @@ morpheus.DatasetUtil.join = function (datasets, field) {
 morpheus.DatasetUtil.shallowCopy = function (dataset) {
   // make a shallow copy of the dataset, metadata is immutable via the UI
   var rowMetadataModel = morpheus.MetadataUtil.shallowCopy(dataset
-  .getRowMetadata());
+    .getRowMetadata());
   var columnMetadataModel = morpheus.MetadataUtil.shallowCopy(dataset
-  .getColumnMetadata());
+    .getColumnMetadata());
   dataset.getRowMetadata = function () {
     return rowMetadataModel;
   };
@@ -924,7 +924,7 @@ morpheus.DatasetUtil.copy = function (dataset) {
       });
     }
     for (var i = 0, nrows = dataset.getRowCount(), ncols = dataset
-    .getColumnCount(); i < nrows; i++) {
+      .getColumnCount(); i < nrows; i++) {
       for (var j = 0; j < ncols; j++) {
         newDataset.setValue(i, j, dataset.getValue(i, j, seriesIndex),
           seriesIndex);
@@ -932,9 +932,9 @@ morpheus.DatasetUtil.copy = function (dataset) {
     }
   }
   var rowMetadataModel = morpheus.MetadataUtil.shallowCopy(dataset
-  .getRowMetadata());
+    .getRowMetadata());
   var columnMetadataModel = morpheus.MetadataUtil.shallowCopy(dataset
-  .getColumnMetadata());
+    .getColumnMetadata());
   newDataset.getRowMetadata = function () {
     return rowMetadataModel;
   };
@@ -950,7 +950,7 @@ morpheus.DatasetUtil.toString = function (dataset, value, seriesIndex) {
   seriesIndex = seriesIndex || 0;
   var s = [];
   for (var i = 0, nrows = dataset.getRowCount(), ncols = dataset
-  .getColumnCount(); i < nrows; i++) {
+    .getColumnCount(); i < nrows; i++) {
     for (var j = 0; j < ncols; j++) {
       if (j > 0) {
         s.push(', ');
@@ -980,190 +980,196 @@ morpheus.DatasetUtil.getNonEmptyRows = function (dataset) {
 };
 morpheus.DatasetUtil.getContentArray = function (dataset) {
 
-	var array = [];
-	var nr = dataset.rows;
-	var nc = dataset.columns;
-	console.log("getContentArray ::", "dataset:", dataset, "rows:", nr, "columns:", nc);
+  var array = [];
+  var nr = dataset.rows;
+  var nc = dataset.columns;
+  console.log("getContentArray ::", "dataset:", dataset, "rows:", nr, "columns:", nc);
 
-	for (var i = 0; i < nr; i++) {
-		for (var j = 0; j < nc; j++) {
-			array.push(dataset.getValue(i, j));
-		}
-	}
-	console.log("getContentArray ::", array);
-	return array;
+  for (var i = 0; i < nr; i++) {
+    for (var j = 0; j < nc; j++) {
+      array.push(dataset.getValue(i, j));
+    }
+  }
+  console.log("getContentArray ::", array);
+  return array;
 };
 morpheus.DatasetUtil.getMetadataArray = function (dataset) {
-	var pDataArray = [];
-	var participantID = [];
-	var labelDescription = [];
-	//console.log("morpheus.DatasetUtil.getMetadataArray ::", dataset);
-	var columnMeta = dataset.getColumnMetadata();
-	var features = columnMeta.getMetadataCount();
-	var participants = dataset.getColumnCount();
-	var vecPartID;
+  var pDataArray = [];
+  var participantID = [];
+  var labelDescription = [];
+  //console.log("morpheus.DatasetUtil.getMetadataArray ::", dataset);
+  var columnMeta = dataset.getColumnMetadata();
+  var features = columnMeta.getMetadataCount();
+  var participants = dataset.getColumnCount();
+  var vecPartID;
 
-	if (columnMeta.getByName("participant_id") != null) {
-		vecPartID = columnMeta.getByName("participant_id");
-	}
-	else {
-		vecPartID = columnMeta.getByName("id");
-	}
-	for (var i = 0; i < participants; i++) {
-		participantID.push({
-			strval: vecPartID ? vecPartID.getValue(i) : i.toString(),
-			isNA: false
-		});
-	}
-	for (var j = 0; j < features; j++) {
-		var vecJ = columnMeta.get(j);
-		if (vecJ.getName() == "participant_id" || vecJ.getName() == "id") {
-			continue;
-		}
-		for (var l = 0; l < participants; l++) {
-			pDataArray.push({
-				strval : vecJ.getValue(l).toString(),
-				isNA : false
-			});
-		}
-		labelDescription.push({
-			strval : vecJ.getName(),
-			isNA : false
-		});
-	}
+  if (columnMeta.getByName("participant_id") != null) {
+    vecPartID = columnMeta.getByName("participant_id");
+  }
+  else {
+    vecPartID = columnMeta.getByName("id");
+  }
+  for (var i = 0; i < participants; i++) {
+    participantID.push({
+      strval: vecPartID ? vecPartID.getValue(i) : i.toString(),
+      isNA: false
+    });
+  }
+  for (var j = 0; j < features; j++) {
+    var vecJ = columnMeta.get(j);
+    if (vecJ.getName() == "participant_id" || vecJ.getName() == "id") {
+      continue;
+    }
+    for (var l = 0; l < participants; l++) {
+      pDataArray.push({
+        strval: vecJ.getValue(l).toString(),
+        isNA: false
+      });
+    }
+    labelDescription.push({
+      strval: vecJ.getName(),
+      isNA: false
+    });
+  }
 
-	var rowMeta = dataset.getRowMetadata();
-	var rowNames = [];
-	var rowNamesVec = rowMeta.getByName("id");
-	if (rowNamesVec) {
-        for (j = 0; j < dataset.getRowCount(); j++) {
-            rowNames.push({
-                strval: rowNamesVec.getValue(j),
-                isNA: false
-            });
-        }
+  var rowMeta = dataset.getRowMetadata();
+  var rowNames = [];
+  var rowNamesVec = rowMeta.getByName("id");
+  if (rowNamesVec) {
+    for (j = 0; j < dataset.getRowCount(); j++) {
+      rowNames.push({
+        strval: rowNamesVec.getValue(j),
+        isNA: false
+      });
     }
-	var symbolNames = rowMeta.getByName("symbol");
-	console.log(symbolNames);
-	var symbol = [];
+  }
+  var symbolNames = rowMeta.getByName("symbol");
+  console.log(symbolNames);
+  var symbol = [];
 
-	if (symbolNames) {
-        for (j = 0; j < dataset.getRowCount(); j++) {
-            symbol.push({
-                strval: symbolNames.getValue(j),
-                isNA: false
-            });
-        }
+  if (symbolNames) {
+    for (j = 0; j < dataset.getRowCount(); j++) {
+      symbol.push({
+        strval: symbolNames.getValue(j),
+        isNA: false
+      });
     }
-    else {
-	  symbol = rowNames;
-    }
-	return {pdata : pDataArray, participants : participantID, labels : labelDescription, rownames : rowNames, symbol : symbol};
+  }
+  else {
+    symbol = rowNames;
+  }
+  return {
+    pdata: pDataArray,
+    participants: participantID,
+    labels: labelDescription,
+    rownames: rowNames,
+    symbol: symbol
+  };
 };
 
 morpheus.DatasetUtil.toESSessionPromise = function (options) {
-	var dataset = options.dataset ? options.dataset : options;
+  var dataset = options.dataset ? options.dataset : options;
 
-    console.log("ENTERED TO_ESSESSION_PROMISE", dataset);
-	//var copiedDataset = morpheus.DatasetUtil.copy(dataset);
-	//console.log("EsSessionPromise ::", "after copying", dataset);
-    while (dataset.dataset) {
-      dataset = dataset.dataset;
+  console.log("ENTERED TO_ESSESSION_PROMISE", dataset);
+  //var copiedDataset = morpheus.DatasetUtil.copy(dataset);
+  //console.log("EsSessionPromise ::", "after copying", dataset);
+  while (dataset.dataset) {
+    dataset = dataset.dataset;
+  }
+  dataset.setESSession(new Promise(function (resolve, reject) {
+    //console.log("morpheus.DatasetUtil.toESSessionPromise ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
+    /*		if (dataset.dataset) {
+     //console.log("morpheus.DatasetUtil.toESSessionPromise ::", "dataset in instanceof morpheus.SlicedDatasetView", "go deeper");
+     morpheus.DatasetUtil.toESSessionPromise(dataset.dataset);
+     }*/
+    if (options.isGEO) {
+      resolve(dataset.getESSession());
+      return;
     }
-	dataset.setESSession(new Promise(function (resolve, reject) {
-		//console.log("morpheus.DatasetUtil.toESSessionPromise ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
-/*		if (dataset.dataset) {
-			//console.log("morpheus.DatasetUtil.toESSessionPromise ::", "dataset in instanceof morpheus.SlicedDatasetView", "go deeper");
-			morpheus.DatasetUtil.toESSessionPromise(dataset.dataset);
-		}*/
-        if (options.isGEO) {
-			resolve(dataset.getESSession());
-			return;
+
+    var array = morpheus.DatasetUtil.getContentArray(dataset);
+    var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
+
+    console.log(array, meta);
+    var messageJSON = {
+      rclass: "LIST",
+      rexpValue: [{
+        rclass: "REAL",
+        realValue: array,
+        attrName: "dim",
+        attrValue: {
+          rclass: "INTEGER",
+          intValue: [dataset.getColumnCount(), dataset.getRowCount()]
         }
+      }, {
+        rclass: "STRING",
+        stringValue: meta.pdata,
+        attrName: "dim",
+        attrValue: {
+          rclass: "INTEGER",
+          intValue: [dataset.getColumnCount(), meta.pdata.length / dataset.getColumnCount()]
+        }
+      }, {
+        rclass: "STRING",
+        stringValue: meta.labels
+      }, {
+        rclass: "STRING",
+        stringValue: meta.participants
+      }, {
+        rclass: "STRING",
+        stringValue: meta.rownames
+      }, {
+        rclass: "STRING",
+        stringValue: meta.symbol
+      }],
+      attrName: "names",
+      attrValue: {
+        rclass: "STRING",
+        stringValue: [{
+          strval: "data",
+          isNA: false
+        }, {
+          strval: "pData",
+          isNA: false
+        }, {
+          strval: "labelDescription",
+          isNA: false
+        }, {
+          strval: "colNames",
+          isNA: false
+        }, {
+          strval: "rowNames",
+          isNA: false
+        }, {
+          strval: "symbol",
+          isNA: false
+        }]
+      }
+    };
+    var ProtoBuf = dcodeIO.ProtoBuf;
+    ProtoBuf.protoFromFile("./message.proto", function (error, success) {
+      if (error) {
+        alert(error);
+        console.log("ExpressionSetCreation :: ", "ProtoBuilder failed", error);
+        return;
+      }
+      //console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder error", error);
+      //console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder success", success);
+      var builder = success,
+        rexp = builder.build("rexp"),
+        REXP = rexp.REXP;
 
-		var array = morpheus.DatasetUtil.getContentArray(dataset);
-		var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
+      var proto = new REXP(messageJSON);
+      var req = ocpu.call("createES", proto, function (session) {
+        //console.log("morpheus.DatasetUtil.toESSessionPromise ::", "from successful request", session);
+        resolve(session);
+      }, true);
 
-		console.log(array, meta);
-		var messageJSON = {
-			rclass : "LIST",
-			rexpValue : [{
-				rclass : "REAL",
-				realValue : array,
-				attrName : "dim",
-				attrValue : {
-					rclass : "INTEGER",
-					intValue : [dataset.getColumnCount(), dataset.getRowCount()]
-				}
-			}, {
-				rclass : "STRING",
-				stringValue : meta.pdata,
-				attrName : "dim",
-				attrValue : {
-					rclass : "INTEGER",
-					intValue : [dataset.getColumnCount(), meta.pdata.length/dataset.getColumnCount()]
-				}
-			}, {
-				rclass : "STRING",
-				stringValue : meta.labels
-			}, {
-				rclass : "STRING",
-				stringValue : meta.participants
-			}, {
-				rclass : "STRING",
-				stringValue : meta.rownames
-			}, {
-			    rclass : "STRING",
-                stringValue : meta.symbol
-            }],
-			attrName : "names",
-			attrValue : {
-				rclass : "STRING",
-				stringValue : [{
-					strval : "data",
-					isNA : false
-				}, {
-					strval : "pData",
-					isNA : false
-				}, {
-					strval : "labelDescription",
-					isNA : false
-				}, {
-					strval : "colNames",
-					isNA : false
-				}, {
-					strval : "rowNames",
-					isNA : false
-				}, {
-				    strval : "symbol",
-                    isNA : false
-                }]
-			}
-		};
-		var ProtoBuf = dcodeIO.ProtoBuf;
-		ProtoBuf.protoFromFile("./message.proto", function (error, success) {
-			if (error) {
-				alert(error);
-				console.log("ExpressionSetCreation :: ", "ProtoBuilder failed", error);
-				return;
-			}
-			//console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder error", error);
-			//console.log("morpheus.DatasetUtil.toESSessionPromise ::", "protobuilder success", success);
-			var builder = success,
-				rexp = builder.build("rexp"),
-				REXP = rexp.REXP;
-
-			var proto = new REXP(messageJSON);
-			var req = ocpu.call("createES", proto, function (session) {
-				//console.log("morpheus.DatasetUtil.toESSessionPromise ::", "from successful request", session);
-				resolve(session);
-			}, true);
-
-			req.fail(function () {
-				reject(req.responseText);
-			});
-		});
-	}));
-	/*var blob = new Blob([new Uint8Array((new REXP(messageJSON)).toArrayBuffer())], {type: "application/octet-stream"});
-	 saveAs(blob, "test1.bin");*/
+      req.fail(function () {
+        reject(req.responseText);
+      });
+    });
+  }));
+  /*var blob = new Blob([new Uint8Array((new REXP(messageJSON)).toArrayBuffer())], {type: "application/octet-stream"});
+   saveAs(blob, "test1.bin");*/
 };

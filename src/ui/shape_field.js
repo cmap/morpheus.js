@@ -6,9 +6,9 @@ morpheus.ShapeField = function (shapes) {
   var x = 4;
   var y = 4;
   html
-  .push('<div style="margin-bottom:1em;" class="btn-group">');
+    .push('<div style="margin-bottom:1em;" class="btn-group">');
   html
-  .push('<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span data-name="selection"></span> <span class="fa fa-caret-down"></span></button>');
+    .push('<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span data-name="selection"></span> <span class="fa fa-caret-down"></span></button>');
   html.push('<ul class="dropdown-menu" role="menu">');
   for (var i = 0; i < shapes.length; i++) {
     var context = new C2S(size2 * 2, size2 * 2);

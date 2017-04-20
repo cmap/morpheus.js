@@ -8,7 +8,7 @@ morpheus.HelpMenu = function () {
   html.push(' <span class="fa fa-caret-down"></span>');
   html.push('</button>');
   html
-  .push('<ul class="dropdown-menu dropdown-menu-right" role="menu">');
+    .push('<ul class="dropdown-menu dropdown-menu-right" role="menu">');
   html.push('<li><a data-name="contact" href="#">Contact</a></li>');
 
   html.push('<li><a data-name="linking" href="#">Linking</a></li>');

@@ -275,7 +275,7 @@ morpheus.MAD = function (list, median) {
     }
   }
   var r = morpheus.Percentile(new morpheus.Vector('', temp.length)
-  .setArray(temp), 50);
+    .setArray(temp), 50);
   return 1.4826 * r;
 };
 morpheus.MAD.toString = function () {

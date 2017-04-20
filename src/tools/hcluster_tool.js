@@ -35,7 +35,7 @@ morpheus.HClusterTool.createLinkageMethod = function (linkageString) {
 morpheus.HClusterTool.execute = function (dataset, input) {
   // note: in worker here
   var linkageMethod = morpheus.HClusterTool
-  .createLinkageMethod(input.linkage_method);
+    .createLinkageMethod(input.linkage_method);
   var f = morpheus.HClusterTool.Functions.fromString(input.metric);
   if (f === morpheus.HClusterTool.PRECOMPUTED_DIST) {
     f = 0;
@@ -64,9 +64,9 @@ morpheus.HClusterTool.execute = function (dataset, input) {
   if (columns) {
     columnsHcl = doCluster(
       morpheus.DatasetUtil
-      .transposedView(input.selectedRowsToUseForClusteringColumns ? new morpheus.SlicedDatasetView(
-        dataset, input.selectedRowsToUseForClusteringColumns, null)
-        : dataset), input.group_columns_by);
+        .transposedView(input.selectedRowsToUseForClusteringColumns ? new morpheus.SlicedDatasetView(
+          dataset, input.selectedRowsToUseForClusteringColumns, null)
+          : dataset), input.group_columns_by);
 
   }
   return {
@@ -80,15 +80,15 @@ morpheus.HClusterTool.prototype = {
   },
   init: function (project, form) {
     form.setOptions('group_rows_by', morpheus.MetadataUtil
-    .getMetadataNames(project.getFullDataset().getRowMetadata()));
+      .getMetadataNames(project.getFullDataset().getRowMetadata()));
     form
-    .setOptions('group_columns_by', morpheus.MetadataUtil
-    .getMetadataNames(project.getFullDataset()
-    .getColumnMetadata()));
+      .setOptions('group_columns_by', morpheus.MetadataUtil
+        .getMetadataNames(project.getFullDataset()
+          .getColumnMetadata()));
     form.setVisible('group_rows_by', false);
     form
-    .setVisible('cluster_rows_in_space_of_selected_columns_only',
-      false);
+      .setVisible('cluster_rows_in_space_of_selected_columns_only',
+        false);
     form.$form.find('[name=cluster]').on(
       'change',
       function (e) {
@@ -151,13 +151,13 @@ morpheus.HClusterTool.prototype = {
     var project = options.project;
     var heatmap = options.heatMap;
     var selectedRowsToUseForClusteringColumns = options.input.cluster_columns_in_space_of_selected_rows_only ? project
-    .getRowSelectionModel().getViewIndices().values()
+      .getRowSelectionModel().getViewIndices().values()
       : null;
     if (selectedRowsToUseForClusteringColumns != null && selectedRowsToUseForClusteringColumns.length === 0) {
       selectedRowsToUseForClusteringColumns = null;
     }
     var selectedColumnsToUseForClusteringRows = options.input.cluster_rows_in_space_of_selected_columns_only ? project
-    .getColumnSelectionModel().getViewIndices().values()
+      .getColumnSelectionModel().getViewIndices().values()
       : null;
     if (selectedColumnsToUseForClusteringRows != null && selectedColumnsToUseForClusteringRows.length === 0) {
       selectedColumnsToUseForClusteringRows = null;

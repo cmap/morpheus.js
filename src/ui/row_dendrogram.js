@@ -31,9 +31,9 @@ morpheus.RowDendrogram.prototype = {
     return {
       width: 100,
       height: Math.ceil(this.positions.getPosition(this.positions
-          .getLength() - 1)
+            .getLength() - 1)
         + this.positions
-        .getItemSize(this.positions.getLength() - 1))
+          .getItemSize(this.positions.getLength() - 1))
     };
   },
   paintMouseOver: function (clip, context) {
@@ -41,7 +41,7 @@ morpheus.RowDendrogram.prototype = {
       morpheus.CanvasUtil.resetTransform(context);
       context.translate(0, -clip.y);
       this.drawRowBorder(context, this.positions, this.project
-      .getHoverRowIndex(), this.getUnscaledWidth());
+        .getHoverRowIndex(), this.getUnscaledWidth());
     }
   },
   drawRowBorder: function (context, positions, index, gridSize) {

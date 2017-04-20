@@ -46,36 +46,36 @@ morpheus.ScentedSearch = function (model, positions, isVertical, scrollbar,
       e.stopImmediatePropagation();
     }
     morpheus.Popup
-    .showPopup(
-      [
+      .showPopup(
+        [
 
+          {
+            name: 'Selection To Top',
+            checked: heatMap.getToolbar().isSelectionOnTop(!isVertical),
+            disabled: isVertical ? heatMap.getProject().getRowSelectionModel()
+              .count() === 0 : heatMap.getProject().getColumnSelectionModel()
+              .count() === 0
+          },
+          {
+            name: 'New Heat Map (' + morpheus.Util.COMMAND_KEY + 'X)'
+          }],
         {
-          name: 'Selection To Top',
-          checked: heatMap.getToolbar().isSelectionOnTop(!isVertical),
-          disabled: isVertical ? heatMap.getProject().getRowSelectionModel()
-            .count() === 0 : heatMap.getProject().getColumnSelectionModel()
-            .count() === 0
+          x: e.pageX,
+          y: e.pageY
         },
-        {
-          name: 'New Heat Map (' + morpheus.Util.COMMAND_KEY + 'X)'
-        }],
-      {
-        x: e.pageX,
-        y: e.pageY
-      },
-      e.target,
-      function (event, item) {
-        if (item === 'Selection To Top') {
-          heatMap.getToolbar().setSelectionOnTop({
-            isColumns: !isVertical,
-            isOnTop: !heatMap.getToolbar().isSelectionOnTop(!isVertical),
-            updateButtonStatus: true
-          });
-        } else {
-          morpheus.HeatMap.showTool(new morpheus.NewHeatMapTool(),
-            heatMap);
-        }
-      });
+        e.target,
+        function (event, item) {
+          if (item === 'Selection To Top') {
+            heatMap.getToolbar().setSelectionOnTop({
+              isColumns: !isVertical,
+              isOnTop: !heatMap.getToolbar().isSelectionOnTop(!isVertical),
+              updateButtonStatus: true
+            });
+          } else {
+            morpheus.HeatMap.showTool(new morpheus.NewHeatMapTool(),
+              heatMap);
+          }
+        });
     return false;
   };
   $(scrollbar.canvas).on('mousemove.morpheus', mouseMove).on('mouseout.morpheus', mouseExit).on('contextmenu.morpheus', showPopup);
@@ -119,7 +119,7 @@ morpheus.ScentedSearch.prototype = {
     var tolerance = morpheus.ScentedSearch.LINE_HEIGHT;
     if (this.mouseMovedIndex > 0) {
       var midVal = this.positions
-        .getPosition(indices[this.mouseMovedIndex])
+          .getPosition(indices[this.mouseMovedIndex])
         * scale;
       if (Math.abs(midVal - pix) <= tolerance) {
         return this.mouseMovedIndex;
@@ -157,10 +157,10 @@ morpheus.ScentedSearch.prototype = {
     if (index >= 0) {
       if (this.isVertical) {
         this.heatMap.scrollTop(this.positions
-        .getPosition(this.searchIndices[index]));
+          .getPosition(this.searchIndices[index]));
       } else {
         this.heatMap.scrollLeft(this.positions
-        .getPosition(this.searchIndices[index]));
+          .getPosition(this.searchIndices[index]));
       }
       return true;
     }
@@ -179,7 +179,7 @@ morpheus.ScentedSearch.prototype = {
       - morpheus.ScentedSearch.LINE_HEIGHT;
     this.scale = availableLength
       / (this.positions.getPosition(this.positions.getLength() - 1) + this.positions
-      .getItemSize(this.positions.getLength() - 1));
+        .getItemSize(this.positions.getLength() - 1));
     context.fillStyle = morpheus.ScentedSearch.TICK_COLOR;
     context.lineWidth = 1;
     this.drawIndices(context, this.searchIndices);
@@ -198,19 +198,19 @@ morpheus.ScentedSearch.prototype = {
       }
       if (track.settings.highlightMatchingValues) {
         var hoverIndex = isColumns ? heatmap.getProject()
-        .getHoverColumnIndex() : heatmap.getProject()
-        .getHoverRowIndex();
+          .getHoverColumnIndex() : heatmap.getProject()
+          .getHoverRowIndex();
         if (hoverIndex === -1) {
           return;
         }
         var vector = track.getVector();
         var value = vector.getValue(hoverIndex);
         var valueToModelIndices = track.getFullVector().getProperties()
-        .get(morpheus.VectorKeys.VALUE_TO_INDICES);
+          .get(morpheus.VectorKeys.VALUE_TO_INDICES);
         if (!valueToModelIndices) {
           var fullVector = track.getFullVector();
           valueToModelIndices = morpheus.VectorUtil
-          .createValueToIndicesMap(fullVector);
+            .createValueToIndicesMap(fullVector);
           fullVector.getProperties().set(
             morpheus.VectorKeys.VALUE_TO_INDICES,
             valueToModelIndices);
@@ -223,16 +223,16 @@ morpheus.ScentedSearch.prototype = {
         }
         var scale = this.scale;
         var lineLength = !this.isVertical ? this.scrollbar
-        .getUnscaledHeight() : this.scrollbar
-        .getUnscaledWidth();
+          .getUnscaledHeight() : this.scrollbar
+          .getUnscaledWidth();
         var isVertical = this.isVertical;
         var positions = this.positions;
         var project = heatmap.getProject();
         for (var i = 0, length = modelIndices.length; i < length; i++) {
           var modelIndex = modelIndices[i];
           var index = isVertical ? project
-          .convertModelRowIndexToView(modelIndex) : project
-          .convertModelColumnIndexToView(modelIndex);
+            .convertModelRowIndexToView(modelIndex) : project
+            .convertModelColumnIndexToView(modelIndex);
           if (index === -1) {
             continue;
           }

@@ -116,7 +116,7 @@ morpheus.DendrogramUtil.parseNewick = function (text) {
 
   visit(rootNode);
   var maxHeight = morpheus.DendrogramUtil
-  .convertEdgeLengthsToHeights(rootNode).maxHeight;
+    .convertEdgeLengthsToHeights(rootNode).maxHeight;
   morpheus.DendrogramUtil.setNodeDepths(rootNode);
   morpheus.DendrogramUtil.setIndices(rootNode);
   return {
@@ -280,7 +280,7 @@ morpheus.DendrogramUtil.sortDendrogram = function (root, vectorToSortBy,
   var leafNodes = morpheus.DendrogramUtil.getLeafNodes(root);
   _.each(leafNodes, function (node) {
     nodeIdToModelIndex[node.id] = project
-    .convertViewColumnIndexToModel(node.index);
+      .convertViewColumnIndexToModel(node.index);
   });
   morpheus.DendrogramUtil.dfs(root, function (node) {
     if (node.children) {
@@ -384,72 +384,72 @@ morpheus.DendrogramUtil.search = function (options) {
     });
     var npredicates = predicates.length;
     morpheus.DendrogramUtil
-    .dfs(
-      rootNode,
-      function (node) {
-        var matches = false;
-        if (node.info) {
-          searchLabel:
-            if (!matchAllPredicates) { // at least one predicate matches
-              for (var p = 0; p < npredicates; p++) {
-                var predicate = predicates[p];
-                var filterColumnName = predicate.getField();
-                if (filterColumnName != null) {
-                  var vals = node.info[filterColumnName];
-                  for (var i = 0, nvals = vals.length; i < nvals; i++) {
-                    if (predicate.accept(vals[i])) {
-                      matches = true;
-                      break searchLabel;
-                    }
-                  }
-                } else {
-                  for (var name in node.info) {
-                    var vals = node.info[name];
+      .dfs(
+        rootNode,
+        function (node) {
+          var matches = false;
+          if (node.info) {
+            searchLabel:
+              if (!matchAllPredicates) { // at least one predicate matches
+                for (var p = 0; p < npredicates; p++) {
+                  var predicate = predicates[p];
+                  var filterColumnName = predicate.getField();
+                  if (filterColumnName != null) {
+                    var vals = node.info[filterColumnName];
                     for (var i = 0, nvals = vals.length; i < nvals; i++) {
                       if (predicate.accept(vals[i])) {
                         matches = true;
                         break searchLabel;
                       }
                     }
-                  }
-
-                }
-              }
-            } else { // all predicates must match
-              matches = true;
-              for (var p = 0; p < npredicates; p++) {
-                var predicate = predicates[p];
-                var filterColumnName = predicate.getField();
-                if (filterColumnName != null) {
-                  var vals = node.info[filterColumnName];
-                  for (var i = 0, nvals = vals.length; i < nvals; i++) {
-                    if (!predicate.accept(vals[i])) {
-                      matches = false;
-                      break searchLabel;
+                  } else {
+                    for (var name in node.info) {
+                      var vals = node.info[name];
+                      for (var i = 0, nvals = vals.length; i < nvals; i++) {
+                        if (predicate.accept(vals[i])) {
+                          matches = true;
+                          break searchLabel;
+                        }
+                      }
                     }
+
                   }
-                } else {
-                  for (var name in node.info) {
-                    var vals = node.info[name];
+                }
+              } else { // all predicates must match
+                matches = true;
+                for (var p = 0; p < npredicates; p++) {
+                  var predicate = predicates[p];
+                  var filterColumnName = predicate.getField();
+                  if (filterColumnName != null) {
+                    var vals = node.info[filterColumnName];
                     for (var i = 0, nvals = vals.length; i < nvals; i++) {
                       if (!predicate.accept(vals[i])) {
                         matches = false;
                         break searchLabel;
                       }
                     }
-                  }
+                  } else {
+                    for (var name in node.info) {
+                      var vals = node.info[name];
+                      for (var i = 0, nvals = vals.length; i < nvals; i++) {
+                        if (!predicate.accept(vals[i])) {
+                          matches = false;
+                          break searchLabel;
+                        }
+                      }
+                    }
 
+                  }
                 }
               }
-            }
+          }
+          node.search = matches;
+          if (matches) {
+            nmatches++;
+          }
+          return true;
         }
-        node.search = matches;
-        if (matches) {
-          nmatches++;
-        }
-        return true;
-      }
-    );
+      );
 
   }
   return nmatches;
@@ -494,12 +494,12 @@ morpheus.DendrogramUtil.squishNonSearchedNodes = function (heatMap,
   }
   if (isColumns) {
     heatMap.getHeatMapElementComponent().getColumnPositions()
-    .setSquishedIndices(squishedIndices);
+      .setSquishedIndices(squishedIndices);
     heatMap.getProject().setGroupColumns(
       [new morpheus.SpecifiedGroupByKey(clusterIds)], false);
   } else {
     heatMap.getHeatMapElementComponent().getRowPositions()
-    .setSquishedIndices(squishedIndices);
+      .setSquishedIndices(squishedIndices);
     heatMap.getProject().setGroupRows(
       [new morpheus.SpecifiedGroupByKey(clusterIds)], false);
   }

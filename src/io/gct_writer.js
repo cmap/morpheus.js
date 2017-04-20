@@ -36,7 +36,7 @@ morpheus.GctWriter.prototype = {
     }
     var rowMetadata = morpheus.GctWriter.idFirst(dataset.getRowMetadata());
     var columnMetadata = morpheus.GctWriter.idFirst(dataset
-    .getColumnMetadata());
+      .getColumnMetadata());
     this.writeHeader(rowMetadata, columnMetadata, pw);
     this.writeData(dataset, rowMetadata, pw);
     return pw.join('');
@@ -88,7 +88,7 @@ morpheus.GctWriter.prototype = {
     }
     pw.push('\n');
     for (var columnMetadataIndex = 1, metadataSize = columnMetadata
-    .getMetadataCount(); columnMetadataIndex < metadataSize; columnMetadataIndex++) {
+      .getMetadataCount(); columnMetadataIndex < metadataSize; columnMetadataIndex++) {
       pw.push(columnMetadata.get(columnMetadataIndex).getName());
       for (var i = 1; i < rowMetadataCount; i++) {
         pw.push('\t');

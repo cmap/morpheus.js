@@ -93,7 +93,7 @@ morpheus.HistogramLegend.prototype = {
       context.font = '11px ' + morpheus.CanvasUtil.FONT_NAME;
       context.fillStyle = 'black';
       context.lineWidth = 1;
-    //  context.textBaseline = 'top';
+      //  context.textBaseline = 'top';
       context.fillText(this.name, 0.5, 12);
       context.translate(0, 14);
     }

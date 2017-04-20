@@ -177,7 +177,7 @@ morpheus.GctReader.prototype = {
       complete: function () {
         var dataset = new morpheus.Dataset({
           name: morpheus.Util.getBaseFileName(morpheus.Util
-          .getFileName(fileOrUrl)),
+            .getFileName(fileOrUrl)),
           rows: matrix.length,
           columns: ncols,
           array: matrix,
@@ -459,7 +459,7 @@ morpheus.GctReader.prototype = {
   _readNoChunking: function (fileOrUrl, callback) {
     var _this = this;
     var name = morpheus.Util.getBaseFileName(morpheus.Util
-    .getFileName(fileOrUrl));
+      .getFileName(fileOrUrl));
     morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err, arrayBuffer) {
       if (err) {
         callback(err);

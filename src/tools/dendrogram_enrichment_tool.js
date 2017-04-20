@@ -9,8 +9,8 @@ morpheus.DendrogramEnrichmentTool.prototype = {
   gui: function (project) {
     var dataset = project.getSortedFilteredDataset();
     var fields = morpheus.MetadataUtil
-    .getMetadataNames(this.isColumns ? dataset.getColumnMetadata()
-      : dataset.getRowMetadata());
+      .getMetadataNames(this.isColumns ? dataset.getColumnMetadata()
+        : dataset.getRowMetadata());
     return [{
       name: 'field',
       options: fields,
@@ -40,11 +40,11 @@ morpheus.DendrogramEnrichmentTool.prototype = {
     var dendrogram = this.isColumns ? heatMap.columnDendrogram
       : heatMap.rowDendrogram;
     var vector = this.isColumns ? dataset.getColumnMetadata().getByName(
-        options.input.field) : dataset.getRowMetadata().getByName(
-        options.input.field);
+      options.input.field) : dataset.getRowMetadata().getByName(
+      options.input.field);
 
     var valueToIndices = morpheus.VectorUtil
-    .createValueToIndicesMap(vector);
+      .createValueToIndicesMap(vector);
     var valueToGlobalCount = new morpheus.Map();
     var values = [];
     valueToIndices.forEach(function (indices, value) {
@@ -68,7 +68,7 @@ morpheus.DendrogramEnrichmentTool.prototype = {
           for (var i = min; i <= max; i++) {
             var value = vector.getValue(i);
             valueToCount
-            .set(value, valueToCount.get(value) + 1);
+              .set(value, valueToCount.get(value) + 1);
           }
           for (var i = 0; i < nvalues; i++) {
             var K = valueToGlobalCount.get(values[i]);

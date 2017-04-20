@@ -36,20 +36,20 @@ morpheus.AdjustDataTool.prototype = {
       || options.input['z-score'] || options.input['robust_z-score'] || options.input.quantile_normalize) {
       // clone the values 1st
       var sortedFilteredDataset = morpheus.DatasetUtil.copy(project
-      .getSortedFilteredDataset());
+        .getSortedFilteredDataset());
       var rowIndices = project.getRowSelectionModel()
-      .getViewIndices().values().sort(
-        function (a, b) {
-          return (a === b ? 0 : (a < b ? -1 : 1));
-        });
+        .getViewIndices().values().sort(
+          function (a, b) {
+            return (a === b ? 0 : (a < b ? -1 : 1));
+          });
       if (rowIndices.length === 0) {
         rowIndices = null;
       }
       var columnIndices = project.getColumnSelectionModel()
-      .getViewIndices().values().sort(
-        function (a, b) {
-          return (a === b ? 0 : (a < b ? -1 : 1));
-        });
+        .getViewIndices().values().sort(
+          function (a, b) {
+            return (a === b ? 0 : (a < b ? -1 : 1));
+          });
       if (columnIndices.length === 0) {
         columnIndices = null;
       }
@@ -106,9 +106,9 @@ morpheus.AdjustDataTool.prototype = {
         changed = true;
       }
 
-     /* if (changed) {
-          morpheus.DatasetUtil.toESSessionPromise(dataset);
-      }*/
+      /* if (changed) {
+       morpheus.DatasetUtil.toESSessionPromise(dataset);
+       }*/
       return new morpheus.HeatMap({
         name: heatMap.getName(),
         dataset: dataset,

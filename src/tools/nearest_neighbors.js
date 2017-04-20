@@ -17,47 +17,47 @@ morpheus.NearestNeighbors.prototype = {
   },
   init: function (project, form) {
     var $selectedOnly = form.$form.find('[name=use_selected_only]')
-    .parent();
+      .parent();
     form.$form
-    .find('[name=compute_nearest_neighbors_of]')
-    .on(
-      'change',
-      function (e) {
-        var val = $(this).val();
-        if (val === 'selected rows' || val === 'column annotation') {
-          $($selectedOnly.contents()[1])
-          .replaceWith(
-            document
-            .createTextNode(' Use selected columns only'));
-        } else {
-          $($selectedOnly.contents()[1])
-          .replaceWith(
-            document
-            .createTextNode(' Use selected rows only'));
-        }
-        form.setVisible('annotation', false);
-        if (val === 'column annotation' || val === 'row annotation') {
-          var metadata = val === 'column annotation' ? project.getFullDataset()
-            .getColumnMetadata() : project.getFullDataset()
-            .getRowMetadata();
-          var names = [];
-          // get numeric columns only
-          for (var i = 0; i < metadata.getMetadataCount(); i++) {
-            var v = metadata.get(i);
-            if (morpheus.VectorUtil.getDataType(v) === 'number') {
-              names.push(v.getName());
-            }
+      .find('[name=compute_nearest_neighbors_of]')
+      .on(
+        'change',
+        function (e) {
+          var val = $(this).val();
+          if (val === 'selected rows' || val === 'column annotation') {
+            $($selectedOnly.contents()[1])
+              .replaceWith(
+                document
+                  .createTextNode(' Use selected columns only'));
+          } else {
+            $($selectedOnly.contents()[1])
+              .replaceWith(
+                document
+                  .createTextNode(' Use selected rows only'));
           }
-          names.sort(function (a, b) {
-            a = a.toLowerCase();
-            b = b.toLowerCase();
-            return (a < b ? -1 : (a === b ? 0 : 1));
-          });
-          form
-          .setOptions('annotation', names);
-          form.setVisible('annotation', true);
-        }
-      });
+          form.setVisible('annotation', false);
+          if (val === 'column annotation' || val === 'row annotation') {
+            var metadata = val === 'column annotation' ? project.getFullDataset()
+              .getColumnMetadata() : project.getFullDataset()
+              .getRowMetadata();
+            var names = [];
+            // get numeric columns only
+            for (var i = 0; i < metadata.getMetadataCount(); i++) {
+              var v = metadata.get(i);
+              if (morpheus.VectorUtil.getDataType(v) === 'number') {
+                names.push(v.getName());
+              }
+            }
+            names.sort(function (a, b) {
+              a = a.toLowerCase();
+              b = b.toLowerCase();
+              return (a < b ? -1 : (a === b ? 0 : 1));
+            });
+            form
+              .setOptions('annotation', names);
+            form.setVisible('annotation', true);
+          }
+        });
     $($selectedOnly.contents()[1]).replaceWith(
       document.createTextNode(' Use selected columns only'));
     form.setVisible('annotation', false);
@@ -87,7 +87,7 @@ morpheus.NearestNeighbors.prototype = {
     var isAnnotation = options.input.compute_nearest_neighbors_of == 'column annotation' || options.input.compute_nearest_neighbors_of == 'row annotation';
     var heatMap = options.heatMap;
     var f = morpheus.NearestNeighbors.Functions
-    .fromString(options.input.metric);
+      .fromString(options.input.metric);
     var dataset = project.getSortedFilteredDataset();
 
     if (isColumns) {
@@ -108,7 +108,7 @@ morpheus.NearestNeighbors.prototype = {
         spaceIndices);
     }
     var d1 = morpheus.DatasetUtil
-    .slicedView(dataset, selectedIndices, null);
+      .slicedView(dataset, selectedIndices, null);
     var list1;
     if (isAnnotation) {
       list1 = dataset.getColumnMetadata().getByName(options.input.annotation);

@@ -8,12 +8,12 @@ morpheus.TransposeTool.prototype = {
     var project = options.project;
     var heatMap = options.heatMap;
     var dataset = new morpheus.TransposedDatasetView(project
-    .getSortedFilteredDataset());
+      .getSortedFilteredDataset());
     // make a shallow copy of the dataset, metadata is immutable via the UI
     var rowMetadataModel = morpheus.MetadataUtil.shallowCopy(dataset
-    .getRowMetadata());
+      .getRowMetadata());
     var columnMetadataModel = morpheus.MetadataUtil.shallowCopy(dataset
-    .getColumnMetadata());
+      .getColumnMetadata());
     dataset.getRowMetadata = function () {
       return rowMetadataModel;
     };

@@ -14,7 +14,7 @@ morpheus.PermutationPValues = function (dataset, aIndices, bIndices,
     scores[i] = f(list1.setIndex(i), list2.setIndex(i));
   }
   dataset = new morpheus.SlicedDatasetView(dataset, null, aIndices
-  .concat(bIndices));
+    .concat(bIndices));
   var rowSpecificPValues = new Float32Array(numRows);
   var permuter = new morpheus.UnbalancedPermuter(aIndices.length,
     bIndices.length);

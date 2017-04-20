@@ -44,7 +44,7 @@ morpheus.VectorShapeModel.prototype = {
 
     // try to reuse existing map
     var existingMetadataValueToShapeMap = this.vectorNameToShapeMap
-    .values();
+      .values();
     for (var i = 0, length = existingMetadataValueToShapeMap.length; i < length; i++) {
       var shape = existingMetadataValueToShapeMap[i].get(value);
       if (shape !== undefined) {
@@ -58,7 +58,7 @@ morpheus.VectorShapeModel.prototype = {
   },
   getMappedValue: function (vector, value) {
     var metadataValueToShapeMap = this.vectorNameToShapeMap.get(vector
-    .getName());
+      .getName());
     if (metadataValueToShapeMap === undefined) {
       metadataValueToShapeMap = new morpheus.Map();
       this.vectorNameToShapeMap.set(vector.getName(),
@@ -86,7 +86,7 @@ morpheus.VectorShapeModel.prototype = {
   },
   setMappedValue: function (vector, value, shape) {
     var metadataValueToShapeMap = this.vectorNameToShapeMap.get(vector
-    .getName());
+      .getName());
     if (metadataValueToShapeMap === undefined) {
       metadataValueToShapeMap = new morpheus.Map();
       this.vectorNameToShapeMap.set(vector.getName(),

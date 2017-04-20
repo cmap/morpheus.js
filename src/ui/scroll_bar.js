@@ -33,60 +33,60 @@ morpheus.ScrollBar = function (isVertical) {
   $(this.canvas).on('mousemove', mouseMove).on('mouseout', mouseExit).on(
     'mouseenter', mouseMove);
   this.hammer = morpheus.Util
-  .hammer(this.canvas, [this.isVertical ? 'panv' : 'panh', 'tap'])
-  .on(
-    'panstart',
-    this.panstart = function (event) {
-      var position = morpheus.CanvasUtil.getMousePos(
-        event.target, event, true);
-      if (position[that.field] >= that.thumbPos
-        && position[that.field] <= (that.thumbPos + that.thumbExtent)) {
-        that.draggingThumb = true;
-        that.dragStartThumbPos = that.thumbPos;
-      } else {
-        that.draggingThumb = false;
-      }
-    })
-  .on('panend', this.panend = function (event) {
-    that.draggingThumb = false;
-  })
-  .on(
-    'panmove',
-    this.panmove = function (event) {
-      if (that.draggingThumb) {
+    .hammer(this.canvas, [this.isVertical ? 'panv' : 'panh', 'tap'])
+    .on(
+      'panstart',
+      this.panstart = function (event) {
         var position = morpheus.CanvasUtil.getMousePos(
-          event.target, event);
-        var thumbPosPix = that.dragStartThumbPos
-          + (that.isVertical ? event.deltaY
-            : event.deltaX);
-        var f = thumbPosPix
-          / (that.visibleExtent - that.thumbExtent);
-        var value = f * that.maxValue;
-        // convert pix to value
-        that.setValue(value, true);
-        event.preventDefault();
-        event.srcEvent.stopPropagation();
-        event.srcEvent.stopImmediatePropagation();
-      }
+          event.target, event, true);
+        if (position[that.field] >= that.thumbPos
+          && position[that.field] <= (that.thumbPos + that.thumbExtent)) {
+          that.draggingThumb = true;
+          that.dragStartThumbPos = that.thumbPos;
+        } else {
+          that.draggingThumb = false;
+        }
+      })
+    .on('panend', this.panend = function (event) {
+      that.draggingThumb = false;
     })
-  .on(
-    'tap doubletap',
-    this.tap = function (event) {
-      // ensure not clicked on the thumb
-      if (!that.draggingThumb) {
-        var position = morpheus.CanvasUtil.getMousePos(
-          event.target, event);
-        if (!that.decorator.tap(position)) {
-          // scroll up or down by thumbExtent
-          var thumbExtentToValue = (that.thumbExtent / that.totalExtent)
-            * that.totalExtent;
-          that.scrollToTop = position[that.field] < that.thumbPos;
-          that.setValue(that.scrollToTop ? that.value
+    .on(
+      'panmove',
+      this.panmove = function (event) {
+        if (that.draggingThumb) {
+          var position = morpheus.CanvasUtil.getMousePos(
+            event.target, event);
+          var thumbPosPix = that.dragStartThumbPos
+            + (that.isVertical ? event.deltaY
+              : event.deltaX);
+          var f = thumbPosPix
+            / (that.visibleExtent - that.thumbExtent);
+          var value = f * that.maxValue;
+          // convert pix to value
+          that.setValue(value, true);
+          event.preventDefault();
+          event.srcEvent.stopPropagation();
+          event.srcEvent.stopImmediatePropagation();
+        }
+      })
+    .on(
+      'tap doubletap',
+      this.tap = function (event) {
+        // ensure not clicked on the thumb
+        if (!that.draggingThumb) {
+          var position = morpheus.CanvasUtil.getMousePos(
+            event.target, event);
+          if (!that.decorator.tap(position)) {
+            // scroll up or down by thumbExtent
+            var thumbExtentToValue = (that.thumbExtent / that.totalExtent)
+              * that.totalExtent;
+            that.scrollToTop = position[that.field] < that.thumbPos;
+            that.setValue(that.scrollToTop ? that.value
             - thumbExtentToValue : that.value
             + thumbExtentToValue, true);
+          }
         }
-      }
-    });
+      });
 };
 morpheus.ScrollBar.prototype = {
   thumbPos: 0, // the top of the thumb, from 0 to visibleExtent-thumbExtent

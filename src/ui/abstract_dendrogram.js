@@ -82,195 +82,195 @@ morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
   if (type !== morpheus.AbstractDendrogram.Type.RADIAL) {
 
     $(this.canvas)
-    .on(
-      'contextmenu',
-      function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        var position = morpheus.CanvasUtil
-        .getMousePosWithScroll(e.target,
-          e, _this.lastClip.x,
-          _this.lastClip.y);
-        var selectedNode = _this.getNode(position);
-        morpheus.Popup
-        .showPopup(
-          [{
-            name: 'Flip',
-            disabled: selectedNode == null
-          }, {
-            name: 'Branch Color',
-            disabled: selectedNode == null
-          }, {
-            separator: true
-          },
-            {
-              name: 'Annotate...'
-            }, {
-            name: 'Save'
-          }, {
-            separator: true
-          }, {
-            name: 'Enrichment...'
-          }, {
-            separator: true
-          }, {
-            name: 'Squish Singleton Clusters',
-            checked: _this.squishEnabled
-          }, {
-            separator: true
-          }, {
-            name: 'Delete'
-          }],
-          {
-            x: e.pageX,
-            y: e.pageY
-          },
-          e.target,
-          function (menuItem, item) {
-            if (item === 'Save') {
-              var formBuilder = new morpheus.FormBuilder();
-              formBuilder.append({
-                name: 'file_name',
-                type: 'text',
-                required: true,
-              });
-              morpheus.FormBuilder.showOkCancel({
-                title: 'Save Dendrogram',
-                content: formBuilder.$form,
-                okCallback: function () {
-                  var fileName = formBuilder.getValue('file_name');
-                  if (fileName === '') {
-                    fileName = 'dendrogram.txt';
-                  }
-                  var out = [];
-                  morpheus.DendrogramUtil.writeNewick(tree.rootNode, out);
-                  var blob = new Blob([out.join('')], {type: 'text/plain;charset=charset=utf-8'});
-                  saveAs(blob, fileName, true);
-                }
-              });
-            } else if (item === 'Flip') {
-              if (selectedNode != null) {
-                var isColumns = morpheus.AbstractDendrogram.Type.COLUMN === _this.type;
-                var min = selectedNode.minIndex;
-                var max = selectedNode.maxIndex;
-
-                // morpheus.DendrogramUtil.dfs(selectedNode, function (n) {
-                //   if (n.children) {
-                //     n.children.reverse();
-                //   }
-                //   return true;
-                // });
-
-                var leafNodes = tree.leafNodes;
-                for (var i = min, index = max; i <= max; i++, index--) {
-                  var n = leafNodes[i];
-                  n.index = index;
-                  n.maxIndex = index;
-                  n.minIndex = index;
-                }
-
-                leafNodes.sort(function (a, b) {
-                  return (a.index < b.index ? -1 : 1);
-                });
-                var setIndex = function (n) {
-                  if (n.children != null && n.children.length > 0) {
-                    for (var i = 0; i < n.children.length; i++) {
-                      setIndex(n.children[i]);
-                    }
-                    var sum = 0;
-                    for (var i = 0; i < n.children.length; i++) {
-                      sum += n.children[i].index;
-                    }
-                    n.index = sum / n.children.length;
-                    var maxIndex = -Number.MAX_VALUE;
-                    var minIndex = Number.MAX_VALUE;
-                    for (var i = 0; i < n.children.length; i++) {
-                      maxIndex = Math.max(maxIndex, n.children[i].maxIndex);
-                      minIndex = Math.min(minIndex, n.children[i].minIndex);
-                    }
-                    n.minIndex = minIndex;
-                    n.maxIndex = maxIndex;
-                  }
-                };
-
-                setIndex(selectedNode);
-
-                var currentOrder = [];
-                var count = isColumns ? heatMap.getProject().getSortedFilteredDataset().getColumnCount() : heatMap.getProject().getSortedFilteredDataset().getRowCount();
-                for (var i = 0; i < count; i++) {
-                  currentOrder.push(isColumns ? project.convertViewColumnIndexToModel(i) : project.convertViewRowIndexToModel(i));
-                }
-                for (var i = min, j = max; i < j; i++, j--) {
-                  var tmp = currentOrder[j];
-                  currentOrder[j] = currentOrder[i];
-                  currentOrder[i] = tmp;
-                }
-                var key = new morpheus.SpecifiedModelSortOrder(currentOrder, currentOrder.length, 'dendrogram', isColumns);
-                if (isColumns) {
-                  heatMap.getProject().setColumnSortKeys([key], true);
-                } else {
-                  heatMap.getProject().setRowSortKeys([key], true);
-                }
-                heatMap.revalidate();
-              }
-
-            } else if (item === 'Branch Color') {
-              if (selectedNode != null) {
-                var formBuilder = new morpheus.FormBuilder();
-                formBuilder.append({
-                  name: 'color',
-                  type: 'color',
-                  value: selectedNode.color,
-                  required: true,
-                  col: 'col-xs-2'
-                });
-                formBuilder.find('color').on(
-                  'change',
-                  function () {
-                    var color = $(this).val();
-                    morpheus.DendrogramUtil.dfs(selectedNode, function (n) {
-                      n.color = color;
-                      return true;
-                    });
-                    _this.setSelectedNode(null);
+      .on(
+        'contextmenu',
+        function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          var position = morpheus.CanvasUtil
+            .getMousePosWithScroll(e.target,
+              e, _this.lastClip.x,
+              _this.lastClip.y);
+          var selectedNode = _this.getNode(position);
+          morpheus.Popup
+            .showPopup(
+              [{
+                name: 'Flip',
+                disabled: selectedNode == null
+              }, {
+                name: 'Branch Color',
+                disabled: selectedNode == null
+              }, {
+                separator: true
+              },
+                {
+                  name: 'Annotate...'
+                }, {
+                name: 'Save'
+              }, {
+                separator: true
+              }, {
+                name: 'Enrichment...'
+              }, {
+                separator: true
+              }, {
+                name: 'Squish Singleton Clusters',
+                checked: _this.squishEnabled
+              }, {
+                separator: true
+              }, {
+                name: 'Delete'
+              }],
+              {
+                x: e.pageX,
+                y: e.pageY
+              },
+              e.target,
+              function (menuItem, item) {
+                if (item === 'Save') {
+                  var formBuilder = new morpheus.FormBuilder();
+                  formBuilder.append({
+                    name: 'file_name',
+                    type: 'text',
+                    required: true,
                   });
-                morpheus.FormBuilder.showInModal({
-                  title: 'Color',
-                  close: 'Close',
-                  html: formBuilder.$form,
-                  focus: document.activeElement
-                });
+                  morpheus.FormBuilder.showOkCancel({
+                    title: 'Save Dendrogram',
+                    content: formBuilder.$form,
+                    okCallback: function () {
+                      var fileName = formBuilder.getValue('file_name');
+                      if (fileName === '') {
+                        fileName = 'dendrogram.txt';
+                      }
+                      var out = [];
+                      morpheus.DendrogramUtil.writeNewick(tree.rootNode, out);
+                      var blob = new Blob([out.join('')], {type: 'text/plain;charset=charset=utf-8'});
+                      saveAs(blob, fileName, true);
+                    }
+                  });
+                } else if (item === 'Flip') {
+                  if (selectedNode != null) {
+                    var isColumns = morpheus.AbstractDendrogram.Type.COLUMN === _this.type;
+                    var min = selectedNode.minIndex;
+                    var max = selectedNode.maxIndex;
 
-              }
-            } else if (item === 'Annotate...') {
-              morpheus.HeatMap
-              .showTool(
-                new morpheus.AnnotateDendrogramTool(
-                  type === morpheus.AbstractDendrogram.Type.COLUMN),
-                _this.heatMap);
-            } else if (item === 'Enrichment...') {
-              morpheus.HeatMap
-              .showTool(
-                new morpheus.DendrogramEnrichmentTool(
-                  type === morpheus.AbstractDendrogram.Type.COLUMN),
-                _this.heatMap);
-            } else if (item === 'Squish Singleton Clusters') {
-              _this.squishEnabled = !_this.squishEnabled;
-              if (!_this.squishEnabled) {
-                _this.positions
-                .setSquishedIndices(null);
-              }
-            } else if (item === 'Delete') {
-              _this.resetCutHeight();
-              _this.heatMap
-              .setDendrogram(
-                null,
-                type === morpheus.AbstractDendrogram.Type.COLUMN);
-            }
-          });
-        return false;
-      });
+                    // morpheus.DendrogramUtil.dfs(selectedNode, function (n) {
+                    //   if (n.children) {
+                    //     n.children.reverse();
+                    //   }
+                    //   return true;
+                    // });
+
+                    var leafNodes = tree.leafNodes;
+                    for (var i = min, index = max; i <= max; i++, index--) {
+                      var n = leafNodes[i];
+                      n.index = index;
+                      n.maxIndex = index;
+                      n.minIndex = index;
+                    }
+
+                    leafNodes.sort(function (a, b) {
+                      return (a.index < b.index ? -1 : 1);
+                    });
+                    var setIndex = function (n) {
+                      if (n.children != null && n.children.length > 0) {
+                        for (var i = 0; i < n.children.length; i++) {
+                          setIndex(n.children[i]);
+                        }
+                        var sum = 0;
+                        for (var i = 0; i < n.children.length; i++) {
+                          sum += n.children[i].index;
+                        }
+                        n.index = sum / n.children.length;
+                        var maxIndex = -Number.MAX_VALUE;
+                        var minIndex = Number.MAX_VALUE;
+                        for (var i = 0; i < n.children.length; i++) {
+                          maxIndex = Math.max(maxIndex, n.children[i].maxIndex);
+                          minIndex = Math.min(minIndex, n.children[i].minIndex);
+                        }
+                        n.minIndex = minIndex;
+                        n.maxIndex = maxIndex;
+                      }
+                    };
+
+                    setIndex(selectedNode);
+
+                    var currentOrder = [];
+                    var count = isColumns ? heatMap.getProject().getSortedFilteredDataset().getColumnCount() : heatMap.getProject().getSortedFilteredDataset().getRowCount();
+                    for (var i = 0; i < count; i++) {
+                      currentOrder.push(isColumns ? project.convertViewColumnIndexToModel(i) : project.convertViewRowIndexToModel(i));
+                    }
+                    for (var i = min, j = max; i < j; i++, j--) {
+                      var tmp = currentOrder[j];
+                      currentOrder[j] = currentOrder[i];
+                      currentOrder[i] = tmp;
+                    }
+                    var key = new morpheus.SpecifiedModelSortOrder(currentOrder, currentOrder.length, 'dendrogram', isColumns);
+                    if (isColumns) {
+                      heatMap.getProject().setColumnSortKeys([key], true);
+                    } else {
+                      heatMap.getProject().setRowSortKeys([key], true);
+                    }
+                    heatMap.revalidate();
+                  }
+
+                } else if (item === 'Branch Color') {
+                  if (selectedNode != null) {
+                    var formBuilder = new morpheus.FormBuilder();
+                    formBuilder.append({
+                      name: 'color',
+                      type: 'color',
+                      value: selectedNode.color,
+                      required: true,
+                      col: 'col-xs-2'
+                    });
+                    formBuilder.find('color').on(
+                      'change',
+                      function () {
+                        var color = $(this).val();
+                        morpheus.DendrogramUtil.dfs(selectedNode, function (n) {
+                          n.color = color;
+                          return true;
+                        });
+                        _this.setSelectedNode(null);
+                      });
+                    morpheus.FormBuilder.showInModal({
+                      title: 'Color',
+                      close: 'Close',
+                      html: formBuilder.$form,
+                      focus: document.activeElement
+                    });
+
+                  }
+                } else if (item === 'Annotate...') {
+                  morpheus.HeatMap
+                    .showTool(
+                      new morpheus.AnnotateDendrogramTool(
+                        type === morpheus.AbstractDendrogram.Type.COLUMN),
+                      _this.heatMap);
+                } else if (item === 'Enrichment...') {
+                  morpheus.HeatMap
+                    .showTool(
+                      new morpheus.DendrogramEnrichmentTool(
+                        type === morpheus.AbstractDendrogram.Type.COLUMN),
+                      _this.heatMap);
+                } else if (item === 'Squish Singleton Clusters') {
+                  _this.squishEnabled = !_this.squishEnabled;
+                  if (!_this.squishEnabled) {
+                    _this.positions
+                      .setSquishedIndices(null);
+                  }
+                } else if (item === 'Delete') {
+                  _this.resetCutHeight();
+                  _this.heatMap
+                    .setDendrogram(
+                      null,
+                      type === morpheus.AbstractDendrogram.Type.COLUMN);
+                }
+              });
+          return false;
+        });
 
     $(this.canvas).on('mousemove', _.throttle(mouseMove, 100)).on(
       'mouseout', _.throttle(mouseExit, 100)).on('mouseenter',
@@ -280,103 +280,103 @@ morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
   this.cutTreeHotSpot = false;
   if (type !== morpheus.AbstractDendrogram.Type.RADIAL) {
     this.hammer = morpheus.Util
-    .hammer(this.canvas, ['pan', 'tap'])
-    .on(
-      'tap',
-      this.tap = function (event) {
-        if (!morpheus.CanvasUtil.dragging) {
-          var position = morpheus.CanvasUtil
-          .getMousePosWithScroll(event.target,
-            event, _this.lastClip.x,
-            _this.lastClip.y);
-          _this.cutTreeHotSpot = _this
-          .isDragHotSpot(position);
-          if (_this.cutTreeHotSpot) {
-            return;
-          }
-          var node = _this.getNode(position);
-          if (node != null && node.parent === undefined) {
-            node = null; // can't select root
-          }
-          var commandKey = morpheus.Util.IS_MAC ? event.srcEvent.metaKey
-            : event.srcEvent.ctrlKey;
-          _this.setSelectedNode(node,
-            event.srcEvent.shiftKey || commandKey);
-        }
-      })
-    .on('panend', this.panend = function (event) {
-      morpheus.CanvasUtil.dragging = false;
-      _this.canvas.style.cursor = 'default';
-      _this.cutTreeHotSpot = true;
-    })
-    .on(
-      'panstart',
-      this.panstart = function (event) {
-        var position = morpheus.CanvasUtil
-        .getMousePosWithScroll(event.target, event,
-          _this.lastClip.x, _this.lastClip.y,
-          true);
-        _this.cutTreeHotSpot = _this
-        .isDragHotSpot(position);
-        if (_this.cutTreeHotSpot) { // make sure start event
-          // was on hotspot
-          morpheus.CanvasUtil.dragging = true;
-          _this.canvas.style.cursor = _this
-          .getResizeCursor();
-          dragStartScaledCutHeight = _this
-          .scale(_this.cutHeight);
-        }
-      })
-    .on(
-      'panmove',
-      this.panmove = function (event) {
-        if (_this.cutTreeHotSpot) {
-          var cutHeight;
-          if (_this.type === morpheus.AbstractDendrogram.Type.COLUMN) {
-            var delta = event.deltaY;
-            cutHeight = Math
-            .max(
-              0,
-              Math
-              .min(
-                _this.tree.maxHeight,
-                _this.scale
-                .invert(dragStartScaledCutHeight
-                  + delta)));
-          } else if (_this.type === morpheus.AbstractDendrogram.Type.ROW) {
-            var delta = event.deltaX;
-            cutHeight = Math
-            .max(
-              0,
-              Math
-              .min(
-                _this.tree.maxHeight,
-                _this.scale
-                .invert(dragStartScaledCutHeight
-                  + delta)));
-          } else {
-            var point = morpheus.CanvasUtil
-            .getMousePos(event.target, event);
-            point.x = _this.radius - point.x;
-            point.y = _this.radius - point.y;
-            var radius = Math.sqrt(point.x * point.x
-              + point.y * point.y);
-            if (radius <= 4) {
-              cutHeight = _this.tree.maxHeight;
-            } else {
-              cutHeight = Math.max(0, Math.min(
-                _this.tree.maxHeight,
-                _this.scale.invert(radius)));
+      .hammer(this.canvas, ['pan', 'tap'])
+      .on(
+        'tap',
+        this.tap = function (event) {
+          if (!morpheus.CanvasUtil.dragging) {
+            var position = morpheus.CanvasUtil
+              .getMousePosWithScroll(event.target,
+                event, _this.lastClip.x,
+                _this.lastClip.y);
+            _this.cutTreeHotSpot = _this
+              .isDragHotSpot(position);
+            if (_this.cutTreeHotSpot) {
+              return;
             }
+            var node = _this.getNode(position);
+            if (node != null && node.parent === undefined) {
+              node = null; // can't select root
+            }
+            var commandKey = morpheus.Util.IS_MAC ? event.srcEvent.metaKey
+              : event.srcEvent.ctrlKey;
+            _this.setSelectedNode(node,
+              event.srcEvent.shiftKey || commandKey);
           }
-          if (cutHeight >= _this.tree.maxHeight) {
-            _this.resetCutHeight();
-          } else {
-            _this.setCutHeight(cutHeight);
+        })
+      .on('panend', this.panend = function (event) {
+        morpheus.CanvasUtil.dragging = false;
+        _this.canvas.style.cursor = 'default';
+        _this.cutTreeHotSpot = true;
+      })
+      .on(
+        'panstart',
+        this.panstart = function (event) {
+          var position = morpheus.CanvasUtil
+            .getMousePosWithScroll(event.target, event,
+              _this.lastClip.x, _this.lastClip.y,
+              true);
+          _this.cutTreeHotSpot = _this
+            .isDragHotSpot(position);
+          if (_this.cutTreeHotSpot) { // make sure start event
+            // was on hotspot
+            morpheus.CanvasUtil.dragging = true;
+            _this.canvas.style.cursor = _this
+              .getResizeCursor();
+            dragStartScaledCutHeight = _this
+              .scale(_this.cutHeight);
           }
-          event.preventDefault();
-        }
-      });
+        })
+      .on(
+        'panmove',
+        this.panmove = function (event) {
+          if (_this.cutTreeHotSpot) {
+            var cutHeight;
+            if (_this.type === morpheus.AbstractDendrogram.Type.COLUMN) {
+              var delta = event.deltaY;
+              cutHeight = Math
+                .max(
+                  0,
+                  Math
+                    .min(
+                      _this.tree.maxHeight,
+                      _this.scale
+                        .invert(dragStartScaledCutHeight
+                          + delta)));
+            } else if (_this.type === morpheus.AbstractDendrogram.Type.ROW) {
+              var delta = event.deltaX;
+              cutHeight = Math
+                .max(
+                  0,
+                  Math
+                    .min(
+                      _this.tree.maxHeight,
+                      _this.scale
+                        .invert(dragStartScaledCutHeight
+                          + delta)));
+            } else {
+              var point = morpheus.CanvasUtil
+                .getMousePos(event.target, event);
+              point.x = _this.radius - point.x;
+              point.y = _this.radius - point.y;
+              var radius = Math.sqrt(point.x * point.x
+                + point.y * point.y);
+              if (radius <= 4) {
+                cutHeight = _this.tree.maxHeight;
+              } else {
+                cutHeight = Math.max(0, Math.min(
+                  _this.tree.maxHeight,
+                  _this.scale.invert(radius)));
+              }
+            }
+            if (cutHeight >= _this.tree.maxHeight) {
+              _this.resetCutHeight();
+            } else {
+              _this.setCutHeight(cutHeight);
+            }
+            event.preventDefault();
+          }
+        });
   }
 };
 morpheus.AbstractDendrogram.Type = {
@@ -389,7 +389,7 @@ morpheus.AbstractDendrogram.prototype = {
     var _this = this;
     var viewIndices;
     var selectionModel = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? this.project
-    .getColumnSelectionModel()
+      .getColumnSelectionModel()
       : this.project.getRowSelectionModel();
     if (node == null) {
       // clear selection
@@ -472,7 +472,7 @@ morpheus.AbstractDendrogram.prototype = {
     this.$squishedLabel.text('');
     var dataset = this.project.getSortedFilteredDataset();
     var clusterIdVector = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? dataset
-    .getColumnMetadata().getByName('dendrogram_cut')
+      .getColumnMetadata().getByName('dendrogram_cut')
       : dataset.getRowMetadata().getByName('dendrogram_cut');
     if (clusterIdVector) {
       for (var i = 0, size = clusterIdVector.size(); i < size; i++) {
@@ -491,7 +491,7 @@ morpheus.AbstractDendrogram.prototype = {
       this.cutHeight);
     var dataset = this.project.getSortedFilteredDataset();
     var clusterIdVector = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? dataset
-    .getColumnMetadata().add('dendrogram_cut')
+      .getColumnMetadata().add('dendrogram_cut')
       : dataset.getRowMetadata().add('dendrogram_cut');
     for (var i = 0, nroots = roots.length; i < nroots; i++) {
       var root = roots[i];
@@ -538,10 +538,10 @@ morpheus.AbstractDendrogram.prototype = {
 
     if (this.type === morpheus.AbstractDendrogram.Type.COLUMN) {
       this.project.setGroupColumns([new morpheus.SortKey(clusterIdVector
-      .getName(), morpheus.SortKey.SortOrder.UNSORTED)], true);
+        .getName(), morpheus.SortKey.SortOrder.UNSORTED)], true);
     } else {
       this.project.setGroupRows([new morpheus.SortKey(clusterIdVector
-      .getName(), morpheus.SortKey.SortOrder.UNSORTED)], true);
+        .getName(), morpheus.SortKey.SortOrder.UNSORTED)], true);
     }
   },
   dispose: function () {

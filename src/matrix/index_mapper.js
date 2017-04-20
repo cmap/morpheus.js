@@ -66,7 +66,7 @@ morpheus.IndexMapper.prototype = {
         sortKeys[i].init(sortKeys[i].isColumns() ? new morpheus.TransposedDatasetView(dataset) : dataset, this.filteredSortedModelIndices);
       }
       this.filteredSortedModelIndices = this.filteredModelIndices
-      .slice(0);
+        .slice(0);
       this.filteredSortedModelIndices.sort(function (a, b) {
         for (var i = 0; i < nkeys; i++) {
           var key = sortKeys[i];
