@@ -6805,7 +6805,7 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 	}
 	for (var i = 0; i < participants; i++) {
 		participantID.push({
-			strval: vecPartID.getValue(i),
+			strval: vecPartID ? vecPartID.getValue(i) : i.toString(),
 			isNA: false
 		});
 	}

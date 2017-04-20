@@ -12,8 +12,11 @@
 
     <!-- include source files here... -->
     <script type="text/javascript" src="../js/morpheus-external-latest.min.js"></script>
-    <!--<script src="../js/morpheus-latest.min.js"></script>-->
-    <script src="../js/morpheus.js"></script>
+    <script src="../js/morpheus-latest.min.js"></script>
+    <script>
+        ocpu.seturl("http://localhost:4767/ocpu/library/morpheusR/R");
+    </script>
+    <!--<script src="../js/morpheus.js"></script>--!>
 
     <!-- include spec files here... -->
     <script src="matchers/custom.js"></script>
@@ -26,7 +29,7 @@
     <script src="spec/collapse_tool_test.js"></script>
     <script src="spec/qnorm_test.js"></script>
     <script src="spec/buffered_reader_test.js"></script>
-    <script src="spec/kmeans_test.js"></script>
+
 </head>
 <body>
 </body>
