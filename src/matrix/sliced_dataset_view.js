@@ -8,6 +8,7 @@ morpheus.SlicedDatasetView = function (dataset, rowIndices, columnIndices) {
   }
   this.rowIndices = rowIndices;
   this.columnIndices = columnIndices;
+  //morpheus.DatasetUtil.toESSessionPromise(this);
 };
 morpheus.SlicedDatasetView.prototype = {
 	setESSession : function (session) {

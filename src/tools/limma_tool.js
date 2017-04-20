@@ -168,13 +168,13 @@ morpheus.LimmaTool.prototype = {
                             var vs = [];
                             var rows = trueIndices.rows.length > 0 ? trueIndices.rows : dataset.rowIndices;
                             console.log(trueIndices.rows);
-                            if (trueIndices.rows.length > 0) {
+                            /*if (trueIndices.rows.length > 0) {
                                 var backRows = Array.apply(null, Array(dataset.rowIndices.length)).map(Number.prototype.valueOf,0);
                                 for (var i = 0; i < trueIndices.rows.length; i++) {
                                     backRows[rows[i]] = i;
                                 }
                                 rows = backRows;
-                            }
+                            }*/
                             console.log("rows", rows);
                             names.forEach(function (name) {
                                 if (name !== "symbol") {

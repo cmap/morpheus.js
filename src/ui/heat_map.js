@@ -225,7 +225,7 @@ morpheus.HeatMap = function (options) {
       inlineTooltip: true,
       $loadingImage: morpheus.Util.createLoadingEl(),
       menu: {
-        File: ['Open File', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
+        File: ['Open', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
         Tools: ['New Heat Map', null, 'Hierarchical Clustering', 'Marker Selection', 'Nearest Neighbors',
             'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose',
             't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API', null, 'k-means', 'limma', 'PCA Plot'],
@@ -435,7 +435,7 @@ morpheus.HeatMap = function (options) {
 
   }
   var heatMapLoaded = function () {
-      morpheus.DatasetUtil.toESSessionPromise(options.dataset);
+    morpheus.DatasetUtil.toESSessionPromise(options.dataset);
     if (typeof window !== 'undefined') {
       $(window).on('orientationchange.morpheus resize.morpheus', _this.resizeListener = function () {
         _this.revalidate();

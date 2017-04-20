@@ -941,7 +941,9 @@ morpheus.DatasetUtil.copy = function (dataset) {
   newDataset.getColumnMetadata = function () {
     return columnMetadataModel;
   };
-    morpheus.DatasetUtil.toESSessionPromise({ dataset : newDataset, isGSE : false });
+  if (dataset.getESSession()) {
+    newDataset.setESSession(dataset.getESSession());
+  }
   return newDataset;
 };
 morpheus.DatasetUtil.toString = function (dataset, value, seriesIndex) {
@@ -1061,10 +1063,13 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 
 morpheus.DatasetUtil.toESSessionPromise = function (options) {
 	var dataset = options.dataset ? options.dataset : options;
-	while (dataset.dataset) {
-	  dataset = dataset.dataset;
+
+    console.log("ENTERED TO_ESSESSION_PROMISE", dataset);
+	//var copiedDataset = morpheus.DatasetUtil.copy(dataset);
+	//console.log("EsSessionPromise ::", "after copying", dataset);
+    while (dataset.dataset) {
+      dataset = dataset.dataset;
     }
-	console.log("ENTERED TO_ESSESSION_PROMISE", dataset);
 	dataset.setESSession(new Promise(function (resolve, reject) {
 		//console.log("morpheus.DatasetUtil.toESSessionPromise ::", dataset, dataset instanceof morpheus.Dataset, dataset instanceof morpheus.SlicedDatasetView);
 /*		if (dataset.dataset) {
@@ -1075,7 +1080,7 @@ morpheus.DatasetUtil.toESSessionPromise = function (options) {
 			resolve(dataset.getESSession());
 			return;
         }
-        console.log("inside promise creation ::", dataset);
+
 		var array = morpheus.DatasetUtil.getContentArray(dataset);
 		var meta = morpheus.DatasetUtil.getMetadataArray(dataset);
 

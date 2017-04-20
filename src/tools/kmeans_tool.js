@@ -13,9 +13,6 @@ morpheus.KmeansTool.prototype = {
             name : 'number_of_clusters',
             type : 'text'
         },{
-            name : 'use_selected_rows_and_columns_only',
-            type : 'checkbox'
-        },{
             name : 'replace_NA_with',
             type : 'bootstrap-select',
             options : [{
@@ -29,36 +26,25 @@ morpheus.KmeansTool.prototype = {
     },
     execute : function(options) {
         var project = options.project;
-        var controller = options.controller;
 
-        var columnIndices = [];
-        var rowIndices = [];
-        var fullDataset = project.getFullDataset();
+        console.log(project.getRowFilter());
         //console.log("morpheus.KmeansTool.prototype.execute ::", "full dataset", fullDataset);
-        var sortedDataset = project.getSortedFilteredDataset();
-
         var dataset = project.getSortedFilteredDataset();
-        while(dataset.dataset instanceof morpheus.SlicedDatasetView) {
-            dataset = dataset.dataset;
-        }
-        var selectedDataset = project.getSelectedDataset();
+
+
+        var trueIndices = morpheus.Util.getTrueIndices(dataset);
+
+
+        //var selectedDataset = project.getSelectedDataset();
         //console.log("morpheus.KmeansTool.prototype.execute ::", "sorted dataset", dataset);
         //console.log("selected dataset", selectedDataset);
 
-        columnIndices = dataset.columnIndices;
-        if (fullDataset.columnIndices && fullDataset.columnIndices.length < columnIndices.length) {
-            columnIndices = columnIndices.slice(0, fullDataset.columnIndices.length);
-        }
-        rowIndices = dataset.rowIndices;
-        if (fullDataset.rowIndices && fullDataset.rowIndices.length < rowIndices.length) {
-            rowIndices = rowIndices.slice(0, fullDataset.rowIndices.length);
-        }
 
         /*if (fullDataset instanceof morpheus.SlicedDatasetView) {
          columnIndices = fullDataset.columnIndices;
          rowIndices = fullDataset.rowIndices;
          }*/
-        if (options.input.use_selected_rows_and_columns_only) {
+        /*if (options.input.use_selected_rows_and_columns_only) {
             var selectedColumns = project.getColumnSelectionModel().getViewIndices().values();
             var selectedRows = project.getRowSelectionModel().getViewIndices().values();
             //console.log(project.getColumnSelectionModel());
@@ -77,7 +63,7 @@ morpheus.KmeansTool.prototype = {
             rowIndices = [];
             for (ind in selectedRows) {
                 rowIndices.push(dataset.rowIndices[ind]);
-            }/*
+            }/!*
              if (fullDataset instanceof morpheus.Dataset ||
              fullDataset instanceof morpheus.SlicedDatasetView && !((!selectedDataset.columnIndices) && (!selectedDataset.rowIndices))) {
              columnIndices = selectedDataset.columnIndices;
@@ -86,8 +72,8 @@ morpheus.KmeansTool.prototype = {
              else {
              columnIndices = fullDataset.columnIndices;
              rowIndices = fullDataset.rowIndices;
-             }*/
-        }
+             }*!/
+        }*/
         //console.log(columnIndices, rowIndices);
         //console.log(project.getRowSelectionModel());
         var number = parseInt(options.input.number_of_clusters);
@@ -98,31 +84,32 @@ morpheus.KmeansTool.prototype = {
         }
         var replacena = options.input.replace_NA_with;
         //console.log(number);
-        var esPromise = fullDataset.getESSession();
+        var esPromise = dataset.getESSession();
         esPromise.then(function(essession) {
             var args = {
                 es : essession,
                 k : number,
                 replacena : replacena
             };
-            if (columnIndices && columnIndices.length > 0 && columnIndices.length < dataset.columnIndices.length) {
-                args.cols = columnIndices;
+            if (trueIndices.columns.length > 0) {
+                args.columns = trueIndices.columns;
             }
-            if (rowIndices && rowIndices.length > 0 && rowIndices.length < dataset.rowIndices.length) {
-                args.rows = rowIndices;
+            if (trueIndices.rows.length > 0) {
+                args.rows = trueIndices.rows;
             }
             //console.log(arguments);
             var req = ocpu.call("kmeans", args, function(session) {
                 session.getObject(function(success) {
                     var clusters = JSON.parse(success);
 
-                    var v = sortedDataset.getRowMetadata().getByName("clusters");
+                    console.log(clusters);
+                    var v = dataset.getRowMetadata().getByName("clusters");
                     if (v == null) {
-                        v = sortedDataset.getRowMetadata().add("clusters");
+                        v = dataset.getRowMetadata().add("clusters");
                     }
                     //console.log(sortedDataset, sortedDataset.getRowCount(), v, sortedDataset);
-                    for (var i = 0; i < sortedDataset.getRowCount(); i++) {
-                        v.setValue(i, clusters[dataset.rowIndices[i]]);
+                    for (var i = 0; i < dataset.getRowCount(); i++) {
+                        v.setValue(i, clusters[i]);
                     }
                     //console.log(dataset.getRowMetadata().getByName("clusters"));
                     /*while (v instanceof morpheus.VectorAdapter || v instanceof morpheus.SlicedVector) {

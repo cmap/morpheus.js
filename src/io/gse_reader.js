@@ -3,7 +3,7 @@ morpheus.GseReader = function (options) {
 };
 morpheus.GseReader.prototype = {
     read: function (name, callback) {
-        var req = ocpu.call('loadGSE', {name : name, type : this.type}, function (session) {
+        var req = ocpu.call('loadGEO', {name : name, type : this.type}, function (session) {
             //console.log('morpheus.GseReader.prototype.read ::', session);
             session.getObject(function (success) {
                 //console.log('morpheus.GseReader.prototype.read ::', success);

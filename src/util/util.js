@@ -1756,19 +1756,34 @@ morpheus.Util.getTrueIndices = function(dataset) {
   var columnIndices = dataset.columnIndices;
   var columns = morpheus.Util.getConsNumbers(dataset.columnIndices.length);
   var iter = 0;
-  while (dataset.dataset && dataset.rowIndices && dataset.columnIndices) {
+  var savedDataset = dataset;
+  console.log("rows processing");
+  while (dataset.dataset) {
+      if (!dataset.rowIndices) {
+        dataset = dataset.dataset;
+        continue;
+      }
       rowIndices = dataset.rowIndices;
-      columnIndices = dataset.columnIndices;
-
-      console.log(iter, rows, columns);
-      console.log(dataset.rowIndices);
-
+      console.log(iter, "rows:", rows.length, rows);
       var newRows = Array.apply(null, Array(rows.length)).map(Number.prototype.valueOf,0);
       for (var i = 0; i < rows.length; i++) {
           newRows[i] = dataset.rowIndices[rows[i]];
       }
       rows = newRows;
-      console.log(dataset.columnIndices);
+      dataset = dataset.dataset;
+      iter++;
+  }
+  iter = 0;
+  console.log("columns processing");
+  dataset = savedDataset;
+  while (dataset.dataset) {
+      if (!dataset.columnIndices) {
+        dataset = dataset.dataset;
+        continue;
+      }
+      columnIndices = dataset.columnIndices;
+
+      console.log(iter, "columns:", columns.length, columns);
       var newCols = Array.apply(null, Array(columns.length)).map(Number.prototype.valueOf,0)
       for (i = 0; i < columns.length; i++) {
           newCols[i] = dataset.columnIndices[columns[i]];
