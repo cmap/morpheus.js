@@ -16932,7 +16932,7 @@ morpheus.PcaPlotTool.prototype = {
                 emptyToAll: false
             });
 
-            console.log(dataset);
+            console.log("PCAPlot :: dataset:", dataset, "trueIndices:", morpheus.Util.getTrueIndices(dataset));
             console.log(project.getColumnSelectionModel());
             console.log(project.getRowSelectionModel());
             var fullDataset = _this.project.getFullDataset();
