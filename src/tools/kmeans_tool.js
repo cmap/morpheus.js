@@ -22,60 +22,27 @@ morpheus.KmeansTool.prototype = {
                 name : 'median',
                 value : 'median'
             }]
-        } ];
+        }];
     },
     execute : function(options) {
         var project = options.project;
-
-        console.log(project.getRowFilter());
         //console.log("morpheus.KmeansTool.prototype.execute ::", "full dataset", fullDataset);
         var dataset = project.getSortedFilteredDataset();
-
-
         var trueIndices = morpheus.Util.getTrueIndices(dataset);
 
+        var columnIndices = [];
+        var rowIndices = [];
+        if (options.input.use_selected_only) {
+            var selectedDataset = project.getSelectedDataset();
+            var selectedIndices = morpheus.Util.getTrueIndices(selectedDataset);
+            columnIndices = selectedIndices.columns.length > 0 ? selectedIndices.columns : trueIndices.columns;
+            rowIndices = selectedIndices.rows.length > 0 ? selectedIndices.rows : trueIndices.rows;
+        }
+        else {
+            columnIndices = trueIndices.columns;
+            rowIndices = trueIndices.rows;
+        }
 
-        //var selectedDataset = project.getSelectedDataset();
-        //console.log("morpheus.KmeansTool.prototype.execute ::", "sorted dataset", dataset);
-        //console.log("selected dataset", selectedDataset);
-
-
-        /*if (fullDataset instanceof morpheus.SlicedDatasetView) {
-         columnIndices = fullDataset.columnIndices;
-         rowIndices = fullDataset.rowIndices;
-         }*/
-        /*if (options.input.use_selected_rows_and_columns_only) {
-            var selectedColumns = project.getColumnSelectionModel().getViewIndices().values();
-            var selectedRows = project.getRowSelectionModel().getViewIndices().values();
-            //console.log(project.getColumnSelectionModel());
-            //console.log(project.getRowSelectionModel());
-
-            if (!selectedColumns && !selectedRows) {
-                alert("There are no rows and/or columns selected");
-                console.log("KMeans :: There are no rows and/or columns selected");
-                return;
-            }
-
-            columnIndices = [];
-            for (var ind in selectedColumns) {
-                columnIndices.push(dataset.columnIndices[ind]);
-            }
-            rowIndices = [];
-            for (ind in selectedRows) {
-                rowIndices.push(dataset.rowIndices[ind]);
-            }/!*
-             if (fullDataset instanceof morpheus.Dataset ||
-             fullDataset instanceof morpheus.SlicedDatasetView && !((!selectedDataset.columnIndices) && (!selectedDataset.rowIndices))) {
-             columnIndices = selectedDataset.columnIndices;
-             rowIndices = selectedDataset.rowIndices;
-             }
-             else {
-             columnIndices = fullDataset.columnIndices;
-             rowIndices = fullDataset.rowIndices;
-             }*!/
-        }*/
-        //console.log(columnIndices, rowIndices);
-        //console.log(project.getRowSelectionModel());
         var number = parseInt(options.input.number_of_clusters);
         if (isNaN(number)) {
 
@@ -83,7 +50,6 @@ morpheus.KmeansTool.prototype = {
             throw new Error("Enter the expected number of clusters");
         }
         var replacena = options.input.replace_NA_with;
-        //console.log(number);
         var esPromise = dataset.getESSession();
         esPromise.then(function(essession) {
             var args = {
@@ -91,13 +57,12 @@ morpheus.KmeansTool.prototype = {
                 k : number,
                 replacena : replacena
             };
-            if (trueIndices.columns.length > 0) {
-                args.columns = trueIndices.columns;
+            if (columnIndices.length > 0) {
+                args.columns = columnIndices;
             }
-            if (trueIndices.rows.length > 0) {
-                args.rows = trueIndices.rows;
+            if (rowIndices.length > 0) {
+                args.rows = rowIndices;
             }
-            //console.log(arguments);
             var req = ocpu.call("kmeans", args, function(session) {
                 session.getObject(function(success) {
                     var clusters = JSON.parse(success);

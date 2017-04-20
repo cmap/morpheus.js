@@ -1753,10 +1753,10 @@ morpheus.Util.getFilePath = function(session, str) {
 
 morpheus.Util.getTrueIndices = function(dataset) {
   console.log('TrueIndices', dataset, dataset.dataset, dataset.dataset === undefined);
-  var rowIndices = dataset.rowIndices;
-  var rows = morpheus.Util.getConsNumbers(dataset.rowIndices.length);
-  var columnIndices = dataset.columnIndices;
-  var columns = morpheus.Util.getConsNumbers(dataset.columnIndices.length);
+  var rowIndices = dataset.rowIndices ? dataset.rowIndices : [];
+  var rows = morpheus.Util.getConsNumbers(rowIndices.length);
+  var columnIndices = dataset.columnIndices ? dataset.columnIndices : [];
+  var columns = morpheus.Util.getConsNumbers(columnIndices.length);
   var iter = 0;
   var savedDataset = dataset;
   console.log("rows processing");
@@ -1801,18 +1801,21 @@ morpheus.Util.getTrueIndices = function(dataset) {
   var conseqCols = morpheus.Util.getConsNumbers(dataset.columns);
   console.log(conseqCols);
   var ans = {};
+  console.log(morpheus.Util.equalArrays(rows, conseqRows));
   if (morpheus.Util.equalArrays(rows, conseqRows) || rows.length == 0 && morpheus.Util.equalArrays(conseqRows, rowIndices)) {
     ans.rows = [];
   }
   else {
     ans.rows = rows.length > 0 ? rows : rowIndices;
   }
+  console.log(morpheus.Util.equalArrays(columns, conseqCols));
     if (morpheus.Util.equalArrays(columns, conseqCols) || columns.length == 0 && morpheus.Util.equalArrays(conseqCols, columnIndices)) {
         ans.columns = [];
     }
     else {
         ans.columns = columns.length > 0 ? columns : columnIndices;
     }
+    console.log(ans);
   return ans;
 };
 
@@ -7285,7 +7288,6 @@ morpheus.CombinedFilter = function (isAndFilter) {
   this.isAndFilter = isAndFilter;
   this.enabledFilters = [];
   this.name = 'combined filter';
-  console.log("Creating CombinedFilter::", this);
 };
 
 morpheus.CombinedFilter.prototype = {
@@ -14766,60 +14768,27 @@ morpheus.KmeansTool.prototype = {
                 name : 'median',
                 value : 'median'
             }]
-        } ];
+        }];
     },
     execute : function(options) {
         var project = options.project;
-
-        console.log(project.getRowFilter());
         //console.log("morpheus.KmeansTool.prototype.execute ::", "full dataset", fullDataset);
         var dataset = project.getSortedFilteredDataset();
-
-
         var trueIndices = morpheus.Util.getTrueIndices(dataset);
 
+        var columnIndices = [];
+        var rowIndices = [];
+        if (options.input.use_selected_only) {
+            var selectedDataset = project.getSelectedDataset();
+            var selectedIndices = morpheus.Util.getTrueIndices(selectedDataset);
+            columnIndices = selectedIndices.columns.length > 0 ? selectedIndices.columns : trueIndices.columns;
+            rowIndices = selectedIndices.rows.length > 0 ? selectedIndices.rows : trueIndices.rows;
+        }
+        else {
+            columnIndices = trueIndices.columns;
+            rowIndices = trueIndices.rows;
+        }
 
-        //var selectedDataset = project.getSelectedDataset();
-        //console.log("morpheus.KmeansTool.prototype.execute ::", "sorted dataset", dataset);
-        //console.log("selected dataset", selectedDataset);
-
-
-        /*if (fullDataset instanceof morpheus.SlicedDatasetView) {
-         columnIndices = fullDataset.columnIndices;
-         rowIndices = fullDataset.rowIndices;
-         }*/
-        /*if (options.input.use_selected_rows_and_columns_only) {
-            var selectedColumns = project.getColumnSelectionModel().getViewIndices().values();
-            var selectedRows = project.getRowSelectionModel().getViewIndices().values();
-            //console.log(project.getColumnSelectionModel());
-            //console.log(project.getRowSelectionModel());
-
-            if (!selectedColumns && !selectedRows) {
-                alert("There are no rows and/or columns selected");
-                console.log("KMeans :: There are no rows and/or columns selected");
-                return;
-            }
-
-            columnIndices = [];
-            for (var ind in selectedColumns) {
-                columnIndices.push(dataset.columnIndices[ind]);
-            }
-            rowIndices = [];
-            for (ind in selectedRows) {
-                rowIndices.push(dataset.rowIndices[ind]);
-            }/!*
-             if (fullDataset instanceof morpheus.Dataset ||
-             fullDataset instanceof morpheus.SlicedDatasetView && !((!selectedDataset.columnIndices) && (!selectedDataset.rowIndices))) {
-             columnIndices = selectedDataset.columnIndices;
-             rowIndices = selectedDataset.rowIndices;
-             }
-             else {
-             columnIndices = fullDataset.columnIndices;
-             rowIndices = fullDataset.rowIndices;
-             }*!/
-        }*/
-        //console.log(columnIndices, rowIndices);
-        //console.log(project.getRowSelectionModel());
         var number = parseInt(options.input.number_of_clusters);
         if (isNaN(number)) {
 
@@ -14827,7 +14796,6 @@ morpheus.KmeansTool.prototype = {
             throw new Error("Enter the expected number of clusters");
         }
         var replacena = options.input.replace_NA_with;
-        //console.log(number);
         var esPromise = dataset.getESSession();
         esPromise.then(function(essession) {
             var args = {
@@ -14835,13 +14803,12 @@ morpheus.KmeansTool.prototype = {
                 k : number,
                 replacena : replacena
             };
-            if (trueIndices.columns.length > 0) {
-                args.columns = trueIndices.columns;
+            if (columnIndices.length > 0) {
+                args.columns = columnIndices;
             }
-            if (trueIndices.rows.length > 0) {
-                args.rows = trueIndices.rows;
+            if (rowIndices.length > 0) {
+                args.rows = rowIndices;
             }
-            //console.log(arguments);
             var req = ocpu.call("kmeans", args, function(session) {
                 session.getObject(function(success) {
                     var clusters = JSON.parse(success);
@@ -16933,10 +16900,11 @@ morpheus.PcaPlotTool.prototype = {
             });
 
             console.log("PCAPlot :: dataset:", dataset, "trueIndices:", morpheus.Util.getTrueIndices(dataset));
-            console.log(project.getColumnSelectionModel());
-            console.log(project.getRowSelectionModel());
-            var fullDataset = _this.project.getFullDataset();
-            console.log(fullDataset);
+            var selectedIndices = morpheus.Util.getTrueIndices(dataset);
+
+            var fullDataset = _this.project.getSortedFilteredDataset();
+            var fullIndices = morpheus.Util.getTrueIndices(fullDataset);
+
             _this.dataset = dataset;
 
             var colorBy = _this.formBuilder.getValue('color');
@@ -16963,7 +16931,7 @@ morpheus.PcaPlotTool.prototype = {
             var size = sizeByVector ? [] : 12;
             var text = [];
             var sizeFunction = null;
-            var n = dataset.getColumnCount() > 0 ? dataset.getColumnCount() : fullDataset.columns;
+            var n = selectedIndices.columns.length > 0 ? selectedIndices.columns.length : fullIndices.columns.length;
 
 
             var data = [];
@@ -17045,23 +17013,9 @@ morpheus.PcaPlotTool.prototype = {
             }
 
             _this.categoriesIndices = categoriesIndices;
-            var columnIndices = [];
-            var rowIndices = [];
+            var columnIndices = selectedIndices.columns.length > 0 ? selectedIndices.columns : fullIndices.columns;
+            var rowIndices = selectedIndices.rows.length > 0 ? selectedIndices.rows : fullIndices.rows;
 
-            if (fullDataset instanceof morpheus.Dataset ||
-                fullDataset instanceof morpheus.SlicedDatasetView && !(!dataset.columnIndices && dataset.rowIndices || dataset.columnIndices.length == 0 && dataset.rowIndices.length == 0)) {
-                columnIndices = dataset.columnIndices;
-                rowIndices = dataset.rowIndices;
-            }
-            else {
-                if (fullDataset.columnIndices) {
-                    columnIndices = fullDataset.columnsIndices;
-                }
-                if (fullDataset.rowIndices) {
-                    rowIndices = fullDataset.rowIndices;
-                }
-
-            }
             if (columnIndices.length == 1) {
                 alert("Choose at least two columns");
                 console.log("PcaPlot :: Choose at least two columns");

@@ -1751,10 +1751,10 @@ morpheus.Util.getFilePath = function(session, str) {
 
 morpheus.Util.getTrueIndices = function(dataset) {
   console.log('TrueIndices', dataset, dataset.dataset, dataset.dataset === undefined);
-  var rowIndices = dataset.rowIndices;
-  var rows = morpheus.Util.getConsNumbers(dataset.rowIndices.length);
-  var columnIndices = dataset.columnIndices;
-  var columns = morpheus.Util.getConsNumbers(dataset.columnIndices.length);
+  var rowIndices = dataset.rowIndices ? dataset.rowIndices : [];
+  var rows = morpheus.Util.getConsNumbers(rowIndices.length);
+  var columnIndices = dataset.columnIndices ? dataset.columnIndices : [];
+  var columns = morpheus.Util.getConsNumbers(columnIndices.length);
   var iter = 0;
   var savedDataset = dataset;
   console.log("rows processing");
@@ -1799,18 +1799,21 @@ morpheus.Util.getTrueIndices = function(dataset) {
   var conseqCols = morpheus.Util.getConsNumbers(dataset.columns);
   console.log(conseqCols);
   var ans = {};
+  console.log(morpheus.Util.equalArrays(rows, conseqRows));
   if (morpheus.Util.equalArrays(rows, conseqRows) || rows.length == 0 && morpheus.Util.equalArrays(conseqRows, rowIndices)) {
     ans.rows = [];
   }
   else {
     ans.rows = rows.length > 0 ? rows : rowIndices;
   }
+  console.log(morpheus.Util.equalArrays(columns, conseqCols));
     if (morpheus.Util.equalArrays(columns, conseqCols) || columns.length == 0 && morpheus.Util.equalArrays(conseqCols, columnIndices)) {
         ans.columns = [];
     }
     else {
         ans.columns = columns.length > 0 ? columns : columnIndices;
     }
+    console.log(ans);
   return ans;
 };
 

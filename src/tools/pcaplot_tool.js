@@ -312,10 +312,11 @@ morpheus.PcaPlotTool.prototype = {
             });
 
             console.log("PCAPlot :: dataset:", dataset, "trueIndices:", morpheus.Util.getTrueIndices(dataset));
-            console.log(project.getColumnSelectionModel());
-            console.log(project.getRowSelectionModel());
-            var fullDataset = _this.project.getFullDataset();
-            console.log(fullDataset);
+            var selectedIndices = morpheus.Util.getTrueIndices(dataset);
+
+            var fullDataset = _this.project.getSortedFilteredDataset();
+            var fullIndices = morpheus.Util.getTrueIndices(fullDataset);
+
             _this.dataset = dataset;
 
             var colorBy = _this.formBuilder.getValue('color');
@@ -342,7 +343,7 @@ morpheus.PcaPlotTool.prototype = {
             var size = sizeByVector ? [] : 12;
             var text = [];
             var sizeFunction = null;
-            var n = dataset.getColumnCount() > 0 ? dataset.getColumnCount() : fullDataset.columns;
+            var n = selectedIndices.columns.length > 0 ? selectedIndices.columns.length : fullIndices.columns.length;
 
 
             var data = [];
@@ -424,23 +425,9 @@ morpheus.PcaPlotTool.prototype = {
             }
 
             _this.categoriesIndices = categoriesIndices;
-            var columnIndices = [];
-            var rowIndices = [];
+            var columnIndices = selectedIndices.columns.length > 0 ? selectedIndices.columns : fullIndices.columns;
+            var rowIndices = selectedIndices.rows.length > 0 ? selectedIndices.rows : fullIndices.rows;
 
-            if (fullDataset instanceof morpheus.Dataset ||
-                fullDataset instanceof morpheus.SlicedDatasetView && !(!dataset.columnIndices && dataset.rowIndices || dataset.columnIndices.length == 0 && dataset.rowIndices.length == 0)) {
-                columnIndices = dataset.columnIndices;
-                rowIndices = dataset.rowIndices;
-            }
-            else {
-                if (fullDataset.columnIndices) {
-                    columnIndices = fullDataset.columnsIndices;
-                }
-                if (fullDataset.rowIndices) {
-                    rowIndices = fullDataset.rowIndices;
-                }
-
-            }
             if (columnIndices.length == 1) {
                 alert("Choose at least two columns");
                 console.log("PcaPlot :: Choose at least two columns");

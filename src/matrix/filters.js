@@ -3,7 +3,6 @@ morpheus.CombinedFilter = function (isAndFilter) {
   this.isAndFilter = isAndFilter;
   this.enabledFilters = [];
   this.name = 'combined filter';
-  console.log("Creating CombinedFilter::", this);
 };
 
 morpheus.CombinedFilter.prototype = {
