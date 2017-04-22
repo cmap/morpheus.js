@@ -190,6 +190,10 @@ morpheus.VectorTrack.prototype = {
     } else if (_.isObject(conf)) {
       conf.maxTextWidth = undefined;
       this.settings = $.extend({}, this.settings, conf);
+      if (conf.discrete) {
+        this.settings.discreteAutoDetermined = true;
+      }
+
       if (conf.render) {
         for (var method in conf.render) {
           method = method.toUpperCase();

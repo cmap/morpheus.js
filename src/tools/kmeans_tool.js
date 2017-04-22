@@ -14,17 +14,12 @@ morpheus.KMeansTool.execute = function (dataset, input) {
     || input.cluster == 'Rows and columns';
 
   var doCluster = function (d) {
-    // TODO make more memory efficient
-    var arrayOfArrays = [];
-    for (var i = 0; i < d.getRowCount(); i++) {
-      var array = new Float32Array(d.getColumnCount());
-      for (var j = 0, ncols = d.getColumnCount(); j < ncols; j++) {
-        array[j] = d.getValue(i, j);
-      }
-      arrayOfArrays.push(array);
-    }
     var kmeans = new morpheus.KMeansPlusPlusClusterer(input.number_of_clusters, input.maximum_iterations, f);
-    var clusters = kmeans.execute(arrayOfArrays);
+    var vectors = [];
+    for (var i = 0; i < d.getRowCount(); i++) {
+      vectors.push(new morpheus.DatasetRowView(d).setIndex(i));
+    }
+    var clusters = kmeans.execute(vectors);
     // need to return in JSON
     var assignments = [];
     for (var i = 0; i < clusters.length; i++) {
@@ -137,11 +132,8 @@ morpheus.KMeansTool.prototype = {
     options.input.selectedRowsToUseForClusteringColumns = selectedRowsToUseForClusteringColumns;
     options.input.selectedColumnsToUseForClusteringRows = selectedColumnsToUseForClusteringRows;
     var dataset = project.getSortedFilteredDataset();
-    if (options.input.background === undefined) {
-      options.input.background = true;
-    }
-    options.input.background = options.input.background && typeof Worker !== 'undefined';
 
+    options.input.background = options.input.background && typeof Worker !== 'undefined';
     function addAssignments(d, assignments, k) {
       var v = d.getColumnMetadata().add('k_means_' + k);
       for (var i = 0; i < assignments.length; i++) {
@@ -189,12 +181,11 @@ morpheus.KMeansTool.prototype = {
 
       worker.onmessage = function (e) {
         var result = e.data;
-        console.log(result);
         if (result.columnAssignments) {
           addAssignments(dataset, result.columnAssignments, options.input.number_of_clusters);
           heatmap.addTrack('k_means_' + options.input.number_of_clusters, true, {
             highlightMatchingValues: true,
-            discreteAutoDetermined: true,
+            discrete: true,
             render: {color: true}
           });
         }
@@ -202,7 +193,7 @@ morpheus.KMeansTool.prototype = {
           addAssignments(new morpheus.TransposedDatasetView(dataset), result.rowAssignments, options.input.number_of_clusters);
           heatmap.addTrack('k_means_' + options.input.number_of_clusters, false, {
             highlightMatchingValues: true,
-            discreteAutoDetermined: true,
+            discrete: true,
             render: {color: true}
           });
         }

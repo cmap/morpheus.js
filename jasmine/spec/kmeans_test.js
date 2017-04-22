@@ -1,24 +1,18 @@
 describe('k_means_test', function () {
-  function DoublePoint(point) {
-    this.getPoint = function () {
-      return point;
-    };
-  }
 
   function CloseDistance(a, b) {
     return morpheus.Euclidean(a, b) * 0.001;
   }
 
   it('testPerformClusterAnalysisDegenerate', function () {
-    var transformer = new morpheus.KMeansPlusPlusClusterer(1, 1, morpheus.Euclidean);
-
-    var points = [new DoublePoint([1959, 325100]), new DoublePoint([1960, 373200])];
-    var clusters = transformer.cluster(points);
+    var clusterer = new morpheus.KMeansPlusPlusClusterer(1, 1, morpheus.Euclidean);
+    var points = [morpheus.VectorUtil.arrayAsVector([1959, 325100]), morpheus.VectorUtil.arrayAsVector([1960, 373200])];
+    var clusters = clusterer.execute(points);
 
     expect(1).toEqual(clusters.length);
     expect(2).toEqual(clusters[0].getPoints().length);
-    var pt1 = new DoublePoint([1959, 325100]);
-    var pt2 = new DoublePoint([1960, 373200]);
+    var pt1 = morpheus.VectorUtil.arrayAsVector([1959, 325100]);
+    var pt2 = morpheus.VectorUtil.arrayAsVector([1960, 373200]);
 
     expect(clusters[0].getPoints().indexOf(pt1) !== -1).not.toEqual(-1);
     expect(clusters[0].getPoints().indexOf(pt2) !== -1).not.toEqual(-1);
@@ -34,12 +28,16 @@ describe('k_means_test', function () {
       [20, 20, 20],
       [200, 200, 200]
     ];
+    var points = [];
+    for (var i = 0; i < data.length; i++) {
+      points.push(morpheus.VectorUtil.arrayAsVector(data[i]));
+    }
 
     var clusterer = new morpheus.KMeansPlusPlusClusterer(2, 20, morpheus.Euclidean);
-    var clusters = clusterer.execute(data);
+    var clusters = clusterer.execute(points);
     var expectedAssignments = [0, 0, 0, 0, 0, 1, 1];
     for (var i = 0; i < data.length; i++) {
-      expect(clusters[expectedAssignments[i]].getPoints().indexOf(data[i]) !== -1).not.toEqual(-1);
+      expect(clusters[expectedAssignments[i]].getPoints().indexOf(points[i]) !== -1).not.toEqual(-1);
     }
   });
 
@@ -53,12 +51,15 @@ describe('k_means_test', function () {
       [20, 20, 20],
       [200, 200, 200]
     ];
-
+    var points = [];
+    for (var i = 0; i < data.length; i++) {
+      points.push(morpheus.VectorUtil.arrayAsVector(data[i]));
+    }
     var clusterer = new morpheus.KMeansPlusPlusClusterer(3, 20, morpheus.Euclidean);
-    var clusters = clusterer.execute(data);
+    var clusters = clusterer.execute(points);
     var expectedAssignments = [0, 0, 0, 0, 1, 2, 2];
     for (var i = 0; i < data.length; i++) {
-      expect(clusters[expectedAssignments[i]].getPoints().indexOf(data[i]) !== -1).not.toEqual(-1);
+      expect(clusters[expectedAssignments[i]].getPoints().indexOf(points[i]) !== -1).not.toEqual(-1);
     }
   })
 
@@ -80,7 +81,7 @@ describe('k_means_test', function () {
       for (var j = 0; j < points.length; j++) {
         points[j] *= multiplier;
       }
-      var p = new DoublePoint(points);
+      var p = morpheus.VectorUtil.arrayAsVector(points);
       breakingPoints[i] = p;
       position1 += numberOfVariables;
       position2 += numberOfVariables;
@@ -91,7 +92,7 @@ describe('k_means_test', function () {
     for (var n = 2; n < 27; ++n) {
       var transformer =
         new morpheus.KMeansPlusPlusClusterer(n, 100, morpheus.Euclidean);
-      var clusters = transformer.cluster(breakingPoints);
+      var clusters = transformer.execute(breakingPoints);
       expect(n).toEqual(clusters.length);
 
       var sum = 0;
@@ -105,9 +106,8 @@ describe('k_means_test', function () {
   it('testSmallDistances', function () {
     var repeatedArray = [0];
     var uniqueArray = [1];
-    var repeatedPoint = new DoublePoint(repeatedArray);
-    var uniquePoint = new DoublePoint(uniqueArray);
-
+    var repeatedPoint = morpheus.VectorUtil.arrayAsVector(repeatedArray, 'repeat');
+    var uniquePoint = morpheus.VectorUtil.arrayAsVector(uniqueArray, 'unique');
     var points = [];
     var NUM_REPEATED_POINTS = 10 * 1000;
     for (var i = 0; i < NUM_REPEATED_POINTS; ++i) {
@@ -120,14 +120,20 @@ describe('k_means_test', function () {
     var NUM_CLUSTERS = 2;
     var NUM_ITERATIONS = 0;
 
-    var clusterer =
-      new morpheus.KMeansPlusPlusClusterer(NUM_CLUSTERS, NUM_ITERATIONS, CloseDistance);
-    var clusters = clusterer.cluster(points);
+    var clusterer = new morpheus.KMeansPlusPlusClusterer(NUM_CLUSTERS, NUM_ITERATIONS, CloseDistance);
+    var clusters = clusterer.execute(points);
 
     // Check that one of the chosen centers is the unique point.
     var uniquePointIsCenter = false;
     clusters.forEach(function (cluster) {
-      if (cluster.getCenter() === uniquePoint) {
+      var center = cluster.getCenter().getPoint();
+      var allEqual = true;
+      for (var i = 0; i < center.size(); i++) {
+        if (center.getValue(i) !== uniquePoint.getValue(i)) {
+          allEqual = false;
+        }
+      }
+      if (allEqual) {
         uniquePointIsCenter = true;
       }
     });

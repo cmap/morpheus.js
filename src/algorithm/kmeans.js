@@ -15,7 +15,7 @@
 morpheus.KMeansPlusPlusClusterer = function (k, maxIterations, distanceFunction) {
 
   var distance = function (points1, points2) {
-    return distanceFunction(morpheus.VectorUtil.arrayAsVector(points1.getPoint()), morpheus.VectorUtil.arrayAsVector(points2.getPoint()));
+    return distanceFunction(points1.getPoint(), points2.getPoint());
   };
 
   function nextInt(upperBound) {
@@ -26,7 +26,7 @@ morpheus.KMeansPlusPlusClusterer = function (k, maxIterations, distanceFunction)
     return Math.random();
   }
 
-  function DoublePoint(point) {
+  function PointWrapper(point) {
     this.getPoint = function () {
       return point;
     };
@@ -76,7 +76,7 @@ morpheus.KMeansPlusPlusClusterer = function (k, maxIterations, distanceFunction)
           newCenter = getPointFromLargestVarianceCluster(clusters);
           emptyCluster = true;
         } else {
-          newCenter = centroidOf(cluster.getPoints(), cluster.getCenter().getPoint().length);
+          newCenter = centroidOf(cluster.getPoints(), cluster.getCenter().getPoint().size());
         }
         newClusters.push(new CentroidCluster(newCenter));
       }
@@ -128,8 +128,7 @@ morpheus.KMeansPlusPlusClusterer = function (k, maxIterations, distanceFunction)
 
     // Convert to list for indexed access. Make it unmodifiable, since removal of items
     // would screw up the logic of this method.
-    var pointList = points.slice(0);
-
+    var pointList = points;
     // The number of points in the list.
     var numPoints = pointList.length;
 
@@ -153,7 +152,7 @@ morpheus.KMeansPlusPlusClusterer = function (k, maxIterations, distanceFunction)
     // To keep track of the minimum distance squared of elements of
     // pointList to elements of resultSet.
 
-    var minDistSquared = new Float64Array(numPoints);
+    var minDistSquared = new Float32Array(numPoints);
 
     // Initialize the elements.  Since the only point in resultSet is firstPoint,
     // this is very easy.
@@ -254,7 +253,9 @@ morpheus.KMeansPlusPlusClusterer = function (k, maxIterations, distanceFunction)
     var selected = null;
     for (var clusterIndex = 0; clusterIndex < clusters.length; clusterIndex++) {
       var cluster = clusters[clusterIndex];
+
       if (cluster.getPoints().length > 0) {
+
         // compute the distance variance of the current cluster
         var center = cluster.getCenter();
         var points = cluster.getPoints();
@@ -262,8 +263,8 @@ morpheus.KMeansPlusPlusClusterer = function (k, maxIterations, distanceFunction)
         for (var i = 0; i < points.length; i++) {
           distances[i] = distance(points[i], center);
         }
-
         var variance = morpheus.Variance(morpheus.VectorUtil.arrayAsVector(distances));
+
         // select the cluster with the largest variance
         if (variance > maxVariance) {
           maxVariance = variance;
@@ -274,7 +275,7 @@ morpheus.KMeansPlusPlusClusterer = function (k, maxIterations, distanceFunction)
 
     // did we find at least one non-empty cluster ?
     if (selected == null) {
-      throw 'Empty cluster';
+      throw 'All clusters are empty';
     }
 
     // extract a random point from the cluster
@@ -352,25 +353,29 @@ morpheus.KMeansPlusPlusClusterer = function (k, maxIterations, distanceFunction)
    */
   function centroidOf(points, dimension) {
     var centroid = new Float32Array(dimension);
-    for (var pointIndex = 0; pointIndex < points.length; pointIndex++) {
-      var p = points[pointIndex];
-      var point = p.getPoint();
-      for (var i = 0; i < centroid.length; i++) {
-        centroid[i] += point[i];
-      }
-    }
     for (var i = 0; i < centroid.length; i++) {
-      centroid[i] /= points.length;
+      var sum = 0;
+      var count = 0;
+      for (var pointIndex = 0; pointIndex < points.length; pointIndex++) {
+        var p = points[pointIndex];
+        var point = p.getPoint();
+        var val = point.getValue(i);
+        if (!isNaN(val)) {
+          sum += val;
+          count++;
+        }
+      }
+      centroid[i] = (sum / count);
     }
-    return new DoublePoint(centroid);
+    return new PointWrapper(morpheus.VectorUtil.arrayAsVector(centroid));
   }
 
-  this.execute = function (arrayOfArraysToCluster) {
+  this.execute = function (vectors) {
     var points = [];
     // cluster rows
-    var npoints = arrayOfArraysToCluster.length;
+    var npoints = vectors.length;
     for (var i = 0; i < npoints; i++) {
-      var p = new DoublePoint(arrayOfArraysToCluster[i]);
+      var p = new PointWrapper(vectors[i]);
       p.i = i;
       points.push(p);
     }
