@@ -397,7 +397,8 @@ morpheus.HeatMapToolBar = function (heatMap) {
     morpheus.FormBuilder.showInModal({
       title: 'Search Help',
       html: $searchHelp,
-      appendTo: heatMap.getContentEl()
+      appendTo: heatMap.getContentEl(),
+      focus: heatMap.getFocusEl()
     });
   });
   var $searchRowsGroup = $searchForm.find('[data-name=searchRowsGroup]');
@@ -972,11 +973,31 @@ morpheus.HeatMapToolBar.prototype = {
     var p = this.heatMap.getProject();
     var d = p.getFullDataset();
     var f = p.getSortedFilteredDataset();
-    var text = 'showing ' + morpheus.Util.intFormat(f.getRowCount())
-      + '/' + morpheus.Util.intFormat(d.getRowCount()) + ' rows, '
-      + morpheus.Util.intFormat(f.getColumnCount()) + '/'
-      + morpheus.Util.intFormat(d.getColumnCount()) + ' columns';
-    this.$dimensionsLabel.html(text);
+    var text = [];
+
+    if (f.getRowCount() !== d.getRowCount()) {
+      text.push('<b>');
+      text.push(morpheus.Util.intFormat(f.getRowCount()));
+      text.push('</b>');
+      text.push('/');
+      text.push(morpheus.Util.intFormat(d.getRowCount()));
+    } else {
+      text.push(morpheus.Util.intFormat(f.getRowCount()));
+    }
+
+    text.push(' rows by ');
+    if (f.getColumnCount() !== d.getColumnCount()) {
+      text.push('<b>');
+      text.push(morpheus.Util.intFormat(f.getColumnCount()));
+      text.push('</b>');
+      text.push('/');
+      text.push(morpheus.Util.intFormat(d.getColumnCount()));
+    } else {
+      text.push(morpheus.Util.intFormat(f.getColumnCount()));
+    }
+
+    text.push(' columns');
+    this.$dimensionsLabel.html(text.join(''));
   },
   updateSelectionLabel: function () {
     var nc = this.heatMap.getProject().getColumnSelectionModel().count();
