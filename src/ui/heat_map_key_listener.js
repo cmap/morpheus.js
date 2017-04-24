@@ -389,8 +389,9 @@ morpheus.HeatMapKeyListener = function (heatMap) {
     if (sc.shiftKey) {
       s.push('Shift+');
     }
-    s.push(morpheus.KeyboardCharMap[sc.which[0]]);
-
+    if (sc.which) {
+      s.push(morpheus.KeyboardCharMap[sc.which[0]]);
+    }
     s.push('</b>');
     return s.join('');
   }

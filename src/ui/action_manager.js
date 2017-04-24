@@ -540,10 +540,8 @@ morpheus.ActionManager = function () {
   });
   this.add({
     name: 'Keymap Reference',
-    cb: function () {
-      new morpheus.HeatMapKeyListener({
-        $tabPanel: $()
-      }).showKeyMapReference();
+    cb: function (options) {
+      new morpheus.HeatMapKeyListener(options.heatMap).showKeyMapReference();
     }
   });
 
