@@ -133,7 +133,8 @@ morpheus.OpenFileTool.prototype = {
       }).fail(function (err) {
         morpheus.FormBuilder.showMessageModal({
           title: 'Error',
-          message: 'Unable to load session'
+          message: 'Unable to load session',
+          focus: document.activeElement
         });
       });
     } else if (options.input.open_file_action === 'append columns'

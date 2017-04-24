@@ -1267,7 +1267,8 @@ morpheus.VectorTrack.prototype = {
           morpheus.FormBuilder.showInModal({
             title: 'Bar Color',
             close: 'Close',
-            html: formBuilder.$form
+            html: formBuilder.$form,
+            focus: heatmap.getFocusEl()
           });
         } else if (item === COLOR_BAR_SIZE) {
           var formBuilder = new morpheus.FormBuilder();
@@ -1292,7 +1293,8 @@ morpheus.VectorTrack.prototype = {
           morpheus.FormBuilder.showInModal({
             title: 'Color Bar Size',
             close: 'Close',
-            html: formBuilder.$form
+            html: formBuilder.$form,
+            focus: heatmap.getFocusEl()
           });
         } else if (item === ANNOTATE_SELECTION) {
           heatmap.getActionManager().execute(isColumns ? 'Annotate Selected Columns' : 'Annotate' +
@@ -1488,7 +1490,8 @@ morpheus.VectorTrack.prototype = {
 
           morpheus.FormBuilder.showInModal({
             title: 'Color Key',
-            html: legend.canvas
+            html: legend.canvas,
+            focus: heatmap.getFocusEl()
           });
         } else if (item === 'Shape Key') {
           var legend = new morpheus.HeatMapTrackShapeLegend(
@@ -1502,7 +1505,8 @@ morpheus.VectorTrack.prototype = {
 
           morpheus.FormBuilder.showInModal({
             title: 'Shape Key',
-            html: legend.canvas
+            html: legend.canvas,
+            focus: heatmap.getFocusEl()
           });
         } else if (item === 'Edit Shapes...') {
           var shapeFormBuilder = new morpheus.FormBuilder();
@@ -1523,7 +1527,8 @@ morpheus.VectorTrack.prototype = {
           morpheus.FormBuilder.showInModal({
             title: 'Edit Shapes',
             html: chooser.$div,
-            close: 'Close'
+            close: 'Close',
+            focus: heatmap.getFocusEl()
           });
         } else if (item === 'Edit Colors...') {
           var colorSchemeChooser;
@@ -1564,6 +1569,7 @@ morpheus.VectorTrack.prototype = {
             title: 'Edit Colors',
             html: colorSchemeChooser.$div,
             close: 'Close',
+            focus: heatmap.getFocusEl(),
             onClose: function () {
               colorSchemeChooser.dispose();
             }

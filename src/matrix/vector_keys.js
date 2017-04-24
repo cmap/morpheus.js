@@ -19,8 +19,11 @@ morpheus.VectorKeys.FUNCTION = 'morpheus.funct';
 /** Indicates that vector values are dynamically computed based on selection */
 morpheus.VectorKeys.SELECTION = 'morpheus.selection';
 
-/** Whether to recompute a function when creating a new heat map */
-morpheus.VectorKeys.RECOMPUTE_FUNCTION = 'morpheus.recompute.funct';
+/** Whether to recompute a function when creating a new heat map (true or false) */
+morpheus.VectorKeys.RECOMPUTE_FUNCTION_NEW_HEAT_MAP = 'morpheus.recompute.funct.new.heat.map';
+
+/** Whether to recompute a function when filter is updated (true or false)  */
+morpheus.VectorKeys.RECOMPUTE_FUNCTION_FILTER = 'morpheus.recompute.funct.filter';
 
 /** Boolean, whether to recompute a function when heat map selection changes */
 morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION = 'morpheus.recompute.funct.selection';

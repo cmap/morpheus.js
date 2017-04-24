@@ -901,6 +901,7 @@ morpheus.Util.xlsxTo2dArray = function (options, callback) {
     morpheus.FormBuilder.showInModal({
       title: 'Choose Sheet',
       html: formBuilder.$form,
+      focus: document.activeElement,
       onClose: function () {
         var worksheet = workbook.Sheets[formBuilder.getValue('sheet')];
         var lines = morpheus.Util.sheetToArray(worksheet);
@@ -942,6 +943,7 @@ morpheus.Util.xlsxTo1dArray = function (options, callback) {
     morpheus.FormBuilder.showOkCancel({
       title: 'Choose Sheet',
       cancel: false,
+      focus: document.activeElement,
       content: formBuilder.$form,
       okCallback: function () {
         var worksheet = workbook.Sheets[formBuilder.getValue('sheet')];

@@ -4,6 +4,7 @@ morpheus.VectorUtil = function () {
 morpheus.VectorUtil.jsonToFunction = function (vector, key) {
   var f = vector.getProperties().get(key);
   if (typeof f === 'object') {
+    // TODO encode other functions
     var binSize = f.binSize;
     var min = f.domain[0];
     var max = f.domain[1];

@@ -135,13 +135,13 @@ morpheus.FilterUI.rangeFilter = function (project, name, isColumns, $ui, filter)
     isColumns ? project.setColumnFilter(project.getColumnFilter(), true)
       : project.setRowFilter(project.getRowFilter(), true);
 
-  }, 100));
+  }, 500));
   $max.on('keyup', _.debounce(function (e) {
     filter.setMax(parseFloat($.trim($(this).val())));
     isColumns ? project.setColumnFilter(project.getColumnFilter(), true)
       : project.setRowFilter(project.getRowFilter(), true);
 
-  }, 100));
+  }, 500));
 
   return filter;
 
@@ -220,7 +220,7 @@ morpheus.FilterUI.topFilter = function (project, name, isColumns, $ui, filter) {
     isColumns ? project.setColumnFilter(project.getColumnFilter(), true)
       : project.setRowFilter(project.getRowFilter(), true);
 
-  }, 100));
+  }, 500));
 
   return filter;
 };

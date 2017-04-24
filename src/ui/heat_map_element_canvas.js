@@ -135,11 +135,11 @@ morpheus.HeatMapElementCanvas.prototype = {
       var width = columnPositions.getItemSize(project
       .getHoverColumnIndex());
       var y = (project.getHoverRowIndex() === -1 ? rowPositions
-        .getPosition(rowPositions.getLength() - 1) : rowPositions
-        .getPosition(project.getHoverRowIndex()));
+      .getPosition(rowPositions.getLength() - 1) : rowPositions
+      .getPosition(project.getHoverRowIndex()));
       var x = (project.getHoverColumnIndex() === -1 ? columnPositions
-        .getPosition(0) : columnPositions.getPosition(project
-        .getHoverColumnIndex()));
+      .getPosition(0) : columnPositions.getPosition(project
+      .getHoverColumnIndex()));
 
       if (project.getHoverColumnIndex() !== -1) {
         // thin rectangle down entire column
@@ -284,13 +284,14 @@ morpheus.HeatMapElementCanvas.prototype = {
     var drawValues = this.drawValues && columnPositions.getSize() > 7 && rowPositions.getSize() > 7;
     var nf;
     if (drawValues) {
-      nf = typeof d3 !== 'undefined' ? d3.format('.2f') : function (d) {
-          return '' + d;
-        };
-      var fontSize = rowPositions.getSize() - 2;
+      nf = typeof d3 !== 'undefined' ? d3.format('.1f') : function (d) {
+        return '' + d;
+      };
+      var fontSize = columnPositions.getSize();
       context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
-      var textWidth = context.measureText('-9999.99').width;
-      fontSize = ((  rowPositions.getSize() - 2) / textWidth) * fontSize;
+      var textWidth = context.measureText('-99.9').width;
+      fontSize = ( (columnPositions.getSize() - 1) / textWidth) * fontSize;
+      fontSize = Math.min(fontSize, 17);
       context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
     }
     var seriesNameToIndex = {};

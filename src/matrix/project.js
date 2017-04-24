@@ -19,10 +19,14 @@ morpheus.Project = function (dataset) {
   this.rowSelectionModel = new morpheus.SelectionModel(this, false);
   this.elementSelectionModel = new morpheus.ElementSelectionModel(this);
   this.symmetricProjectListener = null;
-  morpheus.Project._recomputeCalculatedFields(this.originalDataset);
+  morpheus.Project._recomputeCalculatedColumnFields(this.originalDataset, morpheus.VectorKeys.RECOMPUTE_FUNCTION_NEW_HEAT_MAP);
   morpheus.Project
-  ._recomputeCalculatedFields(new morpheus.TransposedDatasetView(
-    this.originalDataset));
+  ._recomputeCalculatedColumnFields(new morpheus.TransposedDatasetView(
+    this.originalDataset), morpheus.VectorKeys.RECOMPUTE_FUNCTION_NEW_HEAT_MAP);
+  morpheus.Project._recomputeCalculatedColumnFields(this.originalDataset, morpheus.VectorKeys.RECOMPUTE_FUNCTION_FILTER);
+  morpheus.Project
+  ._recomputeCalculatedColumnFields(new morpheus.TransposedDatasetView(
+    this.originalDataset), morpheus.VectorKeys.RECOMPUTE_FUNCTION_FILTER);
 };
 morpheus.Project.Events = {
   DATASET_CHANGED: 'datasetChanged',
@@ -36,14 +40,14 @@ morpheus.Project.Events = {
   COLUMN_TRACK_REMOVED: 'columnTrackRemoved'
 };
 
-morpheus.Project._recomputeCalculatedFields = function (dataset) {
+morpheus.Project._recomputeCalculatedColumnFields = function (dataset, key) {
   var metadata = dataset.getColumnMetadata();
   var view = new morpheus.DatasetColumnView(dataset);
   for (var metadataIndex = 0,
          count = metadata.getMetadataCount(); metadataIndex < count; metadataIndex++) {
     var vector = metadata.get(metadataIndex);
     if (vector.getProperties().get(morpheus.VectorKeys.FUNCTION) != null
-      && vector.getProperties().get(morpheus.VectorKeys.RECOMPUTE_FUNCTION)) {
+      && vector.getProperties().get(key)) {
       var f = morpheus.VectorUtil.jsonToFunction(vector, morpheus.VectorKeys.FUNCTION);
       for (var j = 0, size = vector.size(); j < size; j++) {
         view.setIndex(j);

@@ -109,7 +109,8 @@ morpheus.OpenDatasetTool.prototype = {
       }
       morpheus.FormBuilder.showInModal({
         title: 'Error',
-        html: message.join('')
+        html: message.join(''),
+        focus: document.activeElement
       });
     });
     deferred

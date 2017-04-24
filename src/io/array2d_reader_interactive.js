@@ -137,6 +137,7 @@ morpheus.Array2dReaderInteractive.prototype = {
         title: 'Open',
         content: $el,
         close: false,
+        focus: document.activeElement,
         cancelCallback: function () {
           callback(null);
         },
