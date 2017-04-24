@@ -1922,11 +1922,11 @@ morpheus.HeatMap.prototype = {
       'rowFilterChanged columnFilterChanged rowGroupByChanged columnGroupByChanged rowSortOrderChanged columnSortOrderChanged datasetChanged',
       function (e) {
         if (e.type === 'datasetChanged' || e.type === 'columnFilterChanged') {
-          var dataset = _this.project.getFullDataset();
+          var dataset = new morpheus.SlicedDatasetView(_this.project.getFullDataset(), null, _this.project.getFilteredSortedColumnIndices());
           morpheus.Project._recomputeCalculatedColumnFields(new morpheus.TransposedDatasetView(dataset), morpheus.VectorKeys.RECOMPUTE_FUNCTION_FILTER);
         }
         if (e.type === 'datasetChanged' || e.type === 'rowFilterChanged') {
-          var dataset = _this.project.getFullDataset();
+          var dataset = new morpheus.SlicedDatasetView(_this.project.getFullDataset(), _this.project.getFilteredSortedRowIndices(), null);
           morpheus.Project._recomputeCalculatedColumnFields(dataset, morpheus.VectorKeys.RECOMPUTE_FUNCTION_FILTER);
         }
         if (e.type === 'datasetChanged') { // remove
