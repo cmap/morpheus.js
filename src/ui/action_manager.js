@@ -925,8 +925,9 @@ morpheus.ActionManager.prototype = {
 
     args.heatMap = this.heatMap;
     action.cb(args);
+
     morpheus.Util.trackEvent({
-      eventCategory: '',
+      eventCategory: 'Tool',
       eventAction: name
     });
   },
