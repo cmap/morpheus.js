@@ -325,8 +325,17 @@ morpheus.TopNFilter.prototype = {
   },
 
   init: function (dataset) {
-    if (!this.vector) {
+    if (!this.vector || this.vector !== dataset.getRowMetadata().getByName(this.name)) {
       var vector = dataset.getRowMetadata().getByName(this.name);
+      if (vector == null) {
+        vector = {
+          getValue: function () {
+          },
+          size: function () {
+            return 0;
+          }
+        };
+      }
       this.vector = vector;
       var set = new morpheus.Set();
       for (var i = 0, size = vector.size(); i < size; i++) {
