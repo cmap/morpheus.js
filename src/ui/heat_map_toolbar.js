@@ -1008,9 +1008,9 @@ morpheus.HeatMapToolBar.prototype = {
     if (f.getRowCount() !== d.getRowCount()) {
       text.push('<b>');
       text.push(morpheus.Util.intFormat(f.getRowCount()));
-      text.push('</b>');
       text.push('/');
       text.push(morpheus.Util.intFormat(d.getRowCount()));
+      text.push('</b>');
     } else {
       text.push(morpheus.Util.intFormat(f.getRowCount()));
     }
@@ -1019,9 +1019,9 @@ morpheus.HeatMapToolBar.prototype = {
     if (f.getColumnCount() !== d.getColumnCount()) {
       text.push('<b>');
       text.push(morpheus.Util.intFormat(f.getColumnCount()));
-      text.push('</b>');
       text.push('/');
       text.push(morpheus.Util.intFormat(d.getColumnCount()));
+      text.push('</b>');
     } else {
       text.push(morpheus.Util.intFormat(f.getColumnCount()));
     }
