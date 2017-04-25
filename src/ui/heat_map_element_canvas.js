@@ -418,7 +418,7 @@ morpheus.HeatMapElementCanvas.prototype = {
         } else {
           context.fillRect(px + xoffset, py + yoffset, cellColumnSize, cellRowSize);
         }
-        if (drawValues && cellColumnSize > 7 && cellRowSize > 7) {
+        if (drawValues && cellColumnSize > 7 && cellRowSize > 7 && !isNaN(value)) {
           context.fillStyle = 'rgb(0,0,0)';
           context.fillText(nf(value), px + xoffset + cellColumnSize / 2, py + yoffset + cellRowSize / 2, cellColumnSize);
         }
