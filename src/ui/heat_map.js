@@ -228,12 +228,9 @@ morpheus.HeatMap = function (options) {
         File: ['Open', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
         Tools: ['New Heat Map', null, 'Hierarchical Clustering', 'KMeans Clustering', null, 'Marker Selection', 'Nearest Neighbors', 'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API'],
         View: ['Zoom In', 'Zoom Out', 'Fit To Window', 'Reset Zoom', null, 'Options'],
-        Edit: ['Copy Image', 'Copy Selected Dataset', null, 'Move Selected Rows To Top', 'Annotate Selected Rows', 'Invert' +
-        ' Selected Rows', 'Copy Selected Rows', 'Select All Rows', null, 'Move Selected Columns' +
-        ' To Top', 'Annotate Selected Columns', 'Invert Selected Columns', 'Copy Selected' +
-        ' Columns', 'Select' +
-        ' All' +
-        ' Columns'],
+        Edit: ['Copy Image', 'Copy Selected Dataset', null, 'Move Selected Rows To Top', 'Annotate Selected Rows', 'Copy Selected Rows', 'Invert' +
+        ' Selected Rows', 'Select All Rows', 'Clear Selected Rows', null, 'Move Selected Columns To Top', 'Annotate Selected Columns', 'Copy Selected Columns', 'Invert' +
+        ' Selected Columns', 'Select All Columns', 'Clear Selected Columns'],
         Help: ['Find Action', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keymap' +
         ' Reference']
       },
@@ -1334,16 +1331,13 @@ morpheus.HeatMap.prototype = {
             {
               name: 'Save Image (' + morpheus.Util.COMMAND_KEY + 'S)'
             },
-            {
-              separator: true
-            },
-            {
-              name: 'Copy Selection',
-              disabled: _this.project
-              .getElementSelectionModel()
-              .count() === 0,
-              class: 'copy'
-            },
+            // {
+            //   name: 'Copy Selection',
+            //   disabled: _this.project
+            //   .getElementSelectionModel()
+            //   .count() === 0,
+            //   class: 'copy'
+            // },
             {
               separator: true
             },
@@ -1574,6 +1568,13 @@ morpheus.HeatMap.prototype = {
     this.rowTrackHeaders = [];
     this.columnTracks = [];
     this.columnTrackHeaders = [];
+    if (this.options.rowSize != null && this.options.rowSize !== 'fit') {
+      this.heatmap.getRowPositions().setSize(this.options.rowSize);
+    }
+    if (this.options.columnSize != null && this.options.columnSize !== 'fit') {
+      this.heatmap.getColumnPositions().setSize(
+        this.options.columnSize);
+    }
     var setInitialDisplay = function (isColumns, options) {
       var nameToOption = new morpheus.Map();
       // at
@@ -1747,6 +1748,7 @@ morpheus.HeatMap.prototype = {
 
     reorderTracks(this.options.rows, false);
     reorderTracks(this.options.columns, true);
+
     var colorSchemeSpecified = this.options.colorScheme != null;
     if (this.options.colorScheme == null) {
       var ext = '';
@@ -1835,30 +1837,21 @@ morpheus.HeatMap.prototype = {
       this.updateDataset();
     }
 
-    if (this.options.rowSize != null) {
-      if (this.options.rowSize === 'fit') {
-        this.heatmap.getRowPositions().setSize(this.getFitRowSize());
-      } else {
-        this.heatmap.getRowPositions().setSize(this.options.rowSize);
-      }
+    if (this.options.rowSize === 'fit') {
+      this.heatmap.getRowPositions().setSize(this.getFitRowSize());
+      this.revalidate({
+        paint: false
+      });
+    }
+    if (this.options.columnSize === 'fit') {
+      this.heatmap.getColumnPositions().setSize(
+        this.getFitColumnSize());
       this.revalidate({
         paint: false
       });
 
     }
-    if (this.options.columnSize != null) {
-      if (this.options.columnSize === 'fit') {
-        this.heatmap.getColumnPositions().setSize(
-          this.getFitColumnSize());
-      } else {
-        this.heatmap.getColumnPositions().setSize(
-          this.options.columnSize);
-      }
-      this.revalidate({
-        paint: false
-      });
-    }
-    if (this.options.rowSize != null && this.options.columnSize != null) {
+    if (this.options.rowSize === 'fit' || this.options.columnSize === 'fit') {
       // note that we have to revalidate twice because column sizes are
       // dependent on row sizes and vice versa
       if (this.options.columnSize === 'fit') {
@@ -2262,25 +2255,27 @@ morpheus.HeatMap.prototype = {
     .on(
       'tap',
       this.tap = function (event) {
-        var commandKey = morpheus.Util.IS_MAC ? event.srcEvent.metaKey
-          : event.srcEvent.ctrlKey;
+        // var commandKey = morpheus.Util.IS_MAC ? event.srcEvent.metaKey
+        //   : event.srcEvent.ctrlKey;
         if (morpheus.Util.IS_MAC && event.srcEvent.ctrlKey) { // right-click
           // on
           // Mac
           return;
         }
-        var position = morpheus.CanvasUtil
-        .getMousePosWithScroll(event.target, event,
-          _this.scrollLeft(), _this
-          .scrollTop());
-        var rowIndex = _this.heatmap.getRowPositions()
-        .getIndex(position.y, false);
-        var columnIndex = _this.heatmap
-        .getColumnPositions().getIndex(position.x,
-          false);
-        _this.project.getElementSelectionModel().click(
-          rowIndex, columnIndex,
-          event.srcEvent.shiftKey || commandKey);
+        _this.project.getRowSelectionModel().setViewIndices(new morpheus.Set(), true);
+        _this.project.getColumnSelectionModel().setViewIndices(new morpheus.Set(), true);
+        // var position = morpheus.CanvasUtil
+        // .getMousePosWithScroll(event.target, event,
+        //   _this.scrollLeft(), _this
+        //   .scrollTop());
+        // var rowIndex = _this.heatmap.getRowPositions()
+        // .getIndex(position.y, false);
+        // var columnIndex = _this.heatmap
+        // .getColumnPositions().getIndex(position.x,
+        //   false);
+        // _this.project.getElementSelectionModel().click(
+        //   rowIndex, columnIndex,
+        //   event.srcEvent.shiftKey || commandKey);
       })
     .on(
       'pinch',

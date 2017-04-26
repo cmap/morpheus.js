@@ -51,12 +51,12 @@ morpheus.Project._recomputeCalculatedColumnFields = function (dataset, key) {
     if (vector.getProperties().get(morpheus.VectorKeys.FUNCTION) != null
       && vector.getProperties().get(key)) {
 
-      // copy properties
-      var v = metadata.add(name);
-      vector.getProperties().forEach(function (val, key) {
-        v.getProperties().set(key, val);
-      });
-      vector = v;
+      // // copy properties
+      // var v = metadata.add(name);
+      // vector.getProperties().forEach(function (val, key) {
+      //   v.getProperties().set(key, val);
+      // });
+      // vector = v;
       var f = morpheus.VectorUtil.jsonToFunction(vector, morpheus.VectorKeys.FUNCTION);
       for (var j = 0, size = vector.size(); j < size; j++) {
         view.setIndex(j);
