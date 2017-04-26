@@ -1,5 +1,10 @@
-morpheus.LandingPage = function () {
+morpheus.LandingPage = function (pageOptions) {
+  pageOptions = $.extend({}, {
+    el: $('#vis')
+  }, pageOptions);
+  this.pageOptions = pageOptions;
   var _this = this;
+
   var $el = $('<div class="container" style="display: none;"></div>');
   this.$el = $el;
   var html = [];
@@ -59,6 +64,8 @@ morpheus.LandingPage = function () {
     document.title = title;
   });
 
+  this.tabManager.$nav.appendTo($(this.pageOptions.el));
+  this.tabManager.$tabContent.appendTo($(this.pageOptions.el));
   // for (var i = 0; i < brands.length; i++) {
   // 	brands[i].style.color = colorScale(i);
   // }
