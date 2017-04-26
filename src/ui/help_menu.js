@@ -14,11 +14,36 @@ morpheus.HelpMenu = function () {
   html.push('<li><a data-name="linking" href="#">Linking</a></li>');
   html.push('<li><a data-name="tutorial" href="#">Tutorial</a></li>');
   html.push('<li><a data-name="source" href="#">Source Code</a></li>');
-  html.push('<li role="presentation" class="divider"></li>');
-  html.push('<li><a data-name="keymap" href="#">Keymap Reference</a></li>');
 
   html.push('</ul>');
   html.push('</div>');
   this.$el = $(html.join(''));
+  this.$el.find('[data-name=contact]').on('click', function (e) {
+    morpheus.FormBuilder.showInModal({
+      title: 'Contact',
+      html: 'Please email us at morpheus@broadinstitute.org',
+      focus: document.activeElement
+    });
+    e.preventDefault();
+
+  });
+  this.$el.find('[data-name=tutorial]').on('click', function (e) {
+    window
+    .open('https://clue.io/morpheus/tutorial.html');
+    e.preventDefault();
+
+  });
+
+  this.$el.find('[data-name=linking]').on('click', function (e) {
+    window
+    .open('https://clue.io/morpheus/linking.html');
+    e.preventDefault();
+
+  });
+  this.$el.find('[data-name=source]').on('click', function (e) {
+    window.open('https://github.com/cmap/morpheus.js');
+    e.preventDefault();
+
+  });
 
 };
