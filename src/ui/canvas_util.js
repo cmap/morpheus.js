@@ -167,13 +167,11 @@ morpheus.CanvasUtil.getVectorStringWidth = function (context, vector, positions,
   if (positions.getSize() < 6) {
     return 0;
   }
-  var fontSize = Math.min(24, positions.getSize() - 2);
+  var fontSize = Math.min(morpheus.VectorTrack.MAX_FONT_SIZE, positions.getSize() - 2);
   if (fontSize <= 0) {
     return 0;
   }
-
   context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
-
   var toString = morpheus.VectorTrack.vectorToString(vector);
   var maxWidth = 0;
   // var maxWidth2 = 0;

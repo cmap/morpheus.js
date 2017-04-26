@@ -34,7 +34,7 @@ morpheus.VectorTrack = function (project, name, positions, isColumns, heatmap) {
       var val = vector.getValue(index);
       if (val != null && val !== '') {
         var toString = morpheus.VectorTrack.vectorToString(vector);
-        var fontSize = Math.min(24, _this.positions.getSize() - 2);
+        var fontSize = Math.min(morpheus.VectorTrack.MAX_FONT_SIZE, _this.positions.getSize() - 2);
         var context = _this.canvas.getContext('2d');
         context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
         return context.measureText(toString(val)).width > this.textWidth;
@@ -190,7 +190,7 @@ morpheus.VectorTrack.prototype = {
     } else if (_.isObject(conf)) {
       conf.maxTextWidth = undefined;
       this.settings = $.extend({}, this.settings, conf);
-      if (conf.discrete) {
+      if (conf.discrete != null) {
         this.settings.discreteAutoDetermined = true;
       }
 
@@ -253,7 +253,9 @@ morpheus.VectorTrack.prototype = {
     if (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)
       || this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)) {
       if (this.positions.getSize() >= 6) {
+        var fontSize = morpheus.VectorTrack.MAX_FONT_SIZE;
         var context = this.canvas.getContext('2d');
+
         var textWidth = morpheus.CanvasUtil.getVectorStringWidth(
           context, this.getVector(), this.positions,
           forPrint ? -1 : (this.isColumns ? 120 : 100));
@@ -703,7 +705,7 @@ morpheus.VectorTrack.prototype = {
     context.textAlign = 'left';
     context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
 
-    var fontSize = Math.min(24, positions.getSize() - 2);
+    var fontSize = Math.min(morpheus.VectorTrack.MAX_FONT_SIZE, positions.getSize() - 2);
     var size = 0;
     context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
     context.strokeStyle = morpheus.HeatMapElementCanvas.GRID_COLOR;
@@ -2278,3 +2280,4 @@ morpheus.VectorTrack.prototype = {
   }
 };
 morpheus.Util.extend(morpheus.VectorTrack, morpheus.AbstractCanvas);
+morpheus.VectorTrack.MAX_FONT_SIZE = 18;

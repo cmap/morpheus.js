@@ -143,7 +143,11 @@ morpheus.VectorColorModel.prototype = {
     this.colors = colors;
   },
   getContinuousColorScheme: function (vector) {
-    return this.vectorNameToColorScheme.get(vector.getName());
+    var scheme = this.vectorNameToColorScheme.get(vector.getName());
+    if (scheme == null) {
+      scheme = this.createContinuousColorMap(vector);
+    }
+    return scheme;
   },
   getDiscreteColorScheme: function (vector) {
     return this.vectorNameToColorMap.get(vector.getName());
