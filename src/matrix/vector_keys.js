@@ -35,5 +35,6 @@ morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.VALUE_TO_INDICES);
 
 morpheus.VectorKeys.JSON_WHITELIST = new morpheus.Set();
 morpheus.VectorKeys.JSON_WHITELIST.add(morpheus.VectorKeys.FIELDS);
+morpheus.VectorKeys.JSON_WHITELIST.add(morpheus.VectorKeys.FORMATTER);
 morpheus.VectorKeys.JSON_WHITELIST.add(morpheus.VectorKeys.DATA_TYPE);
 morpheus.VectorKeys.JSON_WHITELIST.add(morpheus.VectorKeys.TITLE);

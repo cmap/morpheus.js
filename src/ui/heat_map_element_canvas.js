@@ -303,7 +303,7 @@ morpheus.HeatMapElementCanvas.prototype = {
     var rowPositions = this.rowPositions;
     //if (rowPositions.getSize() < 1 || columnPositions.getSize() < 1) {
     //force sub-pixel rendering
-    context.getImageData(0, 0, 1, 1);
+    morpheus.CanvasUtil.forceSubPixelRendering(context);
     //}
 
     context.textAlign = 'center';
