@@ -1,10 +1,10 @@
 morpheus.LegendWithStops = function () {
+  var _this = this;
   morpheus.AbstractCanvas.call(this, false);
   this.setBounds({
     width: 300,
     height: 40
   });
-  var _this = this;
   $(this.canvas).on('mousedown', function (event) {
     var position = morpheus.CanvasUtil.getMousePos(
       event.target, event);
@@ -32,9 +32,6 @@ morpheus.LegendWithStops = function () {
     }).on(
     'panstart',
     this.panstart = function (event) {
-      // _this.selectedIndex = _this
-      // .findIndexForPosition(morpheus.CanvasUtil
-      // .getMousePos(event.target, event, true));
     }).on('panend', this.panend = function (event) {
     _this.selectedIndex = -1;
   });
@@ -59,7 +56,7 @@ morpheus.LegendWithStops.prototype = {
     this.hammer.destroy();
   },
   setSelectedIndex: function (index) {
-    this.selectedIndex = -1;
+    this.selectedIndex = index;
   },
   findIndexForPosition: function (position) {
     // pix - stopHalfSize to pix + stopHalfSize
