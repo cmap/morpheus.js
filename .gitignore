@@ -1,1 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
+.idea/
+node_modules/
+morpheus-external.js
+morpheus-external.min.js
+.RData
+.Rhistory
+ctrp

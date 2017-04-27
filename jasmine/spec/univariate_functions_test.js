@@ -1,7 +1,7 @@
-describe("univariate_functions_test", function() {
+describe('univariate_functions_test', function() {
 
-	describe("mean", function() {
-		it("returns the mean value for numbers", function() {
+	describe('mean', function() {
+		it('returns the mean value for numbers', function() {
 			expect(morpheus.Mean(morpheus.VectorUtil.arrayAsVector([ 1 ])))
 					.toEqual(1);
 			expect(
@@ -13,7 +13,7 @@ describe("univariate_functions_test", function() {
 					.toEqual(11.5);
 		});
 
-		it("ignores undefined and NaN", function() {
+		it('ignores undefined and NaN', function() {
 			expect(
 					morpheus.Mean(morpheus.VectorUtil.arrayAsVector([ NaN, 1,
 							2, 3, 4, 5 ]))).toEqual(3);
@@ -26,7 +26,7 @@ describe("univariate_functions_test", function() {
 
 		});
 
-		it("returns NaN for empty array", function() {
+		it('returns NaN for empty array', function() {
 			expect(morpheus.Mean(morpheus.VectorUtil.arrayAsVector([])))
 					.toEqual(NaN);
 			expect(morpheus.Mean(morpheus.VectorUtil.arrayAsVector([ NaN ])))
@@ -35,7 +35,7 @@ describe("univariate_functions_test", function() {
 		});
 	});
 
-	it("returns the variance value for numbers", function() {
+	it('returns the variance value for numbers', function() {
 		expect(morpheus.Variance(morpheus.VectorUtil.arrayAsVector([ 1 ])))
 				.toEqual(NaN);
 		expect(
@@ -48,8 +48,8 @@ describe("univariate_functions_test", function() {
 
 	});
 
-	describe("percentile", function() {
-		it("uses the R-7 algorithm", function() {
+	describe('percentile', function() {
+		it('uses the R-7 algorithm', function() {
 			var v = morpheus.VectorUtil.arrayAsVector([ 3, 6, 7, 8, 8, 10, 13,
 					15, 16, 20 ]);
 			expect(morpheus.Percentile(v, 0)).toEqual(3);
@@ -68,8 +68,8 @@ describe("univariate_functions_test", function() {
 		});
 	});
 
-	describe("mad", function() {
-		it("equals R", function() {
+	describe('mad', function() {
+		it('equals R', function() {
 			var v = morpheus.VectorUtil.arrayAsVector([ 1, 2, 3, 4, 5, 6, 7, 8,
 					9 ]);
 			expect(morpheus.MAD(v)).toEqual(2.9652);

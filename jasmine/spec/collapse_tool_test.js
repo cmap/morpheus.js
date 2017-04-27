@@ -1,6 +1,6 @@
-describe("collapse_tool_test", function() {
+describe('collapse_tool_test', function() {
 
-	it("mean",
+	it('mean',
 			function() {
 				var heatmap = new morpheus.HeatMap({
 					dataset : new morpheus.Dataset({

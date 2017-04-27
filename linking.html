@@ -68,8 +68,8 @@
             </h4>
             <p class="collapse">
                 Optional array of
-                <code>{file:string, datasetField:string, fileField:string,
-                    include:[string]}</code>
+                <code>{file:String, datasetField:String, fileField:String,
+                    include:[String]}</code>
                 <br/>
                 <code>file</code>
                 : An xlsx file, a tab-delimited text file, or a gmt file.<br/>
@@ -100,8 +100,8 @@
             </h4>
             <p class="collapse">
                 Optional object
-                <code>{type:string, stepped:boolean, map:[{value:number,
-                    color:string}]}</code>
+                <code>{type:String, stepped:boolean, map:[{value:Number,
+                    color:String}]}</code>
                 that describes value to color mapping.
                 <code>type</code>
                 : 'fixed' or 'relative' color scheme.<br/>
@@ -121,7 +121,7 @@
             </h4>
             <p class="collapse">
                 Optional array of metadata names and sort order (
-                <code>[{field:string, order:number}]</code>
+                <code>[{field:String, order:Number}]</code>
                 ). <br/>
                 <code>field</code>
                 : Metadata field name. <br/>
@@ -152,7 +152,7 @@
             <p class="collapse">
                 Optional array of objects describing how to display metadata fields
                 (
-                <code>[{field:string, display:string}]</code>
+                <code>[{field:String, display:String}]</code>
                 ). <br/>
                 <code>field</code>
                 : Metadata field name <br/>
@@ -164,6 +164,19 @@
                 <code>[{field:'id', display:'text'}, {field:'stdev',
                     display:'text, color'}]</code>
             </p>
+            <h4>
+                <a data-toggle="collapse">tools</a>
+            </h4>
+            <p class="collapse">
+                Optional array of tools to run at load time
+                <code>[{name:String, params:Object}]</code>
+
+                <b>Example:</b> Cluster rows and columns. <br/>
+                <code>[{
+                    name: 'Hierarchical Clustering',
+                    params: {cluster: 'Rows and columns'}
+                    }]</code>
+            </p>
         </div>
     </div>
     <div class="row"></div>
@@ -174,50 +187,50 @@
     <div class="row"></div>
 </div>
 <script type="text/javascript">
-    var links = $(document.body).find('[data-toggle=collapse]');
-    var collapse = $(document.body).find('.collapse');
-    for (var i = 0; i < collapse.length; i++) {
-        var $c = $(collapse[i]);
-        var $l = $(links[i]);
-        $c.attr('id', i);
-        $l.attr('href', '#' + i);
-    }
-    $('#header').find('[name=expand]').on('click', function () {
-        $(document.body).find('.collapse').collapse('show');
-    });
-    $('#header').find('[name=collapse]').on('click', function () {
-        $(document.body).find('.collapse').collapse('hide');
-    });
-    $(document.body)
-    .find('[name=open]')
-    .on(
-            'click',
-            function (e) {
-                var json = {
-                    columnAnnotations: [{
-                        file: '//s3.amazonaws.com/data.clue.io/morpheus/Achilles_v2.4_SampleInfo_small.txt',
-                        datasetField: 'id',
-                        fileField: 'id'
-                    }],
-                    columns: [{
-                        field: 'id',
-                        display: 'text'
-                    }, {
-                        field: 'Site_primary',
-                        display: 'color'
-                    }],
-                    dataset: '//s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct'
-                }
-                window.location.href = 'http://www.broadinstitute.org/cancer/software/morpheus?json='
-                        + encodeURIComponent(JSON.stringify(json));
+  var links = $(document.body).find('[data-toggle=collapse]');
+  var collapse = $(document.body).find('.collapse');
+  for (var i = 0; i < collapse.length; i++) {
+    var $c = $(collapse[i]);
+    var $l = $(links[i]);
+    $c.attr('id', i);
+    $l.attr('href', '#' + i);
+  }
+  $('#header').find('[name=expand]').on('click', function () {
+    $(document.body).find('.collapse').collapse('show');
+  });
+  $('#header').find('[name=collapse]').on('click', function () {
+    $(document.body).find('.collapse').collapse('hide');
+  });
+  $(document.body)
+  .find('[name=open]')
+  .on(
+    'click',
+    function (e) {
+      var json = {
+        columnAnnotations: [{
+          file: '//s3.amazonaws.com/data.clue.io/morpheus/Achilles_v2.4_SampleInfo_small.txt',
+          datasetField: 'id',
+          fileField: 'id'
+        }],
+        columns: [{
+          field: 'id',
+          display: 'text'
+        }, {
+          field: 'Site_primary',
+          display: 'color'
+        }],
+        dataset: '//s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct'
+      }
+      window.location.href = 'http://www.broadinstitute.org/cancer/software/morpheus?json='
+        + encodeURIComponent(JSON.stringify(json));
 
-            });
-    setTimeout(function () {
-        $(document.body).find('.collapse').collapse('show');
-    }, 200);
+    });
+  setTimeout(function () {
+    $(document.body).find('.collapse').collapse('show');
+  }, 200);
 </script>
 <script>
-    morpheus.Util.loadTrackingCode();
+  morpheus.Util.loadTrackingCode();
 </script>
 </body>
 </html>
