@@ -33,11 +33,13 @@ morpheus.GseReader.prototype = {
             var nrowData = jsondata.data.dim[0];
             var ncolData = jsondata.data.dim[1];
             var flatPdata = jsondata.pdata.values;
-            var participants = jsondata.participants.values;
-            var annotation = jsondata.symbol.values;
+            //var participants = jsondata.participants.values;
+            var annotation = jsondata.fdata.values;
             console.log(annotation);
             var id = jsondata.rownames.values;
             var metaNames = jsondata.colMetaNames.values;
+            var rowMetaNames = jsondata.rowMetaNames.values;
+
             var matrix = [];
             for (var i = 0; i < nrowData; i++) {
               var curArray = new Float32Array(ncolData);
@@ -45,7 +47,6 @@ morpheus.GseReader.prototype = {
                 curArray[j] = flatData[i + j * nrowData];
               }
               matrix.push(curArray);
-
             }
             var dataset = new morpheus.Dataset({
               name: name,
@@ -60,10 +61,10 @@ morpheus.GseReader.prototype = {
             /*console.log("morpheus.GseReader.prototype.read ::", "input list", res);
              console.log("morpheus.GseReader.prototype.read ::", "metaNames", metaNames);
              console.log("morpheus.GseReader.prototype.read ::", dataset);*/
-            var columnsIds = dataset.getColumnMetadata().add('id');
+            /*var columnsIds = dataset.getColumnMetadata().add('id');
             for (var i = 0; i < ncolData; i++) {
               columnsIds.setValue(i, morpheus.Util.copyString(participants[i]));
-            }
+            }*/
             //console.log(flatPdata);
             for (var i = 0; i < metaNames.length; i++) {
               var curVec = dataset.getColumnMetadata().add(metaNames[i]);
@@ -73,13 +74,15 @@ morpheus.GseReader.prototype = {
             }
 
             var rowIds = dataset.getRowMetadata().add('id');
-            if (annotation) {
+
+            /*if (annotation) {
               var rowSymbol = dataset.getRowMetadata().add('symbol');
-            }
-            for (var i = 0; i < nrowData; i++) {
-              rowIds.setValue(i, id[i]);
-              if (annotation) {
-                rowSymbol.setValue(i, annotation[i]);
+            }*/
+            for (var i = 0; i < rowMetaNames.length; i++) {
+              var curVec = dataset.getRowMetadata().add(rowMetaNames[i]);
+              for (var j = 0; j < nrowData; j++) {
+                curVec.setValue(j, annotation[j + i * nrowData]);
+                rowIds.setValue(j, id[j])
               }
             }
             morpheus.MetadataUtil.maybeConvertStrings(dataset.getRowMetadata(), 1);

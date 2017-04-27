@@ -1070,7 +1070,7 @@ morpheus.DatasetUtil.getMetadataArray = function (dataset) {
 morpheus.DatasetUtil.toESSessionPromise = function (options) {
   var dataset = options.dataset ? options.dataset : options;
 
-  console.log("ENTERED TO_ESSESSION_PROMISE", dataset);
+  console.log("ENTERED TO_ESSESSION_PROMISE", dataset, options);
   //var copiedDataset = morpheus.DatasetUtil.copy(dataset);
   //console.log("EsSessionPromise ::", "after copying", dataset);
   while (dataset.dataset) {

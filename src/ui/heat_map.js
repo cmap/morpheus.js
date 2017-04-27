@@ -1597,7 +1597,7 @@ morpheus.HeatMap.prototype = {
       if (!displaySpecified) {
         var defaultFieldsToShow = new morpheus.Set();
         //['pert_iname', 'moa', 'target', 'description', 'cell_id', 'pert_type'
-        ['pert_iname', 'moa', 'target', 'cell_id', 'pert_type', 'condition', 'geo_accession', 'id', 'title', 'characteristics']
+        ['pert_iname', 'moa', 'target', 'cell_id', 'pert_type']
           .forEach(function (field) {
             defaultFieldsToShow.add(field);
           });
@@ -1614,6 +1614,7 @@ morpheus.HeatMap.prototype = {
 
       }
       var isFirst = true;
+      console.log("heat_map ::", displayMetadata, displaySpecified);
       for (var i = 0, metadataCount = displayMetadata.getMetadataCount(); i < metadataCount; i++) {
         var display = displaySpecified ? 'None' : undefined;
         var v = displayMetadata.get(i);
