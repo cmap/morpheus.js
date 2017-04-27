@@ -47,6 +47,7 @@ morpheus.VectorColorModel.STANDARD_COLORS = {
   'kd': '#C675A8',
   'oe': '#56b4e9',
   'cp': '#FF9933',
+  'pcl':'#003B4A',
   'trt_sh.cgs': '#C675A8',
   'trt_oe': '#56b4e9',
   'trt_cp': '#FF9933',

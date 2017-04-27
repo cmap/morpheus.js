@@ -125,11 +125,26 @@ morpheus.VectorTrack.RENDER = {
   HEAT_MAP: 'heat_map'
 };
 morpheus.VectorTrack.vectorToString = function (vector) {
-  var formatter = function (v) {
-    return '' + v;
-  };
   var dataType = morpheus.VectorUtil.getDataType(vector);
-  if (dataType === 'number') {
+  var formatter = vector.getProperties().get(morpheus.VectorKeys.FORMATTER);
+  if (formatter != null) {
+    if (typeof formatter === 'object') { // convert to function
+      formatter = morpheus.Util.createNumberFormat(formatter.pattern);
+      if (dataType === '[number]') {
+        var nf = formatter;
+        formatter = function (v) {
+          var s = [];
+          if (v != null) {
+            for (var i = 0, arrayLength = v.length; i < arrayLength; i++) {
+              s.push(nf(v[i]));
+            }
+          }
+          return s.join(', ');
+        };
+      }
+      vector.getProperties().set(morpheus.VectorKeys.FORMATTER, formatter);
+    }
+  } else if (dataType === 'number') {
     formatter = morpheus.Util.nf;
   } else if (dataType === '[number]') {
     formatter = function (v) {
@@ -150,6 +165,10 @@ morpheus.VectorTrack.vectorToString = function (vector) {
         }
       }
       return s.join(', ');
+    };
+  } else {
+    formatter = function (v) {
+      return '' + v;
     };
   }
   return formatter;
@@ -865,6 +884,7 @@ morpheus.VectorTrack.prototype = {
     var SORT_SEL_DESC = 'Sort Heat Map Descending \u2193';
     var SORT_SEL_TOP_N = 'Sort Heat Map Descending/Ascending';
     var DISPLAY_BAR = 'Show Bar Chart';
+    var NUMBER_FORMAT = 'Format';
     var DISPLAY_STACKED_BAR = 'Show Stacked Bar Chart';
     var DISPLAY_BOX_PLOT = 'Show Box Plot';
     var DISPLAY_COLOR = 'Show Color';
@@ -954,6 +974,13 @@ morpheus.VectorTrack.prototype = {
     var isArray = arrayFields !== undefined;
     var isNumber = dataType === 'number' || dataType === '[number]';
     if (isNumber || isArray) {
+      sectionToItems.Display.push({
+        name: NUMBER_FORMAT
+      });
+      sectionToItems.Display.push({
+        separator: true
+      });
+
       sectionToItems.Display.push({
         name: DISPLAY_BAR,
         checked: this.isRenderAs(morpheus.VectorTrack.RENDER.BAR)
@@ -1145,7 +1172,44 @@ morpheus.VectorTrack.prototype = {
       e.target,
       function (event, item) {
         var customItem;
-        if (item === 'Copy') {
+        if (item === NUMBER_FORMAT) {
+          var vector = _this.getFullVector();
+          var formatter = vector
+          .getProperties().get(morpheus.VectorKeys.FORMATTER);
+          if (formatter != null) {
+            if (typeof formatter === 'object') { // convert to function
+              formatter = morpheus.Util.createNumberFormat(formatter.pattern);
+              vector.getProperties().set(morpheus.VectorKeys.FORMATTER, formatter);
+            }
+          }
+          var pattern = formatter != null ? formatter.toJSON().pattern : '.2f';
+
+          var formBuilder = new morpheus.FormBuilder();
+          formBuilder.append({
+            name: 'number_of_fraction_digits',
+            type: 'number',
+            value: parseInt(pattern.substring(1, pattern.length - 1)),
+            required: true,
+            col: 'col-xs-2'
+          });
+          formBuilder.find('number_of_fraction_digits').on(
+            'keyup input',
+            function () {
+              var n = parseInt($(this)
+              .val());
+              if (n >= 0) {
+                vector.getProperties().set(morpheus.VectorKeys.FORMATTER, {pattern: '.' + n + 'f'});
+                _this.setInvalid(true);
+                _this.repaint();
+              }
+            });
+          morpheus.FormBuilder.showInModal({
+            title: 'Format',
+            close: 'Close',
+            html: formBuilder.$form,
+            focus: heatmap.getFocusEl()
+          });
+        } else if (item === 'Copy') {
           heatmap.getActionManager().execute(isColumns ? 'Copy Selected Columns' : 'Copy' +
             ' Selected Rows');
         } else if (item === FIELDS) {

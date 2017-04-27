@@ -22,11 +22,11 @@ morpheus.VectorKeys.SELECTION = 'morpheus.selection';
 /** Whether to recompute a function when creating a new heat map (true or false) */
 morpheus.VectorKeys.RECOMPUTE_FUNCTION_NEW_HEAT_MAP = 'morpheus.recompute.funct.new.heat.map';
 
-/** Whether to recompute a function when filter is updated (true or false)  */
-morpheus.VectorKeys.RECOMPUTE_FUNCTION_FILTER = 'morpheus.recompute.funct.filter';
-
 /** Boolean, whether to recompute a function when heat map selection changes */
 morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION = 'morpheus.recompute.funct.selection';
+
+/**Number format spec/function */
+morpheus.VectorKeys.FORMATTER = 'morpheus.formatter';
 
 morpheus.VectorKeys.COPY_IGNORE = new morpheus.Set();
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.HEADER_SUMMARY);
