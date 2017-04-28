@@ -55,11 +55,11 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
   items = items.concat({
     name: 'selected_color',
     type: 'color',
-    col: 'col-xs-2'
+    style: 'max-width: 50px;'
   }, {
     name: 'selected_value',
     type: 'text',
-    col: 'col-xs-4'
+    style: 'max-width: 100px;'
   }, [{
     name: 'delete',
     type: 'button',
@@ -71,11 +71,11 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
   }], {
     name: 'minimum',
     type: 'text',
-    col: 'col-xs-4'
+    style: 'max-width: 100px;'
   }, {
     name: 'maximum',
     type: 'text',
-    col: 'col-xs-4'
+    style: 'max-width: 100px;'
   });
   if (options.showRelative) {
     items = items.concat({
@@ -104,7 +104,7 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
   items = items.concat({
     name: 'missing_color',
     type: 'color',
-    col: 'col-xs-2'
+    style: 'max-width: 50px;'
   });
   items
   .push({

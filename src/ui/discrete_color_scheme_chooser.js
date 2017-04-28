@@ -18,7 +18,7 @@ morpheus.DiscreteColorSchemeChooser = function (options) {
   });
   var $select = formBuilder.$form.find('[name=colorPicker]');
   formBuilder.append({
-    col: 'col-xs-2',
+    style: 'max-width:50px;',
     name: 'selected_color',
     type: 'color'
   });

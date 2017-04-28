@@ -64,21 +64,20 @@ morpheus.HeatMapOptions = function (heatMap) {
     title: 'Size by minimum',
     required: true,
     type: 'text',
-    col: 'col-xs-4'
+    style: 'max-width: 100px;'
   });
   items.push({
     name: 'size_by_maximum',
     title: 'Size by maximum',
     required: true,
     type: 'text',
-    col: 'col-xs-4'
+    style: 'max-width: 100px;'
   });
 
   items.push({
     name: 'conditional_rendering',
     required: true,
-    type: 'button',
-    col: 'col-xs-4'
+    type: 'button'
   });
 
   var displayItems = [
@@ -87,7 +86,7 @@ morpheus.HeatMapOptions = function (heatMap) {
       name: 'link_rows_and_columns',
       required: true,
       type: 'checkbox',
-      col: 'col-xs-4',
+      style: 'max-width: 100px;',
       value: heatMap.getProject().isSymmetric()
     },
     {
@@ -100,21 +99,21 @@ morpheus.HeatMapOptions = function (heatMap) {
       name: 'grid_thickness',
       required: true,
       type: 'text',
-      col: 'col-xs-4',
+      style: 'max-width: 100px;',
       value: morpheus.Util.nf(heatMap.heatmap.getGridThickness())
     },
     {
       name: 'grid_color',
       required: true,
       type: 'color',
-      col: 'col-xs-2',
+      style: 'max-width: 50px;',
       value: heatMap.heatmap.getGridColor()
     },
     {
       name: 'row_size',
       required: true,
       type: 'text',
-      col: 'col-xs-4',
+      style: 'max-width: 100px;',
       value: morpheus.Util.nf(heatMap.heatmap.getRowPositions()
       .getSize())
     },
@@ -122,7 +121,7 @@ morpheus.HeatMapOptions = function (heatMap) {
       name: 'column_size',
       required: true,
       type: 'text',
-      col: 'col-xs-4',
+      style: 'max-width: 100px;',
       value: morpheus.Util.nf(heatMap.heatmap
       .getColumnPositions().getSize())
     }, {
@@ -130,6 +129,15 @@ morpheus.HeatMapOptions = function (heatMap) {
       required: true,
       type: 'checkbox',
       value: heatMap.heatmap.isDrawValues()
+    }, {
+      name: 'number_of_fraction_digits',
+      required: true,
+      type: 'number',
+      disabled: !heatMap.heatmap.isDrawValues(),
+      min: 0,
+      step: 1,
+      style: 'max-width: 100px;',
+      value: morpheus.Util.getNumberFormatPatternFractionDigits(heatMap.heatmap.getDrawValuesFormat().toJSON().pattern)
     }];
   if (heatMap.rowDendrogram) {
     displayItems
@@ -137,7 +145,7 @@ morpheus.HeatMapOptions = function (heatMap) {
       name: 'row_dendrogram_line_thickness',
       required: true,
       type: 'text',
-      col: 'col-xs-4',
+      style: 'max-width: 100px;',
       value: morpheus.Util
       .nf(heatMap.rowDendrogram ? heatMap.rowDendrogram.lineWidth
         : 1)
@@ -149,7 +157,7 @@ morpheus.HeatMapOptions = function (heatMap) {
       name: 'column_dendrogram_line_thickness',
       required: true,
       type: 'text',
-      col: 'col-xs-4',
+      style: 'max-width: 100px;',
       value: morpheus.Util
       .nf(heatMap.columnDendrogram ? heatMap.columnDendrogram.lineWidth
         : 1)
@@ -160,7 +168,7 @@ morpheus.HeatMapOptions = function (heatMap) {
     name: 'info_window',
     required: true,
     type: 'select',
-    col: 'col-xs-4',
+    style: 'max-width:130px;',
     options: [{
       name: 'Fixed To Top',
       value: 0
@@ -309,11 +317,27 @@ morpheus.HeatMapOptions = function (heatMap) {
     heatMap.revalidate();
     colorSchemeChooser.restoreCurrentValue();
   });
+  var $fractionDigits = displayFormBuilder.$form.find('[name=number_of_fraction_digits]');
   displayFormBuilder.$form.find('[name=show_values]').on('click', function (e) {
-    heatMap.heatmap.setDrawValues($(this).prop('checked'));
+    var drawValues = $(this).prop('checked');
+    heatMap.heatmap.setDrawValues(drawValues);
+    $fractionDigits.prop('disabled', !drawValues);
     heatMap.revalidate();
     colorSchemeChooser.restoreCurrentValue();
   });
+
+  $fractionDigits.on(
+    'keyup input', _.debounce(
+      function () {
+        var n = parseInt($(this)
+        .val());
+        if (n >= 0) {
+          heatMap.heatmap.setDrawValuesFormat(morpheus.Util.createNumberFormat('.' + n + 'f'));
+          heatMap.heatmap.setInvalid(true);
+          heatMap.heatmap.repaint();
+        }
+      }, 100));
+
   displayFormBuilder.$form.find('[name=inline_tooltip]').on('click',
     function (e) {
       heatMap.options.inlineTooltip = $(this).prop('checked');

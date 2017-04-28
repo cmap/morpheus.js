@@ -896,7 +896,7 @@ morpheus.Util.xlsxTo2dArray = function (options, callback) {
       type: 'bootstrap-select',
       options: sheetNames,
       required: true,
-      col: 'col-xs-2'
+      style: 'max-width:100px;'
     });
     morpheus.FormBuilder.showInModal({
       title: 'Choose Sheet',
@@ -937,7 +937,7 @@ morpheus.Util.xlsxTo1dArray = function (options, callback) {
       type: 'bootstrap-select',
       options: sheetNames,
       required: true,
-      col: 'col-xs-2'
+      style: 'max-width:100px;'
     });
 
     morpheus.FormBuilder.showOkCancel({
@@ -1072,6 +1072,11 @@ morpheus.Util.intFormat = function (n) {
 morpheus.Util._nf = typeof d3 !== 'undefined' ? d3.format('.2f') : function (d) {
   return '' + d;
 };
+
+morpheus.Util.getNumberFormatPatternFractionDigits = function (pattern) {
+  return parseInt(pattern.substring(1, pattern.length - 1));
+};
+
 morpheus.Util.nf = function (n) {
   // var str = (n < 1 && n > -1 && n.toPrecision !== undefined) ? n
   // .toPrecision(4) : morpheus.Util._nf(n);

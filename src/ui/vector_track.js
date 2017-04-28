@@ -1183,26 +1183,25 @@ morpheus.VectorTrack.prototype = {
             }
           }
           var pattern = formatter != null ? formatter.toJSON().pattern : '.2f';
-
           var formBuilder = new morpheus.FormBuilder();
           formBuilder.append({
             name: 'number_of_fraction_digits',
             type: 'number',
-            value: parseInt(pattern.substring(1, pattern.length - 1)),
+            value: morpheus.Util.getNumberFormatPatternFractionDigits(pattern),
             required: true,
-            col: 'col-xs-2'
+            style: 'max-width:10px;'
           });
           formBuilder.find('number_of_fraction_digits').on(
-            'keyup input',
-            function () {
-              var n = parseInt($(this)
-              .val());
-              if (n >= 0) {
-                vector.getProperties().set(morpheus.VectorKeys.FORMATTER, {pattern: '.' + n + 'f'});
-                _this.setInvalid(true);
-                _this.repaint();
-              }
-            });
+            'keyup input', _.debounce(
+              function () {
+                var n = parseInt($(this)
+                .val());
+                if (n >= 0) {
+                  vector.getProperties().set(morpheus.VectorKeys.FORMATTER, {pattern: '.' + n + 'f'});
+                  _this.setInvalid(true);
+                  _this.repaint();
+                }
+              }, 100));
           morpheus.FormBuilder.showInModal({
             title: 'Format',
             close: 'Close',
@@ -1309,7 +1308,7 @@ morpheus.VectorTrack.prototype = {
             type: 'color',
             value: _this.settings.barColor,
             required: true,
-            col: 'col-xs-2'
+            style: 'max-width:50px;'
           });
           formBuilder.find('bar_color').on(
             'change',
@@ -1332,7 +1331,7 @@ morpheus.VectorTrack.prototype = {
             type: 'text',
             value: _this.settings.colorBarSize,
             required: true,
-            col: 'col-xs-2'
+            style: 'max-width:50px;'
           });
           formBuilder.find('size').on(
             'change',

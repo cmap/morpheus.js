@@ -224,7 +224,7 @@ morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
                   type: 'color',
                   value: selectedNode.color,
                   required: true,
-                  col: 'col-xs-2'
+                  style: 'max-width:50px;'
                 });
                 formBuilder.find('color').on(
                   'change',

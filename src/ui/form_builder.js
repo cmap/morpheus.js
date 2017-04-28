@@ -384,6 +384,7 @@ morpheus.FormBuilder.prototype = {
     var help = field.help;
     var value = field.value;
     var showLabel = field.showLabel;
+    var style = field.style || '';
     var col = '';
     var labelColumn = '';
     if (!this.vertical) {
@@ -422,7 +423,7 @@ morpheus.FormBuilder.prototype = {
               : choice;
             var selected = value === optionValue;
             html.push('<div class="radio"><label>');
-            html.push('<input value="' + optionValue
+            html.push('<input style="' + style + '" value="' + optionValue
               + '" name="' + field.name
               + '" type="radio"');
             if (selected) {
@@ -440,7 +441,7 @@ morpheus.FormBuilder.prototype = {
           });
       } else {
         html.push('<div class="radio"><label>');
-        html.push('<input value="' + value + '" name="' + name
+        html.push('<input style="' + style + '" value="' + value + '" name="' + name
           + '" id="' + id + '" type="radio"');
         if (field.checked) {
           html.push(' checked');
@@ -451,7 +452,7 @@ morpheus.FormBuilder.prototype = {
       }
     } else if ('checkbox' === type) {
       html.push('<div class="checkbox"><label>');
-      html.push('<input name="' + name + '" id="' + id
+      html.push('<input style="' + style + '" name="' + name + '" id="' + id
         + '" type="checkbox"');
       if (value) {
         html.push(' checked');
@@ -470,11 +471,11 @@ morpheus.FormBuilder.prototype = {
       // type = 'bootstrap-select';
       // }
       if (type == 'bootstrap-select') {
-        html.push('<select data-live-search="' + (field.search ? true : false) + '" data-selected-text-format="count" name="'
+        html.push('<select style="' + style + '" data-live-search="' + (field.search ? true : false) + '" data-selected-text-format="count" name="'
           + name + '" id="' + id
           + '" class="selectpicker form-control"');
       } else {
-        html.push('<select name="' + name + '" id="' + id
+        html.push('<select style="' + style + '" name="' + name + '" id="' + id
           + '" class="form-control"');
       }
       if (disabled) {
@@ -535,7 +536,7 @@ morpheus.FormBuilder.prototype = {
           });
       }
     } else if ('textarea' == type) {
-      html.push('<textarea id="' + id + '" class="form-control" name="'
+      html.push('<textarea style="' + style + '" id="' + id + '" class="form-control" name="'
         + name + '"');
       if (required) {
         html.push(' required');
@@ -552,7 +553,7 @@ morpheus.FormBuilder.prototype = {
       }
       html.push('</textarea>');
     } else if ('button' == type) {
-      html.push('<button id="' + id + '" name="' + name
+      html.push('<button style="' + style + '" id="' + id + '" name="' + name
         + '" type="button" class="btn btn-default btn-sm">');
       if (field.icon) {
         html.push('<span class="' + field.icon + '"></span> ');
@@ -713,7 +714,7 @@ morpheus.FormBuilder.prototype = {
       if (type === 'div') {
         html.push('<div name="' + name + '" id="' + id + '"');
       } else {
-        html.push('<input type="' + type
+        html.push('<input style="' + style + '" type="' + type
           + '" class="form-control" name="' + name + '" id="'
           + id + '"');
       }
