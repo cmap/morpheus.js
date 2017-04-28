@@ -91,7 +91,7 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
     return false;
   };
   this.selectedBackgroundColor = '#c8c8c8';
-  this.backgroundColor = '#f9f9f9';
+  this.backgroundColor = 'rgb(255,255,255)';
   $(this.canvas).css({'background-color': this.backgroundColor}).on(
     'mousemove.morpheus', mouseMove).on('mouseout.morpheus', mouseExit)
   .on('mouseenter.morpheus', mouseMove);
@@ -136,6 +136,10 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
       $(header.canvas).css('z-index', '0');
       heatMap.revalidate();
     })
+  .on('mousedown', function (event) {
+    resizeCursor = getResizeCursor(morpheus.CanvasUtil
+    .getMousePos(event.target, event, true));
+  })
   .on(
     'panstart',
     this.panstart = function (event) {
@@ -143,8 +147,6 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
       if (morpheus.CanvasUtil.dragging) {
         return;
       }
-      resizeCursor = getResizeCursor(morpheus.CanvasUtil
-      .getMousePos(event.target, event, true));
       if (resizeCursor != null) { // make sure start event was on
         // hotspot
         morpheus.CanvasUtil.dragging = true;
@@ -168,7 +170,7 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
         }
         event.preventDefault();
         reorderingTrack = false;
-      } else {
+      } else { // move track
         var index = heatMap.getTrackIndex(_this.name,
           isColumns);
         if (index == -1) {
@@ -311,7 +313,6 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
         _this.setSortingStatus(_this.getSortKeys(),
           sortKey, additionalSort, isGroupBy);
       }
-      // }
     });
 };
 morpheus.VectorTrackHeader.FONT_OFFSET = 2;
@@ -364,7 +365,7 @@ morpheus.VectorTrackHeader.prototype = {
   },
   getSortKeys: function () {
     return this.isColumns ? this.project.getColumnSortKeys() : this.project
-      .getRowSortKeys();
+    .getRowSortKeys();
   },
   setOrder: function (sortKeys) {
     if (this.isColumns) {
@@ -483,6 +484,7 @@ morpheus.VectorTrackHeader.prototype = {
       return;
     }
 
+    context.strokeStyle = '#ddd';
     if (this.isColumns) {
       context.beginPath();
       context.moveTo(0, this.getUnscaledHeight());
@@ -499,9 +501,8 @@ morpheus.VectorTrackHeader.prototype = {
     var fontHeight = Math.min(this.defaultFontHeight, this
       .getUnscaledHeight()
       - morpheus.VectorTrackHeader.FONT_OFFSET);
-    var squished = this.heatMap.getTrack(this.name, this.isColumns).settings.squished;
-    context.font = (squished ? 'Italic ' : '') + fontHeight + 'px '
-      + morpheus.CanvasUtil.FONT_NAME;
+    fontHeight = Math.min(fontHeight, morpheus.VectorTrack.MAX_FONT_SIZE);
+    context.font = fontHeight + 'px ' + morpheus.CanvasUtil.FONT_NAME;
     var textWidth = context.measureText(name).width;
     var isColumns = this.isColumns;
     var xpix = this.isColumns ? this.getUnscaledWidth() - 2 : 10;
@@ -513,11 +514,11 @@ morpheus.VectorTrackHeader.prototype = {
         xpix -= 6;
       }
     }
+    context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
     var ypix = this.isColumns ? (this.getUnscaledHeight() / 2)
       : (this.getUnscaledHeight() - (this.defaultFontHeight + morpheus.VectorTrackHeader.FONT_OFFSET) / 2);
     context.textBaseline = 'middle';
     if (this.isMouseOver) {
-      context.fillStyle = 'rgb(0,0,0)';
       var xdot = xpix - (isColumns ? textWidth + 4 : 4);
       var ydot = ypix - 3;
       for (var i = 0; i < 2; i++) {
@@ -526,7 +527,7 @@ morpheus.VectorTrackHeader.prototype = {
         }
       }
     }
-    context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
+
     context.fillText(name, xpix, ypix);
     // var vector = (this.isColumns ? this.project.getFullDataset()
     // .getColumnMetadata() : this.project.getFullDataset()

@@ -54,7 +54,7 @@ morpheus.Divider.prototype = {
     var width = this.getUnscaledWidth();
     var height = this.getUnscaledHeight();
     context.clearRect(0, 0, width, height);
-    context.strokeStyle = 'black';
+    context.strokeStyle = '#ddd';
     if (!this.vertical) {// horizontal line at top
       context.beginPath();
       context.moveTo(0, 1.5);

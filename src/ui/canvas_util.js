@@ -3,7 +3,7 @@ morpheus.CanvasUtil = function () {
 morpheus.CanvasUtil.dragging = false;
 
 morpheus.CanvasUtil.FONT_NAME = '"Helvetica Neue",Helvetica,Arial,sans-serif';
-morpheus.CanvasUtil.FONT_COLOR = 'rgb(34, 34, 34)';
+morpheus.CanvasUtil.FONT_COLOR = 'rgb(0, 0, 0)';
 morpheus.CanvasUtil.getPreferredSize = function (c) {
   var size = c.getPreferredSize();
   var prefWidth = c.getPrefWidth();
