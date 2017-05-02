@@ -630,9 +630,15 @@ morpheus.HeatMapOptions = function (heatMap) {
       colorSchemeChooser.restoreCurrentValue();
 
     }, 100));
-  displayFormBuilder.$form.find('[name=gap_size]').on('keyup',
+  displayFormBuilder.$form.find('[name=row_gap_size]').on('keyup',
     _.debounce(function (e) {
-      heatMap.gapSize = parseFloat($(this).val());
+      heatMap.rowGapSize = parseFloat($(this).val());
+      heatMap.revalidate();
+      colorSchemeChooser.restoreCurrentValue();
+    }, 100));
+  displayFormBuilder.$form.find('[name=column_gap_size]').on('keyup',
+    _.debounce(function (e) {
+      heatMap.columnGapSize = parseFloat($(this).val());
       heatMap.revalidate();
       colorSchemeChooser.restoreCurrentValue();
     }, 100));

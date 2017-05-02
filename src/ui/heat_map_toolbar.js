@@ -157,29 +157,28 @@ morpheus.HeatMapToolBar = function (heatMap) {
         menu.push('<li role="separator" class="divider"></li>');
       } else {
         var action = heatMap.getActionManager().getAction(name);
-        if (action == null) {
-          throw name;
-        }
-        menu.push('<li>');
-        menu.push('<a class="morpheus-menu-item" data-action="' + action.name + '" href="#">');
-        menu.push(action.name);
-        if (action.icon) {
-          menu.push('<span class="' + action.icon + ' morpheus-menu-item-icon"></span> ');
-        }
-        if (action.which) {
-          menu.push('<span class="pull-right">');
-          if (action.commandKey) {
-            menu.push(morpheus.Util.COMMAND_KEY);
+        if (action != null) {
+          menu.push('<li>');
+          menu.push('<a class="morpheus-menu-item" data-action="' + action.name + '" href="#">');
+          menu.push(action.name);
+          if (action.icon) {
+            menu.push('<span class="' + action.icon + ' morpheus-menu-item-icon"></span> ');
           }
-          if (action.shiftKey) {
-            menu.push('Shift+');
+          if (action.which) {
+            menu.push('<span class="pull-right">');
+            if (action.commandKey) {
+              menu.push(morpheus.Util.COMMAND_KEY);
+            }
+            if (action.shiftKey) {
+              menu.push('Shift+');
+            }
+            menu.push(morpheus.KeyboardCharMap[action.which[0]]);
+            menu.push('</span>');
           }
-          menu.push(morpheus.KeyboardCharMap[action.which[0]]);
-          menu.push('</span>');
-        }
 
-        menu.push('</a>');
-        menu.push('</li>');
+          menu.push('</a>');
+          menu.push('</li>');
+        }
       }
     });
 
@@ -444,13 +443,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     } else {
       _this.matchAllPredicates = $this.data('name') === 'matchAll';
     }
-    for (var i = 0; i < $searchToggle.length; i++) {
-      var $button = $($searchToggle[i]);
-      if ($button.css('display') === 'block') {
-        $button.click();
-        break;
-      }
-    }
+
     var $searchField;
     if (_this.rowSearchObject.$search.is(':visible')) {
       $searchField = _this.rowSearchObject.$search;
@@ -521,7 +514,13 @@ morpheus.HeatMapToolBar = function (heatMap) {
   this.rowDendrogramSearchObject.$searchResultsWrapper.show();
   this.columnDendrogramSearchObject.$searchResultsWrapper.show();
   this.valueSearchObject.$searchResultsWrapper.show();
-
+  for (var i = 0; i < $searchToggle.length; i++) {
+    var $button = $($searchToggle[i]);
+    if ($button.css('display') === 'block') {
+      $button.click();
+      break;
+    }
+  }
   this.rowSearchObject.$search.css({
     'border-top': '3.8px solid #e6e6e6',
     'border-bottom': '3.8px solid #e6e6e6',
@@ -561,6 +560,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     }
     $next.click();
   };
+
   for (var i = 0; i < $searchToggle.length; i++) {
     var $button = $($searchToggle[i]);
     if ($button.css('display') === 'block') {

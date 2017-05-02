@@ -190,7 +190,8 @@ morpheus.HeatMap = function (options) {
       rename: true,
       rowSize: undefined,
       columnSize: undefined,
-      gapSize: 10,
+      rowGapSize: 10,
+      columnGapSize:10,
       customUrls: undefined, // Custom urls for File>Open.
       height: 'window', // set the available height for the
       // heat map. If not
@@ -258,7 +259,8 @@ morpheus.HeatMap = function (options) {
   } else {
     this.$el = $(options.el);
   }
-  this.gapSize = options.gapSize;
+  this.rowGapSize = options.rowGapSize;
+  this.columnGapSize = options.columnGapSize;
   this.actionManager = new morpheus.ActionManager();
   this.actionManager.heatMap = this;
   this.$el.addClass('morpheus');
@@ -1045,7 +1047,8 @@ morpheus.HeatMap.prototype = {
     json.symmetric = this.options.symmetric;
     json.rowSize = this.heatmap.getRowPositions().getSize();
     json.columnSize = this.heatmap.getColumnPositions().getSize();
-    json.gapSize = this.heatmap.gapSize;
+    json.rowGapSize = this.heatmap.rowGapSize;
+    json.columnGapSize = this.heatmap.columnGapSize;
     json.drawGrid = this.heatmap.isDrawGrid();
     json.gridColor = this.heatmap.getGridColor();
     json.gridThickness = this.heatmap.getGridThickness();
@@ -2799,7 +2802,7 @@ morpheus.HeatMap.prototype = {
       return tracks[existingIndex];
     }
     if (renderSettings == null) {
-      var metadata = isColumns ? this.project.getFullDataset().getColumnMetadata() : this.project.getFullDataset().getRowMetadata()
+      var metadata = isColumns ? this.project.getFullDataset().getColumnMetadata() : this.project.getFullDataset().getRowMetadata();
       renderSettings = morpheus.VectorUtil.getDataType(metadata.getByName(name)) === '[number]' ? 'bar'
         : morpheus.VectorTrack.RENDER.TEXT;
     }
@@ -2858,8 +2861,8 @@ morpheus.HeatMap.prototype = {
     this.horizontalSearchBar.update();
     this.heatmap.setDataset(dataset);
     this.heatmap.getRowPositions().setSpaces(morpheus.HeatMap.createGroupBySpaces(dataset, this.project.getGroupRows(),
-      this.gapSize, false));
-    this.heatmap.getColumnPositions().setSpaces(morpheus.HeatMap.createGroupBySpaces(dataset, this.project.getGroupColumns(), this.gapSize, true));
+      this.rowGapSize, false));
+    this.heatmap.getColumnPositions().setSpaces(morpheus.HeatMap.createGroupBySpaces(dataset, this.project.getGroupColumns(), this.columnGapSize, true));
     this.trigger('change', {
       name: 'updateDataset',
       source: this,
