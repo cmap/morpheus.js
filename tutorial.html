@@ -50,12 +50,7 @@
 					style="font-size: 1.2em; display: block; font-weight: 800;">Median
 					Absolute Deviation (MAD)</a>
 				<p class="collapse">
-					Click the tools icon
-					<button type="button"
-						class="btn btn-default btn-xs dropdown-toggle">
-						<span class="fa fa-wrench"></span> <span class="fa fa-caret-down"></span>
-					</button>
-					and select "Create Calculated Annotation". <br /> Enter "MAD" for
+					Click Tools > Create Calculated Annotation. <br /> Enter "MAD" for
 					the "Annotation name". <br /> Enter "MAD()" for "Formula" and
 					click "OK". <br /> A new row annotation named "MAD" will appear to
 					the right of the heat map.
@@ -81,12 +76,7 @@
 					style="font-size: 1.2em; display: block; font-weight: 800;">Hierarchical
 					Clustering</a>
 				<p class="collapse">
-					Click the tools icon
-					<button type="button"
-						class="btn btn-default btn-xs dropdown-toggle">
-						<span class="fa fa-wrench"></span> <span class="fa fa-caret-down"></span>
-					</button>
-					and select "Hierarchical Clustering". Change "Cluster" to "Rows and
+					Click Tools > Hierarchical Clustering. Change "Cluster" to "Rows and
 					columns". Click "OK" to run the analysis. <br /> Do haematopoietic
 					cell lines cluster together? Hover over the primary_site
 					annotations to highlight cell lines from the same primary site. You
@@ -109,11 +99,11 @@
 					style="font-size: 1.2em; display: block; font-weight: 800;">Compress
 					Heat Map</a>
 				<p class="collapse">
-					Click the fit to window icon
+					Click fit to window
 					<button type="button" class="btn btn-default btn-xs">
 						<span class="fa fa-compress"></span>
 					</button>
-					to fit compress the heat map. Click
+					to compress the heat map. Click
 					<button type="button" class="btn btn-default btn-xs"
 						title="Reset Zoom" name="resetZoom">100%</button>
 					to return to the normal heat map size.
@@ -146,12 +136,6 @@
 					the heat map in ascending order by the median absolute deviation.
 					Click it again to sort the heat map in descending order. Note that
 					you can shift-click to sort multiple columns simultaneously.
-					Alternatively, you can click
-					<button title="Sort" name="sort" type="button"
-						class="btn btn-default btn-xs">
-						<span class="fa fa-sort-alpha-asc"></span>
-					</button>
-					to open a sort dialog.
 				</p>
 
 				<a data-toggle="collapse"
@@ -171,7 +155,6 @@
 					style="font-size: 1.2em; display: block; font-weight: 800;">Visual
 					Enrichment</a>
 				<p class="collapse">
-
 					Double-click on BRAF row to sort by dependency score. <br />
 					Search columns for "skin". <br /> Do skin cell lines seem to be
 					more dependent on BRAF than cell lines from other lineages? <br />
@@ -185,12 +168,7 @@
 					style="font-size: 1.2em; display: block; font-weight: 800;">Nearest
 					Neighbors</a>
 				<p class="collapse">
-					Click the tools icon
-					<button type="button"
-						class="btn btn-default btn-xs dropdown-toggle">
-						<span class="fa fa-wrench"></span> <span class="fa fa-caret-down"></span>
-					</button>
-					and select "Nearest Neighbors". Click "OK" to run the analysis. <br />
+					Click Tools > Nearest Neighbors. Click "OK" to run the analysis. <br />
 					A new row annotation named "Pearson correlation" will appear. <br />
 					What genes correlate with BRAF?
 				</p>
@@ -201,25 +179,17 @@
 					Plot Matrix</a>
 				<p class="collapse">
 					Select the first three rows in order to select the top 3 most
-					correlated genes with BRAF and all samples. Click the chart icon
-					<button type="button" class="btn btn-default btn-xs">
-						<span class="fa fa-line-chart"></span>
-					</button>
-					. Change the chart type to "row scatter" to assess the
+					correlated genes with BRAF and all samples. Click Tools > Chart. Change the
+					chart type	to "row scatter" to assess the
 					relationships between BRAF, FXR2, and ZNF781 simultaneously.
 				</p>
-
 
 
 				<a data-toggle="collapse"
 					style="font-size: 1.2em; display: block; font-weight: 800;">Append
 					Mutations</a>
 				<p class="collapse">
-					Click
-					<button type="button" class="btn btn-default btn-xs">
-						<span class="fa fa-folder-open-o"></span>
-					</button>
-					to bring up the file open window. <br /> Check "Append rows to
+					Click File > Open. <br /> Check "Append rows to
 					current dataset" and select the file CCLE Mutations dataset. Change
 					"Current dataset annotation name" and "New dataset annotation name"
 					to "id" to match the ids in the existing dataset with the id in the
@@ -290,13 +260,8 @@
 				<p class="collapse">
 					Enter "CCLE" in the row search box to select the CCLE mutation
 					data. <br />Right-click on the columns and select "Clear
-					Selection" to clear the column selection. <br />Click the tools
-					icon
-					<button type="button"
-						class="btn btn-default btn-xs dropdown-toggle">
-						<span class="fa fa-wrench"></span> <span class="fa fa-caret-down"></span>
-					</button>
-					and select "New Heat Map". A new tab will open that contains the
+					Selection" to clear the column selection. <br />Click Tools > New Heat Map. A
+					new tab will open that contains the
 					selected subset of the heat map.
 				</p>
 
@@ -304,12 +269,7 @@
 					style="font-size: 1.2em; display: block; font-weight: 800;">Fisher
 					Exact Test</a>
 				<p class="collapse">
-					Click the tools icon
-					<button type="button"
-						class="btn btn-default btn-xs dropdown-toggle">
-						<span class="fa fa-wrench"></span> <span class="fa fa-caret-down"></span>
-					</button>
-					and select "Marker Selection". Change "Metric" to "Fisher Exact
+					Click Tools > Marker Selection. Change "Metric" to "Fisher Exact
 					Test". Change "Field" to "BRAF_sensitive". Set "Class a" to
 					"BRAF_sensitive" and "Class b" to "". Set "Grouping value" to "4"
 					to group missense, splice site, frame shift, and nonsense mutations

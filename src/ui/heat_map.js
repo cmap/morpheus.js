@@ -191,7 +191,7 @@ morpheus.HeatMap = function (options) {
       rowSize: undefined,
       columnSize: undefined,
       rowGapSize: 10,
-      columnGapSize:10,
+      columnGapSize: 10,
       customUrls: undefined, // Custom urls for File>Open.
       height: 'window', // set the available height for the
       // heat map. If not
@@ -3817,14 +3817,15 @@ morpheus.HeatMap.prototype = {
         if (this.rowTracks[i].isVisible()) {
           var rowTrackHeaderSize = morpheus.CanvasUtil
           .getPreferredSize(this.rowTrackHeaders[i]);
+          var width = Math.max(rowTrackHeaderSize.width, morpheus.CanvasUtil
+          .getPreferredSize(this.rowTracks[i]).width);
           if (!rowTrackHeaderSize.widthSet) {
-            var width = Math.max(rowTrackHeaderSize.width, morpheus.CanvasUtil
-            .getPreferredSize(this.rowTracks[i]).width);
             width = Math.min(400, width);
             this.rowTracks[i].setPrefWidth(width);
             this.rowTrackHeaders[i].setPrefWidth(width);
-            rowTrackWidthSum += width;
+
           }
+          rowTrackWidthSum += width;
         }
       }
     }
