@@ -653,6 +653,7 @@ morpheus.ActionManager = function () {
     }
     var sortKey = new morpheus.MatchesOnTopSortKey(project, modelIndices, 'selection on' +
       ' top', isColumns);
+    sortKey.setLockOrder(1);
     if (isColumns) {
       project
       .setColumnSortKeys(

@@ -94,9 +94,7 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
   this.backgroundColor = 'rgb(255,255,255)';
   $(this.canvas).css({'background-color': this.backgroundColor}).on(
     'mousemove.morpheus', mouseMove).on('mouseout.morpheus', mouseExit)
-  .on('mouseenter.morpheus', mouseMove);
-
-  $(this.canvas).on('contextmenu.morpheus', showPopup);
+  .on('mouseenter.morpheus', mouseMove).on('contextmenu.morpheus', showPopup).addClass('morpheus-track-header ' + (isColumns ? 'morpheus-columns' : 'morpheus-rows'));
 
   var resizeCursor;
   var dragStartWidth = 0;
@@ -136,19 +134,15 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
       $(header.canvas).css('z-index', '0');
       heatMap.revalidate();
     })
-  .on('mousedown', function (event) {
-    resizeCursor = getResizeCursor(morpheus.CanvasUtil
-    .getMousePos(event.target, event, true));
-  })
   .on(
     'panstart',
     this.panstart = function (event) {
       _this.isMouseOver = false;
+
       if (morpheus.CanvasUtil.dragging) {
         return;
       }
-      if (resizeCursor != null) { // make sure start event was on
-        // hotspot
+      if (resizeCursor != null) { // resize
         morpheus.CanvasUtil.dragging = true;
         canvas.style.cursor = resizeCursor.cursor;
         if (resizeCursor.isPrevious) {
@@ -314,6 +308,10 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
           sortKey, additionalSort, isGroupBy);
       }
     });
+  $(this.canvas).on('mousedown', function (event) {
+    resizeCursor = getResizeCursor(morpheus.CanvasUtil
+    .getMousePos(event.target, event, true));
+  });
 };
 morpheus.VectorTrackHeader.FONT_OFFSET = 2;
 morpheus.VectorTrackHeader.prototype = {
@@ -328,7 +326,7 @@ morpheus.VectorTrackHeader.prototype = {
   },
   getPreferredSize: function () {
     var size = this.getPrintSize();
-    size.width += 22;
+    size.width += 22; // leave space for sort, drag icon
 
     if (!this.isColumns) {
       size.height = this.defaultFontHeight

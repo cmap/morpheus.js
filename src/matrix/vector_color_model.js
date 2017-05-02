@@ -47,7 +47,7 @@ morpheus.VectorColorModel.STANDARD_COLORS = {
   'kd': '#C675A8',
   'oe': '#56b4e9',
   'cp': '#FF9933',
-  'pcl':'#003B4A',
+  'pcl': '#003B4A',
   'trt_sh.cgs': '#C675A8',
   'trt_oe': '#56b4e9',
   'trt_cp': '#FF9933',
@@ -144,11 +144,10 @@ morpheus.VectorColorModel.prototype = {
     this.colors = colors;
   },
   getContinuousColorScheme: function (vector) {
-    var scheme = this.vectorNameToColorScheme.get(vector.getName());
-    if (scheme == null) {
-      scheme = this.createContinuousColorMap(vector);
-    }
-    return scheme;
+    return this.vectorNameToColorScheme.get(vector.getName());
+  },
+  isContinuous: function (vector) {
+    return this.vectorNameToColorScheme.has(vector.getName());
   },
   getDiscreteColorScheme: function (vector) {
     return this.vectorNameToColorMap.get(vector.getName());

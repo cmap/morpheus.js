@@ -64,8 +64,8 @@ morpheus.HeatMapTrackColorLegend.prototype = {
       }
       ypix += 14;
 
-      var scheme = colorModel.getContinuousColorScheme(vector);
-      if (scheme != null) { // draw continuous color legend
+      if (colorModel.isContinuous(vector)) { // draw continuous color legend
+        var scheme = colorModel.getContinuousColorScheme(vector);
         context.save();
         context.translate(xpix, ypix);
         morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,

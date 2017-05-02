@@ -277,7 +277,6 @@ morpheus.VectorTrack.prototype = {
           context, this.getVector(), this.positions,
           forPrint ? -1 : (this.isColumns ? 120 : 100));
         if (!forPrint) {
-          textWidth = Math.min(textWidth, this.isColumns ? 100 : 500);
           this.settings.maxTextWidth = textWidth;
         }
         width += textWidth;
@@ -297,9 +296,9 @@ morpheus.VectorTrack.prototype = {
     if (this.isRenderAs(morpheus.VectorTrack.RENDER.MOLECULE)) {
       width += 300;
     }
-    if (!forPrint && !this.isRenderAs(morpheus.VectorTrack.RENDER.MOLECULE)) {
-      width = Math.min(300, width);
-    }
+    // if (!forPrint && !this.isRenderAs(morpheus.VectorTrack.RENDER.MOLECULE)) {
+    //   width = Math.min(300, width);
+    // }
     if (this.isRenderAs(morpheus.VectorTrack.RENDER.ARC)) {
       width += this.settings.arcSize;
     }

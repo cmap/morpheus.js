@@ -10,9 +10,11 @@ morpheus.CanvasUtil.getPreferredSize = function (c) {
   var prefHeight = c.getPrefHeight();
   // check for override override
   if (prefWidth !== undefined) {
+    size.widthSet = true;
     size.width = prefWidth;
   }
   if (prefHeight !== undefined) {
+    size.heightSet = true;
     size.height = prefHeight;
   }
   return size;
@@ -195,7 +197,7 @@ morpheus.CanvasUtil.getVectorStringWidth = function (context, vector, positions,
     // maxWidth2 = width;
     // }
   }
-  return maxWidth > 0 ? (maxWidth + 2) : maxWidth;
+  return maxWidth;
 };
 morpheus.CanvasUtil.clipString = function (context, string, availTextWidth) {
   var textWidth = context.measureText(string).width;
