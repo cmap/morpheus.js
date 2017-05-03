@@ -602,48 +602,60 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       formBuilder: formBuilder
     });
     var okCallback = function () {
-      var task = {
-        name: tool.toString(),
-        tabId: tabId
-      };
-      heatMap.getTabManager().addTask(task);
+      var $dialogContent = $('<div><span>' + tool.toString() + '... </span><button' +
+        ' style="display:none;"' +
+        ' class="btn' +
+        ' btn-xs btn-default pull-right">Cancel</button></div>');
+      var value = null;
+
+      var $dialog = morpheus.FormBuilder.showInDraggableDiv({
+        $content: $dialogContent,
+        appendTo: heatMap.getContentEl()
+      });
       var input = {};
       _.each(gui, function (item) {
         input[item.name] = formBuilder.getValue(item.name);
       });
-      var value = tool.execute({
-        heatMap: heatMap,
-        project: heatMap.getProject(),
-        input: input
-      });
-      if (value instanceof Worker) {
-        value.onerror = function (e) {
-          task.worker.terminate();
-          morpheus.FormBuilder.showInModal({
-            title: 'Error',
-            html: e,
-            close: 'Close',
-            focus: heatMap.getFocusEl(),
-            appendTo: heatMap.getContentEl()
+      // give ui a chance to update
+      setTimeout(function () {
+        value = tool.execute({
+          heatMap: heatMap,
+          project: heatMap.getProject(),
+          input: input
+        });
+        if (value instanceof Worker) {
+          $dialogContent.find('button').show().on('click', function () {
+            value.terminate();
           });
-          if (e.stack) {
-            console.log(e.stack);
-          }
-        };
-        var terminate = _.bind(value.terminate, value);
-        task.worker = value;
-        value.terminate = function () {
-          terminate();
-          heatMap.getTabManager().removeTask(task);
+          value.onerror = function (e) {
+            value.terminate();
+            morpheus.FormBuilder.showInModal({
+              title: 'Error',
+              html: e,
+              close: 'Close',
+              focus: heatMap.getFocusEl(),
+              appendTo: heatMap.getContentEl()
+            });
+            if (e.stack) {
+              console.log(e.stack);
+            }
+          };
+          var terminate = _.bind(value.terminate, value);
+          value.terminate = function () {
+            terminate();
+            $dialog.remove();
+            if (callback) {
+              callback(input);
+            }
+          };
+        } else {
+          $dialog.remove();
           if (callback) {
             callback(input);
           }
-        };
-      } else {
-        if (callback) {
-          callback(input);
         }
-      }
+      }, 20);
+
     };
     var $formDiv;
     tool.ok = function () {

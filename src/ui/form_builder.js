@@ -113,13 +113,15 @@ morpheus.FormBuilder.showInDraggableDiv = function (options) {
   var width = options.width || '300px';
   var html = [];
   html
-  .push('<div style="top: 100px; position:absolute; padding-left:10px; padding-right:10px; width:'
+  .push('<div style="z-index: 1050; top: 100px; position:absolute; padding-left:10px; padding-right:10px; width:'
     + width
     + ' ; background:white; box-shadow: 0 5px 15px rgba(0,0,0,0.5); border: 1px solid rgba(0,0,0,0.2); border-radius: 6px;">');
 
-  html
-  .push('<h4 style="cursor:move; border-bottom: 1px solid #e5e5e5;" name="header">'
-    + options.title + '</h4>');
+  if (options.title != null) {
+    html
+    .push('<h4 style="cursor:move; border-bottom: 1px solid #e5e5e5;" name="header">'
+      + options.title + '</h4>');
+  }
   html.push('<div name="content"></div>');
   html.push('</div>');
 
@@ -136,7 +138,7 @@ morpheus.FormBuilder.showInDraggableDiv = function (options) {
   options.$content.appendTo($content);
   $div.css('left', ($(window).width() / 2) - $content.outerWidth() / 2);
   $div.draggable({
-    handle: '[name=header]',
+    //handle: '[name=header]',
     containment: 'document'
   });
   // $div.resizable();
