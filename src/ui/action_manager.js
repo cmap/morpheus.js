@@ -651,8 +651,7 @@ morpheus.ActionManager = function () {
     for (var i = 0, n = viewIndices.length; i < n; i++) {
       modelIndices.push(converter(viewIndices[i]));
     }
-    var sortKey = new morpheus.MatchesOnTopSortKey(project, modelIndices, 'selection on' +
-      ' top', isColumns);
+    var sortKey = new morpheus.MatchesOnTopSortKey(project, modelIndices, 'selection on top', isColumns);
     sortKey.setLockOrder(1);
     if (isColumns) {
       project
@@ -661,7 +660,9 @@ morpheus.ActionManager = function () {
         .keepExistingSortKeys(
           [sortKey],
           project
-          .getColumnSortKeys()),
+          .getColumnSortKeys().filter(function (key) {
+            return !(key instanceof morpheus.MatchesOnTopSortKey && key.toString() === sortKey.toString());
+          })),
         true);
     } else {
       project
@@ -670,7 +671,9 @@ morpheus.ActionManager = function () {
         .keepExistingSortKeys(
           [sortKey],
           project
-          .getRowSortKeys()),
+          .getRowSortKeys().filter(function (key) {
+            return !(key instanceof morpheus.MatchesOnTopSortKey && key.toString() === sortKey.toString());
+          })),
         true);
     }
   };
