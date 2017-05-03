@@ -670,19 +670,21 @@ morpheus.SortKey.reverseComparator = function (c) {
   };
 };
 morpheus.SortKey.keepExistingSortKeys = function (newSortKeys, existingSortKeys) {
-  var dendrogramSortKey = null;
-  var matchesOnTopSortKey = null;
   for (var i = 0, length = existingSortKeys.length; i < length; i++) {
     var key = existingSortKeys[i];
-    if (key instanceof morpheus.MatchesOnTopSortKey && key.toString() === 'matches on top') {
-      matchesOnTopSortKey = key;
-    }
-    if (key instanceof morpheus.SpecifiedModelSortOrder
-      && key.name === 'dendrogram') {
-      dendrogramSortKey = key;
-    }
     if (key.getLockOrder() > 0) {
       // 1 is beginning, 2 is end
+      // don' add it 2x
+      var existingIndex = -1;
+      for (var j = 0; j < newSortKeys.length; j++) {
+        if (newSortKeys[j] === key) {
+          existingIndex = j;
+          break;
+        }
+      }
+      if (existingIndex !== -1) { // remove
+        newSortKeys.splice(existingIndex, 1);
+      }
       newSortKeys.splice(key.getLockOrder() === 1 ? 0 : newSortKeys.length, 0, key);
     }
   }
