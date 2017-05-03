@@ -41,7 +41,8 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
         };
       }
     } else {
-      if (pos.x < 3) {
+      if (pos.x < 3 && heatMap.getTrackIndex(name, isColumns) > 0) { // can't drag left on 1st
+        // row header
         return {
           cursor: 'ew-resize',
           isPrevious: true
