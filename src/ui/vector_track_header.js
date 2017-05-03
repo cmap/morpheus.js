@@ -667,7 +667,8 @@ morpheus.VectorTrackHeader.prototype = {
     // context.restore();
     // }
     context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
-    if (existingSortKeyIndex !== null) {
+    if (existingSortKeyIndex !== null && sortKeys[existingSortKeyIndex.index].getLockOrder() === 0) {
+      // draw arrow
       context.beginPath();
       var x = this.isColumns ? xpix + 4 : xpix + textWidth + 6;
       var arrowHeight = Math.min(8, this.getUnscaledHeight() / 2 - 1);
@@ -690,11 +691,10 @@ morpheus.VectorTrackHeader.prototype = {
         context.lineTo(arrowWidth, arrowHeight / 2);
         context.lineTo(0, arrowHeight);
         context.lineTo(-arrowWidth, arrowHeight / 2);
-
       }
       context.fill();
       morpheus.CanvasUtil.resetTransform(context);
-      if (unlockedSortKeys.length > 1) {
+      if (sortKeys[existingSortKeyIndex.index].getLockOrder() === 0 && unlockedSortKeys.length > 1) {
         context.textAlign = 'left';
         context.font = '8px ' + morpheus.CanvasUtil.FONT_NAME;
         context.fillText('' + (existingSortKeyIndex.number), x + 4,
