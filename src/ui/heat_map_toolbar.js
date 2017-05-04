@@ -206,9 +206,10 @@ morpheus.HeatMapToolBar = function (heatMap) {
   }
 
   $(searchHtml.join('')).appendTo($searchForm);
-  var $toolbar = $el.find('[data-name=toolbar]');
-  $menus.appendTo($toolbar);
-  $searchForm.appendTo($toolbar);
+  var $lineOneColumn = $el.find('[data-name=toolbar]');
+
+  $menus.appendTo($lineOneColumn);
+  $searchForm.appendTo($lineOneColumn);
   var toolbarHtml = ['<div style="display: inline;">'];
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
   // zoom
@@ -339,7 +340,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
   if (heatMap.options.toolbar.$customButtons) {
     heatMap.options.toolbar.$customButtons.appendTo($toolbar);
   }
-  $toolbar.appendTo($toolbar);
+  $toolbar.appendTo($lineOneColumn);
   // $hide.appendTo($el.find('[data-name=toggleEl]'));
   $el.prependTo(heatMap.$content);
   this.$tip = $el.find('[data-name=tip]');
@@ -743,11 +744,11 @@ morpheus.HeatMapToolBar = function (heatMap) {
   }, 500));
 
   this.toggleControls = function () {
-    if ($toolbar.css('display') === 'none') {
-      $toolbar.css('display', '');
+    if ($lineOneColumn.css('display') === 'none') {
+      $lineOneColumn.css('display', '');
       _this.rowSearchObject.$search.focus();
     } else {
-      $toolbar.css('display', 'none');
+      $lineOneColumn.css('display', 'none');
       $(_this.heatMap.heatmap.canvas).focus();
     }
   };
