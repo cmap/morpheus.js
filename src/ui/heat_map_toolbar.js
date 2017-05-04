@@ -6,7 +6,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
   var $el = $('<div class="hidden-print container-fluid">'
     + '<div class="row"><div style="padding-left:0px;padding-right:0px;"' +
     ' class="col-xs-12"><div' +
-    ' data-name="lineOneColumn"></div></div></div>'
+    ' data-name="toolbar"></div></div></div>'
     + '<div class="row"><div class="col-xs-12"><div data-name="tip" style="white-space:nowrap; border-top: thin solid #e7e7e7;margin-bottom:2px;height: 14px; font-size: 10px;overflow:hidden;"></div></div></div>'
     + '</div>');
   var searchHtml = [];
@@ -206,9 +206,9 @@ morpheus.HeatMapToolBar = function (heatMap) {
   }
 
   $(searchHtml.join('')).appendTo($searchForm);
-  var $lineOneColumn = $el.find('[data-name=lineOneColumn]');
-  $menus.appendTo($lineOneColumn);
-  $searchForm.appendTo($lineOneColumn);
+  var $toolbar = $el.find('[data-name=toolbar]');
+  $menus.appendTo($toolbar);
+  $searchForm.appendTo($toolbar);
   var toolbarHtml = ['<div style="display: inline;">'];
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
   // zoom
@@ -339,7 +339,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
   if (heatMap.options.toolbar.$customButtons) {
     heatMap.options.toolbar.$customButtons.appendTo($toolbar);
   }
-  $toolbar.appendTo($lineOneColumn);
+  $toolbar.appendTo($toolbar);
   // $hide.appendTo($el.find('[data-name=toggleEl]'));
   $el.prependTo(heatMap.$content);
   this.$tip = $el.find('[data-name=tip]');
@@ -558,7 +558,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
 
   for (var i = 0; i < $searchToggle.length; i++) {
     var $button = $($searchToggle[i]);
-    if ($button.css('display') === 'block') {
+    if ($button.parent().css('display') === 'block') {
       $button.click();
       break;
     }
@@ -743,11 +743,11 @@ morpheus.HeatMapToolBar = function (heatMap) {
   }, 500));
 
   this.toggleControls = function () {
-    if ($lineOneColumn.css('display') === 'none') {
-      $lineOneColumn.css('display', '');
+    if ($toolbar.css('display') === 'none') {
+      $toolbar.css('display', '');
       _this.rowSearchObject.$search.focus();
     } else {
-      $lineOneColumn.css('display', 'none');
+      $toolbar.css('display', 'none');
       $(_this.heatMap.heatmap.canvas).focus();
     }
   };
