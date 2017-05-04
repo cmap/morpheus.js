@@ -615,6 +615,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
         input[item.name] = formBuilder.getValue(item.name);
       });
       // give ui a chance to update
+
       setTimeout(function () {
         value = tool.execute({
           heatMap: heatMap,
@@ -647,12 +648,18 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
             }
           };
         } else {
-          $dialog.remove();
           if (callback) {
             callback(input);
           }
+          $dialog.remove();
         }
       }, 20);
+      setTimeout(function () {
+        // in case an exception was thrown
+        if (!(value instanceof Worker)) {
+          $dialog.remove();
+        }
+      }, 5000);
 
     };
     var $formDiv;
@@ -1029,18 +1036,23 @@ morpheus.HeatMap.prototype = {
     json.rowColorModel = this.getProject().getRowColorModel().toJSON();
     json.columnColorModel = this.getProject().getColumnColorModel().toJSON();
     // annotation display
-    json.rows = this.rowTracks.map(function (track) {
+    json.rows = this.rowTracks.filter(function (track) {
+      return track.isVisible();
+    }).map(function (track) {
       return {
         field: track.getName(),
         display: track.settings
       };
     });
-    json.columns = this.columnTracks.map(function (track) {
+    json.columns = this.columnTracks.filter(function (track) {
+      return track.isVisible();
+    }).map(function (track) {
       return {
         field: track.getName(),
         display: track.settings
       };
     });
+
     // sort
     json.rowSortBy = morpheus.SortKey.toJSON(this.getProject().getRowSortKeys());
     json.columnSortBy = morpheus.SortKey.toJSON(this.getProject().getColumnSortKeys());
@@ -1613,6 +1625,7 @@ morpheus.HeatMap.prototype = {
         nameToOption.set(option.renameTo != null ? option.renameTo
           : option.field, option);
       });
+
       var displayMetadata = isColumns ? dataset.getColumnMetadata()
         : dataset.getRowMetadata();
       // see if default fields found
@@ -1641,6 +1654,7 @@ morpheus.HeatMap.prototype = {
         var v = displayMetadata.get(i);
         var name = v.getName();
         var option = nameToOption.get(name);
+
         if (morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS.has(name)
           && option == null) {
           continue;
