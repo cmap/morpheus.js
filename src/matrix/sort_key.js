@@ -518,7 +518,7 @@ morpheus.SortKey.ELEMENT_ASCENDING_COMPARATOR = function (obj1, obj2) {
   }
 
   if (a === b) {
-    if (obj1.toObject && obj2.toObject) {
+    if (obj1 != null && obj1.toObject && obj2 != null && obj2.toObject) {
       var a1 = obj1.toObject();
       var b1 = obj2.toObject();
       for (var name in a1) {
@@ -551,7 +551,7 @@ morpheus.SortKey.ELEMENT_DESCENDING_COMPARATOR = function (obj1, obj2) {
     return -1;
   }
   if (a === b) {
-    if (obj1.toObject && obj2.toObject) {
+    if (obj1 != null && obj1.toObject && obj2 != null && obj2.toObject) {
       var a1 = obj1.toObject();
       var b1 = obj2.toObject();
       for (var name in a1) {
