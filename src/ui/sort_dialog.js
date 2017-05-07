@@ -71,7 +71,7 @@ morpheus.SortDialog = function (project) {
       .filter(
         existingSortKeys,
         function (key) {
-          return key.isLocked();
+          return key.getLockOrder() === 0;
         });
       if (keysToKeep.length > 0) {
         _.each(keysToKeep, function (key) {
@@ -126,7 +126,7 @@ morpheus.SortDialog.prototype = {
     .getRowSortKeys();
     this.createLevel0(html);
     for (var i = 0; i < sortKeys.length; i++) { // add existing keys
-      if (!sortKeys[i].isLocked()) {
+      if (sortKeys[i].getLockOrder() === 0) {
         this.createLevel(html, sortKeys[i], fields);
       }
     }
