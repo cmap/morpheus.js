@@ -2293,6 +2293,9 @@ morpheus.VectorTrack.prototype = {
                         canvasSize) {
 
     context.textBaseline = 'middle';
+    if (typeof C2S !== 'undefined' && context instanceof C2S) { // FIXME hack for svg text alignment
+      context.translate(this.isColumns ? 2 : 0, this.isColumns ? 0 : 2);
+    }
     var positions = this.positions;
     var isColumns = this.isColumns;
 
