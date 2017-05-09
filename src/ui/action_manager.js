@@ -15,6 +15,7 @@ morpheus.ActionManager = function () {
   // pin/unpin tab,
   // header stuff-display, delete.
   this.add({
+    ellipsis: true,
     name: 'Sort',
     cb: function (options) {
       new morpheus.SortDialog(options.heatMap.getProject());
@@ -25,6 +26,7 @@ morpheus.ActionManager = function () {
   var $filterModal = null;
   this.add({
     name: 'Filter',
+    ellipsis: true,
     cb: function (options) {
       if ($filterModal == null) {
         var filterModal = [];
@@ -109,6 +111,7 @@ morpheus.ActionManager = function () {
 
   this.add({
     name: 'Options',
+    ellipsis: true,
     cb: function (options) {
       options.heatMap.showOptions();
     },
@@ -167,6 +170,7 @@ morpheus.ActionManager = function () {
   });
   this.add({
     name: 'Rename Tab',
+    ellipsis: true,
     cb: function (options) {
       options.heatMap.getTabManager().rename(options.heatMap.tabId);
     }
@@ -201,6 +205,7 @@ morpheus.ActionManager = function () {
   this.add({
     global: true,
     name: 'Open',
+    ellipsis: true,
     cb: function (options) {
       morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
         customUrls: options.heatMap._customUrls
@@ -212,6 +217,7 @@ morpheus.ActionManager = function () {
   });
 
   this.add({
+    ellipsis: true,
     name: 'Save Image',
     gui: function () {
       return new morpheus.SaveImageTool();
@@ -227,6 +233,7 @@ morpheus.ActionManager = function () {
   });
 
   this.add({
+    ellipsis: true,
     name: 'Save Dataset',
     gui: function () {
       return new morpheus.SaveDatasetTool();
@@ -243,6 +250,7 @@ morpheus.ActionManager = function () {
   });
 
   this.add({
+    ellipsis: true,
     name: 'Save Session',
     gui: function () {
       return new morpheus.SaveSessionTool();
@@ -453,6 +461,7 @@ morpheus.ActionManager = function () {
 
   this.add({
     which: [65],
+    ellipsis: true,
     shiftKey: true,
     commandKey: true,
     name: 'Find Action',
@@ -840,12 +849,14 @@ morpheus.ActionManager = function () {
     });
   };
   this.add({
+    ellipsis: true,
     name: 'Annotate Selected Rows',
     cb: function (options) {
       annotateSelection(options, false);
     }
   });
   this.add({
+    ellipsis: true,
     name: 'Annotate Selected Columns',
     cb: function (options) {
       annotateSelection(options, true);
@@ -901,6 +912,7 @@ morpheus.ActionManager = function () {
   var _this = this;
   [new morpheus.HClusterTool(), new morpheus.KMeansTool(), new morpheus.MarkerSelection(), new morpheus.NearestNeighbors(), new morpheus.AdjustDataTool(), new morpheus.CollapseDatasetTool(), new morpheus.CreateAnnotation(), new morpheus.SimilarityMatrixTool(), new morpheus.TransposeTool(), new morpheus.TsneTool(), new morpheus.DevAPI()].forEach(function (tool) {
     _this.add({
+      ellipsis: true,
       name: tool.toString(),
       gui: function () {
         return tool;

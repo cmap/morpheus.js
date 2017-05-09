@@ -1024,6 +1024,7 @@ morpheus.HeatMap.prototype = {
     return isColumns ? this.columnDendrogram : this.rowDendrogram;
   },
   toJSON: function (options) {
+    var _this = this;
     var json = {};
     // color scheme
     json.colorScheme = this.heatmap.getColorScheme().toJSON();
@@ -1039,7 +1040,11 @@ morpheus.HeatMap.prototype = {
     json.rows = this.rowTracks.filter(function (track) {
       return track.isVisible();
     }).map(function (track) {
+      var size = morpheus.CanvasUtil.getPreferredSize(_this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), false), false));
       return {
+        size: {
+          width: size.widthSet ? size.width : undefined
+        },
         field: track.getName(),
         display: track.settings
       };
@@ -1047,7 +1052,12 @@ morpheus.HeatMap.prototype = {
     json.columns = this.columnTracks.filter(function (track) {
       return track.isVisible();
     }).map(function (track) {
+      var size = morpheus.CanvasUtil.getPreferredSize(_this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), true), true));
       return {
+        size: {
+          width: size.widthSet ? size.width : undefined,
+          height: size.heightSet ? size.height : undefined
+        },
         field: track.getName(),
         display: track.settings
       };
@@ -1691,6 +1701,26 @@ morpheus.HeatMap.prototype = {
           }
           isFirst = false;
           var track = _this.addTrack(name, isColumns, display);
+
+          if (option.size) {
+            if (!isColumns && option.size.width != null) {
+              var header = _this.getTrackHeaderByIndex(_this.getTrackIndex(name, isColumns), isColumns);
+              track.setPrefWidth(option.size.width); // can only set width
+              header.setPrefWidth(option.size.width);
+            } else if (isColumns && (option.size.width != null || option.size.height != null)) {
+              var header = _this.getTrackHeaderByIndex(_this.getTrackIndex(name, isColumns), isColumns);
+              if (option.size.height) {
+                track.setPrefHeight(option.size.height);
+                header.setPrefHeight(option.size.height);
+              }
+              if (option.size.width) {
+                // TODO set width for all tracks since they all have same width
+                track.setPrefWidth(option.size.width);
+                header.setPrefWidth(option.size.width);
+              }
+            }
+
+          }
           if (track.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
             && option.color) {
             var m = isColumns ? _this.project.getColumnColorModel()
@@ -3831,6 +3861,10 @@ morpheus.HeatMap.prototype = {
     var rowTrackWidthSum = 0;
     for (var i = 0, length = this.rowTracks.length; i < length; i++) {
       if (this.rowTracks[i].isVisible()) {
+        // check for override override
+        if (this.rowTracks[i].getPrefWidth() !== undefined) {
+          this.rowTrackHeaders[i].setPrefWidth(this.rowTracks[i].getPrefWidth());
+        }
         rowTrackWidthSum += Math
         .max(morpheus.CanvasUtil
           .getPreferredSize(this.rowTrackHeaders[i]).width,
@@ -3864,6 +3898,9 @@ morpheus.HeatMap.prototype = {
     // get max column header width
     for (var i = 0, length = this.columnTracks.length; i < length; i++) {
       if (this.columnTracks[i].isVisible()) {
+        if (this.columnTracks[i].getPrefHeight() !== undefined) {
+          this.columnTrackHeaders[i].setPrefHeight(this.columnTracks[i].getPrefHeight());
+        }
         var width = morpheus.CanvasUtil
         .getPreferredSize(this.columnTrackHeaders[i]).width;
         maxHeaderWidth = Math.max(maxHeaderWidth, width);
