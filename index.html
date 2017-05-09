@@ -52,12 +52,16 @@
       var options = JSON.parse(decodeURIComponent(params.json));
       landingPage.open(options);
     } else if (params.url) { // url to config
+      var $loading = morpheus.Util.createLoadingEl();
+      $loading.appendTo($('#vis'));
       morpheus.Util.getText(params.url).done(function (text) {
         var options = JSON.parse(text);
         landingPage.open(options);
       }).fail(function (err) {
         console.log('Unable to get config file');
         landingPage.show();
+      }).always(function () {
+        $loading.remove();
       });
 
     } else {
