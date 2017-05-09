@@ -280,16 +280,14 @@ morpheus.ActionManager = function () {
     cb: function (options) {
       options.heatMap.zoom(true);
     },
-    which: [107, 61, 187],
-    icon: 'fa fa-plus'
+    which: [107, 61, 187]
   });
   this.add({
     name: 'Zoom Out',
     cb: function (options) {
       options.heatMap.zoom(false);
     },
-    which: [173, 189, 109],
-    icon: 'fa fa-minus'
+    which: [173, 189, 109]
   });
 
   this.add({
@@ -300,7 +298,7 @@ morpheus.ActionManager = function () {
     icon: 'fa fa-compress'
   });
   this.add({
-    name: 'Reset Zoom',
+    name: '100%',
     cb: function (options) {
       options.heatMap.resetZoom();
     },
@@ -464,7 +462,7 @@ morpheus.ActionManager = function () {
     ellipsis: true,
     shiftKey: true,
     commandKey: true,
-    name: 'Find Action',
+    name: 'Search Menus',
     cb: function (options) {
       if ($findModal == null) {
         var findModal = [];
@@ -548,7 +546,7 @@ morpheus.ActionManager = function () {
     }
   });
   this.add({
-    name: 'Keymap Reference',
+    name: 'Keyboard Shortcuts',
     cb: function (options) {
       new morpheus.HeatMapKeyListener(options.heatMap).showKeyMapReference();
     }

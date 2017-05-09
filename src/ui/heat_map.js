@@ -229,12 +229,12 @@ morpheus.HeatMap = function (options) {
       menu: {
         File: ['Open', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
         Tools: ['New Heat Map', null, 'Hierarchical Clustering', 'KMeans Clustering', null, 'Marker Selection', 'Nearest Neighbors', 'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort', 'Filter', null, 'API'],
-        View: ['Zoom In', 'Zoom Out', 'Fit To Window', 'Reset Zoom', null, 'Options'],
+        View: ['Zoom In', 'Zoom Out', 'Fit To Window', '100%', null, 'Options'],
         Edit: ['Copy Image', 'Copy Selected Dataset', null, 'Move Selected Rows To Top', 'Annotate Selected Rows', 'Copy Selected Rows', 'Invert' +
         ' Selected Rows', 'Select All Rows', 'Clear Selected Rows', null, 'Move Selected Columns To Top', 'Annotate Selected Columns', 'Copy Selected Columns', 'Invert' +
         ' Selected Columns', 'Select All Columns', 'Clear Selected Columns'],
-        Help: ['Find Action', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keymap' +
-        ' Reference']
+        Help: ['Search Menus', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keyboard' +
+        ' Shortcuts']
       },
       toolbar: {
         dimensions: true,

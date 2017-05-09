@@ -413,7 +413,7 @@ morpheus.HeatMapKeyListener = function (heatMap) {
 
     html.push('</table>');
     morpheus.FormBuilder.showInModal({
-      title: 'Keymap Reference',
+      title: 'Keyboard Shortcuts',
       html: html.join(''),
       focus: document.activeElement
     });
