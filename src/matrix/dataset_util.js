@@ -45,7 +45,7 @@ morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
   if (options == null) {
     options = {};
   }
-  var datasetReader;
+  var datasetReader = null;
   if (ext === 'maf') {
     datasetReader = new morpheus.MafFileReader();
     if (options && options.mafGeneFilter) {
@@ -67,12 +67,11 @@ morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
     datasetReader = options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.TxtReader();
   } else if (ext === 'json') {
     datasetReader = new morpheus.JsonDatasetReader();
-  } else {
+  } else if (ext === 'gct') {
     datasetReader = new morpheus.GctReader();
   }
   return datasetReader;
-}
-;
+};
 
 morpheus.DatasetUtil.readDatasetArray = function (datasets) {
   var retDef = $.Deferred();
@@ -191,6 +190,9 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
     datasetReader = options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.TxtReader(); // copy from clipboard
   } else {
     datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
+    if (datasetReader == null) {
+      datasetReader = isFile ? (options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.TxtReader()) : new morpheus.GctReader();
+    }
   }
   if (isString || isFile) { // URL or file
     var deferred = $.Deferred();

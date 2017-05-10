@@ -1472,8 +1472,9 @@ morpheus.Util.splitOnNewLine = function (text, commentChar) {
   }
 
   var rows = [];
+  var rtrim = /\s+$/;
   for (var i = 0, nlines = lines.length; i < nlines; i++) {
-    var line = lines[i].trim();
+    var line = lines[i].replace(rtrim, '');
     if (line !== '') {
       if (commentCharCode !== undefined) {
         if (line.charCodeAt(0) !== commentCharCode) {
