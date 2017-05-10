@@ -24,7 +24,9 @@ morpheus.CreateAnnotation.prototype = {
         type: 'textarea',
         placeholder: 'e.g MAD()',
         required: true,
-        help: 'JavaScript formula. Built-in functions (case-sensitive): COUNT(), MAD(), MAX(), MEAN(), MEDIAN(), MIN(), PERCENTILE(p), SUM(), VARIANCE(). Refer to a field using FIELD(name)'
+        help: 'JavaScript formula. Built-in functions (case-sensitive): COUNTIF(expression),' +
+        ' MAD(), MAX(),' +
+        ' MEAN(), MEDIAN(), MIN(), PERCENTILE(p), SUM(), VARIANCE(). Refer to a field using FIELD(name)'
       }, {
         name: 'use_selected_rows_and_columns_only',
         type: 'checkbox'
@@ -35,7 +37,7 @@ morpheus.CreateAnnotation.prototype = {
     var isColumns = options.input.annotate == 'Columns';
     var __formula = options.input.formula;
     var __dataset = options.input.use_selected_rows_and_columns_only ? __project
-      .getSelectedDataset()
+    .getSelectedDataset()
       : __project.getSortedFilteredDataset();
     if (isColumns) {
       __dataset = morpheus.DatasetUtil.transposedView(__dataset);
@@ -43,8 +45,9 @@ morpheus.CreateAnnotation.prototype = {
     var __rowView = new morpheus.DatasetRowView(__dataset);
     var __vector = __dataset.getRowMetadata().add(
       options.input.annotation_name);
-    var COUNT = function () {
-      return morpheus.CountNonNaN(__rowView);
+
+    var COUNTIF = function (val) {
+      return morpheus.CountIf(__rowView, val);
     };
     var MAD = function () {
       return morpheus.MAD(__rowView);
