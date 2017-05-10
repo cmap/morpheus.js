@@ -95,16 +95,6 @@ morpheus.LandingPage.prototype = {
   },
   show: function () {
     var _this = this;
-    if (navigator.onLine && !this.sampleDatasets) {
-      this.sampleDatasets = new morpheus.SampleDatasets({
-        $el: this.$sampleDatasetsEl,
-        show: true,
-        callback: function (heatMapOptions) {
-          _this.open(heatMapOptions);
-        }
-      });
-    }
-
     this.$el.show();
 
     this.formBuilder.on('change', function (e) {
@@ -159,6 +149,15 @@ morpheus.LandingPage.prototype = {
           _this.openFile(url);
         }
       });
+    if (navigator.onLine && !this.sampleDatasets) {
+      this.sampleDatasets = new morpheus.SampleDatasets({
+        $el: this.$sampleDatasetsEl,
+        show: true,
+        callback: function (heatMapOptions) {
+          _this.open(heatMapOptions);
+        }
+      });
+    }
   },
   openFile: function (value) {
     var _this = this;
