@@ -188,10 +188,28 @@ morpheus.HeatMap = function (options) {
        * Whether heat map tab can be renamed
        */
       rename: true,
-      rowSize: undefined,
-      columnSize: undefined,
+      /*
+       * Heat map row size in pixels or 'fit' to fit heat map to current height.
+       */
+      rowSize: 13,
+      /*
+       * Heat map column size in pixels or 'fit' to fit heat map to current width.
+       */
+      columnSize: 13,
       rowGapSize: 10,
       columnGapSize: 10,
+      /*
+       * Whether to draw heat map grid
+       */
+      drawGrid: true,
+      /*
+       * Heat map grid color
+       */
+      gridColor: '#808080',
+      /*
+       * Heat map grid thickness in pixels
+       */
+      gridThickness:0.1,
       customUrls: undefined, // Custom urls for File>Open.
       height: 'window', // set the available height for the
       // heat map. If not
