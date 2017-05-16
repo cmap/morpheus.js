@@ -9,198 +9,419 @@
     <link rel="stylesheet" href="css/morpheus-latest.min.css">
     <script type="text/javascript" src="js/morpheus-external-latest.min.js"></script>
     <script src="js/morpheus-latest.min.js"></script>
+    <script src="js/morpheus.js"></script>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        ul {
+            margin: 0;
+            padding-left: 4px;
+            list-style-type: none;
+        }
+
+        .description {
+            color: Grey;
+            margin-left: 4px;
+        }
+    </style>
 </head>
 <body>
 <div class="container-fluid">
     <div class="row">
         <div class="col-xs-12">
-            <h2>Morpheus Configuration Options</h2>
-            <h3>
-                Please note that the correct HTTP <a target="_blank"
-                                                     href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a>
-                headers must be set if any of your resources are hosted on a
-                different domain.
-            </h3>
+            <div style="display:inline-block;" id="morpheus-header"></div>
+            <div style="display:inline-block; vertical-align: top;font-size:24px;">reference</div>
             <p class="text-muted">Load Morpheus with a pre-configured matrix</p>
             <p>
-                The Morpheus website accepts the following request parameters <br/>'json':
-                a URI encoded JSON configuration object. <br/>'url': a URL to a
-                JSON configuration file. <br/> <br/> <b>Example</b><br/>
+                The Morpheus website the request parameters <code>json</code>,
+                a URI encoded JSON configuration object and <code>url</code>, a URL to a
+                JSON configuration file. <br/> Please note that the correct HTTP <a target="_blank"
+                                                                                    href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a>
+                headers must be set if any of your resources are hosted on a
+                different domain.<br/> <a href="#" name="open">Example</a><br/>
                 <code>{columnAnnotations : [ { file :
-                    '//s3.amazonaws.com/data.clue.io/morpheus/Achilles_v2.4_SampleInfo_small.txt',
-                    datasetField : 'id', fileField : 'id' } ], columns : [ { field :
-                    'id', display : 'text' }, { field : 'Site_primary', display :
-                    'color' } ], dataset :
-                    '//s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct'}</code>
-                <br/> <a href="#" name="open">Open Example In Morpheus</a>
+                    "//s3.amazonaws.com/data.clue.io/morpheus/Achilles_v2.4_SampleInfo_small.txt",
+                    datasetField : "id", fileField : "id" } ], columns : [ { field :
+                    "id", display : "text" }, { field : "Site_primary", display :
+                    "color" } ], dataset :
+                    "//s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct"}</code>
+
         </div>
     </div>
-    <!-- 		<div id="header" class="row"> -->
-    <!-- 			<div class="col-xs-12"> -->
-    <!-- 				<input type="button" class="btn btn-default btn-sm" -->
-    <!-- 					value="Expand All" name="expand"> <input type="button" -->
-    <!-- 					class="btn btn-default btn-sm" value="Collapse All" name="collapse"> -->
-    <!-- 			</div> -->
-    <!-- 		</div> -->
 
     <div class="row">
         <div class="col-xs-12">
-            <h4>
-                <a data-toggle="collapse">dataset</a>
-            </h4>
-            <p class="collapse">
-                A File or URL to a <a target="_blank"
-                                      href="http://support.lincscloud.org/hc/en-us/articles/202105453-GCT-Gene-Cluster-Text-Format-">GCT
-                1.3</a>, <a target="_blank"
-                            href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT
-                1.2</a>, <a target="_blank"
-                            href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>,
-                <a target="_blank"
-                   href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>,
-                or a tab-delimited text file. Can also be an array of File or URLs
-                in which case the datasets are combined by matching on column ids.
-            </p>
-
-
-            <h4>
-                <a data-toggle="collapse">rowAnnotations/columnAnnotations</a>
-            </h4>
-            <p class="collapse">
-                Optional array of
-                <code>{file:String, datasetField:String, fileField:String,
-                    include:[String]}</code>
-                <br/>
-                <code>file</code>
-                : An xlsx file, a tab-delimited text file, or a gmt file.<br/>
-                <code>datasetField</code>
-                : Field to match in dataset.<br/>
-                <code>fileField</code>
-                : Field to match in file.<br/>
-                <code>include</code>
-                : Optional array of fields to include from file. <br/> <b>Example:</b>
-                Annotate rows matching 'name' field in dataset to 'id' field in
-                file at https://MY_URL.
-
-                <code>[{file:'https://MY_URL', datasetField:'name',
-                    fileField:'id'}]</code>
-            </p>
-
-            <h4>
-                <a data-toggle="collapse">rowGroupBy/columnGroupBy</a>
-            </h4>
-            <p class="collapse">
-                Optional array of metadata names to group the heat map by. <br/> <b>Example:</b>
-                Group by the type and gender metadata fields.
-                <code>[{field:'type'}, {field:'gender'}]</code>
-            </p>
-
-            <h4>
-                <a data-toggle="collapse">colorScheme</a>
-            </h4>
-            <p class="collapse">
-                Optional object
-                <code>{type:String, stepped:boolean, map:[{value:Number,
-                    color:String}]}</code>
-                that describes value to color mapping.
-                <code>type</code>
-                : 'fixed' or 'relative' color scheme.<br/>
-
-                <code>stepped</code>
-                : Whether color scheme is continuous (false) or discrete (true). <br/>
-                <code>map</code>
-                Array of value, color pairs.<br/> <b>Example:</b> Use a fixed
-                color scheme with color stops at -100, -90, 90, and 100. <br/>
-                <code>{ type : 'fixed', stepped:false, map : [ { value :
-                    -100, color : '#abdda4' }, { value : -90, color : 'white' }, {
-                    value : 90, color : 'white' }, { value : 100, color : 'red' } ] };</code>
-            </p>
-
-            <h4>
-                <a data-toggle="collapse">rowSortBy/columnSortBy</a>
-            </h4>
-            <p class="collapse">
-                Optional array of metadata names and sort order (
-                <code>[{field:String, order:Number}]</code>
-                ). <br/>
-                <code>field</code>
-                : Metadata field name. <br/>
-                <code>order</code>
-                : 0 for ascending, 1 for descending. <br/> <b>Example:</b> Sort
-                ascending by gene, and then descending by stdev
-                <code>[{field:'gene', order:0}, {field:'stdev', order:1}]</code>
-            </p>
-
-            <h4>
-                <a data-toggle="collapse">rowDendrogram/columnDendrogram</a>
-            </h4>
-            <p class="collapse">
-                Optional URL to a dendrogram in <a target="_blank"
-                                                   href="https://en.wikipedia.org/wiki/Newick_format">Newick
-                format</a>
-            </p>
-
-            <h4>
-                <a data-toggle="collapse">rowDendrogramField/columnDendrogramField</a>
-            </h4>
-            <p class="collapse">Optional metadata field in dataset to match
-                leaf node ids in the dendrogram Newick file.</p>
-
-            <h4>
-                <a data-toggle="collapse">rows/columns</a>
-            </h4>
-            <p class="collapse">
-                Optional array of objects describing how to display metadata fields
-                (
-                <code>[{field:String, display:String}]</code>
-                ). <br/>
-                <code>field</code>
-                : Metadata field name <br/>
-                <code>display</code>
-                : A comma delimited string that describes how to render a metadata
-                field. Options are text, color, bar, highlight, shape, discrete,
-                and continuous name <br/> <b>Example</b> Display id as text and
-                stdev using text and color
-                <code>[{field:'id', display:'text'}, {field:'stdev',
-                    display:'text, color'}]</code>
-            </p>
-            <h4>
-                <a data-toggle="collapse">tools</a>
-            </h4>
-            <p class="collapse">
-                Optional array of tools to run at load time
-                <code>[{name:String, params:Object}]</code>
-
-                <b>Example:</b> Cluster rows and columns. <br/>
-                <code>[{
-                    name: 'Hierarchical Clustering',
-                    params: {cluster: 'Rows and columns'}
-                    }]</code>
-            </p>
+            <div style="font-size:1.5em">JSON configuration</div>
         </div>
     </div>
-    <div class="row"></div>
-    <div class="row"></div>
-    <div class="row"></div>
-    <div class="row"></div>
-    <div class="row"></div>
-    <div class="row"></div>
+    <div class="row">
+        <div class="col-xs-12">
+            <ul>
+                <li><a data-toggle="collapse" href="#dataset"
+                       aria-expanded="false"
+                       aria-controls="dataset">dataset</a>
+                    <div id="dataset" class="collapse">
+                        A File or URL to a <a target="_blank" href="https://clue.io/help#datasets">GCT
+                        1.3</a>, <a target="_blank"
+                                    href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT
+                        1.2</a>, <a target="_blank"
+                                    href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>,
+                        <a target="_blank"
+                           href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>,
+                        a tab-delimited text file, or an Excel spreadsheet.
+                        <br/>Can also be an array of files or URLs
+                        in which case the datasets are combined by matching on column ids.
+                        <br/>
+                        Also be can specified in <a data-toggle="collapse" href="#datasetJSON"
+                                                    aria-expanded="false"
+                                                    aria-controls="datasetJSON">JSON format</a>
+                        <div id="datasetJSON" class="collapse">
+                            <ul>
+                                <li>rows <code>Number</code>
+                                    <div class="description">Number of rows in the dataset</div>
+                                </li>
+                                <li>columns <code>Number</code>
+                                    <div class="description">Number of columns in the dataset</div>
+                                </li>
+                                <li>seriesArrays<code>[[number, object]]</code>
+                                    <div class="description">Each series contains an array of arrays
+                                        in
+                                        row-major order.
+                                    </div>
+                                </li>
+                                <li>seriesNames <code>[string]</code>
+                                    <div class="description">Array of series names</div>
+                                </li>
+                                <li>seriesDataTypes <code>[string]</code>
+                                    <div class="description">Array of series data types</div>
+                                </li>
+                                <li>rowMetadataModel <code>Object</code> with the key "vectors"
+                                    <div class="description"> Contains dataset row metadata</div>
+                                    <ul>
+                                        <li>vectors <code>Array</code> <br/>Array of objects with
+                                            the keys
+                                            "name" and
+                                            "array".
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>columnMetadataModel <code>Object</code> with the key "vectors"
+                                    <div class="description"> Contains dataset column metadata</div>
+                                    <ul>
+                                        <li>vectors <code>Array</code>
+                                            <div class="description">Array of objects with the
+                                                keys
+                                                "name" and
+                                                "array".
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+
+                <li><a data-toggle="collapse" href="#annotations"
+                       aria-expanded="false"
+                       aria-controls="annotations">rowAnnotations/columnAnnotations</a>
+                    <div id="annotations" class="collapse">
+                        <div class="top-level-description">Optional array of
+                            objects describing additional annotations to join
+                            with dataset.<code> [Object]</code></div>
+                        <ul>
+                            <li>file <code>String</code>
+                                <div class="description">An xlsx file, a tab-delimited text
+                                    file, or a gmt file.
+                                </div>
+                            </li>
+                            <li>datasetField <code>String</code>
+                                <div class="description">Field to match in dataset.</div>
+                            </li>
+                            <li>fileField <code>String</code>
+                                <div class="description">Field to match in file.</div>
+                            </li>
+                            <li>include <code>[String]</code>
+                                <div class="description">Optional array of fields to include
+                                    from file.
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="example">Annotate rows matching "name" field in
+                            dataset to "id" field in file at https://MY_URL.
+                            <code>[{file:"https://MY_URL", datasetField:"name",
+                                fileField:"id"}]</code>
+                        </div>
+
+
+                    </div>
+                </li>
+
+
+                <li><a data-toggle="collapse" href="#rowSize"
+                       aria-expanded="false"
+                       aria-controls="rowSize">rowSize</a>
+                    <div id="rowSize" class="collapse">
+                        <ul>
+                            <li><code>Number|String</code> (default: 13)
+                                <div class="description">Heat map row size in pixels or 'fit' to fit
+                                    heat map to current height.
+                                </div>
+
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li><a data-toggle="collapse" href="#columnSize"
+                       aria-expanded="false"
+                       aria-controls="columnSize">columnSize</a>
+                    <div id="columnSize" class="collapse">
+                        <ul>
+                            <li><code>Number|String</code> (default: 13)
+                                <div class="description">Heat map column size in pixels or 'fit' to
+                                    fit
+                                    heat map to current width.
+                                </div>
+
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li><a data-toggle="collapse" href="#drawGrid"
+                       aria-expanded="false"
+                       aria-controls="drawGrid">drawGrid</a>
+                    <div id="drawGrid" class="collapse">
+                        <ul>
+                            <li><code>Boolean</code> (default:true)
+                                <div class="description">Whether to draw heat map grid.
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+
+                <li><a data-toggle="collapse" href="#groupBy"
+                       aria-expanded="false"
+                       aria-controls="groupBy">rowGroupBy/columnGroupBy</a>
+                    <div id="groupBy" class="collapse">
+                        <div class="top-level-description">Optional array of metadata names to group
+                            the heat map by. <code>[Object]</code></div>
+                        <ul>
+                            <li>field<code>String</code>
+                                <div class="description">The metadata field name.
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="example">
+                            <div class="description">Group by the type and gender metadata
+                                fields
+                            </div>
+                            <code>[{field:"type"}, {field:"gender"}]</code>
+                        </div>
+                    </div>
+                </li>
+
+                <li><a data-toggle="collapse" href="#colorScheme"
+                       aria-expanded="false"
+                       aria-controls="colorScheme">colorScheme</a>
+                    <div id="colorScheme" class="collapse">
+                        <div class="top-level-description">Optional object that describes value
+                            to color mapping<code>Object</code></div>
+                        <ul>
+                            <li>scalingMode<code>String</code>
+                                <div class="description">"fixed" or "relative" color scheme</div>
+                            </li>
+                            <li>stepped<code>Boolean</code>
+                                <div class="description">Whether color scheme is continuous (false)
+                                    or
+                                    discrete (true)
+                                </div>
+                            </li>
+                            <li>values<code>[Number]</code>
+                                <div class="description">Array of values corresponding to colors
+                                </div>
+                            </li>
+                            <li>colors<code>Boolean</code>
+                                <div class="description">Array of colors</div>
+                            </li>
+
+                        </ul>
+                        <div class="example">
+                            <div class="description">Use a fixed
+                                color scheme with color stops at -100, -90, 90, and 100
+                            </div>
+                            <code>{ scalingMode : "fixed", stepped : false, values : [ -100, -90,
+                                90,
+                                100], colors : ["#abdda4", "white", "white", "red"]}</code>
+                        </div>
+
+                    </div>
+                </li>
+
+                <li><a data-toggle="collapse" href="#sortBy"
+                       aria-expanded="false"
+                       aria-controls="sortBy">rowSortBy/columnSortBy</a>
+                    <div id="sortBy" class="collapse">
+                        <div class="top-level-description">Optional array of sort keys. To sort by
+                            an
+                            annotation, set "type" to "annotation" and supply a
+                            metadata name. To sort by values in the heat map set "type" to
+                            "byValues"
+                            and set
+                            "modelIndices" to an array of model row/column indices in the dataset to
+                            sort by. <code>[Object]</code></div>
+                        <ul>
+                            <li>order<code>Number</code>
+                                <div class="description">0 for ascending, 1 for descending.</div>
+                            </li>
+                            <li>field<code>String</code>
+                                <div class="description">Annotation field name when sorting by an
+                                    annotation
+                                </div>
+                            </li>
+                            <li>type<code>String</code>
+                                <div class="description">Sort by "annotation" or "byValues"</div>
+                            </li>
+                            <li>modelIndices<code>[Number]</code>
+                                <div class="description">Array of model row/column indices in the
+                                    dataset to
+                                    sort by when sorting by heat map values
+                                </div>
+                            </li>
+
+                        </ul>
+
+                        <div class="example">
+                            <div class="description">Sort
+                                ascending by gene, and then descending by heat map values in 1st
+                                column
+                            </div>
+                            <code>[{field:"gene", order:0, type:"annotation"}, {modelIndices:[0],
+                                order:1, type:"byValues"}]</code></div>
+                    </div>
+                </li>
+
+                <li><a data-toggle="collapse" href="#colorModel"
+                       aria-expanded="false"
+                       aria-controls="colorModel">rowColorModel/columnColorModel</a>
+                    <div id="colorModel" class="collapse">
+                        <div class="top-level-description">Describes how annotation values
+                            are mapped to colors. The keys in the object are the
+                            annotation names. The structure of the object will depend on whether
+                            you're specifying a continuous or discrete color map.
+                        </div>
+                        <div>For discrete mappings:</div>
+                        <div class="example">
+                            <div class="description">Map "a" to "red", "b" to "blue", and "c" to
+                                "white" for the "type" field.
+                            </div>
+                            <code>{"type":{"a":"red", "b":"blue", "c":"white"}}</code></div>
+                        <div>For continuous mappings:</div>
+                        <div class="example">
+                            <div class="description">Map from yellow to green from 0 to 2 for the
+                                "score" field.
+                            </div>
+                            <code>{"score":{values:[0, 2], colors:["yellow", "green"]}</code></div>
+                    </div>
+                </li>
+
+                <li><a data-toggle="collapse" href="#dendrogram"
+                       aria-expanded="false"
+                       aria-controls="dendrogram">rowDendrogram/columnDendrogram</a>
+                    <div id="dendrogram" class="collapse">
+                        <div class="top-level-description">Optional URL to a dendrogram in <a
+                                target="_blank"
+                                href="https://en.wikipedia.org/wiki/Newick_format">Newick</a>
+                            format<code>String
+                            </code>
+                        </div>
+                    </div>
+                </li>
+
+                <li>
+                    <a data-toggle="collapse" href="#dendrogramField"
+                       aria-expanded="false"
+                       aria-controls="dendrogramField">rowDendrogramField/columnDendrogramField</a>
+
+                    <div id="dendrogramField" class="collapse">
+                        <div class="top-level-description">Optional metadata field in dataset to
+                            match
+                            leaf node ids in the dendrogram Newick file.<code>String</code></div>
+                    </div>
+                </li>
+
+
+                <li><a data-toggle="collapse" href="#metadata"
+                       aria-expanded="false"
+                       aria-controls="metadata">rows/columns</a>
+                    <div id="metadata" class="collapse">
+                        <div class="top-level-description">Optional array of objects describing how
+                            to
+                            display metadata fields <code>[Object]</code></div>
+
+                        <ul>
+                            <li>field <code>String</code>
+                                <div class="description">Metadata field name</div>
+                            </li>
+                            <li>render <code>Object</code>
+                                <ul>
+                                    <li>text <code>Boolean</code>
+                                        <div class="description">Whether to render annotation as
+                                            text
+                                        </div>
+                                    </li>
+                                    <li>color <code>Boolean</code>
+                                        <div class="description">Whether to render annotation as
+                                            color
+                                        </div>
+                                    </li>
+                                    <li>bar <code>Boolean</code>
+                                        <div class="description">Whether to render annotation as
+                                            bar chart
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+
+                        </ul>
+                        <div class="example">
+                            <div class="description">Display id as text and
+                                stdev using text and color
+                            </div>
+                            <code>[{field:"id", display:"text"}, {field:"stdev",
+                                display:"text, color"}]</code></div>
+                    </div>
+                </li>
+
+                <li>
+                    <a data-toggle="collapse" href="#tools"
+                       aria-expanded="false"
+                       aria-controls="tools">tools</a>
+                    <div id="tools" class="collapse">
+                        <div class="top-level-description">Optional array of tools to run at load
+                            time
+                            <code>[Object]</code></div>
+                        <code>[{name:String, params:Object}]</code>
+                        <div class="example">
+                            <div class="description">Cluster rows and columns</div>
+                            <code>[{
+                                name: "Hierarchical Clustering",
+                                params: {cluster: "Rows and columns"}
+                                }]</code>
+                        </div>
+
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
 </div>
 <script type="text/javascript">
-  var links = $(document.body).find('[data-toggle=collapse]');
-  var collapse = $(document.body).find('.collapse');
-  for (var i = 0; i < collapse.length; i++) {
-    var $c = $(collapse[i]);
-    var $l = $(links[i]);
-    $c.attr('id', i);
-    $l.attr('href', '#' + i);
-  }
-  $('#header').find('[name=expand]').on('click', function () {
-    $(document.body).find('.collapse').collapse('show');
-  });
-  $('#header').find('[name=collapse]').on('click', function () {
-    $(document.body).find('.collapse').collapse('hide');
-  });
+  morpheus.Util.createMorpheusHeader().appendTo($('#morpheus-header'));
+
   $(document.body)
   .find('[name=open]')
   .on(
@@ -225,11 +446,6 @@
         + encodeURIComponent(JSON.stringify(json));
 
     });
-  setTimeout(function () {
-    $(document.body).find('.collapse').collapse('show');
-  }, 200);
-</script>
-<script>
   morpheus.Util.loadTrackingCode();
 </script>
 </body>
