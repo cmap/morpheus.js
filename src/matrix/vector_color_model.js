@@ -87,8 +87,8 @@ morpheus.VectorColorModel.prototype = {
   toJSON: function () {
     var json = {};
     this.vectorNameToColorScheme.forEach(function (colorScheme, name) {
-      var colorSchemeJSON = morpheus.AbstractColorSupplier.toJSON(colorScheme);
-      colorSchemeJSON.continuous = true;
+      // colorScheme is instanceof morpheus.HeatMapColorScheme
+      var colorSchemeJSON = morpheus.AbstractColorSupplier.toJSON(colorScheme.getCurrentColorSupplier());
       json[name] = colorSchemeJSON;
     });
     this.vectorNameToColorMap.forEach(function (colorMap, name) {
@@ -98,10 +98,11 @@ morpheus.VectorColorModel.prototype = {
   },
   fromJSON: function (json) {
     for (var name in json) {
-      if (json.continuous) {
-        this.vectorNameToColorScheme.set(name, morpheus.AbstractColorSupplier.fromJSON());
+      var obj = json[name];
+      if (obj.colors) {
+        this.vectorNameToColorScheme.set(name, morpheus.AbstractColorSupplier.fromJSON(obj));
       } else {
-        this.vectorNameToColorMap.set(name, morpheus.Map.fromJSON(json[name]));
+        this.vectorNameToColorMap.set(name, morpheus.Map.fromJSON(obj));
       }
     }
   },

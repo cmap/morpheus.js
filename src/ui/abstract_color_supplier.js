@@ -18,7 +18,6 @@ morpheus.AbstractColorSupplier.toJSON = function (cs) {
   var json = {
     fractions: cs.fractions,
     colors: cs.colors,
-    names: cs.names,
     min: cs.min,
     max: cs.max,
     missingColor: cs.missingColor,
@@ -26,10 +25,13 @@ morpheus.AbstractColorSupplier.toJSON = function (cs) {
     stepped: cs.stepped,
     transformValues: cs.transformValues
   };
-  if (cs.conditions) {
+  if (cs.names) {
+    json.names = cs.names;
+  }
+  if (cs.conditions && cs.conditions.array.length > 0) {
     json.conditions = cs.conditions.array;
   }
-  if (cs.sizer) {
+  if (cs.sizer && cs.sizer.seriesName != null) {
     json.size = {
       seriesName: cs.sizer.seriesName,
       min: cs.sizer.min,
@@ -64,7 +66,7 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
     cs.setTransformValues(json.transformValues);
   }
 
-  if(json.map) { // old
+  if (json.map) { // old
     json.values = json.map.map(function (item) {
       return item.value;
     });

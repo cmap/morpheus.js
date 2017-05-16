@@ -529,6 +529,9 @@ morpheus.HeatMapColorScheme.prototype = {
   isSizeBy: function () {
     this.currentColorSupplier.isSizeBy();
   },
+  getCurrentColorSupplier: function () {
+    return this.currentColorSupplier;
+  },
   getColor: function (row, column, val) {
     if (this.vector !== undefined) {
       var tmp = this.vector.getValue(row);
