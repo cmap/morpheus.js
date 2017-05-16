@@ -16,7 +16,7 @@ morpheus.ActionManager = function () {
   // header stuff-display, delete.
   this.add({
     ellipsis: true,
-    name: 'Sort',
+    name: 'Sort/Group',
     cb: function (options) {
       new morpheus.SortDialog(options.heatMap.getProject());
     },

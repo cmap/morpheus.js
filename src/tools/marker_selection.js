@@ -238,19 +238,21 @@ morpheus.MarkerSelection.prototype = {
       comparisonVector.setValue(bIndices[i], 'B');
     }
     function done(result) {
-      var pvalueVector = dataset.getRowMetadata().add('p_value');
-      var fdrVector = dataset.getRowMetadata().add('FDR(BH)');
-      var kVector = dataset.getRowMetadata().add('k');
 
-      for (var i = 0, size = pvalueVector.size(); i < size; i++) {
-        pvalueVector.setValue(i, result.rowSpecificPValues[i]);
-        fdrVector.setValue(i, result.fdr[i]);
-        kVector.setValue(i, result.k[i]);
-        v.setValue(i, result.scores[i]);
+      if (result) {
+        var pvalueVector = dataset.getRowMetadata().add('p_value');
+        var fdrVector = dataset.getRowMetadata().add('FDR(BH)');
+        var kVector = dataset.getRowMetadata().add('k');
+        for (var i = 0, size = pvalueVector.size(); i < size; i++) {
+          pvalueVector.setValue(i, result.rowSpecificPValues[i]);
+          fdrVector.setValue(i, result.fdr[i]);
+          kVector.setValue(i, result.k[i]);
+          v.setValue(i, result.scores[i]);
+        }
+        vectors.push(pvalueVector);
+        vectors.push(fdrVector);
+        vectors.push(kVector);
       }
-      vectors.push(pvalueVector);
-      vectors.push(fdrVector);
-      vectors.push(kVector);
       if (project.getRowFilter().getFilters().length > 0) {
         project.getRowFilter().setAnd(true, true);
       }
