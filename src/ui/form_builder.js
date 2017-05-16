@@ -1,16 +1,21 @@
 morpheus.FormBuilder = function (options) {
-  var that = this;
+  var _this = this;
   this.prefix = _.uniqueId('form');
   this.$form = $('<form></form>');
   this.$form.attr('role', 'form').attr('id', this.prefix);
-  this.vertical = options && options.vertical;
-  if (!this.vertical) {
+  this.formStyle = options == null || options.formStyle == null ? 'horizontal' : options.formStyle;
+
+  if (this.formStyle === 'horizontal') {
     this.titleClass = 'col-xs-12 control-label';
     this.labelClass = 'col-xs-4 control-label';
     this.$form.addClass('form-horizontal');
-  } else {
+  } else if (this.formStyle === 'vertical') {
     this.labelClass = 'control-label';
     this.titleClass = 'control-label';
+  } else if (this.formStyle === 'inline') {
+    this.titleClass = '';
+    this.labelClass = '';
+    this.$form.addClass('form-inline');
   }
   this.$form.on('submit', function (e) {
     e.preventDefault();
@@ -56,8 +61,8 @@ morpheus.FormBuilder = function (options) {
           e.preventDefault();
           e.stopPropagation();
           var files = e.originalEvent.dataTransfer.files;
-          that.setValue(name, isMultiple ? files : files[0]);
-          that.trigger('change', {
+          _this.setValue(name, isMultiple ? files : files[0]);
+          _this.trigger('change', {
             name: name,
             value: files[0]
           });
@@ -65,8 +70,8 @@ morpheus.FormBuilder = function (options) {
           var url = e.originalEvent.dataTransfer.getData('URL');
           e.preventDefault();
           e.stopPropagation();
-          that.setValue(name, isMultiple ? [url] : url);
-          that.trigger('change', {
+          _this.setValue(name, isMultiple ? [url] : url);
+          _this.trigger('change', {
             name: name,
             value: url
           });
@@ -359,24 +364,28 @@ morpheus.FormBuilder.prototype = {
   addSeparator: function () {
     var html = [];
     html.push('<div class="form-group">');
-    if (!this.vertical) {
+    if (this.formStyle === 'horizontal') {
       html.push('<div class="col-xs-12">');
     }
     html.push('<hr />');
-    if (!this.vertical) {
+    if (this.formStyle === 'horizontal') {
       html.push('</div>');
     }
     html.push('</div>');
     this.$form.append(html.join(''));
   },
   _append: function (html, field, isFieldStart) {
-    var that = this;
+    var _this = this;
     var required = field.required;
     var name = field.name;
     var type = field.type;
     if (type == 'separator') {
-      html.push(this.vertical ? '<div class="form-group"></div>'
-        : '<div class="col-xs-12">');
+      if (this.formStyle === 'horizontal') {
+        html.push('<div class="col-xs-12">');
+      } else {
+        html.push('<div class="form-group">');
+      }
+
       html.push('<hr />');
       html.push('</div>');
       return;
@@ -389,29 +398,33 @@ morpheus.FormBuilder.prototype = {
     var style = field.style || '';
     var col = '';
     var labelColumn = '';
-    if (!this.vertical) {
+    if (this.formStyle === 'horizontal') {
       col = field.col || 'col-xs-8';
     }
+
     if (showLabel === undefined) {
       showLabel = 'checkbox' !== type && 'button' !== type
         && 'radio' !== type;
       showLabel = showLabel || field.options !== undefined;
     }
-    var id = that.prefix + '_' + name;
+    var id = _this.prefix + '_' + name;
     if (title === undefined) {
       title = name.replace(/_/g, ' ');
       title = title[0].toUpperCase() + title.substring(1);
     }
+    var endingDiv = false;
     if (showLabel) {
       html.push('<label for="' + id + '" class="' + this.labelClass
         + '">');
       html.push(title);
       html.push('</label>');
-      if (isFieldStart) {
+      if (isFieldStart && this.formStyle !== 'inline') {
         html.push('<div class="' + col + '">');
+        endingDiv = true;
       }
-    } else if (isFieldStart && !this.vertical) {
+    } else if (isFieldStart && this.formStyle === 'horizontal') { // no label
       html.push('<div class="col-xs-offset-4 ' + col + '">');
+      endingDiv = true;
     }
     if ('radio' === type) {
       if (field.options) {
@@ -475,7 +488,7 @@ morpheus.FormBuilder.prototype = {
       if (type == 'bootstrap-select') {
         html.push('<select style="' + style + '" data-live-search="' + (field.search ? true : false) + '" data-selected-text-format="count" name="'
           + name + '" id="' + id
-          + '" class="selectpicker form-control"');
+          + '" class="selectpicker"');
       } else {
         html.push('<select style="' + style + '" name="' + name + '" id="' + id
           + '" class="form-control"');
@@ -517,10 +530,10 @@ morpheus.FormBuilder.prototype = {
         html.push('<p class="help-block"><a data-name="' + name
           + '_all" href="#">All</a>&nbsp;|&nbsp;<a data-name="' + name
           + '_none" href="#">None</a></p>');
-        that.$form.on('click', '[data-name=' + name + '_all]',
+        _this.$form.on('click', '[data-name=' + name + '_all]',
           function (evt) {
             evt.preventDefault();
-            var $select = that.$form
+            var $select = _this.$form
             .find('[name=' + name + ']');
             $select.selectpicker('val', $.map($select
             .find('option'), function (o) {
@@ -528,10 +541,10 @@ morpheus.FormBuilder.prototype = {
             }));
             $select.trigger('change');
           });
-        that.$form.on('click', '[data-name=' + name + '_none]',
+        _this.$form.on('click', '[data-name=' + name + '_none]',
           function (evt) {
             evt.preventDefault();
-            var $select = that.$form
+            var $select = _this.$form
             .find('[name=' + name + ']');
             $select.selectpicker('val', []);
             $select.trigger('change');
@@ -628,13 +641,14 @@ morpheus.FormBuilder.prototype = {
         .push('<input class="form-control" style="width:50%; display:none;" type="text" name="'
           + name + '_text">');
       }
+
       html.push('</div>');
 
       html.push('<input style="display:none;" type="file" name="' + name
         + '_file"' + (isMultiple ? ' multiple' : '') + '>');
       // browse button clicked
       // select change
-      that.$form
+      _this.$form
       .on(
         'change',
         '[name=' + name + '_picker]',
@@ -650,8 +664,8 @@ morpheus.FormBuilder.prototype = {
                   : results.map(function (result) {
                     return result.link;
                   });
-                that.setValue(name, val);
-                that.trigger('change', {
+                _this.setValue(name, val);
+                _this.trigger('change', {
                   name: name,
                   value: val
                 });
@@ -660,22 +674,22 @@ morpheus.FormBuilder.prototype = {
               multiselect: isMultiple
             };
             Dropbox.choose(options);
-            that.$form.find('[name=' + name + '_picker]').selectpicker('val', '');
+            _this.$form.find('[name=' + name + '_picker]').selectpicker('val', '');
           } else if ('My Computer' === val) {
-            that.$form.find('[name=' + name + '_file]')
+            _this.$form.find('[name=' + name + '_file]')
             .click();
-            that.$form.find('[name=' + name + '_picker]').selectpicker('val', '');
+            _this.$form.find('[name=' + name + '_picker]').selectpicker('val', '');
           }
 
-          that.$form.find('[name=' + name + '_url]')
+          _this.$form.find('[name=' + name + '_url]')
           .css('display',
             showUrlInput ? '' : 'none');
-          that.$form.find('[name=' + name + '_text]')
+          _this.$form.find('[name=' + name + '_text]')
           .css('display',
             showTextInput ? '' : 'none');
         });
       // URL
-      that.$form.on('keyup', '[name=' + name + '_url]', function (evt) {
+      _this.$form.on('keyup', '[name=' + name + '_url]', function (evt) {
         var text = $.trim($(this).val());
         if (isMultiple) {
           text = text.split(',').filter(function (t) {
@@ -683,30 +697,30 @@ morpheus.FormBuilder.prototype = {
             return t !== '';
           });
         }
-        that.setValue(name, text);
+        _this.setValue(name, text);
         if (evt.which === 13) {
-          that.trigger('change', {
+          _this.trigger('change', {
             name: name,
             value: text
           });
         }
       });
-      that.$form.on('keyup', '[name=' + name + '_text]', function (evt) {
+      _this.$form.on('keyup', '[name=' + name + '_text]', function (evt) {
         var text = $.trim($(this).val());
-        that.setValue(name, text);
+        _this.setValue(name, text);
         if (evt.which === 13) {
-          that.trigger('change', {
+          _this.trigger('change', {
             name: name,
             value: text
           });
         }
       });
       // browse file selected
-      that.$form.on('change', '[name=' + name + '_file]', function (evt) {
+      _this.$form.on('change', '[name=' + name + '_file]', function (evt) {
 
         var files = evt.target.files; // FileList object
-        that.setValue(name, isMultiple ? files : files[0]);
-        that.trigger('change', {
+        _this.setValue(name, isMultiple ? files : files[0]);
+        _this.trigger('change', {
           name: name,
           value: isMultiple ? files : files[0]
         });
@@ -751,20 +765,25 @@ morpheus.FormBuilder.prototype = {
       html.push(help);
       html.push('</span>');
     }
+    return endingDiv;
   },
   append: function (fields) {
     var html = [];
-    var that = this;
+    var _this = this;
     var isArray = morpheus.Util.isArray(fields);
     if (!isArray) {
       fields = [fields];
     }
     html.push('<div class="form-group">');
+    var endingDiv = false;
     _.each(fields, function (field, index) {
-      that._append(html, field, index === 0);
+      endingDiv || _this._append(html, field, index === 0);
     });
+
     html.push('</div>');
-    html.push('</div>');
+    if (endingDiv) {
+      html.push('</div>');
+    }
     var $div = $(html.join(''));
     this.$form.append($div);
     var checkBoxLists = $div.find('.checkbox-list');

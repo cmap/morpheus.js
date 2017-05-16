@@ -16,7 +16,7 @@ morpheus.ChartTool = function (chartOptions) {
     + '</div></div>');
 
   var formBuilder = new morpheus.FormBuilder({
-    vertical: true
+    formStyle: 'vertical'
   });
   this.formBuilder = formBuilder;
   formBuilder.append({

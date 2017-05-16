@@ -27,7 +27,7 @@ var customMatchers = {
           pass: true
         };
       }
-    }
+    };
   }
 };
 

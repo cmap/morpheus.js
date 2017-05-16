@@ -76,16 +76,14 @@ morpheus.HeatMap = function (options) {
       rowGroupBy: undefined,
       /*
        * Object that describes mapping of values to colors.
-       * Type can be 'fixed' or 'relative'. Stepped indicates
+       * scalingMode can be 'fixed' or 'relative'. Stepped indicates
        * whether color scheme is continuous (false) or
        * discrete (true).
        * <p>
        * <b>Example:</b> Use a fixed color scheme with color
        * stops at -100, -90, 90, and 100.
        * <p>
-       * <code>{ type : 'fixed', stepped:false, map : [ { value : -100, color :
-       * 'blue' }, { value : -90, color : 'white' }, { value :
-       * 90, color : 'white' }, { value : 100, color : 'red' } ] };</code>
+       * <code>{ scalingMode : 'fixed', stepped:false, values : [-100, -90, 90, 100], colors : ['blue', 'white', 'white', 'red'] };</code>
        */
       colorScheme: undefined,
       /*
@@ -209,7 +207,7 @@ morpheus.HeatMap = function (options) {
       /*
        * Heat map grid thickness in pixels
        */
-      gridThickness:0.1,
+      gridThickness: 0.1,
       customUrls: undefined, // Custom urls for File>Open.
       height: 'window', // set the available height for the
       // heat map. If not
@@ -785,7 +783,7 @@ morpheus.HeatMap.prototype = {
     var colorScheme;
     if (options.extension === 'segtab' || options.extension === 'seg') {
       colorScheme = {
-        type: 'fixed',
+        scalingMode: 'fixed',
         map: morpheus.HeatMapColorScheme.Predefined.CN().map
         .map(function (item) {
           return {
@@ -813,7 +811,7 @@ morpheus.HeatMap.prototype = {
       }
       if (!useMafColorMap) {
         colorScheme = {
-          type: 'fixed',
+          scalingMode: 'fixed',
           stepped: true,
           map: [{
             value: 0,

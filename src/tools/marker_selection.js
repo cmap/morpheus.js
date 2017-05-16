@@ -122,7 +122,7 @@ morpheus.MarkerSelection.prototype = {
         name: 'number_of_markers',
         value: '100',
         type: 'text',
-        help: 'The initial number of markers to show in each direction. Click <button title="Filter (Ctrl+L)" type="button" class="btn btn-default btn-xs dropdown-toggle"><span class="fa fa-filter"></span></button> to change.'
+        help: 'The initial number of markers to show in each direction.'
       }, {
         name: 'permutations',
         value: '0',
@@ -132,10 +132,20 @@ morpheus.MarkerSelection.prototype = {
   execute: function (options) {
 
     var project = options.project;
-    // classA and classB are arrays of identifiers if run via user
+    // classA and classB are arrays of Identifiers if run via user
     // interface. If run via JSON, will be string arrays
     var classA = options.input.class_a;
+    var classB = options.input.class_b;
+    if (classA.length === 0 && classB.length === 0) {
+      throw 'No samples in class A and class B';
+    }
 
+    if (classA.length === 0) {
+      throw 'No samples in class A';
+    }
+    if (classB.length === 0) {
+      throw 'No samples in class B';
+    }
     for (var i = 0; i < classA.length; i++) {
       var val = classA[i];
       if (!(val instanceof morpheus.Identifier)) {
@@ -143,7 +153,7 @@ morpheus.MarkerSelection.prototype = {
           morpheus.Util.isArray(val) ? val : [val]);
       }
     }
-    var classB = options.input.class_b;
+
     for (var i = 0; i < classB.length; i++) {
       var val = classB[i];
       if (!(val instanceof morpheus.Identifier)) {
@@ -152,18 +162,16 @@ morpheus.MarkerSelection.prototype = {
       }
     }
     var npermutations = parseInt(options.input.permutations);
+    var dataset = project.getSortedFilteredDataset();
+
     var fieldNames = options.input.field;
     if (!morpheus.Util.isArray(fieldNames)) {
       fieldNames = [fieldNames];
     }
-    var dataset = project.getSortedFilteredDataset();
+
     var vectors = morpheus.MetadataUtil.getVectors(dataset
     .getColumnMetadata(), fieldNames);
-
     var idToIndices = morpheus.VectorUtil.createValuesToIndicesMap(vectors);
-    var f = morpheus.MarkerSelection.Functions
-    .fromString(options.input.metric);
-
     var aIndices = [];
     var bIndices = [];
     classA.forEach(function (id) {
@@ -181,16 +189,8 @@ morpheus.MarkerSelection.prototype = {
       bIndices = bIndices.concat(indices);
     });
 
-    if (aIndices.length === 0 && bIndices.length === 0) {
-      throw 'No samples in class A and class B';
-    }
-
-    if (aIndices.length === 0) {
-      throw 'No samples in class A';
-    }
-    if (bIndices.length === 0) {
-      throw 'No samples in class B';
-    }
+    var f = morpheus.MarkerSelection.Functions
+    .fromString(options.input.metric);
 
     var classASet = {};
     for (var i = 0; i < aIndices.length; i++) {
@@ -237,8 +237,20 @@ morpheus.MarkerSelection.prototype = {
     for (var i = 0; i < bIndices.length; i++) {
       comparisonVector.setValue(bIndices[i], 'B');
     }
-    function done() {
+    function done(result) {
+      var pvalueVector = dataset.getRowMetadata().add('p_value');
+      var fdrVector = dataset.getRowMetadata().add('FDR(BH)');
+      var kVector = dataset.getRowMetadata().add('k');
 
+      for (var i = 0, size = pvalueVector.size(); i < size; i++) {
+        pvalueVector.setValue(i, result.rowSpecificPValues[i]);
+        fdrVector.setValue(i, result.fdr[i]);
+        kVector.setValue(i, result.k[i]);
+        v.setValue(i, result.scores[i]);
+      }
+      vectors.push(pvalueVector);
+      vectors.push(fdrVector);
+      vectors.push(kVector);
       if (project.getRowFilter().getFilters().length > 0) {
         project.getRowFilter().setAnd(true, true);
       }
@@ -319,51 +331,42 @@ morpheus.MarkerSelection.prototype = {
       vectors.push(contingencyTableVector);
       done();
     } else {
-      // background
       if (npermutations > 0) {
-        options.input.numClassA = aIndices.length;
-        options.input.npermutations = npermutations;
-        var blob = new Blob(
-          ['self.onmessage = function(e) {'
-          + 'importScripts(e.data.scripts);'
-          + 'self.postMessage(morpheus.MarkerSelection.execute(morpheus.Dataset.fromJSON(e.data.dataset), e.data.input));'
-          + '}']);
-
-        var url = window.URL.createObjectURL(blob);
-        var worker = new Worker(url);
         var subset = new morpheus.SlicedDatasetView(dataset, null,
           aIndices.concat(bIndices));
 
-        worker.postMessage({
-          scripts: morpheus.Util.getScriptPath(),
-          dataset: morpheus.Dataset.toJSON(subset, {
-            columnFields: [],
-            rowFields: [],
-            seriesIndices: [0]
-          }),
-          input: options.input
-        });
+        options.input.background = options.input.background && typeof Worker !== 'undefined';
+        options.input.numClassA = aIndices.length;
+        options.input.npermutations = npermutations;
+        if (options.input.background) {
+          var blob = new Blob(
+            ['self.onmessage = function(e) {'
+            + 'importScripts(e.data.scripts);'
+            + 'self.postMessage(morpheus.MarkerSelection.execute(morpheus.Dataset.fromJSON(e.data.dataset), e.data.input));'
+            + '}']);
 
-        worker.onmessage = function (e) {
-          var result = e.data;
-          var pvalueVector = dataset.getRowMetadata().add('p_value');
-          var fdrVector = dataset.getRowMetadata().add('FDR(BH)');
-          var kVector = dataset.getRowMetadata().add('k');
+          var url = window.URL.createObjectURL(blob);
+          var worker = new Worker(url);
+          worker.postMessage({
+            scripts: morpheus.Util.getScriptPath(),
+            dataset: morpheus.Dataset.toJSON(subset, {
+              columnFields: [],
+              rowFields: [],
+              seriesIndices: [0]
+            }),
+            input: options.input
+          });
 
-          for (var i = 0, size = pvalueVector.size(); i < size; i++) {
-            pvalueVector.setValue(i, result.rowSpecificPValues[i]);
-            fdrVector.setValue(i, result.fdr[i]);
-            kVector.setValue(i, result.k[i]);
-            v.setValue(i, result.scores[i]);
-          }
-          vectors.push(pvalueVector);
-          vectors.push(fdrVector);
-          vectors.push(kVector);
-          done();
-          worker.terminate();
-          window.URL.revokeObjectURL(url);
-        };
-        return worker;
+          worker.onmessage = function (e) {
+            done(e.data);
+            worker.terminate();
+            window.URL.revokeObjectURL(url);
+          };
+          return worker;
+        } else {
+          done(morpheus.MarkerSelection.execute(subset, options.input));
+        }
+
       } else {
         for (var i = 0, size = dataset.getRowCount(); i < size; i++) {
           v.setValue(i, f(list1.setIndex(i), list2.setIndex(i)));

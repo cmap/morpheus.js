@@ -41,9 +41,22 @@ morpheus.AbstractColorSupplier.toJSON = function (cs) {
 morpheus.AbstractColorSupplier.fromJSON = function (json) {
   var cs = json.stepped ? new morpheus.SteppedColorSupplier()
     : new morpheus.GradientColorSupplier();
+
+  if (json.scalingMode == null) {
+    json.scalingMode = json.type; // old
+  }
+  if (json.scalingMode === 'relative') {
+    json.scalingMode = 0;
+  } else if (json.scalingMode === 'fixed') {
+    json.scalingMode = 1;
+  }
   cs.setScalingMode(json.scalingMode);
-  cs.setMin(json.min);
-  cs.setMax(json.max);
+  if (json.min != null) {
+    cs.setMin(json.min);
+  }
+  if (json.max != null) {
+    cs.setMax(json.max);
+  }
   if (json.missingColor != null) {
     cs.setMissingColor(json.missingColor);
   }
@@ -51,8 +64,17 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
     cs.setTransformValues(json.transformValues);
   }
 
+  if(json.map) { // old
+    json.values = json.map.map(function (item) {
+      return item.value;
+    });
+    json.colors = json.map.map(function (item) {
+      return item.color;
+    });
+  }
   var fractions = json.fractions;
-  if (json.values) { // map to fractions
+
+  if (json.values || json.map) { // map values to fractions
     fractions = [];
     var values = json.values;
     var min = Number.MAX_VALUE;
@@ -68,6 +90,12 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
 
     for (var i = 0; i < values.length; i++) {
       fractions.push(valueToFraction(values[i]));
+    }
+    if (json.min == null) {
+      cs.setMin(min);
+    }
+    if (json.max == null) {
+      cs.setMax(max);
     }
   }
   if (json.colors != null && json.colors.length > 0) {

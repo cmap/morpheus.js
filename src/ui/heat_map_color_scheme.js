@@ -6,7 +6,7 @@
  */
 morpheus.HeatMapColorScheme = function (project, scheme) {
   this.project = project;
-  var that = this;
+  var _this = this;
 
   this.separateColorSchemeForRowMetadataField = null;
   this.rowValueToColorSupplier = {};
@@ -15,8 +15,7 @@ morpheus.HeatMapColorScheme = function (project, scheme) {
     if (scheme.valueToColorScheme) { // json representation
       this.fromJSON(scheme);
     } else {
-      this.rowValueToColorSupplier[null] = morpheus.HeatMapColorScheme
-      .createColorSupplier(scheme);
+      this.rowValueToColorSupplier[null] = this.fromJSON(scheme);
       this.currentColorSupplier = this.rowValueToColorSupplier[this.value];
     }
   }
@@ -24,7 +23,7 @@ morpheus.HeatMapColorScheme = function (project, scheme) {
   .on(
     'rowFilterChanged columnFilterChanged rowSortOrderChanged columnSortOrderChanged datasetChanged',
     function () {
-      that.projectUpdated();
+      _this.projectUpdated();
     });
   this.projectUpdated();
 };
@@ -452,11 +451,17 @@ morpheus.HeatMapColorScheme.prototype = {
     }
     this.rowValueToColorSupplier = {};
     var obj = json.valueToColorScheme || json.colorSchemes;
-    _.each(_.keys(obj), function (key) {
+    if (obj == null) {
       var colorSupplier = morpheus.AbstractColorSupplier
-      .fromJSON(obj[key]);
-      _this.rowValueToColorSupplier[key] = colorSupplier;
-    });
+      .fromJSON(json);
+      _this.rowValueToColorSupplier['null'] = colorSupplier;
+    } else {
+      _.each(_.keys(obj), function (key) {
+        var colorSupplier = morpheus.AbstractColorSupplier
+        .fromJSON(obj[key]);
+        _this.rowValueToColorSupplier[key] = colorSupplier;
+      });
+    }
     this._ensureColorSupplierExists();
 
   },
@@ -488,10 +493,10 @@ morpheus.HeatMapColorScheme.prototype = {
       this.vector = this.project.getSortedFilteredDataset()
       .getRowMetadata().getByName(
         separateColorSchemeForRowMetadataField);
-      var that = this;
+      var _this = this;
       _.each(_.keys(this.rowValueToColorSupplier), function (key) {
         // remove old color schemes
-        delete that.rowValueToColorSupplier[key];
+        delete _this.rowValueToColorSupplier[key];
       });
     }
   },
