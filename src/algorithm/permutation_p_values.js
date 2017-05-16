@@ -1,25 +1,38 @@
 morpheus.PermutationPValues = function (dataset, aIndices, bIndices,
-                                        numPermutations, f) {
+                                        numPermutations, f, continuousList) {
   var numRows = dataset.getRowCount();
   /** unpermuted scores */
   var scores = new Float32Array(numRows);
   /** Whether to smooth p values */
   var smoothPValues = true;
-  var list1 = new morpheus.DatasetRowView(new morpheus.SlicedDatasetView(
-    dataset, null, aIndices));
-  var list2 = new morpheus.DatasetRowView(new morpheus.SlicedDatasetView(
-    dataset, null, bIndices));
-
-  for (var i = 0; i < numRows; i++) {
-    scores[i] = f(list1.setIndex(i), list2.setIndex(i));
+  var permuter;
+  var permutationScore;
+  if (aIndices != null) {
+    var list1 = new morpheus.DatasetRowView(new morpheus.SlicedDatasetView(
+      dataset, null, aIndices));
+    var list2 = new morpheus.DatasetRowView(new morpheus.SlicedDatasetView(
+      dataset, null, bIndices));
+    dataset = new morpheus.SlicedDatasetView(dataset, null, aIndices
+    .concat(bIndices));
+    permuter = new morpheus.UnbalancedPermuter(aIndices.length,
+      bIndices.length);
+    permutationScore = new morpheus.TwoClassPermutationScore();
+    permutationScore.init(dataset, f);
+    for (var i = 0; i < numRows; i++) {
+      scores[i] = f(list1.setIndex(i), list2.setIndex(i));
+    }
+  } else { // continuous
+    permuter = new morpheus.UnbalancedContinuousPermuter(continuousList.size());
+    permutationScore = new morpheus.ContinuousPermutationScore(continuousList);
+    permutationScore.init(dataset, f);
+    var list = new morpheus.DatasetRowView(dataset);
+    for (var i = 0; i < numRows; i++) {
+      scores[i] = f(continuousList, list.setIndex(i));
+    }
   }
-  dataset = new morpheus.SlicedDatasetView(dataset, null, aIndices
-  .concat(bIndices));
+
   var rowSpecificPValues = new Float32Array(numRows);
-  var permuter = new morpheus.UnbalancedPermuter(aIndices.length,
-    bIndices.length);
-  var permutationScore = new morpheus.TwoClassPermutationScore();
-  permutationScore.init(dataset, f);
+
   for (var permutationIndex = 0; permutationIndex < numPermutations; permutationIndex++) {
     permutationScore.setPermutation(permuter.next());
     for (var i = 0; i < numRows; i++) {
@@ -78,6 +91,33 @@ morpheus.PermutationPValues.prototype = {
   getBonferroni: function (index) {
     return Math.min(this.rowSpecificPValues[index] * this.numRows, 1);
   }
+};
+
+morpheus.UnbalancedContinuousPermuter = function (size) {
+  var indices = new Uint32Array(size);
+  for (var i = 0; i < indices.length; i++) {
+    indices[i] = i;
+  }
+  var n = indices.length;
+  // Returns a random integer between min (included) and max (included)
+  // Using Math.round() will give you a non-uniform distribution!
+  function getRandomIntInclusive(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  this.next = function () {
+    // shuffle indices array
+    for (var i = n - 1; i >= 1; i--) {
+      var j = getRandomIntInclusive(0, i); // random integer such that
+      // 0 ≤ j ≤ i
+      // exchange a[j] and a[i]
+      var tmp = indices[j];
+      indices[j] = indices[i];
+      indices[i] = tmp;
+    }
+
+    return indices;
+  };
 };
 
 morpheus.UnbalancedPermuter = function (numClassZero, numClassOne) {
@@ -149,6 +189,26 @@ morpheus.TwoClassPermutationScore.prototype = {
     this.classOneView.setDataset(new morpheus.SlicedDatasetView(
       this.dataset, null, oneIndices));
 
+  }
+
+};
+
+morpheus.ContinuousPermutationScore = function (referenceList) {
+  this.referenceList = referenceList;
+};
+morpheus.ContinuousPermutationScore.prototype = {
+  getScore: function (index) {
+    this.datasetRowView.setIndex(index);
+    return this.f(this.referenceListView, this.datasetRowView);
+  },
+  init: function (dataset, f) {
+    this.dataset = dataset;
+    this.referenceListView = null;
+    this.datasetRowView = new morpheus.DatasetRowView(dataset);
+    this.f = f;
+  },
+  setPermutation: function (indices) {
+    this.referenceListView = new morpheus.SlicedVector(this.referenceList, indices);
   }
 
 };
