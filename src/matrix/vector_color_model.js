@@ -100,6 +100,7 @@ morpheus.VectorColorModel.prototype = {
     for (var name in json) {
       var obj = json[name];
       if (obj.colors) {
+        obj.scalingMode = 'fixed';
         this.vectorNameToColorScheme.set(name, morpheus.AbstractColorSupplier.fromJSON(obj));
       } else {
         this.vectorNameToColorMap.set(name, morpheus.Map.fromJSON(obj));

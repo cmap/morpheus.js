@@ -514,6 +514,8 @@ morpheus.FormBuilder.prototype = {
           var selected = false;
           if (_.isObject(value)) {
             selected = value[optionValue];
+          } else if (_.isArray(value)) {
+            selected = value.indexOf(optionValue) !== -1;
           } else {
             selected = value == optionValue;
           }

@@ -255,7 +255,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     toolbarHtml
     .push('<li role="separator" class="divider"></li>');
     toolbarHtml
-    .push('<li><a class="morpheus-menu-item" href="#" data-action="Reset Zoom">100%</a></li>');
+    .push('<li><a class="morpheus-menu-item" href="#" data-action="100%">100%</a></li>');
     toolbarHtml.push('</ul>');
     toolbarHtml.push('</div>');
   }
