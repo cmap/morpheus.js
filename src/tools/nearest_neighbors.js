@@ -227,7 +227,7 @@ morpheus.NearestNeighbors.prototype = {
           morpheus.SortKey.SortOrder.DESCENDING)], true);
       }
       project.trigger('trackChanged', {
-        vectors: [v],
+        vectors: [scoreVector],
         render: ['text'],
         columns: isColumns
       });
