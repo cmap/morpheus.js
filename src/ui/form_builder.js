@@ -488,7 +488,7 @@ morpheus.FormBuilder.prototype = {
       if (type == 'bootstrap-select') {
         html.push('<select style="' + style + '" data-live-search="' + (field.search ? true : false) + '" data-selected-text-format="count" name="'
           + name + '" id="' + id
-          + '" class="selectpicker"');
+          + '" data-actions-box="' + (field.selectAll ? true : false) + '" class="selectpicker"');
       } else {
         html.push('<select style="' + style + '" name="' + name + '" id="' + id
           + '" class="form-control"');
