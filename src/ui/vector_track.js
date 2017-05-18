@@ -177,6 +177,7 @@ morpheus.VectorTrack.vectorToString = function (vector) {
 morpheus.VectorTrack.prototype = {
   settingFromConfig: function (conf) {
     var settings = this.settings;
+    // old style, comma separated list of text, color, etc.
     if (_.isString(conf)) {
       settings.render = {};
       var tokens = conf.split(',');
@@ -203,10 +204,7 @@ morpheus.VectorTrack.prototype = {
           console.log(method + ' not found.');
         }
       }
-    } else if (_.isNumber(conf)) {
-      settings.render = {};
-      settings.render[conf] = true;
-    } else if (_.isObject(conf)) {
+    } else if (_.isObject(conf)) { // new style display:{max:10, render:['text']}
       conf.maxTextWidth = undefined;
       this.settings = $.extend({}, this.settings, conf);
       if (conf.discrete != null) {
@@ -214,8 +212,8 @@ morpheus.VectorTrack.prototype = {
       }
 
       if (conf.render) {
-        for (var method in conf.render) {
-          method = method.toUpperCase();
+        for (var i = 0; i < conf.render.length; i++) {
+          var method = conf.render[i].toUpperCase();
           var mapped = morpheus.VectorTrack.RENDER[method];
           if (mapped !== undefined) {
             this.settings.render[mapped] = true;

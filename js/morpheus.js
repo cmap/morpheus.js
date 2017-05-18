@@ -8550,12 +8550,20 @@ morpheus.Positions.prototype = {
   },
   setLength: function (length) {
     this.length = length;
+    this.trigger('change', {
+      source: this,
+      value: 'length'
+    });
   },
   setSize: function (size) {
     this.size = size;
     if (this.isSquished) {
       this.setSquishedIndices(this.squishedIndices);
     }
+    this.trigger('change', {
+      source: this,
+      value: 'size'
+    });
   },
   setSquishedIndices: function (squishedIndices) {
     if (squishedIndices != null) {
@@ -8587,6 +8595,10 @@ morpheus.Positions.prototype = {
       this.isSquished = false;
       this.positionFunction = this.defaultPositionFunction;
     }
+    this.trigger('change', {
+      source: this,
+      value: 'squishedIndices'
+    });
   },
   setSquishFactor: function (f) {
     if (this.squishFactor !== f) {
@@ -8594,6 +8606,10 @@ morpheus.Positions.prototype = {
       if (this.isSquished) {
         this.setSquishedIndices(this.squishedIndices);
       }
+      this.trigger('change', {
+        source: this,
+        value: 'squishFactor'
+      });
     }
   },
   getSquishFactor: function () {
@@ -8633,7 +8649,7 @@ morpheus.Positions.prototype = {
       var midVal = this.getPosition(mid);
       var size = this.getItemSize(mid);
       var nextStart = maxIndex === mid ? midVal + size : this
-        .getPosition(mid + 1);
+      .getPosition(mid + 1);
       if (midVal <= position && position < nextStart) {
         return mid;
       }
@@ -8650,6 +8666,8 @@ morpheus.Positions.prototype = {
     // key not found
   }
 };
+
+morpheus.Util.extend(morpheus.Positions, morpheus.Events);
 
 /**
  *
@@ -18770,10 +18788,10 @@ morpheus.ActionManager = function () {
   });
 
   this.add({
-    name: 'Linking',
+    name: 'Configuration',
     cb: function () {
       window
-      .open('https://clue.io/morpheus/linking.html');
+      .open('https://clue.io/morpheus/configuration.html');
     }
   });
   this.add({
@@ -21339,7 +21357,7 @@ morpheus.FormBuilder = function (options) {
   this.$form = $('<form></form>');
   this.$form.attr('role', 'form').attr('id', this.prefix);
   this.formStyle = options == null || options.formStyle == null ? 'horizontal' : options.formStyle;
-
+  this.$form.addClass('morpheus');
   if (this.formStyle === 'horizontal') {
     this.titleClass = 'col-xs-12 control-label';
     this.labelClass = 'col-xs-4 control-label';
@@ -21823,7 +21841,7 @@ morpheus.FormBuilder.prototype = {
       if (type == 'bootstrap-select') {
         html.push('<select style="' + style + '" data-live-search="' + (field.search ? true : false) + '" data-selected-text-format="count" name="'
           + name + '" id="' + id
-          + '" class="selectpicker"');
+          + '" data-actions-box="' + (field.selectAll ? true : false) + '" class="selectpicker"');
       } else {
         html.push('<select style="' + style + '" name="' + name + '" id="' + id
           + '" class="form-control"');
@@ -27867,7 +27885,7 @@ morpheus.HeatMap = function (options) {
         Edit: ['Copy Image', 'Copy Selected Dataset', null, 'Move Selected Rows To Top', 'Annotate Selected Rows', 'Copy Selected Rows', 'Invert' +
         ' Selected Rows', 'Select All Rows', 'Clear Selected Rows', null, 'Move Selected Columns To Top', 'Annotate Selected Columns', 'Copy Selected Columns', 'Invert' +
         ' Selected Columns', 'Select All Columns', 'Clear Selected Columns'],
-        Help: ['Search Menus', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keyboard' +
+        Help: ['Search Menus', null, 'Contact', 'Configuration', 'Tutorial', 'Source Code', null, 'Keyboard' +
         ' Shortcuts']
       },
       toolbar: {
@@ -27886,6 +27904,10 @@ morpheus.HeatMap = function (options) {
   if (options.menu == null) {
     options.menu = {};
   }
+  if (options.toolbar == null) {
+    options.toolbar = {};
+  }
+
   this.options = options;
   this.tooltipProvider = morpheus.HeatMapTooltipProvider;
   if (!options.el) {
@@ -31835,7 +31857,7 @@ morpheus.HelpMenu = function () {
   .push('<ul class="dropdown-menu dropdown-menu-right" role="menu">');
   html.push('<li><a data-name="contact" href="#">Contact</a></li>');
 
-  html.push('<li><a data-name="linking" href="#">Linking</a></li>');
+  html.push('<li><a data-name="configuration" href="#">Configuration</a></li>');
   html.push('<li><a data-name="tutorial" href="#">Tutorial</a></li>');
   html.push('<li><a data-name="source" href="#">Source Code</a></li>');
 
@@ -31858,9 +31880,9 @@ morpheus.HelpMenu = function () {
 
   });
 
-  this.$el.find('[data-name=linking]').on('click', function (e) {
+  this.$el.find('[data-name=configuration]').on('click', function (e) {
     window
-    .open('https://clue.io/morpheus/linking.html');
+    .open('https://clue.io/morpheus/configuration.html');
     e.preventDefault();
 
   });
@@ -35579,6 +35601,7 @@ morpheus.VectorTrack.vectorToString = function (vector) {
 morpheus.VectorTrack.prototype = {
   settingFromConfig: function (conf) {
     var settings = this.settings;
+    // old style, comma separated list of text, color, etc.
     if (_.isString(conf)) {
       settings.render = {};
       var tokens = conf.split(',');
@@ -35605,10 +35628,7 @@ morpheus.VectorTrack.prototype = {
           console.log(method + ' not found.');
         }
       }
-    } else if (_.isNumber(conf)) {
-      settings.render = {};
-      settings.render[conf] = true;
-    } else if (_.isObject(conf)) {
+    } else if (_.isObject(conf)) { // new style display:{max:10, render:['text']}
       conf.maxTextWidth = undefined;
       this.settings = $.extend({}, this.settings, conf);
       if (conf.discrete != null) {
@@ -35616,8 +35636,8 @@ morpheus.VectorTrack.prototype = {
       }
 
       if (conf.render) {
-        for (var method in conf.render) {
-          method = method.toUpperCase();
+        for (var i = 0; i < conf.render.length; i++) {
+          var method = conf.render[i].toUpperCase();
           var mapped = morpheus.VectorTrack.RENDER[method];
           if (mapped !== undefined) {
             this.settings.render[mapped] = true;

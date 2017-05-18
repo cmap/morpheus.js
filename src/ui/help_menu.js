@@ -11,7 +11,7 @@ morpheus.HelpMenu = function () {
   .push('<ul class="dropdown-menu dropdown-menu-right" role="menu">');
   html.push('<li><a data-name="contact" href="#">Contact</a></li>');
 
-  html.push('<li><a data-name="linking" href="#">Linking</a></li>');
+  html.push('<li><a data-name="configuration" href="#">Configuration</a></li>');
   html.push('<li><a data-name="tutorial" href="#">Tutorial</a></li>');
   html.push('<li><a data-name="source" href="#">Source Code</a></li>');
 
@@ -34,9 +34,9 @@ morpheus.HelpMenu = function () {
 
   });
 
-  this.$el.find('[data-name=linking]').on('click', function (e) {
+  this.$el.find('[data-name=configuration]').on('click', function (e) {
     window
-    .open('https://clue.io/morpheus/linking.html');
+    .open('https://clue.io/morpheus/configuration.html');
     e.preventDefault();
 
   });

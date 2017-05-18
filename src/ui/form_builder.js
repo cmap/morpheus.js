@@ -4,7 +4,7 @@ morpheus.FormBuilder = function (options) {
   this.$form = $('<form></form>');
   this.$form.attr('role', 'form').attr('id', this.prefix);
   this.formStyle = options == null || options.formStyle == null ? 'horizontal' : options.formStyle;
-
+  this.$form.addClass('morpheus');
   if (this.formStyle === 'horizontal') {
     this.titleClass = 'col-xs-12 control-label';
     this.labelClass = 'col-xs-4 control-label';

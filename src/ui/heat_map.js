@@ -249,7 +249,7 @@ morpheus.HeatMap = function (options) {
         Edit: ['Copy Image', 'Copy Selected Dataset', null, 'Move Selected Rows To Top', 'Annotate Selected Rows', 'Copy Selected Rows', 'Invert' +
         ' Selected Rows', 'Select All Rows', 'Clear Selected Rows', null, 'Move Selected Columns To Top', 'Annotate Selected Columns', 'Copy Selected Columns', 'Invert' +
         ' Selected Columns', 'Select All Columns', 'Clear Selected Columns'],
-        Help: ['Search Menus', null, 'Contact', 'Linking', 'Tutorial', 'Source Code', null, 'Keyboard' +
+        Help: ['Search Menus', null, 'Contact', 'Configuration', 'Tutorial', 'Source Code', null, 'Keyboard' +
         ' Shortcuts']
       },
       toolbar: {
@@ -268,6 +268,10 @@ morpheus.HeatMap = function (options) {
   if (options.menu == null) {
     options.menu = {};
   }
+  if (options.toolbar == null) {
+    options.toolbar = {};
+  }
+
   this.options = options;
   this.tooltipProvider = morpheus.HeatMapTooltipProvider;
   if (!options.el) {

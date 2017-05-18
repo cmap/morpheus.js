@@ -95,12 +95,20 @@ morpheus.Positions.prototype = {
   },
   setLength: function (length) {
     this.length = length;
+    this.trigger('change', {
+      source: this,
+      value: 'length'
+    });
   },
   setSize: function (size) {
     this.size = size;
     if (this.isSquished) {
       this.setSquishedIndices(this.squishedIndices);
     }
+    this.trigger('change', {
+      source: this,
+      value: 'size'
+    });
   },
   setSquishedIndices: function (squishedIndices) {
     if (squishedIndices != null) {
@@ -132,6 +140,10 @@ morpheus.Positions.prototype = {
       this.isSquished = false;
       this.positionFunction = this.defaultPositionFunction;
     }
+    this.trigger('change', {
+      source: this,
+      value: 'squishedIndices'
+    });
   },
   setSquishFactor: function (f) {
     if (this.squishFactor !== f) {
@@ -139,6 +151,10 @@ morpheus.Positions.prototype = {
       if (this.isSquished) {
         this.setSquishedIndices(this.squishedIndices);
       }
+      this.trigger('change', {
+        source: this,
+        value: 'squishFactor'
+      });
     }
   },
   getSquishFactor: function () {
@@ -178,7 +194,7 @@ morpheus.Positions.prototype = {
       var midVal = this.getPosition(mid);
       var size = this.getItemSize(mid);
       var nextStart = maxIndex === mid ? midVal + size : this
-        .getPosition(mid + 1);
+      .getPosition(mid + 1);
       if (midVal <= position && position < nextStart) {
         return mid;
       }
@@ -195,3 +211,5 @@ morpheus.Positions.prototype = {
     // key not found
   }
 };
+
+morpheus.Util.extend(morpheus.Positions, morpheus.Events);

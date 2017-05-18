@@ -553,10 +553,10 @@ morpheus.ActionManager = function () {
   });
 
   this.add({
-    name: 'Linking',
+    name: 'Configuration',
     cb: function () {
       window
-      .open('https://clue.io/morpheus/linking.html');
+      .open('https://clue.io/morpheus/configuration.html');
     }
   });
   this.add({
