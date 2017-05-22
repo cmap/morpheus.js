@@ -744,9 +744,10 @@ morpheus.ActionManager = function () {
     .getColumnSelectionModel() : project
     .getRowSelectionModel();
     var text = [];
+    var toStringFunction = morpheus.VectorTrack.vectorToString(v);
     selectionModel.getViewIndices().forEach(
       function (index) {
-        text.push(morpheus.Util.toString(v
+        text.push(toStringFunction(v
         .getValue(index)));
       });
     morpheus.Util.setClipboardData([{
