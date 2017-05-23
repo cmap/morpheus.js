@@ -176,6 +176,15 @@ morpheus.FoldChange = function (list1, list2) {
 morpheus.FoldChange.toString = function () {
   return 'Fold Change';
 };
+
+morpheus.LogFoldChange = function (list1, list2) {
+  var m1 = morpheus.Mean(list1);
+  var m2 = morpheus.Mean(list2);
+  return (m1 - m2);
+};
+morpheus.LogFoldChange.toString = function () {
+  return 'Log Fold Change';
+};
 morpheus.TTest = function (list1, list2) {
   var m1 = morpheus.Mean(list1);
   var m2 = morpheus.Mean(list2);

@@ -6,7 +6,7 @@ morpheus.MarkerSelection = function () {
  * @private
  */
 morpheus.MarkerSelection.Functions = [morpheus.FisherExact,
-  morpheus.FoldChange, morpheus.SignalToNoise,
+  morpheus.FoldChange, morpheus.LogFoldChange, morpheus.SignalToNoise,
   morpheus.createSignalToNoiseAdjust(), morpheus.TTest];
 
 morpheus.MarkerSelection.Functions.fromString = function (s) {
@@ -202,8 +202,8 @@ morpheus.MarkerSelection.prototype = {
       }
     }
     var isFishy = f.toString() === morpheus.FisherExact.toString();
-    if (aIndices.length === 1 || bIndices.length === 1
-      && !(f instanceof morpheus.FisherExact)) {
+    if ((aIndices.length === 1 || bIndices.length === 1)
+      && !isFishy && f.toString() !== morpheus.LogFoldChange.toString()) {
       f = morpheus.FoldChange;
     }
     var list1 = new morpheus.DatasetRowView(new morpheus.SlicedDatasetView(
