@@ -60,5 +60,13 @@ morpheus.CollapseDataset = function (dataset, collapseToFields,
     }
     counter++;
   });
+  if (nfields === 1) {
+    var newVector = collapseToVectors[0];
+    vectors[0].getProperties().forEach(function (val, key) {
+      if (!morpheus.VectorKeys.COPY_IGNORE.has(key)) {
+        newVector.properties.set(key, val);
+      }
+    });
+  }
   return collapsedDataset;
 };

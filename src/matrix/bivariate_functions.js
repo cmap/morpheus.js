@@ -180,7 +180,10 @@ morpheus.FoldChange.toString = function () {
 morpheus.LogFoldChange = function (list1, list2) {
   var m1 = morpheus.Mean(list1);
   var m2 = morpheus.Mean(list2);
-  return (m1 - m2);
+  var diff = m1 - m2;
+  var isNegative = diff < 0;
+  var result = Math.pow(2.0, isNegative ? -diff : diff);
+  return isNegative ? -result : result;
 };
 morpheus.LogFoldChange.toString = function () {
   return 'Log Fold Change';

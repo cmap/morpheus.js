@@ -7,8 +7,13 @@ morpheus.HeatMap = function (options) {
   morpheus.Util.loadTrackingCode();
   var _this = this;
   // don't extend
-  var parent = options.parent;
-  options.parent = null;
+  var dontExtend = ['parent', 'columnDendrogram', 'rowDendrogram'];
+  var cache = [];
+  for (var i = 0; i < dontExtend.length; i++) {
+    var field = dontExtend[i];
+    cache[i] = options[field];
+    options[field] = null;
+  }
   options = $
   .extend(
     true,
@@ -244,7 +249,7 @@ morpheus.HeatMap = function (options) {
       $loadingImage: morpheus.Util.createLoadingEl(),
       menu: {
         File: ['Open', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
-        Tools: ['New Heat Map', null, 'Hierarchical Clustering', 'KMeans Clustering', null, 'Marker Selection', 'Nearest Neighbors', 'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort/Group', 'Filter', null, 'API'],
+        Tools: ['New Heat Map', null, 'Hierarchical Clustering', 'KMeans Clustering', null, 'Marker Selection', 'Nearest Neighbors', 'Create Calculated Annotation', null, 'Adjust', 'Collapse', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort/Group', 'Filter', null, 'API'],
         View: ['Zoom In', 'Zoom Out', 'Fit To Window', '100%', null, 'Options'],
         Edit: ['Copy Image', 'Copy Selected Dataset', null, 'Move Selected Rows To Top', 'Annotate Selected Rows', 'Copy Selected Rows', 'Invert' +
         ' Selected Rows', 'Select All Rows', 'Clear Selected Rows', null, 'Move Selected Columns To Top', 'Annotate Selected Columns', 'Copy Selected Columns', 'Invert' +
@@ -264,7 +269,11 @@ morpheus.HeatMap = function (options) {
         colorKey: true
       }
     }, options);
-  options.parent = parent;
+
+  for (var i = 0; i < dontExtend.length; i++) {
+    var field = dontExtend[i];
+    options[field] = cache[i];
+  }
   if (options.menu == null) {
     options.menu = {};
   }
@@ -761,6 +770,9 @@ morpheus.HeatMap.createGroupBySpaces = function (dataset, groupByKeys, gapSize, 
 morpheus.HeatMap.isDendrogramVisible = function (project, isColumns) {
   var sortKeys = isColumns ? project.getColumnSortKeys() : project
   .getRowSortKeys();
+  if (sortKeys.length === 0) {
+    return true;
+  }
   // var filter = isColumns ? this.project.getColumnFilter()
   //   : this.project.getRowFilter();
   // // FIXME compare filters

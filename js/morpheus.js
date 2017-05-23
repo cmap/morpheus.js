@@ -4951,6 +4951,18 @@ morpheus.FoldChange = function (list1, list2) {
 morpheus.FoldChange.toString = function () {
   return 'Fold Change';
 };
+
+morpheus.LogFoldChange = function (list1, list2) {
+  var m1 = morpheus.Mean(list1);
+  var m2 = morpheus.Mean(list2);
+  var diff = m1 - m2;
+  var isNegative = diff < 0;
+  var result = Math.pow(2.0, isNegative ? -diff : diff);
+  return isNegative ? -result : result;
+};
+morpheus.LogFoldChange.toString = function () {
+  return 'Log Fold Change';
+};
 morpheus.TTest = function (list1, list2) {
   var m1 = morpheus.Mean(list1);
   var m2 = morpheus.Mean(list2);
@@ -14573,7 +14585,7 @@ morpheus.MarkerSelection = function () {
  * @private
  */
 morpheus.MarkerSelection.Functions = [morpheus.FisherExact,
-  morpheus.FoldChange, morpheus.SignalToNoise,
+  morpheus.FoldChange, morpheus.LogFoldChange, morpheus.SignalToNoise,
   morpheus.createSignalToNoiseAdjust(), morpheus.TTest];
 
 morpheus.MarkerSelection.Functions.fromString = function (s) {
@@ -14769,8 +14781,8 @@ morpheus.MarkerSelection.prototype = {
       }
     }
     var isFishy = f.toString() === morpheus.FisherExact.toString();
-    if (aIndices.length === 1 || bIndices.length === 1
-      && !(f instanceof morpheus.FisherExact)) {
+    if ((aIndices.length === 1 || bIndices.length === 1)
+      && !isFishy && f.toString() !== morpheus.LogFoldChange.toString()) {
       f = morpheus.FoldChange;
     }
     var list1 = new morpheus.DatasetRowView(new morpheus.SlicedDatasetView(
@@ -18979,9 +18991,10 @@ morpheus.ActionManager = function () {
     .getColumnSelectionModel() : project
     .getRowSelectionModel();
     var text = [];
+    var toStringFunction = morpheus.VectorTrack.vectorToString(v);
     selectionModel.getViewIndices().forEach(
       function (index) {
-        text.push(morpheus.Util.toString(v
+        text.push(toStringFunction(v
         .getValue(index)));
       });
     morpheus.Util.setClipboardData([{
@@ -27643,8 +27656,13 @@ morpheus.HeatMap = function (options) {
   morpheus.Util.loadTrackingCode();
   var _this = this;
   // don't extend
-  var parent = options.parent;
-  options.parent = null;
+  var dontExtend = ['parent', 'columnDendrogram', 'rowDendrogram'];
+  var cache = [];
+  for (var i = 0; i < dontExtend.length; i++) {
+    var field = dontExtend[i];
+    cache[i] = options[field];
+    options[field] = null;
+  }
   options = $
   .extend(
     true,
@@ -27880,7 +27898,7 @@ morpheus.HeatMap = function (options) {
       $loadingImage: morpheus.Util.createLoadingEl(),
       menu: {
         File: ['Open', 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename Tab'],
-        Tools: ['New Heat Map', null, 'Hierarchical Clustering', 'KMeans Clustering', null, 'Marker Selection', 'Nearest Neighbors', 'Adjust', 'Collapse', 'Create Calculated Annotation', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort/Group', 'Filter', null, 'API'],
+        Tools: ['New Heat Map', null, 'Hierarchical Clustering', 'KMeans Clustering', null, 'Marker Selection', 'Nearest Neighbors', 'Create Calculated Annotation', null, 'Adjust', 'Collapse', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort/Group', 'Filter', null, 'API'],
         View: ['Zoom In', 'Zoom Out', 'Fit To Window', '100%', null, 'Options'],
         Edit: ['Copy Image', 'Copy Selected Dataset', null, 'Move Selected Rows To Top', 'Annotate Selected Rows', 'Copy Selected Rows', 'Invert' +
         ' Selected Rows', 'Select All Rows', 'Clear Selected Rows', null, 'Move Selected Columns To Top', 'Annotate Selected Columns', 'Copy Selected Columns', 'Invert' +
@@ -27900,7 +27918,11 @@ morpheus.HeatMap = function (options) {
         colorKey: true
       }
     }, options);
-  options.parent = parent;
+
+  for (var i = 0; i < dontExtend.length; i++) {
+    var field = dontExtend[i];
+    options[field] = cache[i];
+  }
   if (options.menu == null) {
     options.menu = {};
   }
@@ -28397,6 +28419,9 @@ morpheus.HeatMap.createGroupBySpaces = function (dataset, groupByKeys, gapSize, 
 morpheus.HeatMap.isDendrogramVisible = function (project, isColumns) {
   var sortKeys = isColumns ? project.getColumnSortKeys() : project
   .getRowSortKeys();
+  if (sortKeys.length === 0) {
+    return true;
+  }
   // var filter = isColumns ? this.project.getColumnFilter()
   //   : this.project.getRowFilter();
   // // FIXME compare filters
@@ -36628,7 +36653,7 @@ morpheus.VectorTrack.prototype = {
             type: 'number',
             value: morpheus.Util.getNumberFormatPatternFractionDigits(pattern),
             required: true,
-            style: 'max-width:10px;'
+            style: 'max-width:60px;'
           });
           formBuilder.find('number_of_fraction_digits').on(
             'keyup input', _.debounce(
@@ -37927,6 +37952,14 @@ morpheus.CollapseDataset = function (dataset, collapseToFields,
     }
     counter++;
   });
+  if (nfields === 1) {
+    var newVector = collapseToVectors[0];
+    vectors[0].getProperties().forEach(function (val, key) {
+      if (!morpheus.VectorKeys.COPY_IGNORE.has(key)) {
+        newVector.properties.set(key, val);
+      }
+    });
+  }
   return collapsedDataset;
 };
 
