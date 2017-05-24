@@ -1076,26 +1076,24 @@ morpheus.HeatMap.prototype = {
       return track.isVisible();
     }).map(function (track) {
       var size = morpheus.CanvasUtil.getPreferredSize(_this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), false), false));
-      return {
-        size: {
-          width: size.widthSet ? size.width : undefined
-        },
-        field: track.getName(),
-        display: track.settings
+      var obj = track.settings;
+      obj.field = track.getName();
+      obj.size = {
+        width: size.widthSet ? size.width : undefined
       };
+      return obj;
     });
     json.columns = this.columnTracks.filter(function (track) {
       return track.isVisible();
     }).map(function (track) {
       var size = morpheus.CanvasUtil.getPreferredSize(_this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), true), true));
-      return {
-        size: {
-          width: size.widthSet ? size.width : undefined,
-          height: size.heightSet ? size.height : undefined
-        },
-        field: track.getName(),
-        display: track.settings
+      var obj = track.settings;
+      obj.field = track.getName();
+      obj.size = {
+        width: size.widthSet ? size.width : undefined,
+        height: size.heightSet ? size.height : undefined
       };
+      return obj;
     });
 
     // sort
