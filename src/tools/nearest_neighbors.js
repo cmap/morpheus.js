@@ -173,7 +173,7 @@ morpheus.NearestNeighbors.prototype = {
         var vectors = [pvalueVector, fdrVector, kVector, scoreVector];
         project.trigger('trackChanged', {
           vectors: vectors,
-          render: ['text'],
+          display: ['text'],
           columns: isColumns
         });
       };
@@ -228,7 +228,7 @@ morpheus.NearestNeighbors.prototype = {
       }
       project.trigger('trackChanged', {
         vectors: [scoreVector],
-        render: ['text'],
+        display: ['text'],
         columns: isColumns
       });
     }

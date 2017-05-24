@@ -840,7 +840,7 @@ morpheus.ActionManager = function () {
           'trackChanged',
           {
             vectors: [v],
-            render: existingVector != null ? []
+            display: existingVector != null ? []
               : [morpheus.VectorTrack.RENDER.TEXT],
             columns: isColumns
           });

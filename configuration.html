@@ -360,12 +360,17 @@
                        aria-expanded="false"
                        aria-controls="dendrogram">rowDendrogram/columnDendrogram</a>
                     <div id="dendrogram" class="collapse">
-                        <div class="top-level-description">Optional URL to a dendrogram in <a
-                                target="_blank"
-                                href="https://en.wikipedia.org/wiki/Newick_format">Newick</a>
-                            format<code>String
+                        <ul>
+                            <li><code>String
                             </code>
-                        </div>
+                                <div class="top-level-description">Optional URL to a dendrogram in
+                                    <a
+                                            target="_blank"
+                                            href="https://en.wikipedia.org/wiki/Newick_format">Newick</a>
+                                    format
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </li>
 
@@ -375,13 +380,36 @@
                        aria-controls="dendrogramField">rowDendrogramField/columnDendrogramField</a>
 
                     <div id="dendrogramField" class="collapse">
-                        <div class="top-level-description">Optional metadata field in dataset to
-                            match
-                            leaf node ids in the dendrogram Newick file.<code>String</code></div>
+                        <ul>
+                            <li><code>String</code>
+                                <div class="top-level-description">Optional metadata field in
+                                    dataset to
+                                    match
+                                    leaf node ids in the dendrogram Newick file.
+                                </div>
+                            </li>
+                        </ul>
+
                     </div>
                 </li>
 
 
+                <li><a data-toggle="collapse" href="#overrideDefaults"
+                       aria-expanded="false"
+                       aria-controls="overrideDefaults">overrideRowDefaults
+                    /overrideColumnDefaults</a>
+                    <div id="overrideDefaults" class="collapse">
+                        <ul>
+                            <li><code>Boolean</code> (default: true)
+                                <div class="description">Whether to override default row/column
+                                    display when <a href="#metadata">rows
+                                        /columns</a> is specified.
+                                </div>
+
+                            </li>
+                        </ul>
+                    </div>
+                </li>
                 <li><a data-toggle="collapse" href="#metadata"
                        aria-expanded="false"
                        aria-controls="metadata">rows/columns</a>
@@ -394,21 +422,50 @@
                             <li>field <code>String</code>
                                 <div class="description">Metadata field name</div>
                             </li>
-                            <li>render <code>[String]</code>
+
+                            <li>display <code>[String]</code>
                                 <div class="description">"text" to render annotation as
                                     text, "color" to render annotation as
                                     color, "bar" to render annotation as
                                     bar chart
                                 </div>
                             </li>
+                            <li>highlightMatchingValues <code>Boolean</code> (default:false)
+                                <div
+                                        class="description">Whether to highlight matching values
+                                    on hover
+                                </div>
+                            </li>
+                            <li>colorByField <code>String</code>
+                                <div
+                                        class="description">Optional field name to
+                                    color this field by.
+                                </div>
+                            </li>
+                            <li>min <code>Number</code>
+                                <div
+                                        class="description">Optional minimum for bar chart.
+                                </div>
+                            </li>
+                            <li>mid <code>Number</code>
+                                <div
+                                        class="description">Optional midpoint for bar chart.
+                                </div>
+                            </li>
+                            <li>max <code>Number</code>
+                                <div
+                                        class="description">Optional maximum for bar chart.
+                                </div>
+                            </li>
+
 
                         </ul>
                         <div class="example">
                             <div class="description">Display id as text and
                                 stdev using text and color
                             </div>
-                            <code>[{field:"id", display:"text"}, {field:"stdev",
-                                display:"text, color"}]</code></div>
+                            <code>[{field:"id", display:["text"]}, {field:"stdev",
+                                display:["text", "color"]}]</code></div>
                     </div>
                 </li>
 

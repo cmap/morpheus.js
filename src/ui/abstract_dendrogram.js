@@ -530,9 +530,9 @@ morpheus.AbstractDendrogram.prototype = {
       var settings = {
         discrete: true,
         discreteAutoDetermined: true,
-        render: {}
+        display: {}
       };
-      settings.render[morpheus.VectorTrack.RENDER.COLOR] = true;
+      settings.display[morpheus.VectorTrack.RENDER.COLOR] = true;
       this.heatMap.addTrack(clusterIdVector.getName(),
         this.type === morpheus.AbstractDendrogram.Type.COLUMN,
         settings);

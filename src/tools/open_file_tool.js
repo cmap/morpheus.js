@@ -197,7 +197,7 @@ morpheus.OpenFileTool.prototype = {
     if (heatMap) {
       heatMap.getProject().trigger('trackChanged', {
         vectors: [vector],
-        render: ['color'],
+        display: ['color'],
         columns: isColumns
       });
     }
@@ -343,7 +343,7 @@ morpheus.OpenFileTool.prototype = {
 
       heatMap.getProject().trigger('trackChanged', {
         vectors: [vector],
-        render: ['text'],
+        display: ['text'],
         columns: isColumns
       });
     };
@@ -376,9 +376,9 @@ morpheus.OpenFileTool.prototype = {
         metadataName, fileColumnName);
 
       var nameToIndex = new morpheus.Map();
-      var render = [];
+      var display = [];
       for (var i = 0; i < vectors.length; i++) {
-        render.push(isColumns ? 'color' : 'text');
+        display.push(isColumns ? 'color' : 'text');
         nameToIndex.set(vectors[i].getName(), i);
       }
       if (lines.colors) {
@@ -386,13 +386,13 @@ morpheus.OpenFileTool.prototype = {
         lines.colors.forEach(function (item) {
           var index = nameToIndex.get(item.header);
           var vector = vectors[index];
-          render[index] = 'color';
+          display[index] = 'color';
           colorModel.setMappedValue(vector, item.value, item.color);
         });
       }
       heatMap.getProject().trigger('trackChanged', {
         vectors: vectors,
-        render: render,
+        display: display,
         columns: isColumns
       });
     };

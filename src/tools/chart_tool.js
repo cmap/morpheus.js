@@ -492,7 +492,7 @@ morpheus.ChartTool.prototype = {
           .maybeConvertStringToNumber(rowVector);
           _this.project.trigger('trackChanged', {
             vectors: [rowVector],
-            render: existingRowVector != null ? []
+            display: existingRowVector != null ? []
               : [morpheus.VectorTrack.RENDER.TEXT],
             columns: false
           });
@@ -502,7 +502,7 @@ morpheus.ChartTool.prototype = {
           .maybeConvertStringToNumber(columnVector);
           _this.project.trigger('trackChanged', {
             vectors: [columnVector],
-            render: existingColumnVector != null ? []
+            display: existingColumnVector != null ? []
               : [morpheus.VectorTrack.RENDER.TEXT],
             columns: true
           });

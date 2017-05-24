@@ -291,14 +291,14 @@ morpheus.MarkerSelection.prototype = {
 
       project.trigger('trackChanged', {
         vectors: vectors,
-        render: vectors.map(function () {
+        display: vectors.map(function () {
           return 'text';
         }),
         columns: false
       });
       project.trigger('trackChanged', {
         vectors: [comparisonVector],
-        render: ['color'],
+        display: ['color'],
         columns: true
       });
     }

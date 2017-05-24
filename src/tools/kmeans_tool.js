@@ -148,7 +148,7 @@ morpheus.KMeansTool.prototype = {
         heatmap.addTrack('k_means_' + options.input.number_of_clusters, true, {
           highlightMatchingValues: true,
           discreteAutoDetermined: true,
-          render: {color: true}
+          display: ['color']
         });
       }
       if (result.rowAssignments) {
@@ -156,7 +156,7 @@ morpheus.KMeansTool.prototype = {
         heatmap.addTrack('k_means_' + options.input.number_of_clusters, false, {
           highlightMatchingValues: true,
           discreteAutoDetermined: true,
-          render: {color: true}
+          display: ['color']
         });
       }
       heatmap.revalidate();
@@ -186,7 +186,7 @@ morpheus.KMeansTool.prototype = {
           heatmap.addTrack('k_means_' + options.input.number_of_clusters, true, {
             highlightMatchingValues: true,
             discrete: true,
-            render: {color: true}
+            display: ['color']
           });
         }
         if (result.rowAssignments) {
@@ -194,7 +194,7 @@ morpheus.KMeansTool.prototype = {
           heatmap.addTrack('k_means_' + options.input.number_of_clusters, false, {
             highlightMatchingValues: true,
             discrete: true,
-            render: {color: true}
+            display: ['color']
           });
         }
         heatmap.revalidate();

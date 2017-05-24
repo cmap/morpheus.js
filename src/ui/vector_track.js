@@ -99,7 +99,7 @@ morpheus.VectorTrack = function (project, name, positions, isColumns, heatmap) {
     discreteAutoDetermined: false,
     colorBarSize: 12,
     stackedBar: false,
-    render: {},
+    display: {},
     selectionColor: 'rgb(182,213,253)',
     colorByField: null, // color this vector by another vector
     barColor: '#bdbdbd',
@@ -176,17 +176,21 @@ morpheus.VectorTrack.vectorToString = function (vector) {
 
 morpheus.VectorTrack.prototype = {
   settingFromConfig: function (conf) {
+    console.log(conf);
+
+
     var settings = this.settings;
-    // old style, comma separated list of text, color, etc.
-    if (_.isString(conf)) {
-      settings.render = {};
-      var tokens = conf.split(',');
+    // new style= rows:[{field: 'test', display:['text']}]
+    // old style= rows:[{field: 'test', display:'text,color'}]
+    var fromString = function (s) {
+      settings.display = {};
+      var tokens = s.split(',');
       for (var i = 0, length = tokens.length; i < length; i++) {
         var method = $.trim(tokens[i]);
         method = method.toUpperCase();
         var mapped = morpheus.VectorTrack.RENDER[method];
         if (mapped !== undefined) {
-          settings.render[mapped] = true;
+          settings.display[mapped] = true;
         } else if (method === 'DISCRETE') {
           settings.discrete = true;
           settings.discreteAutoDetermined = true;
@@ -197,26 +201,44 @@ morpheus.VectorTrack.prototype = {
           settings.highlightMatchingValues = true;
         } else if (method === 'STACKED_BAR') {
           settings.stackedBar = true;
-          settings.render[morpheus.VectorTrack.RENDER.BAR] = true;
+          settings.display[morpheus.VectorTrack.RENDER.BAR] = true;
         } else if (method === 'TOOLTIP') {
           settings.inlineTooltip = true;
         } else {
           console.log(method + ' not found.');
         }
       }
-    } else if (_.isObject(conf)) { // new style display:{max:10, render:['text']}
-      conf.maxTextWidth = undefined;
-      this.settings = $.extend({}, this.settings, conf);
-      if (conf.discrete != null) {
-        this.settings.discreteAutoDetermined = true;
+    };
+    var fromArray = function (array) {
+      settings.display = {};
+      for (var i = 0; i < array.length; i++) {
+        var method = array[i].toUpperCase();
+        var mapped = morpheus.VectorTrack.RENDER[method];
+        if (mapped !== undefined) {
+          settings.display[mapped] = true;
+        } else {
+          console.log(method + ' not found.');
+        }
       }
-
-      if (conf.render) {
-        for (var i = 0; i < conf.render.length; i++) {
-          var method = conf.render[i].toUpperCase();
-          var mapped = morpheus.VectorTrack.RENDER[method];
-          if (mapped !== undefined) {
-            this.settings.render[mapped] = true;
+    };
+    if (conf != null) {
+      if (_.isString(conf)) {
+        fromString(conf);
+      } else if (_.isArray(conf)) {
+        fromArray(conf);
+      } else {
+        settings = $.extend({}, settings, conf);
+        settings.maxTextWidth = undefined;
+        if (conf.discrete != null) {
+          settings.discreteAutoDetermined = true;
+        }
+        this.settings = settings;
+        if (conf.display != null) {
+          var display = conf.display;
+          if (_.isArray(display)) {
+            fromArray(display);
+          } else if (_.isString(display)) {  // old style, comma separated list of text, color, etc.
+            fromString(display);
           }
         }
       }
@@ -234,7 +256,7 @@ morpheus.VectorTrack.prototype = {
     return this.settings.tooltip;
   },
   isRenderAs: function (value) {
-    return this.settings.render[value];
+    return this.settings.display[value];
   },
   dispose: function () {
     morpheus.AbstractCanvas.prototype.dispose.call(this);
@@ -307,7 +329,7 @@ morpheus.VectorTrack.prototype = {
       width += 100;
     }
     // 2 pixel spacing between display types
-    var nkeys = _.keys(this.settings.render).length;
+    var nkeys = _.keys(this.settings.display).length;
 
     if (nkeys > 0) {
       width += (nkeys - 1) * 2;
@@ -1717,9 +1739,9 @@ morpheus.VectorTrack.prototype = {
           }
           var show = !_this.isRenderAs(item);
           if (!show) {
-            delete _this.settings.render[item];
+            delete _this.settings.display[item];
           } else {
-            _this.settings.render[item] = true;
+            _this.settings.display[item] = true;
           }
           _this._update();
           heatmap.revalidate();
@@ -1852,7 +1874,7 @@ morpheus.VectorTrack.prototype = {
     var gridColor = this.heatmap.getHeatMapElementComponent().getGridColor();
     var gridThickness = this.heatmap.getHeatMapElementComponent().getGridThickness();
     for (var i = start; i < end; i++) {
-      var value = vector.getValue(i); // value is an array of values to render as a heat map
+      var value = vector.getValue(i); // value is an array of values to display as a heat map
       if (value != null) {
         var pix = positions.getPosition(i);
         var itemSize = positions.getItemSize(i);
