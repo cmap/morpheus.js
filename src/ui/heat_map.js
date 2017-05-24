@@ -1069,8 +1069,8 @@ morpheus.HeatMap.prototype = {
     // TODO shapes
 
     // annotation colors
-    json.rowColorModel = this.getProject().getRowColorModel().toJSON();
-    json.columnColorModel = this.getProject().getColumnColorModel().toJSON();
+    json.rowColorModel = this.getProject().getRowColorModel().toJSON(this.rowTracks);
+    json.columnColorModel = this.getProject().getColumnColorModel().toJSON(this.columnTracks);
     // annotation display
     json.rows = this.rowTracks.filter(function (track) {
       return track.isVisible();
