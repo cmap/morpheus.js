@@ -242,10 +242,10 @@ morpheus.ActionManager = function () {
       morpheus.HeatMap.showTool(this.gui(),
         options.heatMap);
     },
-    shiftKey: true,
-    which: [83],
-    commandKey: true,
-    global: true,
+    // shiftKey: true,
+    // which: [83],
+    // commandKey: true,
+    // global: true,
     icon: 'fa fa-floppy-o'
   });
 

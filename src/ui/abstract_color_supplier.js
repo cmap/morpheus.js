@@ -51,6 +51,8 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
     json.scalingMode = 0;
   } else if (json.scalingMode === 'fixed') {
     json.scalingMode = 1;
+  } else { // default to fixed
+    json.scalingMode = 1;
   }
   cs.setScalingMode(json.scalingMode);
   if (json.min != null) {
@@ -75,8 +77,7 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
     });
   }
   var fractions = json.fractions;
-
-  if (json.values || json.map) { // map values to fractions
+  if (json.values) { // map values to fractions
     fractions = [];
     var values = json.values;
     var min = Number.MAX_VALUE;
@@ -107,7 +108,6 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
       names: json.names
     });
   }
-
   if (json.size) {
     cs.getSizer().setSeriesName(json.size.seriesName);
     cs.getSizer().setMin(json.size.min);

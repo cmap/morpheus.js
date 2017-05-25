@@ -11993,9 +11993,25 @@ morpheus.AdjustDataTool.prototype = {
   toString: function () {
     return 'Adjust';
   },
+  init: function (project, form) {
+    var _this = this;
+    form.$form.find('[name=scale_column_sum]').on('change', function (e) {
+      form.setVisible('column_sum', form.getValue('scale_column_sum'));
+    });
+    form.setVisible('column_sum', false);
+
+  },
   gui: function () {
     // z-score, robust z-score, log2, inverse log2
     return [{
+      name: 'scale_column_sum',
+      type: 'checkbox',
+      help: 'Whether to scale each column sum to a specified value'
+    }, {
+      name: 'column_sum',
+      type: 'text',
+      style: 'max-width:150px;'
+    }, {
       name: 'log_2',
       type: 'checkbox'
     }, {
@@ -12022,7 +12038,7 @@ morpheus.AdjustDataTool.prototype = {
     var heatMap = options.heatMap;
 
     if (options.input.log_2 || options.input.inverse_log_2
-      || options.input['z-score'] || options.input['robust_z-score'] || options.input.quantile_normalize) {
+      || options.input['z-score'] || options.input['robust_z-score'] || options.input.quantile_normalize || options.input.scale_column_sum) {
       // clone the values 1st
       var sortedFilteredDataset = morpheus.DatasetUtil.copy(project
       .getSortedFilteredDataset());
@@ -12046,6 +12062,25 @@ morpheus.AdjustDataTool.prototype = {
         : sortedFilteredDataset;
       var rowView = new morpheus.DatasetRowView(dataset);
       var functions = [];
+      if (options.input.scale_column_sum) {
+        var scaleToValue = parseFloat(options.input.column_sum);
+        if (!isNaN(scaleToValue)) {
+          for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+            var sum = 0;
+            for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+              var value = dataset.getValue(i, j);
+              if (!isNaN(value)) {
+                sum += value;
+              }
+            }
+            var ratio = scaleToValue / sum;
+            for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+              var value = dataset.getValue(i, j);
+              dataset.setValue(i, j, value * ratio);
+            }
+          }
+        }
+      }
       if (options.input.log_2) {
         for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
           for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
@@ -17207,6 +17242,8 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
     json.scalingMode = 0;
   } else if (json.scalingMode === 'fixed') {
     json.scalingMode = 1;
+  } else { // default to fixed
+    json.scalingMode = 1;
   }
   cs.setScalingMode(json.scalingMode);
   if (json.min != null) {
@@ -17231,8 +17268,7 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
     });
   }
   var fractions = json.fractions;
-
-  if (json.values || json.map) { // map values to fractions
+  if (json.values) { // map values to fractions
     fractions = [];
     var values = json.values;
     var min = Number.MAX_VALUE;
@@ -17263,7 +17299,6 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
       names: json.names
     });
   }
-
   if (json.size) {
     cs.getSizer().setSeriesName(json.size.seriesName);
     cs.getSizer().setMin(json.size.min);
@@ -18497,10 +18532,10 @@ morpheus.ActionManager = function () {
       morpheus.HeatMap.showTool(this.gui(),
         options.heatMap);
     },
-    shiftKey: true,
-    which: [83],
-    commandKey: true,
-    global: true,
+    // shiftKey: true,
+    // which: [83],
+    // commandKey: true,
+    // global: true,
     icon: 'fa fa-floppy-o'
   });
 
