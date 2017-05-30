@@ -202,9 +202,18 @@ morpheus.HCluster.computeDistanceMatrix = function (dataset, distanceFunction) {
       }
     }
   } else if (distanceFunction === 1) { // already a similarity matrix
+    var max = -Number.MAX_VALUE;
     for (var i = 1; i < n; i++) {
       for (var j = 0; j < i; j++) {
-        matrix[i][j] = 1 - dataset.getValue(i, j);
+        var value = dataset.getValue(i, j);
+        if (!isNaN(value)) {
+          max = Math.max(value, max);
+        }
+      }
+    }
+    for (var i = 1; i < n; i++) {
+      for (var j = 0; j < i; j++) {
+        matrix[i][j] = max - dataset.getValue(i, j);
       }
     }
   } else {
