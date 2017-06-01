@@ -48,7 +48,7 @@ module.exports = function (grunt) {
       },
       extJsAll: {
         src: ['js/morpheus-external.min.js',
-          'js/plotly-latest.min.js', 'js/papaparse.min.js'],
+          'js/echarts.min.js', 'js/papaparse.min.js'],
         dest: 'js/morpheus-external-latest.min.js'
       },
       extJs: {

@@ -303,7 +303,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     .push('<button data-action="Filter" data-toggle="tooltip" title="Filter" type="button"' +
       ' class="btn btn-default btn-xxs"><span class="fa fa-filter"></span></button>');
   }
-  if (heatMap.options.toolbar.chart && typeof Plotly !== 'undefined') {
+  if (heatMap.options.toolbar.chart && typeof echarts !== 'undefined') {
     toolbarHtml
     .push('<button data-action="Chart" data-toggle="tooltip" title="Chart" type="button" class="btn' +
       ' btn-default btn-xxs"><span class="fa fa-line-chart"></span></button>');

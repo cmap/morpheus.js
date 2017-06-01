@@ -1079,7 +1079,7 @@ morpheus.HeatMap.prototype = {
       var obj = track.settings;
       obj.field = track.getName();
       obj.size = {
-        width: size.widthSet ? size.width : undefined
+        width: size.width
       };
       return obj;
     });
@@ -1090,8 +1090,8 @@ morpheus.HeatMap.prototype = {
       var obj = track.settings;
       obj.field = track.getName();
       obj.size = {
-        width: size.widthSet ? size.width : undefined,
-        height: size.heightSet ? size.height : undefined
+        width: size.width,
+        height: size.height
       };
       return obj;
     });
@@ -1685,7 +1685,7 @@ morpheus.HeatMap.prototype = {
         for (var i = 0, metadataCount = displayMetadata
         .getMetadataCount(); i < metadataCount; i++) {
           var v = displayMetadata.get(i);
-          if (defaultFieldsToShow.has(v.getName())) {
+          if (defaultFieldsToShow.has(v.getName()) && !nameToOption.has(v.getName())) {
             nameToOption.set(v.getName(), {
               display: ['text']
             });

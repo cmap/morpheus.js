@@ -205,16 +205,7 @@ morpheus.HClusterTool.prototype = {
         heatmap.setDendrogram(result.columnsHcl.tree, true, modelOrder);
       }
     } else {
-      var subtitle = ['clustering '];
-      if (rows) {
-        subtitle.push(dataset.getRowCount() + ' row'
-          + morpheus.Util.s(dataset.getRowCount()));
-      }
-      if (columns) {
-        subtitle.push(rows ? ', ' : '');
-        subtitle.push(dataset.getColumnCount() + ' column'
-          + morpheus.Util.s(dataset.getColumnCount()));
-      }
+
 
       var blob = new Blob(
         ['self.onmessage = function(e) {'

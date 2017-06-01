@@ -319,6 +319,10 @@ morpheus.BoxPlotItem = function (list) {
       upperAdjacentValue: NaN
     };
   }
+  return morpheus.BoxPlotArrayItem(values);
+};
+
+morpheus.BoxPlotArrayItem = function (values) {
   var median = morpheus.ArrayPercentile(values, 50, true);
   var q1 = morpheus.ArrayPercentile(values, 25, true);
   var q3 = morpheus.ArrayPercentile(values, 75, true);

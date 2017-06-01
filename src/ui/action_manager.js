@@ -261,7 +261,7 @@ morpheus.ActionManager = function () {
     icon: 'fa fa-anchor'
   });
 
-  if (typeof Plotly !== 'undefined') {
+  if (typeof echarts !== 'undefined') {
     this.add({
       name: 'Chart',
       cb: function (options) {
