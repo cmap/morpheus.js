@@ -22,9 +22,7 @@ morpheus.ChartTool = function (chartOptions) {
   formBuilder.append({
     name: 'chart_type',
     type: 'bootstrap-select',
-    options: ['boxplot', 'row scatter matrix', 'column scatter matrix', 'row' +
-    ' profile', 'column' +
-    ' profile']
+    options: ['boxplot', 'row scatter matrix', 'column scatter matrix']
   });
   var rowOptions = [];
   var columnOptions = [];
