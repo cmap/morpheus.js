@@ -177,16 +177,14 @@ morpheus.FoldChange.toString = function () {
   return 'Fold Change';
 };
 
-morpheus.LogFoldChange = function (list1, list2) {
+morpheus.MeanDifference = function (list1, list2) {
   var m1 = morpheus.Mean(list1);
   var m2 = morpheus.Mean(list2);
   var diff = m1 - m2;
-  var isNegative = diff < 0;
-  var result = Math.pow(2.0, isNegative ? -diff : diff);
-  return isNegative ? -result : result;
+  return diff;
 };
-morpheus.LogFoldChange.toString = function () {
-  return 'Log Fold Change';
+morpheus.MeanDifference.toString = function () {
+  return 'Mean Difference';
 };
 morpheus.TTest = function (list1, list2) {
   var m1 = morpheus.Mean(list1);

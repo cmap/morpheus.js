@@ -1075,23 +1075,23 @@ morpheus.HeatMap.prototype = {
     json.rows = this.rowTracks.filter(function (track) {
       return track.isVisible();
     }).map(function (track) {
-      var size = morpheus.CanvasUtil.getPreferredSize(_this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), false), false));
+      var width = _this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), false), false).getWidth().width;
       var obj = track.settings;
       obj.field = track.getName();
       obj.size = {
-        width: size.width
+        width: width
       };
       return obj;
     });
     json.columns = this.columnTracks.filter(function (track) {
       return track.isVisible();
     }).map(function (track) {
-      var size = morpheus.CanvasUtil.getPreferredSize(_this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), true), true));
+      var header = _this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), true), true);
       var obj = track.settings;
       obj.field = track.getName();
       obj.size = {
-        width: size.width,
-        height: size.height
+        width: header.getWidth(),
+        height: header.getHeight()
       };
       return obj;
     });

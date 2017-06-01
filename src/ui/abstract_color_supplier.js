@@ -51,8 +51,8 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
     json.scalingMode = 0;
   } else if (json.scalingMode === 'fixed') {
     json.scalingMode = 1;
-  } else { // default to fixed
-    json.scalingMode = 1;
+  } else { // default to relative
+    json.scalingMode = 0;
   }
   cs.setScalingMode(json.scalingMode);
   if (json.min != null) {

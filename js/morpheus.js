@@ -4952,16 +4952,14 @@ morpheus.FoldChange.toString = function () {
   return 'Fold Change';
 };
 
-morpheus.LogFoldChange = function (list1, list2) {
+morpheus.MeanDifference = function (list1, list2) {
   var m1 = morpheus.Mean(list1);
   var m2 = morpheus.Mean(list2);
   var diff = m1 - m2;
-  var isNegative = diff < 0;
-  var result = Math.pow(2.0, isNegative ? -diff : diff);
-  return isNegative ? -result : result;
+  return diff;
 };
-morpheus.LogFoldChange.toString = function () {
-  return 'Log Fold Change';
+morpheus.MeanDifference.toString = function () {
+  return 'Mean Difference';
 };
 morpheus.TTest = function (list1, list2) {
   var m1 = morpheus.Mean(list1);
@@ -13962,7 +13960,7 @@ morpheus.MarkerSelection = function () {
  * @private
  */
 morpheus.MarkerSelection.Functions = [morpheus.FisherExact,
-  morpheus.FoldChange, morpheus.LogFoldChange, morpheus.SignalToNoise,
+  morpheus.FoldChange, morpheus.MeanDifference, morpheus.SignalToNoise,
   morpheus.createSignalToNoiseAdjust(), morpheus.TTest];
 
 morpheus.MarkerSelection.Functions.fromString = function (s) {
@@ -14159,7 +14157,7 @@ morpheus.MarkerSelection.prototype = {
     }
     var isFishy = f.toString() === morpheus.FisherExact.toString();
     if ((aIndices.length === 1 || bIndices.length === 1)
-      && !isFishy && f.toString() !== morpheus.LogFoldChange.toString()) {
+      && !isFishy && f.toString() !== morpheus.MeanDifference.toString()) {
       f = morpheus.FoldChange;
     }
     var list1 = new morpheus.DatasetRowView(new morpheus.SlicedDatasetView(
@@ -16576,8 +16574,8 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
     json.scalingMode = 0;
   } else if (json.scalingMode === 'fixed') {
     json.scalingMode = 1;
-  } else { // default to fixed
-    json.scalingMode = 1;
+  } else { // default to relative
+    json.scalingMode = 0;
   }
   cs.setScalingMode(json.scalingMode);
   if (json.min != null) {
@@ -28090,23 +28088,23 @@ morpheus.HeatMap.prototype = {
     json.rows = this.rowTracks.filter(function (track) {
       return track.isVisible();
     }).map(function (track) {
-      var size = morpheus.CanvasUtil.getPreferredSize(_this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), false), false));
+      var width = _this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), false), false).getWidth().width;
       var obj = track.settings;
       obj.field = track.getName();
       obj.size = {
-        width: size.width
+        width: width
       };
       return obj;
     });
     json.columns = this.columnTracks.filter(function (track) {
       return track.isVisible();
     }).map(function (track) {
-      var size = morpheus.CanvasUtil.getPreferredSize(_this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), true), true));
+      var header = _this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), true), true);
       var obj = track.settings;
       obj.field = track.getName();
       obj.size = {
-        width: size.width,
-        height: size.height
+        width: header.getWidth(),
+        height: header.getHeight()
       };
       return obj;
     });
