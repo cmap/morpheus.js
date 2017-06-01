@@ -12614,8 +12614,32 @@ morpheus.ChartTool.prototype = {
     var chartHeight = options.chartHeight;
     var axisLabelVector = options.axisLabelVector; // for row scatter, row vector
     var transpose = options.transpose;
+    // toolbox.feature.brush.title.rect
+
+    // toolbox.feature.brush.title.polygon string
+    //   [ default: 'Polygon selection' ]
+    // toolbox.feature.brush.title.lineX string
+    //   [ default: 'Horizontal selection' ]
+    // toolbox.feature.brush.title.lineY string
+    //   [ default: 'Vertical selection' ]
+    // toolbox.feature.brush.title.keep string
+    //   [ default: 'Keep previous selection' ]
+    // toolbox.feature.brush.title.clear string
+    //   [ default: 'Clear selection' ]
     var chart = {
       animation: false,
+      toolbox: {
+        feature: {
+          brush: {
+            title: {
+              rect: 'Rectangle selection',
+              polygon: 'Polygon selection',
+              clear: 'Clear Selection',
+              keep: 'Keep previous selection'
+            }
+          }
+        }
+      },
       brush: {
         brushLink: 'all',
         xAxisIndex: [],
