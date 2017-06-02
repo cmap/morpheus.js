@@ -26,6 +26,9 @@
 morpheus.Percentile = function (vector, p, isSorted) {
   return morpheus.ArrayPercentile(morpheus.RemoveNaN(vector), p, isSorted);
 };
+morpheus.Percentile.toString = function () {
+  return 'Percentile';
+};
 /**
  * @private
  * @ignore
