@@ -12227,6 +12227,7 @@ morpheus.AnnotateDendrogramTool.prototype = {
 };
 
 /**
+ * @param chartOptions.heatmap morpheus.HeatMap
  * @param chartOptions.project
  *            morpheus.Project
  * @param chartOptions.getVisibleTrackNames
@@ -12236,6 +12237,7 @@ morpheus.ChartTool = function (chartOptions) {
   var _this = this;
   this.getVisibleTrackNames = chartOptions.getVisibleTrackNames;
   this.project = chartOptions.project;
+  this.heatmap = chartOptions.heatmap;
   var project = this.project;
   this.$el = $('<div class="container-fluid">'
     + '<div class="row">'
@@ -12634,9 +12636,9 @@ morpheus.ChartTool.prototype = {
               formatter: function (obj) {
                 var value = obj.value;
                 var s = [];
-                s.push('x:' + value[0]);
+                s.push('x: ' + _this.heatmap.getHeatMapElementComponent().getDrawValuesFormat()(value[0]));
                 s.push('<br>');
-                s.push('y:' + value[1]);
+                s.push('y ' + _this.heatmap.getHeatMapElementComponent().getDrawValuesFormat()(value[1]));
                 if (transpose) {
                   morpheus.ChartTool.getTooltip({
                     text: s,
@@ -12721,7 +12723,7 @@ morpheus.ChartTool.prototype = {
           formatter: function (obj) {
             var value = obj.value;
             var s = [];
-            s.push(value[1]);
+            s.push(_this.heatmap.getHeatMapElementComponent().getDrawValuesFormat()(value[1]));
             morpheus.ChartTool.getTooltip({
               text: s,
               tooltip: _this.tooltip,
@@ -12852,12 +12854,13 @@ morpheus.ChartTool.prototype = {
               if (param.name !== '') {
                 text.push(param.name);
               }
+
               text = text.concat([
-                'upper: ' + param.data[4],
-                'Q3: ' + param.data[3],
-                'median: ' + param.data[2],
-                'Q1: ' + param.data[1],
-                'lower: ' + param.data[0]
+                'upper: ' + _this.heatmap.getHeatMapElementComponent().getDrawValuesFormat()(param.data[4]),
+                'Q3: ' + _this.heatmap.getHeatMapElementComponent().getDrawValuesFormat()(param.data[3]),
+                'median: ' + _this.heatmap.getHeatMapElementComponent().getDrawValuesFormat()(param.data[2]),
+                'Q1: ' + _this.heatmap.getHeatMapElementComponent().getDrawValuesFormat()(param.data[1]),
+                'lower: ' + _this.heatmap.getHeatMapElementComponent().getDrawValuesFormat()(param.data[0])
               ]);
               return text.join('<br/>');
             }
@@ -12880,10 +12883,10 @@ morpheus.ChartTool.prototype = {
               var value = obj.value;
               var s = [];
               if (value[0] !== '') {
-                s.push(value[0]);
+                s.push(value[0]); // name
                 s.push('<br>');
               }
-              s.push(value[1]);
+              s.push(_this.heatmap.getHeatMapElementComponent().getDrawValuesFormat()(value[1]));
               morpheus.ChartTool.getTooltip({
                 text: s,
                 tooltip: _this.tooltip,
@@ -17831,6 +17834,7 @@ morpheus.ActionManager = function () {
       cb: function (options) {
         new morpheus.ChartTool({
           project: options.heatMap.getProject(),
+          heatmap: options.heatMap,
           getVisibleTrackNames: _.bind(
             options.heatMap.getVisibleTrackNames, options.heatMap)
         });

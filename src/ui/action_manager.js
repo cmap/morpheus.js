@@ -267,6 +267,7 @@ morpheus.ActionManager = function () {
       cb: function (options) {
         new morpheus.ChartTool({
           project: options.heatMap.getProject(),
+          heatmap: options.heatMap,
           getVisibleTrackNames: _.bind(
             options.heatMap.getVisibleTrackNames, options.heatMap)
         });
