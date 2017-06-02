@@ -1455,12 +1455,13 @@ morpheus.HeatMap.prototype = {
     var rowDendrogramSortKey = null;
     if (rowDendrogram != undefined) {
       var tree = rowDendrogram;
-      if (tree.leafNodes.length !== this.project.getFullDataset()
+      if (tree.leafNodes.length !== this.project.getSortedFilteredDataset()
         .getRowCount()) {
         throw '# leaf nodes in row dendrogram ' + tree.leafNodes.length
-        + ' != ' + this.project.getFullDataset().getRowCount();
+        + ' != ' + this.project.getSortedFilteredDataset().getRowCount();
       }
       var rowIndices = null;
+      // when saving a session the dataset is reordered to reflect the clustering
       if (this.options.rowDendrogramField != null) {
         var vector = dataset.getRowMetadata().getByName(
           this.options.rowDendrogramField);
@@ -1516,10 +1517,10 @@ morpheus.HeatMap.prototype = {
     if (columnDendrogram !== undefined) {
       var tree = columnDendrogram;
 
-      if (tree.leafNodes.length !== this.project.getFullDataset()
+      if (tree.leafNodes.length !== this.project.getSortedFilteredDataset()
         .getColumnCount()) {
         throw '# leaf nodes ' + tree.leafNodes.length + ' != '
-        + this.project.getFullDataset().getColumnCount();
+        + this.project.getSortedFilteredDataset().getColumnCount();
       }
       var columnIndices = null;
       if (this.options.columnDendrogramField != null) {

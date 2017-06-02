@@ -133,7 +133,6 @@ morpheus.HeatMapOptions = function (heatMap) {
       name: 'number_of_fraction_digits',
       required: true,
       type: 'number',
-      disabled: !heatMap.heatmap.isDrawValues(),
       min: 0,
       step: 1,
       style: 'max-width: 100px;',
@@ -321,7 +320,7 @@ morpheus.HeatMapOptions = function (heatMap) {
   displayFormBuilder.$form.find('[name=show_values]').on('click', function (e) {
     var drawValues = $(this).prop('checked');
     heatMap.heatmap.setDrawValues(drawValues);
-    $fractionDigits.prop('disabled', !drawValues);
+    // $fractionDigits.prop('disabled', !drawValues);
     heatMap.revalidate();
     colorSchemeChooser.restoreCurrentValue();
   });

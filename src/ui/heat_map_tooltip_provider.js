@@ -25,11 +25,11 @@ morpheus.HeatMapTooltipProvider = function (heatMap, rowIndex, columnIndex, opti
   if (rowIndex !== -1 && columnIndex !== -1) {
     var tooltipSeriesIndices = options.tooltipSeriesIndices ? options.tooltipSeriesIndices : morpheus.Util.sequ32(dataset.getSeriesCount());
     for (var i = 0, nseries = tooltipSeriesIndices.length; i < nseries; i++) {
-      morpheus.HeatMapTooltipProvider._matrixValueToString(dataset,
+      morpheus.HeatMapTooltipProvider._matrixValueToString(heatMap, dataset,
         rowIndex, columnIndex, tooltipSeriesIndices[i], tipText, separator,
         options.showSeriesNameInTooltip || i > 0);
       if (heatMap.options.symmetric && dataset.getValue(rowIndex, columnIndex, tooltipSeriesIndices[i]) !== dataset.getValue(columnIndex, rowIndex, tooltipSeriesIndices[i])) {
-        morpheus.HeatMapTooltipProvider._matrixValueToString(dataset,
+        morpheus.HeatMapTooltipProvider._matrixValueToString(heatMap, dataset,
           columnIndex, rowIndex, tooltipSeriesIndices[i], tipText, separator, false);
       }
     }
@@ -136,10 +136,10 @@ morpheus.HeatMapTooltipProvider = function (heatMap, rowIndex, columnIndex, opti
 
 };
 
-morpheus.HeatMapTooltipProvider._matrixValueToString = function (dataset, rowIndex, columnIndex, seriesIndex, tipText, separator, showSeriesNameInTooltip) {
+morpheus.HeatMapTooltipProvider._matrixValueToString = function (heatMap, dataset, rowIndex, columnIndex, seriesIndex, tipText, separator, showSeriesNameInTooltip) {
   var val = dataset.getValue(rowIndex, columnIndex, seriesIndex);
   if (val != null) {
-
+    var nf = heatMap.getHeatMapElementComponent().getDrawValuesFormat();
     if (val.toObject || !_.isNumber(val)) {
       var obj = val.toObject ? val.toObject() : val;
       if (morpheus.Util.isArray(obj)) {
@@ -191,7 +191,7 @@ morpheus.HeatMapTooltipProvider._matrixValueToString = function (dataset, rowInd
           if (_.isNumber(val)) {
             tipText.push(separator);
             tipText.push('Value: <b>');
-            tipText.push(morpheus.Util.nf(val));
+            tipText.push(nf(val));
             tipText.push('</b>');
           }
         }
@@ -206,7 +206,7 @@ morpheus.HeatMapTooltipProvider._matrixValueToString = function (dataset, rowInd
         tipText.push(': ');
       }
       tipText.push('<b>');
-      tipText.push(morpheus.Util.nf(val));
+      tipText.push(nf(val));
       tipText.push('</b>');
     }
   }
