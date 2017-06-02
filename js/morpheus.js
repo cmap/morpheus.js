@@ -10136,6 +10136,9 @@ morpheus.Util.extend(morpheus.TransposedDatasetView, morpheus.DatasetAdapter);
 morpheus.Percentile = function (vector, p, isSorted) {
   return morpheus.ArrayPercentile(morpheus.RemoveNaN(vector), p, isSorted);
 };
+morpheus.Percentile.toString = function () {
+  return 'Percentile';
+};
 /**
  * @private
  * @ignore
@@ -13189,7 +13192,7 @@ morpheus.ChartTool.getTooltip = function (options) {
 morpheus.CollapseDatasetTool = function () {
 };
 morpheus.CollapseDatasetTool.Functions = [morpheus.Mean, morpheus.Median,
-  new morpheus.MaxPercentiles([25, 75]), morpheus.Min, morpheus.Max, morpheus.Sum];
+  new morpheus.MaxPercentiles([25, 75]), morpheus.Min, morpheus.Max, morpheus.Percentile, morpheus.Sum];
 morpheus.CollapseDatasetTool.Functions.fromString = function (s) {
   for (var i = 0; i < morpheus.CollapseDatasetTool.Functions.length; i++) {
     if (morpheus.CollapseDatasetTool.Functions[i].toString() === s) {
@@ -13206,13 +13209,18 @@ morpheus.CollapseDatasetTool.prototype = {
     var setValue = function (val) {
       var isRows = val === 'Rows';
       var names = morpheus.MetadataUtil.getMetadataNames(isRows ? project
-        .getFullDataset().getRowMetadata() : project
-        .getFullDataset().getColumnMetadata());
+      .getFullDataset().getRowMetadata() : project
+      .getFullDataset().getColumnMetadata());
       form.setOptions('collapse_to_fields', names);
     };
     form.$form.find('[name=collapse]').on('change', function (e) {
       setValue($(this).val());
     });
+    form.setVisible('percentile', false);
+    form.$form.find('[name=collapse_method]').on('change', function (e) {
+      form.setVisible('percentile', $(this).val() === morpheus.Percentile.toString());
+    });
+
     setValue('Rows');
   },
   gui: function () {
@@ -13221,6 +13229,10 @@ morpheus.CollapseDatasetTool.prototype = {
       options: morpheus.CollapseDatasetTool.Functions,
       value: morpheus.CollapseDatasetTool.Functions[1].toString(),
       type: 'select'
+    }, {
+      name: 'percentile',
+      value: 75,
+      type: 'text'
     }, {
       name: 'collapse',
       options: ['Columns', 'Rows'],
@@ -13238,6 +13250,12 @@ morpheus.CollapseDatasetTool.prototype = {
     var heatMap = options.heatMap;
     var f = morpheus.CollapseDatasetTool.Functions
     .fromString(options.input.collapse_method);
+    if (f.toString() === morpheus.Percentile.toString()) {
+      var p = parseFloat(options.input.percentile);
+      f = function (vector) {
+        return morpheus.Percentile(vector, p);
+      };
+    }
     var collapseToFields = options.input.collapse_to_fields;
     if (collapseToFields.length === 0) {
       throw new Error('Please select one or more fields to collapse to');
@@ -13264,7 +13282,12 @@ morpheus.CollapseDatasetTool.prototype = {
     set.forEach(function (val, name) {
       heatMap.setTrackVisible(name, false, !rows);
     });
-    project.setFullDataset(dataset, true);
+    return new morpheus.HeatMap({
+      name: heatMap.getName(),
+      dataset: dataset,
+      parent: heatMap,
+      symmetric: false
+    });
   }
 };
 
@@ -16570,9 +16593,9 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
   if (json.scalingMode == null) {
     json.scalingMode = json.type; // old
   }
-  if (json.scalingMode === 'relative') {
+  if (json.scalingMode === 'relative' || json.scalingMode === 0) {
     json.scalingMode = 0;
-  } else if (json.scalingMode === 'fixed') {
+  } else if (json.scalingMode === 'fixed' || json.scalingMode === 1) {
     json.scalingMode = 1;
   } else { // default to relative
     json.scalingMode = 0;
