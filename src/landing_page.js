@@ -5,22 +5,38 @@ morpheus.LandingPage = function (pageOptions) {
   this.pageOptions = pageOptions;
   var _this = this;
 
-  var $el = $('<div class="container" style="display: none;"></div>');
+  var $el = $('<div class="container-fluid" style="display: none;"></div>');
   this.$el = $el;
   var html = [];
-  morpheus.Util.createMorpheusHeader().appendTo($el);
   html.push('<div data-name="help" class="pull-right"></div>');
+  html.push('<div class="row">');
 
-  html.push('<h4>Open your own file</h4>');
-  html.push('<div data-name="formRow" class="center-block"></div>');
-  html.push('<div style="display: none;" data-name="preloadedDataset"><h4>Or select a preloaded' +
-    ' dataset</h4></div>');
-  html.push('</div>');
+  html.push('<div class="col-xs-12 col-md-offset-1 col-md-7"><div' +
+    ' data-name="input"></div>');
+  html.push('<div style="height:20px;"></div>');
+  html.push('<hr />');
+  html.push('<div style="height:20px;"></div>');
+  html.push('<a data-toggle="collapse"' +
+    ' href="#morpheus-preloadedDataset" aria-expanded="false"' +
+    ' aria-controls="morpheus-preloadedDataset"><h4>Preloaded datasets</h4></a>');
+  html.push('<div style="padding-left:20px;" class="collapse"' +
+    ' id="morpheus-preloadedDataset"></div>');
+  html.push('</div>'); // col
+  html.push('<div data-name="desc" class="col-xs-12 col-md-3"><p><img' +
+    ' src="images/morpheus_landing_img.png" style="width:100%;"></p></div>');
+  html.push('</div>'); // container
   var $html = $(html.join(''));
-
   $html.appendTo($el);
+  var $description = $el.find('[data-name=desc]');
+
+  morpheus.Util.createMorpheusHeader().appendTo($description);
+  $('<p>Versatile heatmap analysis and visualization</p><p>View your dataset as a heat map,' +
+    ' and then explore' +
+    ' the' +
+    ' interactive tools in Morpheus' +
+    ' to analyze the data and highlight results. Find relationships between data points, create new annotations, filter or cluster your data, display charts, and more.</p>').appendTo($description);
   new morpheus.HelpMenu().$el.appendTo($el.find('[data-name=help]'));
-  var formBuilder = new morpheus.FormBuilder();
+  var formBuilder = new morpheus.FormBuilder({formStyle: 'vertical'});
   formBuilder.append({
     name: 'file',
     showLabel: false,
@@ -28,11 +44,13 @@ morpheus.LandingPage = function (pageOptions) {
     type: 'file',
     required: true,
     help: morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS + '<br />All data is processed in the' +
-    ' browser and never sent to any server'
+    ' browser and never sent to any server.'
   });
-  formBuilder.$form.appendTo($el.find('[data-name=formRow]'));
+  var $input = $el.find('[data-name=input]');
+  $('<svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg><h2 style="padding-left: 4px; display:inline-block;">Open</h2>').appendTo($input);
+  formBuilder.$form.appendTo($input);
   this.formBuilder = formBuilder;
-  this.$sampleDatasetsEl = $el.find('[data-name=preloadedDataset]');
+  this.$sampleDatasetsEl = $el.find('#morpheus-preloadedDataset');
 
   this.tabManager = new morpheus.TabManager({landingPage: this});
   this.tabManager.on('change rename add remove', function (e) {

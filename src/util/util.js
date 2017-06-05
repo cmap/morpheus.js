@@ -1455,21 +1455,22 @@ morpheus.Util.createValueToIndices = function (array, field) {
 
 morpheus.Util.createMorpheusHeader = function () {
   var html = [];
-  html
-  .push('<div style="margin-bottom:10px;"><svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg> <div data-name="brand" style="display:inline-block; vertical-align: top;font-size:24px;font-family:sans-serif;">');
+
+  html.push('<div style="display:inline-block;' +
+    ' vertical-align:top;font-size:24px;font-family:sans-serif;">');
   html.push('<span>M</span>');
-  html.push('<span>o</span>');
-  html.push('<span>r</span>');
-  html.push('<span>p</span>');
-  html.push('<span>h</span>');
-  html.push('<span>e</span>');
-  html.push('<span>u</span>');
-  html.push('<span>s</span>');
+  html.push('<span>O</span>');
+  html.push('<span>R</span>');
+  html.push('<span>P</span>');
+  html.push('<span>H</span>');
+  html.push('<span>E</span>');
+  html.push('<span>U</span>');
+  html.push('<span>S</span>');
   html.push('</span>');
   html.push('</div>');
   var $div = $(html.join(''));
   var colorScale = d3.scale.linear().domain([0, 4, 7]).range(['#ca0020', '#999999', '#0571b0']).clamp(true);
-  var brands = $div.find('[data-name="brand"] > span');
+  var brands = $div.find('span');
   var index = 0;
   var step = function () {
     brands[index].style.color = colorScale(index);

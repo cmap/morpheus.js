@@ -1457,21 +1457,22 @@ morpheus.Util.createValueToIndices = function (array, field) {
 
 morpheus.Util.createMorpheusHeader = function () {
   var html = [];
-  html
-  .push('<div style="margin-bottom:10px;"><svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg> <div data-name="brand" style="display:inline-block; vertical-align: top;font-size:24px;font-family:sans-serif;">');
+
+  html.push('<div style="display:inline-block;' +
+    ' vertical-align:top;font-size:24px;font-family:sans-serif;">');
   html.push('<span>M</span>');
-  html.push('<span>o</span>');
-  html.push('<span>r</span>');
-  html.push('<span>p</span>');
-  html.push('<span>h</span>');
-  html.push('<span>e</span>');
-  html.push('<span>u</span>');
-  html.push('<span>s</span>');
+  html.push('<span>O</span>');
+  html.push('<span>R</span>');
+  html.push('<span>P</span>');
+  html.push('<span>H</span>');
+  html.push('<span>E</span>');
+  html.push('<span>U</span>');
+  html.push('<span>S</span>');
   html.push('</span>');
   html.push('</div>');
   var $div = $(html.join(''));
   var colorScale = d3.scale.linear().domain([0, 4, 7]).range(['#ca0020', '#999999', '#0571b0']).clamp(true);
-  var brands = $div.find('[data-name="brand"] > span');
+  var brands = $div.find('span');
   var index = 0;
   var step = function () {
     brands[index].style.color = colorScale(index);
@@ -2697,9 +2698,23 @@ morpheus.GctReader.prototype = {
         if (version == 2) {
           var expectedColumns = ncols + 2;
           if (columnNamesArray.length !== expectedColumns) {
-            callback('Expected ' + (expectedColumns - 2)
-              + ' column names, but read '
-              + (columnNamesArray.length - 2) + ' column names.');
+            // check for trailing tabs
+            if (columnNamesArray.length > expectedColumns) {
+              var skip = columnNamesArray.length - 1;
+              for (var i = columnNamesArray.length - 1; i >= 0; i--, skip--) {
+                if (columnNamesArray[i] !== '') {
+                  break;
+                }
+              }
+              if (skip !== columnNamesArray.length - 1) {
+                columnNamesArray = columnNamesArray.slice(0, skip + 1);
+              }
+            }
+            if (columnNamesArray.length !== expectedColumns) {
+              return callback('Expected ' + (expectedColumns - 2)
+                + ' column names, but read '
+                + (columnNamesArray.length - 2) + ' column names.');
+            }
           }
         }
         var name = columnNamesArray[0];
@@ -11420,22 +11435,38 @@ morpheus.LandingPage = function (pageOptions) {
   this.pageOptions = pageOptions;
   var _this = this;
 
-  var $el = $('<div class="container" style="display: none;"></div>');
+  var $el = $('<div class="container-fluid" style="display: none;"></div>');
   this.$el = $el;
   var html = [];
-  morpheus.Util.createMorpheusHeader().appendTo($el);
   html.push('<div data-name="help" class="pull-right"></div>');
+  html.push('<div class="row">');
 
-  html.push('<h4>Open your own file</h4>');
-  html.push('<div data-name="formRow" class="center-block"></div>');
-  html.push('<div style="display: none;" data-name="preloadedDataset"><h4>Or select a preloaded' +
-    ' dataset</h4></div>');
-  html.push('</div>');
+  html.push('<div class="col-xs-12 col-md-offset-1 col-md-7"><div' +
+    ' data-name="input"></div>');
+  html.push('<div style="height:20px;"></div>');
+  html.push('<hr />');
+  html.push('<div style="height:20px;"></div>');
+  html.push('<a data-toggle="collapse"' +
+    ' href="#morpheus-preloadedDataset" aria-expanded="false"' +
+    ' aria-controls="morpheus-preloadedDataset"><h4>Preloaded datasets</h4></a>');
+  html.push('<div style="padding-left:20px;" class="collapse"' +
+    ' id="morpheus-preloadedDataset"></div>');
+  html.push('</div>'); // col
+  html.push('<div data-name="desc" class="col-xs-12 col-md-3"><p><img' +
+    ' src="images/morpheus_landing_img.png" style="width:100%;"></p></div>');
+  html.push('</div>'); // container
   var $html = $(html.join(''));
-
   $html.appendTo($el);
+  var $description = $el.find('[data-name=desc]');
+
+  morpheus.Util.createMorpheusHeader().appendTo($description);
+  $('<p>Versatile heatmap analysis and visualization</p><p>View your dataset as a heat map,' +
+    ' and then explore' +
+    ' the' +
+    ' interactive tools in Morpheus' +
+    ' to analyze the data and highlight results. Find relationships between data points, create new annotations, filter or cluster your data, display charts, and more.</p>').appendTo($description);
   new morpheus.HelpMenu().$el.appendTo($el.find('[data-name=help]'));
-  var formBuilder = new morpheus.FormBuilder();
+  var formBuilder = new morpheus.FormBuilder({formStyle: 'vertical'});
   formBuilder.append({
     name: 'file',
     showLabel: false,
@@ -11443,11 +11474,13 @@ morpheus.LandingPage = function (pageOptions) {
     type: 'file',
     required: true,
     help: morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS + '<br />All data is processed in the' +
-    ' browser and never sent to any server'
+    ' browser and never sent to any server.'
   });
-  formBuilder.$form.appendTo($el.find('[data-name=formRow]'));
+  var $input = $el.find('[data-name=input]');
+  $('<svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg><h2 style="padding-left: 4px; display:inline-block;">Open</h2>').appendTo($input);
+  formBuilder.$form.appendTo($input);
   this.formBuilder = formBuilder;
-  this.$sampleDatasetsEl = $el.find('[data-name=preloadedDataset]');
+  this.$sampleDatasetsEl = $el.find('#morpheus-preloadedDataset');
 
   this.tabManager = new morpheus.TabManager({landingPage: this});
   this.tabManager.on('change rename add remove', function (e) {
@@ -11586,16 +11619,13 @@ morpheus.LandingPage.prototype = {
 };
 
 morpheus.SampleDatasets = function (options) {
-  if (!options.openText) {
-    options.openText = 'Open';
-  }
   var _this = this;
   var $el = options.$el;
   this.callback = options.callback;
-  $el.on('click', '[name=ccle]', function (e) {
+  $el.on('click', '[name=ccle]', function (e) { // button click
     var $this = $(this);
     var obj = {};
-    $this.parents('tr').find('input:checked').each(function (i, c) {
+    $this.parents('.collapse').find('input:checked').each(function (i, c) {
       obj[$(c).data('type')] = true;
     });
 
@@ -11608,7 +11638,7 @@ morpheus.SampleDatasets = function (options) {
     var $this = $(this);
     var type = $this.data('disease-type');
     var obj = {};
-    $this.parents('tr').find('input:checked').each(function (i, c) {
+    $this.parents('.collapse').find('input:checked').each(function (i, c) {
       obj[$(c).data('type')] = true;
     });
     var disease;
@@ -11628,8 +11658,8 @@ morpheus.SampleDatasets = function (options) {
     '[data-toggle=dataTypeToggle]',
     function (e) {
       var $this = $(this);
-      var $button = $this.parents('tr').find('button');
-      var isDisabled = $this.parents('tr').find(
+      var $button = $this.parents('.collapse').find('button');
+      var isDisabled = $this.parents('.collapse').find(
           'input:checked').length === 0;
       $button.prop('disabled', isDisabled);
       if (!isDisabled) {
@@ -11650,38 +11680,48 @@ morpheus.SampleDatasets = function (options) {
   .done(
     function (text) {
       var exampleHtml = [];
-      exampleHtml.push('<table class="table table-condensed table-bordered">');
-      exampleHtml.push('<thead><tr><th>Name</th><th>Gene' +
-        ' Expression</th><th>Copy Number By Gene</th><th>Mutations</th><th>Gene' +
-        ' Essentiality</th><th></th></tr></thead>');
-      exampleHtml.push('<tbody>');
-      exampleHtml.push('<tr>');
-      exampleHtml
-      .push('<td>Cancer Cell Line Encyclopedia (CCLE), Project Achilles</td>');
-      exampleHtml
-      .push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="mrna"> </td>');
 
       exampleHtml
-      .push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="cn"> </td>');
+      .push('<a data-toggle="collapse" href="#morpheus-ccle" aria-expanded="false" aria-controls="morpheus-ccle">Cancer Cell Line Encyclopedia (CCLE), Project Achilles</a>');
+      exampleHtml.push('<div class="collapse" id="morpheus-ccle">');
+      exampleHtml.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
+        ' top;">');
+      exampleHtml
+      .push('<div><input type="checkbox" style="margin-left:4px;"' +
+        ' data-toggle="dataTypeToggle"' +
+        ' data-type="mrna">GENE EXPRESSION</div>');
+      exampleHtml
+      .push('<div><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
+        ' data-type="cn">COPY NUMBER BY GENE</div>');
+      exampleHtml.push('</div>');
 
       exampleHtml
-      .push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="sig_genes"> </td>');
-
+      .push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align: top;">');
       exampleHtml
-      .push('<td><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="ach"> </td>');
-
+      .push('<div><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
+        ' data-type="sig_genes">MUTATIONS</div>');
       exampleHtml
-      .push('<td><button disabled type="button" class="btn btn-link" name="ccle">'
-        + options.openText + '</button></td>');
-      exampleHtml.push('</tr></tbody></table>');
-
+      .push('<div><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
+        ' data-type="ach">GENE ESSENTIALITY</div>');
       exampleHtml
-      .push('<div class="text-muted">TCGA data version 1/11/2015</div><span class="text-muted">Please adhere to <a target="_blank" href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines"> the TCGA publication guidelines</a></u> when using TCGA data in your publications.</span>');
+      .push('</div>');
+      exampleHtml
+      .push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align: top;">');
+      exampleHtml
+      .push('<button disabled type="button" class="btn btn-default" name="ccle">Open</button>');
+      exampleHtml
+      .push('</div>');
+      exampleHtml.push('</div>');
 
+      exampleHtml.push('<hr>');
+      exampleHtml
+      .push('<div>TCGA data (1/11/2015)</div><span>Please adhere to <a target="_blank" href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines"> the TCGA publication guidelines</a></u> when using TCGA data in your publications.</span>');
+      exampleHtml.push('<br />');
+      // Gene Expression	GISTIC Copy Number	Copy Number By Gene	Mutations	Proteomics	Methylation
       exampleHtml.push('<div data-name="tcga"></div>');
       $(exampleHtml.join('')).appendTo($el);
       if (options.show) {
-        $el.show();
+        $el.css('display', '');
       }
       var lines = text.split('\n');
       var diseases = [];
@@ -11725,75 +11765,67 @@ morpheus.SampleDatasets = function (options) {
       var tcga = [];
       _this.diseases = diseases;
 
-      tcga.push('<table class="table table-condensed table-bordered">');
-      tcga.push('<thead><tr>');
-      tcga.push('<th>Disease</th>');
-      tcga.push('<th>Gene Expression</th>');
-      tcga.push('<th>GISTIC Copy Number</th>');
-      tcga.push('<th>Copy Number By Gene</th>');
-      tcga.push('<th>Mutations</th>');
-      tcga.push('<th>Proteomics</th>');
-      tcga.push('<th>Methylation</th>');
-      tcga.push('<th></th>');
-      tcga.push('</tr></thead>');
-      tcga.push('<tbody>');
       for (var i = 0; i < diseases.length; i++) {
+        var id = _.uniqueId('morpheus');
         var disease = diseases[i];
-        tcga.push('<tr>');
-
-        tcga.push('<td>' + disease.name + '</td>');
-        tcga.push('<td>');
-        if (disease.mrna) {
-          tcga
-          .push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="mrna"> ');
-        }
-        tcga.push('</td>');
-
-        tcga.push('<td>');
-        if (disease.gistic) {
-          tcga
-          .push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="gistic"> ');
-        }
-        tcga.push('</td>');
-
-        tcga.push('<td>');
-        if (disease.gistic) {
-          tcga
-          .push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="gisticGene"> ');
-        }
-        tcga.push('</td>');
-
-        tcga.push('<td>');
-        if (disease.sig_genes) {
-          tcga
-          .push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="sig_genes"> ');
-        }
-        tcga.push('</td>');
-
-        tcga.push('<td>');
-        if (disease.rppa) {
-          tcga
-          .push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="rppa"> ');
-        }
-        tcga.push('</td>');
-        tcga.push('<td>');
-        if (disease.methylation) {
-          tcga
-          .push('<input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-type="methylation"> ');
-        }
-        tcga.push('</td>');
-
+        tcga.push('<div>');
         tcga
-        .push('<td><button disabled type="button" class="btn btn-link" name="tcgaLink" data-disease-type="'
-          + disease.type
-          + '">'
-          + options.openText
-          + '</button></td>');
+        .push('<a data-toggle="collapse" href="#' + id + '" aria-expanded="false"' +
+          ' aria-controls="' + id + '">' + disease.name + '</a>');
+        tcga.push('<div class="collapse" id="' + id + '">');
 
-        tcga.push('</tr>');
+        tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
+          ' top;">');
+        tcga
+        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+          ' data-toggle="dataTypeToggle"' +
+          ' data-type="mrna"' + (!disease.mrna ? ' disabled' : '') + '>GENE EXPRESSION</div>');
+        tcga
+        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+          ' data-toggle="dataTypeToggle"' +
+          ' data-type="gistic"' + (!disease.mrna ? ' disabled' : '') + '>GISTIC COPY' +
+          ' NUMBER</div>');
+        tcga.push('</div>');
+
+        tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
+          ' top;">');
+        tcga
+        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+          ' data-toggle="dataTypeToggle"' +
+          ' data-type="gisticGene"' + (!disease.mrna ? ' disabled' : '') + '>COPY' +
+          ' NUMBER BY GENE</div>');
+        tcga
+        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+          ' data-toggle="dataTypeToggle"' +
+          ' data-type="sig_genes"' + (!disease.sig_genes ? ' disabled' : '') + '>MUTATION</div>');
+        tcga.push('</div>');
+
+        tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
+          ' top;">');
+        tcga
+        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+          ' data-toggle="dataTypeToggle"' +
+          ' data-type="rppa"' + (!disease.rppa ? ' disabled' : '') + '>PROTEOMICS</div>');
+        tcga
+        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+          ' data-toggle="dataTypeToggle"' +
+          ' data-type="methylation"' + (!disease.rppa ? ' disabled' : '') + '>METHYLATION</div>');
+        tcga.push('</div>');
+
+        tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
+          ' top;">');
+        tcga
+        .push('<button disabled type="button" class="btn btn-default" name="tcgaLink"' +
+          ' data-disease-type="'
+          + disease.type
+          + '">Open</button>');
+        tcga.push('</div>');
+
+        tcga.push('</div>');
+        tcga.push('</div>');
+
       }
-      tcga.push('</tbody>');
-      tcga.push('</table>');
+
       $(tcga.join('')).appendTo($el.find('[data-name=tcga]'));
     });
 };

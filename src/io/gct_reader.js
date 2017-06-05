@@ -100,9 +100,23 @@ morpheus.GctReader.prototype = {
         if (version == 2) {
           var expectedColumns = ncols + 2;
           if (columnNamesArray.length !== expectedColumns) {
-            callback('Expected ' + (expectedColumns - 2)
-              + ' column names, but read '
-              + (columnNamesArray.length - 2) + ' column names.');
+            // check for trailing tabs
+            if (columnNamesArray.length > expectedColumns) {
+              var skip = columnNamesArray.length - 1;
+              for (var i = columnNamesArray.length - 1; i >= 0; i--, skip--) {
+                if (columnNamesArray[i] !== '') {
+                  break;
+                }
+              }
+              if (skip !== columnNamesArray.length - 1) {
+                columnNamesArray = columnNamesArray.slice(0, skip + 1);
+              }
+            }
+            if (columnNamesArray.length !== expectedColumns) {
+              return callback('Expected ' + (expectedColumns - 2)
+                + ' column names, but read '
+                + (columnNamesArray.length - 2) + ' column names.');
+            }
           }
         }
         var name = columnNamesArray[0];
