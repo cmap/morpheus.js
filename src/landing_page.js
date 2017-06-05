@@ -30,7 +30,7 @@ morpheus.LandingPage = function (pageOptions) {
   var $description = $el.find('[data-name=desc]');
 
   morpheus.Util.createMorpheusHeader().appendTo($description);
-  $('<p>Versatile heatmap analysis and visualization</p><p>View your dataset as a heat map,' +
+  $('<p>Versatile heatmap software</p><p>View your dataset as a heat map,' +
     ' and then explore' +
     ' the' +
     ' interactive tools in Morpheus' +
