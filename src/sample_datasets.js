@@ -60,29 +60,29 @@ morpheus.SampleDatasets = function (options) {
   .done(
     function (text) {
       var exampleHtml = [];
-
+      var id = _.uniqueId('morpheus');
       exampleHtml
-      .push('<a data-toggle="collapse" href="#morpheus-ccle" aria-expanded="false" aria-controls="morpheus-ccle">Cancer Cell Line Encyclopedia (CCLE), Project Achilles</a>');
-      exampleHtml.push('<div class="collapse" id="morpheus-ccle">');
+      .push('<a data-toggle="collapse" href="#' + id + '" aria-expanded="false" aria-controls="' + id + '">Cancer Cell Line Encyclopedia (CCLE), Project Achilles</a>');
+      exampleHtml.push('<div class="collapse" id="' + id + '">');
       exampleHtml.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
         ' top;">');
       exampleHtml
-      .push('<div><input type="checkbox" style="margin-left:4px;"' +
+      .push('<label><input type="checkbox" style="margin-left:4px;"' +
         ' data-toggle="dataTypeToggle"' +
-        ' data-type="mrna">GENE EXPRESSION</div>');
+        ' data-type="mrna">GENE EXPRESSION</label>');
       exampleHtml
-      .push('<div><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
-        ' data-type="cn">COPY NUMBER BY GENE</div>');
+      .push('<label><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
+        ' data-type="cn">COPY NUMBER BY GENE</label>');
       exampleHtml.push('</div>');
 
       exampleHtml
       .push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align: top;">');
       exampleHtml
-      .push('<div><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
-        ' data-type="sig_genes">MUTATIONS</div>');
+      .push('<label><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
+        ' data-type="sig_genes">MUTATIONS</label>');
       exampleHtml
-      .push('<div><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
-        ' data-type="ach">GENE ESSENTIALITY</div>');
+      .push('<label><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
+        ' data-type="ach">GENE ESSENTIALITY</label>');
       exampleHtml
       .push('</div>');
       exampleHtml
@@ -157,39 +157,39 @@ morpheus.SampleDatasets = function (options) {
         tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
           ' top;">');
         tcga
-        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+        .push('<label><input type="checkbox" style="margin-left:4px;"' +
           ' data-toggle="dataTypeToggle"' +
-          ' data-type="mrna"' + (!disease.mrna ? ' disabled' : '') + '>GENE EXPRESSION</div>');
+          ' data-type="mrna"' + (!disease.mrna ? ' disabled' : '') + '>GENE EXPRESSION</label>');
         tcga
-        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+        .push('<label><input type="checkbox" style="margin-left:4px;"' +
           ' data-toggle="dataTypeToggle"' +
           ' data-type="gistic"' + (!disease.mrna ? ' disabled' : '') + '>GISTIC COPY' +
-          ' NUMBER</div>');
+          ' NUMBER</label>');
         tcga.push('</div>');
 
         tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
           ' top;">');
         tcga
-        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+        .push('<label><input type="checkbox" style="margin-left:4px;"' +
           ' data-toggle="dataTypeToggle"' +
           ' data-type="gisticGene"' + (!disease.mrna ? ' disabled' : '') + '>COPY' +
-          ' NUMBER BY GENE</div>');
+          ' NUMBER BY GENE</label>');
         tcga
-        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+        .push('<label><input type="checkbox" style="margin-left:4px;"' +
           ' data-toggle="dataTypeToggle"' +
-          ' data-type="sig_genes"' + (!disease.sig_genes ? ' disabled' : '') + '>MUTATION</div>');
+          ' data-type="sig_genes"' + (!disease.sig_genes ? ' disabled' : '') + '>MUTATION</label>');
         tcga.push('</div>');
 
         tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
           ' top;">');
         tcga
-        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+        .push('<label><input type="checkbox" style="margin-left:4px;"' +
           ' data-toggle="dataTypeToggle"' +
-          ' data-type="rppa"' + (!disease.rppa ? ' disabled' : '') + '>PROTEOMICS</div>');
+          ' data-type="rppa"' + (!disease.rppa ? ' disabled' : '') + '>PROTEOMICS</label>');
         tcga
-        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+        .push('<label><input type="checkbox" style="margin-left:4px;"' +
           ' data-toggle="dataTypeToggle"' +
-          ' data-type="methylation"' + (!disease.rppa ? ' disabled' : '') + '>METHYLATION</div>');
+          ' data-type="methylation"' + (!disease.rppa ? ' disabled' : '') + '>METHYLATION</label>');
         tcga.push('</div>');
 
         tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +

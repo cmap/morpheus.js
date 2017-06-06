@@ -48,7 +48,7 @@ morpheus.OpenFileTool.prototype = {
         value: '',
         type: 'file',
         required: true,
-        help: morpheus.DatasetUtil.DATASET_FILE_FORMATS
+        help: morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS
       });
     }
     array.options = {
@@ -82,14 +82,12 @@ morpheus.OpenFileTool.prototype = {
         }
       });
     if (this.options.file == null) {
-      $('<h4>Use your own file</h4>').insertAfter(
-        form.$form.find('.form-group:first'));
       var _this = this;
       var collapseId = _.uniqueId('morpheus');
       $('<h4><a role="button" data-toggle="collapse" href="#'
         + collapseId
         + '" aria-expanded="false" aria-controls="'
-        + collapseId + '">Or select a preloaded dataset</a></h4>').appendTo($preloaded);
+        + collapseId + '">Preloaded datasets</a></h4>').appendTo($preloaded);
       var $sampleDatasets = $('<div data-name="sampleData" id="' + collapseId + '" class="collapse"' +
         ' id="' + collapseId + '" style="overflow:auto;"></div>');
       $preloaded.appendTo(form.$form);

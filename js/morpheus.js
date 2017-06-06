@@ -11428,6 +11428,167 @@ morpheus.Vector.prototype = {
 };
 morpheus.Util.extend(morpheus.Vector, morpheus.AbstractVector);
 
+morpheus.FilePicker = function (options) {
+
+  var html = [];
+  html.push('<div>');
+  html.push('<ul style="margin-bottom:5px;" class="nav nav-pills morpheus">');
+  html.push('<li role="presentation" class="active"><a href="#myComputer"' +
+    ' aria-controls="myComputer" role="tab" data-toggle="tab"><i class="fa fa-desktop"></i>' +
+    ' My Computer</a></li>');
+  html.push('<li role="presentation"><a href="#url"' +
+    ' aria-controls="url" role="tab" data-toggle="url"><i class="fa fa-link"></i>' +
+    ' URL</a></li>');
+  html.push('<li role="presentation"><a href="#dropbox"' +
+    ' aria-controls="dropbox" role="tab" data-toggle="dropbox"><i class="fa fa-link"></i>' +
+    ' Dropbox</a></li>');
+
+  for (var i = 0; i < options.addOn.length; i++) {
+    var id = _.uniqueId('morpheus');
+    options.addOn[i].id = id;
+    html.push('<li role="presentation"><a href="#' + id + '"' +
+      ' aria-controls="' + id + '" role="tab" data-toggle="' + id + '">' + options.addOn[i].header + '</a></li>');
+  }
+
+  html.push('</ul>');
+
+  html.push('<div class="tab-content"' +
+    ' style="text-align:center;cursor:pointer;height:300px;">');
+
+  html.push('<div role="tabpanel" class="tab-pane active" id="myComputer">');
+  html.push('<div data-name="drop" class="morpheus-file-drop morpheus-landing-panel">');
+  html.push('<button class="btn btn-default"><span class="fa-stack"><i' +
+    ' class="fa fa-file-o' +
+    ' fa-stack-2x"></i> <i class="fa fa-plus fa-stack-1x"></i></span> Select File</button>' +
+    ' <div style="padding-top:10px;">or Copy and Paste Clipboard Data, <span' +
+    ' class="morpheus-drag-text">Drag and' +
+    ' Drop</span></div>');
+  html.push('<input name="hiddenFile" style="display:none;" type="file">');
+  html.push('</div>');
+  html.push('</div>');
+
+  html.push('<div role="tabpanel" class="tab-pane" id="url">');
+  html.push('<div class="morpheus-landing-panel">');
+  html.push('<input name="url" placeholder="Enter a URL" class="form-control"' +
+    ' style="display:inline;max-width:400px;' +
+    ' type="text">');
+  html.push('</div>');
+  html.push('</div>');
+
+  html.push('<div role="tabpanel" class="tab-pane" id="dropbox">');
+  html.push('<div class="morpheus-landing-panel">');
+  html.push('<button name="dropbox" class="btn btn-default">Browse Dropbox</button>');
+  html.push('</div>');
+  html.push('</div>');
+
+  for (var i = 0; i < options.addOn.length; i++) {
+    html.push('<div role="tabpanel" class="tab-pane" id="' + options.addOn[i].id + '">');
+    html.push('<div class="morpheus-landing-panel">');
+    html.push('</div>');
+    html.push('</div>');
+  }
+  html.push('</div>'); // tab-content
+  html.push('</div>');
+  var $el = $(html.join(''));
+  this.$el = $el;
+  for (var i = 0; i < options.addOn.length; i++) {
+    var $div = $el.find('#' + options.addOn[i].id + ' > .morpheus-landing-panel');
+    options.addOn[i].$el.appendTo($div);
+  }
+  var $file = $el.find('[name=hiddenFile]');
+  this.$el.find('.nav').on('click', 'li > a', function (e) {
+    e.preventDefault();
+    $(this).tab('show');
+  });
+
+  var $url = $el.find('[name=url]');
+  $url.on('keyup', function (evt) {
+    if (evt.which === 13) {
+      var text = $.trim($(this).val());
+      if (text !== '') {
+        options.cb(text);
+      }
+    }
+  });
+  var $dropbox = $el.find('[name=dropbox]');
+  $dropbox.on('click', function (e) {
+    Dropbox.choose({
+      success: function (results) {
+        var val = results[0].link;
+        options.cb(val);
+      },
+      linkType: 'direct',
+      multiselect: false
+
+    });
+  });
+
+  $file.on('change', function (evt) {
+    var files = evt.target.files; // FileList object
+    options.cb(files[0]);
+  });
+  $(window).on('paste.morpheus', function (e) {
+    if ($('#myComputer').is(':visible')) {
+      var text = e.originalEvent.clipboardData.getData('text/plain');
+      if (text != null && text.length > 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        var url;
+        if (text.indexOf('http') === 0) {
+          url = text;
+        } else {
+          var blob = new Blob([text]);
+          url = window.URL.createObjectURL(blob);
+        }
+        options.cb(url);
+      }
+    }
+  })
+  var $drop = $el.find('[data-name=drop]');
+  var clicking = false;
+  $drop.on('click', function (e) {
+    if (!clicking) {
+      clicking = true;
+      $file.click();
+      clicking = false;
+    }
+    // e.preventDefault();
+  }).on(
+    'dragover',
+    function (e) {
+      $drop.addClass('drag');
+      e.preventDefault();
+      e.stopPropagation();
+    }).on(
+    'dragenter',
+    function (e) {
+      $drop.addClass('drag');
+      e.preventDefault();
+      e.stopPropagation();
+    }).on('dragleave', function (e) {
+    $drop.removeClass('drag');
+    e.preventDefault();
+    e.stopPropagation();
+  }).on('drop', function (e) {
+    $drop.removeClass('drag');
+    if (e.originalEvent.dataTransfer) {
+      if (e.originalEvent.dataTransfer.files.length) {
+        e.preventDefault();
+        e.stopPropagation();
+        var files = e.originalEvent.dataTransfer.files;
+        options.cb(files[0]);
+      } else {
+        var url = e.originalEvent.dataTransfer.getData('URL');
+        options.cb(url);
+        e.preventDefault();
+        e.stopPropagation();
+
+      }
+    }
+  });
+  ;
+};
+
 morpheus.LandingPage = function (pageOptions) {
   pageOptions = $.extend({}, {
     el: $('#vis')
@@ -11435,52 +11596,61 @@ morpheus.LandingPage = function (pageOptions) {
   this.pageOptions = pageOptions;
   var _this = this;
 
-  var $el = $('<div class="container-fluid" style="display: none;"></div>');
-  this.$el = $el;
   var html = [];
-  html.push('<div data-name="help" class="pull-right"></div>');
-  html.push('<div class="row">');
 
+  html.push('<div class="container-fluid">');
+  html.push('<div style="min-height:78vh" class="row">');
   html.push('<div class="col-xs-12 col-md-offset-1 col-md-7"><div' +
     ' data-name="input"></div>');
-  html.push('<div style="height:20px;"></div>');
-  html.push('<hr />');
-  html.push('<div style="height:20px;"></div>');
-  html.push('<a data-toggle="collapse"' +
-    ' href="#morpheus-preloadedDataset" aria-expanded="false"' +
-    ' aria-controls="morpheus-preloadedDataset"><h4>Preloaded datasets</h4></a>');
-  html.push('<div style="padding-left:20px;" class="collapse"' +
-    ' id="morpheus-preloadedDataset"></div>');
+  html.push('<div class="clearfix"></div>');
   html.push('</div>'); // col
   html.push('<div data-name="desc" class="col-xs-12 col-md-3"><p><img' +
     ' src="images/morpheus_landing_img.png" style="width:100%;"></p></div>');
-  html.push('</div>'); // container
-  var $html = $(html.join(''));
-  $html.appendTo($el);
-  var $description = $el.find('[data-name=desc]');
+  html.push('</div>'); // row
 
+  html.push('<div class="row"><div class="col-xs-12 morpheus-footer"></div></div>');
+  html.push('</div>'); // container
+
+  var $el = $(html.join(''));
+  new morpheus.HelpMenu().$el.appendTo($el.find('.morpheus-footer'));
+  this.$el = $el;
+  var $description = $el.find('[data-name=desc]');
   morpheus.Util.createMorpheusHeader().appendTo($description);
-  $('<p>Versatile heatmap software</p><p>View your dataset as a heat map,' +
+  $('<p>Versatile matrix visualization and analysis software</p><p>View your dataset as a heat' +
+    ' map,' +
     ' and then explore' +
     ' the' +
     ' interactive tools in Morpheus' +
     ' to analyze the data and highlight results. Find relationships between data points, create new annotations, filter or cluster your data, display charts, and more.</p>').appendTo($description);
-  new morpheus.HelpMenu().$el.appendTo($el.find('[data-name=help]'));
-  var formBuilder = new morpheus.FormBuilder({formStyle: 'vertical'});
-  formBuilder.append({
-    name: 'file',
-    showLabel: false,
-    value: '',
-    type: 'file',
-    required: true,
-    help: morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS + '<br />All data is processed in the' +
-    ' browser and never sent to any server.'
-  });
+
   var $input = $el.find('[data-name=input]');
+
   $('<svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg><h2 style="padding-left: 4px; display:inline-block;">Open</h2>').appendTo($input);
-  formBuilder.$form.appendTo($input);
-  this.formBuilder = formBuilder;
-  this.$sampleDatasetsEl = $el.find('#morpheus-preloadedDataset');
+  $('<div style="margin-bottom:20px;">' + morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS + '<br' +
+    ' />All' +
+    ' data is' +
+    ' processed in the' +
+    ' browser and never sent to any server.</div>').appendTo($input);
+  this.$sampleDatasetsEl = $('<div class="morpheus-preloaded"></div>');
+  if (navigator.onLine && !this.sampleDatasets) {
+    this.sampleDatasets = new morpheus.SampleDatasets({
+      $el: this.$sampleDatasetsEl,
+      show: true,
+      callback: function (heatMapOptions) {
+        _this.open(heatMapOptions);
+      }
+    });
+  }
+  var filePicker = new morpheus.FilePicker({
+    cb: function (file) {
+      _this.openFile(file);
+    },
+    addOn: [{
+      header: '<i class="fa fa-database"></i> Preloaded Datasets',
+      $el: _this.$sampleDatasetsEl
+    }]
+  });
+  filePicker.$el.appendTo($input);
 
   this.tabManager = new morpheus.TabManager({landingPage: this});
   this.tabManager.on('change rename add remove', function (e) {
@@ -11493,10 +11663,11 @@ morpheus.LandingPage = function (pageOptions) {
 
   this.tabManager.$nav.appendTo($(this.pageOptions.el));
   this.tabManager.$tabContent.appendTo($(this.pageOptions.el));
-  // for (var i = 0; i < brands.length; i++) {
-  // 	brands[i].style.color = colorScale(i);
-  // }
-};
+// for (var i = 0; i < brands.length; i++) {
+// 	brands[i].style.color = colorScale(i);
+// }
+}
+;
 
 morpheus.LandingPage.prototype = {
   open: function (openOptions) {
@@ -11513,78 +11684,16 @@ morpheus.LandingPage.prototype = {
 
   },
   dispose: function () {
-    this.formBuilder.setValue('file', '');
     this.$el.hide();
-    $(window)
-    .off(
-      'paste.morpheus drop.morpheus dragover.morpheus dragenter.morpheus');
-    this.formBuilder.off('change');
   },
   show: function () {
     var _this = this;
     this.$el.show();
-
-    this.formBuilder.on('change', function (e) {
-      var value = e.value;
-      if (value !== '' && value != null) {
-        _this.openFile(value);
-      }
-    });
-
     $(window).on('beforeunload.morpheus', function () {
       if (_this.tabManager.getTabCount() > 0) {
         return 'Are you sure you want to close Morpheus?';
       }
     });
-    $(window).on('paste.morpheus', function (e) {
-      var tagName = e.target.tagName;
-      if (tagName == 'INPUT' || tagName == 'SELECT' || tagName == 'TEXTAREA') {
-        return;
-      }
-
-      var text = e.originalEvent.clipboardData.getData('text/plain');
-      if (text != null && text.length > 0) {
-        e.preventDefault();
-        e.stopPropagation();
-        var url;
-        if (text.indexOf('http') === 0) {
-          url = text;
-        } else {
-          var blob = new Blob([text]);
-          url = window.URL.createObjectURL(blob);
-        }
-
-        _this.openFile(url);
-      }
-
-    }).on('dragover.morpheus dragenter.morpheus', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }).on(
-      'drop.morpheus',
-      function (e) {
-        if (e.originalEvent.dataTransfer
-          && e.originalEvent.dataTransfer.files.length) {
-          e.preventDefault();
-          e.stopPropagation();
-          var files = e.originalEvent.dataTransfer.files;
-          _this.openFile(files[0]);
-        } else if (e.originalEvent.dataTransfer) {
-          var url = e.originalEvent.dataTransfer.getData('URL');
-          e.preventDefault();
-          e.stopPropagation();
-          _this.openFile(url);
-        }
-      });
-    if (navigator.onLine && !this.sampleDatasets) {
-      this.sampleDatasets = new morpheus.SampleDatasets({
-        $el: this.$sampleDatasetsEl,
-        show: true,
-        callback: function (heatMapOptions) {
-          _this.open(heatMapOptions);
-        }
-      });
-    }
   },
   openFile: function (value) {
     var _this = this;
@@ -11680,29 +11789,29 @@ morpheus.SampleDatasets = function (options) {
   .done(
     function (text) {
       var exampleHtml = [];
-
+      var id = _.uniqueId('morpheus');
       exampleHtml
-      .push('<a data-toggle="collapse" href="#morpheus-ccle" aria-expanded="false" aria-controls="morpheus-ccle">Cancer Cell Line Encyclopedia (CCLE), Project Achilles</a>');
-      exampleHtml.push('<div class="collapse" id="morpheus-ccle">');
+      .push('<a data-toggle="collapse" href="#' + id + '" aria-expanded="false" aria-controls="' + id + '">Cancer Cell Line Encyclopedia (CCLE), Project Achilles</a>');
+      exampleHtml.push('<div class="collapse" id="' + id + '">');
       exampleHtml.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
         ' top;">');
       exampleHtml
-      .push('<div><input type="checkbox" style="margin-left:4px;"' +
+      .push('<label><input type="checkbox" style="margin-left:4px;"' +
         ' data-toggle="dataTypeToggle"' +
-        ' data-type="mrna">GENE EXPRESSION</div>');
+        ' data-type="mrna">GENE EXPRESSION</label>');
       exampleHtml
-      .push('<div><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
-        ' data-type="cn">COPY NUMBER BY GENE</div>');
+      .push('<label><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
+        ' data-type="cn">COPY NUMBER BY GENE</label>');
       exampleHtml.push('</div>');
 
       exampleHtml
       .push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align: top;">');
       exampleHtml
-      .push('<div><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
-        ' data-type="sig_genes">MUTATIONS</div>');
+      .push('<label><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
+        ' data-type="sig_genes">MUTATIONS</label>');
       exampleHtml
-      .push('<div><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
-        ' data-type="ach">GENE ESSENTIALITY</div>');
+      .push('<label><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
+        ' data-type="ach">GENE ESSENTIALITY</label>');
       exampleHtml
       .push('</div>');
       exampleHtml
@@ -11777,39 +11886,39 @@ morpheus.SampleDatasets = function (options) {
         tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
           ' top;">');
         tcga
-        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+        .push('<label><input type="checkbox" style="margin-left:4px;"' +
           ' data-toggle="dataTypeToggle"' +
-          ' data-type="mrna"' + (!disease.mrna ? ' disabled' : '') + '>GENE EXPRESSION</div>');
+          ' data-type="mrna"' + (!disease.mrna ? ' disabled' : '') + '>GENE EXPRESSION</label>');
         tcga
-        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+        .push('<label><input type="checkbox" style="margin-left:4px;"' +
           ' data-toggle="dataTypeToggle"' +
           ' data-type="gistic"' + (!disease.mrna ? ' disabled' : '') + '>GISTIC COPY' +
-          ' NUMBER</div>');
+          ' NUMBER</label>');
         tcga.push('</div>');
 
         tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
           ' top;">');
         tcga
-        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+        .push('<label><input type="checkbox" style="margin-left:4px;"' +
           ' data-toggle="dataTypeToggle"' +
           ' data-type="gisticGene"' + (!disease.mrna ? ' disabled' : '') + '>COPY' +
-          ' NUMBER BY GENE</div>');
+          ' NUMBER BY GENE</label>');
         tcga
-        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+        .push('<label><input type="checkbox" style="margin-left:4px;"' +
           ' data-toggle="dataTypeToggle"' +
-          ' data-type="sig_genes"' + (!disease.sig_genes ? ' disabled' : '') + '>MUTATION</div>');
+          ' data-type="sig_genes"' + (!disease.sig_genes ? ' disabled' : '') + '>MUTATION</label>');
         tcga.push('</div>');
 
         tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
           ' top;">');
         tcga
-        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+        .push('<label><input type="checkbox" style="margin-left:4px;"' +
           ' data-toggle="dataTypeToggle"' +
-          ' data-type="rppa"' + (!disease.rppa ? ' disabled' : '') + '>PROTEOMICS</div>');
+          ' data-type="rppa"' + (!disease.rppa ? ' disabled' : '') + '>PROTEOMICS</label>');
         tcga
-        .push('<div><input type="checkbox" style="margin-left:4px;"' +
+        .push('<label><input type="checkbox" style="margin-left:4px;"' +
           ' data-toggle="dataTypeToggle"' +
-          ' data-type="methylation"' + (!disease.rppa ? ' disabled' : '') + '>METHYLATION</div>');
+          ' data-type="methylation"' + (!disease.rppa ? ' disabled' : '') + '>METHYLATION</label>');
         tcga.push('</div>');
 
         tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
@@ -15173,7 +15282,7 @@ morpheus.OpenFileTool.prototype = {
         value: '',
         type: 'file',
         required: true,
-        help: morpheus.DatasetUtil.DATASET_FILE_FORMATS
+        help: morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS
       });
     }
     array.options = {
@@ -15207,14 +15316,12 @@ morpheus.OpenFileTool.prototype = {
         }
       });
     if (this.options.file == null) {
-      $('<h4>Use your own file</h4>').insertAfter(
-        form.$form.find('.form-group:first'));
       var _this = this;
       var collapseId = _.uniqueId('morpheus');
       $('<h4><a role="button" data-toggle="collapse" href="#'
         + collapseId
         + '" aria-expanded="false" aria-controls="'
-        + collapseId + '">Or select a preloaded dataset</a></h4>').appendTo($preloaded);
+        + collapseId + '">Preloaded datasets</a></h4>').appendTo($preloaded);
       var $sampleDatasets = $('<div data-name="sampleData" id="' + collapseId + '" class="collapse"' +
         ' id="' + collapseId + '" style="overflow:auto;"></div>');
       $preloaded.appendTo(form.$form);
@@ -27240,7 +27347,7 @@ morpheus.HeatMap = function (options) {
       inlineTooltip: true,
       $loadingImage: morpheus.Util.createLoadingEl(),
       menu: {
-        File: ['Open', null, 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename' +
+        File: ['Open', null, 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', null, 'Rename' +
         ' Tab'],
         Tools: ['New Heat Map', null, 'Hierarchical Clustering', 'KMeans Clustering', null, 'Marker Selection', 'Nearest Neighbors', 'Create Calculated Annotation', null, 'Adjust', 'Collapse', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort/Group', 'Filter', null, 'API'],
         View: ['Zoom In', 'Zoom Out', 'Fit To Window', '100%', null, 'Options'],
@@ -31207,23 +31314,14 @@ morpheus.Util.extend(morpheus.HeatMap, morpheus.Events);
 
 morpheus.HelpMenu = function () {
   var html = [];
-  html.push('<div class="btn-group">');
-  html.push('<button type="button" class="btn btn-default btn-xxs' +
-    ' dropdown-toggle"' +
-    ' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">');
-  html.push('<svg width="14px" height="14px" style="inline-block;vertical-align:middle;"><g><rect x="0" y="0" width="14" height="6" style="fill:#ca0020;stroke:none"></rect><rect x="0" y="7" width="14" height="6" style="fill:#0571b0;stroke:none"></rect></g></svg>');
-  html.push(' <span class="fa fa-caret-down"></span>');
-  html.push('</button>');
   html
-  .push('<ul class="dropdown-menu dropdown-menu-right" role="menu">');
+  .push('<ul class="morpheus-footer-links">');
   html.push('<li><a data-name="contact" href="#">Contact</a></li>');
-
   html.push('<li><a data-name="configuration" href="#">Configuration</a></li>');
   html.push('<li><a data-name="tutorial" href="#">Tutorial</a></li>');
   html.push('<li><a data-name="source" href="#">Source Code</a></li>');
-
   html.push('</ul>');
-  html.push('</div>');
+  html.push('<p>Created and developed by Joshua Gould</p>');
   this.$el = $(html.join(''));
   this.$el.find('[data-name=contact]').on('click', function (e) {
     morpheus.FormBuilder.showInModal({

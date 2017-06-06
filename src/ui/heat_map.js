@@ -250,7 +250,7 @@ morpheus.HeatMap = function (options) {
       inlineTooltip: true,
       $loadingImage: morpheus.Util.createLoadingEl(),
       menu: {
-        File: ['Open', null, 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', 'Rename' +
+        File: ['Open', null, 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', null, 'Rename' +
         ' Tab'],
         Tools: ['New Heat Map', null, 'Hierarchical Clustering', 'KMeans Clustering', null, 'Marker Selection', 'Nearest Neighbors', 'Create Calculated Annotation', null, 'Adjust', 'Collapse', 'Similarity Matrix', 'Transpose', 't-SNE', null, 'Chart', null, 'Sort/Group', 'Filter', null, 'API'],
         View: ['Zoom In', 'Zoom Out', 'Fit To Window', '100%', null, 'Options'],
