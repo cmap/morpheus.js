@@ -11432,7 +11432,7 @@ morpheus.FilePicker = function (options) {
 
   var html = [];
   html.push('<div>');
-  html.push('<ul style="margin-bottom:5px;" class="nav nav-pills morpheus">');
+  html.push('<ul style="margin-bottom:10px;" class="nav nav-pills morpheus">');
   html.push('<li role="presentation" class="active"><a href="#myComputer"' +
     ' aria-controls="myComputer" role="tab" data-toggle="tab"><i class="fa fa-desktop"></i>' +
     ' My Computer</a></li>');
@@ -11598,14 +11598,14 @@ morpheus.LandingPage = function (pageOptions) {
 
   var html = [];
 
-  html.push('<div class="container-fluid">');
+  html.push('<div style="display:none;" class="container-fluid">');
   html.push('<div style="min-height:78vh" class="row">');
   html.push('<div class="col-xs-12 col-md-offset-1 col-md-7"><div' +
     ' data-name="input"></div>');
   html.push('<div class="clearfix"></div>');
   html.push('</div>'); // col
   html.push('<div data-name="desc" class="col-xs-12 col-md-3"><p><img' +
-    ' src="images/morpheus_landing_img.png" style="width:100%;"></p></div>');
+    ' src="css/images/morpheus_landing_img.png" style="width:100%;"></p></div>');
   html.push('</div>'); // row
 
   html.push('<div class="row"><div class="col-xs-12 morpheus-footer"></div></div>');

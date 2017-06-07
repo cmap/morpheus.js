@@ -2,7 +2,7 @@ morpheus.FilePicker = function (options) {
 
   var html = [];
   html.push('<div>');
-  html.push('<ul style="margin-bottom:5px;" class="nav nav-pills morpheus">');
+  html.push('<ul style="margin-bottom:10px;" class="nav nav-pills morpheus">');
   html.push('<li role="presentation" class="active"><a href="#myComputer"' +
     ' aria-controls="myComputer" role="tab" data-toggle="tab"><i class="fa fa-desktop"></i>' +
     ' My Computer</a></li>');
