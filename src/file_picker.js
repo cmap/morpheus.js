@@ -10,7 +10,7 @@ morpheus.FilePicker = function (options) {
     ' aria-controls="url" role="tab" data-toggle="url"><i class="fa fa-link"></i>' +
     ' URL</a></li>');
   html.push('<li role="presentation"><a href="#dropbox"' +
-    ' aria-controls="dropbox" role="tab" data-toggle="dropbox"><i class="fa fa-link"></i>' +
+    ' aria-controls="dropbox" role="tab" data-toggle="dropbox"><i class="fa fa-dropbox"></i>' +
     ' Dropbox</a></li>');
 
   for (var i = 0; i < options.addOn.length; i++) {
