@@ -39,9 +39,9 @@ morpheus.ClsReader.prototype = {
   /**
    * Parses the cls file.
    *
-   * @param file
-   *            The file.
-   * @throw new Errors Exception If there is a problem with the data
+   * @param lines
+   *            The lines to read.
+   * @throw Error If there is a problem with the data
    */
   read: function (lines) {
     var regex = /[ ,]+/;
