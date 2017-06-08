@@ -11553,9 +11553,17 @@ morpheus.FilePicker = function (options) {
     html.push('</div>');
     html.push('</div>');
   }
+  if (navigator.onLine) {
+    html.push('<div role="tabpanel" class="tab-pane" id="' + preloaded + '">');
+    html.push('<div class="morpheus-landing-panel">');
+    html.push('</div>');
+    html.push('</div>');
+  }
   html.push('</div>'); // tab-content
   html.push('</div>');
   var $el = $(html.join(''));
+  console.log($el.find('#' + preloaded + ' > .morpheus-landing-panel').length);
+  $sampleDatasetsEl.appendTo($el.find('#' + preloaded + ' > .morpheus-landing-panel'));
   this.$el = $el;
 
   var $file = $el.find('[name=hiddenFile]');
@@ -11736,7 +11744,6 @@ morpheus.LandingPage = function (pageOptions) {
   var _this = this;
 
   var html = [];
-
   html.push('<div style="display:none;" class="container-fluid">');
   html.push('<div style="min-height:78vh" class="row">');
   html.push('<div class="col-xs-12 col-md-offset-1 col-md-7"><div' +
@@ -31442,7 +31449,6 @@ morpheus.HelpMenu = function () {
     '<li><a target="_blank" href="https://github.com/cmap/morpheus.R">R Interface</a></li>');
 
   html.push('</ul>');
-  html.push('<p>Created and developed by Joshua Gould</p>');
   this.$el = $(html.join(''));
   this.$el.find('[data-name=contact]').on('click', function (e) {
     morpheus.FormBuilder.showInModal({

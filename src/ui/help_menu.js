@@ -11,7 +11,6 @@ morpheus.HelpMenu = function () {
     '<li><a target="_blank" href="https://github.com/cmap/morpheus.R">R Interface</a></li>');
 
   html.push('</ul>');
-  html.push('<p>Created and developed by Joshua Gould</p>');
   this.$el = $(html.join(''));
   this.$el.find('[data-name=contact]').on('click', function (e) {
     morpheus.FormBuilder.showInModal({

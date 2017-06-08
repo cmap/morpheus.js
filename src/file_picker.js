@@ -83,9 +83,17 @@ morpheus.FilePicker = function (options) {
     html.push('</div>');
     html.push('</div>');
   }
+  if (navigator.onLine) {
+    html.push('<div role="tabpanel" class="tab-pane" id="' + preloaded + '">');
+    html.push('<div class="morpheus-landing-panel">');
+    html.push('</div>');
+    html.push('</div>');
+  }
   html.push('</div>'); // tab-content
   html.push('</div>');
   var $el = $(html.join(''));
+  console.log($el.find('#' + preloaded + ' > .morpheus-landing-panel').length);
+  $sampleDatasetsEl.appendTo($el.find('#' + preloaded + ' > .morpheus-landing-panel'));
   this.$el = $el;
 
   var $file = $el.find('[name=hiddenFile]');

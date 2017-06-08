@@ -6,7 +6,6 @@ morpheus.LandingPage = function (pageOptions) {
   var _this = this;
 
   var html = [];
-
   html.push('<div style="display:none;" class="container-fluid">');
   html.push('<div style="min-height:78vh" class="row">');
   html.push('<div class="col-xs-12 col-md-offset-1 col-md-7"><div' +
