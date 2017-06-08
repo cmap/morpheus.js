@@ -9,8 +9,14 @@ morpheus.FilePicker = function (options) {
   html.push('<li role="presentation"><a href="#url"' +
     ' aria-controls="url" role="tab" data-toggle="url"><i class="fa fa-link"></i>' +
     ' URL</a></li>');
+
+  if (typeof gapi !== 'undefined') {
+    html.push('<li role="presentation"><a href="#google"' +
+      ' aria-controls="google" role="tab" data-toggle="google"><i class="fa fa-google"></i>' +
+      ' Google</a></li>');
+  }
   html.push('<li role="presentation"><a href="#dropbox"' +
-    ' aria-controls="dropbox" role="tab" data-toggle="dropbox"><i class="fa fa-link"></i>' +
+    ' aria-controls="dropbox" role="tab" data-toggle="dropbox"><i class="fa fa-dropbox"></i>' +
     ' Dropbox</a></li>');
 
   for (var i = 0; i < options.addOn.length; i++) {
@@ -50,6 +56,14 @@ morpheus.FilePicker = function (options) {
   html.push('<button name="dropbox" class="btn btn-default">Browse Dropbox</button>');
   html.push('</div>');
   html.push('</div>');
+
+  if (typeof gapi !== 'undefined') {
+    html.push('<div role="tabpanel" class="tab-pane" id="google">');
+    html.push('<div class="morpheus-landing-panel">');
+    html.push('<button name="google" class="btn btn-default">Browse Google Drive</button>');
+    html.push('</div>');
+    html.push('</div>');
+  }
 
   for (var i = 0; i < options.addOn.length; i++) {
     html.push('<div role="tabpanel" class="tab-pane" id="' + options.addOn[i].id + '">');
@@ -93,6 +107,86 @@ morpheus.FilePicker = function (options) {
     });
   });
 
+  var $google = $el.find('[name=google]');
+  $google.on('click', function () {
+    var developerKey = 'AIzaSyBCRqn5xgdUsJZcC6oJnIInQubaaL3aYvI';
+    var clientId = '936482190815-85k6k06b98ihv272n0b7f7fm33v5mmfa.apps.googleusercontent.com';
+    var scope = ['https://www.googleapis.com/auth/drive'];
+
+    var pickerApiLoaded = false;
+    var oauthToken;
+
+    // Use the API Loader script to load google.picker and gapi.auth.
+    function onApiLoad() {
+      gapi.load('auth', {'callback': onAuthApiLoad});
+      gapi.load('picker', {'callback': onPickerApiLoad});
+      gapi.load('drive');
+    }
+
+    function onAuthApiLoad() {
+      if (1 == 1) {
+        window.gapi.auth.authorize(
+          {
+            'client_id': clientId,
+            'scope': scope,
+            'immediate': false
+          },
+          handleAuthResult);
+      } else {
+        handleAuthResult();
+      }
+    }
+
+    function onPickerApiLoad() {
+      pickerApiLoaded = true;
+      createPicker();
+    }
+
+    function handleAuthResult(authResult) {
+      if (authResult && !authResult.error) {
+        oauthToken = authResult.access_token;
+        createPicker();
+      }
+    }
+
+    function createPicker() {
+      if (pickerApiLoaded && oauthToken) {
+        var picker = new google.picker.PickerBuilder().addViewGroup(
+          new google.picker.ViewGroup(google.picker.ViewId.DOCS).addView(google.picker.ViewId.DOCUMENTS).addView(google.picker.ViewId.SPREADSHEETS)).setOAuthToken(oauthToken).setDeveloperKey(developerKey).setCallback(pickerCallback).build();
+        picker.setVisible(true);
+      }
+    }
+
+    function pickerCallback(data) {
+      if (data.action == google.picker.Action.PICKED) {
+        var file = data.docs[0];
+        var fileName = file.name;
+        var accessToken = gapi.auth.getToken().access_token;
+        var xhr = new XMLHttpRequest();
+        var url = new String('https://www.googleapis.com/drive/v3/files/' + file.id + '?alt=media');
+        url.name = fileName;
+        url.headers = {'Authorization': 'Bearer ' + accessToken};
+        options.cb(url);
+        // xhr.open('GET', url, true);
+        //   xhr.open('GET', 'https://www.googleapis.com/drive/v3/files/' + file.id +
+        // '/export/?mimeType=' + file.mimeType, true);
+        //  xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+        //   xhr.onload = function () {
+        //     var text = xhr.responseText;
+        //     var ext = morpheus.Util.getExtension(fileName);
+        //     var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, {interactive: true});
+        //     if (datasetReader == null) {
+        //       datasetReader = new morpheus.Array2dReaderInteractive();
+        //     }
+        //     options.cb(datasetReader.read());
+        //   };
+        //   xhr.send();
+      }
+
+    }
+
+    onApiLoad();
+  });
   $file.on('change', function (evt) {
     var files = evt.target.files; // FileList object
     options.cb(files[0]);
