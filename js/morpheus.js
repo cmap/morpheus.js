@@ -17,7 +17,6 @@ if (typeof module !== 'undefined' && module.exports) {
 morpheus.Util = function () {
 };
 
-morpheus.Util.URL = 'https://clue.io/morpheus/';
 morpheus.Util.RIGHT_ARROW = String.fromCharCode(8594);
 /**
  * Add properties in c2 to c1
@@ -225,6 +224,9 @@ morpheus.Util.forceDelete = function (obj) {
 };
 morpheus.Util.getFileName = function (fileOrUrl) {
   if (fileOrUrl instanceof File) {
+    return fileOrUrl.name;
+  }
+  if (fileOrUrl.name !== undefined) {
     return fileOrUrl.name;
   }
   var name = '' + fileOrUrl;
@@ -963,25 +965,26 @@ morpheus.Util.xlsxTo1dArray = function (options, callback) {
 /**
  * Returns a promise that resolves to a string
  */
-morpheus.Util.getText = function (urlOrFile) {
+morpheus.Util.getText = function (fileOrUrl) {
   var deferred = $.Deferred();
-  if (morpheus.Util.isString(urlOrFile)) {
+  if (morpheus.Util.isString(fileOrUrl)) {
     $.ajax({
+      headers: fileOrUrl.headers,
       contentType: 'text/plain',
-      url: urlOrFile,
+      url: fileOrUrl,
     }).done(function (text, status, xhr) {
       // var type = xhr.getResponseHeader('Content-Type');
       deferred.resolve(text);
     });
-  } else if (urlOrFile instanceof File) {
+  } else if (fileOrUrl instanceof File) {
     var reader = new FileReader();
     reader.onload = function (event) {
       deferred.resolve(event.target.result);
     };
-    reader.readAsText(urlOrFile);
+    reader.readAsText(fileOrUrl);
   } else {
-    // what is urlOrFile?
-    deferred.resolve(urlOrFile);
+    // what is fileOrUrl?
+    deferred.resolve(fileOrUrl);
   }
   return deferred.promise();
 };
@@ -1377,11 +1380,16 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
   var deferred = $.Deferred();
   if (isString) { // URL
     if (ext === 'xlsx') {
-      var oReq = new XMLHttpRequest();
-      oReq.open('GET', fileOrUrl, true);
-      $.ajaxPrefilter({url: fileOrUrl}, {}, oReq);
-      oReq.responseType = 'arraybuffer';
-      oReq.onload = function (oEvent) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', fileOrUrl, true);
+      if (fileOrUrl.headers) {
+        for (var header in fileOrUrl.headers) {
+          xhr.setRequestHeader(header, fileOrUrl.headers[header]);
+        }
+      }
+      // $.ajaxPrefilter({url: fileOrUrl}, {}, oReq); // copy ajax pre-filters from ajax
+      xhr.responseType = 'arraybuffer';
+      xhr.onload = function (oEvent) {
         var arrayBuffer = oReq.response;
         if (arrayBuffer) {
           var data = new Uint8Array(arrayBuffer);
@@ -1401,9 +1409,10 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
           throw 'not found';
         }
       };
-      oReq.send(null);
+      xhr.send(null);
     } else {
       $.ajax({
+        headers: fileOrUrl.headers,
         url: fileOrUrl,
       }).done(function (text, status, xhr) {
         deferred.resolve(morpheus.Util.splitOnNewLine(text));
@@ -2143,21 +2152,26 @@ morpheus.ArrayBufferReader.prototype = {
 morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
   var isString = typeof fileOrUrl === 'string' || fileOrUrl instanceof String;
   if (isString) { // URL
-    var oReq = new XMLHttpRequest();
-    oReq.open('GET', fileOrUrl, true);
-    oReq.responseType = 'arraybuffer';
-    oReq.onload = function (oEvent) {
-      callback(null, oReq.response);
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', fileOrUrl, true);
+    xhr.responseType = 'arraybuffer';
+    if (fileOrUrl.headers) {
+      for (var header in fileOrUrl.headers) {
+        xhr.setRequestHeader(header, fileOrUrl.headers[header]);
+      }
+    }
+    xhr.onload = function (oEvent) {
+      callback(null, xhr.response);
     };
 
-    oReq.onerror = function (oEvent) {
+    xhr.onerror = function (oEvent) {
       callback(oEvent);
     };
-    oReq.onreadystatechange = function (oEvent) {
-      if (oReq.readyState === 4 && oReq.status !== 200) {
-        oReq.onload = null;
-        oReq.onerror = null;
-        if (oReq.status === 404) {
+    xhr.onreadystatechange = function (oEvent) {
+      if (xhr.readyState === 4 && xhr.status !== 200) {
+        xhr.onload = null;
+        xhr.onerror = null;
+        if (xhr.status === 404) {
           callback(new Error(fileOrUrl + ' not found.'));
         } else {
           callback(new Error('Unable to read ' + fileOrUrl + '.'));
@@ -2165,8 +2179,8 @@ morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
       }
     };
 
-    oReq.send(null);
-    return oReq;
+    xhr.send(null);
+    return xhr;
 
   } else {
     var reader = new FileReader();
@@ -2452,7 +2466,16 @@ morpheus.BufferedReader.parse = function (url, options) {
   var regex = new RegExp(delim);
   var handleTokens = options.handleTokens;
   var complete = options.complete;
-  fetch(url).then(function (response) {
+
+  var fetchOptions = {};
+  if (url.headers) {
+    var headers = new Headers();
+    for (var header in url.headers) {
+      headers.append(header, url.headers[header]);
+    }
+    fetchOptions.headers = headers;
+  }
+  fetch(url, fetchOptions).then(function (response) {
     if (response.ok) {
       var reader = response.body.getReader();
       new morpheus.BufferedReader(reader, function (line) {
@@ -2510,9 +2533,9 @@ morpheus.ClsReader.prototype = {
   /**
    * Parses the cls file.
    *
-   * @param file
-   *            The file.
-   * @throw new Errors Exception If there is a problem with the data
+   * @param lines
+   *            The lines to read.
+   * @throw Error If there is a problem with the data
    */
   read: function (lines) {
     var regex = /[ ,]+/;
@@ -5753,8 +5776,11 @@ morpheus.DatasetUtil.annotate = function (options) {
 };
 /**
  * Reads a dataset at the specified URL or file
- * @param file
+ * @param fileOrUrl
  *            a File or URL
+ * @param options.background
+ * @params options.interactive
+ * @params options.extension
  * @return A promise that resolves to morpheus.DatasetInterface
  */
 morpheus.DatasetUtil.read = function (fileOrUrl, options) {
@@ -11442,26 +11468,51 @@ morpheus.Vector.prototype = {
 };
 morpheus.Util.extend(morpheus.Vector, morpheus.AbstractVector);
 
+/**
+ *
+ * @param options.fileCallback Callback when file is selected
+ * @param options.optionsCallback Callback when preloaded option is selected
+ * @constructor
+ */
 morpheus.FilePicker = function (options) {
-
   var html = [];
   html.push('<div>');
+  var myComputer = _.uniqueId('morpheus');
+  var url = _.uniqueId('morpheus');
+  var googleId = _.uniqueId('morpheus');
+  var dropbox = _.uniqueId('morpheus');
+  var preloaded = _.uniqueId('morpheus');
   html.push('<ul style="margin-bottom:10px;" class="nav nav-pills morpheus">');
-  html.push('<li role="presentation" class="active"><a href="#myComputer"' +
-    ' aria-controls="myComputer" role="tab" data-toggle="tab"><i class="fa fa-desktop"></i>' +
+  html.push('<li role="presentation" class="active"><a href="#' + myComputer + '"' +
+    ' aria-controls="' + myComputer + '" role="tab" data-toggle="tab"><i class="fa fa-desktop"></i>' +
     ' My Computer</a></li>');
-  html.push('<li role="presentation"><a href="#url"' +
-    ' aria-controls="url" role="tab" data-toggle="url"><i class="fa fa-link"></i>' +
+  html.push('<li role="presentation"><a href="#' + url + '"' +
+    ' aria-controls="' + url + '" role="tab" data-toggle="tav"><i class="fa fa-link"></i>' +
     ' URL</a></li>');
-  html.push('<li role="presentation"><a href="#dropbox"' +
-    ' aria-controls="dropbox" role="tab" data-toggle="dropbox"><i class="fa fa-dropbox"></i>' +
+
+  if (typeof gapi !== 'undefined') {
+    html.push('<li role="presentation"><a href="#' + googleId + '"' +
+      ' aria-controls="' + googleId + '" role="tab" data-toggle="tab"><i class="fa' +
+      ' fa-google"></i>' +
+      ' Google</a></li>');
+  }
+  html.push('<li role="presentation"><a href="#' + dropbox + '"' +
+    ' aria-controls="' + dropbox + '" role="tab" data-toggle="tab"><i class="fa fa-dropbox"></i>' +
     ' Dropbox</a></li>');
 
-  for (var i = 0; i < options.addOn.length; i++) {
-    var id = _.uniqueId('morpheus');
-    options.addOn[i].id = id;
-    html.push('<li role="presentation"><a href="#' + id + '"' +
-      ' aria-controls="' + id + '" role="tab" data-toggle="' + id + '">' + options.addOn[i].header + '</a></li>');
+  var $sampleDatasetsEl = $('<div class="morpheus-preloaded"></div>');
+  if (navigator.onLine) {
+    html.push('<li role="presentation"><a href="#' + preloaded + '"' +
+      ' aria-controls="' + preloaded + '" role="tab" data-toggle="tab"><i class="fa fa-database"></i>' +
+      ' Preloaded Datasets</a></li>');
+
+    new morpheus.SampleDatasets({
+      $el: $sampleDatasetsEl,
+      show: true,
+      callback: function (heatMapOptions) {
+        options.optionsCallback(heatMapOptions);
+      }
+    });
   }
 
   html.push('</ul>');
@@ -11469,7 +11520,7 @@ morpheus.FilePicker = function (options) {
   html.push('<div class="tab-content"' +
     ' style="text-align:center;cursor:pointer;height:300px;">');
 
-  html.push('<div role="tabpanel" class="tab-pane active" id="myComputer">');
+  html.push('<div role="tabpanel" class="tab-pane active" id="' + myComputer + '">');
   html.push('<div data-name="drop" class="morpheus-file-drop morpheus-landing-panel">');
   html.push('<button class="btn btn-default"><span class="fa-stack"><i' +
     ' class="fa fa-file-o' +
@@ -11481,7 +11532,7 @@ morpheus.FilePicker = function (options) {
   html.push('</div>');
   html.push('</div>');
 
-  html.push('<div role="tabpanel" class="tab-pane" id="url">');
+  html.push('<div role="tabpanel" class="tab-pane" id="' + url + '">');
   html.push('<div class="morpheus-landing-panel">');
   html.push('<input name="url" placeholder="Enter a URL" class="form-control"' +
     ' style="display:inline;max-width:400px;' +
@@ -11489,15 +11540,16 @@ morpheus.FilePicker = function (options) {
   html.push('</div>');
   html.push('</div>');
 
-  html.push('<div role="tabpanel" class="tab-pane" id="dropbox">');
+  html.push('<div role="tabpanel" class="tab-pane" id="' + dropbox + '">');
   html.push('<div class="morpheus-landing-panel">');
   html.push('<button name="dropbox" class="btn btn-default">Browse Dropbox</button>');
   html.push('</div>');
   html.push('</div>');
 
-  for (var i = 0; i < options.addOn.length; i++) {
-    html.push('<div role="tabpanel" class="tab-pane" id="' + options.addOn[i].id + '">');
+  if (typeof gapi !== 'undefined') {
+    html.push('<div role="tabpanel" class="tab-pane" id="' + googleId + '">');
     html.push('<div class="morpheus-landing-panel">');
+    html.push('<button name="google" class="btn btn-default">Browse Google Drive</button>');
     html.push('</div>');
     html.push('</div>');
   }
@@ -11505,10 +11557,7 @@ morpheus.FilePicker = function (options) {
   html.push('</div>');
   var $el = $(html.join(''));
   this.$el = $el;
-  for (var i = 0; i < options.addOn.length; i++) {
-    var $div = $el.find('#' + options.addOn[i].id + ' > .morpheus-landing-panel');
-    options.addOn[i].$el.appendTo($div);
-  }
+
   var $file = $el.find('[name=hiddenFile]');
   this.$el.find('.nav').on('click', 'li > a', function (e) {
     e.preventDefault();
@@ -11520,7 +11569,7 @@ morpheus.FilePicker = function (options) {
     if (evt.which === 13) {
       var text = $.trim($(this).val());
       if (text !== '') {
-        options.cb(text);
+        options.fileCallback(text);
       }
     }
   });
@@ -11529,7 +11578,7 @@ morpheus.FilePicker = function (options) {
     Dropbox.choose({
       success: function (results) {
         var val = results[0].link;
-        options.cb(val);
+        options.fileCallback(val);
       },
       linkType: 'direct',
       multiselect: false
@@ -11537,9 +11586,86 @@ morpheus.FilePicker = function (options) {
     });
   });
 
+  var $google = $el.find('[name=google]');
+  $google.on('click', function () {
+    var developerKey = 'AIzaSyBCRqn5xgdUsJZcC6oJnIInQubaaL3aYvI';
+    var clientId = '936482190815-85k6k06b98ihv272n0b7f7fm33v5mmfa.apps.googleusercontent.com';
+    var scope = ['https://www.googleapis.com/auth/drive'];
+    var oauthToken;
+    var pickerApiLoaded = false;
+    var oauthToken;
+
+    // Use the API Loader script to load google.picker and gapi.auth.
+    function onApiLoad() {
+      gapi.load('auth', {'callback': onAuthApiLoad});
+      gapi.load('picker', {'callback': onPickerApiLoad});
+    }
+
+    function onAuthApiLoad() {
+      window.gapi.auth.authorize(
+        {
+          'client_id': clientId,
+          'scope': scope,
+          'immediate': false
+        },
+        handleAuthResult);
+    }
+
+    function onPickerApiLoad() {
+      pickerApiLoaded = true;
+      createPicker();
+    }
+
+    function handleAuthResult(authResult) {
+      if (authResult && !authResult.error) {
+        oauthToken = authResult.access_token;
+        createPicker();
+      }
+    }
+
+    // Create and render a Picker object for picking user Photos.
+    function createPicker() {
+      if (pickerApiLoaded && oauthToken) {
+        var picker = new google.picker.PickerBuilder().addView(google.picker.ViewId.DOCS).setOAuthToken(oauthToken).setDeveloperKey(developerKey).setCallback(pickerCallback).build();
+        picker.setVisible(true);
+        $('.picker-dialog-bg').css('z-index', 1052); // make it appear above modals
+        $('.picker-dialog').css('z-index', 1053);
+      }
+    }
+
+    function pickerCallback(data) {
+      if (data.action == google.picker.Action.PICKED) {
+        var file = data.docs[0];
+        var fileName = file.name;
+        var accessToken = gapi.auth.getToken().access_token;
+        var xhr = new XMLHttpRequest();
+        var url = new String('https://www.googleapis.com/drive/v3/files/' + file.id + '?alt=media');
+        url.name = fileName;
+        url.headers = {'Authorization': 'Bearer ' + accessToken};
+        options.fileCallback(url);
+        // xhr.open('GET', url, true);
+        //   xhr.open('GET', 'https://www.googleapis.com/drive/v3/files/' + file.id +
+        // '/export/?mimeType=' + file.mimeType, true);
+        //  xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+        //   xhr.onload = function () {
+        //     var text = xhr.responseText;
+        //     var ext = morpheus.Util.getExtension(fileName);
+        //     var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, {interactive: true});
+        //     if (datasetReader == null) {
+        //       datasetReader = new morpheus.Array2dReaderInteractive();
+        //     }
+        //     options.fileCallback(datasetReader.read());
+        //   };
+        //   xhr.send();
+      }
+
+    }
+
+    onApiLoad();
+  });
   $file.on('change', function (evt) {
     var files = evt.target.files; // FileList object
-    options.cb(files[0]);
+    options.fileCallback(files[0]);
   });
   $(window).on('paste.morpheus', function (e) {
     if ($('#myComputer').is(':visible')) {
@@ -11554,10 +11680,10 @@ morpheus.FilePicker = function (options) {
           var blob = new Blob([text]);
           url = window.URL.createObjectURL(blob);
         }
-        options.cb(url);
+        options.fileCallback(url);
       }
     }
-  })
+  });
   var $drop = $el.find('[data-name=drop]');
   var clicking = false;
   $drop.on('click', function (e) {
@@ -11590,17 +11716,16 @@ morpheus.FilePicker = function (options) {
         e.preventDefault();
         e.stopPropagation();
         var files = e.originalEvent.dataTransfer.files;
-        options.cb(files[0]);
+        options.fileCallback(files[0]);
       } else {
         var url = e.originalEvent.dataTransfer.getData('URL');
-        options.cb(url);
+        options.fileCallback(url);
         e.preventDefault();
         e.stopPropagation();
 
       }
     }
   });
-  ;
 };
 
 morpheus.LandingPage = function (pageOptions) {
@@ -11645,24 +11770,14 @@ morpheus.LandingPage = function (pageOptions) {
     ' data is' +
     ' processed in the' +
     ' browser and never sent to any server.</div>').appendTo($input);
-  this.$sampleDatasetsEl = $('<div class="morpheus-preloaded"></div>');
-  if (navigator.onLine && !this.sampleDatasets) {
-    this.sampleDatasets = new morpheus.SampleDatasets({
-      $el: this.$sampleDatasetsEl,
-      show: true,
-      callback: function (heatMapOptions) {
-        _this.open(heatMapOptions);
-      }
-    });
-  }
+
   var filePicker = new morpheus.FilePicker({
-    cb: function (file) {
+    fileCallback: function (file) {
       _this.openFile(file);
     },
-    addOn: [{
-      header: '<i class="fa fa-database"></i> Preloaded Datasets',
-      $el: _this.$sampleDatasetsEl
-    }]
+    optionsCallback: function (opt) {
+      _this.open(opt);
+    }
   });
   filePicker.$el.appendTo($input);
 
@@ -15249,114 +15364,101 @@ morpheus.OpenDendrogramTool.prototype = {
 morpheus.OpenFileTool = function (options) {
   this.options = options || {};
 };
+
+morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS = [{
+  name: 'Open session',
+  value: 'Open session'
+}, {
+  name: 'Open dataset in new tab',
+  value: 'open'
+}, {
+  name: 'Append rows to current dataset',
+  value: 'append'
+}, {
+  name: 'Append columns to current dataset',
+  value: 'append columns'
+}, {
+  name: 'Overlay onto current dataset',
+  value: 'overlay'
+}, {divider: true}, {
+  name: 'Annotate columns',
+  value: 'Annotate Columns'
+}, {
+  name: 'Annotate rows',
+  value: 'Annotate Rows'
+}, {
+  divider: true
+}, {
+  name: 'Open dendrogram',
+  value: 'Open dendrogram'
+}];
+
 morpheus.OpenFileTool.prototype = {
   toString: function () {
     return 'Open';
   },
   gui: function () {
-    var array = [{
+    var params = [{
       name: 'open_file_action',
       value: 'open',
       type: 'bootstrap-select',
-      options: [{
-        name: 'Open session',
-        value: 'Open session'
-      }, {divider: true}, {
-        name: 'Annotate columns',
-        value: 'Annotate Columns'
-      }, {
-        name: 'Annotate rows',
-        value: 'Annotate Rows'
-      }, {
-        divider: true
-      }, {
-        name: 'Append rows to current dataset',
-        value: 'append'
-      }, {
-        name: 'Append columns to current dataset',
-        value: 'append columns'
-      }, {
-        name: 'Overlay onto current dataset',
-        value: 'overlay'
-      }, {
-        name: 'Open dataset in new tab',
-        value: 'open'
-      }, {
-        divider: true
-      }, {
-        name: 'Open dendrogram',
-        value: 'Open dendrogram'
-      }]
+      options: morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS
     }];
-    if (this.options.file == null) {
-      array.push({
-        name: 'file',
-        showLabel: false,
-        placeholder: 'Open your own file',
-        value: '',
-        type: 'file',
-        required: true,
-        help: morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS
-      });
+
+    if (this.options.file == null) { // pick file and action
+      params.options = {
+        size: 'modal-lg'
+      };
+    } else {
+      var extension = morpheus.Util.getExtension(morpheus.Util.getFileName(this.options.file));
+      if (extension === 'json') { // TODO no gui needed
+        params[0].options = params[0].options.filter(function (opt) {
+          return opt.value != null && ( opt.value === 'Open session' || opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+        });
+      } else if (extension === 'gct') {
+        params[0].options = params[0].options.filter(function (opt) {
+          return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+        });
+      }
     }
-    array.options = {
-      ok: this.options.file != null,
-      size: 'modal-lg'
-    };
-    return array;
+    return params;
   },
   init: function (project, form, initOptions) {
-    var $preloaded = $('<div></div>');
-    form.$form.find('[name=open_file_action]').on(
-      'change',
-      function (e) {
-        var action = $(this).val();
-        if (action === 'append columns' || action === 'append'
-          || action === 'open' || action === 'overlay') {
-          form.setHelpText('file',
-            morpheus.DatasetUtil.DATASET_FILE_FORMATS);
-          $preloaded.show();
-        } else if (action === 'Open dendrogram') {
-          form.setHelpText('file',
-            morpheus.DatasetUtil.DENDROGRAM_FILE_FORMATS);
-          $preloaded.hide();
-        } else if (action === 'Open session') {
-          form.setHelpText('file', morpheus.DatasetUtil.SESSION_FILE_FORMAT);
-          $preloaded.hide();
-        } else {
-          form.setHelpText('file',
-            morpheus.DatasetUtil.ANNOTATION_FILE_FORMATS);
-          $preloaded.hide();
-        }
-      });
-    if (this.options.file == null) {
-      var _this = this;
-      var collapseId = _.uniqueId('morpheus');
-      $('<h4><a role="button" data-toggle="collapse" href="#'
-        + collapseId
-        + '" aria-expanded="false" aria-controls="'
-        + collapseId + '">Preloaded datasets</a></h4>').appendTo($preloaded);
-      var $sampleDatasets = $('<div data-name="sampleData" id="' + collapseId + '" class="collapse"' +
-        ' id="' + collapseId + '" style="overflow:auto;"></div>');
-      $preloaded.appendTo(form.$form);
-      var sampleDatasets = new morpheus.SampleDatasets({
-        $el: $sampleDatasets,
-        callback: function (heatMapOptions) {
-          _this.options.file = heatMapOptions.dataset;
-          _this.ok();
-        }
-      });
-      $sampleDatasets.appendTo($preloaded);
-    }
-    form.on('change', function (e) {
-      var value = e.value;
-      if (value !== '' && value != null) {
-        form.setValue('file', value);
-        _this.options.file = value;
-        _this.ok();
-      }
-    });
+    var _this = this;
 
+    if (this.options.file == null) {
+      // hide ok and cancel buttons
+      form.setVisible('open_file_action', false);
+      var $div = $('<div></div>');
+      var filePicker = new morpheus.FilePicker({
+        fileCallback: function (fileOrUrl) {
+          $div.hide();
+          _this.options.file = fileOrUrl;
+          // if it's a file, check file type and update choices
+          var extension = morpheus.Util.getExtension(morpheus.Util.getFileName(_this.options.file));
+          if (extension === 'json') { // TODO no gui needed
+            form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.options.filter(function (opt) {
+              return opt.value != null && (opt.value === 'Open session' || opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+            }));
+          } else if (extension === 'gct') {
+            form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.options.filter(function (opt) {
+              return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+            }));
+          }
+          form.setVisible('open_file_action', true);
+        },
+        optionsCallback: function (heatMapOptions) {
+          $div.hide();
+          _this.options.file = heatMapOptions.dataset;
+          form.setVisible('open_file_action', true);
+          form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.options.filter(function (opt) {
+            return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+          }));
+        }
+      });
+      filePicker.$el.appendTo($div);
+      $div.appendTo(form.$form);
+    }
   },
 
   execute: function (options) {
@@ -27817,6 +27919,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       title: tool.toString(),
       apply: tool.apply,
       ok: guiOptions.ok,
+      cancel: guiOptions.cancel,
       size: guiOptions.size,
       draggable: true,
       content: formBuilder.$form,
@@ -32972,11 +33075,12 @@ morpheus.TabManager = function (options) {
     _this.$nav.find('[data-link=' + _this.activeTabId + ']').each(function () {
       $(this).parent().addClass('active');// not added via droptab
     });
+    var scrollTop = document.body.scrollTop;
     $('#' + _this.activeTabId).focus();
+    document.body.scrollTop = scrollTop; // focus can change scroll position
     if (_this.adding) {
       return;
     }
-
     _this.trigger('change', {
       tab: _this.activeTabId,
       previous: previous
