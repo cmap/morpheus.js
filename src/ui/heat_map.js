@@ -706,6 +706,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       title: tool.toString(),
       apply: tool.apply,
       ok: guiOptions.ok,
+      cancel: guiOptions.cancel,
       size: guiOptions.size,
       draggable: true,
       content: formBuilder.$form,

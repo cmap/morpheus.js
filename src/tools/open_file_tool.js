@@ -1,114 +1,101 @@
 morpheus.OpenFileTool = function (options) {
   this.options = options || {};
 };
+
+morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS = [{
+  name: 'Open session',
+  value: 'Open session'
+}, {
+  name: 'Open dataset in new tab',
+  value: 'open'
+}, {
+  name: 'Append rows to current dataset',
+  value: 'append'
+}, {
+  name: 'Append columns to current dataset',
+  value: 'append columns'
+}, {
+  name: 'Overlay onto current dataset',
+  value: 'overlay'
+}, {divider: true}, {
+  name: 'Annotate columns',
+  value: 'Annotate Columns'
+}, {
+  name: 'Annotate rows',
+  value: 'Annotate Rows'
+}, {
+  divider: true
+}, {
+  name: 'Open dendrogram',
+  value: 'Open dendrogram'
+}];
+
 morpheus.OpenFileTool.prototype = {
   toString: function () {
     return 'Open';
   },
   gui: function () {
-    var array = [{
+    var params = [{
       name: 'open_file_action',
       value: 'open',
       type: 'bootstrap-select',
-      options: [{
-        name: 'Open session',
-        value: 'Open session'
-      }, {divider: true}, {
-        name: 'Annotate columns',
-        value: 'Annotate Columns'
-      }, {
-        name: 'Annotate rows',
-        value: 'Annotate Rows'
-      }, {
-        divider: true
-      }, {
-        name: 'Append rows to current dataset',
-        value: 'append'
-      }, {
-        name: 'Append columns to current dataset',
-        value: 'append columns'
-      }, {
-        name: 'Overlay onto current dataset',
-        value: 'overlay'
-      }, {
-        name: 'Open dataset in new tab',
-        value: 'open'
-      }, {
-        divider: true
-      }, {
-        name: 'Open dendrogram',
-        value: 'Open dendrogram'
-      }]
+      options: morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS
     }];
-    if (this.options.file == null) {
-      array.push({
-        name: 'file',
-        showLabel: false,
-        placeholder: 'Open your own file',
-        value: '',
-        type: 'file',
-        required: true,
-        help: morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS
-      });
+
+    if (this.options.file == null) { // pick file and action
+      params.options = {
+        size: 'modal-lg'
+      };
+    } else {
+      var extension = morpheus.Util.getExtension(morpheus.Util.getFileName(this.options.file));
+      if (extension === 'json') { // TODO no gui needed
+        params[0].options = params[0].options.filter(function (opt) {
+          return opt.value != null && ( opt.value === 'Open session' || opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+        });
+      } else if (extension === 'gct') {
+        params[0].options = params[0].options.filter(function (opt) {
+          return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+        });
+      }
     }
-    array.options = {
-      ok: this.options.file != null,
-      size: 'modal-lg'
-    };
-    return array;
+    return params;
   },
   init: function (project, form, initOptions) {
-    var $preloaded = $('<div></div>');
-    form.$form.find('[name=open_file_action]').on(
-      'change',
-      function (e) {
-        var action = $(this).val();
-        if (action === 'append columns' || action === 'append'
-          || action === 'open' || action === 'overlay') {
-          form.setHelpText('file',
-            morpheus.DatasetUtil.DATASET_FILE_FORMATS);
-          $preloaded.show();
-        } else if (action === 'Open dendrogram') {
-          form.setHelpText('file',
-            morpheus.DatasetUtil.DENDROGRAM_FILE_FORMATS);
-          $preloaded.hide();
-        } else if (action === 'Open session') {
-          form.setHelpText('file', morpheus.DatasetUtil.SESSION_FILE_FORMAT);
-          $preloaded.hide();
-        } else {
-          form.setHelpText('file',
-            morpheus.DatasetUtil.ANNOTATION_FILE_FORMATS);
-          $preloaded.hide();
-        }
-      });
-    if (this.options.file == null) {
-      var _this = this;
-      var collapseId = _.uniqueId('morpheus');
-      $('<h4><a role="button" data-toggle="collapse" href="#'
-        + collapseId
-        + '" aria-expanded="false" aria-controls="'
-        + collapseId + '">Preloaded datasets</a></h4>').appendTo($preloaded);
-      var $sampleDatasets = $('<div data-name="sampleData" id="' + collapseId + '" class="collapse"' +
-        ' id="' + collapseId + '" style="overflow:auto;"></div>');
-      $preloaded.appendTo(form.$form);
-      var sampleDatasets = new morpheus.SampleDatasets({
-        $el: $sampleDatasets,
-        callback: function (heatMapOptions) {
-          _this.options.file = heatMapOptions.dataset;
-          _this.ok();
-        }
-      });
-      $sampleDatasets.appendTo($preloaded);
-    }
-    form.on('change', function (e) {
-      var value = e.value;
-      if (value !== '' && value != null) {
-        form.setValue('file', value);
-        _this.options.file = value;
-        _this.ok();
-      }
-    });
+    var _this = this;
 
+    if (this.options.file == null) {
+      // hide ok and cancel buttons
+      form.setVisible('open_file_action', false);
+      var $div = $('<div></div>');
+      var filePicker = new morpheus.FilePicker({
+        fileCallback: function (fileOrUrl) {
+          $div.hide();
+          _this.options.file = fileOrUrl;
+          // if it's a file, check file type and update choices
+          var extension = morpheus.Util.getExtension(morpheus.Util.getFileName(_this.options.file));
+          if (extension === 'json') { // TODO no gui needed
+            form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.options.filter(function (opt) {
+              return opt.value != null && (opt.value === 'Open session' || opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+            }));
+          } else if (extension === 'gct') {
+            form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.options.filter(function (opt) {
+              return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+            }));
+          }
+          form.setVisible('open_file_action', true);
+        },
+        optionsCallback: function (heatMapOptions) {
+          $div.hide();
+          _this.options.file = heatMapOptions.dataset;
+          form.setVisible('open_file_action', true);
+          form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.options.filter(function (opt) {
+            return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+          }));
+        }
+      });
+      filePicker.$el.appendTo($div);
+      $div.appendTo(form.$form);
+    }
   },
 
   execute: function (options) {

@@ -55,21 +55,26 @@ morpheus.ArrayBufferReader.prototype = {
 morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
   var isString = typeof fileOrUrl === 'string' || fileOrUrl instanceof String;
   if (isString) { // URL
-    var oReq = new XMLHttpRequest();
-    oReq.open('GET', fileOrUrl, true);
-    oReq.responseType = 'arraybuffer';
-    oReq.onload = function (oEvent) {
-      callback(null, oReq.response);
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', fileOrUrl, true);
+    xhr.responseType = 'arraybuffer';
+    if (fileOrUrl.headers) {
+      for (var header in fileOrUrl.headers) {
+        xhr.setRequestHeader(header, fileOrUrl.headers[header]);
+      }
+    }
+    xhr.onload = function (oEvent) {
+      callback(null, xhr.response);
     };
 
-    oReq.onerror = function (oEvent) {
+    xhr.onerror = function (oEvent) {
       callback(oEvent);
     };
-    oReq.onreadystatechange = function (oEvent) {
-      if (oReq.readyState === 4 && oReq.status !== 200) {
-        oReq.onload = null;
-        oReq.onerror = null;
-        if (oReq.status === 404) {
+    xhr.onreadystatechange = function (oEvent) {
+      if (xhr.readyState === 4 && xhr.status !== 200) {
+        xhr.onload = null;
+        xhr.onerror = null;
+        if (xhr.status === 404) {
           callback(new Error(fileOrUrl + ' not found.'));
         } else {
           callback(new Error('Unable to read ' + fileOrUrl + '.'));
@@ -77,8 +82,8 @@ morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
       }
     };
 
-    oReq.send(null);
-    return oReq;
+    xhr.send(null);
+    return xhr;
 
   } else {
     var reader = new FileReader();

@@ -40,24 +40,14 @@ morpheus.LandingPage = function (pageOptions) {
     ' data is' +
     ' processed in the' +
     ' browser and never sent to any server.</div>').appendTo($input);
-  this.$sampleDatasetsEl = $('<div class="morpheus-preloaded"></div>');
-  if (navigator.onLine && !this.sampleDatasets) {
-    this.sampleDatasets = new morpheus.SampleDatasets({
-      $el: this.$sampleDatasetsEl,
-      show: true,
-      callback: function (heatMapOptions) {
-        _this.open(heatMapOptions);
-      }
-    });
-  }
+
   var filePicker = new morpheus.FilePicker({
-    cb: function (file) {
+    fileCallback: function (file) {
       _this.openFile(file);
     },
-    addOn: [{
-      header: '<i class="fa fa-database"></i> Preloaded Datasets',
-      $el: _this.$sampleDatasetsEl
-    }]
+    optionsCallback: function (opt) {
+      _this.open(opt);
+    }
   });
   filePicker.$el.appendTo($input);
 

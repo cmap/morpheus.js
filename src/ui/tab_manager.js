@@ -168,11 +168,12 @@ morpheus.TabManager = function (options) {
     _this.$nav.find('[data-link=' + _this.activeTabId + ']').each(function () {
       $(this).parent().addClass('active');// not added via droptab
     });
+    var scrollTop = document.body.scrollTop;
     $('#' + _this.activeTabId).focus();
+    document.body.scrollTop = scrollTop; // focus can change scroll position
     if (_this.adding) {
       return;
     }
-
     _this.trigger('change', {
       tab: _this.activeTabId,
       previous: previous

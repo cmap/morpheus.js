@@ -15,7 +15,6 @@ if (typeof module !== 'undefined' && module.exports) {
 morpheus.Util = function () {
 };
 
-morpheus.Util.URL = 'https://clue.io/morpheus/';
 morpheus.Util.RIGHT_ARROW = String.fromCharCode(8594);
 /**
  * Add properties in c2 to c1
@@ -223,6 +222,9 @@ morpheus.Util.forceDelete = function (obj) {
 };
 morpheus.Util.getFileName = function (fileOrUrl) {
   if (fileOrUrl instanceof File) {
+    return fileOrUrl.name;
+  }
+  if (fileOrUrl.name !== undefined) {
     return fileOrUrl.name;
   }
   var name = '' + fileOrUrl;
@@ -961,25 +963,26 @@ morpheus.Util.xlsxTo1dArray = function (options, callback) {
 /**
  * Returns a promise that resolves to a string
  */
-morpheus.Util.getText = function (urlOrFile) {
+morpheus.Util.getText = function (fileOrUrl) {
   var deferred = $.Deferred();
-  if (morpheus.Util.isString(urlOrFile)) {
+  if (morpheus.Util.isString(fileOrUrl)) {
     $.ajax({
+      headers: fileOrUrl.headers,
       contentType: 'text/plain',
-      url: urlOrFile,
+      url: fileOrUrl,
     }).done(function (text, status, xhr) {
       // var type = xhr.getResponseHeader('Content-Type');
       deferred.resolve(text);
     });
-  } else if (urlOrFile instanceof File) {
+  } else if (fileOrUrl instanceof File) {
     var reader = new FileReader();
     reader.onload = function (event) {
       deferred.resolve(event.target.result);
     };
-    reader.readAsText(urlOrFile);
+    reader.readAsText(fileOrUrl);
   } else {
-    // what is urlOrFile?
-    deferred.resolve(urlOrFile);
+    // what is fileOrUrl?
+    deferred.resolve(fileOrUrl);
   }
   return deferred.promise();
 };
@@ -1375,11 +1378,16 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
   var deferred = $.Deferred();
   if (isString) { // URL
     if (ext === 'xlsx') {
-      var oReq = new XMLHttpRequest();
-      oReq.open('GET', fileOrUrl, true);
-      $.ajaxPrefilter({url: fileOrUrl}, {}, oReq);
-      oReq.responseType = 'arraybuffer';
-      oReq.onload = function (oEvent) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', fileOrUrl, true);
+      if (fileOrUrl.headers) {
+        for (var header in fileOrUrl.headers) {
+          xhr.setRequestHeader(header, fileOrUrl.headers[header]);
+        }
+      }
+      // $.ajaxPrefilter({url: fileOrUrl}, {}, oReq); // copy ajax pre-filters from ajax
+      xhr.responseType = 'arraybuffer';
+      xhr.onload = function (oEvent) {
         var arrayBuffer = oReq.response;
         if (arrayBuffer) {
           var data = new Uint8Array(arrayBuffer);
@@ -1399,9 +1407,10 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
           throw 'not found';
         }
       };
-      oReq.send(null);
+      xhr.send(null);
     } else {
       $.ajax({
+        headers: fileOrUrl.headers,
         url: fileOrUrl,
       }).done(function (text, status, xhr) {
         deferred.resolve(morpheus.Util.splitOnNewLine(text));
