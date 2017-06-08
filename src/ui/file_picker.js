@@ -92,7 +92,6 @@ morpheus.FilePicker = function (options) {
   html.push('</div>'); // tab-content
   html.push('</div>');
   var $el = $(html.join(''));
-  console.log($el.find('#' + preloaded + ' > .morpheus-landing-panel').length);
   $sampleDatasetsEl.appendTo($el.find('#' + preloaded + ' > .morpheus-landing-panel'));
   this.$el = $el;
 

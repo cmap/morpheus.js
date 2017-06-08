@@ -151,7 +151,7 @@
 }
 
 .morpheus-file-drop.drag {
-    border: 1px dotted #0571b0;
+    border: 2px dotted #0571b0;
 }
 
 .morpheus-file-drop.drag .morpheus-drag-text {
