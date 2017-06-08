@@ -151,16 +151,13 @@
 }
 
 .morpheus-file-drop.drag {
-    border-color: #ca0020;
+    border: 1px dotted #0571b0;
 }
 
 .morpheus-file-drop.drag .morpheus-drag-text {
-    color: #ca0020;
+    color: #0571b0;
 }
 
-.morpheus-file-drop:hover {
-    border-color: #ca0020;
-}
 
 .morpheus-nav {
     border-bottom: none;

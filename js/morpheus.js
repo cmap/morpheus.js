@@ -6911,7 +6911,7 @@ morpheus.CombinedFilter.prototype = {
     this.filters.push(filter);
     if (notify) {
       this.trigger('add', {
-        filter: filter
+        filter: filter,
       });
     }
   },
@@ -6934,7 +6934,7 @@ morpheus.CombinedFilter.prototype = {
     this.filters.splice(index, 1);
     if (notify) {
       this.trigger('remove', {
-        index: index
+        index: index,
       });
     }
   },
@@ -6980,7 +6980,7 @@ morpheus.CombinedFilter.prototype = {
   },
   isEnabled: function () {
     return this.enabledFilters.length > 0;
-  }
+  },
 };
 morpheus.Util.extend(morpheus.CombinedFilter, morpheus.Events);
 /**
@@ -7024,7 +7024,7 @@ morpheus.IndexFilter.prototype = {
    */
   accept: function (index) {
     return this.acceptIndicesSet.has(index);
-  }
+  },
 };
 morpheus.VectorFilter = function (set, maxSetSize, name, isColumns) {
   this.set = set;
@@ -7063,7 +7063,7 @@ morpheus.VectorFilter.prototype = {
    */
   accept: function (index) {
     return this.set.has(this.vector.getValue(index));
-  }
+  },
 };
 
 morpheus.NotNullFilter = function (name, isColumns) {
@@ -7099,7 +7099,7 @@ morpheus.NotNullFilter.prototype = {
    */
   accept: function (index) {
     return this.vector.getValue(index) != null;
-  }
+  },
 };
 
 morpheus.RangeFilter = function (min, max, name, isColumns) {
@@ -7147,7 +7147,7 @@ morpheus.RangeFilter.prototype = {
   accept: function (index) {
     var value = this.vector.getValue(index);
     return value >= this.min && value <= this.max;
-  }
+  },
 };
 
 morpheus.TopNFilter = function (n, direction, name, isColumns) {
@@ -7189,7 +7189,8 @@ morpheus.TopNFilter.prototype = {
   },
 
   init: function (dataset) {
-    if (!this.vector || this.vector !== dataset.getRowMetadata().getByName(this.name)) {
+    if (!this.vector ||
+      this.vector !== dataset.getRowMetadata().getByName(this.name)) {
       var vector = dataset.getRowMetadata().getByName(this.name);
       if (vector == null) {
         vector = {
@@ -7197,7 +7198,7 @@ morpheus.TopNFilter.prototype = {
           },
           size: function () {
             return 0;
-          }
+          },
         };
       }
       this.vector = vector;
@@ -7215,7 +7216,8 @@ morpheus.TopNFilter.prototype = {
       });
       this.sortedValues = values;
     }
-    var topAndBottomIndices = [(this.sortedValues.length - this.n),
+    var topAndBottomIndices = [
+      (this.sortedValues.length - this.n),
       (this.n - 1)];
 
     for (var i = 0; i < topAndBottomIndices.length; i++) {
@@ -7224,7 +7226,8 @@ morpheus.TopNFilter.prototype = {
         topAndBottomIndices[i]);
     }
 
-    var topAndBottomValues = [this.sortedValues[topAndBottomIndices[0]],
+    var topAndBottomValues = [
+      this.sortedValues[topAndBottomIndices[0]],
       this.sortedValues[topAndBottomIndices[1]]];
 
     if (this.direction === morpheus.TopNFilter.TOP) {
@@ -7254,7 +7257,7 @@ morpheus.TopNFilter.prototype = {
   },
   toString: function () {
     return this.name;
-  }
+  },
 };
 
 morpheus.AlwaysTrueFilter = function () {
@@ -7286,12 +7289,13 @@ morpheus.AlwaysTrueFilter.prototype = {
    */
   accept: function (index) {
     return true;
-  }
+  },
 };
 
 morpheus.CombinedFilter.fromJSON = function (combinedFilter, json) {
   combinedFilter.setAnd(json.isAnd);
   json.filters.forEach(function (filter) {
+    var name = filter.name != null ? filter.name : filter.field;
     if (filter.type === 'set') {
       var set = new morpheus.Set();
       filter.values.forEach(function (value) {
@@ -7300,21 +7304,30 @@ morpheus.CombinedFilter.fromJSON = function (combinedFilter, json) {
       combinedFilter.add(new morpheus.VectorFilter(
         set,
         filter.maxSetSize,
-        filter.name,
+        name,
         filter.isColumns
       ));
     } else if (filter.type === 'range') {
       combinedFilter.add(new morpheus.RangeFilter(
         filter.min,
         filter.max,
-        filter.name,
+        name,
         filter.isColumns
       ));
     } else if (filter.type === 'top') {
+      if (_.isString(filter.direction)) {
+        if (filter.direction === 'top') {
+          filter.direction = morpheus.TopNFilter.TOP;
+        } else if (filter.direction === 'bottom') {
+          filter.direction = morpheus.TopNFilter.BOTTOM;
+        } else if (filter.direction === 'topAndBottom') {
+          filter.direction = morpheus.TopNFilter.TOP_BOTTOM;
+        }
+      }
       combinedFilter.add(new morpheus.TopNFilter(
         filter.n,
         filter.direction,
-        filter.name,
+        name,
         filter.isColumns
       ));
     } else if (filter.type === 'index') {
@@ -7324,7 +7337,7 @@ morpheus.CombinedFilter.fromJSON = function (combinedFilter, json) {
       });
       combinedFilter.add(new morpheus.IndexFilter(
         set,
-        filter.name,
+        name,
         filter.isColumns
       ));
     } else {
@@ -7336,7 +7349,7 @@ morpheus.CombinedFilter.fromJSON = function (combinedFilter, json) {
 morpheus.CombinedFilter.toJSON = function (filter) {
   var json = {
     isAnd: filter.isAnd(),
-    filters: []
+    filters: [],
   };
   filter.getFilters().forEach(function (filter) {
     if (filter.isEnabled()) {
@@ -7347,7 +7360,7 @@ morpheus.CombinedFilter.toJSON = function (filter) {
           isColumns: filter.isColumns(),
           values: filter.set.values(),
           maxSetSize: filter.maxSetSize,
-          type: 'set'
+          type: 'set',
         });
       } else if (filter instanceof morpheus.RangeFilter) {
         // morpheus.RangeFilter = function (min, max, name, isColumns)
@@ -7356,16 +7369,17 @@ morpheus.CombinedFilter.toJSON = function (filter) {
           isColumns: filter.isColumns(),
           min: filter.min,
           max: filter.max,
-          type: 'range'
+          type: 'range',
         });
       } else if (filter instanceof morpheus.TopNFilter) {
         // morpheus.TopNFilter = function (n, direction, name, isColumns)
+
         json.filters.push({
           name: filter.name,
           isColumns: filter.isColumns(),
-          min: filter.n,
-          max: filter.direction,
-          type: 'top'
+          n: filter.n,
+          direction: filter.direction,
+          type: 'top',
         });
       } else if (filter instanceof morpheus.IndexFilter) {
         // morpheus.IndexFilter = function (acceptIndicesSet, name, isColumns
@@ -7373,7 +7387,7 @@ morpheus.CombinedFilter.toJSON = function (filter) {
           name: filter.name,
           isColumns: filter.isColumns(),
           indices: filter.acceptIndicesSet.values(),
-          type: 'index'
+          type: 'index',
         });
       }
     }
@@ -11440,7 +11454,7 @@ morpheus.FilePicker = function (options) {
     ' aria-controls="url" role="tab" data-toggle="url"><i class="fa fa-link"></i>' +
     ' URL</a></li>');
   html.push('<li role="presentation"><a href="#dropbox"' +
-    ' aria-controls="dropbox" role="tab" data-toggle="dropbox"><i class="fa fa-link"></i>' +
+    ' aria-controls="dropbox" role="tab" data-toggle="dropbox"><i class="fa fa-dropbox"></i>' +
     ' Dropbox</a></li>');
 
   for (var i = 0; i < options.addOn.length; i++) {
@@ -31314,12 +31328,16 @@ morpheus.Util.extend(morpheus.HeatMap, morpheus.Events);
 
 morpheus.HelpMenu = function () {
   var html = [];
-  html
-  .push('<ul class="morpheus-footer-links">');
+  html.push('<ul class="morpheus-footer-links">');
   html.push('<li><a data-name="contact" href="#">Contact</a></li>');
-  html.push('<li><a data-name="configuration" href="#">Configuration</a></li>');
-  html.push('<li><a data-name="tutorial" href="#">Tutorial</a></li>');
-  html.push('<li><a data-name="source" href="#">Source Code</a></li>');
+  html.push(
+    '<li><a target="_blank" href="configuration.html">Configuration</a></li>');
+  html.push('<li><a target="_blank" href="tutorial.html">Tutorial</a></li>');
+  html.push(
+    '<li><a target="_blank" href="https://github.com/cmap/morpheus.js">Source Code</a></li>');
+  html.push(
+    '<li><a target="_blank" href="https://github.com/cmap/morpheus.R">R Interface</a></li>');
+
   html.push('</ul>');
   html.push('<p>Created and developed by Joshua Gould</p>');
   this.$el = $(html.join(''));
@@ -31327,26 +31345,8 @@ morpheus.HelpMenu = function () {
     morpheus.FormBuilder.showInModal({
       title: 'Contact',
       html: 'Please email us at morpheus@broadinstitute.org',
-      focus: document.activeElement
+      focus: document.activeElement,
     });
-    e.preventDefault();
-
-  });
-  this.$el.find('[data-name=tutorial]').on('click', function (e) {
-    window
-    .open('https://clue.io/morpheus/tutorial.html');
-    e.preventDefault();
-
-  });
-
-  this.$el.find('[data-name=configuration]').on('click', function (e) {
-    window
-    .open('https://clue.io/morpheus/configuration.html');
-    e.preventDefault();
-
-  });
-  this.$el.find('[data-name=source]').on('click', function (e) {
-    window.open('https://github.com/cmap/morpheus.js');
     e.preventDefault();
 
   });
