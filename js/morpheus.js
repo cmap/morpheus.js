@@ -11741,7 +11741,6 @@ morpheus.SampleDatasets = function (options) {
       });
       var tcga = [];
       _this.diseases = diseases;
-
       for (var i = 0; i < diseases.length; i++) {
         var id = _.uniqueId('morpheus');
         var disease = diseases[i];
@@ -11751,56 +11750,30 @@ morpheus.SampleDatasets = function (options) {
           ' aria-controls="' + id + '">' + disease.name + '</a>');
         tcga.push('<div class="collapse" id="' + id + '">');
 
-        tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
-          ' top;">');
-        tcga
-        .push('<label><input type="checkbox" style="margin-left:4px;"' +
-          ' data-toggle="dataTypeToggle"' +
-          ' data-type="mrna"' + (!disease.mrna ? ' disabled' : '') + '>GENE EXPRESSION</label>');
-        tcga
-        .push('<label><input type="checkbox" style="margin-left:4px;"' +
-          ' data-toggle="dataTypeToggle"' +
-          ' data-type="gistic"' + (!disease.mrna ? ' disabled' : '') + '>GISTIC COPY' +
-          ' NUMBER</label>');
+        for (var j = 0; j < morpheus.SampleDatasets.TCGA_DISEASE_TYPES_INFO.length; j++) {
+          var info = morpheus.SampleDatasets.TCGA_DISEASE_TYPES_INFO[j];
+          if (j % 2 === 0) {
+            if (j > 0) {
+              tcga.push('</div>');
+            }
+            tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:top;">');
+          }
+          tcga
+          .push('<label><input type="checkbox" style="margin-left:4px;"' +
+            ' data-toggle="dataTypeToggle"' +
+            ' data-type="' + info.type + '"' + (!disease[info.id] ? ' disabled' : '') + '>' + info.name + '</label>');
+        }
         tcga.push('</div>');
 
-        tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
-          ' top;">');
-        tcga
-        .push('<label><input type="checkbox" style="margin-left:4px;"' +
-          ' data-toggle="dataTypeToggle"' +
-          ' data-type="gisticGene"' + (!disease.mrna ? ' disabled' : '') + '>COPY' +
-          ' NUMBER BY GENE</label>');
-        tcga
-        .push('<label><input type="checkbox" style="margin-left:4px;"' +
-          ' data-toggle="dataTypeToggle"' +
-          ' data-type="sig_genes"' + (!disease.sig_genes ? ' disabled' : '') + '>MUTATION</label>');
-        tcga.push('</div>');
-
-        tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
-          ' top;">');
-        tcga
-        .push('<label><input type="checkbox" style="margin-left:4px;"' +
-          ' data-toggle="dataTypeToggle"' +
-          ' data-type="rppa"' + (!disease.rppa ? ' disabled' : '') + '>PROTEOMICS</label>');
-        tcga
-        .push('<label><input type="checkbox" style="margin-left:4px;"' +
-          ' data-toggle="dataTypeToggle"' +
-          ' data-type="methylation"' + (!disease.rppa ? ' disabled' : '') + '>METHYLATION</label>');
-        tcga.push('</div>');
-
-        tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
-          ' top;">');
+        tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:top;">');
         tcga
         .push('<button disabled type="button" class="btn btn-default" name="tcgaLink"' +
           ' data-disease-type="'
           + disease.type
           + '">Open</button>');
+        tcga.push('</div>'); // collapse
+        tcga.push('</div>'); // button div
         tcga.push('</div>');
-
-        tcga.push('</div>');
-        tcga.push('</div>');
-
       }
 
       $(tcga.join('')).appendTo($el.find('[data-name=tcga]'));
@@ -12000,6 +11973,32 @@ morpheus.SampleDatasets.prototype = {
     });
   }
 };
+
+morpheus.SampleDatasets.TCGA_DISEASE_TYPES_INFO = [{
+  id: 'mrna',
+  name: 'GENE EXPRESSION',
+  type: 'mrna'
+}, {
+  id: 'gistic',
+  name: 'GISTIC COPY NUMBER',
+  type: 'gistic'
+}, {
+  id: 'gistic',
+  name: 'COPY NUMBER BY GENE',
+  type: 'gisticGene'
+}, {
+  id: 'sig_genes',
+  name: 'MUTATION',
+  type: 'sig_genes'
+}, {
+  id: 'rppa',
+  name: 'PROTEOMICS',
+  type: 'rppa'
+}, {
+  id: 'methylation',
+  name: 'METHYLATION',
+  type: 'methylation'
+}];
 
 morpheus.AdjustDataTool = function () {
 };
@@ -20325,9 +20324,11 @@ morpheus.FilePicker = function (options) {
       ' fa-google"></i>' +
       ' Google</a></li>');
   }
-  html.push('<li role="presentation"><a href="#' + dropbox + '"' +
-    ' aria-controls="' + dropbox + '" role="tab" data-toggle="tab"><i class="fa fa-dropbox"></i>' +
-    ' Dropbox</a></li>');
+  if (typeof Dropbox !== 'undefined') {
+    html.push('<li role="presentation"><a href="#' + dropbox + '"' +
+      ' aria-controls="' + dropbox + '" role="tab" data-toggle="tab"><i class="fa fa-dropbox"></i>' +
+      ' Dropbox</a></li>');
+  }
 
   var $sampleDatasetsEl = $('<div class="morpheus-preloaded"></div>');
   if (navigator.onLine) {
@@ -20369,12 +20370,13 @@ morpheus.FilePicker = function (options) {
   html.push('</div>');
   html.push('</div>');
 
-  html.push('<div role="tabpanel" class="tab-pane" id="' + dropbox + '">');
-  html.push('<div class="morpheus-landing-panel">');
-  html.push('<button name="dropbox" class="btn btn-default">Browse Dropbox</button>');
-  html.push('</div>');
-  html.push('</div>');
-
+  if (typeof Dropbox !== 'undefined') {
+    html.push('<div role="tabpanel" class="tab-pane" id="' + dropbox + '">');
+    html.push('<div class="morpheus-landing-panel">');
+    html.push('<button name="dropbox" class="btn btn-default">Browse Dropbox</button>');
+    html.push('</div>');
+    html.push('</div>');
+  }
   if (typeof gapi !== 'undefined') {
     html.push('<div role="tabpanel" class="tab-pane" id="' + googleId + '">');
     html.push('<div class="morpheus-landing-panel">');
@@ -20514,7 +20516,8 @@ morpheus.FilePicker = function (options) {
           url = text;
         } else {
           var blob = new Blob([text]);
-          url = window.URL.createObjectURL(blob);
+          url = new String(window.URL.createObjectURL(blob));
+          url.name = 'clipboard';
         }
         options.fileCallback(url);
       }
