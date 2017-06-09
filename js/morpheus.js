@@ -3117,6 +3117,7 @@ morpheus.GctReader.prototype = {
 };
 
 morpheus.GctWriter = function () {
+  this.nf = morpheus.Util.createNumberFormat('.2f');
 };
 
 morpheus.GctWriter.idFirst = function (model) {
@@ -3142,8 +3143,8 @@ morpheus.GctWriter.idFirst = function (model) {
 };
 
 morpheus.GctWriter.prototype = {
-  toString: function (value) {
-    return morpheus.Util.toString(value);
+  setNumberFormat: function (nf) {
+    this.nf = nf;
   },
   getExtension: function () {
     return 'gct';
@@ -3162,22 +3163,24 @@ morpheus.GctWriter.prototype = {
   writeData: function (dataset, rowMetadata, pw) {
     var ncols = dataset.getColumnCount();
     var rowMetadataCount = rowMetadata.getMetadataCount();
+    var nf = this.nf;
     for (var i = 0, rows = dataset.getRowCount(); i < rows; i++) {
       for (var rowMetadataIndex = 0; rowMetadataIndex < rowMetadataCount; rowMetadataIndex++) {
         if (rowMetadataIndex > 0) {
           pw.push('\t');
         }
-        var value = rowMetadata.get(rowMetadataIndex).getValue(i);
+        var vector = rowMetadata.get(rowMetadataIndex);
+        var value = vector.getValue(i);
+
         if (value !== null) {
-          pw.push(this.toString(value));
+          var toString = morpheus.VectorTrack.vectorToString(vector);
+          pw.push(toString(value));
         }
       }
       for (var j = 0; j < ncols; j++) {
         pw.push('\t');
         var value = dataset.getValue(i, j);
-        // pw.push((value != null && value.toObject) ? JSON
-        // .stringify(value.toObject()) : morpheus.Util.nf(value));
-        pw.push(morpheus.Util.nf(value));
+        pw.push(nf(value));
       }
       pw.push('\n');
     }
@@ -3200,9 +3203,10 @@ morpheus.GctWriter.prototype = {
       }
       pw.push(name);
     }
+    var toString = morpheus.VectorTrack.vectorToString(columnMetadata.get(0));
     for (var j = 0; j < ncols; j++) {
       pw.push('\t');
-      pw.push(this.toString(columnMetadata.get(0).getValue(j)));
+      pw.push(toString(columnMetadata.get(0).getValue(j)));
     }
     pw.push('\n');
     for (var columnMetadataIndex = 1, metadataSize = columnMetadata
@@ -3214,9 +3218,11 @@ morpheus.GctWriter.prototype = {
       }
       for (var j = 0; j < ncols; j++) {
         pw.push('\t');
-        var value = columnMetadata.get(columnMetadataIndex).getValue(j);
+        var vector = columnMetadata.get(columnMetadataIndex);
+        var value = vector.getValue(j);
         if (value != null) {
-          pw.push(this.toString(value));
+          toString = morpheus.VectorTrack.vectorToString(columnMetadata.get(0));
+          pw.push(toString(value));
         }
       }
       pw.push('\n');
@@ -3230,10 +3236,11 @@ morpheus.GctWriter12 = function () {
     rowId: 'id',
     columnId: 'id'
   };
+  this.nf = morpheus.Util.createNumberFormat('.2f');
 };
 morpheus.GctWriter12.prototype = {
-  toString: function (value) {
-    return morpheus.Util.toString(value);
+  setNumberFormat: function (nf) {
+    this.nf = nf;
   },
   getExtension: function () {
     return 'gct';
@@ -3259,9 +3266,10 @@ morpheus.GctWriter12.prototype = {
     if (!columnIds) {
       columnIds = columnMetadata.get(0);
     }
+    var columnIdToString = morpheus.VectorTrack.vectorToString(columnIds);
     for (var j = 0; j < columns; j++) {
       pw.push('\t');
-      pw.push(this.toString(columnIds.getValue(j)));
+      pw.push(columnIdToString(columnIds.getValue(j)));
     }
     var rowIds = rowMetadata.get(this.options.rowId);
     if (!rowIds) {
@@ -3272,19 +3280,21 @@ morpheus.GctWriter12.prototype = {
     if (rowDescriptions == null && rowMetadata.getMetadataCount() > 1) {
       rowDescriptions = rowMetadata.get(1);
     }
-
+    var rowIdToString = morpheus.VectorTrack.vectorToString(rowIds);
+    var rowDescriptionToString = rowDescriptions != null ? morpheus.VectorTrack.vectorToString(rowDescriptions) : null;
+    var nf = this.nf;
     for (var i = 0; i < rows; i++) {
       pw.push('\n');
-      pw.push(this.toString(rowIds.getValue(i)));
+      pw.push(rowIdToString(rowIds.getValue(i)));
       pw.push('\t');
       var rowDescription = rowDescriptions != null ? rowDescriptions
-        .getValue(i) : null;
+      .getValue(i) : null;
       if (rowDescription != null) {
-        pw.push(this.toString(rowDescription));
+        pw.push(rowDescriptionToString(rowDescription));
       }
       for (var j = 0; j < columns; j++) {
         pw.push('\t');
-        pw.push(morpheus.Util.nf(dataset.getValue(i, j)));
+        pw.push(nf(dataset.getValue(i, j)));
       }
     }
     pw.push('\n');
@@ -15587,7 +15597,7 @@ morpheus.SaveDatasetTool.prototype = {
     if (ext !== '' && !morpheus.Util.endsWith(fileName.toLowerCase(), '.' + ext)) {
       fileName += '.' + ext;
     }
-
+    writer.setNumberFormat(heatMap.getHeatMapElementComponent().getDrawValuesFormat());
     var blobs = [];
     var textArray = [];
     var proxy = {

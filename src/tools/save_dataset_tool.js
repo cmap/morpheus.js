@@ -72,7 +72,7 @@ morpheus.SaveDatasetTool.prototype = {
     if (ext !== '' && !morpheus.Util.endsWith(fileName.toLowerCase(), '.' + ext)) {
       fileName += '.' + ext;
     }
-
+    writer.setNumberFormat(heatMap.getHeatMapElementComponent().getDrawValuesFormat());
     var blobs = [];
     var textArray = [];
     var proxy = {
