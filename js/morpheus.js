@@ -15155,7 +15155,9 @@ morpheus.OpenFileTool.prototype = {
 
     if (this.options.file == null) { // pick file and action
       params.options = {
-        size: 'modal-lg'
+        size: 'modal-lg',
+        cancel: false,
+        ok: false
       };
     } else {
       var extension = morpheus.Util.getExtension(morpheus.Util.getFileName(this.options.file));
@@ -15175,21 +15177,27 @@ morpheus.OpenFileTool.prototype = {
     var _this = this;
 
     if (this.options.file == null) {
-      // hide ok and cancel buttons
+
       form.setVisible('open_file_action', false);
       var $div = $('<div></div>');
+      var $ok = $('<div style="display:none;padding:15px;text-align:right;"><button name="ok" type="button" class="btn' +
+        ' btn-default">OK</button></div>');
+      $ok.find('[name=ok]').on('click', function () {
+        _this.ok();
+      });
       var filePicker = new morpheus.FilePicker({
         fileCallback: function (fileOrUrl) {
           $div.hide();
+          $ok.show();
           _this.options.file = fileOrUrl;
           // if it's a file, check file type and update choices
           var extension = morpheus.Util.getExtension(morpheus.Util.getFileName(_this.options.file));
           if (extension === 'json') { // TODO no gui needed
-            form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.options.filter(function (opt) {
+            form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(function (opt) {
               return opt.value != null && (opt.value === 'Open session' || opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
             }));
           } else if (extension === 'gct') {
-            form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.options.filter(function (opt) {
+            form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(function (opt) {
               return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
             }));
           }
@@ -15197,14 +15205,16 @@ morpheus.OpenFileTool.prototype = {
         },
         optionsCallback: function (heatMapOptions) {
           $div.hide();
+          $ok.show();
           _this.options.file = heatMapOptions.dataset;
           form.setVisible('open_file_action', true);
-          form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.options.filter(function (opt) {
+          form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(function (opt) {
             return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
           }));
         }
       });
       filePicker.$el.appendTo($div);
+      $ok.appendTo(form.$form);
       $div.appendTo(form.$form);
     }
   },
@@ -20376,7 +20386,8 @@ morpheus.FilePicker = function (options) {
   html.push('<div class="morpheus-landing-panel">');
   html.push('<input name="url" placeholder="Enter a URL" class="form-control"' +
     ' style="display:inline;max-width:400px;' +
-    ' type="text">');
+    ' type="text"><button name="openUrl" class="btn btn-default"' +
+    ' type="button">Go</button>');
   html.push('</div>');
   html.push('</div>');
 
@@ -20421,6 +20432,13 @@ morpheus.FilePicker = function (options) {
       }
     }
   });
+  $el.find('[name=openUrl]').on('click', function (evt) {
+    var text = $.trim($url.val());
+    if (text !== '') {
+      options.fileCallback(text);
+    }
+  });
+
   var $dropbox = $el.find('[name=dropbox]');
   $dropbox.on('click', function (e) {
     Dropbox.choose({

@@ -68,7 +68,8 @@ morpheus.FilePicker = function (options) {
   html.push('<div class="morpheus-landing-panel">');
   html.push('<input name="url" placeholder="Enter a URL" class="form-control"' +
     ' style="display:inline;max-width:400px;' +
-    ' type="text">');
+    ' type="text"><button name="openUrl" class="btn btn-default"' +
+    ' type="button">Go</button>');
   html.push('</div>');
   html.push('</div>');
 
@@ -113,6 +114,13 @@ morpheus.FilePicker = function (options) {
       }
     }
   });
+  $el.find('[name=openUrl]').on('click', function (evt) {
+    var text = $.trim($url.val());
+    if (text !== '') {
+      options.fileCallback(text);
+    }
+  });
+
   var $dropbox = $el.find('[name=dropbox]');
   $dropbox.on('click', function (e) {
     Dropbox.choose({
