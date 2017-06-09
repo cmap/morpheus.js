@@ -26,9 +26,11 @@ morpheus.FilePicker = function (options) {
       ' fa-google"></i>' +
       ' Google</a></li>');
   }
-  html.push('<li role="presentation"><a href="#' + dropbox + '"' +
-    ' aria-controls="' + dropbox + '" role="tab" data-toggle="tab"><i class="fa fa-dropbox"></i>' +
-    ' Dropbox</a></li>');
+  if (typeof Dropbox !== 'undefined') {
+    html.push('<li role="presentation"><a href="#' + dropbox + '"' +
+      ' aria-controls="' + dropbox + '" role="tab" data-toggle="tab"><i class="fa fa-dropbox"></i>' +
+      ' Dropbox</a></li>');
+  }
 
   var $sampleDatasetsEl = $('<div class="morpheus-preloaded"></div>');
   if (navigator.onLine) {
@@ -70,12 +72,13 @@ morpheus.FilePicker = function (options) {
   html.push('</div>');
   html.push('</div>');
 
-  html.push('<div role="tabpanel" class="tab-pane" id="' + dropbox + '">');
-  html.push('<div class="morpheus-landing-panel">');
-  html.push('<button name="dropbox" class="btn btn-default">Browse Dropbox</button>');
-  html.push('</div>');
-  html.push('</div>');
-
+  if (typeof Dropbox !== 'undefined') {
+    html.push('<div role="tabpanel" class="tab-pane" id="' + dropbox + '">');
+    html.push('<div class="morpheus-landing-panel">');
+    html.push('<button name="dropbox" class="btn btn-default">Browse Dropbox</button>');
+    html.push('</div>');
+    html.push('</div>');
+  }
   if (typeof gapi !== 'undefined') {
     html.push('<div role="tabpanel" class="tab-pane" id="' + googleId + '">');
     html.push('<div class="morpheus-landing-panel">');
@@ -215,7 +218,8 @@ morpheus.FilePicker = function (options) {
           url = text;
         } else {
           var blob = new Blob([text]);
-          url = window.URL.createObjectURL(blob);
+          url = new String(window.URL.createObjectURL(blob));
+          url.name = 'clipboard';
         }
         options.fileCallback(url);
       }
