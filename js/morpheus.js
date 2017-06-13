@@ -18537,6 +18537,10 @@ morpheus.CanvasUtil.dragging = false;
 
 morpheus.CanvasUtil.FONT_NAME = '"Helvetica Neue",Helvetica,Arial,sans-serif';
 morpheus.CanvasUtil.FONT_COLOR = 'rgb(0, 0, 0)';
+morpheus.CanvasUtil.getFontFamily = function (context) {
+  // older versions of Adobe choke when a font family contains a font that is not installed
+  return context instanceof C2S ? 'Helvetica' : morpheus.CanvasUtil.FONT_NAME;
+};
 morpheus.CanvasUtil.getPreferredSize = function (c) {
   var size = c.getPreferredSize();
   var prefWidth = c.getPrefWidth();
@@ -18694,7 +18698,7 @@ morpheus.CanvasUtil.createCanvas = function () {
   return $c[0];
 };
 morpheus.CanvasUtil.getHeaderStringWidth = function (context, s) {
-  context.font = '14px ' + morpheus.CanvasUtil.FONT_NAME;
+  context.font = '14px ' + morpheus.CanvasUtil.getFontFamily(context);
   return context.measureText(s).width + 18;
 };
 
@@ -18710,7 +18714,7 @@ morpheus.CanvasUtil.getVectorStringWidth = function (context, vector, positions,
   if (fontSize <= 0) {
     return 0;
   }
-  context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+  context.font = fontSize + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
   var toString = morpheus.VectorTrack.vectorToString(vector);
   var maxWidth = 0;
   // var maxWidth2 = 0;
@@ -20509,20 +20513,6 @@ morpheus.FilePicker = function (options) {
         url.name = fileName;
         url.headers = {'Authorization': 'Bearer ' + accessToken};
         options.fileCallback(url);
-        // xhr.open('GET', url, true);
-        //   xhr.open('GET', 'https://www.googleapis.com/drive/v3/files/' + file.id +
-        // '/export/?mimeType=' + file.mimeType, true);
-        //  xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
-        //   xhr.onload = function () {
-        //     var text = xhr.responseText;
-        //     var ext = morpheus.Util.getExtension(fileName);
-        //     var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, {interactive: true});
-        //     if (datasetReader == null) {
-        //       datasetReader = new morpheus.Array2dReaderInteractive();
-        //     }
-        //     options.fileCallback(datasetReader.read());
-        //   };
-        //   xhr.send();
       }
 
     }
@@ -22926,7 +22916,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
   if (!legendHeight) {
     legendHeight = 12;
   }
-  context.font = '11px ' + morpheus.CanvasUtil.FONT_NAME;
+  context.font = '11px ' + morpheus.CanvasUtil.getFontFamily(context);
   var names = colorScheme.getNames();
   var hasNames = names != null;
   // if hasNames that we draw vertically to ensure space for names
@@ -23010,7 +23000,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorSchemeVertically = function (context,
   var xpix = 0;
   var ypix = 0;
 
-  context.font = '12px ' + morpheus.CanvasUtil.FONT_NAME;
+  context.font = '12px ' + morpheus.CanvasUtil.getFontFamily(context);
   for (var i = 0; i < colors.length; i++) {
     var name = names[i];
     if (name != null) {
@@ -23027,7 +23017,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorSchemeVertically = function (context,
         // else {
         // context.fillText("\uf096", -14, ypix); // unchecked
         // }
-        context.font = '12px ' + morpheus.CanvasUtil.FONT_NAME;
+        context.font = '12px ' + morpheus.CanvasUtil.getFontFamily(context);
       }
       context.fillText(name, xpix + 16, ypix);
     }
@@ -24073,7 +24063,7 @@ morpheus.HeatMapElementCanvas.prototype = {
     var top = options.top;
     var bottom = options.bottom;
     var context = options.context;
-
+    var fontFamily = morpheus.CanvasUtil.getFontFamily(context);
     var columnPositions = this.columnPositions;
     var rowPositions = this.rowPositions;
     //if (rowPositions.getSize() < 1 || columnPositions.getSize() < 1) {
@@ -24094,11 +24084,11 @@ morpheus.HeatMapElementCanvas.prototype = {
     if (drawValues) {
       nf = this.drawValuesFormat;
       var fontSize = columnPositions.getSize();
-      context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+      context.font = fontSize + 'px ' + fontFamily;
       var textWidth = context.measureText('-99.9').width;
       fontSize = ( (columnPositions.getSize() - 1) / textWidth) * fontSize;
       fontSize = Math.min(fontSize, 17);
-      context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+      context.font = fontSize + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
     }
     var seriesNameToIndex = {};
     for (var i = 0; i < dataset.getSeriesCount(); i++) {
@@ -27086,7 +27076,7 @@ morpheus.HeatMapTrackColorLegend.prototype = {
     var maxYPix = 0;
     var canvas = this.canvas;
     var context = canvas.getContext('2d');
-    context.font = '12px ' + morpheus.CanvasUtil.FONT_NAME;
+    context.font = '12px ' + morpheus.CanvasUtil.getFontFamily(context);
     for (var i = 0; i < tracks.length; i++) {
       ypix = 0;
       var maxWidth = 0;
@@ -27123,7 +27113,7 @@ morpheus.HeatMapTrackColorLegend.prototype = {
       var ypix = 0;
       var vector = tracks[i].getVector();
       context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
-      context.font = '12px ' + morpheus.CanvasUtil.FONT_NAME;
+      context.font = '12px ' + morpheus.CanvasUtil.getFontFamily(context);
       context.textAlign = 'left';
       // draw name
       context.textBaseline = 'top';
@@ -27217,7 +27207,7 @@ morpheus.HeatMapTrackShapeLegend.prototype = {
     var ypix = 0;
     context.textAlign = 'left';
     context.textBaseline = 'top';
-    context.font = '12px ' + morpheus.CanvasUtil.FONT_NAME;
+    context.font = '12px ' + morpheus.CanvasUtil.getFontFamily(context);
     context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
     context.strokeStyle = 'black';
     for (var i = 0; i < tracks.length; i++) {
@@ -30625,8 +30615,13 @@ morpheus.HeatMap.prototype = {
       var context = new C2S(bounds.width, bounds.height);
       this.snapshot(context);
       var svg = context.getSerializedSvg();
-      svg = '<?xml version="1.0" encoding="utf-8" standalone="no"?><!DOCTYPE svg PUBLIC' +
-        ' "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' + svg; // make adobe happy
+      var prefix = [];
+
+      prefix.push('<?xml version="1.0" encoding="utf-8"?>\n');
+      prefix.push('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"' +
+        ' "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n');
+
+      svg = prefix.join('') + svg;
       var blob = new Blob([svg], {
         type: 'text/plain;charset=utf-8'
       });
@@ -31586,10 +31581,10 @@ morpheus.HistogramLegend.prototype = {
     var y0 = countToPosition(0);
 
     if (this.name != null) {
-      context.font = '11px ' + morpheus.CanvasUtil.FONT_NAME;
+      context.font = '11px ' + morpheus.CanvasUtil.getFontFamily(context);
       context.fillStyle = 'black';
       context.lineWidth = 1;
-    //  context.textBaseline = 'top';
+      //  context.textBaseline = 'top';
       context.fillText(this.name, 0.5, 12);
       context.translate(0, 14);
     }
@@ -32572,12 +32567,12 @@ morpheus.SortByValuesIndicator.prototype = {
     var isVertical = this.isVertical;
     var positions = this.positions;
     var sortKeys = isVertical ? project.getColumnSortKeys() : project
-      .getRowSortKeys();
+    .getRowSortKeys();
     context.translate(-clip.x, -clip.y);
     context.fillStyle = 'black';
     context.textBaseline = 'top';
     context.textAlign = 'left';
-    context.font = '8px ' + morpheus.CanvasUtil.FONT_NAME;
+    context.font = '8px ' + morpheus.CanvasUtil.getFontFamily(context);
     var start = 0;
     var end = positions.getLength();
     if (!isVertical) {
@@ -32599,8 +32594,8 @@ morpheus.SortByValuesIndicator.prototype = {
         for (var j = 0; j < modelIndices.length; j++) {
           var modelIndex = modelIndices[j];
           var view = isVertical ? project
-            .convertModelRowIndexToView(modelIndex) : project
-            .convertModelColumnIndexToView(modelIndex);
+          .convertModelRowIndexToView(modelIndex) : project
+          .convertModelColumnIndexToView(modelIndex);
           if (view !== -1 && view >= start && view < end) {
             context.save();
             var pix = positions.getPosition(view);
@@ -34672,7 +34667,7 @@ morpheus.VectorTrackHeader.prototype = {
   getPrintSize: function () {
     var context = this.canvas.getContext('2d');
     context.font = this.defaultFontHeight + 'px '
-      + morpheus.CanvasUtil.FONT_NAME;
+      + morpheus.CanvasUtil.getFontFamily(context);
     var textWidth = 4 + context.measureText(this.name).width;
     return {
       width: textWidth,
@@ -34786,11 +34781,11 @@ morpheus.VectorTrackHeader.prototype = {
       context.textAlign = 'right';
       context.font = Math.min(this.defaultFontHeight, clip.height
           - morpheus.VectorTrackHeader.FONT_OFFSET)
-        + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+        + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
     } else {
       context.textAlign = 'left';
       context.font = (clip.height - morpheus.VectorTrackHeader.FONT_OFFSET)
-        + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+        + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
     }
     context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
     context.fillText(this.name, 0, 0);
@@ -34829,7 +34824,7 @@ morpheus.VectorTrackHeader.prototype = {
       .getUnscaledHeight()
       - morpheus.VectorTrackHeader.FONT_OFFSET);
     fontHeight = Math.min(fontHeight, morpheus.VectorTrack.MAX_FONT_SIZE);
-    context.font = fontHeight + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+    context.font = fontHeight + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
     var textWidth = context.measureText(name).width;
     var isColumns = this.isColumns;
     var xpix = this.isColumns ? this.getUnscaledWidth() - 2 : 10;
@@ -35014,7 +35009,7 @@ morpheus.VectorTrackHeader.prototype = {
       morpheus.CanvasUtil.resetTransform(context);
       if (sortKeys[existingSortKeyIndex.index].getLockOrder() === 0 && unlockedSortKeys.length > 1) {
         context.textAlign = 'left';
-        context.font = '8px ' + morpheus.CanvasUtil.FONT_NAME;
+        context.font = '8px ' + morpheus.CanvasUtil.getFontFamily(context);
         context.fillText('' + (existingSortKeyIndex.number), x + 4,
           ypix - 3);
       }
@@ -35049,23 +35044,6 @@ morpheus.VectorTrack = function (project, name, positions, isColumns, heatmap) {
   };
   // for molecule span
   this.events = 'rowSortOrderChanged rowFilterChanged datasetChanged';
-  var isTruncated = function (index) {
-    if (index !== -1) {
-      var size = _this.positions.getItemSize(index);
-      if (size < 6) {
-        return true;
-      }
-      var vector = _this.getVector();
-      var val = vector.getValue(index);
-      if (val != null && val !== '') {
-        var toString = morpheus.VectorTrack.vectorToString(vector);
-        var fontSize = Math.min(morpheus.VectorTrack.MAX_FONT_SIZE, _this.positions.getSize() - 2);
-        var context = _this.canvas.getContext('2d');
-        context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
-        return context.measureText(toString(val)).width > this.textWidth;
-      }
-    }
-  };
   var mouseMoved = function (event) {
     var index = -1;
     if (event.type !== 'mouseout') {
@@ -35801,7 +35779,7 @@ morpheus.VectorTrack.prototype = {
 
     var fontSize = Math.min(morpheus.VectorTrack.MAX_FONT_SIZE, positions.getSize() - 2);
     var size = 0;
-    context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+    context.font = fontSize + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
     context.strokeStyle = morpheus.HeatMapElementCanvas.GRID_COLOR;
     context.lineWidth = 0.1;
     // grid lines

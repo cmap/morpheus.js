@@ -4,6 +4,10 @@ morpheus.CanvasUtil.dragging = false;
 
 morpheus.CanvasUtil.FONT_NAME = '"Helvetica Neue",Helvetica,Arial,sans-serif';
 morpheus.CanvasUtil.FONT_COLOR = 'rgb(0, 0, 0)';
+morpheus.CanvasUtil.getFontFamily = function (context) {
+  // older versions of Adobe choke when a font family contains a font that is not installed
+  return context instanceof C2S ? 'Helvetica' : morpheus.CanvasUtil.FONT_NAME;
+};
 morpheus.CanvasUtil.getPreferredSize = function (c) {
   var size = c.getPreferredSize();
   var prefWidth = c.getPrefWidth();
@@ -161,7 +165,7 @@ morpheus.CanvasUtil.createCanvas = function () {
   return $c[0];
 };
 morpheus.CanvasUtil.getHeaderStringWidth = function (context, s) {
-  context.font = '14px ' + morpheus.CanvasUtil.FONT_NAME;
+  context.font = '14px ' + morpheus.CanvasUtil.getFontFamily(context);
   return context.measureText(s).width + 18;
 };
 
@@ -177,7 +181,7 @@ morpheus.CanvasUtil.getVectorStringWidth = function (context, vector, positions,
   if (fontSize <= 0) {
     return 0;
   }
-  context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+  context.font = fontSize + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
   var toString = morpheus.VectorTrack.vectorToString(vector);
   var maxWidth = 0;
   // var maxWidth2 = 0;

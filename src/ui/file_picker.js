@@ -191,20 +191,6 @@ morpheus.FilePicker = function (options) {
         url.name = fileName;
         url.headers = {'Authorization': 'Bearer ' + accessToken};
         options.fileCallback(url);
-        // xhr.open('GET', url, true);
-        //   xhr.open('GET', 'https://www.googleapis.com/drive/v3/files/' + file.id +
-        // '/export/?mimeType=' + file.mimeType, true);
-        //  xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
-        //   xhr.onload = function () {
-        //     var text = xhr.responseText;
-        //     var ext = morpheus.Util.getExtension(fileName);
-        //     var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, {interactive: true});
-        //     if (datasetReader == null) {
-        //       datasetReader = new morpheus.Array2dReaderInteractive();
-        //     }
-        //     options.fileCallback(datasetReader.read());
-        //   };
-        //   xhr.send();
       }
 
     }

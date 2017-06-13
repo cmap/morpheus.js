@@ -13,7 +13,7 @@ morpheus.HeatMapTrackColorLegend.prototype = {
     var maxYPix = 0;
     var canvas = this.canvas;
     var context = canvas.getContext('2d');
-    context.font = '12px ' + morpheus.CanvasUtil.FONT_NAME;
+    context.font = '12px ' + morpheus.CanvasUtil.getFontFamily(context);
     for (var i = 0; i < tracks.length; i++) {
       ypix = 0;
       var maxWidth = 0;
@@ -50,7 +50,7 @@ morpheus.HeatMapTrackColorLegend.prototype = {
       var ypix = 0;
       var vector = tracks[i].getVector();
       context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
-      context.font = '12px ' + morpheus.CanvasUtil.FONT_NAME;
+      context.font = '12px ' + morpheus.CanvasUtil.getFontFamily(context);
       context.textAlign = 'left';
       // draw name
       context.textBaseline = 'top';

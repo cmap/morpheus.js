@@ -354,7 +354,7 @@ morpheus.VectorTrackHeader.prototype = {
   getPrintSize: function () {
     var context = this.canvas.getContext('2d');
     context.font = this.defaultFontHeight + 'px '
-      + morpheus.CanvasUtil.FONT_NAME;
+      + morpheus.CanvasUtil.getFontFamily(context);
     var textWidth = 4 + context.measureText(this.name).width;
     return {
       width: textWidth,
@@ -468,11 +468,11 @@ morpheus.VectorTrackHeader.prototype = {
       context.textAlign = 'right';
       context.font = Math.min(this.defaultFontHeight, clip.height
           - morpheus.VectorTrackHeader.FONT_OFFSET)
-        + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+        + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
     } else {
       context.textAlign = 'left';
       context.font = (clip.height - morpheus.VectorTrackHeader.FONT_OFFSET)
-        + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+        + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
     }
     context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
     context.fillText(this.name, 0, 0);
@@ -511,7 +511,7 @@ morpheus.VectorTrackHeader.prototype = {
       .getUnscaledHeight()
       - morpheus.VectorTrackHeader.FONT_OFFSET);
     fontHeight = Math.min(fontHeight, morpheus.VectorTrack.MAX_FONT_SIZE);
-    context.font = fontHeight + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+    context.font = fontHeight + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
     var textWidth = context.measureText(name).width;
     var isColumns = this.isColumns;
     var xpix = this.isColumns ? this.getUnscaledWidth() - 2 : 10;
@@ -696,7 +696,7 @@ morpheus.VectorTrackHeader.prototype = {
       morpheus.CanvasUtil.resetTransform(context);
       if (sortKeys[existingSortKeyIndex.index].getLockOrder() === 0 && unlockedSortKeys.length > 1) {
         context.textAlign = 'left';
-        context.font = '8px ' + morpheus.CanvasUtil.FONT_NAME;
+        context.font = '8px ' + morpheus.CanvasUtil.getFontFamily(context);
         context.fillText('' + (existingSortKeyIndex.number), x + 4,
           ypix - 3);
       }

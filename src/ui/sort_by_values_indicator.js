@@ -32,12 +32,12 @@ morpheus.SortByValuesIndicator.prototype = {
     var isVertical = this.isVertical;
     var positions = this.positions;
     var sortKeys = isVertical ? project.getColumnSortKeys() : project
-      .getRowSortKeys();
+    .getRowSortKeys();
     context.translate(-clip.x, -clip.y);
     context.fillStyle = 'black';
     context.textBaseline = 'top';
     context.textAlign = 'left';
-    context.font = '8px ' + morpheus.CanvasUtil.FONT_NAME;
+    context.font = '8px ' + morpheus.CanvasUtil.getFontFamily(context);
     var start = 0;
     var end = positions.getLength();
     if (!isVertical) {
@@ -59,8 +59,8 @@ morpheus.SortByValuesIndicator.prototype = {
         for (var j = 0; j < modelIndices.length; j++) {
           var modelIndex = modelIndices[j];
           var view = isVertical ? project
-            .convertModelRowIndexToView(modelIndex) : project
-            .convertModelColumnIndexToView(modelIndex);
+          .convertModelRowIndexToView(modelIndex) : project
+          .convertModelColumnIndexToView(modelIndex);
           if (view !== -1 && view >= start && view < end) {
             context.save();
             var pix = positions.getPosition(view);

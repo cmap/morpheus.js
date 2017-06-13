@@ -90,10 +90,10 @@ morpheus.HistogramLegend.prototype = {
     var y0 = countToPosition(0);
 
     if (this.name != null) {
-      context.font = '11px ' + morpheus.CanvasUtil.FONT_NAME;
+      context.font = '11px ' + morpheus.CanvasUtil.getFontFamily(context);
       context.fillStyle = 'black';
       context.lineWidth = 1;
-    //  context.textBaseline = 'top';
+      //  context.textBaseline = 'top';
       context.fillText(this.name, 0.5, 12);
       context.translate(0, 14);
     }

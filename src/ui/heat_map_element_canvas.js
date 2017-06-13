@@ -308,7 +308,7 @@ morpheus.HeatMapElementCanvas.prototype = {
     var top = options.top;
     var bottom = options.bottom;
     var context = options.context;
-
+    var fontFamily = morpheus.CanvasUtil.getFontFamily(context);
     var columnPositions = this.columnPositions;
     var rowPositions = this.rowPositions;
     //if (rowPositions.getSize() < 1 || columnPositions.getSize() < 1) {
@@ -329,11 +329,11 @@ morpheus.HeatMapElementCanvas.prototype = {
     if (drawValues) {
       nf = this.drawValuesFormat;
       var fontSize = columnPositions.getSize();
-      context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+      context.font = fontSize + 'px ' + fontFamily;
       var textWidth = context.measureText('-99.9').width;
       fontSize = ( (columnPositions.getSize() - 1) / textWidth) * fontSize;
       fontSize = Math.min(fontSize, 17);
-      context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+      context.font = fontSize + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
     }
     var seriesNameToIndex = {};
     for (var i = 0; i < dataset.getSeriesCount(); i++) {

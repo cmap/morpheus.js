@@ -24,23 +24,6 @@ morpheus.VectorTrack = function (project, name, positions, isColumns, heatmap) {
   };
   // for molecule span
   this.events = 'rowSortOrderChanged rowFilterChanged datasetChanged';
-  var isTruncated = function (index) {
-    if (index !== -1) {
-      var size = _this.positions.getItemSize(index);
-      if (size < 6) {
-        return true;
-      }
-      var vector = _this.getVector();
-      var val = vector.getValue(index);
-      if (val != null && val !== '') {
-        var toString = morpheus.VectorTrack.vectorToString(vector);
-        var fontSize = Math.min(morpheus.VectorTrack.MAX_FONT_SIZE, _this.positions.getSize() - 2);
-        var context = _this.canvas.getContext('2d');
-        context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
-        return context.measureText(toString(val)).width > this.textWidth;
-      }
-    }
-  };
   var mouseMoved = function (event) {
     var index = -1;
     if (event.type !== 'mouseout') {
@@ -776,7 +759,7 @@ morpheus.VectorTrack.prototype = {
 
     var fontSize = Math.min(morpheus.VectorTrack.MAX_FONT_SIZE, positions.getSize() - 2);
     var size = 0;
-    context.font = fontSize + 'px ' + morpheus.CanvasUtil.FONT_NAME;
+    context.font = fontSize + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
     context.strokeStyle = morpheus.HeatMapElementCanvas.GRID_COLOR;
     context.lineWidth = 0.1;
     // grid lines

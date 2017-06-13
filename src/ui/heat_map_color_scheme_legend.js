@@ -57,7 +57,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
   if (!legendHeight) {
     legendHeight = 12;
   }
-  context.font = '11px ' + morpheus.CanvasUtil.FONT_NAME;
+  context.font = '11px ' + morpheus.CanvasUtil.getFontFamily(context);
   var names = colorScheme.getNames();
   var hasNames = names != null;
   // if hasNames that we draw vertically to ensure space for names
@@ -141,7 +141,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorSchemeVertically = function (context,
   var xpix = 0;
   var ypix = 0;
 
-  context.font = '12px ' + morpheus.CanvasUtil.FONT_NAME;
+  context.font = '12px ' + morpheus.CanvasUtil.getFontFamily(context);
   for (var i = 0; i < colors.length; i++) {
     var name = names[i];
     if (name != null) {
@@ -158,7 +158,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorSchemeVertically = function (context,
         // else {
         // context.fillText("\uf096", -14, ypix); // unchecked
         // }
-        context.font = '12px ' + morpheus.CanvasUtil.FONT_NAME;
+        context.font = '12px ' + morpheus.CanvasUtil.getFontFamily(context);
       }
       context.fillText(name, xpix + 16, ypix);
     }
