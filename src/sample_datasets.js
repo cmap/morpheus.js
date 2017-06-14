@@ -214,7 +214,7 @@ morpheus.SampleDatasets.getTcgaDataset = function (options) {
   datasetOptions.columnAnnotations = [{
     file: baseUrl + 'All_CDEs.txt',
     datasetField: 'participant_id',
-    fileField: 'patient_id'
+    fileField: 'bcr_patient_barcode'
   }];
   return morpheus.TcgaUtil.getDataset(datasetOptions);
 
