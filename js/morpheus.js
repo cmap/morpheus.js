@@ -11702,7 +11702,7 @@ morpheus.SampleDatasets = function (options) {
 
       exampleHtml.push('<hr>');
       exampleHtml
-      .push('<div>TCGA data (1/11/2015)</div><span>Please adhere to <a target="_blank" href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines"> the TCGA publication guidelines</a></u> when using TCGA data in your publications.</span>');
+      .push('<div>TCGA data (1/28/2016)</div><span>Please adhere to the <a target="_blank" href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines">TCGA publication guidelines</a></u> when using TCGA data in your publications.</span>');
       exampleHtml.push('<br />');
       // Gene Expression	GISTIC Copy Number	Copy Number By Gene	Mutations	Proteomics	Methylation
       exampleHtml.push('<div data-name="tcga"></div>');
@@ -20422,6 +20422,7 @@ morpheus.FilePicker = function (options) {
   this.$el = $el;
 
   var $file = $el.find('[name=hiddenFile]');
+  var $myComputer = $el.find('[id=' + myComputer + ']');
   this.$el.find('.nav').on('click', 'li > a', function (e) {
     e.preventDefault();
     $(this).tab('show');
@@ -20523,8 +20524,9 @@ morpheus.FilePicker = function (options) {
     var files = evt.target.files; // FileList object
     options.fileCallback(files[0]);
   });
+
   $(window).on('paste.morpheus', function (e) {
-    if ($('#myComputer').is(':visible')) {
+    if ($myComputer.is(':visible')) {
       var text = e.originalEvent.clipboardData.getData('text/plain');
       if (text != null && text.length > 0) {
         e.preventDefault();
@@ -20550,36 +20552,44 @@ morpheus.FilePicker = function (options) {
       clicking = false;
     }
     // e.preventDefault();
-  }).on(
+  });
+  $(window).on(
     'dragover',
     function (e) {
-      $drop.addClass('drag');
-      e.preventDefault();
-      e.stopPropagation();
+      if ($myComputer.is(':visible')) {
+        $drop.addClass('drag');
+        e.preventDefault();
+        e.stopPropagation();
+      }
     }).on(
     'dragenter',
     function (e) {
-      $drop.addClass('drag');
+      if ($myComputer.is(':visible')) {
+        $drop.addClass('drag');
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }).on('dragleave', function (e) {
+    if ($myComputer.is(':visible')) {
+      $drop.removeClass('drag');
       e.preventDefault();
       e.stopPropagation();
-    }).on('dragleave', function (e) {
-    $drop.removeClass('drag');
-    e.preventDefault();
-    e.stopPropagation();
+    }
   }).on('drop', function (e) {
-    $drop.removeClass('drag');
-    if (e.originalEvent.dataTransfer) {
-      if (e.originalEvent.dataTransfer.files.length) {
-        e.preventDefault();
-        e.stopPropagation();
-        var files = e.originalEvent.dataTransfer.files;
-        options.fileCallback(files[0]);
-      } else {
-        var url = e.originalEvent.dataTransfer.getData('URL');
-        options.fileCallback(url);
-        e.preventDefault();
-        e.stopPropagation();
-
+    if ($myComputer.is(':visible')) {
+      $drop.removeClass('drag');
+      if (e.originalEvent.dataTransfer) {
+        if (e.originalEvent.dataTransfer.files.length) {
+          e.preventDefault();
+          e.stopPropagation();
+          var files = e.originalEvent.dataTransfer.files;
+          options.fileCallback(files[0]);
+        } else {
+          var url = e.originalEvent.dataTransfer.getData('URL');
+          options.fileCallback(url);
+          e.preventDefault();
+          e.stopPropagation();
+        }
       }
     }
   });

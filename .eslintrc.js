@@ -15,6 +15,8 @@ module.exports = {
     "no-unused-vars": 0
   },
   "globals": {
+    "google": true,
+    "gapi": true,
     "describe": true,
     "expect": true,
     "it": true,

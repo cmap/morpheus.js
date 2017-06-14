@@ -95,7 +95,7 @@ morpheus.SampleDatasets = function (options) {
 
       exampleHtml.push('<hr>');
       exampleHtml
-      .push('<div>TCGA data (1/11/2015)</div><span>Please adhere to <a target="_blank" href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines"> the TCGA publication guidelines</a></u> when using TCGA data in your publications.</span>');
+      .push('<div>TCGA data (1/28/2016)</div><span>Please adhere to the <a target="_blank" href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines">TCGA publication guidelines</a></u> when using TCGA data in your publications.</span>');
       exampleHtml.push('<br />');
       // Gene Expression	GISTIC Copy Number	Copy Number By Gene	Mutations	Proteomics	Methylation
       exampleHtml.push('<div data-name="tcga"></div>');
