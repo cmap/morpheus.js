@@ -20525,7 +20525,7 @@ morpheus.FilePicker = function (options) {
     options.fileCallback(files[0]);
   });
 
-  $(window).on('paste.morpheus', function (e) {
+  $(window).on('paste.morpheus', this.paste = function (e) {
     if ($myComputer.is(':visible')) {
       var text = e.originalEvent.clipboardData.getData('text/plain');
       if (text != null && text.length > 0) {
@@ -20544,6 +20544,10 @@ morpheus.FilePicker = function (options) {
     }
   });
   var $drop = $el.find('[data-name=drop]');
+  var _this = this;
+  $el.on('remove', function () {
+    $(window).off(_this.paste).off(_this.dragover).off(_this.dragenter).off(_this.dragleave).off(_this.drop);
+  });
   var clicking = false;
   $drop.on('click', function (e) {
     if (!clicking) {
@@ -20555,7 +20559,7 @@ morpheus.FilePicker = function (options) {
   });
   $(window).on(
     'dragover',
-    function (e) {
+    this.dragover = function (e) {
       if ($myComputer.is(':visible')) {
         $drop.addClass('drag');
         e.preventDefault();
@@ -20563,19 +20567,19 @@ morpheus.FilePicker = function (options) {
       }
     }).on(
     'dragenter',
-    function (e) {
+    this.dragenter = function (e) {
       if ($myComputer.is(':visible')) {
         $drop.addClass('drag');
         e.preventDefault();
         e.stopPropagation();
       }
-    }).on('dragleave', function (e) {
+    }).on('dragleave', this.dragleave = function (e) {
     if ($myComputer.is(':visible')) {
       $drop.removeClass('drag');
       e.preventDefault();
       e.stopPropagation();
     }
-  }).on('drop', function (e) {
+  }).on('drop', this.drop = function (e) {
     if ($myComputer.is(':visible')) {
       $drop.removeClass('drag');
       if (e.originalEvent.dataTransfer) {
