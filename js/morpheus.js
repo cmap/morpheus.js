@@ -31482,6 +31482,7 @@ morpheus.Util.extend(morpheus.HeatMap, morpheus.Events);
 morpheus.HelpMenu = function () {
   var html = [];
   html.push('<ul class="morpheus-footer-links">');
+  html.push('<li><a href="index.html">Home</a></li>');
   html.push('<li><a data-name="contact" href="#">Contact</a></li>');
   html.push(
     '<li><a target="_blank" href="configuration.html">Configuration</a></li>');
@@ -31500,7 +31501,6 @@ morpheus.HelpMenu = function () {
       focus: document.activeElement,
     });
     e.preventDefault();
-
   });
 
 };
