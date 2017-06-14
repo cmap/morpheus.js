@@ -549,6 +549,7 @@
   $(document.body).find('[name=open]').on(
     'click',
     function (e) {
+      e.preventDefault();
       var json = {
         columnAnnotations: [
           {
