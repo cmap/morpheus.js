@@ -26,10 +26,9 @@ morpheus.LandingPage = function (pageOptions) {
   morpheus.Util.createMorpheusHeader().appendTo($description);
   $('<p>Versatile matrix visualization and analysis software</p><p>View your dataset as a heat' +
     ' map,' +
-    ' and then explore' +
+    ' then explore' +
     ' the' +
-    ' interactive tools in Morpheus' +
-    ' to analyze the data and highlight results. Find relationships between data points, create new annotations, filter or cluster your data, display charts, and more.</p>').appendTo($description);
+    ' interactive tools in Morpheus. Cluster, create new annotations, search, filter, sort, display charts, and more.</p><p style="color:#586069;">27,000+ users <br />89,000+ matrices analyzed</p>').appendTo($description);
 
   var $input = $el.find('[data-name=input]');
 
