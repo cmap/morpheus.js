@@ -28,8 +28,13 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-xs-12">
-            <div style="display:inline-block;" id="morpheus-header"></div>
-            <div style="display:inline-block; vertical-align: top;font-size:24px;">reference</div>
+            <svg width="32px" height="32px">
+                <g>
+                    <rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/>
+                    <rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/>
+                </g>
+            </svg>
+            <h2 style="padding-left: 4px; display:inline-block;">Configuration</h2>
             <p class="text-muted">Load Morpheus with a pre-configured matrix</p>
             <p>
                 The Morpheus website the request parameters <code>json</code>,
@@ -43,9 +48,11 @@
                     columnAnnotations : [ { file :
                     "//s3.amazonaws.com/data.clue.io/morpheus/Achilles_v2.4_SampleInfo_small.txt",
                     datasetField : "id", fileField : "id" } ],
-                    <br/> columns : [ { field : "id", display : "text" }, { field : "Site_primary", display :"color" }
+                    <br/> columns : [ { field : "id", display : "text" }, { field : "Site_primary",
+                    display :"color" }
                     ],
-                    <br/> dataset : "//s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct"
+                    <br/> dataset :
+                    "//s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct"
                     }
                 </code>
 
@@ -261,7 +268,8 @@
                        aria-expanded="false"
                        aria-controls="filter">rowFilter/columnFilter</a>
                     <div id="filter" class="collapse">
-                        <div class="top-level-description">Optional array of filters. <code>[Object]</code></div>
+                        <div class="top-level-description">Optional array of filters.
+                            <code>[Object]</code></div>
                         <ul>
                             <li>field <code>String</code>
                                 <div class="description">The metadata field name.
@@ -541,11 +549,13 @@
             </ul>
         </div>
     </div>
+    <div class="row">
+        <div class="col-xs-12 morpheus-footer"></div>
+    </div>
 
 </div>
 <script type="text/javascript">
-  morpheus.Util.createMorpheusHeader().appendTo($('#morpheus-header'));
-
+  new morpheus.HelpMenu().$el.appendTo($('.morpheus-footer'));
   $(document.body).find('[name=open]').on(
     'click',
     function (e) {

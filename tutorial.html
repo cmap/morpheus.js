@@ -15,13 +15,20 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-xs-12">
-            <h4>
-                Tutorial: <a target="_blank"
-                             href="http://www.broadinstitute.org/achilles">Project Achilles</a>
-                and the <a target="_blank"
-                           href="http://www.broadinstitute.org/ccle/home">Cancer Cell
-                Line Encyclopedia (CCLE)</a> datasets.
-            </h4>
+            <svg width="32px" height="32px">
+                <g>
+                    <rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/>
+                    <rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/>
+                </g>
+            </svg>
+            <h2 style="padding-left: 4px; display:inline-block;">Tutorial</h2>
+            <p>This tutorial uses data from <a target="_blank"
+                                               href="http://www.broadinstitute.org/achilles">Project
+                Achilles</a>
+                and <a target="_blank"
+                       href="http://www.broadinstitute.org/ccle/home">Cancer Cell
+                    Line Encyclopedia (CCLE)</a>.</p>
+            <hr/>
         </div>
     </div>
     <div id="header" class="row">
@@ -291,23 +298,26 @@
     <div class="row"></div>
     <div class="row"></div>
     <div class="row"></div>
+    <div class="row">
+        <div class="col-xs-12 morpheus-footer"></div>
+    </div>
 </div>
-<script type="text/javascript">
-  var links = $(document.body).find('[data-toggle=collapse]');
-  var collapse = $(document.body).find('.collapse');
-  for (var i = 0; i < collapse.length; i++) {
-    var $c = $(collapse[i]);
-    var $l = $(links[i]);
-    $l.html((i + 1) + '. ' + $l.html());
-    $c.attr('id', i);
-    $l.attr('href', '#' + i);
-  }
-  $('#header').find('[name=expand]').on('click', function () {
-    $(document.body).find('.collapse').collapse('show');
-  });
-  $('#header').find('[name=collapse]').on('click', function () {
-    $(document.body).find('.collapse').collapse('hide');
-  });
+<script type="text/javascript">new morpheus.HelpMenu().$el.appendTo($('.morpheus-footer'));
+var links = $(document.body).find('[data-toggle=collapse]');
+var collapse = $(document.body).find('.collapse');
+for (var i = 0; i < collapse.length; i++) {
+  var $c = $(collapse[i]);
+  var $l = $(links[i]);
+  $l.html((i + 1) + '. ' + $l.html());
+  $c.attr('id', i);
+  $l.attr('href', '#' + i);
+}
+$('#header').find('[name=expand]').on('click', function () {
+  $(document.body).find('.collapse').collapse('show');
+});
+$('#header').find('[name=collapse]').on('click', function () {
+  $(document.body).find('.collapse').collapse('hide');
+});
 </script>
 </body>
 </html>
