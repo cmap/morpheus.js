@@ -11641,6 +11641,7 @@ morpheus.SampleDatasets = function (options) {
     obj.name = disease.name;
     _this.openTcga(obj);
   });
+
   $el
   .on(
     'click',
@@ -20362,6 +20363,7 @@ morpheus.FilePicker = function (options) {
       ' aria-controls="' + preloaded + '" role="tab" data-toggle="tab"><i class="fa fa-database"></i>' +
       ' Preloaded Datasets</a></li>');
 
+    // lazy load
     new morpheus.SampleDatasets({
       $el: $sampleDatasetsEl,
       show: true,
@@ -27552,10 +27554,6 @@ morpheus.HeatMap = function (options) {
   this.actionManager = new morpheus.ActionManager();
   this.actionManager.heatMap = this;
   this.$el.addClass('morpheus');
-  if (!options.landingPage) {
-    options.landingPage = new morpheus.LandingPage();
-    options.landingPage.$el.prependTo(this.$el);
-  }
 
   if (this.options.dataset == null) {
     var datasetFormBuilder = new morpheus.FormBuilder();
@@ -27594,7 +27592,13 @@ morpheus.HeatMap = function (options) {
 
     this.tabManager = this.options.tabManager != null ? this.options.tabManager
       : new morpheus.TabManager({
-        landingPage: this.options.landingPage,
+        landingPage: function () {
+          if (_this.options.landingPage == null) {
+            _this.options.landingPage = new morpheus.LandingPage();
+            _this.options.landingPage.$el.prependTo(_this.$el);
+          }
+          return _this.options.landingPage;
+        },
         autohideTabBar: this.options.autohideTabBar
       });
 
@@ -31485,12 +31489,12 @@ morpheus.HelpMenu = function () {
   html.push('<li><a href="index.html">Home</a></li>');
   html.push('<li><a data-name="contact" href="#">Contact</a></li>');
   html.push(
-    '<li><a target="_blank" href="configuration.html">Configuration</a></li>');
-  html.push('<li><a target="_blank" href="tutorial.html">Tutorial</a></li>');
+    '<li><a href="configuration.html">Configuration</a></li>');
+  html.push('<li><a href="tutorial.html">Tutorial</a></li>');
   html.push(
-    '<li><a target="_blank" href="https://github.com/cmap/morpheus.js">Source Code</a></li>');
+    '<li><a href="https://github.com/cmap/morpheus.js">Source Code</a></li>');
   html.push(
-    '<li><a target="_blank" href="https://github.com/cmap/morpheus.R">R Interface</a></li>');
+    '<li><a href="https://github.com/cmap/morpheus.R">R Interface</a></li>');
 
   html.push('</ul>');
   this.$el = $(html.join(''));
@@ -33262,7 +33266,11 @@ morpheus.TabManager.prototype = {
     if ($a.length === 0) {
       // no content
       if (this.options.landingPage) {
-        this.options.landingPage.show();
+        if (typeof this.options.landingPage === 'function') {
+          this.options.landingPage().show();
+        } else {
+          this.options.landingPage.show();
+        }
       }
     }
 

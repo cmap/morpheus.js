@@ -306,7 +306,11 @@ morpheus.TabManager.prototype = {
     if ($a.length === 0) {
       // no content
       if (this.options.landingPage) {
-        this.options.landingPage.show();
+        if (typeof this.options.landingPage === 'function') {
+          this.options.landingPage().show();
+        } else {
+          this.options.landingPage.show();
+        }
       }
     }
 

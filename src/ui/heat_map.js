@@ -296,10 +296,6 @@ morpheus.HeatMap = function (options) {
   this.actionManager = new morpheus.ActionManager();
   this.actionManager.heatMap = this;
   this.$el.addClass('morpheus');
-  if (!options.landingPage) {
-    options.landingPage = new morpheus.LandingPage();
-    options.landingPage.$el.prependTo(this.$el);
-  }
 
   if (this.options.dataset == null) {
     var datasetFormBuilder = new morpheus.FormBuilder();
@@ -338,7 +334,13 @@ morpheus.HeatMap = function (options) {
 
     this.tabManager = this.options.tabManager != null ? this.options.tabManager
       : new morpheus.TabManager({
-        landingPage: this.options.landingPage,
+        landingPage: function () {
+          if (_this.options.landingPage == null) {
+            _this.options.landingPage = new morpheus.LandingPage();
+            _this.options.landingPage.$el.prependTo(_this.$el);
+          }
+          return _this.options.landingPage;
+        },
         autohideTabBar: this.options.autohideTabBar
       });
 

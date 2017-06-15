@@ -32,6 +32,7 @@ morpheus.SampleDatasets = function (options) {
     obj.name = disease.name;
     _this.openTcga(obj);
   });
+
   $el
   .on(
     'click',
