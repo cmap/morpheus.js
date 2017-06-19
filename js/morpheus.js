@@ -11652,17 +11652,6 @@ morpheus.SampleDatasets = function (options) {
       var isDisabled = $this.parents('.collapse').find(
           'input:checked').length === 0;
       $button.prop('disabled', isDisabled);
-      if (!isDisabled) {
-        $button
-        .removeClass('animated flash')
-        .addClass('animated flash')
-        .one(
-          'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend',
-          function () {
-            $(this).removeClass(
-              'animated flash');
-          });
-      }
     });
   $
   .ajax(
