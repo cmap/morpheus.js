@@ -2,61 +2,68 @@ morpheus.OpenFileTool = function (options) {
   this.options = options || {};
 };
 
-morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS = [{
-  name: 'Open session',
-  value: 'Open session'
-}, {
-  name: 'Open dataset in new tab',
-  value: 'open'
-}, {
-  name: 'Append rows to current dataset',
-  value: 'append'
-}, {
-  name: 'Append columns to current dataset',
-  value: 'append columns'
-}, {
-  name: 'Overlay onto current dataset',
-  value: 'overlay'
-}, {divider: true}, {
-  name: 'Annotate columns',
-  value: 'Annotate Columns'
-}, {
-  name: 'Annotate rows',
-  value: 'Annotate Rows'
-}, {
-  divider: true
-}, {
-  name: 'Open dendrogram',
-  value: 'Open dendrogram'
-}];
+morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS = [
+  {
+    name: 'Open session',
+    value: 'Open session',
+  }, {
+    name: 'Open dataset in new tab',
+    value: 'open',
+  }, {
+    name: 'Append rows to current dataset',
+    value: 'append',
+  }, {
+    name: 'Append columns to current dataset',
+    value: 'append columns',
+  }, {
+    name: 'Overlay onto current dataset',
+    value: 'overlay',
+  }, {divider: true}, {
+    name: 'Annotate columns',
+    value: 'Annotate Columns',
+  }, {
+    name: 'Annotate rows',
+    value: 'Annotate Rows',
+  }, {
+    divider: true,
+  }, {
+    name: 'Open dendrogram',
+    value: 'Open dendrogram',
+  }];
 
 morpheus.OpenFileTool.prototype = {
   toString: function () {
     return 'Open';
   },
   gui: function () {
-    var params = [{
-      name: 'open_file_action',
-      value: 'open',
-      type: 'bootstrap-select',
-      options: morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS
-    }];
+    var params = [
+      {
+        name: 'open_file_action',
+        value: 'open',
+        type: 'bootstrap-select',
+        options: morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS,
+      }];
 
     if (this.options.file == null) { // pick file and action
       params.options = {
         size: 'modal-lg',
         cancel: false,
-        ok: false
+        ok: false,
       };
     } else {
-      var extension = morpheus.Util.getExtension(morpheus.Util.getFileName(this.options.file));
+      var extension = morpheus.Util.getExtension(
+        morpheus.Util.getFileName(this.options.file));
       if (extension === 'json') { // TODO no gui needed
         params[0].options = params[0].options.filter(function (opt) {
-          return opt.value != null && ( opt.value === 'Open session' || opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+          return opt.value != null &&
+            ( opt.value === 'Open session' || opt.value === 'open' ||
+            opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
         });
       } else if (extension === 'gct') {
         params[0].options = params[0].options.filter(function (opt) {
-          return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+          return opt.value != null &&
+            (opt.value === 'open' || opt.value === 'overlay' ||
+            opt.value.indexOf('append') !== -1);
         });
       }
     }
@@ -69,7 +76,8 @@ morpheus.OpenFileTool.prototype = {
 
       form.setVisible('open_file_action', false);
       var $div = $('<div></div>');
-      var $ok = $('<div style="display:none;padding:15px;text-align:right;"><button name="ok" type="button" class="btn' +
+      var $ok = $(
+        '<div style="display:none;padding:15px;text-align:right;"><button name="ok" type="button" class="btn' +
         ' btn-default">OK</button></div>');
       $ok.find('[name=ok]').on('click', function () {
         _this.ok();
@@ -80,15 +88,25 @@ morpheus.OpenFileTool.prototype = {
           $ok.show();
           _this.options.file = fileOrUrl;
           // if it's a file, check file type and update choices
-          var extension = morpheus.Util.getExtension(morpheus.Util.getFileName(_this.options.file));
+          var extension = morpheus.Util.getExtension(
+            morpheus.Util.getFileName(_this.options.file));
           if (extension === 'json') { // TODO no gui needed
-            form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(function (opt) {
-              return opt.value != null && (opt.value === 'Open session' || opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
-            }));
+            form.setOptions('open_file_action',
+              morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(
+                function (opt) {
+                  return opt.value != null &&
+                    (opt.value === 'Open session' || opt.value === 'open' ||
+                    opt.value === 'overlay' ||
+                    opt.value.indexOf('append') !== -1);
+                }));
           } else if (extension === 'gct') {
-            form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(function (opt) {
-              return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
-            }));
+            form.setOptions('open_file_action',
+              morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(
+                function (opt) {
+                  return opt.value != null &&
+                    (opt.value === 'open' || opt.value === 'overlay' ||
+                    opt.value.indexOf('append') !== -1);
+                }));
           }
           form.setVisible('open_file_action', true);
         },
@@ -97,10 +115,14 @@ morpheus.OpenFileTool.prototype = {
           $ok.show();
           _this.options.file = heatMapOptions.dataset;
           form.setVisible('open_file_action', true);
-          form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(function (opt) {
-            return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
-          }));
-        }
+          form.setOptions('open_file_action',
+            morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(
+              function (opt) {
+                return opt.value != null &&
+                  (opt.value === 'open' || opt.value === 'overlay' ||
+                  opt.value.indexOf('append') !== -1);
+              }));
+        },
       });
       filePicker.$el.appendTo($div);
       $ok.appendTo(form.$form);
@@ -129,7 +151,7 @@ morpheus.OpenFileTool.prototype = {
         morpheus.FormBuilder.showMessageModal({
           title: 'Error',
           message: 'Unable to load session',
-          focus: document.activeElement
+          focus: document.activeElement,
         });
       });
     } else if (options.input.open_file_action === 'append columns'
@@ -142,7 +164,8 @@ morpheus.OpenFileTool.prototype = {
         options.input.file), options.heatMap);
     } else { // annotate rows or columns
 
-      var isAnnotateColumns = options.input.open_file_action == 'Annotate Columns';
+      var isAnnotateColumns = options.input.open_file_action ==
+        'Annotate Columns';
       var fileOrUrl = options.input.file;
       var dataset = project.getFullDataset();
       var fileName = morpheus.Util.getFileName(fileOrUrl);
@@ -153,16 +176,18 @@ morpheus.OpenFileTool.prototype = {
             isAnnotateColumns, lines);
         });
       } else if (morpheus.Util.endsWith(fileName, '.gmt')) {
-        morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
-                                                                       buf) {
+        morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (
+          err,
+          buf) {
           if (err) {
             throw new Error('Unable to read ' + fileOrUrl);
           }
-          var sets = new morpheus.GmtReader()
-          .read(new morpheus.ArrayBufferReader(new Uint8Array(
-            buf)));
+          var sets = new morpheus.GmtReader().read(
+            new morpheus.ArrayBufferReader(new Uint8Array(
+              buf)));
           that.promptSets(dataset, heatMap, isAnnotateColumns,
-            sets, morpheus.Util.getBaseFileName(morpheus.Util.getFileName(fileOrUrl)));
+            sets, morpheus.Util.getBaseFileName(
+              morpheus.Util.getFileName(fileOrUrl)));
         });
 
       } else {
@@ -193,7 +218,7 @@ morpheus.OpenFileTool.prototype = {
       heatMap.getProject().trigger('trackChanged', {
         vectors: [vector],
         display: ['color'],
-        columns: isColumns
+        columns: isColumns,
       });
     }
   },
@@ -242,9 +267,10 @@ morpheus.OpenFileTool.prototype = {
    * @param fileColumnNamesToInclude
    *            An array of column names to include from the metadata file or
    *            null to include all
+   * @param tranposed For text/Excel files only. If <code>true</code>, different annotations are on each row.
    */
   annotate: function (lines, dataset, isColumns, sets, metadataName,
-                      fileColumnName, fileColumnNamesToInclude) {
+                      fileColumnName, fileColumnNamesToInclude, transposed) {
     if (isColumns) {
       dataset = morpheus.DatasetUtil.transposedView(dataset);
     }
@@ -255,8 +281,7 @@ morpheus.OpenFileTool.prototype = {
     var vectors = [];
     var idToIndices = morpheus.VectorUtil.createValueToIndicesMap(vector);
     if (!lines) {
-      _
-      .each(
+      _.each(
         sets,
         function (set) {
           var name = set.name;
@@ -264,12 +289,10 @@ morpheus.OpenFileTool.prototype = {
 
           var v = dataset.getRowMetadata().add(name);
           vectors.push(v);
-          _
-          .each(
+          _.each(
             members,
             function (id) {
-              var indices = idToIndices
-              .get(id);
+              var indices = idToIndices.get(id);
               if (indices !== undefined) {
                 for (var i = 0, nIndices = indices.length; i < nIndices; i++) {
                   v.setValue(
@@ -281,44 +304,87 @@ morpheus.OpenFileTool.prototype = {
         });
     } else {
       var tab = /\t/;
-      var header = lines[0].split(tab);
-      var fileMatchOnColumnIndex = _.indexOf(header, fileColumnName);
-      if (fileMatchOnColumnIndex === -1) {
-        throw new Error(fileColumnName + ' not found in header:'
-          + header);
-      }
-      var columnIndices = [];
-      var nheaders = header.length;
-      for (var j = 0; j < header.length; j++) {
-        var name = header[j];
-        if (j === fileMatchOnColumnIndex) {
-          continue;
+      if (!transposed) {
+        var header = lines[0].split(tab);
+        var fileMatchOnColumnIndex = _.indexOf(header, fileColumnName);
+        if (fileMatchOnColumnIndex === -1) {
+          throw new Error(fileColumnName + ' not found in header:'
+            + header);
         }
-        if (fileColumnNamesToInclude
-          && _.indexOf(fileColumnNamesToInclude, name) === -1) {
-          continue;
+        var columnIndices = [];
+        var nheaders = header.length;
+        for (var j = 0; j < header.length; j++) {
+          var name = header[j];
+          if (j === fileMatchOnColumnIndex) {
+            continue;
+          }
+          if (fileColumnNamesToInclude
+            && _.indexOf(fileColumnNamesToInclude, name) === -1) {
+            continue;
+          }
+          var v = dataset.getRowMetadata().getByName(name);
+          if (!v) {
+            v = dataset.getRowMetadata().add(name);
+          }
+          columnIndices.push(j);
+          vectors.push(v);
         }
-        var v = dataset.getRowMetadata().getByName(name);
-        if (!v) {
-          v = dataset.getRowMetadata().add(name);
-        }
-        columnIndices.push(j);
-        vectors.push(v);
-      }
-      var nheaders = columnIndices.length;
-      for (var i = 1, nrows = lines.length; i < nrows; i++) {
-        var line = lines[i].split(tab);
-        var id = line[fileMatchOnColumnIndex];
-        var indices = idToIndices.get(id);
-        if (indices !== undefined) {
-          var nIndices = indices.length;
-          for (var j = 0; j < nheaders; j++) {
-            var token = line[columnIndices[j]];
-            var v = vectors[j];
-            for (var r = 0; r < nIndices; r++) {
-              v.setValue(indices[r], token);
+        var nheaders = columnIndices.length;
+        for (var i = 1, nrows = lines.length; i < nrows; i++) {
+          var line = lines[i].split(tab);
+          var id = line[fileMatchOnColumnIndex];
+          var indices = idToIndices.get(id);
+          if (indices !== undefined) {
+            var nIndices = indices.length;
+            for (var j = 0; j < nheaders; j++) {
+              var token = line[columnIndices[j]];
+              var v = vectors[j];
+              for (var r = 0; r < nIndices; r++) {
+                v.setValue(indices[r], token);
+              }
             }
           }
+        }
+      }
+      else {
+        var splitLines = [];
+        var matchOnLine;
+        for (var i = 0, nrows = lines.length; i < nrows; i++) {
+          var line = lines[i].split(tab);
+          if (fileColumnName === line[0]) {
+            matchOnLine = line;
+          } else {
+            var name = line[0];
+            if (fileColumnNamesToInclude
+              && _.indexOf(fileColumnNamesToInclude, name) === -1) {
+              continue;
+            }
+            splitLines.push(line);
+            var v = dataset.getRowMetadata().getByName(name);
+            if (!v) {
+              v = dataset.getRowMetadata().add(name);
+            }
+            vectors.push(v);
+          }
+        }
+        if (matchOnLine == null) {
+          throw new Error(fileColumnName + ' not found in header.');
+        }
+
+        for (var j = 1, ncols = matchOnLine.length; j < ncols; j++) {
+          var id = matchOnLine[j];
+          var indices = idToIndices.get(id);
+          if (indices !== undefined) {
+            var nIndices = indices.length;
+            splitLines.forEach(function (line, j) {
+              var token = line[j];
+              var v = vectors[j];
+              for (var r = 0; r < nIndices; r++) {
+                v.setValue(indices[r], token);
+              }
+            });
+          }
+
         }
       }
     }
@@ -339,22 +405,22 @@ morpheus.OpenFileTool.prototype = {
       heatMap.getProject().trigger('trackChanged', {
         vectors: [vector],
         display: ['text'],
-        columns: isColumns
+        columns: isColumns,
       });
     };
     promptTool.toString = function () {
       return 'Select Fields To Match On';
     };
     promptTool.gui = function () {
-      return [{
-        name: 'dataset_field_name',
-        options: morpheus.MetadataUtil
-        .getMetadataNames(isColumns ? dataset
-        .getColumnMetadata() : dataset.getRowMetadata()),
-        type: 'select',
-        value: 'id',
-        required: true
-      }];
+      return [
+        {
+          name: 'dataset_field_name',
+          options: morpheus.MetadataUtil.getMetadataNames(
+            isColumns ? dataset.getColumnMetadata() : dataset.getRowMetadata()),
+          type: 'select',
+          value: 'id',
+          required: true,
+        }];
 
     };
     morpheus.HeatMap.showTool(promptTool, heatMap);
@@ -377,7 +443,9 @@ morpheus.OpenFileTool.prototype = {
         nameToIndex.set(vectors[i].getName(), i);
       }
       if (lines.colors) {
-        var colorModel = isColumns ? heatMap.getProject().getColumnColorModel() : heatMap.getProject().getRowColorModel();
+        var colorModel = isColumns
+          ? heatMap.getProject().getColumnColorModel()
+          : heatMap.getProject().getRowColorModel();
         lines.colors.forEach(function (item) {
           var index = nameToIndex.get(item.header);
           var vector = vectors[index];
@@ -388,21 +456,21 @@ morpheus.OpenFileTool.prototype = {
       heatMap.getProject().trigger('trackChanged', {
         vectors: vectors,
         display: display,
-        columns: isColumns
+        columns: isColumns,
       });
     };
     promptTool.toString = function () {
       return 'Select Fields To Match On';
     };
     promptTool.gui = function () {
-      var items = [{
-        name: 'dataset_field_name',
-        options: morpheus.MetadataUtil
-        .getMetadataNames(isColumns ? dataset
-        .getColumnMetadata() : dataset.getRowMetadata()),
-        type: 'select',
-        required: true
-      }];
+      var items = [
+        {
+          name: 'dataset_field_name',
+          options: morpheus.MetadataUtil.getMetadataNames(
+            isColumns ? dataset.getColumnMetadata() : dataset.getRowMetadata()),
+          type: 'select',
+          required: true,
+        }];
       if (lines) {
         items.push({
           name: 'file_field_name',
@@ -410,14 +478,14 @@ morpheus.OpenFileTool.prototype = {
           options: _.map(header, function (item) {
             return {
               name: item,
-              value: item
+              value: item,
             };
           }),
-          required: true
+          required: true,
         });
       }
       return items;
     };
     morpheus.HeatMap.showTool(promptTool, heatMap);
-  }
+  },
 };

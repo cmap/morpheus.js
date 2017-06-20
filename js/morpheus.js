@@ -5730,9 +5730,10 @@ morpheus.DatasetUtil.readDatasetArray = function (datasets) {
  * Annotate a dataset from external file or text.
  *
  * @param options.annotations -
- *            Array of file, datasetField, and fileField.
- * @param options.isColumns -
+ *            Array of file, datasetField, and fileField, and transposed.
+ * @param options.isColumns
  *            Whether to annotate columns
+ *
  * @return A jQuery Deferred object that resolves to an array of functions to
  *         execute with a dataset parameter.
  */
@@ -5775,7 +5776,7 @@ morpheus.DatasetUtil.annotate = function (options) {
           functions[annotationIndex] = function (dataset) {
             new morpheus.OpenFileTool().annotate(lines, dataset,
               isColumns, null, ann.datasetField,
-              ann.fileField, ann.include);
+              ann.fileField, ann.include, ann.transposed);
           };
           deferred.resolve();
         }
@@ -11642,8 +11643,7 @@ morpheus.SampleDatasets = function (options) {
     _this.openTcga(obj);
   });
 
-  $el
-  .on(
+  $el.on(
     'click',
     '[data-toggle=dataTypeToggle]',
     function (e) {
@@ -11653,48 +11653,37 @@ morpheus.SampleDatasets = function (options) {
           'input:checked').length === 0;
       $button.prop('disabled', isDisabled);
     });
-  $
-  .ajax(
-    'https://s3.amazonaws.com/data.clue.io/morpheus/tcga/tcga_index.txt')
-  .done(
+  $.ajax(
+    'https://s3.amazonaws.com/data.clue.io/morpheus/tcga/tcga_index.txt').done(
     function (text) {
       var exampleHtml = [];
       var id = _.uniqueId('morpheus');
-      exampleHtml
-      .push('<a data-toggle="collapse" href="#' + id + '" aria-expanded="false" aria-controls="' + id + '">Cancer Cell Line Encyclopedia (CCLE), Project Achilles</a>');
+      exampleHtml.push('<a data-toggle="collapse" href="#' + id + '" aria-expanded="false" aria-controls="' + id +
+        '">Cancer Cell Line Encyclopedia (CCLE), Project Achilles</a>');
       exampleHtml.push('<div class="collapse" id="' + id + '">');
       exampleHtml.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:' +
         ' top;">');
-      exampleHtml
-      .push('<label><input type="checkbox" style="margin-left:4px;"' +
+      exampleHtml.push('<label><input type="checkbox" style="margin-left:4px;"' +
         ' data-toggle="dataTypeToggle"' +
         ' data-type="mrna">GENE EXPRESSION</label>');
-      exampleHtml
-      .push('<label><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
+      exampleHtml.push('<label><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
         ' data-type="cn">COPY NUMBER BY GENE</label>');
       exampleHtml.push('</div>');
 
-      exampleHtml
-      .push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align: top;">');
-      exampleHtml
-      .push('<label><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
+      exampleHtml.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align: top;">');
+      exampleHtml.push('<label><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
         ' data-type="sig_genes">MUTATIONS</label>');
-      exampleHtml
-      .push('<label><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
+      exampleHtml.push('<label><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle"' +
         ' data-type="ach">GENE ESSENTIALITY</label>');
-      exampleHtml
-      .push('</div>');
-      exampleHtml
-      .push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align: top;">');
-      exampleHtml
-      .push('<button disabled type="button" class="btn btn-default" name="ccle">Open</button>');
-      exampleHtml
-      .push('</div>');
+      exampleHtml.push('</div>');
+      exampleHtml.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align: top;">');
+      exampleHtml.push('<button disabled type="button" class="btn btn-default" name="ccle">Open</button>');
+      exampleHtml.push('</div>');
       exampleHtml.push('</div>');
 
       exampleHtml.push('<hr>');
-      exampleHtml
-      .push('<div>TCGA data (1/28/2016)</div><span>Please adhere to the <a target="_blank" href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines">TCGA publication guidelines</a></u> when using TCGA data in your publications.</span>');
+      exampleHtml.push(
+        '<div>TCGA data (1/28/2016)</div><span>Please adhere to the <a target="_blank" href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines">TCGA publication guidelines</a></u> when using TCGA data in your publications.</span>');
       exampleHtml.push('<br />');
       // Gene Expression	GISTIC Copy Number	Copy Number By Gene	Mutations	Proteomics	Methylation
       exampleHtml.push('<div data-name="tcga"></div>');
@@ -11714,20 +11703,16 @@ morpheus.SampleDatasets = function (options) {
         var dataTypes = tokens[1].split(',');
         var name = morpheus.TcgaUtil.DISEASE_STUDIES[type];
         var disease = {
-          mrna: dataTypes
-          .indexOf('mRNAseq_RSEM_normalized_log2.txt') !== -1,
+          mrna: dataTypes.indexOf('mRNAseq_RSEM_normalized_log2.txt') !== -1,
           sig_genes: dataTypes.indexOf('sig_genes.txt') !== -1,
-          gistic: dataTypes
-          .indexOf('all_lesions.conf_99.txt') !== -1,
+          gistic: dataTypes.indexOf('all_lesions.conf_99.txt') !== -1,
           sample_info: dataTypes.indexOf('All_CDEs.txt') !== -1,
-          mutation: dataTypes
-          .indexOf('mutations_merged.maf.txt') !== -1,
+          mutation: dataTypes.indexOf('mutations_merged.maf.txt') !== -1,
           rppa: dataTypes.indexOf('rppa.txt') !== -1,
-          methylation: dataTypes
-          .indexOf('meth.by_mean.data.txt') !== -1,
+          methylation: dataTypes.indexOf('meth.by_mean.data.txt') !== -1,
           name: name,
           type: type,
-          dataTypes: dataTypes
+          dataTypes: dataTypes,
         };
         if (disease.mrna || disease.gistic
           || disease.sig_genes || disease.rppa
@@ -11747,8 +11732,7 @@ morpheus.SampleDatasets = function (options) {
         var id = _.uniqueId('morpheus');
         var disease = diseases[i];
         tcga.push('<div>');
-        tcga
-        .push('<a data-toggle="collapse" href="#' + id + '" aria-expanded="false"' +
+        tcga.push('<a data-toggle="collapse" href="#' + id + '" aria-expanded="false"' +
           ' aria-controls="' + id + '">' + disease.name + '</a>');
         tcga.push('<div class="collapse" id="' + id + '">');
 
@@ -11760,16 +11744,14 @@ morpheus.SampleDatasets = function (options) {
             }
             tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:top;">');
           }
-          tcga
-          .push('<label><input type="checkbox" style="margin-left:4px;"' +
+          tcga.push('<label><input type="checkbox" style="margin-left:4px;"' +
             ' data-toggle="dataTypeToggle"' +
             ' data-type="' + info.type + '"' + (!disease[info.id] ? ' disabled' : '') + '>' + info.name + '</label>');
         }
         tcga.push('</div>');
 
         tcga.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:top;">');
-        tcga
-        .push('<button disabled type="button" class="btn btn-default" name="tcgaLink"' +
+        tcga.push('<button disabled type="button" class="btn btn-default" name="tcgaLink"' +
           ' data-disease-type="'
           + disease.type
           + '">Open</button>');
@@ -11810,19 +11792,21 @@ morpheus.SampleDatasets.getTcgaDataset = function (options) {
 
   datasetOptions.mrnaClust = baseUrl + 'bestclus.txt';
 
-  datasetOptions.columnAnnotations = [{
-    file: baseUrl + 'All_CDEs.txt',
-    datasetField: 'participant_id',
-    fileField: 'bcr_patient_barcode'
-  }];
+  datasetOptions.columnAnnotations = [
+    {
+      file: baseUrl + 'All_CDEs.txt',
+      datasetField: 'participant_id',
+      fileField: 'patient_id', // e.g. tcga-5l-aat0
+      transposed: true,
+    }];
   return morpheus.TcgaUtil.getDataset(datasetOptions);
 
 };
 morpheus.SampleDatasets.getCCLEDataset = function (options) {
   var datasets = [];
   if (options.sig_genes) {
-    datasets
-    .push('https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_hybrid_capture1650_hg19_NoCommonSNPs_NoNeutralVariants_CDS_2012.05.07.maf.txt');
+    datasets.push(
+      'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_hybrid_capture1650_hg19_NoCommonSNPs_NoNeutralVariants_CDS_2012.05.07.maf.txt');
     // datasets
     // .push({
     // dataset :
@@ -11830,33 +11814,29 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
     // });
   }
   if (options.cn) {
-    datasets
-    .push('https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_copynumber_byGene_2013-12-03.gct');
+    datasets.push('https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_copynumber_byGene_2013-12-03.gct');
   }
 
   if (options.mrna) {
-    datasets
-    .push('https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_Expression_Entrez_2012-09-29.txt');
+    datasets.push('https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_Expression_Entrez_2012-09-29.txt');
   }
   if (options.ach) {
-    datasets
-    .push('https://s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct');
+    datasets.push('https://s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct');
   }
   var columnAnnotations = [];
   if (options.ach) {
     // there are several cell lines that are in Achilles but not CCLE
-    columnAnnotations
-    .push({
+    columnAnnotations.push({
       file: 'https://s3.amazonaws.com/data.clue.io/morpheus/Achilles_v2.4_SampleInfo_small.txt',
       datasetField: 'id',
-      fileField: 'id'
+      fileField: 'id',
     });
 
   }
   columnAnnotations.push({
     file: 'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_Sample_Info.txt',
     datasetField: 'id',
-    fileField: 'id'
+    fileField: 'id',
   });
 
   var returnDeferred = $.Deferred();
@@ -11864,7 +11844,7 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
 
   var annotationDef = morpheus.DatasetUtil.annotate({
     annotations: columnAnnotations,
-    isColumns: true
+    isColumns: true,
   });
   var datasetToReturn;
   datasetDef.done(function (d) {
@@ -11894,8 +11874,7 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
 morpheus.SampleDatasets.prototype = {
 
   openTcga: function (options) {
-    this
-    .callback({
+    this.callback({
       name: options.name,
       renderReady: function (heatMap) {
         var whitelist = [
@@ -11906,8 +11885,7 @@ morpheus.SampleDatasets.prototype = {
           'days_to_death', 'ethnicity', 'gender',
           'histological_type', 'pathologic_stage'];
 
-        var columnMetadata = heatMap.getProject()
-        .getFullDataset().getColumnMetadata();
+        var columnMetadata = heatMap.getProject().getFullDataset().getColumnMetadata();
         for (var i = 0; i < whitelist.length; i++) {
           if (columnMetadata.getByName(whitelist[i])) {
             heatMap.addTrack(whitelist[i], true, 'color');
@@ -11920,87 +11898,91 @@ morpheus.SampleDatasets.prototype = {
           }
         }
       },
-      columns: [{
-        field: 'participant_id',
-        display: 'text'
-      }, {
-        field: 'sample_type',
-        display: 'color'
-      }, {
-        field: 'mutation_summary',
-        display: 'stacked_bar'
-      }, {
-        field: 'mutation_summary_selection',
-        display: 'stacked_bar'
-      }, {
-        field: 'mRNAseq_cluster',
-        display: 'color, highlight'
-      }],
-      dataset: morpheus.SampleDatasets.getTcgaDataset(options)
+      columns: [
+        {
+          field: 'participant_id',
+          display: 'text',
+        }, {
+          field: 'sample_type',
+          display: 'color',
+        }, {
+          field: 'mutation_summary',
+          display: 'stacked_bar',
+        }, {
+          field: 'mutation_summary_selection',
+          display: 'stacked_bar',
+        }, {
+          field: 'mRNAseq_cluster',
+          display: 'color, highlight',
+        }],
+      dataset: morpheus.SampleDatasets.getTcgaDataset(options),
     });
   },
   openCCLE: function (options) {
     this.callback({
       name: 'CCLE',
-      rows: [{
-        field: 'id',
-        display: 'text,tooltip'
-      }, {
-        field: 'mutation_summary',
-        display: 'stacked_bar'
-      }, {
-        field: 'Source',
-        display: 'color'
-      }],
-      columns: [{
-        field: 'id',
-        display: 'text,tooltip'
-      }, {
-        field: 'mutation_summary',
-        display: 'stacked_bar'
-      }, {
-        field: 'gender',
-        display: 'color, highlight'
-      }, {
-        field: 'histology',
-        display: 'color, highlight'
-      }, {
-        field: 'histology subtype',
-        display: 'color, highlight'
-      }, {
-        field: 'primary_site',
-        display: 'color, highlight'
-      }],
-      dataset: morpheus.SampleDatasets.getCCLEDataset(options)
+      rows: [
+        {
+          field: 'id',
+          display: 'text,tooltip',
+        }, {
+          field: 'mutation_summary',
+          display: 'stacked_bar',
+        }, {
+          field: 'Source',
+          display: 'color',
+        }],
+      columns: [
+        {
+          field: 'id',
+          display: 'text,tooltip',
+        }, {
+          field: 'mutation_summary',
+          display: 'stacked_bar',
+        }, {
+          field: 'gender',
+          display: 'color, highlight',
+        }, {
+          field: 'histology',
+          display: 'color, highlight',
+        }, {
+          field: 'histology subtype',
+          display: 'color, highlight',
+        }, {
+          field: 'primary_site',
+          display: 'color, highlight',
+        }],
+      dataset: morpheus.SampleDatasets.getCCLEDataset(options),
     });
-  }
+  },
 };
 
-morpheus.SampleDatasets.TCGA_DISEASE_TYPES_INFO = [{
-  id: 'mrna',
-  name: 'GENE EXPRESSION',
-  type: 'mrna'
-}, {
-  id: 'gistic',
-  name: 'GISTIC COPY NUMBER',
-  type: 'gistic'
-}, {
-  id: 'gistic',
-  name: 'COPY NUMBER BY GENE',
-  type: 'gisticGene'
-}, {
-  id: 'sig_genes',
-  name: 'MUTATION',
-  type: 'sig_genes'
-}, {
-  id: 'rppa',
-  name: 'PROTEOMICS',
-  type: 'rppa'
-}, {
-  id: 'methylation',
-  name: 'METHYLATION',
-  type: 'methylation'
-}];
+  morpheus.SampleDatasets.TCGA_DISEASE_TYPES_INFO = [
+    {
+      id: 'mrna',
+      name: 'GENE EXPRESSION',
+      type: 'mrna',
+    }, {
+      id: 'gistic',
+      name: 'GISTIC COPY NUMBER',
+      type: 'gistic',
+    }, {
+      id: 'gistic',
+      name: 'COPY NUMBER BY GENE',
+      type: 'gisticGene',
+    }, {
+      id: 'sig_genes',
+      name: 'MUTATION',
+      type: 'sig_genes',
+    }, {
+      id: 'rppa',
+      name: 'PROTEOMICS',
+      type: 'rppa',
+    }, {
+      id: 'methylation',
+      name: 'METHYLATION',
+      type: 'methylation',
+    }];
 
 morpheus.AdjustDataTool = function () {
 };
@@ -15105,61 +15087,68 @@ morpheus.OpenFileTool = function (options) {
   this.options = options || {};
 };
 
-morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS = [{
-  name: 'Open session',
-  value: 'Open session'
-}, {
-  name: 'Open dataset in new tab',
-  value: 'open'
-}, {
-  name: 'Append rows to current dataset',
-  value: 'append'
-}, {
-  name: 'Append columns to current dataset',
-  value: 'append columns'
-}, {
-  name: 'Overlay onto current dataset',
-  value: 'overlay'
-}, {divider: true}, {
-  name: 'Annotate columns',
-  value: 'Annotate Columns'
-}, {
-  name: 'Annotate rows',
-  value: 'Annotate Rows'
-}, {
-  divider: true
-}, {
-  name: 'Open dendrogram',
-  value: 'Open dendrogram'
-}];
+  morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS = [
+    {
+      name: 'Open session',
+      value: 'Open session',
+    }, {
+      name: 'Open dataset in new tab',
+      value: 'open',
+    }, {
+      name: 'Append rows to current dataset',
+      value: 'append',
+    }, {
+      name: 'Append columns to current dataset',
+      value: 'append columns',
+    }, {
+      name: 'Overlay onto current dataset',
+      value: 'overlay',
+    }, {divider: true}, {
+      name: 'Annotate columns',
+      value: 'Annotate Columns',
+    }, {
+      name: 'Annotate rows',
+      value: 'Annotate Rows',
+    }, {
+      divider: true,
+    }, {
+      name: 'Open dendrogram',
+      value: 'Open dendrogram',
+    }];
 
 morpheus.OpenFileTool.prototype = {
   toString: function () {
     return 'Open';
   },
   gui: function () {
-    var params = [{
-      name: 'open_file_action',
-      value: 'open',
-      type: 'bootstrap-select',
-      options: morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS
-    }];
+    var params = [
+      {
+        name: 'open_file_action',
+        value: 'open',
+        type: 'bootstrap-select',
+        options: morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS,
+      }];
 
     if (this.options.file == null) { // pick file and action
       params.options = {
         size: 'modal-lg',
         cancel: false,
-        ok: false
+        ok: false,
       };
     } else {
-      var extension = morpheus.Util.getExtension(morpheus.Util.getFileName(this.options.file));
+      var extension = morpheus.Util.getExtension(
+        morpheus.Util.getFileName(this.options.file));
       if (extension === 'json') { // TODO no gui needed
         params[0].options = params[0].options.filter(function (opt) {
-          return opt.value != null && ( opt.value === 'Open session' || opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+          return opt.value != null &&
+            ( opt.value === 'Open session' || opt.value === 'open' ||
+            opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
         });
       } else if (extension === 'gct') {
         params[0].options = params[0].options.filter(function (opt) {
-          return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
+          return opt.value != null &&
+            (opt.value === 'open' || opt.value === 'overlay' ||
+            opt.value.indexOf('append') !== -1);
         });
       }
     }
@@ -15172,7 +15161,8 @@ morpheus.OpenFileTool.prototype = {
 
       form.setVisible('open_file_action', false);
       var $div = $('<div></div>');
-      var $ok = $('<div style="display:none;padding:15px;text-align:right;"><button name="ok" type="button" class="btn' +
+      var $ok = $(
+        '<div style="display:none;padding:15px;text-align:right;"><button name="ok" type="button" class="btn' +
         ' btn-default">OK</button></div>');
       $ok.find('[name=ok]').on('click', function () {
         _this.ok();
@@ -15183,15 +15173,25 @@ morpheus.OpenFileTool.prototype = {
           $ok.show();
           _this.options.file = fileOrUrl;
           // if it's a file, check file type and update choices
-          var extension = morpheus.Util.getExtension(morpheus.Util.getFileName(_this.options.file));
+          var extension = morpheus.Util.getExtension(
+            morpheus.Util.getFileName(_this.options.file));
           if (extension === 'json') { // TODO no gui needed
-            form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(function (opt) {
-              return opt.value != null && (opt.value === 'Open session' || opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
-            }));
+            form.setOptions('open_file_action',
+              morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(
+                function (opt) {
+                  return opt.value != null &&
+                    (opt.value === 'Open session' || opt.value === 'open' ||
+                    opt.value === 'overlay' ||
+                    opt.value.indexOf('append') !== -1);
+                }));
           } else if (extension === 'gct') {
-            form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(function (opt) {
-              return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
-            }));
+            form.setOptions('open_file_action',
+              morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(
+                function (opt) {
+                  return opt.value != null &&
+                    (opt.value === 'open' || opt.value === 'overlay' ||
+                    opt.value.indexOf('append') !== -1);
+                }));
           }
           form.setVisible('open_file_action', true);
         },
@@ -15200,10 +15200,14 @@ morpheus.OpenFileTool.prototype = {
           $ok.show();
           _this.options.file = heatMapOptions.dataset;
           form.setVisible('open_file_action', true);
-          form.setOptions('open_file_action', morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(function (opt) {
-            return opt.value != null && (opt.value === 'open' || opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
-          }));
-        }
+          form.setOptions('open_file_action',
+            morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS.filter(
+              function (opt) {
+                return opt.value != null &&
+                  (opt.value === 'open' || opt.value === 'overlay' ||
+                  opt.value.indexOf('append') !== -1);
+              }));
+        },
       });
       filePicker.$el.appendTo($div);
       $ok.appendTo(form.$form);
@@ -15232,7 +15236,7 @@ morpheus.OpenFileTool.prototype = {
         morpheus.FormBuilder.showMessageModal({
           title: 'Error',
           message: 'Unable to load session',
-          focus: document.activeElement
+          focus: document.activeElement,
         });
       });
     } else if (options.input.open_file_action === 'append columns'
@@ -15245,7 +15249,8 @@ morpheus.OpenFileTool.prototype = {
         options.input.file), options.heatMap);
     } else { // annotate rows or columns
 
-      var isAnnotateColumns = options.input.open_file_action == 'Annotate Columns';
+      var isAnnotateColumns = options.input.open_file_action ==
+        'Annotate Columns';
       var fileOrUrl = options.input.file;
       var dataset = project.getFullDataset();
       var fileName = morpheus.Util.getFileName(fileOrUrl);
@@ -15256,16 +15261,18 @@ morpheus.OpenFileTool.prototype = {
             isAnnotateColumns, lines);
         });
       } else if (morpheus.Util.endsWith(fileName, '.gmt')) {
-        morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
-                                                                       buf) {
+        morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (
+          err,
+          buf) {
           if (err) {
             throw new Error('Unable to read ' + fileOrUrl);
           }
-          var sets = new morpheus.GmtReader()
-          .read(new morpheus.ArrayBufferReader(new Uint8Array(
-            buf)));
+          var sets = new morpheus.GmtReader().read(
+            new morpheus.ArrayBufferReader(new Uint8Array(
+              buf)));
           that.promptSets(dataset, heatMap, isAnnotateColumns,
-            sets, morpheus.Util.getBaseFileName(morpheus.Util.getFileName(fileOrUrl)));
+            sets, morpheus.Util.getBaseFileName(
+              morpheus.Util.getFileName(fileOrUrl)));
         });
 
       } else {
@@ -15296,7 +15303,7 @@ morpheus.OpenFileTool.prototype = {
       heatMap.getProject().trigger('trackChanged', {
         vectors: [vector],
         display: ['color'],
-        columns: isColumns
+        columns: isColumns,
       });
     }
   },
@@ -15345,9 +15352,10 @@ morpheus.OpenFileTool.prototype = {
    * @param fileColumnNamesToInclude
    *            An array of column names to include from the metadata file or
    *            null to include all
+   * @param tranposed For text/Excel files only. If <code>true</code>, different annotations are on each row.
    */
   annotate: function (lines, dataset, isColumns, sets, metadataName,
-                      fileColumnName, fileColumnNamesToInclude) {
+                      fileColumnName, fileColumnNamesToInclude, transposed) {
     if (isColumns) {
       dataset = morpheus.DatasetUtil.transposedView(dataset);
     }
@@ -15358,8 +15366,7 @@ morpheus.OpenFileTool.prototype = {
     var vectors = [];
     var idToIndices = morpheus.VectorUtil.createValueToIndicesMap(vector);
     if (!lines) {
-      _
-      .each(
+      _.each(
         sets,
         function (set) {
           var name = set.name;
@@ -15367,12 +15374,10 @@ morpheus.OpenFileTool.prototype = {
 
           var v = dataset.getRowMetadata().add(name);
           vectors.push(v);
-          _
-          .each(
+          _.each(
             members,
             function (id) {
-              var indices = idToIndices
-              .get(id);
+              var indices = idToIndices.get(id);
               if (indices !== undefined) {
                 for (var i = 0, nIndices = indices.length; i < nIndices; i++) {
                   v.setValue(
@@ -15384,44 +15389,87 @@ morpheus.OpenFileTool.prototype = {
         });
     } else {
       var tab = /\t/;
-      var header = lines[0].split(tab);
-      var fileMatchOnColumnIndex = _.indexOf(header, fileColumnName);
-      if (fileMatchOnColumnIndex === -1) {
-        throw new Error(fileColumnName + ' not found in header:'
-          + header);
-      }
-      var columnIndices = [];
-      var nheaders = header.length;
-      for (var j = 0; j < header.length; j++) {
-        var name = header[j];
-        if (j === fileMatchOnColumnIndex) {
-          continue;
+      if (!transposed) {
+        var header = lines[0].split(tab);
+        var fileMatchOnColumnIndex = _.indexOf(header, fileColumnName);
+        if (fileMatchOnColumnIndex === -1) {
+          throw new Error(fileColumnName + ' not found in header:'
+            + header);
         }
-        if (fileColumnNamesToInclude
-          && _.indexOf(fileColumnNamesToInclude, name) === -1) {
-          continue;
+        var columnIndices = [];
+        var nheaders = header.length;
+        for (var j = 0; j < header.length; j++) {
+          var name = header[j];
+          if (j === fileMatchOnColumnIndex) {
+            continue;
+          }
+          if (fileColumnNamesToInclude
+            && _.indexOf(fileColumnNamesToInclude, name) === -1) {
+            continue;
+          }
+          var v = dataset.getRowMetadata().getByName(name);
+          if (!v) {
+            v = dataset.getRowMetadata().add(name);
+          }
+          columnIndices.push(j);
+          vectors.push(v);
         }
-        var v = dataset.getRowMetadata().getByName(name);
-        if (!v) {
-          v = dataset.getRowMetadata().add(name);
-        }
-        columnIndices.push(j);
-        vectors.push(v);
-      }
-      var nheaders = columnIndices.length;
-      for (var i = 1, nrows = lines.length; i < nrows; i++) {
-        var line = lines[i].split(tab);
-        var id = line[fileMatchOnColumnIndex];
-        var indices = idToIndices.get(id);
-        if (indices !== undefined) {
-          var nIndices = indices.length;
-          for (var j = 0; j < nheaders; j++) {
-            var token = line[columnIndices[j]];
-            var v = vectors[j];
-            for (var r = 0; r < nIndices; r++) {
-              v.setValue(indices[r], token);
+        var nheaders = columnIndices.length;
+        for (var i = 1, nrows = lines.length; i < nrows; i++) {
+          var line = lines[i].split(tab);
+          var id = line[fileMatchOnColumnIndex];
+          var indices = idToIndices.get(id);
+          if (indices !== undefined) {
+            var nIndices = indices.length;
+            for (var j = 0; j < nheaders; j++) {
+              var token = line[columnIndices[j]];
+              var v = vectors[j];
+              for (var r = 0; r < nIndices; r++) {
+                v.setValue(indices[r], token);
+              }
             }
           }
+        }
+      }
+      else {
+        var splitLines = [];
+        var matchOnLine;
+        for (var i = 0, nrows = lines.length; i < nrows; i++) {
+          var line = lines[i].split(tab);
+          if (fileColumnName === line[0]) {
+            matchOnLine = line;
+          } else {
+            var name = line[0];
+            if (fileColumnNamesToInclude
+              && _.indexOf(fileColumnNamesToInclude, name) === -1) {
+              continue;
+            }
+            splitLines.push(line);
+            var v = dataset.getRowMetadata().getByName(name);
+            if (!v) {
+              v = dataset.getRowMetadata().add(name);
+            }
+            vectors.push(v);
+          }
+        }
+        if (matchOnLine == null) {
+          throw new Error(fileColumnName + ' not found in header.');
+        }
+
+        for (var j = 1, ncols = matchOnLine.length; j < ncols; j++) {
+          var id = matchOnLine[j];
+          var indices = idToIndices.get(id);
+          if (indices !== undefined) {
+            var nIndices = indices.length;
+            splitLines.forEach(function (line, j) {
+              var token = line[j];
+              var v = vectors[j];
+              for (var r = 0; r < nIndices; r++) {
+                v.setValue(indices[r], token);
+              }
+            });
+          }
+
         }
       }
     }
@@ -15442,22 +15490,22 @@ morpheus.OpenFileTool.prototype = {
       heatMap.getProject().trigger('trackChanged', {
         vectors: [vector],
         display: ['text'],
-        columns: isColumns
+        columns: isColumns,
       });
     };
     promptTool.toString = function () {
       return 'Select Fields To Match On';
     };
     promptTool.gui = function () {
-      return [{
-        name: 'dataset_field_name',
-        options: morpheus.MetadataUtil
-        .getMetadataNames(isColumns ? dataset
-        .getColumnMetadata() : dataset.getRowMetadata()),
-        type: 'select',
-        value: 'id',
-        required: true
-      }];
+      return [
+        {
+          name: 'dataset_field_name',
+          options: morpheus.MetadataUtil.getMetadataNames(
+            isColumns ? dataset.getColumnMetadata() : dataset.getRowMetadata()),
+          type: 'select',
+          value: 'id',
+          required: true,
+        }];
 
     };
     morpheus.HeatMap.showTool(promptTool, heatMap);
@@ -15480,7 +15528,9 @@ morpheus.OpenFileTool.prototype = {
         nameToIndex.set(vectors[i].getName(), i);
       }
       if (lines.colors) {
-        var colorModel = isColumns ? heatMap.getProject().getColumnColorModel() : heatMap.getProject().getRowColorModel();
+        var colorModel = isColumns
+          ? heatMap.getProject().getColumnColorModel()
+          : heatMap.getProject().getRowColorModel();
         lines.colors.forEach(function (item) {
           var index = nameToIndex.get(item.header);
           var vector = vectors[index];
@@ -15491,21 +15541,21 @@ morpheus.OpenFileTool.prototype = {
       heatMap.getProject().trigger('trackChanged', {
         vectors: vectors,
         display: display,
-        columns: isColumns
+        columns: isColumns,
       });
     };
     promptTool.toString = function () {
       return 'Select Fields To Match On';
     };
     promptTool.gui = function () {
-      var items = [{
-        name: 'dataset_field_name',
-        options: morpheus.MetadataUtil
-        .getMetadataNames(isColumns ? dataset
-        .getColumnMetadata() : dataset.getRowMetadata()),
-        type: 'select',
-        required: true
-      }];
+      var items = [
+        {
+          name: 'dataset_field_name',
+          options: morpheus.MetadataUtil.getMetadataNames(
+            isColumns ? dataset.getColumnMetadata() : dataset.getRowMetadata()),
+          type: 'select',
+          required: true,
+        }];
       if (lines) {
         items.push({
           name: 'file_field_name',
@@ -15513,16 +15563,16 @@ morpheus.OpenFileTool.prototype = {
           options: _.map(header, function (item) {
             return {
               name: item,
-              value: item
+              value: item,
             };
           }),
-          required: true
+          required: true,
         });
       }
       return items;
     };
     morpheus.HeatMap.showTool(promptTool, heatMap);
-  }
+  },
 };
 
 morpheus.SaveDatasetTool = function () {
