@@ -296,6 +296,8 @@ morpheus.ActionManager = function () {
     cb: function (options) {
       options.heatMap.fitToWindow(true);
     },
+    which: [48], // zero
+    commandKey: true,
     icon: 'fa fa-compress'
   });
   this.add({
