@@ -435,7 +435,7 @@ morpheus.HeatMap = function (options) {
     promises.push(columnDef);
   }
 
-  if (options.rowDendrogram !== undefined
+  if (options.rowDendrogram != null
     && _.isString(options.rowDendrogram)) {
     if (options.rowDendrogram[0] === '(') {
       _this.options.rowDendrogram = morpheus.DendrogramUtil
@@ -451,7 +451,7 @@ morpheus.HeatMap = function (options) {
     }
 
   }
-  if (options.columnDendrogram !== undefined
+  if (options.columnDendrogram != null
     && _.isString(options.columnDendrogram)) {
     if (options.columnDendrogram[0] === '(') {
       _this.options.columnDendrogram = morpheus.DendrogramUtil
@@ -1456,7 +1456,7 @@ morpheus.HeatMap.prototype = {
     heatmap.appendTo(this.$parent);
     this.heatmap = heatmap;
     var rowDendrogramSortKey = null;
-    if (rowDendrogram != undefined) {
+    if (rowDendrogram != null) {
       var tree = rowDendrogram;
       if (tree.leafNodes.length !== this.project.getSortedFilteredDataset()
         .getRowCount()) {
@@ -1517,7 +1517,7 @@ morpheus.HeatMap.prototype = {
       }
     }
     var columnDendrogramSortKey = null;
-    if (columnDendrogram !== undefined) {
+    if (columnDendrogram != null) {
       var tree = columnDendrogram;
 
       if (tree.leafNodes.length !== this.project.getSortedFilteredDataset()
@@ -1589,10 +1589,10 @@ morpheus.HeatMap.prototype = {
       this.heatmap.setDrawValues(this.options.drawValues);
     }
 
-    if (rowDendrogramSortKey !== null) {
+    if (rowDendrogramSortKey != null) {
       this.project.setRowSortKeys([rowDendrogramSortKey]);
     }
-    if (columnDendrogramSortKey !== null) {
+    if (columnDendrogramSortKey != null) {
       this.project.setColumnSortKeys([columnDendrogramSortKey]);
     }
     if (this.options.rowSortBy && this.options.rowSortBy.length > 0) {

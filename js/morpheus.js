@@ -11957,32 +11957,32 @@ morpheus.SampleDatasets.prototype = {
   },
 };
 
-  morpheus.SampleDatasets.TCGA_DISEASE_TYPES_INFO = [
-    {
-      id: 'mrna',
-      name: 'GENE EXPRESSION',
-      type: 'mrna',
-    }, {
-      id: 'gistic',
-      name: 'GISTIC COPY NUMBER',
-      type: 'gistic',
-    }, {
-      id: 'gistic',
-      name: 'COPY NUMBER BY GENE',
-      type: 'gisticGene',
-    }, {
-      id: 'sig_genes',
-      name: 'MUTATION',
-      type: 'sig_genes',
-    }, {
-      id: 'rppa',
-      name: 'PROTEOMICS',
-      type: 'rppa',
-    }, {
-      id: 'methylation',
-      name: 'METHYLATION',
-      type: 'methylation',
-    }];
+morpheus.SampleDatasets.TCGA_DISEASE_TYPES_INFO = [
+  {
+    id: 'mrna',
+    name: 'GENE EXPRESSION',
+    type: 'mrna',
+  }, {
+    id: 'gistic',
+    name: 'GISTIC COPY NUMBER',
+    type: 'gistic',
+  }, {
+    id: 'gistic',
+    name: 'COPY NUMBER BY GENE',
+    type: 'gisticGene',
+  }, {
+    id: 'sig_genes',
+    name: 'MUTATION',
+    type: 'sig_genes',
+  }, {
+    id: 'rppa',
+    name: 'PROTEOMICS',
+    type: 'rppa',
+  }, {
+    id: 'methylation',
+    name: 'METHYLATION',
+    type: 'methylation',
+  }];
 
 morpheus.AdjustDataTool = function () {
 };
@@ -15087,34 +15087,34 @@ morpheus.OpenFileTool = function (options) {
   this.options = options || {};
 };
 
-  morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS = [
-    {
-      name: 'Open session',
-      value: 'Open session',
-    }, {
-      name: 'Open dataset in new tab',
-      value: 'open',
-    }, {
-      name: 'Append rows to current dataset',
-      value: 'append',
-    }, {
-      name: 'Append columns to current dataset',
-      value: 'append columns',
-    }, {
-      name: 'Overlay onto current dataset',
-      value: 'overlay',
-    }, {divider: true}, {
-      name: 'Annotate columns',
-      value: 'Annotate Columns',
-    }, {
-      name: 'Annotate rows',
-      value: 'Annotate Rows',
-    }, {
-      divider: true,
-    }, {
-      name: 'Open dendrogram',
-      value: 'Open dendrogram',
-    }];
+morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS = [
+  {
+    name: 'Open session',
+    value: 'Open session',
+  }, {
+    name: 'Open dataset in new tab',
+    value: 'open',
+  }, {
+    name: 'Append rows to current dataset',
+    value: 'append',
+  }, {
+    name: 'Append columns to current dataset',
+    value: 'append columns',
+  }, {
+    name: 'Overlay onto current dataset',
+    value: 'overlay',
+  }, {divider: true}, {
+    name: 'Annotate columns',
+    value: 'Annotate Columns',
+  }, {
+    name: 'Annotate rows',
+    value: 'Annotate Rows',
+  }, {
+    divider: true,
+  }, {
+    name: 'Open dendrogram',
+    value: 'Open dendrogram',
+  }];
 
 morpheus.OpenFileTool.prototype = {
   toString: function () {
@@ -27780,7 +27780,7 @@ morpheus.HeatMap = function (options) {
     promises.push(columnDef);
   }
 
-  if (options.rowDendrogram !== undefined
+  if (options.rowDendrogram != null
     && _.isString(options.rowDendrogram)) {
     if (options.rowDendrogram[0] === '(') {
       _this.options.rowDendrogram = morpheus.DendrogramUtil
@@ -27796,7 +27796,7 @@ morpheus.HeatMap = function (options) {
     }
 
   }
-  if (options.columnDendrogram !== undefined
+  if (options.columnDendrogram != null
     && _.isString(options.columnDendrogram)) {
     if (options.columnDendrogram[0] === '(') {
       _this.options.columnDendrogram = morpheus.DendrogramUtil
@@ -28801,7 +28801,7 @@ morpheus.HeatMap.prototype = {
     heatmap.appendTo(this.$parent);
     this.heatmap = heatmap;
     var rowDendrogramSortKey = null;
-    if (rowDendrogram != undefined) {
+    if (rowDendrogram != null) {
       var tree = rowDendrogram;
       if (tree.leafNodes.length !== this.project.getSortedFilteredDataset()
         .getRowCount()) {
@@ -28862,7 +28862,7 @@ morpheus.HeatMap.prototype = {
       }
     }
     var columnDendrogramSortKey = null;
-    if (columnDendrogram !== undefined) {
+    if (columnDendrogram != null) {
       var tree = columnDendrogram;
 
       if (tree.leafNodes.length !== this.project.getSortedFilteredDataset()
@@ -28934,10 +28934,10 @@ morpheus.HeatMap.prototype = {
       this.heatmap.setDrawValues(this.options.drawValues);
     }
 
-    if (rowDendrogramSortKey !== null) {
+    if (rowDendrogramSortKey != null) {
       this.project.setRowSortKeys([rowDendrogramSortKey]);
     }
-    if (columnDendrogramSortKey !== null) {
+    if (columnDendrogramSortKey != null) {
       this.project.setColumnSortKeys([columnDendrogramSortKey]);
     }
     if (this.options.rowSortBy && this.options.rowSortBy.length > 0) {
