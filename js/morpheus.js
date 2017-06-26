@@ -2366,7 +2366,7 @@ morpheus.Array2dReaderInteractive.prototype = {
       for (var i = 0; i < dataRowStart; i++) {
         var name = lines[i][0];
         if (name == null || name === '' || name === 'na') {
-          name = 'Annotation';
+          name = 'id';
         }
         var unique = 1;
         while (dataset.getColumnMetadata().getByName(name) != null) {
@@ -2393,7 +2393,7 @@ morpheus.Array2dReaderInteractive.prototype = {
       for (var j = 0; j < dataColumnStart; j++) {
         var name = lines[0][j];
         if (name == null || name === '') {
-          name = 'Annotation';
+          name = 'id';
         }
         var unique = 1;
         while (dataset.getRowMetadata().get(name) != null) {
