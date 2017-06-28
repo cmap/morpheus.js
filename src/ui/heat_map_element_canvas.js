@@ -398,6 +398,12 @@ morpheus.HeatMapElementCanvas.prototype = {
           if (condition !== null) {
             if (condition.shape != null) {
               if (condition.inheritColor) {
+                if (sizeBySeriesIndex === undefined) {
+                  xoffset = 0.5;
+                  yoffset = 0.5;
+                  cellRowSize -= 1;
+                  cellColumnSize -= 1;
+                }
                 var x = px + xoffset + cellRowSize / 2;
                 var y = py + yoffset + cellColumnSize / 2;
                 morpheus.CanvasUtil.drawShape(context, condition.shape,
