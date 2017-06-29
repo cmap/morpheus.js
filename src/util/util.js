@@ -420,6 +420,9 @@ morpheus.Util.hammer = function (el, recognizers) {
   if (_.indexOf(recognizers, 'press') !== -1) {
     hammer.add(new Hammer.Press());
   }
+  if (_.indexOf(recognizers, 'swipe') !== -1) {
+    hammer.add(new Hammer.Swipe());
+  }
 
   return hammer;
 };
