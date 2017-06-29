@@ -24212,6 +24212,12 @@ morpheus.HeatMapElementCanvas.prototype = {
           if (condition !== null) {
             if (condition.shape != null) {
               if (condition.inheritColor) {
+                if (sizeBySeriesIndex === undefined) {
+                  xoffset = 0.5;
+                  yoffset = 0.5;
+                  cellRowSize -= 1;
+                  cellColumnSize -= 1;
+                }
                 var x = px + xoffset + cellRowSize / 2;
                 var y = py + yoffset + cellColumnSize / 2;
                 morpheus.CanvasUtil.drawShape(context, condition.shape,
@@ -29622,6 +29628,7 @@ morpheus.HeatMap.prototype = {
         _this.heatmap.setSelectionBox(null);
         _this.heatmap.repaint();
       }
+      event.preventDefault();
     }).on('panmove', this.panmove = function (event) {
       if (panstartMousePosition) {
         var pos = morpheus.CanvasUtil
@@ -29695,6 +29702,7 @@ morpheus.HeatMap.prototype = {
         dragStartScrollTop = _this.scrollTop();
         dragStartScrollLeft = _this.scrollLeft();
       }
+      event.preventDefault();
     })
     .on(
       'tap',
