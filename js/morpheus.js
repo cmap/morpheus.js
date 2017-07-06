@@ -15617,6 +15617,48 @@ morpheus.OpenFileTool.prototype = {
   },
 };
 
+morpheus.PCA = function () {
+
+};
+
+morpheus.PCA.execute = function (dataset, input) {
+
+  return {
+    rowSpecificPValues: permutations.rowSpecificPValues,
+    k: permutations.k,
+    fdr: permutations.fdr,
+    scores: permutations.scores
+  };
+};
+morpheus.PCA.prototype = {
+  toString: function () {
+    return 'PCA';
+  },
+  init: function (project, form) {
+
+  },
+  gui: function (project) {
+    return [
+      {
+        name: 'metric',
+        options: morpheus.MarkerSelection.Functions,
+        value: morpheus.SignalToNoise.toString(),
+        type: 'select',
+        help: ''
+      },
+      {
+        name: 'grouping_value',
+        value: '1',
+        help: 'Class values are categorized into two groups based on whether dataset values are greater than or equal to this value',
+      }];
+  },
+  execute: function (options) {
+    var project = options.project;
+    var dataset = project.getSortedFilteredDataset();
+
+  }
+};
+
 morpheus.SaveDatasetTool = function () {
 };
 morpheus.SaveDatasetTool.prototype = {
@@ -25492,7 +25534,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
       createMenu('Edit', heatMap.options.menu.Edit);
     }
     if (heatMap.options.menu.View) {
-      createMenu('View', heatMap.options.menu.View, '150px');
+      createMenu('View', heatMap.options.menu.View, '170px');
     }
     if (heatMap.options.menu.Tools) {
       createMenu('Tools', heatMap.options.menu.Tools);
@@ -31392,9 +31434,11 @@ morpheus.HelpMenu = function () {
   html.push('<ul class="morpheus-footer-links">');
   html.push('<li><a href="index.html">Home</a></li>');
   html.push('<li><a data-name="contact" href="#">Contact</a></li>');
+  html.push('<li><a href="documentation.html">Documentation</a></li>');
+  html.push('<li><a href="tutorial.html">Tutorial</a></li>');
   html.push(
     '<li><a href="configuration.html">Configuration</a></li>');
-  html.push('<li><a href="tutorial.html">Tutorial</a></li>');
+
   html.push(
     '<li><a href="https://github.com/cmap/morpheus.js">Source Code</a></li>');
   html.push(

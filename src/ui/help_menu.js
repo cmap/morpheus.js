@@ -3,9 +3,11 @@ morpheus.HelpMenu = function () {
   html.push('<ul class="morpheus-footer-links">');
   html.push('<li><a href="index.html">Home</a></li>');
   html.push('<li><a data-name="contact" href="#">Contact</a></li>');
+  html.push('<li><a href="documentation.html">Documentation</a></li>');
+  html.push('<li><a href="tutorial.html">Tutorial</a></li>');
   html.push(
     '<li><a href="configuration.html">Configuration</a></li>');
-  html.push('<li><a href="tutorial.html">Tutorial</a></li>');
+
   html.push(
     '<li><a href="https://github.com/cmap/morpheus.js">Source Code</a></li>');
   html.push(
