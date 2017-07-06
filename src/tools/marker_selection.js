@@ -238,7 +238,6 @@ morpheus.MarkerSelection.prototype = {
       comparisonVector.setValue(bIndices[i], 'B');
     }
     function done(result) {
-
       if (result) {
         var pvalueVector = dataset.getRowMetadata().add('p_value');
         var fdrVector = dataset.getRowMetadata().add('FDR(BH)');
@@ -368,11 +367,38 @@ morpheus.MarkerSelection.prototype = {
         } else {
           done(morpheus.MarkerSelection.execute(subset, options.input));
         }
-
       } else {
         for (var i = 0, size = dataset.getRowCount(); i < size; i++) {
           v.setValue(i, f(list1.setIndex(i), list2.setIndex(i)));
         }
+        // no permutations, compute asymptotic p-value if t-test
+        if (f.toString() === morpheus.TTest.toString() && typeof jStat !== 'undefined') {
+          var pvalueVector = dataset.getRowMetadata().add('p_value');
+          var fdrVector = dataset.getRowMetadata().add('FDR(BH)');
+          var rowSpecificPValues = new Float32Array(dataset.getRowCount());
+          for (var i = 0, size = dataset.getRowCount(); i < size; i++) {
+            list1.setIndex(i);
+            list2.setIndex(i);
+            var m1 = morpheus.Mean(list1);
+            var m2 = morpheus.Mean(list2);
+            var v1 = morpheus.Variance(list1, m1);
+            var v2 = morpheus.Variance(list2, m2);
+            var n1 = morpheus.CountNonNaN(list1);
+            var n2 = morpheus.CountNonNaN(list2);
+            var df = morpheus.DegreesOfFreedom(v1, v2, n1, n2);
+            var t = v.getValue(i);
+            var p = 2.0 * (1 - jStat.studentt.cdf(Math.abs(t), df));
+            rowSpecificPValues[i] = p;
+            pvalueVector.setValue(i, p);
+          }
+          vectors.push(pvalueVector);
+          var fdr = morpheus.FDR_BH(rowSpecificPValues);
+          for (var i = 0, size = dataset.getRowCount(); i < size; i++) {
+            fdrVector.setValue(i, fdr[i]);
+          }
+          vectors.push(fdrVector);
+        }
+
         done();
       }
     }

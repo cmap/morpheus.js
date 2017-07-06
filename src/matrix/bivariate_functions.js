@@ -198,6 +198,19 @@ morpheus.TTest = function (list1, list2) {
 morpheus.TTest.toString = function () {
   return 'T-Test';
 };
+/**
+ * Computes approximate degrees of freedom for 2-sample t-test.
+ *
+ * @param v1 first sample variance
+ * @param v2 second sample variance
+ * @param n1 first sample n
+ * @param n2 second sample n
+ * @return approximate degrees of freedom
+ */
+morpheus.DegreesOfFreedom = function (v1, v2, n1, n2) {
+  return (((v1 / n1) + (v2 / n2)) * ((v1 / n1) + (v2 / n2))) / ((v1 * v1) / (n1 * n1 * (n1 - 1.0)) + (v2 * v2) / (n2 * n2 * (n2 - 1.0)));
+};
+
 morpheus.Spearman = function (list1, list2) {
   var flist1 = [];
   var flist2 = [];
