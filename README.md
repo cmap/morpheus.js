@@ -6,7 +6,10 @@ Versatile matrix visualization and analysis software
 
 View your dataset as a heat map, then explore the interactive tools in Morpheus. Cluster, create new annotations, search, filter, sort, display charts, and more.
 
- **[HOMEPAGE](https://software.broadinstitute.org/morpheus/)**
+## Links
+ + [Homepage](https://software.broadinstitute.org/morpheus/)
+ + [Configuration](https://software.broadinstitute.org/morpheus/configuration.html)
+ + [R Interface](https://github.com/cmap/morpheus.R)
  
 
 ## License
