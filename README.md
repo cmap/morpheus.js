@@ -10,6 +10,7 @@ View your dataset as a heat map, then explore the interactive tools in Morpheus.
  + [Homepage](https://software.broadinstitute.org/morpheus/)
  + [Configuration](https://software.broadinstitute.org/morpheus/configuration.html)
  + [R Interface](https://github.com/cmap/morpheus.R)
+ + [Tutorial](https://software.broadinstitute.org/morpheus/tutorial.html)
  
 
 ## License
