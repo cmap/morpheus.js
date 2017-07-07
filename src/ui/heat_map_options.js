@@ -393,10 +393,13 @@ morpheus.HeatMapOptions = function (heatMap) {
   var separateSchemesField = heatMap.heatmap.getColorScheme()
   .getSeparateColorSchemeForRowMetadataField();
   if (separateSchemesField != null) {
-    $colorByValue.html(morpheus.Util.createOptions(morpheus.VectorUtil
-    .createValueToIndexMap(
-      heatMap.project.getFullDataset().getRowMetadata()
-      .getByName(separateSchemesField)).keys()));
+    var v = heatMap.project.getFullDataset().getRowMetadata()
+    .getByName(separateSchemesField);
+    if (v != null) {
+      $colorByValue.html(morpheus.Util.createOptions(morpheus.VectorUtil
+      .createValueToIndexMap(
+        v).keys()));
+    }
   }
 
   if (separateSchemesField != null) {

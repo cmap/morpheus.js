@@ -55,7 +55,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
   searchHtml.push('</label>');
   searchHtml.push('</div>');
 
-  function createSearchOptionsMenu () {
+  function createSearchOptionsMenu() {
     searchHtml.push('<div style="display:inline-block;" class="dropdown">');
     searchHtml.push(
       '<button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="fa fa-caret-down"></span></button>');
@@ -85,7 +85,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     searchHtml.push('</div>');
   }
 
-  function createSearchMenu (dataName, navigation) {
+  function createSearchMenu(dataName, navigation) {
     searchHtml.push(
       '<div style="display:inline-block;" data-name="' + dataName + '">');
     searchHtml.push('<div class="form-group">');
@@ -144,7 +144,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
   var $menus = $(
     '<div style="display: inline-block;margin-right:14px;"></div>');
 
-  function createMenu (menuName, actions, minWidth) {
+  function createMenu(menuName, actions, minWidth) {
     if (!minWidth) {
       minWidth = '0px';
     }
@@ -228,18 +228,6 @@ morpheus.HeatMapToolBar = function (heatMap) {
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
   // zoom
   if (heatMap.options.toolbar.zoom) {
-    // toolbarHtml
-    // .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip"' +
-    //   ' title="Zoom Out (-)" name="Zoom Out"><span class="fa fa-minus"></span></button>');
-    // toolbarHtml
-    // .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip"' +
-    //   ' title="Zoom In (+)" name="Zoom In"><span class="fa fa-plus"></span></button>');
-    // toolbarHtml
-    // .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip"' +
-    //   ' title="Fit To Window" name="Fit To Window"><span class="fa fa-compress"></span></button>');
-    // toolbarHtml
-    // .push('<button type="button" class="btn btn-default btn-xxs" data-toggle="tooltip"' +
-    //   ' title="Reset Zoom" name="Reset Zoom">100%</button>');
 
     var dropdownId = _.uniqueId('morpheus');
     toolbarHtml.push('<div style="display:inline-block;" class="dropdown">');
@@ -255,8 +243,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
       ' <span style="font-size: .8em;" class="fa fa-caret-down"></span>');
     toolbarHtml.push('</button>');
     toolbarHtml.push(
-      '<ul class="dropdown-menu" aria-labelledby="' + dropdownId + '">');
-
+      '<ul style="width:200px;" class="dropdown-menu" aria-labelledby="' + dropdownId + '">');
     toolbarHtml.push(
       '<li><a class="morpheus-menu-item" href="#" data-action="Zoom In">Zoom In<span class="pull-right">+</span></a></li>');
     toolbarHtml.push(
@@ -268,8 +255,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
       ' class="fa' +
       ' fa-compress morpheus-menu-item-icon"></span><span class="pull-right">' +
       morpheus.Util.COMMAND_KEY +
-      morpheus.KeyboardCharMap[heatMap.getActionManager().
-        getAction('Fit To Window').which[0]] + '</span> </a></li>');
+      morpheus.KeyboardCharMap[heatMap.getActionManager().getAction('Fit To Window').which[0]] + '</span> </a></li>');
     toolbarHtml.push('<li role="separator" class="divider"></li>');
     toolbarHtml.push(
       '<li><a class="morpheus-menu-item" href="#" data-action="100%">100%</a></li>');
@@ -448,7 +434,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
   var $searchToggle = $searchForm.find('[name=searchToggle]'); // buttons
   var nameToSearchObject = {};
 
-  function getSearchElements ($group, searchName, cb) {
+  function getSearchElements($group, searchName, cb) {
     var obj = {
       $group: $group,
       $search: $group.find('[name=search]'),
@@ -457,8 +443,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
       $previousMatch: $group.find('[name=previousMatch]'),
       $nextMatch: $group.find('[name=nextMatch]'),
       $matchesToTop: $group.find('[name=matchesToTop]'),
-      $toggleButton: $searchToggle.filter('[data-search=' + searchName + ']').
-        parent(),
+      $toggleButton: $searchToggle.filter('[data-search=' + searchName + ']').parent(),
     };
 
     nameToSearchObject[searchName] = obj;
@@ -498,10 +483,9 @@ morpheus.HeatMapToolBar = function (heatMap) {
 
     var $span = $(this).find('span');
     if ($span.data('type') === 'toggle') {
-      $searchOptions.find('[data-group=' + group + '] > [data-type=toggle]').
-        removeClass('dropdown-checkbox' +
-          ' fa' +
-          ' fa-check');
+      $searchOptions.find('[data-group=' + group + '] > [data-type=toggle]').removeClass('dropdown-checkbox' +
+        ' fa' +
+        ' fa-check');
       $span.addClass('dropdown-checkbox fa fa-check');
     }
     morpheus.Util.trackEvent({
@@ -745,7 +729,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
       });
     }, 500));
 
-  function searchValues () {
+  function searchValues() {
     var $searchResultsLabel = _this.$valueSearchResults;
     var text = $.trim(_this.$valueTextField.val());
     if (text === '') {
@@ -1091,8 +1075,7 @@ morpheus.HeatMapToolBar.prototype = {
         + (matches === 1 ? '' : 'es'));
     }
     if (matches <= 0) {
-      var positions = isColumns ? this.heatMap.getHeatMapElementComponent().
-        getColumnPositions()
+      var positions = isColumns ? this.heatMap.getHeatMapElementComponent().getColumnPositions()
         : this.heatMap.getHeatMapElementComponent().getRowPositions();
       positions.setSquishedIndices(null);
       if (isColumns) {

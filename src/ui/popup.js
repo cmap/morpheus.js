@@ -103,7 +103,7 @@ morpheus.Popup.showPopup = function (menuItems, position, component, callback) {
   }
 
   morpheus.Popup.$popupDiv.css({
-    height: popupHeight + 'px',
+    // height: popupHeight + 'px',
     display: 'block',
     left: left,
     top: top

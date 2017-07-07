@@ -48,6 +48,21 @@ morpheus.SampleDatasets = function (options) {
     function (text) {
       var exampleHtml = [];
       var id = _.uniqueId('morpheus');
+      // exampleHtml.push('<a data-toggle="collapse" href="#' + id + '" aria-expanded="false" aria-controls="' + id +
+      //   '">Other</a>');
+      // exampleHtml.push('<hr>');
+      // exampleHtml.push('<div class="collapse" id="' + id + '">');
+      // exampleHtml.push('<label style="display: inline;">Motor Trend Car Road Tests</label>');
+      // exampleHtml.push('<div style="margin: 6px 0 0 20px;display: inline;vertical-align:' +
+      //   ' top;">');
+      // exampleHtml.push('<button type="button" class="btn btn-default" name="ccle">Open</button>');
+      // exampleHtml.push('</div>');
+      // exampleHtml.push('<div></div><small>The data was extracted from 1974' +
+      //   ' Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).</small></div>');
+      //
+      // exampleHtml.push('</div>');
+      //
+      // id = _.uniqueId('morpheus');
       exampleHtml.push('<a data-toggle="collapse" href="#' + id + '" aria-expanded="false" aria-controls="' + id +
         '">Cancer Cell Line Encyclopedia (CCLE), Project Achilles</a>');
       exampleHtml.push('<div class="collapse" id="' + id + '">');
