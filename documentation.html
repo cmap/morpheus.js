@@ -212,8 +212,10 @@
     [-1.47, -1, -0.88, -1.26, -0.38, -1.02, 1.05, 0.83, 0.64, 1.31, 0.72]
   ];
 
-  var colorScale = d3.scale.linear().domain([-2, -1.5, -1, 0, 1, 1.5, 2]).range(
-    ['#ffffb2', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#b10026']).clamp(true);
+  //  var colorScale = d3.scale.linear().domain([-2, -1.5, -1, 0, 1, 1.5, 2]).range(
+  //    ['#ffffb2', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#b10026']).clamp(true);
+  var colorScale =
+    d3.scale.linear().range(['#ca0020', 'white', '#0571b0']).domain([-2, 0, 2]).clamp(true);
   var margin = {
     top: 0,
     right: 0,
