@@ -6768,6 +6768,18 @@ morpheus.Dataset.fromJSON = function (options) {
       }
     }
   }
+
+  for (var seriesIndex = 0; seriesIndex < options.seriesArrays.length; seriesIndex++) {
+    var array = options.seriesArrays[seriesIndex];
+    for (var i = 0; i < options.rows; i++) {
+      for (var j = 0; j < options.columns; j++) {
+        var value = array[i][j];
+        if (value == null) {
+          array[i][j] = NaN;
+        }
+      }
+    }
+  }
   var dataset = new morpheus.Dataset({
     name: options.seriesNames[0],
     dataType: options.seriesDataTypes[0],
@@ -11575,6 +11587,7 @@ morpheus.LandingPage.prototype = {
       var options = optionsArray[i];
       options.tabManager = _this.tabManager;
       options.focus = i === 0;
+      options.standalone = true;
       options.landingPage = _this;
       new morpheus.HeatMap(options);
     }
@@ -17703,6 +17716,8 @@ morpheus.ActionManager = function () {
       },
       icon: 'fa fa-line-chart'
     });
+  } else {
+    console.log('echarts not found.');
   }
 
   this.add({
@@ -18204,7 +18219,7 @@ morpheus.ActionManager = function () {
 
     var project = options.heatMap.getProject();
     var selectionModel = isColumns ? project
-    .getColumnSelectionModel()
+      .getColumnSelectionModel()
       : project
       .getRowSelectionModel();
     if (selectionModel.count() === 0) {
@@ -24512,12 +24527,12 @@ morpheus.HeatMapKeyListener = function (heatMap) {
         }
       }
     }
-    // if (stop) {
+    if (stop && heatMap.options.standalone) {
       e.preventDefault();
       e.stopPropagation();
-    // }
-
+    }
   });
+
   function shortcutToString(sc) {
     var s = ['<b>'];
 
@@ -25636,6 +25651,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
   var $toolbar = $(toolbarHtml.join(''));
 
   $toolbar.find('[data-action]').on('click', function (e) {
+    e.preventDefault();
     heatMap.getActionManager().execute($(this).data('action'));
   }).on('blur', function (e) {
     if (document.activeElement === document.body) {
@@ -26412,7 +26428,7 @@ morpheus.HeatMapToolBar.prototype = {
       : project.getColumnSortKeys();
     sortKeys = sortKeys.filter(function (key) {
       return !(key instanceof morpheus.MatchesOnTopSortKey &&
-      key.toString() === 'matches on top');
+        key.toString() === 'matches on top');
     });
 
     var dataset = project.getSortedFilteredDataset();
@@ -26559,7 +26575,7 @@ morpheus.HeatMapToolBar.prototype = {
     // remove existing matches on top key
     sortKeys = sortKeys.filter(function (key) {
       return !(key instanceof morpheus.MatchesOnTopSortKey &&
-      key.name === 'matches on top');
+        key.name === 'matches on top');
     });
     if (options.isOnTop) { // bring to top
       var key = new morpheus.MatchesOnTopSortKey(project,
@@ -27412,6 +27428,9 @@ morpheus.HeatMap = function (options) {
       symmetric: false,
       keyboard: true,
       inlineTooltip: true,
+      // Prevent mousewheel default (stops accidental page back on Mac), but also prevents page
+      // scrolling
+      standalone: false,
       $loadingImage: morpheus.Util.createLoadingEl(),
       menu: {
         File: ['Open', null, 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', null, 'Rename' +
@@ -28966,6 +28985,7 @@ morpheus.HeatMap.prototype = {
     };
     setInitialDisplay(false, this.options.rows);
     setInitialDisplay(true, this.options.columns);
+
     function reorderTracks(array, isColumns) {
       if (array == null || array.length <= 1) {
         return;
@@ -29657,7 +29677,9 @@ morpheus.HeatMap.prototype = {
     return this.$content;
   },
   focus: function () {
+    var scrollTop = document.body.scrollTop;
     this.$tabPanel.focus();
+    document.body.scrollTop = scrollTop;
   },
   getFocusEl: function () {
     return this.$tabPanel;
@@ -31114,8 +31136,8 @@ morpheus.HeatMap.prototype = {
     var xpos = Math.max(rowDendrogramWidth, maxHeaderWidth);
     var heatMapWidth = heatmapPrefSize.width;
     var maxHeatMapWidth = Math.max(50, availableWidth === -1 ? Number.MAX_VALUE : (availableWidth - rowTrackWidthSum
-    - xpos
-    - morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS));
+      - xpos
+      - morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS));
     if (maxHeatMapWidth > 0 && heatMapWidth > maxHeatMapWidth) {
       heatMapWidth = maxHeatMapWidth;
       heatMapWidth = Math.min(heatMapWidth, heatmapPrefSize.width); // can't
@@ -31222,7 +31244,7 @@ morpheus.HeatMap.prototype = {
     this.hscroll.setExtent(heatMapWidth, heatmapPrefSize.width,
       options.scrollLeft !== undefined ? options.scrollLeft
         : (heatmapPrefSize.width === this.hscroll
-      .getTotalExtent() ? this.hscroll.getValue()
+        .getTotalExtent() ? this.hscroll.getValue()
         : heatmapPrefSize.width
         * this.hscroll.getValue()
         / this.hscroll.getMaxValue()));
@@ -31288,7 +31310,7 @@ morpheus.HeatMap.prototype = {
     this.vscroll.setExtent(heatMapHeight, heatmapPrefSize.height,
       options.scrollTop !== undefined ? options.scrollTop
         : (heatmapPrefSize.height === this.vscroll
-      .getTotalExtent() ? this.vscroll.getValue()
+        .getTotalExtent() ? this.vscroll.getValue()
         : heatmapPrefSize.height
         * this.vscroll.getValue()
         / this.vscroll.getMaxValue()));
