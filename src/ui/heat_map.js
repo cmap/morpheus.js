@@ -248,6 +248,9 @@ morpheus.HeatMap = function (options) {
       symmetric: false,
       keyboard: true,
       inlineTooltip: true,
+      // Prevent mousewheel default (stops accidental page back on Mac), but also prevents page
+      // scrolling
+      standalone: false,
       $loadingImage: morpheus.Util.createLoadingEl(),
       menu: {
         File: ['Open', null, 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', null, 'Rename' +
@@ -1802,6 +1805,7 @@ morpheus.HeatMap.prototype = {
     };
     setInitialDisplay(false, this.options.rows);
     setInitialDisplay(true, this.options.columns);
+
     function reorderTracks(array, isColumns) {
       if (array == null || array.length <= 1) {
         return;
@@ -2493,7 +2497,9 @@ morpheus.HeatMap.prototype = {
     return this.$content;
   },
   focus: function () {
+    var scrollTop = document.body.scrollTop;
     this.$tabPanel.focus();
+    document.body.scrollTop = scrollTop;
   },
   getFocusEl: function () {
     return this.$tabPanel;
@@ -3950,8 +3956,8 @@ morpheus.HeatMap.prototype = {
     var xpos = Math.max(rowDendrogramWidth, maxHeaderWidth);
     var heatMapWidth = heatmapPrefSize.width;
     var maxHeatMapWidth = Math.max(50, availableWidth === -1 ? Number.MAX_VALUE : (availableWidth - rowTrackWidthSum
-    - xpos
-    - morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS));
+      - xpos
+      - morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS));
     if (maxHeatMapWidth > 0 && heatMapWidth > maxHeatMapWidth) {
       heatMapWidth = maxHeatMapWidth;
       heatMapWidth = Math.min(heatMapWidth, heatmapPrefSize.width); // can't
@@ -4058,7 +4064,7 @@ morpheus.HeatMap.prototype = {
     this.hscroll.setExtent(heatMapWidth, heatmapPrefSize.width,
       options.scrollLeft !== undefined ? options.scrollLeft
         : (heatmapPrefSize.width === this.hscroll
-      .getTotalExtent() ? this.hscroll.getValue()
+        .getTotalExtent() ? this.hscroll.getValue()
         : heatmapPrefSize.width
         * this.hscroll.getValue()
         / this.hscroll.getMaxValue()));
@@ -4124,7 +4130,7 @@ morpheus.HeatMap.prototype = {
     this.vscroll.setExtent(heatMapHeight, heatmapPrefSize.height,
       options.scrollTop !== undefined ? options.scrollTop
         : (heatmapPrefSize.height === this.vscroll
-      .getTotalExtent() ? this.vscroll.getValue()
+        .getTotalExtent() ? this.vscroll.getValue()
         : heatmapPrefSize.height
         * this.vscroll.getValue()
         / this.vscroll.getMaxValue()));
