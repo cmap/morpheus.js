@@ -330,6 +330,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
   var $toolbar = $(toolbarHtml.join(''));
 
   $toolbar.find('[data-action]').on('click', function (e) {
+    e.preventDefault();
     heatMap.getActionManager().execute($(this).data('action'));
   }).on('blur', function (e) {
     if (document.activeElement === document.body) {
@@ -1106,7 +1107,7 @@ morpheus.HeatMapToolBar.prototype = {
       : project.getColumnSortKeys();
     sortKeys = sortKeys.filter(function (key) {
       return !(key instanceof morpheus.MatchesOnTopSortKey &&
-      key.toString() === 'matches on top');
+        key.toString() === 'matches on top');
     });
 
     var dataset = project.getSortedFilteredDataset();
@@ -1253,7 +1254,7 @@ morpheus.HeatMapToolBar.prototype = {
     // remove existing matches on top key
     sortKeys = sortKeys.filter(function (key) {
       return !(key instanceof morpheus.MatchesOnTopSortKey &&
-      key.name === 'matches on top');
+        key.name === 'matches on top');
     });
     if (options.isOnTop) { // bring to top
       var key = new morpheus.MatchesOnTopSortKey(project,
