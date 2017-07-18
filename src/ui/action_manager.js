@@ -274,6 +274,8 @@ morpheus.ActionManager = function () {
       },
       icon: 'fa fa-line-chart'
     });
+  } else {
+    console.log('echarts not found.');
   }
 
   this.add({
@@ -775,7 +777,7 @@ morpheus.ActionManager = function () {
 
     var project = options.heatMap.getProject();
     var selectionModel = isColumns ? project
-    .getColumnSelectionModel()
+      .getColumnSelectionModel()
       : project
       .getRowSelectionModel();
     if (selectionModel.count() === 0) {
