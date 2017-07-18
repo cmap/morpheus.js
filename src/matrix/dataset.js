@@ -156,6 +156,18 @@ morpheus.Dataset.fromJSON = function (options) {
       }
     }
   }
+
+  for (var seriesIndex = 0; seriesIndex < options.seriesArrays.length; seriesIndex++) {
+    var array = options.seriesArrays[seriesIndex];
+    for (var i = 0; i < options.rows; i++) {
+      for (var j = 0; j < options.columns; j++) {
+        var value = array[i][j];
+        if (value == null) {
+          array[i][j] = NaN;
+        }
+      }
+    }
+  }
   var dataset = new morpheus.Dataset({
     name: options.seriesNames[0],
     dataType: options.seriesDataTypes[0],
