@@ -374,12 +374,12 @@ morpheus.HeatMapKeyListener = function (heatMap) {
         }
       }
     }
-    // if (stop) {
+    if (stop && heatMap.options.standalone) {
       e.preventDefault();
       e.stopPropagation();
-    // }
-
+    }
   });
+
   function shortcutToString(sc) {
     var s = ['<b>'];
 
