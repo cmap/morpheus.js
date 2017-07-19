@@ -400,8 +400,8 @@ morpheus.VectorTrack.prototype = {
   _update: function () {
     if (!this.settings.discreteAutoDetermined
       && (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
-      || this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || this
-      .isRenderAs(morpheus.VectorTrack.RENDER.BAR))) {
+        || this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || this
+        .isRenderAs(morpheus.VectorTrack.RENDER.BAR))) {
       if ((this.isColumns ? this.project.getColumnColorModel() : this.project.getRowColorModel()).getContinuousColorScheme(this.getFullVector()) != null) {
         this.settings.discrete = false;
         this.settings.highlightMatchingValues = false;
@@ -900,7 +900,7 @@ morpheus.VectorTrack.prototype = {
     var project = this.project;
     var isColumns = this.isColumns;
     var hasSelection = isColumns ? project.getColumnSelectionModel()
-      .count() > 0 : project.getRowSelectionModel().count() > 0;
+    .count() > 0 : project.getRowSelectionModel().count() > 0;
     var ANNOTATE_SELECTION = 'Annotate Selection';
     var INVERT_SELECTION = 'Invert Selection';
     var SELECT_ALL = 'Select All';
@@ -1314,9 +1314,9 @@ morpheus.VectorTrack.prototype = {
                 summaryFunction.indices = visibleFieldIndices;
               }
               var updatedVector = _this.isColumns ? _this.project
-              .getFullDataset()
-              .getColumnMetadata()
-              .add(_this.name)
+                .getFullDataset()
+                .getColumnMetadata()
+                .add(_this.name)
                 : _this.project
                 .getFullDataset()
                 .getRowMetadata()
@@ -1397,8 +1397,8 @@ morpheus.VectorTrack.prototype = {
             + _this.name + '?',
             okCallback: function () {
               var metadata = isColumns ? project
-              .getFullDataset()
-              .getColumnMetadata()
+                .getFullDataset()
+                .getColumnMetadata()
                 : project
                 .getFullDataset()
                 .getRowMetadata();
@@ -1408,7 +1408,7 @@ morpheus.VectorTrack.prototype = {
                 metadata,
                 _this.name));
               var sortKeys = isColumns ? project
-              .getColumnSortKeys()
+                .getColumnSortKeys()
                 : project
                 .getRowSortKeys();
               var sortKeyIndex = _.indexOf(
@@ -1429,7 +1429,7 @@ morpheus.VectorTrack.prototype = {
                 }
               }
               var groupByKeys = isColumns ? project
-              .getGroupColumns()
+                .getGroupColumns()
                 : project
                 .getGroupRows();
               var groupByKeyIndex = _
@@ -1571,7 +1571,7 @@ morpheus.VectorTrack.prototype = {
 
           var legend = new morpheus.HeatMapTrackColorLegend(
             [_this], isColumns ? _this.project
-            .getColumnColorModel()
+              .getColumnColorModel()
               : _this.project
               .getRowColorModel());
           var size = legend.getPreferredSize();
@@ -1586,7 +1586,7 @@ morpheus.VectorTrack.prototype = {
         } else if (item === 'Shape Key') {
           var legend = new morpheus.HeatMapTrackShapeLegend(
             [_this], isColumns ? _this.project
-            .getColumnShapeModel()
+              .getColumnShapeModel()
               : _this.project
               .getRowShapeModel());
           var size = legend.getPreferredSize();
@@ -2062,6 +2062,10 @@ morpheus.VectorTrack.prototype = {
     var midPix = scale(this.settings.mid);
     var settings = this.settings;
     var discrete = settings.discrete && this.discreteValueMap != null;
+    var colorByVector = this.settings.colorByField != null ? this
+    .getVector(this.settings.colorByField) : null;
+    var colorModel = isColumns ? this.project.getColumnColorModel()
+      : this.project.getRowColorModel();
     for (var i = start; i < end; i++) {
       var value = vector.getValue(i);
       if (discrete) {
@@ -2070,6 +2074,9 @@ morpheus.VectorTrack.prototype = {
       var position = positions.getPosition(i);
       var size = positions.getItemSize(i);
       var scaledValue = scale(value);
+      if (colorByVector !== null) {
+        context.fillStyle = colorModel.getMappedValue(colorByVector, colorByVector.getValue(i));
+      }
       if (isColumns) {
         context.beginPath();
         context.rect(position, Math.min(midPix, scaledValue), size,
