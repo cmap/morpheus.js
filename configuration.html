@@ -14,8 +14,12 @@
     <style>
         ul {
             margin: 0;
-            padding-left: 4px;
+            padding-left: 8px;
             list-style-type: none;
+        }
+
+        .example {
+            padding-top: 8px;
         }
 
         .description {
@@ -268,44 +272,55 @@
                        aria-expanded="false"
                        aria-controls="filter">rowFilter/columnFilter</a>
                     <div id="filter" class="collapse">
-                        <div class="top-level-description">Optional array of filters.
-                            <code>[Object]</code></div>
+                        <div class="top-level-description">Optional object that describes filter.
+                            <code>Object</code></div>
                         <ul>
-                            <li>field <code>String</code>
-                                <div class="description">The metadata field name.
-                                </div>
-                            </li>
-                            <li>type <code>String</code>
-                                <div class="description">One of "set", "range", "top", "index"
-                                </div>
-                            </li>
-                            <li>min <code>Number</code> for "range" filter
-                                <div class="description">Minimum value to include
-                                </div>
-                            </li>
-                            <li>max <code>Number</code> for "range" filter
-                                <div class="description">Maximum value to include
-                                </div>
-                            </li>
-                            <li>direction <code>String</code> for "top" filter
-                                <div class="description">One of "top", "bottom", "topAndBottom"
-                                </div>
-                            </li>
-                            <li>n <code>Number</code> for "top" filter
-                                <div class="description">Number to include
-                                </div>
-                            </li>
-                            <li>indices <code>[Number]</code> for "index" filter
-                                <div class="description">Array of indices include
-                                </div>
-                            </li>
+                            <li>filters <code>[Object]</code>
+                                <ul>
+                                    <li>field <code>String</code>
+                                        <div class="description">The metadata field name.
+                                        </div>
+                                    </li>
+                                    <li>type <code>String</code>
+                                        <div class="description">One of "set", "range", "top",
+                                            "index"
+                                        </div>
+                                    </li>
+                                    <li>min <code>Number</code> for "range" filter
+                                        <div class="description">Minimum value to include
+                                        </div>
+                                    </li>
+                                    <li>max <code>Number</code> for "range" filter
+                                        <div class="description">Maximum value to include
+                                        </div>
+                                    </li>
+                                    <li>direction <code>String</code> for "top" filter
+                                        <div class="description">One of "top", "bottom",
+                                            "topAndBottom"
+                                        </div>
+                                    </li>
+                                    <li>n <code>Number</code> for "top" filter
+                                        <div class="description">Number to include
+                                        </div>
+                                    </li>
+                                    <li>indices <code>[Number]</code> for "index" filter
+                                        <div class="description">Array of indices include
+                                        </div>
+                                    </li>
 
 
+                                </ul>
+                            </li>
+                            <li>isAnd <code>Boolean</code>
+                                <div class="description">Whether filters are combined by AND or OR.
+                                </div>
+                            </li>
                         </ul>
+
                         <div class="example">
                             <div class="description">Keep rows with type "A" or "B"
                             </div>
-                            <code>[{type:"set", name:"type", values:["A", "B"]}]</code>
+                            <code>{filters:[{type:"set", name:"type", values:["A", "B"]}]}</code>
                         </div>
                     </div>
                 </li>
