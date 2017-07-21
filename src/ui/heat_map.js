@@ -3598,7 +3598,8 @@ morpheus.HeatMap.prototype = {
       //   : 40;
     }
     context.save();
-    context.translate(4, legendHeight);
+    var legendOffset = 15;
+    context.translate(legendOffset, legendHeight);
     // column color legend
     var columnTrackLegend = new morpheus.HeatMapTrackColorLegend(
       _
@@ -3615,7 +3616,7 @@ morpheus.HeatMap.prototype = {
     // row color legend to the right of column color legend
     var columnTrackLegendSize = columnTrackLegend.getPreferredSize();
     context.save();
-    context.translate(4 + columnTrackLegendSize.width, legendHeight);
+    context.translate(legendOffset + columnTrackLegendSize.width, legendHeight);
     var rowTrackLegend = new morpheus.HeatMapTrackColorLegend(
       _
       .filter(
