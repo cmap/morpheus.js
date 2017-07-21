@@ -23,10 +23,6 @@ morpheus.Project = function (dataset) {
   morpheus.Project
   ._recomputeCalculatedColumnFields(new morpheus.TransposedDatasetView(
     this.originalDataset), morpheus.VectorKeys.RECOMPUTE_FUNCTION_NEW_HEAT_MAP);
-  morpheus.Project._recomputeCalculatedColumnFields(this.originalDataset, morpheus.VectorKeys.RECOMPUTE_FUNCTION_FILTER);
-  morpheus.Project
-  ._recomputeCalculatedColumnFields(new morpheus.TransposedDatasetView(
-    this.originalDataset), morpheus.VectorKeys.RECOMPUTE_FUNCTION_FILTER);
 };
 morpheus.Project.Events = {
   DATASET_CHANGED: 'datasetChanged',

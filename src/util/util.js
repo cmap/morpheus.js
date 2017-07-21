@@ -50,8 +50,8 @@ morpheus.Util.loadTrackingCode = function () {
       (function (i, s, o, g, r, a, m) {
         i['GoogleAnalyticsObject'] = r;
         i[r] = i[r] || function () {
-            (i[r].q = i[r].q || []).push(arguments);
-          }, i[r].l = 1 * new Date();
+          (i[r].q = i[r].q || []).push(arguments);
+        }, i[r].l = 1 * new Date();
         a = s.createElement(o),
           m = s.getElementsByTagName(o)[0];
         a.async = 1;
@@ -1421,6 +1421,10 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
     }
   } else if (isFile) {
     var reader = new FileReader();
+    reader.onerror = function () {
+      console.log('Unable to read file');
+      deferred.reject('Unable to read file');
+    };
     reader.onload = function (event) {
       if (ext === 'xlsx' || ext === 'xls') {
         var data = new Uint8Array(event.target.result);
