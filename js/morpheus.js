@@ -52,8 +52,8 @@ morpheus.Util.loadTrackingCode = function () {
       (function (i, s, o, g, r, a, m) {
         i['GoogleAnalyticsObject'] = r;
         i[r] = i[r] || function () {
-            (i[r].q = i[r].q || []).push(arguments);
-          }, i[r].l = 1 * new Date();
+          (i[r].q = i[r].q || []).push(arguments);
+        }, i[r].l = 1 * new Date();
         a = s.createElement(o),
           m = s.getElementsByTagName(o)[0];
         a.async = 1;
@@ -1423,6 +1423,10 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
     }
   } else if (isFile) {
     var reader = new FileReader();
+    reader.onerror = function () {
+      console.log('Unable to read file');
+      deferred.reject('Unable to read file');
+    };
     reader.onload = function (event) {
       if (ext === 'xlsx' || ext === 'xls') {
         var data = new Uint8Array(event.target.result);
@@ -8801,10 +8805,6 @@ morpheus.Project = function (dataset) {
   morpheus.Project
   ._recomputeCalculatedColumnFields(new morpheus.TransposedDatasetView(
     this.originalDataset), morpheus.VectorKeys.RECOMPUTE_FUNCTION_NEW_HEAT_MAP);
-  morpheus.Project._recomputeCalculatedColumnFields(this.originalDataset, morpheus.VectorKeys.RECOMPUTE_FUNCTION_FILTER);
-  morpheus.Project
-  ._recomputeCalculatedColumnFields(new morpheus.TransposedDatasetView(
-    this.originalDataset), morpheus.VectorKeys.RECOMPUTE_FUNCTION_FILTER);
 };
 morpheus.Project.Events = {
   DATASET_CHANGED: 'datasetChanged',
@@ -30778,7 +30778,8 @@ morpheus.HeatMap.prototype = {
       //   : 40;
     }
     context.save();
-    context.translate(4, legendHeight);
+    var legendOffset = 15;
+    context.translate(legendOffset, legendHeight);
     // column color legend
     var columnTrackLegend = new morpheus.HeatMapTrackColorLegend(
       _
@@ -30795,7 +30796,7 @@ morpheus.HeatMap.prototype = {
     // row color legend to the right of column color legend
     var columnTrackLegendSize = columnTrackLegend.getPreferredSize();
     context.save();
-    context.translate(4 + columnTrackLegendSize.width, legendHeight);
+    context.translate(legendOffset + columnTrackLegendSize.width, legendHeight);
     var rowTrackLegend = new morpheus.HeatMapTrackColorLegend(
       _
       .filter(
@@ -35378,8 +35379,8 @@ morpheus.VectorTrack.prototype = {
   _update: function () {
     if (!this.settings.discreteAutoDetermined
       && (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
-      || this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || this
-      .isRenderAs(morpheus.VectorTrack.RENDER.BAR))) {
+        || this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || this
+        .isRenderAs(morpheus.VectorTrack.RENDER.BAR))) {
       if ((this.isColumns ? this.project.getColumnColorModel() : this.project.getRowColorModel()).getContinuousColorScheme(this.getFullVector()) != null) {
         this.settings.discrete = false;
         this.settings.highlightMatchingValues = false;
@@ -35839,36 +35840,32 @@ morpheus.VectorTrack.prototype = {
           this.renderUnstackedBar(context, vector, start, end, clip,
             offset, barSize, visibleFieldIndices);
         } else {
-          this.renderBar(context, vector, start, end, clip, offset,
+          this.renderBar(context, vector, start, end, clip, this.isColumns ? (fullAvailableSpace - offset - barSize) : offset,
             barSize);
         }
       }
+
       offset += barSize + 2;
       availableSpace -= offset;
-    }
 
+    }
     if (!this.settings.squished
       && this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)) {
       context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
-      this.renderText(context, vector, true, start, end, clip, offset,
-        this.isColumns ? fullAvailableSpace : 0);
+      this.renderText(context, vector, true, start, end, clip, this.isColumns ? (fullAvailableSpace - offset) : offset);
       offset += this.settings.maxTextWidth + 2;
       availableSpace -= offset;
     }
-    this.textWidth = 0;
     if (!this.settings.squished
       && this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)) {
-      this.textWidth = availableSpace;
       context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
       var dataType = morpheus.VectorUtil.getDataType(vector);
       if (dataType === 'url') {
         context.fillStyle = 'blue';
         this.canvas.style.cursor = 'pointer';
       }
-      this.renderText(context, vector, false, start, end, clip, offset,
-        this.isColumns ? fullAvailableSpace : 0);
-      offset += this.settings.textWidth + 2;
-      availableSpace -= offset;
+      this.renderText(context, vector, false, start, end, clip, this.isColumns ? (fullAvailableSpace - offset) : offset);
+
     }
 
   }
@@ -35878,7 +35875,7 @@ morpheus.VectorTrack.prototype = {
     var project = this.project;
     var isColumns = this.isColumns;
     var hasSelection = isColumns ? project.getColumnSelectionModel()
-      .count() > 0 : project.getRowSelectionModel().count() > 0;
+    .count() > 0 : project.getRowSelectionModel().count() > 0;
     var ANNOTATE_SELECTION = 'Annotate Selection';
     var INVERT_SELECTION = 'Invert Selection';
     var SELECT_ALL = 'Select All';
@@ -36292,9 +36289,9 @@ morpheus.VectorTrack.prototype = {
                 summaryFunction.indices = visibleFieldIndices;
               }
               var updatedVector = _this.isColumns ? _this.project
-              .getFullDataset()
-              .getColumnMetadata()
-              .add(_this.name)
+                .getFullDataset()
+                .getColumnMetadata()
+                .add(_this.name)
                 : _this.project
                 .getFullDataset()
                 .getRowMetadata()
@@ -36375,8 +36372,8 @@ morpheus.VectorTrack.prototype = {
             + _this.name + '?',
             okCallback: function () {
               var metadata = isColumns ? project
-              .getFullDataset()
-              .getColumnMetadata()
+                .getFullDataset()
+                .getColumnMetadata()
                 : project
                 .getFullDataset()
                 .getRowMetadata();
@@ -36386,7 +36383,7 @@ morpheus.VectorTrack.prototype = {
                 metadata,
                 _this.name));
               var sortKeys = isColumns ? project
-              .getColumnSortKeys()
+                .getColumnSortKeys()
                 : project
                 .getRowSortKeys();
               var sortKeyIndex = _.indexOf(
@@ -36407,7 +36404,7 @@ morpheus.VectorTrack.prototype = {
                 }
               }
               var groupByKeys = isColumns ? project
-              .getGroupColumns()
+                .getGroupColumns()
                 : project
                 .getGroupRows();
               var groupByKeyIndex = _
@@ -36549,7 +36546,7 @@ morpheus.VectorTrack.prototype = {
 
           var legend = new morpheus.HeatMapTrackColorLegend(
             [_this], isColumns ? _this.project
-            .getColumnColorModel()
+              .getColumnColorModel()
               : _this.project
               .getRowColorModel());
           var size = legend.getPreferredSize();
@@ -36564,7 +36561,7 @@ morpheus.VectorTrack.prototype = {
         } else if (item === 'Shape Key') {
           var legend = new morpheus.HeatMapTrackShapeLegend(
             [_this], isColumns ? _this.project
-            .getColumnShapeModel()
+              .getColumnShapeModel()
               : _this.project
               .getRowShapeModel());
           var size = legend.getPreferredSize();
@@ -37040,6 +37037,11 @@ morpheus.VectorTrack.prototype = {
     var midPix = scale(this.settings.mid);
     var settings = this.settings;
     var discrete = settings.discrete && this.discreteValueMap != null;
+    var colorByVector = this.settings.colorByField != null ? this
+    .getVector(this.settings.colorByField) : null;
+    var colorModel = isColumns ? this.project.getColumnColorModel()
+      : this.project.getRowColorModel();
+
     for (var i = start; i < end; i++) {
       var value = vector.getValue(i);
       if (discrete) {
@@ -37048,9 +37050,12 @@ morpheus.VectorTrack.prototype = {
       var position = positions.getPosition(i);
       var size = positions.getItemSize(i);
       var scaledValue = scale(value);
+      if (colorByVector !== null) {
+        context.fillStyle = colorModel.getMappedValue(colorByVector, colorByVector.getValue(i));
+      }
       if (isColumns) {
         context.beginPath();
-        context.rect(position, Math.min(midPix, scaledValue), size,
+        context.rect(position, Math.min(midPix, scaledValue) + offset, size,
           Math.abs(midPix - scaledValue));
         context.fill();
       } else {
@@ -37348,8 +37353,8 @@ morpheus.VectorTrack.prototype = {
         }
         if (isColumns) {
           context.save();
-          context.translate(position + size / 2 - clip.x, canvasSize
-            - clip.y - offset);
+          context.translate(position + size / 2 - clip.x,
+            offset - clip.y);
           context.rotate(-Math.PI / 2);
           context.fillText(value, 0, 0);
           context.restore();
