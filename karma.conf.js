@@ -69,7 +69,7 @@ module.exports = function (config) {
     browsers: ['MyChrome'],
 
     customLaunchers: {
-      MyChromeHeadless: {
+      MyChrome: {
         base: 'Chrome',
         flags: ['--disable-hang-monitor']
       }
