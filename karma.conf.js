@@ -15,7 +15,7 @@ module.exports = function (config) {
         watched: false
       },
       {
-        pattern: 'js/morpheus.js',
+        pattern: 'js/morpheus-latest.min.js',
         watched: false
       },
       {
