@@ -1,6 +1,4 @@
 language: node_js
-node_js:
-  - 0.8
-# 'npm test' runs 'grunt test'
 before_script:
+  - npm update -g npm
   - npm install -g grunt-cli
