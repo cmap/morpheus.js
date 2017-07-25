@@ -66,11 +66,11 @@ module.exports = function (config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['MyChromeHeadless'],
+    browsers: ['MyChrome'],
 
     customLaunchers: {
       MyChromeHeadless: {
-        base: 'ChromeHeadless',
+        base: 'Chrome',
         flags: ['--disable-hang-monitor']
       }
     },
