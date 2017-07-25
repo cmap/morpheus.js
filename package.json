@@ -30,7 +30,7 @@
     "test": "grunt travis --verbose"
   },
   "devDependencies": {
-    "finalhandler": "^1.0.3",
+    "finalhandler": "1.0.3",
     "grunt": "^1.0.1",
     "grunt-contrib-concat": "~1.0.1",
     "grunt-contrib-copy": "~1.0.0",
