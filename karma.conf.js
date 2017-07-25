@@ -66,7 +66,7 @@ module.exports = function (config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['MyChrome'],
+    browsers: ['PhantomJS'],
 
     customLaunchers: {
       MyChrome: {
@@ -80,6 +80,6 @@ module.exports = function (config) {
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: 1
+    concurrency: Infinity
   });
 }
