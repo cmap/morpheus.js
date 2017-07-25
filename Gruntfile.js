@@ -80,16 +80,29 @@ module.exports = function (grunt) {
     watch: {
       files: ['src/*.js', 'src/**/*.js'],
       tasks: ['concat:morpheus']
+    },
+    jasmine: {
+      morpheus: {
+        options: {
+          specs: 'jasmine/spec/*.js',
+          helpers: ['jasmine/matchers/*.js'],
+          vendor: [
+            'js/morpheus-external-latest.min.js', 'js/morpheus-latest.min.js', 'jasmine/jasmine-helper.js'
+          ]
+        }
+      }
     }
   });
 
-  // rebuild js and css:
-  // grunt concat:morpheus concat:extJs uglify concat:extJsAll
   grunt.registerTask('default', 'watch');
+  grunt.registerTask('travis', [
+    'concat', 'uglify', 'jasmine'
+  ]);
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-jasmine');
 };
