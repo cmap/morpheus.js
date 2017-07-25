@@ -71,7 +71,7 @@ module.exports = function (config) {
     customLaunchers: {
       MyChromeHeadless: {
         base: 'ChromeHeadless',
-        flags: ['--headless', '--disable-gpu', '--deterministic-fetch', '--disable-extensions', '--disable-file-system', '--disable-hang-monitor', '--remote-debugging-port=9876']
+        flags: ['--disable-hang-monitor']
       }
     },
     // Continuous Integration mode

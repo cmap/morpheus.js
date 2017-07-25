@@ -2,6 +2,6 @@ language: node_js
 notifications:
   email: false
 addons:
-  chrome: beta
+  chrome: stable
 before_script:
   - npm install -g grunt-cli
