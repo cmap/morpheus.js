@@ -30,17 +30,15 @@
     "test": "grunt travis --verbose"
   },
   "devDependencies": {
-    "finalhandler": "1.0.3",
-    "grunt": "1.0.1",
-    "grunt-contrib-concat": "~1.0.1",
-    "grunt-contrib-copy": "~1.0.0",
-    "grunt-contrib-cssmin": "~2.0.0",
-    "grunt-contrib-jasmine": "1.1.0",
-    "grunt-contrib-jshint": "~1.1.0",
-    "grunt-contrib-uglify": "~2.0.0",
-    "grunt-contrib-watch": "~1.0.0",
-    "grunt-jsdoc": "2.1.0",
-    "phantomjs-prebuilt": "2.1.14",
-    "serve-static": "1.12.1"
+    "finalhandler": "^1.0.3",
+    "grunt": "^1.0.1",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "^2.2.0",
+    "grunt-contrib-jasmine": "^1.1.0",
+    "grunt-contrib-uglify": "^3.0.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "phantomjs-prebuilt": "^2.1.14",
+    "serve-static": "^1.12.3"
   }
 }
