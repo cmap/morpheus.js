@@ -3,6 +3,7 @@ notifications:
   email: false
 addons:
   chrome: stable
+sudo: false
 before_script:
   - npm install -g grunt-cli
   - "export DISPLAY=:99.0"
