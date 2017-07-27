@@ -1024,12 +1024,12 @@ morpheus.Util.rankIndexArray = function (index) {
 
 morpheus.Util.indexSort = function (array, ascending) {
   var pairs = [];
-  array.forEach(function (value, index) {
+  for(var i = 0, length = array.length; i < length; i++) {
     pairs.push({
-      value: value,
-      index: index
+      value: array[i],
+      index: i
     });
-  });
+  }
   return morpheus.Util.indexSortPairs(pairs, ascending);
 };
 morpheus.Util.indexSortPairs = function (array, ascending) {
@@ -14344,7 +14344,8 @@ morpheus.MarkerSelection.prototype = {
 
 morpheus.NearestNeighbors = function () {
 };
-morpheus.NearestNeighbors.Functions = [morpheus.Cosine, morpheus.Euclidean,
+morpheus.NearestNeighbors.Functions = [
+  morpheus.Cosine, morpheus.Euclidean,
   morpheus.Jaccard, morpheus.KendallsCorrelation, morpheus.Pearson, morpheus.Spearman,
   morpheus.WeightedMean];
 morpheus.NearestNeighbors.Functions.fromString = function (s) {
@@ -14358,12 +14359,13 @@ morpheus.NearestNeighbors.Functions.fromString = function (s) {
 
 morpheus.NearestNeighbors.execute = function (dataset, input) {
   var f = morpheus.NearestNeighbors.Functions.fromString(input.metric);
-  var permutations = new morpheus.PermutationPValues(dataset, null, null, input.npermutations, f, morpheus.Vector.fromArray('', input.listValues));
+  var permutations = new morpheus.PermutationPValues(dataset, null, null, input.npermutations, f,
+    morpheus.Vector.fromArray('', input.listValues));
   return {
     rowSpecificPValues: permutations.rowSpecificPValues,
     k: permutations.k,
     fdr: permutations.fdr,
-    scores: permutations.scores
+    scores: permutations.scores,
   };
 };
 morpheus.NearestNeighbors.prototype = {
@@ -14371,30 +14373,23 @@ morpheus.NearestNeighbors.prototype = {
     return 'Nearest Neighbors';
   },
   init: function (project, form) {
-    var $selectedOnly = form.$form.find('[name=use_selected_only]')
-    .parent();
-    form.$form
-    .find('[name=compute_nearest_neighbors_of]')
-    .on(
+    var $selectedOnly = form.$form.find('[name=use_selected_only]').parent();
+    form.$form.find('[name=compute_nearest_neighbors_of]').on(
       'change',
       function (e) {
         var val = $(this).val();
         if (val === 'selected rows' || val === 'column annotation') {
-          $($selectedOnly.contents()[1])
-          .replaceWith(
-            document
-            .createTextNode(' Use selected columns only'));
+          $($selectedOnly.contents()[1]).replaceWith(
+            document.createTextNode(' Use selected columns only'));
         } else {
-          $($selectedOnly.contents()[1])
-          .replaceWith(
-            document
-            .createTextNode(' Use selected rows only'));
+          $($selectedOnly.contents()[1]).replaceWith(
+            document.createTextNode(' Use selected rows only'));
         }
         form.setVisible('annotation', false);
         if (val === 'column annotation' || val === 'row annotation') {
-          var metadata = val === 'column annotation' ? project.getFullDataset()
-          .getColumnMetadata() : project.getFullDataset()
-          .getRowMetadata();
+          var metadata = val === 'column annotation'
+            ? project.getFullDataset().getColumnMetadata()
+            : project.getFullDataset().getRowMetadata();
           var names = [];
           // get numeric columns only
           for (var i = 0; i < metadata.getMetadataCount(); i++) {
@@ -14408,8 +14403,7 @@ morpheus.NearestNeighbors.prototype = {
             b = b.toLowerCase();
             return (a < b ? -1 : (a === b ? 0 : 1));
           });
-          form
-          .setOptions('annotation', names);
+          form.setOptions('annotation', names);
           form.setVisible('annotation', true);
         }
       });
@@ -14418,35 +14412,37 @@ morpheus.NearestNeighbors.prototype = {
     form.setVisible('annotation', false);
   },
   gui: function () {
-    return [{
-      name: 'metric',
-      options: morpheus.NearestNeighbors.Functions,
-      value: morpheus.Pearson.toString(),
-      type: 'select'
-    }, {
-      name: 'compute_nearest_neighbors_of',
-      options: ['selected rows', 'selected columns', 'column annotation', 'row annotation'],
-      value: 'selected rows',
-      type: 'radio'
-    }, {
-      name: 'use_selected_only',
-      type: 'checkbox'
-    }, {
-      name: 'annotation',
-      type: 'bootstrap-select'
-    }, {
-      name: 'permutations',
-      value: '0',
-      type: 'text'
-    }];
+    return [
+      {
+        name: 'metric',
+        options: morpheus.NearestNeighbors.Functions,
+        value: morpheus.Pearson.toString(),
+        type: 'select',
+      }, {
+        name: 'compute_nearest_neighbors_of',
+        options: ['selected rows', 'selected columns', 'column annotation', 'row annotation'],
+        value: 'selected rows',
+        type: 'radio',
+      }, {
+        name: 'use_selected_only',
+        type: 'checkbox',
+      }, {
+        name: 'annotation',
+        type: 'bootstrap-select',
+      }, {
+        name: 'permutations',
+        value: '0',
+        type: 'text',
+      }];
   },
   execute: function (options) {
     var project = options.project;
-    var isColumns = options.input.compute_nearest_neighbors_of == 'selected columns' || options.input.compute_nearest_neighbors_of == 'row annotation';
-    var isAnnotation = options.input.compute_nearest_neighbors_of == 'column annotation' || options.input.compute_nearest_neighbors_of == 'row annotation';
+    var isColumns = options.input.compute_nearest_neighbors_of == 'selected columns' ||
+      options.input.compute_nearest_neighbors_of == 'row annotation';
+    var isAnnotation = options.input.compute_nearest_neighbors_of == 'column annotation' ||
+      options.input.compute_nearest_neighbors_of == 'row annotation';
     var heatMap = options.heatMap;
-    var f = morpheus.NearestNeighbors.Functions
-    .fromString(options.input.metric);
+    var f = morpheus.NearestNeighbors.Functions.fromString(options.input.metric);
     var dataset = project.getSortedFilteredDataset();
 
     if (isColumns) {
@@ -14466,8 +14462,7 @@ morpheus.NearestNeighbors.prototype = {
       dataset = morpheus.DatasetUtil.slicedView(dataset, null,
         spaceIndices);
     }
-    var d1 = morpheus.DatasetUtil
-    .slicedView(dataset, selectedIndices, null);
+    var d1 = morpheus.DatasetUtil.slicedView(dataset, selectedIndices, null);
     var nearestNeighborsList;
     if (isAnnotation) {
       nearestNeighborsList = dataset.getColumnMetadata().getByName(options.input.annotation);
@@ -14481,7 +14476,7 @@ morpheus.NearestNeighbors.prototype = {
         var newDataset = new morpheus.Dataset({
           name: '',
           rows: 1,
-          columns: d1.getColumnCount()
+          columns: d1.getColumnCount(),
         });
         for (var j = 0, ncols = d1.getColumnCount(); j < ncols; j++) {
           var v = morpheus.Percentile(columnView.setIndex(j), 50);
@@ -14500,7 +14495,6 @@ morpheus.NearestNeighbors.prototype = {
         options.input.background = true;
       }
       options.input.background = options.input.background && typeof Worker !== 'undefined';
-      options.input.background = false; // FIXME
       options.input.npermutations = npermutations;
 
       var done = function (result) {
@@ -14518,7 +14512,7 @@ morpheus.NearestNeighbors.prototype = {
         project.trigger('trackChanged', {
           vectors: vectors,
           display: ['text'],
-          columns: isColumns
+          columns: isColumns,
         });
       };
 
@@ -14529,10 +14523,12 @@ morpheus.NearestNeighbors.prototype = {
       options.input.listValues = listValues;
       if (options.input.background) {
         var blob = new Blob(
-          ['self.onmessage = function(e) {'
-          + 'importScripts(e.data.scripts);'
-          + 'self.postMessage(morpheus.NearestNeighbors.execute(morpheus.Dataset.fromJSON(e.data.dataset), e.data.input));'
-          + '}']);
+          [
+            'self.onmessage = function(e) {'
+            + 'importScripts(e.data.scripts);'
+            +
+            'self.postMessage(morpheus.NearestNeighbors.execute(morpheus.Dataset.fromJSON(e.data.dataset), e.data.input));'
+            + '}']);
 
         var url = window.URL.createObjectURL(blob);
         var worker = new Worker(url);
@@ -14542,9 +14538,9 @@ morpheus.NearestNeighbors.prototype = {
           dataset: morpheus.Dataset.toJSON(dataset, {
             columnFields: [],
             rowFields: [],
-            seriesIndices: [0]
+            seriesIndices: [0],
           }),
-          input: options.input
+          input: options.input,
         });
 
         worker.onmessage = function (e) {
@@ -14564,20 +14560,22 @@ morpheus.NearestNeighbors.prototype = {
         scoreVector.setValue(i, f(nearestNeighborsList, datasetRowView.setIndex(i)));
       }
       if (!isColumns) {
-        project.setRowSortKeys([new morpheus.SortKey(f.toString(),
-          morpheus.SortKey.SortOrder.DESCENDING)], true);
+        project.setRowSortKeys([
+          new morpheus.SortKey(f.toString(),
+            morpheus.SortKey.SortOrder.DESCENDING)], true);
       } else {
-        project.setColumnSortKeys([new morpheus.SortKey(f.toString(),
-          morpheus.SortKey.SortOrder.DESCENDING)], true);
+        project.setColumnSortKeys([
+          new morpheus.SortKey(f.toString(),
+            morpheus.SortKey.SortOrder.DESCENDING)], true);
       }
       project.trigger('trackChanged', {
         vectors: [scoreVector],
         display: ['text'],
-        columns: isColumns
+        columns: isColumns,
       });
     }
 
-  }
+  },
 };
 
 morpheus.NewHeatMapTool = function () {

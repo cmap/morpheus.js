@@ -27,7 +27,9 @@
     "morpheus"
   ],
   "scripts": {
-    "test": "grunt concat:morpheus concat:extJs concat:extJsAll uglify && ./node_modules/.bin/karma start --single-run"
+    "test:js": "grunt concat:morpheus concat:extJs concat:extJsAll uglify",
+    "test:karma": "./node_modules/.bin/karma start --single-run",
+    "test": "npm run test:js && npm run test:karma"
   },
   "devDependencies": {
     "finalhandler": "^1.0.3",
