@@ -23,3 +23,6 @@ Morpheus is available under the BSD license.
 ## Status
 
 [![Build Status](https://travis-ci.org/cmap/morpheus.js.svg?branch=master)](https://travis-ci.org/cmap/morpheus.js)
+
+## Creators
+ + [Joshua Gould](https://github.com/joshua-gould)
