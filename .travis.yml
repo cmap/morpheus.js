@@ -1,10 +1,9 @@
 language: node_js
 node_js:
-  - "6"
+  - "node"
 notifications:
   email: false
 sudo: false
-dist: trusty
 before_script:
   - npm install -g grunt-cli
 cache:
