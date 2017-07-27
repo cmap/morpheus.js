@@ -1022,12 +1022,12 @@ morpheus.Util.rankIndexArray = function (index) {
 
 morpheus.Util.indexSort = function (array, ascending) {
   var pairs = [];
-  array.forEach(function (value, index) {
+  for(var i = 0, length = array.length; i < length; i++) {
     pairs.push({
-      value: value,
-      index: index
+      value: array[i],
+      index: i
     });
-  });
+  }
   return morpheus.Util.indexSortPairs(pairs, ascending);
 };
 morpheus.Util.indexSortPairs = function (array, ascending) {
