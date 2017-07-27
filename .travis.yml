@@ -3,6 +3,7 @@ node_js:
   - "node"
 notifications:
   email: false
+sudo: false
 before_script:
   - npm install -g grunt-cli
 cache:
