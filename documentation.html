@@ -388,7 +388,7 @@
             "transform",
             "translate(" + margin.left + "," + margin.top + ")");
 
-        d3.text("data/rawdata_2091.txt", function (text) {
+        d3.text("doc-data/rawdata_2091.txt", function (text) {
             var data = d3.tsv.parseRows(text).map(function (row) {
                 return {
                     country: row[1],
