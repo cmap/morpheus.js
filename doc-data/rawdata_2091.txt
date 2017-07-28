@@ -1,0 +1,224 @@
+1	Afghanistan	115.08	
+2	Mali	102.23	
+3	Somalia	98.39	
+4	Central African Republic	90.63	
+5	Guinea-Bissau	89.21	
+6	Chad	88.69	
+7	Niger	84.59	
+8	Angola	78.26	
+9	Burkina Faso	75.32	
+10	Nigeria	72.70	
+11	Sierra Leone	71.68	
+12	Congo, Democratic Republic of the	71.47	
+13	Mozambique	70.21	
+14	Equatorial Guinea	69.17	
+15	Liberia	67.50	
+16	South Sudan	66.39	
+17	Zambia	64.72	
+18	Gambia, The	63.90	
+19	Comoros	63.55	
+20	Burundi	61.89	
+21	Uganda	59.21	
+22	Cote d'Ivoire	58.70	
+23	Rwanda	58.19	
+24	Congo, Republic of the	57.92	
+25	Benin	55.68	
+26	Pakistan	55.67	
+27	Western Sahara	54.70	
+28	Mauritania	54.68	
+29	Cameroon	53.63	
+30	Guinea	53.43	
+31	Ethiopia	53.37	
+32	Laos	52.97	
+33	Swaziland	52.57	
+34	Senegal	51.54	
+35	Sudan	51.52	
+36	Cambodia	50.04	
+37	Lesotho	49.03	
+38	Yemen	48.93	
+39	Djibouti	48.70	
+40	Haiti	47.98	
+41	Sao Tome and Principe	47.88	
+42	Malawi	46.26	
+43	Gabon	46.07	
+44	Namibia	45.62	
+45	Togo	45.22	
+46	Bangladesh	44.09	
+47	Madagascar	43.67	
+48	Burma	43.55	
+49	Tanzania	42.43	
+50	India	41.81	
+51	Kenya	39.38	
+52	Nepal	39.14	
+53	Papua New Guinea	38.55	
+54	Iran	38.04	
+55	Timor-Leste	37.54	
+56	Eritrea	37.53	
+57	Iraq	37.49	
+58	Bolivia	37.49	
+59	Ghana	37.37	
+60	Turkmenistan	36.82	
+61	Bhutan	35.91	
+62	Kiribati	34.26	
+63	Tajikistan	33.93	
+64	South Africa	32.99	
+65	Guyana	32.56	
+66	Tuvalu	30.80	
+67	Kyrgyzstan	27.73	
+68	Suriname	26.17	
+69	Zimbabwe	26.11	
+70	Azerbaijan	25.68	
+71	Indonesia	24.29	
+72	Trinidad and Tobago	23.90	
+73	Maldives	23.70	
+74	Korea, North	23.68	
+75	Morocco	23.60	
+76	Cabo Verde	23.45	
+77	Guatemala	22.73	
+78	Mongolia	22.44	
+79	Tunisia	22.35	
+80	Philippines	22.34	
+81	Egypt	21.55	
+82	Micronesia, Federated States of	21.18	
+83	Algeria	20.98	
+84	Kazakhstan	20.92	
+85	Marshall Islands	20.66	
+86	Paraguay	20.05	
+87	Belize	19.82	
+88	Nicaragua	19.65	
+89	Peru	19.59	
+90	Samoa	19.57	
+91	Uzbekistan	19.20	
+92	Venezuela	18.91	
+93	Turkey	18.87	
+94	Dominican Republic	18.84	
+95	Brazil	18.60	
+96	Vietnam	18.39	
+97	Honduras	18.18	
+98	El Salvador	17.86	
+99	Ecuador	17.38	
+100	Georgia	16.15	
+101	Vanuatu	15.70	
+102	Solomon Islands	15.65	
+103	Syria	15.61	
+104	Jordan	15.18	
+105	Gaza Strip	14.94	
+106	Colombia	14.58	
+107	Saint Helena, Ascension, and Tristan da Cunha	14.19	
+108	Saudi Arabia	14.09	
+109	Cook Islands	13.87	
+110	Oman	13.55	
+111	Armenia	13.51	
+112	Jamaica	13.37	
+113	Malaysia	13.27	
+114	Montserrat	13.17	
+115	West Bank	13.08	
+116	British Virgin Islands	12.98	
+117	Antigua and Barbuda	12.87	
+118	Albania	12.75	
+119	Saint Vincent and the Grenadines	12.69	
+120	Moldova	12.59	
+121	China	12.44	
+122	Mexico	12.23	
+123	Tonga	11.96	
+124	Bahamas, The	11.92	
+125	Libya	11.48	
+126	Saint Lucia	11.45	
+127	Aruba	11.37	
+128	Dominica	11.25	
+129	Palau	11.15	
+130	Turks and Caicos Islands	10.65	
+131	United Arab Emirates	10.59	
+132	Seychelles	10.49	
+133	Barbados	10.42	
+134	Panama	10.41	
+135	Mauritius	10.30	
+136	Grenada	10.21	
+137	Brunei	10.16	
+138	Fiji	9.94	
+139	Romania	9.89	
+140	Argentina	9.69	
+141	Thailand	9.63	
+142	Bahrain	9.35	
+143	Greenland	9.23	
+144	Sint Maarten	9.05	
+145	Botswana	8.93	
+146	Sri Lanka	8.80	
+147	Saint Kitts and Nevis	8.77	
+148	Uruguay	8.74	
+149	American Samoa	8.69	
+150	Bulgaria	8.66	
+151	Costa Rica	8.46	
+152	Cyprus	8.36	
+153	Ukraine	8.12	
+154	Nauru	8.07	
+155	Lebanon	7.76	
+156	Macedonia	7.70	
+157	Puerto Rico	7.57	
+158	Kuwait	7.31	
+159	Russia	6.97	
+160	Chile	6.86	
+161	Saint Pierre and Miquelon	6.78	
+162	Virgin Islands	6.64	
+163	Qatar	6.32	
+164	Gibraltar	6.16	
+165	Cayman Islands	6.08	
+166	Serbia	6.05	
+167	United States	5.87	
+168	Croatia	5.77	
+169	Bosnia and Herzegovina	5.72	
+170	Faroe Islands	5.60	
+171	Guam	5.41	
+172	Northern Mariana Islands	5.40	
+173	New Caledonia	5.37	
+174	Latvia	5.36	
+175	Slovakia	5.27	
+176	Hungary	5.02	
+177	French Polynesia	4.73	
+178	Greece	4.70	
+179	Canada	4.65	
+180	Cuba	4.63	
+181	New Zealand	4.52	
+182	Poland	4.50	
+183	San Marino	4.45	
+184	Taiwan	4.44	
+185	Portugal	4.43	
+186	Wallis and Futuna	4.43	
+187	United Kingdom	4.38	
+188	Australia	4.37	
+189	Liechtenstein	4.29	
+190	Isle of Man	4.11	
+191	Denmark	4.05	
+192	Slovenia	4.00	
+193	European Union	4.00	
+194	Korea, South	3.86	
+195	Estonia	3.85	
+196	Lithuania	3.84	
+197	Jersey	3.82	
+198	Ireland	3.70	
+199	Switzerland	3.67	
+200	Andorra	3.65	
+201	Netherlands	3.62	
+202	Belarus	3.62	
+203	Malta	3.56	
+204	Israel	3.55	
+205	Luxembourg	3.46	
+206	Austria	3.45	
+207	Guernsey	3.44	
+208	Germany	3.43	
+209	Belgium	3.41	
+210	Anguilla	3.37	
+211	Spain	3.30	
+212	Italy	3.29	
+213	France	3.28	
+214	Macau	3.12	
+215	Hong Kong	2.73	
+216	Czech Republic	2.63	
+217	Sweden	2.60	
+218	Finland	2.52	
+219	Bermuda	2.48	
+220	Norway	2.48	
+221	Singapore	2.48	
+222	Japan	2.08	
+223	Iceland	2.06	
+224	Monaco	1.82	

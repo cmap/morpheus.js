@@ -22,7 +22,21 @@
             stroke: #E6E6E6;
         }
 
+        .bar {
+            fill: steelblue;
+        }
+
+        .axis path, .axis line {
+            fill: none;
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
+
+        .tick {
+            font-size: 12px;
+        }
     </style>
+
 </head>
 <body>
 <div class="container-fluid">
@@ -116,11 +130,16 @@
             <p>
                 Hierarchical clustering recursively merges objects based on their pair-wise
                 distance. Objects closest together are merged first, objects furthest apart are
-                merged last. The result is a tree structure, referred to as a dendogram, where the
+                merged last. The result is a tree structure, referred to as a dendrogram, where the
                 leaf nodes represent the original items and internal (higher) nodes represent the
                 merges that occurred.
                 Once the dendrogram is generated, a dotted line will appear that can be clicked and
-                dragged to adjust the cut of the clusters.
+                dragged to adjust the cut of the clusters. Gaps (white space) are introduced in the heat
+                map between clusters that are created when cutting the dendrogram.
+                When there are lots of singleton clusters, the width of the heat
+                map can become too large. One way to solve this issue is by
+                "squishing" singleton clusters together as shown <a href="#" data-toggle="modal"
+                                                                    data-target="#dendrogramModal">here</a>.
 
                 <br/><a target="_blank" href="https://youtu.be/_3JX9BeQcIg">Video <i
                     class="fa fa-video-camera" aria-hidden="true"></i></a>
@@ -163,8 +182,10 @@
                 once along the rows/columns in the heat map to sort by
                 the matrix values in descending order,
                 double click twice to sort ascending, and
-                double click three times to order the data from the
-                highest to lowest values in groups of ten</p>
+                double click three times to order the data in <a href="#" data-toggle="modal"
+                                                                 data-target="#sortOrderModal">alternating
+                    groups of ten</a> of most
+                similar and dissimilar items.</p>
 
             <p>Select Tools > Sort/Group to group annotations in the heat map. Groupings add
                 whitespace to visually
@@ -201,92 +222,259 @@
 
         </div>
     </div>
-    <div class="row">
-        <div class="col-xs-12 morpheus-footer"></div>
-    </div>
+
+    <div id="dendrogramModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dendrogramModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="dendrogramModalLabel">"Squish" singleton clusters</h4>
+                </div>
+                <div class="modal-body">
+                    <img style="width:100%;" src="doc-data/squished.gif">
+                </div>
+
+            </div>
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<div id="sortOrderModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="sortOrderModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="sortOrderModalLabel">A New Sort Order</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <p>One way users navigate large tables or charts is by sorting.
+                            Typically, users can sort data in ascending or descending order by
+                            one or more variables of interest. But what if the user is
+                            interested in seeing the bottom and the top of the sorted data
+                            simultaneously? One way to achieve this is to define a "sliding
+                            window" sort order in which we alternate between the top n most
+                            similar and dissimilar items.</p>
+                        <small>Infant mortality rate from
+                            https://www.cia.gov/library/publications/the-world-factbook/rankorder/2091rank.html
+                        </small>
+                        <br/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <label> <input name="sort" type="radio" value="asc"> Ascending</label>
+                        <label><input
+                                name="sort" type="radio" value="desc" checked> Descending </label>
+                        <label><input
+                                name="sort" type="radio" value="wind"> Sliding Window</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div id="sortOrderChart"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="row">
+    <div class="col-xs-12 morpheus-footer"></div>
+</div>
 </div>
 <script type="text/javascript">
-  new morpheus.HelpMenu().$el.appendTo($('.morpheus-footer'));
-  var matrix = [[1.34, 1.88, 0.01, 0.93, -0.09, 1.13, -0.66, -0.4, -0.91, -1.13, -0.75],
-    [1.13, 1.84, 0.89, 1.38, -0.39, -0.13, -0.59, -0.74, -0.42, -0.84, -1],
-    [1.1, 0.29, 0.83, -0.62, -0.59, 1.78, -1.11, 1.24, -1.15, -0.39, -0.28],
-    [1.04, 1.97, -0.02, 1.46, -0.35, 0.47, -0.62, -0.96, -0.61, -0.81, -0.54],
-    [1.03, 2.38, 0.07, -0.02, 0.98, -0.1, -0.35, -0.64, -0.71, -0.77, -0.84],
-    [-1.2, -0.58, -0.55, -0.62, -0.6, -0.68, -0.22, 2.33, 1.25, -0.01, -0.31],
-    [-1.2, -0.66, -0.79, -0.91, -0.35, -0.93, -0.25, 0.75, 1.81, 1.48, -0.15],
-    [-1.41, -1.01, -0.59, -0.9, -0.67, -0.95, 0.44, 0.87, 2.02, 0.67, 0.11],
-    [-1.42, -0.71, -0.51, -1.02, -0.8, -0.92, -0.07, 0.64, 2.1, 0.76, 0.53],
-    [-1.47, -1, -0.88, -1.26, -0.38, -1.02, 1.05, 0.83, 0.64, 1.31, 0.72]
-  ];
+    new morpheus.HelpMenu().$el.appendTo($('.morpheus-footer'));
 
-  //  var colorScale = d3.scale.linear().domain([-2, -1.5, -1, 0, 1, 1.5, 2]).range(
-  //    ['#ffffb2', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#b10026']).clamp(true);
-  var colorScale =
-    d3.scale.linear().range(['#ca0020', 'white', '#0571b0']).domain([-2, 0, 2]).clamp(true);
-  var margin = {
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0
-  };
-  var gridWidth = 40;
-  var gridHeight = 25;
-  var width = matrix.length * gridWidth - margin.left - margin.right;
-  var height = matrix[0].length * gridHeight - margin.top - margin.bottom;
+    var showHeatMap = function () {
+        var matrix = [[1.34, 1.88, 0.01, 0.93, -0.09, 1.13, -0.66, -0.4, -0.91, -1.13, -0.75],
+            [1.13, 1.84, 0.89, 1.38, -0.39, -0.13, -0.59, -0.74, -0.42, -0.84, -1],
+            [1.1, 0.29, 0.83, -0.62, -0.59, 1.78, -1.11, 1.24, -1.15, -0.39, -0.28],
+            [1.04, 1.97, -0.02, 1.46, -0.35, 0.47, -0.62, -0.96, -0.61, -0.81, -0.54],
+            [1.03, 2.38, 0.07, -0.02, 0.98, -0.1, -0.35, -0.64, -0.71, -0.77, -0.84],
+            [-1.2, -0.58, -0.55, -0.62, -0.6, -0.68, -0.22, 2.33, 1.25, -0.01, -0.31],
+            [-1.2, -0.66, -0.79, -0.91, -0.35, -0.93, -0.25, 0.75, 1.81, 1.48, -0.15],
+            [-1.41, -1.01, -0.59, -0.9, -0.67, -0.95, 0.44, 0.87, 2.02, 0.67, 0.11],
+            [-1.42, -0.71, -0.51, -1.02, -0.8, -0.92, -0.07, 0.64, 2.1, 0.76, 0.53],
+            [-1.47, -1, -0.88, -1.26, -0.38, -1.02, 1.05, 0.83, 0.64, 1.31, 0.72]
+        ];
 
-  var svg = d3.select("#heatmap").append("svg")
-  .attr("width", width + margin.left + margin.right)
-  .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        //  var colorScale = d3.scale.linear().domain([-2, -1.5, -1, 0, 1, 1.5, 2]).range(
+        //    ['#ffffb2', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#b10026']).clamp(true);
+        var colorScale =
+            d3.scale.linear().range(['#ca0020', 'white', '#0571b0']).domain([-2, 0, 2]).clamp(true);
+        var margin = {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0
+        };
+        var gridWidth = 40;
+        var gridHeight = 25;
+        var width = matrix.length * gridWidth - margin.left - margin.right;
+        var height = matrix[0].length * gridHeight - margin.top - margin.bottom;
 
-  var data = [];
-  for (var i = 0; i < matrix.length; i++) {
-    for (var j = 0; j < matrix[0].length; j++) {
-      data.push({
-        x: i,
-        y: j,
-        value: matrix[i][j]
-      });
+        var svg = d3.select("#heatmap").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var data = [];
+        for (var i = 0; i < matrix.length; i++) {
+            for (var j = 0; j < matrix[0].length; j++) {
+                data.push({
+                    x: i,
+                    y: j,
+                    value: matrix[i][j]
+                });
+            }
+        }
+        var elements = svg.selectAll(".elem").data(data);
+
+        var rects = elements.enter().append("rect");
+        rects.attr("x", function (d, index) {
+            return (d.x) * gridWidth;
+        }).attr("y", function (d) {
+            return (d.y) * gridHeight;
+        }).attr("class", "bordered")
+            .attr("width", gridWidth)
+            .attr("height", gridHeight)
+            .style("fill", 'white');
+        var labels = svg.selectAll(".text")
+            .data(data)
+            .enter().append("text")
+            .text(function (d) {
+                return '' + d.value;
+            })
+            .attr("x", function (d) {
+                return d.x * gridWidth + gridWidth / 2;
+            })
+            .attr("y", function (d) {
+                return d.y * gridHeight + gridHeight / 2 + 4;
+            })
+            .style("text-anchor", "middle");
+        d3.transition()
+            .duration(3000).delay(3000)
+            .each(function () {
+                d3.selectAll("text").transition()
+                    .style("opacity", function (d) {
+                        return 0;
+                    }).remove();
+                d3.selectAll(".bordered").transition()
+                    .style("fill", function (d) {
+                        return colorScale(d.value)
+                    });
+            });
+    };
+
+    showHeatMap();
+    var sortOrderChart = function () {
+        var margin = {
+            top: 10,
+            right: 1,
+            bottom: 20,
+            left: 300
+        }, width = 700 - margin.left - margin.right, height = 2500 - margin.top
+            - margin.bottom;
+        $('sortOrderChart').empty();
+        var svg = d3.select("#sortOrderChart").append("svg").attr("width",
+            width + margin.left + margin.right).attr("height",
+            height + margin.top + margin.bottom).append("g").attr(
+            "transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+
+        d3.text("data/rawdata_2091.txt", function (text) {
+            var data = d3.tsv.parseRows(text).map(function (row) {
+                return {
+                    country: row[1],
+                    rate: parseFloat(row[2])
+                }
+            });
+
+            var y = d3.scale.ordinal().rangeRoundBands([0, height], .1)
+                .domain(data.map(function (d) {
+                    return d.country;
+                }));
+            var x = d3.scale.linear().range([0, width]).domain(
+                [d3.min(data, function (d) {
+                    return d.rate;
+                }), d3.max(data, function (d) {
+                    return d.rate;
+                })]);
+            var xAxis = d3.svg.axis().scale(x).orient("bottom");
+            var yAxis = d3.svg.axis().scale(y).orient("left");
+            svg.append("g").attr("class", "x axis").attr("transform",
+                "translate(0," + height + ")").call(xAxis);
+            svg.append("g").attr("class", "y axis").call(yAxis);
+
+            var bar = svg.selectAll(".bar").data(data);
+            bar.enter().append("rect").attr("class", "bar");
+            bar.attr("height", y.rangeBand()).attr("width", function (d) {
+                return x(d.rate);
+            }).attr('y', function (d) {
+                return y(d.country);
+            });
+            var sortData = function (order) {
+                if (order == 'asc') {
+                    data.sort(function (a, b) {
+                        return (a.rate === b.rate ? 0 : (a.rate < b.rate ? -1
+                            : 1));
+                    });
+                } else if (order == 'desc') {
+                    data.sort(function (a, b) {
+                        return (a.rate === b.rate ? 0 : (a.rate < b.rate ? 1
+                            : -1));
+                    });
+                } else { // sliding window
+                    data.sort(function (a, b) {
+                        return (a.rate === b.rate ? 0 : (a.rate < b.rate ? 1
+                            : -1));
+                    });
+                    var array = [];
+                    var windowSize = 10;
+                    var topIndex = 0;
+                    var half = Math.floor(data.length / 2);
+                    var bottomIndex = data.length - 1;
+                    while (array.length < data.length) {
+                        for (var i = 0; i < windowSize && topIndex < half; i++, topIndex++) {
+                            array.push(data[topIndex]);
+                        }
+                        for (var i = 0; i < windowSize && bottomIndex >= half; i++, bottomIndex--) {
+                            array.push(data[bottomIndex]);
+                        }
+                    }
+                    data = array;
+                }
+                y.domain(data.map(function (d) {
+                    return d.country;
+                }));
+                svg.selectAll(".bar").data(data, function (d) {
+                    return d.country;
+                }).transition().duration(1000)
+                    .attr('y', function (d) {
+                        return y(d.country);
+                    });
+                svg.select(".y").transition().duration(1000).call(yAxis);
+            }
+            $('[name=sort]').on('change', function (d) {
+                sortData($(this).filter(':checked').val());
+            });
+            setTimeout(function () {
+                $('[name=sort]').filter('[value=wind]').prop('checked', true);
+                sortData('wind');
+            }, 1500);
+
+        });
+        // data from https://www.cia.gov/library/publications/the-world-factbook/rankorder/2091rank.html
     }
-  }
-  var elements = svg.selectAll(".elem").data(data);
-
-  var rects = elements.enter().append("rect");
-  rects.attr("x", function (d, index) {
-    return (d.x) * gridWidth;
-  }).attr("y", function (d) {
-    return (d.y) * gridHeight;
-  }).attr("class", "bordered")
-  .attr("width", gridWidth)
-  .attr("height", gridHeight)
-  .style("fill", 'white');
-  var labels = svg.selectAll(".text")
-  .data(data)
-  .enter().append("text")
-  .text(function (d) {
-    return '' + d.value;
-  })
-  .attr("x", function (d) {
-    return d.x * gridWidth + gridWidth / 2;
-  })
-  .attr("y", function (d) {
-    return d.y * gridHeight + gridHeight / 2 + 4;
-  })
-  .style("text-anchor", "middle");
-  d3.transition()
-  .duration(3000).delay(3000)
-  .each(function () {
-    d3.selectAll("text").transition()
-    .style("opacity", function (d) {
-      return 0;
-    }).remove();
-    d3.selectAll(".bordered").transition()
-    .style("fill", function (d) {
-      return colorScale(d.value)
-    });
-  });
-
+    $('#sortOrderModal').on('show.bs.modal', function (e) {
+        sortOrderChart();
+    })
 </script>
 </body>
 </html>

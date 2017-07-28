@@ -449,7 +449,7 @@ morpheus.ActionManager = function () {
     name: 'Tutorial',
     cb: function () {
       window
-      .open('https://clue.io/morpheus/tutorial.html');
+      .open('https://software.broadinstitute.org/morpheus/tutorial.html');
     }
   });
   this.add({
@@ -561,7 +561,7 @@ morpheus.ActionManager = function () {
     name: 'Configuration',
     cb: function () {
       window
-      .open('https://clue.io/morpheus/configuration.html');
+      .open('https://software.broadinstitute.org/morpheus/configuration.html');
     }
   });
   this.add({
