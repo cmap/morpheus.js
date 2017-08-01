@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * @param tree An object with maxHeight, rootNode, leafNodes, nLeafNodes. Each node has an id
  * (integer), name (string), children, depth, height, minIndex, maxIndex, parent. Leaf nodes also
  * have an index.
@@ -81,24 +81,22 @@ morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
   };
   if (type !== morpheus.AbstractDendrogram.Type.RADIAL) {
 
-    $(this.canvas)
-    .on(
+    $(this.canvas).on(
       'contextmenu',
       function (e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        var position = morpheus.CanvasUtil
-        .getMousePosWithScroll(e.target,
+        var position = morpheus.CanvasUtil.getMousePosWithScroll(e.target,
           e, _this.lastClip.x,
           _this.lastClip.y);
         var selectedNode = _this.getNode(position);
-        morpheus.Popup
-        .showPopup(
-          [{
-            name: 'Flip',
-            disabled: selectedNode == null
-          }, {
+        morpheus.Popup.showPopup(
+          [
+            {
+              name: 'Flip',
+              disabled: selectedNode == null
+            }, {
             name: 'Branch Color',
             disabled: selectedNode == null
           }, {
@@ -133,7 +131,16 @@ morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
               formBuilder.append({
                 name: 'file_name',
                 type: 'text',
+                required: true
+              });
+              formBuilder.append({
+                name: 'leaf_node_id_field',
+                type: 'bootstrap-select',
                 required: true,
+                options: morpheus.MetadataUtil.getMetadataNames(
+                  type === morpheus.AbstractDendrogram.Type.COLUMN
+                    ? project.getFullDataset().getColumnMetadata()
+                    : project.getFullDataset().getRowMetadata())
               });
               morpheus.FormBuilder.showOkCancel({
                 title: 'Save Dendrogram',
@@ -144,8 +151,15 @@ morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
                   if (fileName === '') {
                     fileName = 'dendrogram.txt';
                   }
+                  var leafNodeIdField = formBuilder.getValue('leaf_node_id_field');
                   var out = [];
-                  morpheus.DendrogramUtil.writeNewick(tree.rootNode, out);
+                  var vector = type === morpheus.AbstractDendrogram.Type.COLUMN
+                    ? project.getFullDataset().getColumnMetadata().getByName(leafNodeIdField)
+                    : project.getFullDataset().getRowMetadata().getByName(leafNodeIdField);
+                  var leafNodeToString = function (n) {
+                    return vector.getValue(n.index);
+                  };
+                  morpheus.DendrogramUtil.writeNewick(tree.rootNode, out, leafNodeToString);
                   var blob = new Blob([out.join('')], {type: 'text/plain;charset=charset=utf-8'});
                   saveAs(blob, fileName, true);
                 }
@@ -198,7 +212,9 @@ morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
                 setIndex(selectedNode);
 
                 var currentOrder = [];
-                var count = isColumns ? heatMap.getProject().getSortedFilteredDataset().getColumnCount() : heatMap.getProject().getSortedFilteredDataset().getRowCount();
+                var count = isColumns ? heatMap.getProject().getSortedFilteredDataset().getColumnCount() : heatMap.getProject()
+                  .getSortedFilteredDataset()
+                  .getRowCount();
                 for (var i = 0; i < count; i++) {
                   currentOrder.push(isColumns ? project.convertViewColumnIndexToModel(i) : project.convertViewRowIndexToModel(i));
                 }
@@ -246,27 +262,23 @@ morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
 
               }
             } else if (item === 'Annotate...') {
-              morpheus.HeatMap
-              .showTool(
+              morpheus.HeatMap.showTool(
                 new morpheus.AnnotateDendrogramTool(
                   type === morpheus.AbstractDendrogram.Type.COLUMN),
                 _this.heatMap);
             } else if (item === 'Enrichment...') {
-              morpheus.HeatMap
-              .showTool(
+              morpheus.HeatMap.showTool(
                 new morpheus.DendrogramEnrichmentTool(
                   type === morpheus.AbstractDendrogram.Type.COLUMN),
                 _this.heatMap);
             } else if (item === 'Squish Singleton Clusters') {
               _this.squishEnabled = !_this.squishEnabled;
               if (!_this.squishEnabled) {
-                _this.positions
-                .setSquishedIndices(null);
+                _this.positions.setSquishedIndices(null);
               }
             } else if (item === 'Delete') {
               _this.resetCutHeight();
-              _this.heatMap
-              .setDendrogram(
+              _this.heatMap.setDendrogram(
                 null,
                 type === morpheus.AbstractDendrogram.Type.COLUMN);
             }
@@ -281,18 +293,14 @@ morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
   var dragStartScaledCutHeight = 0;
   this.cutTreeHotSpot = false;
   if (type !== morpheus.AbstractDendrogram.Type.RADIAL) {
-    this.hammer = morpheus.Util
-    .hammer(this.canvas, ['pan', 'tap'])
-    .on(
+    this.hammer = morpheus.Util.hammer(this.canvas, ['pan', 'tap']).on(
       'tap',
       this.tap = function (event) {
         if (!morpheus.CanvasUtil.dragging) {
-          var position = morpheus.CanvasUtil
-          .getMousePosWithScroll(event.target,
+          var position = morpheus.CanvasUtil.getMousePosWithScroll(event.target,
             event, _this.lastClip.x,
             _this.lastClip.y);
-          _this.cutTreeHotSpot = _this
-          .isDragHotSpot(position);
+          _this.cutTreeHotSpot = _this.isDragHotSpot(position);
           if (_this.cutTreeHotSpot) {
             return;
           }
@@ -305,60 +313,46 @@ morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
           _this.setSelectedNode(node,
             event.srcEvent.shiftKey || commandKey);
         }
-      })
-    .on('panend', this.panend = function (event) {
+      }).on('panend', this.panend = function (event) {
       morpheus.CanvasUtil.dragging = false;
       _this.canvas.style.cursor = 'default';
       _this.cutTreeHotSpot = true;
-    })
-    .on(
+    }).on(
       'panstart',
       this.panstart = function (event) {
-        var position = morpheus.CanvasUtil
-        .getMousePosWithScroll(event.target, event,
+        var position = morpheus.CanvasUtil.getMousePosWithScroll(event.target, event,
           _this.lastClip.x, _this.lastClip.y,
           true);
-        _this.cutTreeHotSpot = _this
-        .isDragHotSpot(position);
+        _this.cutTreeHotSpot = _this.isDragHotSpot(position);
         if (_this.cutTreeHotSpot) { // make sure start event
           // was on hotspot
           morpheus.CanvasUtil.dragging = true;
-          _this.canvas.style.cursor = _this
-          .getResizeCursor();
-          dragStartScaledCutHeight = _this
-          .scale(_this.cutHeight);
+          _this.canvas.style.cursor = _this.getResizeCursor();
+          dragStartScaledCutHeight = _this.scale(_this.cutHeight);
         }
-      })
-    .on(
+      }).on(
       'panmove',
       this.panmove = function (event) {
         if (_this.cutTreeHotSpot) {
           var cutHeight;
           if (_this.type === morpheus.AbstractDendrogram.Type.COLUMN) {
             var delta = event.deltaY;
-            cutHeight = Math
-            .max(
+            cutHeight = Math.max(
               0,
-              Math
-              .min(
+              Math.min(
                 _this.tree.maxHeight,
-                _this.scale
-                .invert(dragStartScaledCutHeight
+                _this.scale.invert(dragStartScaledCutHeight
                   + delta)));
           } else if (_this.type === morpheus.AbstractDendrogram.Type.ROW) {
             var delta = event.deltaX;
-            cutHeight = Math
-            .max(
+            cutHeight = Math.max(
               0,
-              Math
-              .min(
+              Math.min(
                 _this.tree.maxHeight,
-                _this.scale
-                .invert(dragStartScaledCutHeight
+                _this.scale.invert(dragStartScaledCutHeight
                   + delta)));
           } else {
-            var point = morpheus.CanvasUtil
-            .getMousePos(event.target, event);
+            var point = morpheus.CanvasUtil.getMousePos(event.target, event);
             point.x = _this.radius - point.x;
             point.y = _this.radius - point.y;
             var radius = Math.sqrt(point.x * point.x
@@ -390,8 +384,7 @@ morpheus.AbstractDendrogram.prototype = {
   setSelectedNode: function (node, add) {
     var _this = this;
     var viewIndices;
-    var selectionModel = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? this.project
-    .getColumnSelectionModel()
+    var selectionModel = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? this.project.getColumnSelectionModel()
       : this.project.getRowSelectionModel();
     if (node == null) {
       // clear selection
@@ -473,8 +466,7 @@ morpheus.AbstractDendrogram.prototype = {
     this.$label.text('');
     this.$squishedLabel.text('');
     var dataset = this.project.getSortedFilteredDataset();
-    var clusterIdVector = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? dataset
-    .getColumnMetadata().getByName('dendrogram_cut')
+    var clusterIdVector = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? dataset.getColumnMetadata().getByName('dendrogram_cut')
       : dataset.getRowMetadata().getByName('dendrogram_cut');
     if (clusterIdVector) {
       for (var i = 0, size = clusterIdVector.size(); i < size; i++) {
@@ -492,8 +484,7 @@ morpheus.AbstractDendrogram.prototype = {
     var roots = morpheus.DendrogramUtil.cutAtHeight(this.tree.rootNode,
       this.cutHeight);
     var dataset = this.project.getSortedFilteredDataset();
-    var clusterIdVector = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? dataset
-    .getColumnMetadata().add('dendrogram_cut')
+    var clusterIdVector = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? dataset.getColumnMetadata().add('dendrogram_cut')
       : dataset.getRowMetadata().add('dendrogram_cut');
     for (var i = 0, nroots = roots.length; i < nroots; i++) {
       var root = roots[i];
@@ -539,11 +530,9 @@ morpheus.AbstractDendrogram.prototype = {
     }
 
     if (this.type === morpheus.AbstractDendrogram.Type.COLUMN) {
-      this.project.setGroupColumns([new morpheus.SortKey(clusterIdVector
-      .getName(), morpheus.SortKey.SortOrder.UNSORTED)], true);
+      this.project.setGroupColumns([new morpheus.SortKey(clusterIdVector.getName(), morpheus.SortKey.SortOrder.UNSORTED)], true);
     } else {
-      this.project.setGroupRows([new morpheus.SortKey(clusterIdVector
-      .getName(), morpheus.SortKey.SortOrder.UNSORTED)], true);
+      this.project.setGroupRows([new morpheus.SortKey(clusterIdVector.getName(), morpheus.SortKey.SortOrder.UNSORTED)], true);
     }
   },
   dispose: function () {
