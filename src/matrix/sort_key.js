@@ -1,4 +1,46 @@
+morpheus.AbstractSortKey = function (name, columns) {
+  this.name = name;
+  this.columns = columns;
+};
+
+morpheus.AbstractSortKey.prototype = {
+  lockOrder: 0,
+  columns: true,
+  preservesDendrogram: false,
+  /**
+   * Indicates whether this key is sorting rows or columns.
+   * @return {Boolean}
+   */
+  isColumns: function () {
+    return this.columns;
+  },
+  setColumns: function (columns) {
+    this.columns = columns;
+  },
+  isPreservesDendrogram: function () {
+    return this.preservesDendrogram;
+  },
+  setPreservesDendrogram: function (preservesDendrogram) {
+    this.preservesDendrogram = preservesDendrogram;
+  },
+  getLockOrder: function () {
+    return this.lockOrder;
+  },
+  setLockOrder: function (lockOrder) {
+    this.lockOrder = lockOrder;
+  },
+  setSortOrder: function (sortOrder) {
+    this.sortOrder = sortOrder;
+  },
+  getSortOrder: function () {
+    return this.sortOrder;
+  },
+  init: function () {
+
+  }
+};
 morpheus.MatchesOnTopSortKey = function (project, modelIndices, name, columns) {
+  morpheus.AbstractSortKey.call(this, name, columns);
   var highlightedModelIndices = {};
   var p = project;
   var viewIndices = [];
@@ -18,22 +60,10 @@ morpheus.MatchesOnTopSortKey = function (project, modelIndices, name, columns) {
     return (a === b ? 0 : (a < b ? -1 : 1));
   };
   this.indices = viewIndices;
-  this.name = name;
-  this.columns = columns;
 };
 morpheus.MatchesOnTopSortKey.prototype = {
-  lockOrder: 0,
-  /**
-   * Indicates whether this key is sorting rows or columns.
-   * @return {*}
-   */
-  isColumns: function () {
-    return this.columns;
-  },
-  setColumns: function (columns) {
-    this.columns = columns;
-  },
-  init: function () {
+  toString: function () {
+    return this.name;
   },
   getSortOrder: function () {
     return 2;
@@ -43,39 +73,29 @@ morpheus.MatchesOnTopSortKey.prototype = {
   },
   getValue: function (i) {
     return i;
-  },
-  toString: function (i) {
-    return this.name;
-  },
-  getLockOrder: function () {
-    return this.lockOrder;
-  },
-  setLockOrder: function (lockOrder) {
-    this.lockOrder = lockOrder;
   }
 };
+morpheus.Util.extend(morpheus.MatchesOnTopSortKey, morpheus.AbstractSortKey);
+
 morpheus.SortKey = function (field, sortOrder, columns) {
+  morpheus.AbstractSortKey.call(this, field, columns);
   if (typeof sortOrder === 'string') {
     sortOrder = morpheus.SortKey.SortOrder[sortOrder.toUpperCase()];
+    if (sortOrder === undefined) {
+      sortOrder = 0;
+    }
   }
-  this.field = field;
-  this.sortOrder = sortOrder;
   this.v = null;
   this.c = null;
   this.setSortOrder(sortOrder);
-  this.columns = columns;
 };
 
 morpheus.SortKey.prototype = {
-  lockOrder: 0,
-  isColumns: function () {
-    return this.columns;
-  },
-  setColumns: function (columns) {
-    this.columns = columns;
+  toString: function () {
+    return this.name;
   },
   init: function (dataset, visibleModelIndices) {
-    this.v = dataset.getRowMetadata().getByName(this.field);
+    this.v = dataset.getRowMetadata().getByName(this.name);
     if (!this.v) {
       this.v = {};
       this.v.getValue = function () {
@@ -90,17 +110,32 @@ morpheus.SortKey.prototype = {
           : morpheus.SortKey.NUMBER_DESCENDING_COMPARATOR;
       } else if (dataType === '[number]') {
         var summary = this.v.getProperties().get(
-            morpheus.VectorKeys.ARRAY_SUMMARY_FUNCTION)
+          morpheus.VectorKeys.ARRAY_SUMMARY_FUNCTION)
           || morpheus.SortKey.ARRAY_MAX_SUMMARY_FUNCTION;
-
         this.c = this.sortOrder === morpheus.SortKey.SortOrder.ASCENDING ? morpheus.SortKey
-        .ARRAY_ASCENDING_COMPARATOR(summary)
+            .ARRAY_ASCENDING_COMPARATOR(summary)
           : morpheus.SortKey.ARRAY_DESCENDING_COMPARATOR(summary);
       } else {
         this.c = this.sortOrder === morpheus.SortKey.SortOrder.ASCENDING ? morpheus.SortKey.ASCENDING_COMPARATOR
           : morpheus.SortKey.DESCENDING_COMPARATOR;
       }
+      if (this.customComparator != null) {
+        var oldC = this.c;
+        var customComparator = this.customComparator;
+        if (this.sortOrder === morpheus.SortKey.SortOrder.ASCENDING) {
+          this.c = function (a, b) {
+            var val = customComparator(a, b);
+            return val === 0 ? oldC(a, b) : val;
+          };
+        } else {
+          this.c = function (a, b) {
+            var val = customComparator(b, a);
+            return val === 0 ? oldC(a, b) : val;
+          };
+        }
+      }
     }
+
     if (this.sortOrder === morpheus.SortKey.SortOrder.TOP_N) {
       var pairs = [];
       var missingIndices = [];
@@ -120,9 +155,9 @@ morpheus.SortKey.prototype = {
       var c = this.c;
       this.c = morpheus.SortKey.NUMBER_ASCENDING_COMPARATOR;
       pairs
-      .sort(function (pair1, pair2) {
-        return c(pair1.value, pair2.value);
-      });
+        .sort(function (pair1, pair2) {
+          return c(pair1.value, pair2.value);
+        });
 
       var modelIndexToValue = [];
       var nInGroup = Math.min(pairs.length, 10);
@@ -141,7 +176,8 @@ morpheus.SortKey.prototype = {
         }
         var indexCounterPairs = [];
         for (var i = 0; i < nInGroup && bottomIndex >= 0; i++, bottomIndex--, counter++) {
-          indexCounterPairs.push([bottomPairs[bottomIndex].index,
+          indexCounterPairs.push([
+            bottomPairs[bottomIndex].index,
             counter]);
         }
         for (var i = indexCounterPairs.length - 1, j = 0; i >= 0; i--, j++) {
@@ -165,31 +201,12 @@ morpheus.SortKey.prototype = {
   },
   getComparator: function () {
     return this.c;
-  }
-  ,
+  },
   getValue: function (i) {
     return this.modelIndexToValue ? this.modelIndexToValue[i] : this.v.getValue(i);
   }
-  ,
-  setSortOrder: function (sortOrder) {
-    this.sortOrder = sortOrder;
-  }
-  ,
-  getSortOrder: function () {
-    return this.sortOrder;
-  }
-  ,
-  toString: function () {
-    return this.field;
-  },
-  getLockOrder: function () {
-    return this.lockOrder;
-  },
-  setLockOrder: function (lockOrder) {
-    this.lockOrder = lockOrder;
-  }
-}
-;
+};
+morpheus.Util.extend(morpheus.SortKey, morpheus.AbstractSortKey);
 /**
  * @param modelIndices
  *            Selected rows or columns
@@ -197,21 +214,16 @@ morpheus.SortKey.prototype = {
  *            sort columns by selected rows.
  */
 morpheus.SortByValuesKey = function (modelIndices, sortOrder, isColumnSort) {
-  this.field = 'selection';
+  morpheus.AbstractSortKey.call(this, 'values', isColumnSort);
   this.bothCount = 10;
   this.modelIndices = modelIndices;
   this.sortOrder = sortOrder;
-  this.isColumnSort = isColumnSort;
   this.setSortOrder(sortOrder);
 
 };
 morpheus.SortByValuesKey.prototype = {
-  lockOrder: 0,
-  isColumns: function () {
-    return this.isColumnSort;
-  },
-  setColumns: function (columns) {
-    this.isColumnSort = columns;
+  toString: function () {
+    return this.name;
   },
   init: function (dataset, visibleModelIndices) {
     // isColumnSort-sort columns by selected rows
@@ -240,10 +252,10 @@ morpheus.SortByValuesKey.prototype = {
       }
       // sort values in descending order
       pairs
-      .sort(function (a, b) {
-        return (a.value < b.value ? 1
-          : (a.value === b.value ? 0 : -1));
-      });
+        .sort(function (a, b) {
+          return (a.value < b.value ? 1
+            : (a.value === b.value ? 0 : -1));
+        });
 
       var modelIndexToValue = [];
       var nInGroup = Math.min(pairs.length, this.bothCount);
@@ -262,7 +274,8 @@ morpheus.SortByValuesKey.prototype = {
         }
         var indexCounterPairs = [];
         for (var i = 0; i < nInGroup && bottomIndex >= 0; i++, bottomIndex--, counter++) {
-          indexCounterPairs.push([bottomPairs[bottomIndex].index,
+          indexCounterPairs.push([
+            bottomPairs[bottomIndex].index,
             counter]);
         }
         for (var i = indexCounterPairs.length - 1, j = 0; i >= 0; i--, j++) {
@@ -288,7 +301,7 @@ morpheus.SortByValuesKey.prototype = {
   },
   getValue: function (i) {
     return this.modelIndexToValue ? this.modelIndexToValue[i] : this
-    .summaryFunction(this.rowView.setIndex(i));
+      .summaryFunction(this.rowView.setIndex(i));
   },
   setSortOrder: function (sortOrder) {
     if (typeof sortOrder === 'string') {
@@ -303,20 +316,10 @@ morpheus.SortByValuesKey.prototype = {
       this.c = morpheus.SortKey.NUMBER_ASCENDING_COMPARATOR;
     }
 
-  },
-  getSortOrder: function () {
-    return this.sortOrder;
-  },
-  toString: function () {
-    return 'values';
-  },
-  getLockOrder: function () {
-    return this.lockOrder;
-  },
-  setLockOrder: function (lockOrder) {
-    this.lockOrder = lockOrder;
   }
 };
+morpheus.Util.extend(morpheus.SortByValuesKey, morpheus.AbstractSortKey);
+
 /**
  * @param modelIndices
  *            Array of model indices
@@ -329,6 +332,7 @@ morpheus.SortByValuesKey.prototype = {
  * @param columns Whether column sort
  */
 morpheus.SpecifiedModelSortOrder = function (modelIndices, nvisible, name, columns) {
+  morpheus.AbstractSortKey.call(this, name, columns);
   this.nvisible = nvisible;
   var modelIndexToValue = [];
   for (var i = 0, length = modelIndices.length; i < length; i++) {
@@ -336,19 +340,11 @@ morpheus.SpecifiedModelSortOrder = function (modelIndices, nvisible, name, colum
   }
   this.modelIndices = modelIndices;
   this.modelIndexToValue = modelIndexToValue;
-  this.name = name;
   this.c = morpheus.SortKey.NUMBER_ASCENDING_COMPARATOR;
-  this.columns = columns;
 };
 morpheus.SpecifiedModelSortOrder.prototype = {
-  lockOrder: 0,
-  isColumns: function () {
-    return this.columns;
-  },
-  setColumns: function (columns) {
-    this.columns = columns;
-  },
-  init: function (dataset) {
+  toString: function () {
+    return this.name;
   },
   getComparator: function (a, b) {
     return this.c;
@@ -360,20 +356,9 @@ morpheus.SpecifiedModelSortOrder.prototype = {
     this.sortOrder = sortOrder;
     this.c = this.sortOrder === morpheus.SortKey.SortOrder.ASCENDING ? morpheus.SortKey.NUMBER_ASCENDING_COMPARATOR
       : morpheus.SortKey.NUMBER_DESCENDING_COMPARATOR;
-  },
-  getSortOrder: function () {
-    return this.sortOrder;
-  },
-  getName: function () {
-    return this.name;
-  },
-  getLockOrder: function () {
-    return this.lockOrder;
-  },
-  setLockOrder: function (lockOrder) {
-    this.lockOrder = lockOrder;
   }
 };
+morpheus.Util.extend(morpheus.SpecifiedModelSortOrder, morpheus.AbstractSortKey);
 
 /**
  * Group by key
@@ -381,37 +366,27 @@ morpheus.SpecifiedModelSortOrder.prototype = {
  * @param values
  */
 morpheus.SpecifiedGroupByKey = function (clusterIds, columns) {
+  morpheus.AbstractSortKey.call(this, 'Dendrogram Cut', columns);
   this.clusterIds = clusterIds;
   this.c = function (a, b) {
     return (a === b ? 0 : // Values are equal
       (a < b ? -1 : // (-0.0, 0.0) or (!NaN, NaN)
         1));
   };
-  this.columns = columns;
 };
 morpheus.SpecifiedGroupByKey.prototype = {
-  isColumns: function () {
-    return this.columns;
-  },
-  setColumns: function (columns) {
-    this.columns = columns;
-  },
-  init: function (dataset) {
+  toString: function () {
+    return this.name;
   },
   getComparator: function (a, b) {
     return this.c;
   },
   getValue: function (i) {
     return this.clusterIds[i];
-  },
-  setSortOrder: function (sortOrder) {
-  },
-  getSortOrder: function () {
-  },
-  getName: function () {
-    return 'Dendrogram Cut';
   }
 };
+morpheus.Util.extend(morpheus.SpecifiedGroupByKey, morpheus.AbstractSortKey);
+
 morpheus.SortKey.SortOrder = {
   ASCENDING: 0,
   DESCENDING: 1,
@@ -571,8 +546,8 @@ morpheus.SortKey.BOX_PLOT_SUMMARY_FUNCTION = function (array) {
   if (box == null) {
     var v = morpheus.VectorUtil.arrayAsVector(array);
     box = morpheus
-    .BoxPlotItem(this.indices != null ? new morpheus.SlicedVector(
-      v, this.indices) : v);
+      .BoxPlotItem(this.indices != null ? new morpheus.SlicedVector(
+        v, this.indices) : v);
     array.box = box;
   }
 
@@ -697,6 +672,32 @@ morpheus.SortKey.fromJSON = function (project, json) {
     var sortKey = null;
     if (key.type === 'annotation') {
       sortKey = new morpheus.SortKey(key.field, key.order, key.isColumns);
+      if (key.customSortOrder != null) {
+
+        var customSortOrderMap = new morpheus.Map();
+        for (var i = 0, size = key.customSortOrder.length; i < size; i++) {
+          customSortOrderMap.set(key.customSortOrder[i], i);
+        }
+        var comparator = function (a, b) {
+          var v1 = customSortOrderMap.get(a);
+          var v2 = customSortOrderMap.get(b);
+          if (v1 === undefined && v2 === undefined) {
+            return 0;
+          }
+          if (v1 === undefined) {
+            v1 = Infinity;
+          }
+          if (v2 === undefined) {
+            v2 = Infinity;
+          }
+          return (v1 < v2 ? -1 : 1);
+        };
+        sortKey.customComparator = comparator;
+        if (key.preservesDendrogram) {
+          sortKey.nvisible = key.customSortOrder.length;
+        }
+      }
+
     } else if (key.type === 'byValues') {
       sortKey = new morpheus.SortByValuesKey(key.modelIndices, key.order, key.isColumns);
     } else if (key.type === 'specified') {
@@ -711,6 +712,9 @@ morpheus.SortKey.fromJSON = function (project, json) {
       }
     }
     if (sortKey != null) {
+      if (key.preservesDendrogram != null) {
+        sortKey.setPreservesDendrogram(key.preservesDendrogram);
+      }
       if (key.lockOrder !== 0) {
         sortKey.setLockOrder(key.lockOrder);
       }
@@ -729,7 +733,7 @@ morpheus.SortKey.toJSON = function (sortKeys) {
         isColumns: key.isColumns(),
         order: key.getSortOrder(),
         type: 'annotation',
-        field: '' + key,
+        field: '' + key
       };
     } else if (key instanceof morpheus.SortByValuesKey) {
       sortKey = {
@@ -757,6 +761,7 @@ morpheus.SortKey.toJSON = function (sortKeys) {
       };
     }
     if (sortKey != null) {
+      sortKey.preservesDendrogram = key.isPreservesDendrogram();
       if (key.getLockOrder && key.getLockOrder() !== 0) {
         sortKey.lockOrder = key.getLockOrder();
       }
