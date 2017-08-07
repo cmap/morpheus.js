@@ -176,7 +176,11 @@ morpheus.FilePicker = function (options) {
     // Create and render a Picker object for picking user Photos.
     function createPicker() {
       if (pickerApiLoaded && oauthToken) {
-        var picker = new google.picker.PickerBuilder().addView(google.picker.ViewId.DOCS).setOAuthToken(oauthToken).setDeveloperKey(developerKey).setCallback(pickerCallback).build();
+        var picker = new google.picker.PickerBuilder().addView(google.picker.ViewId.DOCS)
+          .setOAuthToken(oauthToken)
+          .setDeveloperKey(developerKey)
+          .setCallback(pickerCallback)
+          .build();
         picker.setVisible(true);
         $('.picker-dialog-bg').css('z-index', 1052); // make it appear above modals
         $('.picker-dialog').css('z-index', 1053);
@@ -201,7 +205,9 @@ morpheus.FilePicker = function (options) {
   });
   $file.on('change', function (evt) {
     var files = evt.target.files; // FileList object
-    options.fileCallback(files[0]);
+    for (var i = 0; i < files.length; i++) {
+      options.fileCallback(files[i]);
+    }
   });
 
   $(window).on('paste.morpheus', this.paste = function (e) {
@@ -266,7 +272,9 @@ morpheus.FilePicker = function (options) {
           e.preventDefault();
           e.stopPropagation();
           var files = e.originalEvent.dataTransfer.files;
-          options.fileCallback(files[0]);
+          for (var i = 0; i < files.length; i++) {
+            options.fileCallback(files[i]);
+          }
         } else {
           var url = e.originalEvent.dataTransfer.getData('URL');
           options.fileCallback(url);
