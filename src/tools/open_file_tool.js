@@ -33,7 +33,7 @@ morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS = [
 
 morpheus.OpenFileTool.prototype = {
   toString: function () {
-    return 'Open';
+    return 'Open' + (this.options.file != null ? (' - ' + this.options.file.name) : '');
   },
   gui: function () {
     var params = [

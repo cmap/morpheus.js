@@ -15200,7 +15200,7 @@ morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS = [
 
 morpheus.OpenFileTool.prototype = {
   toString: function () {
-    return 'Open';
+    return 'Open' + (this.options.file != null ? (' - ' + this.options.file.name) : '');
   },
   gui: function () {
     var params = [
@@ -24443,7 +24443,8 @@ morpheus.HeatMapKeyListener = function (heatMap) {
       heatMap: heatMap
     };
     var shortcutMatches = function (sc) {
-      if (sc.which.indexOf(which) !== -1 && (sc.commandKey === undefined || commandKey === sc.commandKey) && (sc.shiftKey === undefined || shiftKey === sc.shiftKey) && (sc.accept == undefined || sc.accept(acceptOptions))) {
+      if (sc.which.indexOf(which) !== -1 && (sc.commandKey === undefined || commandKey === sc.commandKey) && (sc.shiftKey === undefined || shiftKey === sc.shiftKey) &&
+        (sc.accept == undefined || sc.accept(acceptOptions))) {
         sc.cb({heatMap: heatMap});
         return true;
       }
@@ -24488,9 +24489,12 @@ morpheus.HeatMapKeyListener = function (heatMap) {
         e.preventDefault();
         e.stopPropagation();
         var files = e.originalEvent.dataTransfer.files;
-        morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
-          file: files[0]
-        }), heatMap);
+        for (var i = 0; i < files.length; i++) {
+          morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
+            file: files[i]
+          }), heatMap);
+        }
+
       }
     });
   $keyelement.on('paste.morpheus',
