@@ -1,10 +1,10 @@
 morpheus.BufferedReader = function (reader, callback, doneCallback) {
-  var textDecoder = new TextDecoder();
+  var textDecoder = morpheus.Util.createTextDecoder();
   var skipLF = false;
   var text = '';
   reader.read().then(function processResult(result) {
     // result contains a value which is an array of Uint8Array
-    text += (result.done ? '' : textDecoder.decode(result.value));
+    text += (result.done ? '' : textDecoder(result.value, 0, result.value.length));
     var start = 0;
     // TODO no need to search previous chunk of text
     for (var i = 0, length = text.length; i < length; i++) {
