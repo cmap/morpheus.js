@@ -40,9 +40,10 @@ morpheus.Util.viewPortSize = function () {
     /"/g, '');
 };
 
+morpheus.Util.TRACKING_ENABLED = true;
 morpheus.Util.TRACKING_CODE_LOADED = false;
 morpheus.Util.loadTrackingCode = function () {
-  if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && navigator.onLine) {
+  if (morpheus.Util.TRACKING_ENABLED && typeof window !== 'undefined' && typeof navigator !== 'undefined' && navigator.onLine) {
     if (morpheus.Util.TRACKING_CODE_LOADED) {
       return;
     } else if (typeof ga === 'undefined') {
