@@ -284,6 +284,13 @@ morpheus.OpenFileTool.prototype = {
     if (!vector) {
       throw new Error('vector ' + metadataName + ' not found.');
     }
+    var fileColumnNamesToIncludeSet = null;
+    if (fileColumnNamesToInclude) {
+      fileColumnNamesToIncludeSet = new morpheus.Set();
+      fileColumnNamesToInclude.forEach(function (name) {
+        fileColumnNamesToIncludeSet.add(name);
+      });
+    }
     var vectors = [];
     var idToIndices = morpheus.VectorUtil.createValueToIndicesMap(vector);
     if (!lines) {
@@ -319,13 +326,13 @@ morpheus.OpenFileTool.prototype = {
         }
         var columnIndices = [];
         var nheaders = header.length;
-        for (var j = 0; j < header.length; j++) {
+        for (var j = 0; j < nheaders; j++) {
           var name = header[j];
           if (j === fileMatchOnColumnIndex) {
             continue;
           }
-          if (fileColumnNamesToInclude
-            && _.indexOf(fileColumnNamesToInclude, name) === -1) {
+          if (fileColumnNamesToIncludeSet
+            && !fileColumnNamesToIncludeSet.has(name)) {
             continue;
           }
           var v = dataset.getRowMetadata().getByName(name);
@@ -353,16 +360,17 @@ morpheus.OpenFileTool.prototype = {
         }
       }
       else {
+        // transposed
         var splitLines = [];
         var matchOnLine;
         for (var i = 0, nrows = lines.length; i < nrows; i++) {
           var line = lines[i].split(tab);
-          if (fileColumnName === line[0]) {
+          var name = line[0];
+          if (fileColumnName === name) {
             matchOnLine = line;
           } else {
-            var name = line[0];
-            if (fileColumnNamesToInclude
-              && _.indexOf(fileColumnNamesToInclude, name) === -1) {
+            if (fileColumnNamesToIncludeSet
+              && !fileColumnNamesToIncludeSet.has(name)) {
               continue;
             }
             splitLines.push(line);
@@ -377,18 +385,18 @@ morpheus.OpenFileTool.prototype = {
           throw new Error(fileColumnName + ' not found in header.');
         }
 
-        for (var j = 1, ncols = matchOnLine.length; j < ncols; j++) {
-          var id = matchOnLine[j];
+        for (var fileColumnIndex = 1, ncols = matchOnLine.length; fileColumnIndex < ncols; fileColumnIndex++) {
+          var id = matchOnLine[fileColumnIndex];
           var indices = idToIndices.get(id);
           if (indices !== undefined) {
             var nIndices = indices.length;
-            splitLines.forEach(function (line, j) {
-              var token = line[j];
+            for (var j = 0; j < splitLines.length; j++) {
+              var token = splitLines[j][fileColumnIndex];
               var v = vectors[j];
               for (var r = 0; r < nIndices; r++) {
                 v.setValue(indices[r], token);
               }
-            });
+            }
           }
 
         }

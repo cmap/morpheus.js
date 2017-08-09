@@ -42,9 +42,10 @@ morpheus.Util.viewPortSize = function () {
     /"/g, '');
 };
 
+morpheus.Util.TRACKING_ENABLED = true;
 morpheus.Util.TRACKING_CODE_LOADED = false;
 morpheus.Util.loadTrackingCode = function () {
-  if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && navigator.onLine) {
+  if (morpheus.Util.TRACKING_ENABLED && typeof window !== 'undefined' && typeof navigator !== 'undefined' && navigator.onLine) {
     if (morpheus.Util.TRACKING_CODE_LOADED) {
       return;
     } else if (typeof ga === 'undefined') {
@@ -2167,6 +2168,23 @@ morpheus.ArrayBufferReader.prototype = {
 morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
   var isString = typeof fileOrUrl === 'string' || fileOrUrl instanceof String;
   if (isString) { // URL
+    // var headers = new Headers();
+    // if (fileOrUrl.headers) {
+    //   for (var header in fileOrUrl.headers) {
+    //     headers.append(header, fileOrUrl.headers[header]);
+    //   }
+    // }
+    // fetch(fileOrUrl, {
+    //   headers: headers
+    // }).then(function (response) {
+    //   if (response.ok) {
+    //     return callback(null, response.arrayBuffer());
+    //   } else {
+    //     callback(new Error(fileOrUrl + ' status: ' + response.status));
+    //   }
+    // }).catch(function (error) {
+    //   callback(error);
+    // });
     var xhr = new XMLHttpRequest();
     xhr.open('GET', fileOrUrl, true);
     xhr.responseType = 'arraybuffer';
@@ -2193,10 +2211,7 @@ morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
         }
       }
     };
-
     xhr.send(null);
-    return xhr;
-
   } else {
     var reader = new FileReader();
     reader.onload = function (event) {
@@ -2206,7 +2221,6 @@ morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
       callback(event);
     };
     reader.readAsArrayBuffer(fileOrUrl);
-    return reader;
   }
 };
 
@@ -4295,8 +4309,9 @@ morpheus.TcgaUtil.getDataset = function (options) {
     // id + type
     var methylation = $.Deferred();
     promises.push(methylation);
-    new morpheus.TxtReader({}).read(options.methylation, function (err,
-                                                                   dataset) {
+    new morpheus.TxtReader({}).read(options.methylation, function (
+      err,
+      dataset) {
       if (err) {
         console.log('Error reading file:' + err);
       } else {
@@ -4329,6 +4344,7 @@ morpheus.TcgaUtil.getDataset = function (options) {
   var annotationCallbacks = [];
   var annotationDef = null;
   if (options.columnAnnotations) {
+    // match datasetField: 'participant_id' to fileField: 'patient_id', // e.g. tcga-5l-aat0
     annotationDef = morpheus.DatasetUtil.annotate({
       annotations: options.columnAnnotations,
       isColumns: true
@@ -4389,23 +4405,23 @@ morpheus.TcgaUtil.getDataset = function (options) {
         'id');
       for (var j = 0, size = idVector.size(); j < size; j++) {
         clusterIdVector.setValue(j, sampleIdToClusterId
-        .get(idVector.getValue(j)));
+          .get(idVector.getValue(j)));
       }
       // view in space of mutation sample ids only
       if (options.mutation) {
         var sourceToIndices = morpheus.VectorUtil
-        .createValueToIndicesMap(datasetToReturn
-        .getRowMetadata().getByName('Source'));
+          .createValueToIndicesMap(datasetToReturn
+            .getRowMetadata().getByName('Source'));
         var mutationDataset = new morpheus.SlicedDatasetView(
           datasetToReturn, sourceToIndices
-          .get('mutations_merged.maf'));
+            .get('mutations_merged.maf'));
         new morpheus.OpenFileTool()
-        .annotate(sigGenesLines, mutationDataset, false,
-          null, 'id', 'gene', ['q']);
+          .annotate(sigGenesLines, mutationDataset, false,
+            null, 'id', 'gene', ['q']);
         var qVector = mutationDataset.getRowMetadata().getByName(
           'q');
         var qValueVector = mutationDataset.getRowMetadata()
-        .getByName('q_value');
+          .getByName('q_value');
         if (qValueVector == null) {
           qValueVector = mutationDataset.getRowMetadata().add(
             'q_value');
@@ -4416,7 +4432,7 @@ morpheus.TcgaUtil.getDataset = function (options) {
 
         mutationDataset.getRowMetadata().remove(
           morpheus.MetadataUtil.indexOf(mutationDataset
-          .getRowMetadata(), 'q'));
+            .getRowMetadata(), 'q'));
       }
       if (annotationDef) {
         annotationCallbacks.forEach(function (f) {
@@ -15459,6 +15475,13 @@ morpheus.OpenFileTool.prototype = {
     if (!vector) {
       throw new Error('vector ' + metadataName + ' not found.');
     }
+    var fileColumnNamesToIncludeSet = null;
+    if (fileColumnNamesToInclude) {
+      fileColumnNamesToIncludeSet = new morpheus.Set();
+      fileColumnNamesToInclude.forEach(function (name) {
+        fileColumnNamesToIncludeSet.add(name);
+      });
+    }
     var vectors = [];
     var idToIndices = morpheus.VectorUtil.createValueToIndicesMap(vector);
     if (!lines) {
@@ -15494,13 +15517,13 @@ morpheus.OpenFileTool.prototype = {
         }
         var columnIndices = [];
         var nheaders = header.length;
-        for (var j = 0; j < header.length; j++) {
+        for (var j = 0; j < nheaders; j++) {
           var name = header[j];
           if (j === fileMatchOnColumnIndex) {
             continue;
           }
-          if (fileColumnNamesToInclude
-            && _.indexOf(fileColumnNamesToInclude, name) === -1) {
+          if (fileColumnNamesToIncludeSet
+            && !fileColumnNamesToIncludeSet.has(name)) {
             continue;
           }
           var v = dataset.getRowMetadata().getByName(name);
@@ -15528,16 +15551,17 @@ morpheus.OpenFileTool.prototype = {
         }
       }
       else {
+        // transposed
         var splitLines = [];
         var matchOnLine;
         for (var i = 0, nrows = lines.length; i < nrows; i++) {
           var line = lines[i].split(tab);
-          if (fileColumnName === line[0]) {
+          var name = line[0];
+          if (fileColumnName === name) {
             matchOnLine = line;
           } else {
-            var name = line[0];
-            if (fileColumnNamesToInclude
-              && _.indexOf(fileColumnNamesToInclude, name) === -1) {
+            if (fileColumnNamesToIncludeSet
+              && !fileColumnNamesToIncludeSet.has(name)) {
               continue;
             }
             splitLines.push(line);
@@ -15552,18 +15576,18 @@ morpheus.OpenFileTool.prototype = {
           throw new Error(fileColumnName + ' not found in header.');
         }
 
-        for (var j = 1, ncols = matchOnLine.length; j < ncols; j++) {
-          var id = matchOnLine[j];
+        for (var fileColumnIndex = 1, ncols = matchOnLine.length; fileColumnIndex < ncols; fileColumnIndex++) {
+          var id = matchOnLine[fileColumnIndex];
           var indices = idToIndices.get(id);
           if (indices !== undefined) {
             var nIndices = indices.length;
-            splitLines.forEach(function (line, j) {
-              var token = line[j];
+            for (var j = 0; j < splitLines.length; j++) {
+              var token = splitLines[j][fileColumnIndex];
               var v = vectors[j];
               for (var r = 0; r < nIndices; r++) {
                 v.setValue(indices[r], token);
               }
-            });
+            }
           }
 
         }
@@ -27727,6 +27751,9 @@ morpheus.HeatMap = function (options) {
       if (_this.options.$loadingImage) {
         _this.options.$loadingImage.remove();
       }
+      if (_this.options.datasetError) {
+        _this.options.datasetError(message);
+      }
       morpheus.FormBuilder.showInModal({
         title: 'Error',
         html: message,
@@ -27790,7 +27817,9 @@ morpheus.HeatMap = function (options) {
         message.push(err.message);
 
       }
-
+      if (_this.options.datasetError) {
+        _this.options.datasetError(message);
+      }
       morpheus.FormBuilder.showInModal({
         title: 'Error',
         html: message.join(''),

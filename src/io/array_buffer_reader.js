@@ -41,6 +41,23 @@ morpheus.ArrayBufferReader.prototype = {
 morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
   var isString = typeof fileOrUrl === 'string' || fileOrUrl instanceof String;
   if (isString) { // URL
+    // var headers = new Headers();
+    // if (fileOrUrl.headers) {
+    //   for (var header in fileOrUrl.headers) {
+    //     headers.append(header, fileOrUrl.headers[header]);
+    //   }
+    // }
+    // fetch(fileOrUrl, {
+    //   headers: headers
+    // }).then(function (response) {
+    //   if (response.ok) {
+    //     return callback(null, response.arrayBuffer());
+    //   } else {
+    //     callback(new Error(fileOrUrl + ' status: ' + response.status));
+    //   }
+    // }).catch(function (error) {
+    //   callback(error);
+    // });
     var xhr = new XMLHttpRequest();
     xhr.open('GET', fileOrUrl, true);
     xhr.responseType = 'arraybuffer';
@@ -67,10 +84,7 @@ morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
         }
       }
     };
-
     xhr.send(null);
-    return xhr;
-
   } else {
     var reader = new FileReader();
     reader.onload = function (event) {
@@ -80,6 +94,5 @@ morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
       callback(event);
     };
     reader.readAsArrayBuffer(fileOrUrl);
-    return reader;
   }
 };
