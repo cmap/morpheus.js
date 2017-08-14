@@ -8,9 +8,15 @@ morpheus.JsonDatasetReader.prototype = {
     var name = morpheus.Util.getBaseFileName(morpheus.Util.getFileName(fileOrUrl));
     var isString = typeof fileOrUrl === 'string' || fileOrUrl instanceof String;
     if (isString) {
-      $.ajax(fileOrUrl).done(function (json) {
-        callback(null, morpheus.Dataset.fromJSON(json));
-      }).fail(function (err) {
+      fetch(fileOrUrl).then(function (response) {
+        if (response.ok) {
+          return response.text();
+        } else {
+          callback(response.status + ' ' + response.statusText);
+        }
+      }).then(function (text) {
+        callback(null, morpheus.Dataset.fromJSON(JSON.parse(text.trim())));
+      }).catch(function (err) {
         callback(err);
       });
     } else {
@@ -24,5 +30,5 @@ morpheus.JsonDatasetReader.prototype = {
       reader.readAsText(fileOrUrl);
     }
 
-  },
+  }
 };

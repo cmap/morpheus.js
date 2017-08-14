@@ -41,11 +41,10 @@ morpheus.BufferedReader.parse = function (url, options) {
 
   var fetchOptions = {};
   if (url.headers) {
-    var headers = new Headers();
+    fetchOptions.headers = new Headers();
     for (var header in url.headers) {
-      headers.append(header, url.headers[header]);
+      fetchOptions.headers.append(header, url.headers[header]);
     }
-    fetchOptions.headers = headers;
   }
   fetch(url, fetchOptions).then(function (response) {
     if (response.ok) {

@@ -8,10 +8,10 @@ morpheus.GctReader.prototype = {
   },
   read: function (fileOrUrl, callback) {
     var _this = this;
-    if (fileOrUrl instanceof File) {
+    if (morpheus.Util.isFile(fileOrUrl)) {
       this._readChunking(fileOrUrl, callback, false);
     } else {
-      if (morpheus.Util.isFetchSupported()) {
+      if (morpheus.Util.isFetchStreamingSupported()) {
         this._readChunking(fileOrUrl, callback, true);
       } else {
         this._readNoChunking(fileOrUrl, callback);
@@ -58,7 +58,6 @@ morpheus.GctReader.prototype = {
     var columnNamesArray;
 
     var handleTokens = function (tokens) {
-
       if (lineNumber === 0) {
         var text = tokens[0].trim();
         if ('#1.2' === text) {
@@ -191,7 +190,7 @@ morpheus.GctReader.prototype = {
       complete: function () {
         var dataset = new morpheus.Dataset({
           name: morpheus.Util.getBaseFileName(morpheus.Util
-          .getFileName(fileOrUrl)),
+            .getFileName(fileOrUrl)),
           rows: matrix.length,
           columns: ncols,
           array: matrix,
@@ -211,7 +210,7 @@ morpheus.GctReader.prototype = {
       error: function (err) {
         callback(err);
       },
-      download: !(fileOrUrl instanceof File),
+      download: !morpheus.Util.isFile(fileOrUrl),
       skipEmptyLines: false,
       chunk: undefined,
       fastMode: true,
@@ -389,8 +388,9 @@ morpheus.GctReader.prototype = {
         }
       }
 
-      var rowAnnotationVectors = [dataset.getRowMetadata().add(
-        rowIdFieldName)];
+      var rowAnnotationVectors = [
+        dataset.getRowMetadata().add(
+          rowIdFieldName)];
       if (version === 3) {
         for (var j = 0; j < numRowAnnotations; j++) {
           var rowMetadataName = '' === columnNamesArray[1] ? 'description'
@@ -473,7 +473,7 @@ morpheus.GctReader.prototype = {
   _readNoChunking: function (fileOrUrl, callback) {
     var _this = this;
     var name = morpheus.Util.getBaseFileName(morpheus.Util
-    .getFileName(fileOrUrl));
+      .getFileName(fileOrUrl));
     morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err, arrayBuffer) {
       if (err) {
         callback(err);

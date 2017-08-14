@@ -107,7 +107,7 @@ morpheus.HeatMapElementCanvas.prototype = {
     var h = Math.ceil(this.rowPositions.getPosition(this.rowPositions
         .getLength() - 1)
       + this.rowPositions
-      .getItemSize(this.rowPositions.getLength() - 1));
+        .getItemSize(this.rowPositions.getLength() - 1));
     return {
       width: w,
       height: h
@@ -142,20 +142,20 @@ morpheus.HeatMapElementCanvas.prototype = {
     if (project.getHoverColumnIndex() >= 0
       || project.getHoverRowIndex() >= 0) {
       var height = rowPositions
-      .getItemSize(project.getHoverColumnIndex());
+        .getItemSize(project.getHoverColumnIndex());
       var width = columnPositions.getItemSize(project
-      .getHoverColumnIndex());
+        .getHoverColumnIndex());
       var y = (project.getHoverRowIndex() === -1 ? rowPositions
-      .getPosition(rowPositions.getLength() - 1) : rowPositions
-      .getPosition(project.getHoverRowIndex()));
+        .getPosition(rowPositions.getLength() - 1) : rowPositions
+        .getPosition(project.getHoverRowIndex()));
       var x = (project.getHoverColumnIndex() === -1 ? columnPositions
-      .getPosition(0) : columnPositions.getPosition(project
-      .getHoverColumnIndex()));
+        .getPosition(0) : columnPositions.getPosition(project
+        .getHoverColumnIndex()));
 
       if (project.getHoverColumnIndex() !== -1) {
         // thin rectangle down entire column
         context.strokeRect(x - clip.x, 0, width, this
-        .getUnscaledHeight());
+          .getUnscaledHeight());
       }
       if (project.getHoverRowIndex() !== -1) {
         // thin rectangle across entire row
@@ -187,7 +187,7 @@ morpheus.HeatMapElementCanvas.prototype = {
     // context.fillRect(0, 0, this.canvas.width, this.canvas.height);
     context.translate(-clip.x, -clip.y);
     var selectedElements = project.getElementSelectionModel()
-    .getViewIndices();
+      .getViewIndices();
 
     if (selectedElements != null) {
       selectedElements.forEach(function (id) {
@@ -211,7 +211,7 @@ morpheus.HeatMapElementCanvas.prototype = {
     var selectedColumnElements = this.selectedColumnElements;
 
     if (!(selectedRowElements.length === 0 &&
-      selectedColumnElements.length === 0)) {
+        selectedColumnElements.length === 0)) {
       if (selectedRowElements.length === 0) {
         selectedRowElements = [[top, bottom - 1]];
       }
@@ -364,7 +364,7 @@ morpheus.HeatMapElementCanvas.prototype = {
           conditions = colorScheme.getConditions().getConditions();
           for (var ci = 0, nconditions = conditions.length; ci < nconditions; ci++) {
             conditionSeriesIndices
-            .push(seriesNameToIndex[conditions[ci].series]);
+              .push(seriesNameToIndex[conditions[ci].series]);
           }
 
         }

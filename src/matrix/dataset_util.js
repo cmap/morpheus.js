@@ -24,7 +24,7 @@ morpheus.DatasetUtil.slicedView = function (dataset, rows, columns) {
 };
 morpheus.DatasetUtil.transposedView = function (dataset) {
   return dataset instanceof morpheus.TransposedDatasetView ? dataset
-  .getDataset() : new morpheus.TransposedDatasetView(dataset);
+    .getDataset() : new morpheus.TransposedDatasetView(dataset);
 };
 morpheus.DatasetUtil.max = function (dataset, seriesIndex) {
   seriesIndex = seriesIndex || 0;
@@ -84,8 +84,9 @@ morpheus.DatasetUtil.readDatasetArray = function (datasets) {
       loadedDatasets[this.index] = dataset;
     });
     p.fail(function (err) {
-      var message = ['Error opening ' + morpheus.Util
-      .getFileName(url) + '.'];
+      var message = [
+        'Error opening ' + morpheus.Util
+          .getFileName(url) + '.'];
       if (err.message) {
         message.push('<br />Cause: ');
         message.push(err.message);
@@ -100,11 +101,11 @@ morpheus.DatasetUtil.readDatasetArray = function (datasets) {
   }
 
   $.when
-  .apply($, promises)
-  .then(
-    function () {
-      retDef.resolve(morpheus.DatasetUtil.join(loadedDatasets, 'id'));
-    });
+    .apply($, promises)
+    .then(
+      function () {
+        retDef.resolve(morpheus.DatasetUtil.join(loadedDatasets, 'id'));
+      });
   return retDef;
 };
 /**
@@ -185,7 +186,7 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
   if (options == null) {
     options = {};
   }
-  var isFile = fileOrUrl instanceof File;
+  var isFile = morpheus.Util.isFile(fileOrUrl);
   var isString = morpheus.Util.isString(fileOrUrl);
   var ext = options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
   var datasetReader;
@@ -204,14 +205,15 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
     if (options.background) {
       var path = morpheus.Util.getScriptPath();
       var blob = new Blob(
-        ['self.onmessage = function(e) {'
-        + 'importScripts(e.data.path);'
-        + 'var ext = morpheus.Util.getExtension(morpheus.Util'
-        + '.getFileName(e.data.fileOrUrl));'
-        + 'var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext,'
-        + '	e.data.options);'
-        + 'datasetReader.read(e.data.fileOrUrl, function(err,dataset) {'
-        + '	self.postMessage(dataset);' + '	});' + '}']);
+        [
+          'self.onmessage = function(e) {'
+          + 'importScripts(e.data.path);'
+          + 'var ext = morpheus.Util.getExtension(morpheus.Util'
+          + '.getFileName(e.data.fileOrUrl));'
+          + 'var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext,'
+          + '	e.data.options);'
+          + 'datasetReader.read(e.data.fileOrUrl, function(err,dataset) {'
+          + '	self.postMessage(dataset);' + '	});' + '}']);
 
       var blobURL = window.URL.createObjectURL(blob);
       var worker = new Worker(blobURL);
@@ -554,8 +556,8 @@ morpheus.DatasetUtil.searchValues = function (options) {
 
       if (matches) {
         viewIndices
-        .add(new morpheus.Identifier(
-          [i, j]));
+          .add(new morpheus.Identifier(
+            [i, j]));
       }
     }
   }
@@ -747,7 +749,7 @@ morpheus.DatasetUtil.autocompleteValues = function (dataset) {
 morpheus.DatasetUtil.fill = function (dataset, value, seriesIndex) {
   seriesIndex = seriesIndex || 0;
   for (var i = 0, nrows = dataset.getRowCount(), ncols = dataset
-  .getColumnCount(); i < nrows; i++) {
+    .getColumnCount(); i < nrows; i++) {
     for (var j = 0; j < ncols; j++) {
       dataset.setValue(i, j, value, seriesIndex);
     }
@@ -773,55 +775,55 @@ morpheus.DatasetUtil.overlay = function (options) {
   var new_dataset_column_annotation_name = options.newColumnAnnotationName;
 
   var rowValueToIndexMap = morpheus.VectorUtil
-  .createValueToIndexMap(dataset
-  .getRowMetadata()
-  .getByName(
-    current_dataset_row_annotation_name));
+    .createValueToIndexMap(dataset
+      .getRowMetadata()
+      .getByName(
+        current_dataset_row_annotation_name));
   var columnValueToIndexMap = morpheus.VectorUtil
-  .createValueToIndexMap(dataset
-  .getColumnMetadata()
-  .getByName(
-    current_dataset_column_annotation_name));
+    .createValueToIndexMap(dataset
+      .getColumnMetadata()
+      .getByName(
+        current_dataset_column_annotation_name));
   var seriesIndex = dataset
-  .addSeries({
-    name: newDataset
-    .getName(),
-    dataType: newDataset.getDataType(0)
-  });
+    .addSeries({
+      name: newDataset
+        .getName(),
+      dataType: newDataset.getDataType(0)
+    });
 
   var rowVector = newDataset
-  .getRowMetadata()
-  .getByName(
-    new_dataset_row_annotation_name);
+    .getRowMetadata()
+    .getByName(
+      new_dataset_row_annotation_name);
   var rowIndices = [];
   var newDatasetRowIndicesSubset = [];
   for (var i = 0, size = rowVector
-  .size(); i < size; i++) {
+    .size(); i < size; i++) {
     var index = rowValueToIndexMap
-    .get(rowVector
-    .getValue(i));
+      .get(rowVector
+        .getValue(i));
     if (index !== undefined) {
       rowIndices.push(index);
       newDatasetRowIndicesSubset
-      .push(i);
+        .push(i);
     }
   }
 
   var columnVector = newDataset
-  .getColumnMetadata()
-  .getByName(
-    new_dataset_column_annotation_name);
+    .getColumnMetadata()
+    .getByName(
+      new_dataset_column_annotation_name);
   var columnIndices = [];
   var newDatasetColumnIndicesSubset = [];
   for (var i = 0, size = columnVector
-  .size(); i < size; i++) {
+    .size(); i < size; i++) {
     var index = columnValueToIndexMap
-    .get(columnVector
-    .getValue(i));
+      .get(columnVector
+        .getValue(i));
     if (index !== undefined) {
       columnIndices.push(index);
       newDatasetColumnIndicesSubset
-      .push(i);
+        .push(i);
     }
   }
   newDataset = new morpheus.SlicedDatasetView(
@@ -829,16 +831,16 @@ morpheus.DatasetUtil.overlay = function (options) {
     newDatasetRowIndicesSubset,
     newDatasetColumnIndicesSubset);
   for (var i = 0, nrows = newDataset
-  .getRowCount(); i < nrows; i++) {
+    .getRowCount(); i < nrows; i++) {
     for (var j = 0, ncols = newDataset
-    .getColumnCount(); j < ncols; j++) {
+      .getColumnCount(); j < ncols; j++) {
       dataset.setValue(
         rowIndices[i],
         columnIndices[j],
         newDataset
-        .getValue(
-          i,
-          j),
+          .getValue(
+            i,
+            j),
         seriesIndex);
 
     }
@@ -893,9 +895,9 @@ morpheus.DatasetUtil.join = function (datasets, field) {
 morpheus.DatasetUtil.shallowCopy = function (dataset) {
   // make a shallow copy of the dataset, metadata is immutable via the UI
   var rowMetadataModel = morpheus.MetadataUtil.shallowCopy(dataset
-  .getRowMetadata());
+    .getRowMetadata());
   var columnMetadataModel = morpheus.MetadataUtil.shallowCopy(dataset
-  .getColumnMetadata());
+    .getColumnMetadata());
   dataset.getRowMetadata = function () {
     return rowMetadataModel;
   };
@@ -923,7 +925,7 @@ morpheus.DatasetUtil.copy = function (dataset) {
       });
     }
     for (var i = 0, nrows = dataset.getRowCount(), ncols = dataset
-    .getColumnCount(); i < nrows; i++) {
+      .getColumnCount(); i < nrows; i++) {
       for (var j = 0; j < ncols; j++) {
         newDataset.setValue(i, j, dataset.getValue(i, j, seriesIndex),
           seriesIndex);
@@ -931,9 +933,9 @@ morpheus.DatasetUtil.copy = function (dataset) {
     }
   }
   var rowMetadataModel = morpheus.MetadataUtil.shallowCopy(dataset
-  .getRowMetadata());
+    .getRowMetadata());
   var columnMetadataModel = morpheus.MetadataUtil.shallowCopy(dataset
-  .getColumnMetadata());
+    .getColumnMetadata());
   newDataset.getRowMetadata = function () {
     return rowMetadataModel;
   };
@@ -946,7 +948,7 @@ morpheus.DatasetUtil.toString = function (dataset, value, seriesIndex) {
   seriesIndex = seriesIndex || 0;
   var s = [];
   for (var i = 0, nrows = dataset.getRowCount(), ncols = dataset
-  .getColumnCount(); i < nrows; i++) {
+    .getColumnCount(); i < nrows; i++) {
     for (var j = 0; j < ncols; j++) {
       if (j > 0) {
         s.push(', ');

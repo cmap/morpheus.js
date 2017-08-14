@@ -41,50 +41,26 @@ morpheus.ArrayBufferReader.prototype = {
 morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
   var isString = typeof fileOrUrl === 'string' || fileOrUrl instanceof String;
   if (isString) { // URL
-    // var headers = new Headers();
-    // if (fileOrUrl.headers) {
-    //   for (var header in fileOrUrl.headers) {
-    //     headers.append(header, fileOrUrl.headers[header]);
-    //   }
-    // }
-    // fetch(fileOrUrl, {
-    //   headers: headers
-    // }).then(function (response) {
-    //   if (response.ok) {
-    //     return callback(null, response.arrayBuffer());
-    //   } else {
-    //     callback(new Error(fileOrUrl + ' status: ' + response.status));
-    //   }
-    // }).catch(function (error) {
-    //   callback(error);
-    // });
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', fileOrUrl, true);
-    xhr.responseType = 'arraybuffer';
+    var fetchOptions = {};
     if (fileOrUrl.headers) {
+      fetchOptions.headers = new Headers();
       for (var header in fileOrUrl.headers) {
-        xhr.setRequestHeader(header, fileOrUrl.headers[header]);
+        fetchOptions.headers.append(header, fileOrUrl.headers[header]);
       }
     }
-    xhr.onload = function (oEvent) {
-      callback(null, xhr.response);
-    };
-
-    xhr.onerror = function (oEvent) {
-      callback(oEvent);
-    };
-    xhr.onreadystatechange = function (oEvent) {
-      if (xhr.readyState === 4 && xhr.status !== 200) {
-        xhr.onload = null;
-        xhr.onerror = null;
-        if (xhr.status === 404) {
-          callback(new Error(fileOrUrl + ' not found.'));
-        } else {
-          callback(new Error('Unable to read ' + fileOrUrl + '.'));
-        }
+    fetch(fileOrUrl, fetchOptions).then(function (response) {
+      if (response.ok) {
+        return response.arrayBuffer();
+      } else {
+        callback(new Error(fileOrUrl + ' status: ' + response.status));
       }
-    };
-    xhr.send(null);
+    }).then(function (buf) {
+      callback(null, buf);
+    }).catch(function (error) {
+      console.log('Fetch error');
+      callback(error);
+    });
+
   } else {
     var reader = new FileReader();
     reader.onload = function (event) {
