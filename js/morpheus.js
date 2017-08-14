@@ -2207,7 +2207,7 @@ morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
     }).then(function (buf) {
       callback(null, buf);
     }).catch(function (error) {
-      console.log('Fetch error');
+      console.log('Fetch error', error);
       callback(error);
     });
 
@@ -30444,7 +30444,7 @@ morpheus.HeatMap.prototype = {
     var columns = options.paintColumns;
     var invalidateRows = options.invalidateRows;
     var invalidateColumns = options.invalidateColumns;
-    // FIXME double buffer search bars
+    // TODO double buffer search bars
     this.hSortByValuesIndicator.setInvalid(invalidateRows
       || invalidateColumns);
     this.hSortByValuesIndicator.paint({
@@ -31126,6 +31126,31 @@ morpheus.HeatMap.prototype = {
    */
   revalidate: function (options) {
     if (morpheus.Util.isHeadless()) {
+      // hack to force creation of color scheme
+      for (var i = 0, length = this.rowTracks.length; i < length; i++) {
+        var track = this.rowTracks[i];
+        track.setInvalid(true);
+        if (track.isVisible()) {
+          track.paint({
+            x: 0,
+            y: 0,
+            height: 10,
+            width: 10
+          });
+        }
+      }
+      for (var i = 0, length = this.columnTracks.length; i < length; i++) {
+        var track = this.columnTracks[i];
+        track.setInvalid(true);
+        if (track.isVisible()) {
+          track.paint({
+            x: 0,
+            y: 0,
+            height: 10,
+            width: 10
+          });
+        }
+      }
       return;
     }
     options = $.extend({}, {

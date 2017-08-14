@@ -57,7 +57,7 @@ morpheus.ArrayBufferReader.getArrayBuffer = function (fileOrUrl, callback) {
     }).then(function (buf) {
       callback(null, buf);
     }).catch(function (error) {
-      console.log('Fetch error');
+      console.log('Fetch error', error);
       callback(error);
     });
 
