@@ -881,7 +881,7 @@ morpheus.Util.sheetToArray = function (sheet, delim) {
       }
 
       var txt = String(XLSX.utils.format_cell(val));
-      if (val.s != null) {
+      if (val.s != null && val.s.fgColor != null) {
         var color = '#' + val.s.fgColor.rgb;
         colors.push({
           header: header[row.length],
