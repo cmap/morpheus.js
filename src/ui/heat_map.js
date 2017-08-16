@@ -1833,6 +1833,7 @@ morpheus.HeatMap.prototype = {
       var nameOrderPairs = [];
       var found = false;
       array.forEach(function (item, index) {
+
         var name = item.renameTo || item.field;
         var order = index;
         if (item.order != null) {
@@ -3357,18 +3358,13 @@ morpheus.HeatMap.prototype = {
     var _this = this;
     var bounds = this.getTotalSize();
     if (format === 'pdf') {
-      // var context = new morpheus.PdfGraphics();
-      // this.snapshot(context);
-      // context.toBlob(function (blob) {
-      // 	saveAs(blob, file, true);
-      // });
-      // var context = new C2S(bounds.width, bounds.height);
-      // this.snapshot(context);
-      // var svg = context.getSerializedSvg();
-      // var doc = new jsPDF();
-      // doc.addHTML(svg, 0, 0, bounds.width, bounds.height);
-      // doc.save(file);
-
+      var context = new canvas2pdf.PdfContext(blobStream(), {size: [bounds.width, bounds.height]});
+      this.snapshot(context);
+      context.stream.on('finish', function () {
+        var blob = context.stream.toBlob('application/pdf');
+        saveAs(blob, file, true);
+      });
+      context.end();
     } else if (format === 'svg') {
       var context = new C2S(bounds.width, bounds.height);
       this.snapshot(context);
@@ -3574,6 +3570,7 @@ morpheus.HeatMap.prototype = {
       //   .getColorScheme().getNames().length * 14
       //   : 40;
     }
+
     context.save();
     var legendOffset = 15;
     context.translate(legendOffset, legendHeight);
@@ -3587,6 +3584,7 @@ morpheus.HeatMap.prototype = {
         }), this.getProject().getColumnColorModel());
     columnTrackLegend.draw({}, context);
     context.restore();
+
     // row color legend to the right of column color legend
     var columnTrackLegendSize = columnTrackLegend.getPreferredSize();
     context.save();
@@ -3689,6 +3687,7 @@ morpheus.HeatMap.prototype = {
     }
     context.save();
     context.translate(heatmapX, heatmapY);
+
     this.heatmap.draw({
       x: 0,
       y: 0,

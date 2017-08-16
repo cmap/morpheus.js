@@ -6,7 +6,9 @@ morpheus.CanvasUtil.FONT_NAME = '"Helvetica Neue",Helvetica,Arial,sans-serif';
 morpheus.CanvasUtil.FONT_COLOR = 'rgb(0, 0, 0)';
 morpheus.CanvasUtil.getFontFamily = function (context) {
   // older versions of Adobe choke when a font family contains a font that is not installed
-  return typeof C2S !== 'undefined' && context instanceof C2S ? 'Helvetica' : morpheus.CanvasUtil.FONT_NAME;
+  return (typeof C2S !== 'undefined' && context instanceof C2S) || (typeof canvas2pdf !== 'undefined' && context instanceof canvas2pdf.PdfContext)
+    ? 'Helvetica'
+    : morpheus.CanvasUtil.FONT_NAME;
 };
 morpheus.CanvasUtil.getPreferredSize = function (c) {
   var size = c.getPreferredSize();

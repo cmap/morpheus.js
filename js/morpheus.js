@@ -2248,7 +2248,7 @@ morpheus.Array2dReaderInteractive.prototype = {
       ' width:10px;height:10px;background-color:#ccebc5;"></div><span> Row' +
       ' Annotations</span>');
 
-    html.push('<div class="slick-bordered-table" style="width:550px;height:400px;"></div>');
+    html.push('<div class="slick-bordered-table" style="width:550px;height:300px;"></div>');
     html.push('</div>');
     var $el = $(html.join(''));
 
@@ -2354,10 +2354,11 @@ morpheus.Array2dReaderInteractive.prototype = {
       $el.find('.slick-header').remove();
       var footer = [];
       footer
-      .push('<button name="ok" type="button" class="btn btn-default">OK</button>');
+        .push('<button name="ok" type="button" class="btn btn-default">OK</button>');
       footer
-      .push('<button name="cancel" type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>');
+        .push('<button name="cancel" type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>');
       var $footer = $(footer.join(''));
+
       morpheus.FormBuilder.showOkCancel({
         title: 'Open',
         content: $el,
@@ -5868,7 +5869,6 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
   }
   if (isString || isFile) { // URL or file
     var deferred = $.Deferred();
-    // override toString so can determine file name
     if (options.background) {
       var path = morpheus.Util.getScriptPath();
       var blob = new Blob(
@@ -5905,6 +5905,7 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
       });
     }
     var pr = deferred.promise();
+    // override toString so can determine file name
     pr.toString = function () {
       return '' + fileOrUrl;
     };
@@ -15819,17 +15820,18 @@ morpheus.SaveImageTool.prototype = {
     form.find('file_name').prop('autofocus', true).focus();
   },
   gui: function () {
-    return [{
-      name: 'file_name',
-      type: 'text',
-      required: true
-    }, {
-      name: 'format',
-      type: 'radio',
-      options: ['PNG', 'SVG'],
-      value: 'PNG',
-      required: true
-    }];
+    return [
+      {
+        name: 'file_name',
+        type: 'text',
+        required: true
+      }, {
+        name: 'format',
+        type: 'radio',
+        options: ['PDF', 'PNG', 'SVG'],
+        value: 'PNG',
+        required: true
+      }];
   },
   execute: function (options) {
     var fileName = options.input.file_name;
@@ -18471,7 +18473,9 @@ morpheus.CanvasUtil.FONT_NAME = '"Helvetica Neue",Helvetica,Arial,sans-serif';
 morpheus.CanvasUtil.FONT_COLOR = 'rgb(0, 0, 0)';
 morpheus.CanvasUtil.getFontFamily = function (context) {
   // older versions of Adobe choke when a font family contains a font that is not installed
-  return typeof C2S !== 'undefined' && context instanceof C2S ? 'Helvetica' : morpheus.CanvasUtil.FONT_NAME;
+  return (typeof C2S !== 'undefined' && context instanceof C2S) || (typeof canvas2pdf !== 'undefined' && context instanceof canvas2pdf.PdfContext)
+    ? 'Helvetica'
+    : morpheus.CanvasUtil.FONT_NAME;
 };
 morpheus.CanvasUtil.getPreferredSize = function (c) {
   var size = c.getPreferredSize();
@@ -27151,11 +27155,12 @@ morpheus.HeatMapTrackColorLegend.prototype = {
         maxWidth = Math.max(maxWidth, 220);
         ypix += 40;
       } else {
+        var toStringFunction = morpheus.VectorTrack.vectorToString(vector);
         var map = colorModel.getDiscreteColorScheme(vector);
-        var values = map.keys().sort(
-          morpheus.SortKey.ASCENDING_COMPARATOR);
+        var values = map.keys().sort(morpheus.SortKey.ASCENDING_COMPARATOR);
         values.forEach(function (key) {
           if (key != null) {
+            key = toStringFunction(key);
             var color = colorModel.getMappedValue(vector, key);
             var textWidth = context.measureText(key).width;
             if (!isNaN(textWidth)) {
@@ -29087,6 +29092,7 @@ morpheus.HeatMap.prototype = {
       var nameOrderPairs = [];
       var found = false;
       array.forEach(function (item, index) {
+
         var name = item.renameTo || item.field;
         var order = index;
         if (item.order != null) {
@@ -30611,18 +30617,13 @@ morpheus.HeatMap.prototype = {
     var _this = this;
     var bounds = this.getTotalSize();
     if (format === 'pdf') {
-      // var context = new morpheus.PdfGraphics();
-      // this.snapshot(context);
-      // context.toBlob(function (blob) {
-      // 	saveAs(blob, file, true);
-      // });
-      // var context = new C2S(bounds.width, bounds.height);
-      // this.snapshot(context);
-      // var svg = context.getSerializedSvg();
-      // var doc = new jsPDF();
-      // doc.addHTML(svg, 0, 0, bounds.width, bounds.height);
-      // doc.save(file);
-
+      var context = new canvas2pdf.PdfContext(blobStream(), {size: [bounds.width, bounds.height]});
+      this.snapshot(context);
+      context.stream.on('finish', function () {
+        var blob = context.stream.toBlob('application/pdf');
+        saveAs(blob, file, true);
+      });
+      context.end();
     } else if (format === 'svg') {
       var context = new C2S(bounds.width, bounds.height);
       this.snapshot(context);
@@ -30828,6 +30829,7 @@ morpheus.HeatMap.prototype = {
       //   .getColorScheme().getNames().length * 14
       //   : 40;
     }
+
     context.save();
     var legendOffset = 15;
     context.translate(legendOffset, legendHeight);
@@ -30841,6 +30843,7 @@ morpheus.HeatMap.prototype = {
         }), this.getProject().getColumnColorModel());
     columnTrackLegend.draw({}, context);
     context.restore();
+
     // row color legend to the right of column color legend
     var columnTrackLegendSize = columnTrackLegend.getPreferredSize();
     context.save();
@@ -30943,6 +30946,7 @@ morpheus.HeatMap.prototype = {
     }
     context.save();
     context.translate(heatmapX, heatmapY);
+
     this.heatmap.draw({
       x: 0,
       y: 0,

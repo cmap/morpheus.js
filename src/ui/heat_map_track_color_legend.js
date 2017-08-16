@@ -74,11 +74,12 @@ morpheus.HeatMapTrackColorLegend.prototype = {
         maxWidth = Math.max(maxWidth, 220);
         ypix += 40;
       } else {
+        var toStringFunction = morpheus.VectorTrack.vectorToString(vector);
         var map = colorModel.getDiscreteColorScheme(vector);
-        var values = map.keys().sort(
-          morpheus.SortKey.ASCENDING_COMPARATOR);
+        var values = map.keys().sort(morpheus.SortKey.ASCENDING_COMPARATOR);
         values.forEach(function (key) {
           if (key != null) {
+            key = toStringFunction(key);
             var color = colorModel.getMappedValue(vector, key);
             var textWidth = context.measureText(key).width;
             if (!isNaN(textWidth)) {
