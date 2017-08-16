@@ -276,7 +276,7 @@ morpheus.HeatMap = function (options) {
           'Filter',
           null,
           'API'],
-        View: ['Zoom In', 'Zoom Out', 'Fit To Window', '100%', null, 'Options'],
+        View: ['Zoom In', 'Zoom Out', null, 'Fit To Window', 'Fit Rows To Window', 'Fit Columns To Window', null, '100%', null, 'Options'],
         Edit: [
           'Copy Image',
           'Copy Selected Dataset',

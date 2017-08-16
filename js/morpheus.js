@@ -25655,6 +25655,10 @@ morpheus.HeatMapToolBar = function (heatMap) {
       ' fa-compress morpheus-menu-item-icon"></span><span class="pull-right">' +
       morpheus.Util.COMMAND_KEY +
       morpheus.KeyboardCharMap[heatMap.getActionManager().getAction('Fit To Window').which[0]] + '</span> </a></li>');
+    toolbarHtml.push(
+      '<li><a class="morpheus-menu-item" href="#" data-action="Fit Rows To Window">Fit Rows To Window</a></li>');
+    toolbarHtml.push(
+      '<li><a class="morpheus-menu-item" href="#" data-action="Fit Columns To Window">Fit Columns To Window</a></li>');
     toolbarHtml.push('<li role="separator" class="divider"></li>');
     toolbarHtml.push(
       '<li><a class="morpheus-menu-item" href="#" data-action="100%">100%</a></li>');
@@ -25755,7 +25759,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
   $el.find('[data-toggle="tooltip"]').tooltip({
     placement: 'bottom',
     container: 'body',
-    trigger: 'hover',
+    trigger: 'hover'
   }).on('click', function () {
     $(this).tooltip('hide');
   });
@@ -25765,7 +25769,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     new morpheus.HeatMapColorSchemeLegend(heatMap, $keyContent);
     morpheus.Util.trackEvent({
       eventCategory: 'ToolBar',
-      eventAction: 'colorKey',
+      eventAction: 'colorKey'
     });
   });
 
@@ -25816,7 +25820,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
       title: 'Search Help',
       html: $searchHelp,
       appendTo: heatMap.getContentEl(),
-      focus: heatMap.getFocusEl(),
+      focus: heatMap.getFocusEl()
     });
   });
   var $searchRowsGroup = $searchForm.find('[data-name=searchRowsGroup]');
@@ -25843,7 +25847,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
       $previousMatch: $group.find('[name=previousMatch]'),
       $nextMatch: $group.find('[name=nextMatch]'),
       $matchesToTop: $group.find('[name=matchesToTop]'),
-      $toggleButton: $searchToggle.filter('[data-search=' + searchName + ']').parent(),
+      $toggleButton: $searchToggle.filter('[data-search=' + searchName + ']').parent()
     };
 
     nameToSearchObject[searchName] = obj;
@@ -25876,7 +25880,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     if ($searchField) {
       $searchField.trigger($.Event('keyup', {
         keyCode: 13,
-        which: 13,
+        which: 13
       }));
       // trigger search again
     }
@@ -25890,7 +25894,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     }
     morpheus.Util.trackEvent({
       eventCategory: 'ToolBar',
-      eventAction: 'searchMatchMode',
+      eventAction: 'searchMatchMode'
     });
   });
   this.rowSearchObject = getSearchElements($searchRowsGroup, 'rows',
@@ -25941,13 +25945,13 @@ morpheus.HeatMapToolBar = function (heatMap) {
   this.rowSearchObject.$search.css({
     'border-top': '3.8px solid #e6e6e6',
     'border-bottom': '3.8px solid #e6e6e6',
-    width: '240px',
+    width: '240px'
   });
 
   this.columnSearchObject.$search.css({
     'border-right': '3.8px solid #e6e6e6',
     'border-left': '3.8px solid #e6e6e6',
-    width: '240px',
+    width: '240px'
   });
 
   this.$valueSearchResults = $searchValuesGroup.find('[name=searchResults]');
@@ -26017,7 +26021,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     },
     select: function () {
       _this.search(true);
-    },
+    }
   });
 
   this.rowSearchObject.$search.on('keyup', _.debounce(function (e) {
@@ -26027,7 +26031,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     _this.search(true);
     morpheus.Util.trackEvent({
       eventCategory: 'ToolBar',
-      eventAction: 'searchRows',
+      eventAction: 'searchRows'
     });
   }, 500));
   morpheus.Util.autosuggest({
@@ -26043,7 +26047,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     },
     select: function () {
       _this.search(false);
-    },
+    }
   });
   this.columnSearchObject.$search.on('keyup', _.debounce(function (e) {
     if (e.which === 13) {
@@ -26052,7 +26056,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     _this.search(false);
     morpheus.Util.trackEvent({
       eventCategory: 'ToolBar',
-      eventAction: 'searchColumns',
+      eventAction: 'searchColumns'
     });
   }, 500));
 
@@ -26079,7 +26083,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     },
     select: function () {
       _this.searchDendrogram(false);
-    },
+    }
   });
 
   this.rowDendrogramSearchObject.$search.on('keyup', _.debounce(function (e) {
@@ -26089,7 +26093,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     _this.searchDendrogram(false);
     morpheus.Util.trackEvent({
       eventCategory: 'ToolBar',
-      eventAction: 'searchRowDendrogram',
+      eventAction: 'searchRowDendrogram'
     });
   }, 500));
 
@@ -26114,7 +26118,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     },
     select: function () {
       _this.searchDendrogram(true);
-    },
+    }
   });
 
   this.columnDendrogramSearchObject.$search.on('keyup',
@@ -26125,7 +26129,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
       _this.searchDendrogram(true);
       morpheus.Util.trackEvent({
         eventCategory: 'ToolBar',
-        eventAction: 'searchColumnDendrogram',
+        eventAction: 'searchColumnDendrogram'
       });
     }, 500));
 
@@ -26140,7 +26144,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
         dataset: project.getSortedFilteredDataset(),
         text: text,
         matchAllPredicates: _this.matchAllPredicates,
-        defaultMatchMode: _this.matchMode,
+        defaultMatchMode: _this.matchMode
       });
 
       project.getElementSelectionModel().setViewIndices(viewIndices);
@@ -26157,7 +26161,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     },
     select: function () {
       searchValues();
-    },
+    }
   });
 
   this.$valueTextField.on('keyup', _.debounce(function (e) {
@@ -26198,11 +26202,11 @@ morpheus.HeatMapToolBar = function (heatMap) {
       _this.setSelectionOnTop({
         isColumns: true,
         isOnTop: $this.hasClass('btn-primary'),
-        updateButtonStatus: false,
+        updateButtonStatus: false
       });
       morpheus.Util.trackEvent({
         eventCategory: 'ToolBar',
-        eventAction: 'columnMatchesToTop',
+        eventAction: 'columnMatchesToTop'
       });
     });
   this.rowSearchObject.$matchesToTop.on(
@@ -26214,11 +26218,11 @@ morpheus.HeatMapToolBar = function (heatMap) {
       _this.setSelectionOnTop({
         isColumns: false,
         isOnTop: $this.hasClass('btn-primary'),
-        updateButtonStatus: false,
+        updateButtonStatus: false
       });
       morpheus.Util.trackEvent({
         eventCategory: 'ToolBar',
-        eventAction: 'rowMatchesToTop',
+        eventAction: 'rowMatchesToTop'
       });
     });
   project.on('rowSortOrderChanged.morpheus', function (e) {
@@ -26275,7 +26279,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
           _this.columnSearchResultViewIndicesSorted[_this.currentColumnSearchIndex]));
       morpheus.Util.trackEvent({
         eventCategory: 'ToolBar',
-        eventAction: 'previousColumnMatch',
+        eventAction: 'previousColumnMatch'
       });
     });
   this.rowSearchObject.$previousMatch.on(
@@ -26291,14 +26295,14 @@ morpheus.HeatMapToolBar = function (heatMap) {
           _this.rowSearchResultViewIndicesSorted[_this.currentRowSearchIndex]));
       morpheus.Util.trackEvent({
         eventCategory: 'ToolBar',
-        eventAction: 'previousRowMatch',
+        eventAction: 'previousRowMatch'
       });
     });
   this.columnSearchObject.$nextMatch.on('click', function () {
     _this.next(true);
     morpheus.Util.trackEvent({
       eventCategory: 'ToolBar',
-      eventAction: 'nextColumnMatch',
+      eventAction: 'nextColumnMatch'
     });
 
   });
@@ -26306,7 +26310,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     _this.next(false);
     morpheus.Util.trackEvent({
       eventCategory: 'ToolBar',
-      eventAction: 'nextRowMatch',
+      eventAction: 'nextRowMatch'
     });
   });
   this.updateDimensionsLabel();
@@ -26466,7 +26470,7 @@ morpheus.HeatMapToolBar.prototype = {
       rootNode: dendrogram.tree.rootNode,
       text: text,
       matchAllPredicates: this.matchAllPredicates,
-      defaultMatchMode: this.matchMode,
+      defaultMatchMode: this.matchMode
     });
     if (matches === -1) {
       $searchResults.html('');
@@ -26534,7 +26538,7 @@ morpheus.HeatMapToolBar.prototype = {
       text: searchText,
       isColumns: !isRows,
       matchAllPredicates: this.matchAllPredicates,
-      defaultMatchMode: this.matchMode,
+      defaultMatchMode: this.matchMode
     });
     if (searchText === '') {
       $searchResultsLabel.html('');
@@ -26677,7 +26681,7 @@ morpheus.HeatMapToolBar.prototype = {
     this._updateSearchIndices(options.isColumns);
     this.searching = false;
 
-  },
+  }
 };
 morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD = 'column';
 morpheus.HeatMapToolBar.ROW_SEARCH_FIELD = 'column';
@@ -27535,7 +27539,7 @@ morpheus.HeatMap = function (options) {
           'Filter',
           null,
           'API'],
-        View: ['Zoom In', 'Zoom Out', 'Fit To Window', '100%', null, 'Options'],
+        View: ['Zoom In', 'Zoom Out', null, 'Fit To Window', 'Fit Rows To Window', 'Fit Columns To Window', null, '100%', null, 'Options'],
         Edit: [
           'Copy Image',
           'Copy Selected Dataset',
