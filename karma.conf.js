@@ -27,6 +27,14 @@ module.exports = function (config) {
         watched: false
       },
       {
+        pattern: 'node_modules/whatwg-fetch/fetch.js',
+        watched: false
+      },
+      {
+        pattern: 'node_modules/promise-polyfill/promise.js',
+        watched: false
+      },
+      {
         pattern: 'jasmine/test_files/*',
         included: false,
         served: true,
@@ -76,4 +84,4 @@ module.exports = function (config) {
     // how many browser should be started simultaneous
     concurrency: Infinity
   });
-}
+};
