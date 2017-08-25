@@ -3582,6 +3582,9 @@ morpheus.MafFileReader.VARIANT_MAP.set('Intron', 3);
 morpheus.MafFileReader.VARIANT_MAP.set('RNA', 3);
 morpheus.MafFileReader.VARIANT_MAP.set('Targeted_Region', 3);
 morpheus.MafFileReader.VARIANT_MAP.set('Unknown', 3);
+morpheus.MafFileReader.VARIANT_MAP.set('1DEL', 3); // single copy loss from oncopanel
+morpheus.MafFileReader.VARIANT_MAP.set('HA', 3); // high amplification from oncopanel
+
 // mis-sense
 morpheus.MafFileReader.VARIANT_MAP.set('Missense_Mutation', 4);
 morpheus.MafFileReader.VARIANT_MAP.set('Missense', 4);
@@ -3599,6 +3602,7 @@ morpheus.MafFileReader.VARIANT_MAP.set('Frameshift', 6);
 // non-sense
 morpheus.MafFileReader.VARIANT_MAP.set('Nonsense_Mutation', 7);
 morpheus.MafFileReader.VARIANT_MAP.set('Nonsense', 7);
+morpheus.MafFileReader.VARIANT_MAP.set('2DEL', 7); // homozygous deletion from oncopanel
 
 morpheus.MafFileReader.FIELD_NAMES = [
   'Synonymous', 'In Frame Indel', 'Other Non-Synonymous',
@@ -6088,26 +6092,25 @@ morpheus.DatasetUtil.geneSetsToDataset = function (name, sets) {
   }
   return dataset;
 };
-morpheus.DatasetUtil.DATASET_FILE_FORMATS = '<a target="_blank" href="https://clue.io/help#datasets">GCT 1.3</a>, '
+morpheus.DatasetUtil.DATASET_FILE_FORMATS = 'GCT 1.3, '
   + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
   + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
   + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
   + ' a tab-delimited text file, or an Excel spreadsheet';
 morpheus.DatasetUtil.SESSION_FILE_FORMAT = 'a saved Morpheus session';
 
-morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS = '<a target="_blank"' +
-  ' href="https://clue.io/help#datasets">GCT 1.3</a>, '
+morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS = 'GCT 1.3, '
   + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
   + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
   + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
   + ' a tab-delimited text file, an Excel spreadsheet, or a saved Morpheus session';
-morpheus.DatasetUtil.BASIC_DATASET_FILE_FORMATS = '<a target="_blank" href="https://clue.io/help#datasets">GCT 1.3</a>, '
+morpheus.DatasetUtil.BASIC_DATASET_FILE_FORMATS = 'GCT 1.3, '
   + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
   + ' or a tab-delimited text file';
-morpheus.DatasetUtil.GCT_FILE_FORMAT = '<a target="_blank" href="https://clue.io/help#datasets">GCT 1.3</a>';
+morpheus.DatasetUtil.GCT_FILE_FORMAT = 'GCT 1.3';
 morpheus.DatasetUtil.ANNOTATION_FILE_FORMATS = 'an xlsx file, tab-delimited text file, or a <a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT file</a>';
 morpheus.DatasetUtil.DENDROGRAM_FILE_FORMATS = 'a <a href="http://en.wikipedia.org/wiki/Newick_format" target="_blank">Newick</a> file';
-morpheus.DatasetUtil.OPEN_FILE_FORMATS = '<a target="_blank" href="https://clue.io/help#datasets">GCT 1.3</a>, '
+morpheus.DatasetUtil.OPEN_FILE_FORMATS = 'GCT 1.3, '
   + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
   + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
   + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '

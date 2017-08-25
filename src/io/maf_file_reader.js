@@ -72,6 +72,9 @@ morpheus.MafFileReader.VARIANT_MAP.set('Intron', 3);
 morpheus.MafFileReader.VARIANT_MAP.set('RNA', 3);
 morpheus.MafFileReader.VARIANT_MAP.set('Targeted_Region', 3);
 morpheus.MafFileReader.VARIANT_MAP.set('Unknown', 3);
+morpheus.MafFileReader.VARIANT_MAP.set('1DEL', 3); // single copy loss from oncopanel
+morpheus.MafFileReader.VARIANT_MAP.set('HA', 3); // high amplification from oncopanel
+
 // mis-sense
 morpheus.MafFileReader.VARIANT_MAP.set('Missense_Mutation', 4);
 morpheus.MafFileReader.VARIANT_MAP.set('Missense', 4);
@@ -89,6 +92,7 @@ morpheus.MafFileReader.VARIANT_MAP.set('Frameshift', 6);
 // non-sense
 morpheus.MafFileReader.VARIANT_MAP.set('Nonsense_Mutation', 7);
 morpheus.MafFileReader.VARIANT_MAP.set('Nonsense', 7);
+morpheus.MafFileReader.VARIANT_MAP.set('2DEL', 7); // homozygous deletion from oncopanel
 
 morpheus.MafFileReader.FIELD_NAMES = [
   'Synonymous', 'In Frame Indel', 'Other Non-Synonymous',
