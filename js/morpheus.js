@@ -6092,29 +6092,7 @@ morpheus.DatasetUtil.geneSetsToDataset = function (name, sets) {
   }
   return dataset;
 };
-morpheus.DatasetUtil.DATASET_FILE_FORMATS = 'GCT 1.3, '
-  + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
-  + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
-  + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
-  + ' a tab-delimited text file, or an Excel spreadsheet';
-morpheus.DatasetUtil.SESSION_FILE_FORMAT = 'a saved Morpheus session';
 
-morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS = 'GCT 1.3, '
-  + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
-  + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
-  + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
-  + ' a tab-delimited text file, an Excel spreadsheet, or a saved Morpheus session';
-morpheus.DatasetUtil.BASIC_DATASET_FILE_FORMATS = 'GCT 1.3, '
-  + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
-  + ' or a tab-delimited text file';
-morpheus.DatasetUtil.GCT_FILE_FORMAT = 'GCT 1.3';
-morpheus.DatasetUtil.ANNOTATION_FILE_FORMATS = 'an xlsx file, tab-delimited text file, or a <a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT file</a>';
-morpheus.DatasetUtil.DENDROGRAM_FILE_FORMATS = 'a <a href="http://en.wikipedia.org/wiki/Newick_format" target="_blank">Newick</a> file';
-morpheus.DatasetUtil.OPEN_FILE_FORMATS = 'GCT 1.3, '
-  + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/genepattern/gp_guides/file-formats/sections/gct">GCT 1.2</a>, '
-  + '<a target="_blank" href="https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+%28MAF%29+Specification">MAF</a>, '
-  + '<a target="_blank" href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">GMT</a>, '
-  + ' a tab-delimited text file, or a <a href="http://en.wikipedia.org/wiki/Newick_format" target="_blank">Newick</a> file';
 morpheus.DatasetUtil.getRootDataset = function (dataset) {
   while (dataset.getDataset) {
     dataset = dataset.getDataset();
@@ -11563,6 +11541,12 @@ morpheus.Vector.prototype = {
 };
 morpheus.Util.extend(morpheus.Vector, morpheus.AbstractVector);
 
+/**
+ *
+ * @param pageOptions.el
+ * @param pageOptions.tabManager
+ * @constructor
+ */
 morpheus.LandingPage = function (pageOptions) {
   pageOptions = $.extend({}, {
     el: $('#vis')
@@ -11578,7 +11562,7 @@ morpheus.LandingPage = function (pageOptions) {
   html.push('<div class="clearfix"></div>');
   html.push('</div>'); // col
   html.push('<div data-name="desc" class="col-xs-12 col-md-3"><p><img' +
-    ' src="css/images/morpheus_landing_img.png" style="width:100%;"></p></div>');
+    ' src="https://software.broadinstitute.org/morpheus/css/images/morpheus_landing_img.png" style="width:100%;"></p></div>');
   html.push('</div>'); // row
 
   html.push('<div class="row"><div class="col-xs-12 morpheus-footer"></div></div>');
@@ -11593,16 +11577,17 @@ morpheus.LandingPage = function (pageOptions) {
     ' map,' +
     ' then explore' +
     ' the' +
-    ' interactive tools in Morpheus. Cluster, create new annotations, search, filter, sort, display charts, and more.</p><p style="color:#586069;">27,000+ users <br />89,000+ matrices analyzed</p>').appendTo($description);
+    ' interactive tools in Morpheus. Cluster, create new annotations, search, filter, sort, display charts, and more.</p><p style="color:#586069;">27,000+ users <br />89,000+ matrices analyzed</p>')
+    .appendTo($description);
 
   var $input = $el.find('[data-name=input]');
 
-  $('<svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg><h2 style="padding-left: 4px; display:inline-block;">Open</h2>').appendTo($input);
-  $('<div style="margin-bottom:20px;">' + morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS + '<br' +
-    ' />All' +
+  $('<svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg><h2 style="padding-left: 4px; display:inline-block;">Open</h2>')
+    .appendTo($input);
+  $('<div style="margin-bottom:20px;"><small>All' +
     ' data is' +
     ' processed in the' +
-    ' browser and never sent to any server.</div>').appendTo($input);
+    ' browser and never sent to any server.</small></div>').appendTo($input);
 
   var filePicker = new morpheus.FilePicker({
     fileCallback: function (file) {
@@ -11614,17 +11599,22 @@ morpheus.LandingPage = function (pageOptions) {
   });
   filePicker.$el.appendTo($input);
 
-  this.tabManager = new morpheus.TabManager({landingPage: this});
-  this.tabManager.on('change rename add remove', function (e) {
-    var title = _this.tabManager.getTabText(_this.tabManager.getActiveTabId());
-    if (title == null || title === '') {
-      title = 'Morpheus';
-    }
-    document.title = title;
-  });
+  if (pageOptions.tabManager) {
+    this.tabManager = pageOptions.tabManager;
+  } else {
+    this.tabManager = new morpheus.TabManager({landingPage: this});
+    this.tabManager.on('change rename add remove', function (e) {
+      var title = _this.tabManager.getTabText(_this.tabManager.getActiveTabId());
+      if (title == null || title === '') {
+        title = 'Morpheus';
+      }
+      document.title = title;
+    });
 
-  this.tabManager.$nav.appendTo($(this.pageOptions.el));
-  this.tabManager.$tabContent.appendTo($(this.pageOptions.el));
+    this.tabManager.$nav.appendTo($(this.pageOptions.el));
+    this.tabManager.$tabContent.appendTo($(this.pageOptions.el));
+  }
+
 // for (var i = 0; i < brands.length; i++) {
 // 	brands[i].style.color = colorScale(i);
 // }
@@ -27653,19 +27643,23 @@ morpheus.HeatMap = function (options) {
   if (this.options.parent == null) {
 
     if (!morpheus.Util.isHeadless()) {
-      this.tabManager = this.options.tabManager != null ? this.options.tabManager
-        : new morpheus.TabManager({
-          landingPage: function () {
-            if (_this.options.landingPage == null) {
-              _this.options.landingPage = new morpheus.LandingPage();
-              _this.options.landingPage.$el.prependTo(_this.$el);
-            }
-            return _this.options.landingPage;
-          },
-          autohideTabBar: this.options.autohideTabBar
-        });
+      if (this.options.tabManager == null) {
+        this.tabManager =
+          new morpheus.TabManager({
+            landingPage: function () {
+              if (_this.options.landingPage == null) {
+                _this.options.landingPage = new morpheus.LandingPage({tabManager: _this.tabManager});
+                _this.options.landingPage.$el.prependTo(_this.$el);
+              }
+              return _this.options.landingPage;
+            },
+            autohideTabBar: this.options.autohideTabBar
+          });
+      } else {
+        this.tabManager = this.options.tabManager;
+      }
 
-      if (!this.options.tabManager) {
+      if (this.options.tabManager == null) {
         this.tabManager.appendTo(this.$el);
       }
     }

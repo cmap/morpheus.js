@@ -19,7 +19,7 @@ morpheus.LandingPage = function (pageOptions) {
   html.push('<div class="clearfix"></div>');
   html.push('</div>'); // col
   html.push('<div data-name="desc" class="col-xs-12 col-md-3"><p><img' +
-    ' src="css/images/morpheus_landing_img.png" style="width:100%;"></p></div>');
+    ' src="https://software.broadinstitute.org/morpheus/css/images/morpheus_landing_img.png" style="width:100%;"></p></div>');
   html.push('</div>'); // row
 
   html.push('<div class="row"><div class="col-xs-12 morpheus-footer"></div></div>');
@@ -41,11 +41,10 @@ morpheus.LandingPage = function (pageOptions) {
 
   $('<svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg><h2 style="padding-left: 4px; display:inline-block;">Open</h2>')
     .appendTo($input);
-  $('<div style="margin-bottom:20px;">' + morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS + '<br' +
-    ' />All' +
+  $('<div style="margin-bottom:20px;"><small>All' +
     ' data is' +
     ' processed in the' +
-    ' browser and never sent to any server.</div>').appendTo($input);
+    ' browser and never sent to any server.</small></div>').appendTo($input);
 
   var filePicker = new morpheus.FilePicker({
     fileCallback: function (file) {
