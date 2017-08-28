@@ -214,7 +214,6 @@ morpheus.HeatMap = function (options) {
        * Heat map grid thickness in pixels
        */
       gridThickness: 0.1,
-      customUrls: undefined, // Custom urls for File>Open.
       height: 'window', // set the available height for the
       // heat map. If not
       // set, it will be determined automatically
@@ -643,6 +642,12 @@ morpheus.HeatMap = function (options) {
 
 morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS = 6;
 
+/**
+ *
+ * @param tool A tool instance
+ * @param heatMap The calling heat map instance
+ * @param callback Optional callback to invoke when tool is done
+ */
 morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
   if (tool.gui) {
     var gui = tool.gui(heatMap.getProject());
@@ -1253,10 +1258,6 @@ morpheus.HeatMap.prototype = {
       isColumns: isColumns
     });
   },
-
-  setCustomUrls: function (customUrls) {
-    this._customUrls = customUrls;
-  },
   getTabManager: function () {
     return this.tabManager;
   },
@@ -1342,9 +1343,6 @@ morpheus.HeatMap.prototype = {
     this.$parent.appendTo(this.$content);
     if (!morpheus.Util.isHeadless()) {
       this.toolbar = new morpheus.HeatMapToolBar(this);
-    }
-    if (this.options.customUrls) {
-      this.setCustomUrls(this.options.customUrls);
     }
 
     // scroll bars at the bottom of the heatmap, and right of the heatmap

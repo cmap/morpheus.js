@@ -24,7 +24,7 @@ morpheus.FormBuilder = function (options) {
     'dragover',
     function (e) {
       var node = $(e.originalEvent.srcElement).parent().parent()
-      .prev();
+        .prev();
       if (node.is('select') && node.hasClass('file-input')) {
         $(e.originalEvent.srcElement).parent().css('border',
           '1px solid black');
@@ -35,7 +35,7 @@ morpheus.FormBuilder = function (options) {
     'dragenter',
     function (e) {
       var node = $(e.originalEvent.srcElement).parent().parent()
-      .prev();
+        .prev();
       if (node.is('select') && node.hasClass('file-input')) {
         $(e.originalEvent.srcElement).parent().css('border',
           '1px solid black');
@@ -89,11 +89,12 @@ morpheus.FormBuilder.showProgressBar = function (options) {
   content.push('<div class="row">');
   content.push('<div class="col-xs-8">');
   content
-  .push('<div class="progress progress-striped active"><div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div></div>');
+    .push(
+      '<div class="progress progress-striped active"><div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div></div>');
   content.push('</div>'); // col
   content.push('<div class="col-xs-2">');
   content
-  .push('<input class="btn btn-default" type="button" name="stop" value="Cancel">');
+    .push('<input class="btn btn-default" type="button" name="stop" value="Cancel">');
   content.push('</div>'); // col
   content.push('</div>'); // row
   if (options.subtitle) {
@@ -118,14 +119,14 @@ morpheus.FormBuilder.showInDraggableDiv = function (options) {
   var width = options.width || '300px';
   var html = [];
   html
-  .push('<div style="z-index: 1050; top: 100px; position:absolute; padding-left:10px; padding-right:10px; width:'
-    + width
-    + ' ; background:white; box-shadow: 0 5px 15px rgba(0,0,0,0.5); border: 1px solid rgba(0,0,0,0.2); border-radius: 6px;">');
+    .push('<div style="z-index: 1050; top: 100px; position:absolute; padding-left:10px; padding-right:10px; width:'
+      + width
+      + ' ; background:white; box-shadow: 0 5px 15px rgba(0,0,0,0.5); border: 1px solid rgba(0,0,0,0.2); border-radius: 6px;">');
 
   if (options.title != null) {
     html
-    .push('<h4 style="cursor:move; border-bottom: 1px solid #e5e5e5;" name="header">'
-      + options.title + '</h4>');
+      .push('<h4 style="cursor:move; border-bottom: 1px solid #e5e5e5;" name="header">'
+        + options.title + '</h4>');
   }
   html.push('<div name="content"></div>');
   html.push('</div>');
@@ -153,17 +154,17 @@ morpheus.FormBuilder.showInDraggableDiv = function (options) {
 
 morpheus.FormBuilder.showMessageModal = function (options) {
   var $div = morpheus.FormBuilder
-  ._showInModal({
-    modalClass: options.modalClass,
-    title: options.title,
-    html: options.html,
-    footer: ('<button type="button" class="btn btn-default"' +
-    ' data-dismiss="modal">OK</button>'),
-    backdrop: options.backdrop,
-    size: options.size,
-    focus: options.focus,
-    appendTo: options.appendTo
-  });
+    ._showInModal({
+      modalClass: options.modalClass,
+      title: options.title,
+      html: options.html,
+      footer: ('<button type="button" class="btn btn-default"' +
+        ' data-dismiss="modal">OK</button>'),
+      backdrop: options.backdrop,
+      size: options.size,
+      focus: options.focus,
+      appendTo: options.appendTo
+    });
   $div.find('button').focus();
   return $div;
 
@@ -192,7 +193,7 @@ morpheus.FormBuilder._showInModal = function (options) {
   html.push(' <div class="modal-header">');
   if (options.close) {
     html
-    .push('  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>');
+      .push('  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>');
   }
   if (options.title != null) {
     html.push('<h4 class="modal-title">' + options.title + '</h4>');
@@ -216,7 +217,7 @@ morpheus.FormBuilder._showInModal = function (options) {
   $div.prependTo(options.appendTo != null ? options.appendTo : $(document.body));
   $div.modal({
     keyboard: true,
-    backdrop: options.backdrop === true ? true : false,
+    backdrop: options.backdrop === true ? true : false
   }).on('hidden.bs.modal', function (e) {
     $div.remove();
     if (options.onClose) {
@@ -243,19 +244,19 @@ morpheus.FormBuilder._showInModal = function (options) {
  */
 morpheus.FormBuilder.showInModal = function (options) {
   return morpheus.FormBuilder
-  ._showInModal({
-    modalClass: options.modalClass,
-    title: options.title,
-    html: options.html,
-    footer: options.close ? ('<button type="button" class="btn btn-default" data-dismiss="modal">'
-    + options.close + '</button>')
-      : null,
-    onClose: options.onClose,
-    appendTo: options.appendTo,
-    backdrop: options.backdrop,
-    size: options.size,
-    focus: options.focus
-  });
+    ._showInModal({
+      modalClass: options.modalClass,
+      title: options.title,
+      html: options.html,
+      footer: options.close ? ('<button type="button" class="btn btn-default" data-dismiss="modal">'
+        + options.close + '</button>')
+        : null,
+      onClose: options.onClose,
+      appendTo: options.appendTo,
+      backdrop: options.backdrop,
+      size: options.size,
+      focus: options.focus
+    });
   // if (options.draggable) {
   // $div.draggable({
   // handle : $div.find(".modal-header")
@@ -283,15 +284,15 @@ morpheus.FormBuilder.showOkCancel = function (options) {
   var footer = [];
   if (options.ok) {
     footer
-    .push('<button name="ok" type="button" class="btn btn-default">OK</button>');
+      .push('<button name="ok" type="button" class="btn btn-default">OK</button>');
   }
   if (options.apply) {
     footer
-    .push('<button name="apply" type="button" class="btn btn-default">Apply</button>');
+      .push('<button name="apply" type="button" class="btn btn-default">Apply</button>');
   }
   if (options.cancel) {
     footer
-    .push('<button name="cancel" type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>');
+      .push('<button name="cancel" type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>');
   }
   var $div = morpheus.FormBuilder._showInModal({
     title: options.title,
@@ -307,9 +308,12 @@ morpheus.FormBuilder.showOkCancel = function (options) {
   // $div.css('left', $(window).width()
   // - $div.find('.modal-content').width() - 60);
   // }
+
   var $ok = $div.find('[name=ok]');
   $ok.on('click', function (e) {
-    options.okCallback();
+    if (options.okCallback) {
+      options.okCallback();
+    }
     $div.modal('hide');
   });
   $div.find('[name=cancel]').on('click', function (e) {
@@ -536,9 +540,9 @@ morpheus.FormBuilder.prototype = {
           function (evt) {
             evt.preventDefault();
             var $select = _this.$form
-            .find('[name=' + name + ']');
+              .find('[name=' + name + ']');
             $select.selectpicker('val', $.map($select
-            .find('option'), function (o) {
+              .find('option'), function (o) {
               return $(o).val();
             }));
             $select.trigger('change');
@@ -547,7 +551,7 @@ morpheus.FormBuilder.prototype = {
           function (evt) {
             evt.preventDefault();
             var $select = _this.$form
-            .find('[name=' + name + ']');
+              .find('[name=' + name + ']');
             $select.selectpicker('val', []);
             $select.trigger('change');
           });
@@ -582,14 +586,14 @@ morpheus.FormBuilder.prototype = {
     } else if ('file' === type) {
       var isMultiple = field.multiple == null ? false : field.multiple;
       html
-      .push('<select data-multiple="'
-        + isMultiple
-        + '" data-type="file" title="'
-        + (field.placeholder || (isMultiple ? 'Choose one or more files...'
-          : 'Choose a file...'))
-        + '" name="'
-        + name
-        + '_picker" data-width="35%" class="file-input selectpicker form-control">');
+        .push('<select data-multiple="'
+          + isMultiple
+          + '" data-type="file" title="'
+          + (field.placeholder || (isMultiple ? 'Choose one or more files...'
+            : 'Choose a file...'))
+          + '" name="'
+          + name
+          + '_picker" data-width="35%" class="file-input selectpicker form-control">');
       var options = [];
 
       if (field.options) {
@@ -632,16 +636,16 @@ morpheus.FormBuilder.prototype = {
       html.push('<div>');
 
       html
-      .push('<input placeholder="'
-        + (isMultiple ? 'Enter one or more URLs'
-          : 'Enter a URL')
-        + '" class="form-control" style="width:50%; display:none;" type="text" name="'
-        + name + '_url">');
+        .push('<input placeholder="'
+          + (isMultiple ? 'Enter one or more URLs'
+            : 'Enter a URL')
+          + '" class="form-control" style="width:50%; display:none;" type="text" name="'
+          + name + '_url">');
 
       if (field.text) {
         html
-        .push('<input class="form-control" style="width:50%; display:none;" type="text" name="'
-          + name + '_text">');
+          .push('<input class="form-control" style="width:50%; display:none;" type="text" name="'
+            + name + '_text">');
       }
 
       html.push('</div>');
@@ -651,45 +655,45 @@ morpheus.FormBuilder.prototype = {
       // browse button clicked
       // select change
       _this.$form
-      .on(
-        'change',
-        '[name=' + name + '_picker]',
-        function (evt) {
-          var $this = $(this);
-          var val = $this.val();
-          var showUrlInput = val === 'URL';
-          var showTextInput = val === field.text;
-          if ('Dropbox' === val) {
-            var options = {
-              success: function (results) {
-                var val = !isMultiple ? results[0].link
-                  : results.map(function (result) {
-                    return result.link;
+        .on(
+          'change',
+          '[name=' + name + '_picker]',
+          function (evt) {
+            var $this = $(this);
+            var val = $this.val();
+            var showUrlInput = val === 'URL';
+            var showTextInput = val === field.text;
+            if ('Dropbox' === val) {
+              var options = {
+                success: function (results) {
+                  var val = !isMultiple ? results[0].link
+                    : results.map(function (result) {
+                      return result.link;
+                    });
+                  _this.setValue(name, val);
+                  _this.trigger('change', {
+                    name: name,
+                    value: val
                   });
-                _this.setValue(name, val);
-                _this.trigger('change', {
-                  name: name,
-                  value: val
-                });
-              },
-              linkType: 'direct',
-              multiselect: isMultiple
-            };
-            Dropbox.choose(options);
-            _this.$form.find('[name=' + name + '_picker]').selectpicker('val', '');
-          } else if ('My Computer' === val) {
-            _this.$form.find('[name=' + name + '_file]')
-            .click();
-            _this.$form.find('[name=' + name + '_picker]').selectpicker('val', '');
-          }
+                },
+                linkType: 'direct',
+                multiselect: isMultiple
+              };
+              Dropbox.choose(options);
+              _this.$form.find('[name=' + name + '_picker]').selectpicker('val', '');
+            } else if ('My Computer' === val) {
+              _this.$form.find('[name=' + name + '_file]')
+                .click();
+              _this.$form.find('[name=' + name + '_picker]').selectpicker('val', '');
+            }
 
-          _this.$form.find('[name=' + name + '_url]')
-          .css('display',
-            showUrlInput ? '' : 'none');
-          _this.$form.find('[name=' + name + '_text]')
-          .css('display',
-            showTextInput ? '' : 'none');
-        });
+            _this.$form.find('[name=' + name + '_url]')
+              .css('display',
+                showUrlInput ? '' : 'none');
+            _this.$form.find('[name=' + name + '_text]')
+              .css('display',
+                showTextInput ? '' : 'none');
+          });
       // URL
       _this.$form.on('keyup', '[name=' + name + '_url]', function (evt) {
         var text = $.trim($(this).val());
@@ -899,7 +903,7 @@ morpheus.FormBuilder.prototype = {
   },
   setVisible: function (name, visible) {
     var $div = this.$form.find('[name=' + name + ']')
-    .parents('.form-group');
+      .parents('.form-group');
     if (visible) {
       $div.show();
     } else {
@@ -908,7 +912,7 @@ morpheus.FormBuilder.prototype = {
   },
   remove: function (name) {
     var $div = this.$form.find('[name=' + name + ']')
-    .parents('.form-group');
+      .parents('.form-group');
     $div.remove();
   },
   setEnabled: function (name, enabled) {

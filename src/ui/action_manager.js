@@ -208,9 +208,7 @@ morpheus.ActionManager = function () {
     name: 'Open',
     ellipsis: true,
     cb: function (options) {
-      morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
-        customUrls: options.heatMap._customUrls
-      }), options.heatMap);
+      morpheus.HeatMap.showTool(new morpheus.OpenFileTool(), options.heatMap);
     },
     which: [79],
     commandKey: true,

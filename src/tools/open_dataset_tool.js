@@ -1,94 +1,6 @@
 morpheus.OpenDatasetTool = function () {
-  this.customUrls = [];
 };
 
-morpheus.OpenDatasetTool.fileExtensionPrompt = function (file, callback) {
-  var ext = morpheus.Util.getExtension(morpheus.Util.getFileName(file));
-  var deferred;
-  if (ext === 'seg' || ext === 'segtab') {
-    this._promptSegtab(function (regions) {
-      callback(regions);
-    });
-
-  } else {
-    callback(null);
-  }
-
-};
-morpheus.OpenDatasetTool._promptMaf = function (promptCallback) {
-  var formBuilder = new morpheus.FormBuilder();
-  formBuilder
-    .append({
-      name: 'MAF_gene_symbols',
-      value: '',
-      type: 'textarea',
-      required: true,
-      help: 'Enter one gene symbol per line to filter genes. Leave blank to show all genes.'
-    });
-  morpheus.FormBuilder
-    .showInModal({
-      title: 'Gene Symbols',
-      html: formBuilder.$form,
-      close: 'OK',
-      onClose: function () {
-        var text = formBuilder.getValue('MAF_gene_symbols');
-        var lines = morpheus.Util.splitOnNewLine(text);
-        var mafGeneFilter = new morpheus.Map();
-        for (var i = 0, nlines = lines.length, counter = 0; i < nlines; i++) {
-          var line = lines[i];
-          if (line !== '') {
-            mafGeneFilter.set(line, counter++);
-          }
-        }
-        var readOptions = mafGeneFilter.size() > 0 ? {
-          mafGeneFilter: mafGeneFilter
-        } : null;
-        promptCallback(readOptions);
-      }
-    });
-};
-morpheus.OpenDatasetTool._promptSegtab = function (promptCallback) {
-  var formBuilder = new morpheus.FormBuilder();
-  formBuilder
-    .append({
-      name: 'regions',
-      value: '',
-      type: 'textarea',
-      required: true,
-      help: 'Define the regions over which you want to define the CNAs. Enter one region per line. Each line should contain region_id, chromosome, start, and end separated by a tab. Leave blank to use all unique segments in the segtab file as regions.'
-    });
-  morpheus.FormBuilder
-    .showInModal({
-      title: 'Regions',
-      html: formBuilder.$form,
-      close: 'OK',
-      onClose: function () {
-        var text = formBuilder.getValue('regions');
-        var lines = morpheus.Util.splitOnNewLine(text);
-        var regions = [];
-        var tab = /\t/;
-        for (var i = 0, nlines = lines.length, counter = 0; i < nlines; i++) {
-          var line = lines[i];
-
-          if (line !== '') {
-            var tokens = line.split(tab);
-            if (tokens.length >= 4) {
-              regions.push({
-                id: tokens[0],
-                chromosome: tokens[1],
-                start: parseInt(tokens[2]),
-                end: parseInt(tokens[3])
-              });
-            }
-          }
-        }
-        var readOptions = regions.length > 0 ? {
-          regions: regions
-        } : null;
-        promptCallback(readOptions);
-      }
-    });
-};
 morpheus.OpenDatasetTool.prototype = {
   toString: function () {
     return 'Open Dataset';
@@ -328,17 +240,18 @@ morpheus.OpenDatasetTool.prototype = {
                 });
               });
         } else if (action === 'open') { // new tab
+          console.log('open');
           new morpheus.HeatMap({
             dataset: newDataset,
             parent: heatMap,
             inheritFromParent: false
           });
-
         } else {
           console.log('Unknown action: ' + action);
         }
-
-        heatMap.revalidate();
+        if (action !== 'open') {
+          heatMap.revalidate();
+        }
       });
   },
   execute: function (options) {
@@ -436,4 +349,92 @@ morpheus.OpenDatasetTool.prototype = {
     };
     morpheus.HeatMap.showTool(tool, heatMap, callback);
   }
+};
+
+morpheus.OpenDatasetTool.fileExtensionPrompt = function (file, callback) {
+  var ext = morpheus.Util.getExtension(morpheus.Util.getFileName(file));
+  var deferred;
+  if (ext === 'seg' || ext === 'segtab') {
+    this._promptSegtab(function (regions) {
+      callback(regions);
+    });
+
+  } else {
+    callback(null);
+  }
+
+};
+morpheus.OpenDatasetTool._promptMaf = function (promptCallback) {
+  var formBuilder = new morpheus.FormBuilder();
+  formBuilder
+    .append({
+      name: 'MAF_gene_symbols',
+      value: '',
+      type: 'textarea',
+      required: true,
+      help: 'Enter one gene symbol per line to filter genes. Leave blank to show all genes.'
+    });
+  morpheus.FormBuilder
+    .showInModal({
+      title: 'Gene Symbols',
+      html: formBuilder.$form,
+      close: 'OK',
+      onClose: function () {
+        var text = formBuilder.getValue('MAF_gene_symbols');
+        var lines = morpheus.Util.splitOnNewLine(text);
+        var mafGeneFilter = new morpheus.Map();
+        for (var i = 0, nlines = lines.length, counter = 0; i < nlines; i++) {
+          var line = lines[i];
+          if (line !== '') {
+            mafGeneFilter.set(line, counter++);
+          }
+        }
+        var readOptions = mafGeneFilter.size() > 0 ? {
+          mafGeneFilter: mafGeneFilter
+        } : null;
+        promptCallback(readOptions);
+      }
+    });
+};
+morpheus.OpenDatasetTool._promptSegtab = function (promptCallback) {
+  var formBuilder = new morpheus.FormBuilder();
+  formBuilder
+    .append({
+      name: 'regions',
+      value: '',
+      type: 'textarea',
+      required: true,
+      help: 'Define the regions over which you want to define the CNAs. Enter one region per line. Each line should contain region_id, chromosome, start, and end separated by a tab. Leave blank to use all unique segments in the segtab file as regions.'
+    });
+  morpheus.FormBuilder
+    .showInModal({
+      title: 'Regions',
+      html: formBuilder.$form,
+      close: 'OK',
+      onClose: function () {
+        var text = formBuilder.getValue('regions');
+        var lines = morpheus.Util.splitOnNewLine(text);
+        var regions = [];
+        var tab = /\t/;
+        for (var i = 0, nlines = lines.length, counter = 0; i < nlines; i++) {
+          var line = lines[i];
+
+          if (line !== '') {
+            var tokens = line.split(tab);
+            if (tokens.length >= 4) {
+              regions.push({
+                id: tokens[0],
+                chromosome: tokens[1],
+                start: parseInt(tokens[2]),
+                end: parseInt(tokens[3])
+              });
+            }
+          }
+        }
+        var readOptions = regions.length > 0 ? {
+          regions: regions
+        } : null;
+        promptCallback(readOptions);
+      }
+    });
 };

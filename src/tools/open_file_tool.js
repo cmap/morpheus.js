@@ -77,9 +77,9 @@ morpheus.OpenFileTool.prototype = {
       form.setVisible('open_file_action', false);
       var $div = $('<div></div>');
       var $ok = $(
-        '<div style="display:none;padding:15px;text-align:right;"><button name="ok" type="button" class="btn' +
+        '<div style="display:none;padding:15px;text-align:right;"><button name="action-selected" type="button" class="btn' +
         ' btn-default">OK</button></div>');
-      $ok.find('[name=ok]').on('click', function () {
+      $ok.find('[name=action-selected]').on('click', function () {
         _this.ok();
       });
       var filePicker = new morpheus.FilePicker({
