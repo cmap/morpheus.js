@@ -1,3 +1,9 @@
+/**
+ *
+ * @param pageOptions.el
+ * @param pageOptions.tabManager
+ * @constructor
+ */
 morpheus.LandingPage = function (pageOptions) {
   pageOptions = $.extend({}, {
     el: $('#vis')
@@ -28,11 +34,13 @@ morpheus.LandingPage = function (pageOptions) {
     ' map,' +
     ' then explore' +
     ' the' +
-    ' interactive tools in Morpheus. Cluster, create new annotations, search, filter, sort, display charts, and more.</p><p style="color:#586069;">27,000+ users <br />89,000+ matrices analyzed</p>').appendTo($description);
+    ' interactive tools in Morpheus. Cluster, create new annotations, search, filter, sort, display charts, and more.</p><p style="color:#586069;">27,000+ users <br />89,000+ matrices analyzed</p>')
+    .appendTo($description);
 
   var $input = $el.find('[data-name=input]');
 
-  $('<svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg><h2 style="padding-left: 4px; display:inline-block;">Open</h2>').appendTo($input);
+  $('<svg width="32px" height="32px"><g><rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/><rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/></g></svg><h2 style="padding-left: 4px; display:inline-block;">Open</h2>')
+    .appendTo($input);
   $('<div style="margin-bottom:20px;">' + morpheus.DatasetUtil.DATASET_AND_SESSION_FILE_FORMATS + '<br' +
     ' />All' +
     ' data is' +
@@ -49,17 +57,22 @@ morpheus.LandingPage = function (pageOptions) {
   });
   filePicker.$el.appendTo($input);
 
-  this.tabManager = new morpheus.TabManager({landingPage: this});
-  this.tabManager.on('change rename add remove', function (e) {
-    var title = _this.tabManager.getTabText(_this.tabManager.getActiveTabId());
-    if (title == null || title === '') {
-      title = 'Morpheus';
-    }
-    document.title = title;
-  });
+  if (pageOptions.tabManager) {
+    this.tabManager = pageOptions.tabManager;
+  } else {
+    this.tabManager = new morpheus.TabManager({landingPage: this});
+    this.tabManager.on('change rename add remove', function (e) {
+      var title = _this.tabManager.getTabText(_this.tabManager.getActiveTabId());
+      if (title == null || title === '') {
+        title = 'Morpheus';
+      }
+      document.title = title;
+    });
 
-  this.tabManager.$nav.appendTo($(this.pageOptions.el));
-  this.tabManager.$tabContent.appendTo($(this.pageOptions.el));
+    this.tabManager.$nav.appendTo($(this.pageOptions.el));
+    this.tabManager.$tabContent.appendTo($(this.pageOptions.el));
+  }
+
 // for (var i = 0; i < brands.length; i++) {
 // 	brands[i].style.color = colorScale(i);
 // }
