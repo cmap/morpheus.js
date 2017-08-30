@@ -1516,7 +1516,6 @@ morpheus.Util.createValueToIndices = function (array, field) {
 
 morpheus.Util.createMorpheusHeader = function () {
   var html = [];
-
   html.push('<div style="display:inline-block;' +
     ' vertical-align:top;font-size:24px;font-family:sans-serif;">');
   html.push('<span>M</span>');
@@ -1540,7 +1539,7 @@ morpheus.Util.createMorpheusHeader = function () {
       setTimeout(step, 200);
     }
   };
-  setTimeout(step, 300);
+  setTimeout(step, 500);
   return $div;
 };
 morpheus.Util.createLoadingEl = function () {
