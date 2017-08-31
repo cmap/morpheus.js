@@ -72,9 +72,6 @@ morpheus.LandingPage = function (pageOptions) {
     this.tabManager.$tabContent.appendTo($(this.pageOptions.el));
   }
 
-// for (var i = 0; i < brands.length; i++) {
-// 	brands[i].style.color = colorScale(i);
-// }
 }
 ;
 

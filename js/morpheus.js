@@ -1518,7 +1518,6 @@ morpheus.Util.createValueToIndices = function (array, field) {
 
 morpheus.Util.createMorpheusHeader = function () {
   var html = [];
-
   html.push('<div style="display:inline-block;' +
     ' vertical-align:top;font-size:24px;font-family:sans-serif;">');
   html.push('<span>M</span>');
@@ -1542,7 +1541,7 @@ morpheus.Util.createMorpheusHeader = function () {
       setTimeout(step, 200);
     }
   };
-  setTimeout(step, 300);
+  setTimeout(step, 500);
   return $div;
 };
 morpheus.Util.createLoadingEl = function () {
@@ -11615,9 +11614,6 @@ morpheus.LandingPage = function (pageOptions) {
     this.tabManager.$tabContent.appendTo($(this.pageOptions.el));
   }
 
-// for (var i = 0; i < brands.length; i++) {
-// 	brands[i].style.color = colorScale(i);
-// }
 }
 ;
 
@@ -27943,13 +27939,14 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       formBuilder: formBuilder
     });
     var okCallback = function () {
-      var $dialogContent = $('<div><span>' + tool.toString() + '... </span><button class="btn' +
-        ' btn-xs btn-default pull-right" disabled>Cancel</button></div>');
+      var $dialogContent = $('<div><span>' + tool.toString() + '...</span><button class="btn' +
+        ' btn-xs btn-default" style="margin-left:6px;display: none;">Cancel</button></div>');
       var value = null;
 
       var $dialog = morpheus.FormBuilder.showInDraggableDiv({
         $content: $dialogContent,
-        appendTo: heatMap.getContentEl()
+        appendTo: heatMap.getContentEl(),
+        width: 'auto'
       });
       var input = {};
       _.each(gui, function (item) {
@@ -27964,7 +27961,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
           input: input
         });
         if (value instanceof Worker) {
-          $dialogContent.find('button').prop('disabled', false).on('click', function () {
+          $dialogContent.find('button').css('display', '').on('click', function () {
             value.terminate();
           });
           value.onerror = function (e) {
@@ -30145,14 +30142,14 @@ morpheus.HeatMap.prototype = {
       arguments: arguments
     });
   },
-  addTrack: function (name, isColumns, renderSettings) {
+  addTrack: function (name, isColumns, renderSettings, trackIndex) {
     if (name === undefined) {
       throw 'Name not specified';
     }
 
     var tracks = isColumns ? this.columnTracks : this.rowTracks;
     var headers = isColumns ? this.columnTrackHeaders : this.rowTrackHeaders;
-    // see if already visible
+    // see if already exists
     var existingIndex = this.getTrackIndex(name, isColumns);
     if (existingIndex !== -1) {
       return tracks[existingIndex];
@@ -30166,15 +30163,20 @@ morpheus.HeatMap.prototype = {
     var positions = isColumns ? this.heatmap.getColumnPositions() : this.heatmap.getRowPositions();
     var track = new morpheus.VectorTrack(this.project, name, positions, isColumns, this);
     track.settingFromConfig(renderSettings);
-    tracks.push(track);
     track.appendTo(this.$parent);
     var header = new morpheus.VectorTrackHeader(this.project, name, isColumns,
       this);
-    headers.push(header);
     header.appendTo(this.$parent);
     track._selection = new morpheus.TrackSelection(track, positions,
       isColumns ? this.project.getColumnSelectionModel() : this.project.getRowSelectionModel(),
       isColumns, this);
+    if (trackIndex != null && trackIndex >= 0) {
+      tracks.splice(trackIndex, 0, track);
+      headers.splice(trackIndex, 0, header);
+    } else {
+      tracks.push(track);
+      headers.push(header);
+    }
     return track;
   }
   ,
@@ -30645,11 +30647,9 @@ morpheus.HeatMap.prototype = {
       this.snapshot(context);
       var svg = context.getSerializedSvg();
       var prefix = [];
-
       prefix.push('<?xml version="1.0" encoding="utf-8"?>\n');
       prefix.push('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"' +
         ' "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n');
-
       svg = prefix.join('') + svg;
       var blob = new Blob([svg], {
         type: 'text/plain;charset=utf-8'
@@ -30667,43 +30667,6 @@ morpheus.HeatMap.prototype = {
       var context = canvas.getContext('2d');
       morpheus.CanvasUtil.resetTransform(context);
       this.snapshot(context);
-      // var stack = context.stack();
-      // var s = [];
-      // for (var i = 0; i < stack.length; i++) {
-      // 	var arg = stack[i];
-      // 	if (arg.attr) {
-      // 		if (_.isString(arg.val)) {
-      // 			s.push('context.' + arg.attr + ' = \'' + arg.val + '\';');
-      // 		} else {
-      // 			s.push('context.' + arg.attr + ' = ' + arg.val + ';');
-      // 		}
-      // 		s.push('\n');
-      // 	} else {
-      // 		var arguments = arg.arguments;
-      // 		s.push('context.' + arg.method + '(');
-      // 		if (arguments) {
-      // 			for (var j = 0; j < arguments.length; j++) {
-      // 				if (j > 0) {
-      // 					s.push(', ');
-      // 				}
-      // 				var val = arguments[j];
-      // 				if (_.isString()) {
-      // 					s.push("'");
-      // 					s.push(val);
-      // 					s.push("'");
-      // 				} else {
-      // 					s.push(val);
-      // 				}
-      //
-      // 			}
-      // 		}
-      // 		s.push(');\n');
-      // 	}
-      //
-      // }
-      // saveAs(new Blob([s.join('')], {
-      // 	type: 'text/plain;charset=utf-8'
-      // }), 'canvas.txt', true);
       var toBlob = canvas.toBlobHD ? ['toBlobHD'] : 'toBlob';
       canvas[toBlob](function (blob) {
         if (blob == null || blob.size === 0) {
@@ -30715,7 +30678,6 @@ morpheus.HeatMap.prototype = {
           });
           return;
         }
-
         saveAs(blob, file, true);
       });
     }

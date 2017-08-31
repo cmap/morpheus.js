@@ -670,13 +670,14 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       formBuilder: formBuilder
     });
     var okCallback = function () {
-      var $dialogContent = $('<div><span>' + tool.toString() + '... </span><button class="btn' +
-        ' btn-xs btn-default pull-right" disabled>Cancel</button></div>');
+      var $dialogContent = $('<div><span>' + tool.toString() + '...</span><button class="btn' +
+        ' btn-xs btn-default" style="margin-left:6px;display: none;">Cancel</button></div>');
       var value = null;
 
       var $dialog = morpheus.FormBuilder.showInDraggableDiv({
         $content: $dialogContent,
-        appendTo: heatMap.getContentEl()
+        appendTo: heatMap.getContentEl(),
+        width: 'auto'
       });
       var input = {};
       _.each(gui, function (item) {
@@ -691,7 +692,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
           input: input
         });
         if (value instanceof Worker) {
-          $dialogContent.find('button').prop('disabled', false).on('click', function () {
+          $dialogContent.find('button').css('display', '').on('click', function () {
             value.terminate();
           });
           value.onerror = function (e) {
