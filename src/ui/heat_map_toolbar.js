@@ -136,8 +136,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     searchHtml.push(
       '<h6 style="display: inline; margin-left:10px;" data-name="dim"></h6>');
     searchHtml.push(
-      '<h6 style="display: inline; margin-left:10px; background-color:rgb(182,213,253);"' +
-      ' data-name="selection"></h6>');
+      '<h6 style="display: inline; margin-left:10px;" data-name="selection"></h6>');
     searchHtml.push('</div>');
   }
 
