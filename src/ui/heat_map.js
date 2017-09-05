@@ -3149,12 +3149,16 @@ morpheus.HeatMap.prototype = {
       var header = this.rowTrackHeaders[index];
       track.setPrefWidth(width); // can only set width
       header.setPrefWidth(width);
+      // set width of heat map so that heat map doesn't shrink
+      this.heatmap.setPrefWidth(this.heatmap.getUnscaledWidth());
     } else {
       var track = this.columnTracks[index];
       var header = this.columnTrackHeaders[index];
       if (height) {
         track.setPrefHeight(height);
         header.setPrefHeight(height);
+        // set heat of heat map so that heat map doesn't shrink
+        // this.heatmap.setPrefHeight(this.heatmap.getUnscaledWidth());
       }
       if (width) {
         for (var i = 0; i < this.columnTracks.length; i++) {
@@ -3885,7 +3889,7 @@ morpheus.HeatMap.prototype = {
     var rowTrackWidthSum = 0;
     for (var i = 0, length = this.rowTracks.length; i < length; i++) {
       if (this.rowTracks[i].isVisible()) {
-        // check for override override
+        // was manually resized
         if (this.rowTracks[i].getPrefWidth() !== undefined) {
           this.rowTrackHeaders[i].setPrefWidth(this.rowTracks[i].getPrefWidth());
         }
@@ -3905,7 +3909,6 @@ morpheus.HeatMap.prototype = {
             width = Math.min(400, width);
             this.rowTracks[i].setPrefWidth(width);
             this.rowTrackHeaders[i].setPrefWidth(width);
-
           }
           rowTrackWidthSum += width;
         }
