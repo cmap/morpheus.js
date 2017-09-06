@@ -92,6 +92,12 @@ morpheus.HeatMapOptions = function (heatMap) {
       value: heatMap.getProject().isSymmetric()
     },
     {
+      name: 'show_row_number',
+      required: true,
+      type: 'checkbox',
+      value: heatMap.isShowRowNumber()
+    },
+    {
       name: 'show_grid',
       required: true,
       type: 'checkbox',
@@ -391,6 +397,12 @@ morpheus.HeatMapOptions = function (heatMap) {
       } else {
         heatMap.getProject().setSymmetric(null);
       }
+    });
+  displayFormBuilder.find('show_row_number').on('click',
+    function (e) {
+      var checked = $(this).prop('checked');
+      heatMap.setShowRowNumber(checked);
+      heatMap.revalidate();
     });
 
   var $colorByValue = colorSchemeFormBuilder.$form

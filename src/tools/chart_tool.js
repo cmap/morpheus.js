@@ -2,12 +2,9 @@
  * @param chartOptions.heatmap morpheus.HeatMap
  * @param chartOptions.project
  *            morpheus.Project
- * @param chartOptions.getVisibleTrackNames
- *            {Function}
  */
 morpheus.ChartTool = function (chartOptions) {
   var _this = this;
-  this.getVisibleTrackNames = chartOptions.getVisibleTrackNames;
   this.project = chartOptions.project;
   this.heatmap = chartOptions.heatmap;
   var project = this.project;
@@ -24,8 +21,9 @@ morpheus.ChartTool = function (chartOptions) {
   formBuilder.append({
     name: 'chart_type',
     type: 'bootstrap-select',
-    options: ['boxplot', 'row profile', 'column profile', 'row scatter matrix', 'column scatter' +
-    ' matrix']
+    options: [
+      'boxplot', 'row profile', 'column profile', 'row scatter matrix', 'column scatter' +
+      ' matrix']
   });
   var rowOptions = [];
   var columnOptions = [];
@@ -35,68 +33,74 @@ morpheus.ChartTool = function (chartOptions) {
   var numericOptions = [];
   var updateOptions = function () {
     var dataset = project.getFullDataset();
-    rowOptions = [{
-      name: '(None)',
-      value: ''
-    }];
-    columnOptions = [{
-      name: '(None)',
-      value: ''
-    }];
-    numericRowOptions = [{
-      name: '(None)',
-      value: ''
-    }];
-    numericColumnOptions = [{
-      name: '(None)',
-      value: ''
-    }];
-    options = [{
-      name: '(None)',
-      value: ''
-    }];
-    numericOptions = [{
-      name: '(None)',
-      value: ''
-    }];
+    rowOptions = [
+      {
+        name: '(None)',
+        value: ''
+      }];
+    columnOptions = [
+      {
+        name: '(None)',
+        value: ''
+      }];
+    numericRowOptions = [
+      {
+        name: '(None)',
+        value: ''
+      }];
+    numericColumnOptions = [
+      {
+        name: '(None)',
+        value: ''
+      }];
+    options = [
+      {
+        name: '(None)',
+        value: ''
+      }];
+    numericOptions = [
+      {
+        name: '(None)',
+        value: ''
+      }];
 
     morpheus.MetadataUtil.getMetadataNames(dataset.getRowMetadata())
-    .forEach(
-      function (name) {
-        var dataType = morpheus.VectorUtil
-        .getDataType(dataset.getRowMetadata()
-        .getByName(name));
-        if (dataType === 'number'
-          || dataType === '[number]') {
-          numericRowOptions.push({
+      .forEach(
+        function (name) {
+          var dataType = morpheus.VectorUtil
+            .getDataType(dataset.getRowMetadata()
+              .getByName(name));
+          if (dataType === 'number'
+            || dataType === '[number]') {
+            numericRowOptions.push({
+              name: name + ' (row)',
+              value: name + '_r'
+            });
+          }
+          rowOptions.push({
             name: name + ' (row)',
             value: name + '_r'
           });
-        }
-        rowOptions.push({
-          name: name + ' (row)',
-          value: name + '_r'
         });
-      });
 
     morpheus.MetadataUtil.getMetadataNames(dataset.getColumnMetadata())
-    .forEach(
-      function (name) {
-        var dataType = morpheus.VectorUtil
-        .getDataType(dataset.getColumnMetadata()
-        .getByName(name));
-        if (dataType === 'number'
-          || dataType === '[number]') {
-          numericColumnOptions.push({
+      .forEach(
+        function (name) {
+          var dataType = morpheus.VectorUtil
+            .getDataType(dataset.getColumnMetadata()
+              .getByName(name));
+          if (dataType === 'number'
+            || dataType === '[number]') {
+            numericColumnOptions.push({
+              name: name + ' (column)',
+              value: name + '_c'
+            });
+          }
+          columnOptions.push({
             name: name + ' (column)',
             value: name + '_c'
           });
-        }
-        columnOptions.push({
-          name: name + ' (column)',
-          value: name + '_c'
         });
-      });
 
     options = options.concat(rowOptions.slice(1));
     options = options.concat(columnOptions.slice(1));
@@ -534,7 +538,7 @@ morpheus.ChartTool.prototype = {
           onZero: false
         },
         type: 'value',
-        name: '',
+        name: ''
       },
       grid: {right: 120},
       series: series
@@ -611,7 +615,7 @@ morpheus.ChartTool.prototype = {
           onZero: false
         },
         type: 'value',
-        name: '',
+        name: ''
       },
       series: [
         {
@@ -647,7 +651,7 @@ morpheus.ChartTool.prototype = {
             normal: {
               borderWidth: 1,
               borderColor: 'black',
-              opacity: 0.8,
+              opacity: 0.8
             }
           },
           tooltip: {
@@ -697,16 +701,16 @@ morpheus.ChartTool.prototype = {
     this.dataset = dataset;
     if (dataset.getRowCount() === 0 && dataset.getColumnCount() === 0) {
       $('<h4>Please select rows and columns in the heat map.</h4>')
-      .appendTo(this.$chart);
+        .appendTo(this.$chart);
       return;
     } else if (dataset.getRowCount() === 0) {
       $('<h4>Please select rows in the heat map.</h4>')
-      .appendTo(this.$chart);
+        .appendTo(this.$chart);
       return;
     }
     if (dataset.getColumnCount() === 0) {
       $('<h4>Please select columns in the heat map.</h4>')
-      .appendTo(this.$chart);
+        .appendTo(this.$chart);
       return;
     }
 
@@ -740,7 +744,7 @@ morpheus.ChartTool.prototype = {
       }
       if (dataset.getRowCount() > 100) {
         $('<h4>Maximum chart size exceeded.</h4>')
-        .appendTo(this.$chart);
+          .appendTo(this.$chart);
         return;
       }
       // add horizontal space for legend
@@ -765,10 +769,11 @@ morpheus.ChartTool.prototype = {
       }
       if (dataset.getRowCount() > 20) {
         $('<h4>Maximum chart size exceeded.</h4>')
-        .appendTo(this.$chart);
+          .appendTo(this.$chart);
         return;
       }
-      var $chart = $('<div style="width:' + (80 + (dataset.getRowCount() - 1) * (gridWidth + 20)) + 'px;height:' + (80 + dataset.getRowCount() * (gridHeight + 20)) + 'px;"></div>');
+      var $chart = $('<div style="width:' + (80 + (dataset.getRowCount() - 1) * (gridWidth + 20)) + 'px;height:' + (80 + dataset.getRowCount() * (gridHeight + 20)) +
+        'px;"></div>');
       $chart.appendTo(this.$chart);
       this._createScatter({
         el: $chart[0],
@@ -785,9 +790,9 @@ morpheus.ChartTool.prototype = {
       var ids = []; // 1-d array of grouping values
       if (groupBy) {
         var groupByInfo = morpheus.ChartTool
-        .getVectorInfo(groupBy);
+          .getVectorInfo(groupBy);
         var vector = groupByInfo.isColumns ? dataset
-        .getColumnMetadata().getByName(groupByInfo.field)
+            .getColumnMetadata().getByName(groupByInfo.field)
           : dataset.getRowMetadata().getByName(
             groupByInfo.field);
         var isArray = morpheus.VectorUtil.getDataType(vector)[0] === '[';

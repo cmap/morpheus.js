@@ -265,10 +265,13 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
         }
         _this.isMouseOver = false;
         heatMap.setSelectedTrack(_this.name, isColumns);
-        if (isColumns && !heatMap.options.columnsSortable) {
+        var vector = (isColumns ? project.getFullDataset().getColumnMetadata()
+          : project.getFullDataset().getRowMetadata()).getByName(name);
+        // vector will be null for row #
+        if ((isColumns && !heatMap.options.columnsSortable) || vector == null) {
           return;
         }
-        if (!isColumns && !heatMap.options.rowsSortable) {
+        if ((!isColumns && !heatMap.options.rowsSortable) || vector == null) {
           return;
         }
 
@@ -280,8 +283,7 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
             .getSortKeys(), _this.name);
         var sortOrder;
         var sortKey;
-        var vector = (isColumns ? project.getFullDataset().getColumnMetadata()
-          : project.getFullDataset().getRowMetadata()).getByName(name);
+
         var dataType = morpheus.VectorUtil.getDataType(vector);
         if (existingSortKeyIndex != null) {
           sortKey = _this.getSortKeys()[existingSortKeyIndex.index];

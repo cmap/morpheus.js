@@ -614,7 +614,10 @@ morpheus.HeatMapToolBar = function (heatMap) {
       var indices = [];
       var meta = project.getSortedFilteredDataset().getRowMetadata();
       heatMap.getVisibleTrackNames(false).forEach(function (name) {
-        indices.push(morpheus.MetadataUtil.indexOf(meta, name));
+        var index = morpheus.MetadataUtil.indexOf(meta, name);
+        if (index !== -1) {
+          indices.push(index);
+        }
       });
       meta = new morpheus.MetadataModelColumnView(meta, indices);
       morpheus.MetadataUtil.autocomplete(meta)(terms, cb);
@@ -640,7 +643,10 @@ morpheus.HeatMapToolBar = function (heatMap) {
       var indices = [];
       var meta = project.getSortedFilteredDataset().getColumnMetadata();
       heatMap.getVisibleTrackNames(true).forEach(function (name) {
-        indices.push(morpheus.MetadataUtil.indexOf(meta, name));
+        var index = morpheus.MetadataUtil.indexOf(meta, name);
+        if (index !== -1) {
+          indices.push(index);
+        }
       });
       meta = new morpheus.MetadataModelColumnView(meta, indices);
       morpheus.MetadataUtil.autocomplete(meta)(terms, cb);
@@ -1126,7 +1132,10 @@ morpheus.HeatMapToolBar.prototype = {
       : dataset.getColumnMetadata();
     var visibleIndices = [];
     heatMap.getVisibleTrackNames(!isRows).forEach(function (name) {
-      visibleIndices.push(morpheus.MetadataUtil.indexOf(metadata, name));
+      var index = morpheus.MetadataUtil.indexOf(metadata, name);
+      if (index !== -1) {
+        visibleIndices.push(index);
+      }
     });
     var fullModel = metadata;
     metadata = new morpheus.MetadataModelColumnView(metadata,
