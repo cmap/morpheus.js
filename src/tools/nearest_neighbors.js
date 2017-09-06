@@ -21,7 +21,7 @@ morpheus.NearestNeighbors.execute = function (dataset, input) {
     rowSpecificPValues: permutations.rowSpecificPValues,
     k: permutations.k,
     fdr: permutations.fdr,
-    scores: permutations.scores,
+    scores: permutations.scores
   };
 };
 morpheus.NearestNeighbors.prototype = {
@@ -73,22 +73,22 @@ morpheus.NearestNeighbors.prototype = {
         name: 'metric',
         options: morpheus.NearestNeighbors.Functions,
         value: morpheus.Pearson.toString(),
-        type: 'select',
+        type: 'select'
       }, {
         name: 'compute_nearest_neighbors_of',
         options: ['selected rows', 'selected columns', 'column annotation', 'row annotation'],
         value: 'selected rows',
-        type: 'radio',
+        type: 'radio'
       }, {
         name: 'use_selected_only',
-        type: 'checkbox',
+        type: 'checkbox'
       }, {
         name: 'annotation',
-        type: 'bootstrap-select',
+        type: 'bootstrap-select'
       }, {
         name: 'permutations',
         value: '0',
-        type: 'text',
+        type: 'text'
       }];
   },
   execute: function (options) {
@@ -132,7 +132,7 @@ morpheus.NearestNeighbors.prototype = {
         var newDataset = new morpheus.Dataset({
           name: '',
           rows: 1,
-          columns: d1.getColumnCount(),
+          columns: d1.getColumnCount()
         });
         for (var j = 0, ncols = d1.getColumnCount(); j < ncols; j++) {
           var v = morpheus.Percentile(columnView.setIndex(j), 50);
@@ -164,11 +164,12 @@ morpheus.NearestNeighbors.prototype = {
           kVector.setValue(i, result.k[i]);
           scoreVector.setValue(i, result.scores[i]);
         }
+        kVector.getProperties().set(morpheus.VectorKeys.FORMATTER, {pattern: 'i'});
         var vectors = [pvalueVector, fdrVector, kVector, scoreVector];
         project.trigger('trackChanged', {
           vectors: vectors,
           display: ['text'],
-          columns: isColumns,
+          columns: isColumns
         });
       };
 
@@ -194,9 +195,9 @@ morpheus.NearestNeighbors.prototype = {
           dataset: morpheus.Dataset.toJSON(dataset, {
             columnFields: [],
             rowFields: [],
-            seriesIndices: [0],
+            seriesIndices: [0]
           }),
-          input: options.input,
+          input: options.input
         });
 
         worker.onmessage = function (e) {
@@ -227,9 +228,9 @@ morpheus.NearestNeighbors.prototype = {
       project.trigger('trackChanged', {
         vectors: [scoreVector],
         display: ['text'],
-        columns: isColumns,
+        columns: isColumns
       });
     }
 
-  },
+  }
 };

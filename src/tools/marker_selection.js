@@ -5,7 +5,8 @@ morpheus.MarkerSelection = function () {
 /**
  * @private
  */
-morpheus.MarkerSelection.Functions = [morpheus.FisherExact,
+morpheus.MarkerSelection.Functions = [
+  morpheus.FisherExact,
   morpheus.FoldChange, morpheus.MeanDifference, morpheus.SignalToNoise,
   morpheus.createSignalToNoiseAdjust(), morpheus.TTest];
 
@@ -47,9 +48,9 @@ morpheus.MarkerSelection.prototype = {
       var ids = [];
       if (fieldNames != null) {
         var vectors = morpheus.MetadataUtil.getVectors(project
-        .getFullDataset().getColumnMetadata(), fieldNames);
+          .getFullDataset().getColumnMetadata(), fieldNames);
         var idToIndices = morpheus.VectorUtil
-        .createValuesToIndicesMap(vectors);
+          .createValuesToIndicesMap(vectors);
         idToIndices.forEach(function (indices, id) {
           ids.push(id);
         });
@@ -82,7 +83,7 @@ morpheus.MarkerSelection.prototype = {
   gui: function (project) {
     var dataset = project.getSortedFilteredDataset();
     var fields = morpheus.MetadataUtil.getMetadataNames(dataset
-    .getColumnMetadata());
+      .getColumnMetadata());
     return [
       {
         name: 'metric',
@@ -94,7 +95,7 @@ morpheus.MarkerSelection.prototype = {
       {
         name: 'grouping_value',
         value: '1',
-        help: 'Class values are categorized into two groups based on whether dataset values are greater than or equal to this value',
+        help: 'Class values are categorized into two groups based on whether dataset values are greater than or equal to this value'
       },
       {
         name: 'field',
@@ -170,7 +171,7 @@ morpheus.MarkerSelection.prototype = {
     }
 
     var vectors = morpheus.MetadataUtil.getVectors(dataset
-    .getColumnMetadata(), fieldNames);
+      .getColumnMetadata(), fieldNames);
     var idToIndices = morpheus.VectorUtil.createValuesToIndicesMap(vectors);
     var aIndices = [];
     var bIndices = [];
@@ -190,7 +191,7 @@ morpheus.MarkerSelection.prototype = {
     });
 
     var f = morpheus.MarkerSelection.Functions
-    .fromString(options.input.metric);
+      .fromString(options.input.metric);
 
     var classASet = {};
     for (var i = 0; i < aIndices.length; i++) {
@@ -237,6 +238,7 @@ morpheus.MarkerSelection.prototype = {
     for (var i = 0; i < bIndices.length; i++) {
       comparisonVector.setValue(bIndices[i], 'B');
     }
+
     function done(result) {
       if (result) {
         var pvalueVector = dataset.getRowMetadata().add('p_value');
@@ -248,6 +250,7 @@ morpheus.MarkerSelection.prototype = {
           kVector.setValue(i, result.k[i]);
           v.setValue(i, result.scores[i]);
         }
+        kVector.getProperties().set(morpheus.VectorKeys.FORMATTER, {pattern: 'i'});
         vectors.push(pvalueVector);
         vectors.push(fdrVector);
         vectors.push(kVector);
@@ -268,13 +271,14 @@ morpheus.MarkerSelection.prototype = {
           new morpheus.TopNFilter(
             parseInt(options.input.number_of_markers),
             morpheus.TopNFilter.TOP_BOTTOM, vectors[0]
-            .getName()), true);
+              .getName()), true);
       }
 
       project.setRowFilter(project.getRowFilter(), true);
-      project.setRowSortKeys([new morpheus.SortKey(vectors[0].getName(),
-        isFishy ? morpheus.SortKey.SortOrder.ASCENDING
-          : morpheus.SortKey.SortOrder.DESCENDING)], true);
+      project.setRowSortKeys([
+        new morpheus.SortKey(vectors[0].getName(),
+          isFishy ? morpheus.SortKey.SortOrder.ASCENDING
+            : morpheus.SortKey.SortOrder.DESCENDING)], true);
       // select samples used in comparison
       var selectedColumnIndices = new morpheus.Set();
       aIndices.forEach(function (index) {
@@ -285,8 +289,9 @@ morpheus.MarkerSelection.prototype = {
       });
       project.getColumnSelectionModel().setViewIndices(selectedColumnIndices, true);
 
-      project.setColumnSortKeys([new morpheus.SortKey(comparisonVector
-      .getName(), morpheus.SortKey.SortOrder.ASCENDING)], true);
+      project.setColumnSortKeys([
+        new morpheus.SortKey(comparisonVector
+          .getName(), morpheus.SortKey.SortOrder.ASCENDING)], true);
 
       project.trigger('trackChanged', {
         vectors: vectors,
@@ -341,10 +346,11 @@ morpheus.MarkerSelection.prototype = {
         options.input.npermutations = npermutations;
         if (options.input.background) {
           var blob = new Blob(
-            ['self.onmessage = function(e) {'
-            + 'importScripts(e.data.scripts);'
-            + 'self.postMessage(morpheus.MarkerSelection.execute(morpheus.Dataset.fromJSON(e.data.dataset), e.data.input));'
-            + '}']);
+            [
+              'self.onmessage = function(e) {'
+              + 'importScripts(e.data.scripts);'
+              + 'self.postMessage(morpheus.MarkerSelection.execute(morpheus.Dataset.fromJSON(e.data.dataset), e.data.input));'
+              + '}']);
 
           var url = window.URL.createObjectURL(blob);
           var worker = new Worker(url);
