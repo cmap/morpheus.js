@@ -50,7 +50,7 @@ morpheus.MetadataUtil.search = function (options) {
   if (tokens.length == 0) {
     return null;
   }
-  var indexField = 'INDEX';
+  var indexField = '#';
   var fieldNames = morpheus.MetadataUtil.getMetadataNames(fullModel);
   fieldNames.push(indexField);
   var predicates = morpheus.Util.createSearchPredicates({
