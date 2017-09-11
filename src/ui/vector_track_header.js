@@ -448,10 +448,10 @@ morpheus.VectorTrackHeader.prototype = {
     if (sortKeys != null) {
       var counter = 0;
       for (var i = 0, size = sortKeys.length; i < size; i++) {
-        if (sortKeys[i].getLockOrder() === 0) {
+        if (sortKeys[i].isUnlockable()) {
           counter++;
         }
-        if (sortKeys[i].getLockOrder() === 0 && sortKeys[i] instanceof morpheus.SortKey && columnName === sortKeys[i].toString()) {
+        if (sortKeys[i] instanceof morpheus.SortKey && columnName === sortKeys[i].toString()) {
           return {
             index: i,
             number: counter
@@ -484,8 +484,8 @@ morpheus.VectorTrackHeader.prototype = {
     var name = this.name;
     var existingSortKeyIndex = this.getSortKeyIndexForColumnName(sortKeys,
       name);
-    var unlockedSortKeys = sortKeys.filter(function (key) {
-      return key.getLockOrder() === 0;
+    var unlockableSortKeys = sortKeys.filter(function (key) {
+      return key.isUnlockable();
     });
     morpheus.CanvasUtil.resetTransform(context);
     context.clearRect(0, 0, this.getUnscaledWidth(), this
@@ -520,10 +520,14 @@ morpheus.VectorTrackHeader.prototype = {
     if (isColumns) {
       if (existingSortKeyIndex != null) {
         xpix -= 6;
+        if (sortKeys[existingSortKeyIndex.index].getLockOrder() !== 0) {
+          xpix -= 10;
+        }
       }
       if (sortKeys.length > 1) {
         xpix -= 6;
       }
+
     }
     context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
     var ypix = this.isColumns ? (this.getUnscaledHeight() / 2)
@@ -669,7 +673,7 @@ morpheus.VectorTrackHeader.prototype = {
     // context.restore();
     // }
     context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
-    if (existingSortKeyIndex !== null && sortKeys[existingSortKeyIndex.index].getLockOrder() === 0) {
+    if (existingSortKeyIndex !== null) {
       // draw arrow
       context.beginPath();
       var x = this.isColumns ? xpix + 4 : xpix + textWidth + 6;
@@ -696,12 +700,19 @@ morpheus.VectorTrackHeader.prototype = {
       }
       context.fill();
       morpheus.CanvasUtil.resetTransform(context);
-      if (sortKeys[existingSortKeyIndex.index].getLockOrder() === 0 && unlockedSortKeys.length > 1) {
-        context.textAlign = 'left';
+      context.textAlign = 'left';
+      if (unlockableSortKeys.length > 1) {
         context.font = '8px ' + morpheus.CanvasUtil.getFontFamily(context);
-        context.fillText('' + (existingSortKeyIndex.number), x + 4,
-          ypix - 3);
+        var sortIndex = '' + (existingSortKeyIndex.number);
+        context.fillText(sortIndex, x + 4,
+          ypix - 2);
+        x += context.measureText(sortIndex).width;
       }
+      if (sortKeys[existingSortKeyIndex.index].getLockOrder() !== 0) {
+        context.font = fontHeight + 'px FontAwesome';
+        context.fillText('\uf023', x + arrowWidth + 2, ypix);
+      }
+
     }
   }
 };

@@ -1222,6 +1222,7 @@ morpheus.HeatMap.prototype = {
           modelOrder.length, 'dendrogram', true);
         sortKey.setPreservesDendrogram(true);
         sortKey.setLockOrder(2);
+        sortKey.setUnlockable(false);
         this.project.setColumnSortKeys(
           [sortKey], true);
       } else {
@@ -1233,6 +1234,7 @@ morpheus.HeatMap.prototype = {
           modelOrder.length, 'dendrogram', false);
         sortKey.setPreservesDendrogram(true);
         sortKey.setLockOrder(2);
+        sortKey.setUnlockable(false);
         this.project.setRowSortKeys(
           [sortKey], true);
       }
@@ -1547,6 +1549,7 @@ morpheus.HeatMap.prototype = {
         rowDendrogramSortKey = new morpheus.SpecifiedModelSortOrder(
           rowIndices, rowIndices.length, 'dendrogram');
         rowDendrogramSortKey.setLockOrder(2);
+        rowDendrogramSortKey.setUnlockable(false);
         rowDendrogramSortKey.setPreservesDendrogram(true);
       }
     }
@@ -1605,6 +1608,7 @@ morpheus.HeatMap.prototype = {
         columnDendrogramSortKey = new morpheus.SpecifiedModelSortOrder(
           columnIndices, columnIndices.length, 'dendrogram');
         columnDendrogramSortKey.setLockOrder(2);
+        columnDendrogramSortKey.setUnlockable(false);
         columnDendrogramSortKey.setPreservesDendrogram(true);
       }
     }

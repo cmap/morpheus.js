@@ -9332,6 +9332,7 @@ morpheus.AbstractSortKey.prototype = {
   lockOrder: 0,
   columns: true,
   preservesDendrogram: false,
+  unlockable: true,
   /**
    * Indicates whether this key is sorting rows or columns.
    * @return {Boolean}
@@ -9339,6 +9340,10 @@ morpheus.AbstractSortKey.prototype = {
   isColumns: function () {
     return this.columns;
   },
+  /**
+   * Sets whether this key is columns (true) or rows (false).
+   * @param columns {Boolean}
+   */
   setColumns: function (columns) {
     this.columns = columns;
   },
@@ -9351,6 +9356,20 @@ morpheus.AbstractSortKey.prototype = {
   getLockOrder: function () {
     return this.lockOrder;
   },
+  /**
+   * When lock order is set, indicates whether lock order can be unlocked. For example, bring matches to top sort key can not be unlocked.
+   */
+  isUnlockable: function () {
+    return this.unlockable;
+  },
+  setUnlockable: function (unlockable) {
+    this.unlockable = unlockable;
+  },
+  /**
+   * Sets the sort key lock order. One is locked to beginning of sort keys, two is locked to end of sort keys. Zero clears lock order.
+   * Dendrogram sort key is locked to end. Selection on top sort key is locked to beginning.
+   * @param lockOrder {Number}
+   */
   setLockOrder: function (lockOrder) {
     this.lockOrder = lockOrder;
   },
@@ -10042,6 +10061,7 @@ morpheus.SortKey.fromJSON = function (project, json) {
       }
       if (key.lockOrder !== 0) {
         sortKey.setLockOrder(key.lockOrder);
+        sortKey.setUnlockable(key.unlockable);
       }
       sortKeys.push(sortKey);
     }
@@ -10089,6 +10109,7 @@ morpheus.SortKey.toJSON = function (sortKeys) {
       sortKey.preservesDendrogram = key.isPreservesDendrogram();
       if (key.getLockOrder && key.getLockOrder() !== 0) {
         sortKey.lockOrder = key.getLockOrder();
+        sortKey.unlockable = key.isUnlockable ? key.isUnlockable() : false;
       }
       json.push(sortKey);
     } else {
@@ -17005,6 +17026,7 @@ morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
                 var key = new morpheus.SpecifiedModelSortOrder(currentOrder, currentOrder.length, 'dendrogram', isColumns);
                 key.setPreservesDendrogram(true);
                 key.setLockOrder(2);
+                key.setUnlockable(false);
                 if (isColumns) {
                   heatMap.getProject().setColumnSortKeys([key], true);
                 } else {
@@ -18185,6 +18207,7 @@ morpheus.ActionManager = function () {
     }
     var sortKey = new morpheus.MatchesOnTopSortKey(project, modelIndices, 'selection on top', isColumns);
     sortKey.setLockOrder(1);
+    sortKey.setUnlockable(false);
     if (isColumns) {
       project
         .setColumnSortKeys(
@@ -28530,6 +28553,7 @@ morpheus.HeatMap.prototype = {
           modelOrder.length, 'dendrogram', true);
         sortKey.setPreservesDendrogram(true);
         sortKey.setLockOrder(2);
+        sortKey.setUnlockable(false);
         this.project.setColumnSortKeys(
           [sortKey], true);
       } else {
@@ -28541,6 +28565,7 @@ morpheus.HeatMap.prototype = {
           modelOrder.length, 'dendrogram', false);
         sortKey.setPreservesDendrogram(true);
         sortKey.setLockOrder(2);
+        sortKey.setUnlockable(false);
         this.project.setRowSortKeys(
           [sortKey], true);
       }
@@ -28855,6 +28880,7 @@ morpheus.HeatMap.prototype = {
         rowDendrogramSortKey = new morpheus.SpecifiedModelSortOrder(
           rowIndices, rowIndices.length, 'dendrogram');
         rowDendrogramSortKey.setLockOrder(2);
+        rowDendrogramSortKey.setUnlockable(false);
         rowDendrogramSortKey.setPreservesDendrogram(true);
       }
     }
@@ -28913,6 +28939,7 @@ morpheus.HeatMap.prototype = {
         columnDendrogramSortKey = new morpheus.SpecifiedModelSortOrder(
           columnIndices, columnIndices.length, 'dendrogram');
         columnDendrogramSortKey.setLockOrder(2);
+        columnDendrogramSortKey.setUnlockable(false);
         columnDendrogramSortKey.setPreservesDendrogram(true);
       }
     }
@@ -32737,19 +32764,20 @@ morpheus.SortDialog = function (project) {
   var $div = $('<div class="container-fluid"></div>');
   var html = [];
   html
-  .push('<div style="border-bottom:1px solid LightGrey;margin-bottom:20px;" class="row">');
+    .push('<div style="border-bottom:1px solid LightGrey;margin-bottom:20px;" class="row">');
   html.push('<form class="form-horizontal" role="form">');
   html
-  .push('<div class="col-xs-2"><label class="control-label">Sort</label></div>');
+    .push('<div class="col-xs-2"><label class="control-label">Sort</label></div>');
   html.push('<div class="col-xs-5">');
   html
-  .push('<div class="radio"><label><input type="radio" name="rowsOrColumns" value="rows" checked>Rows</label></div>');
+    .push('<div class="radio"><label><input type="radio" name="rowsOrColumns" value="rows" checked>Rows</label></div>');
   html
-  .push('<div class="radio"><label><input type="radio" name="rowsOrColumns" value="columns">Columns</label></div>');
+    .push('<div class="radio"><label><input type="radio" name="rowsOrColumns" value="columns">Columns</label></div>');
   html.push('</div>');
   html.push('</form>');
   html.push('</div>');
   $chooserDiv.html(html.join(''));
+
   function toggle(isColumns) {
     _this.isColumns = isColumns;
     var $element = _this.build(project, isColumns);
@@ -32779,97 +32807,103 @@ morpheus.SortDialog = function (project) {
   $chooserDiv.appendTo($outer);
   $div.appendTo($outer);
   morpheus.FormBuilder
-  .showOkCancel({
-    title: 'Sort',
-    content: $outer,
-    okCallback: function () {
-      var $forms = $div.find('form');
-      var sortBy = $forms.find('[name=sortBy]').map(function () {
-        return $(this).val();
-      });
-      var sortOrder = $forms.find('[name=sortOrder]:checked')
-      .map(function () {
-        return $(this).val();
-      });
-      var groupBy = $div.find('[name=groupBy]').val();
-      var newSortKeys = [];
-      var modelIndices = _this.isColumns ? project
-      .getRowSelectionModel().toModelIndices() : project
-      .getColumnSelectionModel().toModelIndices();
-      var existingSortKeys = _this.isColumns ? project
-      .getColumnSortKeys() : project.getRowSortKeys();
-      // keep MatchesOnTopSortKey and dendrogram
-      var keysToKeep = _
-      .filter(
-        existingSortKeys,
-        function (key) {
-          return key.getLockOrder() === 0;
+    .showOkCancel({
+      title: 'Sort',
+      content: $outer,
+      okCallback: function () {
+        var $forms = $div.find('form');
+        var sortBy = $forms.find('[name=sortBy]').map(function () {
+          return $(this).val();
         });
-      if (keysToKeep.length > 0) {
-        _.each(keysToKeep, function (key) {
-          newSortKeys.push(key);
+        var lockOrder = $forms.find('[name=lockOrder]').map(function () {
+          return $(this).prop('checked');
         });
-      }
-      var newSortKeyFields = new morpheus.Set();
-      for (var i = 0; i < sortBy.length; i++) {
-        if (!newSortKeyFields.has(sortBy[i])) {
-          newSortKeyFields.add(sortBy[i]);
-          if (sortBy[i] === 'selection') {
-            newSortKeys.push(new morpheus.SortByValuesKey(
-              modelIndices, sortOrder[i],
-              _this.isColumns));
-          } else if (sortBy[i] !== '') {
-            newSortKeys.push(new morpheus.SortKey(
-              sortBy[i], sortOrder[i]));
+        var sortOrder = $forms.find('[name=sortOrder]:checked')
+          .map(function () {
+            return $(this).val();
+          });
+
+        var groupBy = $div.find('[name=groupBy]').val();
+        var newSortKeys = [];
+        var modelIndices = _this.isColumns ? project
+          .getRowSelectionModel().toModelIndices() : project
+          .getColumnSelectionModel().toModelIndices();
+        var existingSortKeys = _this.isColumns ? project
+          .getColumnSortKeys() : project.getRowSortKeys();
+        for (var i = 0; i < existingSortKeys.length; i++) {
+          // delete existing sort keys that were locked and were deleted by user
+          if (existingSortKeys[i].isUnlockable()) {
+            existingSortKeys.splice(i, 1);
+            i--;
           }
         }
-      }
-      var newGroupKeys = [];
-      if (groupBy != null) {
-        for (var i = 0; i < groupBy.length; i++) {
-          newGroupKeys.push(new morpheus.SortKey(groupBy[i],
-            morpheus.SortKey.SortOrder.UNSORTED));
+
+        var newSortKeyFields = new morpheus.Set();
+        for (var i = 0; i < sortBy.length; i++) {
+          if (!newSortKeyFields.has(sortBy[i])) { // don't add 2x
+            newSortKeyFields.add(sortBy[i]);
+            var key = null;
+            if (sortBy[i] === 'selection') {
+              key = new morpheus.SortByValuesKey(
+                modelIndices, sortOrder[i],
+                _this.isColumns);
+            } else if (sortBy[i] !== '') {
+              key = new morpheus.SortKey(
+                sortBy[i], sortOrder[i]);
+            }
+            if (key != null) {
+              newSortKeys.push(key);
+              if (lockOrder[i]) {
+                key.setLockOrder(1);
+              }
+            }
+          }
+        }
+        var newGroupKeys = [];
+        if (groupBy != null) {
+          for (var i = 0; i < groupBy.length; i++) {
+            newGroupKeys.push(new morpheus.SortKey(groupBy[i],
+              morpheus.SortKey.SortOrder.UNSORTED));
+          }
+        }
+
+        if (_this.isColumns) {
+          project.setGroupColumns(newGroupKeys, true);
+          project.setColumnSortKeys(morpheus.SortKey
+            .keepExistingSortKeys(newSortKeys, existingSortKeys), true);
+        } else {
+          project.setGroupRows(newGroupKeys, true);
+          project.setRowSortKeys(morpheus.SortKey
+            .keepExistingSortKeys(newSortKeys, existingSortKeys), true);
         }
       }
-
-      if (_this.isColumns) {
-        project.setGroupColumns(newGroupKeys, true);
-        project.setColumnSortKeys(morpheus.SortKey
-        .keepExistingSortKeys(newSortKeys, project
-        .getColumnSortKeys()), true);
-      } else {
-        project.setGroupRows(newGroupKeys, true);
-        project.setRowSortKeys(morpheus.SortKey
-        .keepExistingSortKeys(newSortKeys, project
-        .getRowSortKeys()), true);
-      }
-    }
-  });
+    });
 };
 morpheus.SortDialog.prototype = {
   isColumns: false,
   build: function (project, isColumns) {
     var fields = morpheus.MetadataUtil.getMetadataNames(isColumns ? project
-    .getFullDataset().getColumnMetadata() : project
-    .getFullDataset().getRowMetadata());
+      .getFullDataset().getColumnMetadata() : project
+      .getFullDataset().getRowMetadata());
     this.fields = fields;
     var html = [];
     var sortKeys = isColumns ? project.getColumnSortKeys() : project
-    .getRowSortKeys();
+      .getRowSortKeys();
+
     this.createLevel0(html);
     for (var i = 0; i < sortKeys.length; i++) { // add existing keys
-      if (sortKeys[i].getLockOrder() === 0) {
+      if (sortKeys[i].isUnlockable()) {
         this.createLevel(html, sortKeys[i], fields);
       }
     }
     // group by
     html.push('<div class="row">');
     html
-    .push('<form class="form-horizontal" role="form">');
+      .push('<form class="form-horizontal" role="form">');
     html.push('<div class="col-xs-2"><label>Group by</label></div>');
     html.push('<div class="col-xs-4">');
     var groupByKeys = (isColumns ? project.getGroupColumns() : project
-    .getGroupRows()).map(function (key) {
+      .getGroupRows()).map(function (key) {
       return key.field;
     });
 
@@ -32896,7 +32930,7 @@ morpheus.SortDialog.prototype = {
   },
   createLevel0: function (html) {
     html
-    .push('<div style="border-bottom:1px solid LightGrey;margin-bottom:20px;" class="row">');
+      .push('<div style="border-bottom:1px solid LightGrey;margin-bottom:20px;" class="row">');
     html.push('<form class="form-horizontal" role="form">');
     html.push('<div class="col-xs-8">');
     html.push('<a data-name="add" href="#">Add sort level</a>');
@@ -32906,10 +32940,10 @@ morpheus.SortDialog.prototype = {
   },
   createLevel: function (html, key, fields) {
     html
-    .push('<div style="border-bottom:1px solid LightGrey;margin-bottom:20px;" class="row">');
+      .push('<div style="border-bottom:1px solid LightGrey;margin-bottom:20px;" class="row">');
     html.push('<form class="form-horizontal" role="form">');
     html
-    .push('<div class="col-xs-2"><label class="control-label">Sort by</label></div>');
+      .push('<div class="col-xs-2"><label class="control-label">Sort by</label></div>');
     html.push('<div class="col-xs-4">');
     html.push('<select name="sortBy" class="form-control">');
     html.push('<option value=""></option>');
@@ -32918,7 +32952,7 @@ morpheus.SortDialog.prototype = {
       + '>selection</option>');
     _.each(fields, function (field) {
       html.push('<option value="' + field + '"');
-      if (field == key.field) {
+      if (field == key.toString()) {
         html.push(' selected');
       }
       html.push('>');
@@ -32929,20 +32963,24 @@ morpheus.SortDialog.prototype = {
     html.push('</div>');
     html.push('<div class="col-xs-5">');
     html
-    .push('<div class="radio"><label><input type="radio" name="sortOrder" value="ascending"'
-      + (morpheus.SortKey.SortOrder.ASCENDING == key
-      .getSortOrder() ? ' checked' : '')
-      + '>Ascending</label></div>');
+      .push('<div class="radio"><label><input type="radio" name="sortOrder" value="ascending"'
+        + (morpheus.SortKey.SortOrder.ASCENDING == key
+          .getSortOrder() ? ' checked' : '')
+        + '>Ascending</label></div>');
     html
-    .push('<div class="radio"><label><input type="radio" name="sortOrder" value="descending"'
-      + (morpheus.SortKey.SortOrder.DESCENDING == key
-      .getSortOrder() ? ' checked' : '')
-      + '>Descending</label></div>');
+      .push('<div class="radio"><label><input type="radio" name="sortOrder" value="descending"'
+        + (morpheus.SortKey.SortOrder.DESCENDING == key
+          .getSortOrder() ? ' checked' : '')
+        + '>Descending</label></div>');
     html.push('</div>');
     html.push('<div class="col-xs-1">');
-    html.push('<a data-name="delete" class="pull-right">Delete</a>');
+    html.push('<a data-name="delete">Delete</a>');
     html.push('</div>');
-    html.push('<div class="col-xs-8">');
+    html.push('<div class="col-xs-12">');
+    html.push('<div class="checkbox"><label><input name="lockOrder" type="checkbox"' + (key.getLockOrder() !== 0 ? ' checked' : '') + '> Lock sort level</label></div>');
+    html.push('</div>');
+    html.push('<div class="col-xs-12">');
+    html.push('<br />');
     html.push('<a data-name="add" href="#">Add sort level</a>');
     html.push('</div>');
     html.push('</form>');
@@ -34900,10 +34938,10 @@ morpheus.VectorTrackHeader.prototype = {
     if (sortKeys != null) {
       var counter = 0;
       for (var i = 0, size = sortKeys.length; i < size; i++) {
-        if (sortKeys[i].getLockOrder() === 0) {
+        if (sortKeys[i].isUnlockable()) {
           counter++;
         }
-        if (sortKeys[i].getLockOrder() === 0 && sortKeys[i] instanceof morpheus.SortKey && columnName === sortKeys[i].toString()) {
+        if (sortKeys[i] instanceof morpheus.SortKey && columnName === sortKeys[i].toString()) {
           return {
             index: i,
             number: counter
@@ -34936,8 +34974,8 @@ morpheus.VectorTrackHeader.prototype = {
     var name = this.name;
     var existingSortKeyIndex = this.getSortKeyIndexForColumnName(sortKeys,
       name);
-    var unlockedSortKeys = sortKeys.filter(function (key) {
-      return key.getLockOrder() === 0;
+    var unlockableSortKeys = sortKeys.filter(function (key) {
+      return key.isUnlockable();
     });
     morpheus.CanvasUtil.resetTransform(context);
     context.clearRect(0, 0, this.getUnscaledWidth(), this
@@ -34972,10 +35010,14 @@ morpheus.VectorTrackHeader.prototype = {
     if (isColumns) {
       if (existingSortKeyIndex != null) {
         xpix -= 6;
+        if (sortKeys[existingSortKeyIndex.index].getLockOrder() !== 0) {
+          xpix -= 10;
+        }
       }
       if (sortKeys.length > 1) {
         xpix -= 6;
       }
+
     }
     context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
     var ypix = this.isColumns ? (this.getUnscaledHeight() / 2)
@@ -35121,7 +35163,7 @@ morpheus.VectorTrackHeader.prototype = {
     // context.restore();
     // }
     context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
-    if (existingSortKeyIndex !== null && sortKeys[existingSortKeyIndex.index].getLockOrder() === 0) {
+    if (existingSortKeyIndex !== null) {
       // draw arrow
       context.beginPath();
       var x = this.isColumns ? xpix + 4 : xpix + textWidth + 6;
@@ -35148,12 +35190,19 @@ morpheus.VectorTrackHeader.prototype = {
       }
       context.fill();
       morpheus.CanvasUtil.resetTransform(context);
-      if (sortKeys[existingSortKeyIndex.index].getLockOrder() === 0 && unlockedSortKeys.length > 1) {
-        context.textAlign = 'left';
+      context.textAlign = 'left';
+      if (unlockableSortKeys.length > 1) {
         context.font = '8px ' + morpheus.CanvasUtil.getFontFamily(context);
-        context.fillText('' + (existingSortKeyIndex.number), x + 4,
-          ypix - 3);
+        var sortIndex = '' + (existingSortKeyIndex.number);
+        context.fillText(sortIndex, x + 4,
+          ypix - 2);
+        x += context.measureText(sortIndex).width;
       }
+      if (sortKeys[existingSortKeyIndex.index].getLockOrder() !== 0) {
+        context.font = fontHeight + 'px FontAwesome';
+        context.fillText('\uf023', x + arrowWidth + 2, ypix);
+      }
+
     }
   }
 };

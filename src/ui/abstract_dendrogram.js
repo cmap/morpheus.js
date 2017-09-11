@@ -226,6 +226,7 @@ morpheus.AbstractDendrogram = function (heatMap, tree, positions, project,
                 var key = new morpheus.SpecifiedModelSortOrder(currentOrder, currentOrder.length, 'dendrogram', isColumns);
                 key.setPreservesDendrogram(true);
                 key.setLockOrder(2);
+                key.setUnlockable(false);
                 if (isColumns) {
                   heatMap.getProject().setColumnSortKeys([key], true);
                 } else {
