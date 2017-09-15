@@ -44,7 +44,7 @@ morpheus.SampleDatasets = function (options) {
       $button.prop('disabled', isDisabled);
     });
 
-  fetch('https://s3.amazonaws.com/data.clue.io/morpheus/tcga/tcga_index.txt').then(function (response) {
+  fetch('https://software.broadinstitute.org/morpheus/preloaded-datasets/tcga/tcga_index.txt').then(function (response) {
     if (response.ok) {
       return response.text();
     }
@@ -175,7 +175,7 @@ morpheus.SampleDatasets = function (options) {
 };
 
 morpheus.SampleDatasets.getTcgaDataset = function (options) {
-  var baseUrl = 'https://s3.amazonaws.com/data.clue.io/morpheus/tcga/'
+  var baseUrl = 'https://software.broadinstitute.org/morpheus/preloaded-datasets/tcga/'
     + options.type + '/';
   var datasetOptions = {};
   if (options.mrna) {
@@ -216,35 +216,30 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
   var datasets = [];
   if (options.sig_genes) {
     datasets.push(
-      'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_hybrid_capture1650_hg19_NoCommonSNPs_NoNeutralVariants_CDS_2012.05.07.maf.txt');
-    // datasets
-    // .push({
-    // dataset :
-    // '//s3.amazonaws.com/data.clue.io/morpheus/1650_HC_plus_RD_muts.maf.txt'
-    // });
+      'https://software.broadinstitute.org/morpheus/preloaded-datasets/CCLE_hybrid_capture1650_hg19_NoCommonSNPs_NoNeutralVariants_CDS_2012.05.07.maf.txt');
   }
   if (options.cn) {
-    datasets.push('https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_copynumber_byGene_2013-12-03.gct');
+    datasets.push('https://software.broadinstitute.org/morpheus/preloaded-datasets/CCLE_copynumber_byGene_2013-12-03.gct');
   }
 
   if (options.mrna) {
-    datasets.push('https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_Expression_Entrez_2012-09-29.txt');
+    datasets.push('https://software.broadinstitute.org/morpheus/preloaded-datasets/CCLE_Expression_Entrez_2012-09-29.txt');
   }
   if (options.ach) {
-    datasets.push('https://s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct');
+    datasets.push('https://software.broadinstitute.org/morpheus/preloaded-datasets/Achilles_QC_v2.4.3.rnai.Gs.gct');
   }
   var columnAnnotations = [];
   if (options.ach) {
     // there are several cell lines that are in Achilles but not CCLE
     columnAnnotations.push({
-      file: 'https://s3.amazonaws.com/data.clue.io/morpheus/Achilles_v2.4_SampleInfo_small.txt',
+      file: 'https://software.broadinstitute.org/morpheus/preloaded-datasets/Achilles_v2.4_SampleInfo_small.txt',
       datasetField: 'id',
       fileField: 'id'
     });
 
   }
   columnAnnotations.push({
-    file: 'https://s3.amazonaws.com/data.clue.io/morpheus/CCLE_Sample_Info.txt',
+    file: 'https://software.broadinstitute.org/morpheus/preloaded-datasets/CCLE_Sample_Info.txt',
     datasetField: 'id',
     fileField: 'id'
   });
