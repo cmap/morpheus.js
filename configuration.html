@@ -437,6 +437,40 @@
           </div>
         </li>
 
+        <li><a data-toggle="collapse" href="#shapeModel"
+               aria-expanded="false"
+               aria-controls="shapeModel">rowShapeModel/columnShapeModel</a>
+          <div id="shapeModel" class="collapse">
+            <div class="top-level-description">Describes how annotation values
+              are mapped to shapes. The keys in the object are the
+              annotation names. The values are one of "circle", "square", "plus", "x",
+              "asterisk", "diamond", "triangle-up", "triangle-down", "triangle-left",
+              "triangle-right", or "minus".
+            </div>
+            <div class="example">
+              <div class="description">Map "a" to "diamond", "b" to "asterisk", and "c" to
+                "x" for the "type" field.
+              </div>
+              <code>{"type":{"a":"diamond", "b":"asterisk", "c":"x"}}</code></div>
+          </div>
+        </li>
+
+
+        <li><a data-toggle="collapse" href="#fontModel"
+               aria-expanded="false"
+               aria-controls="fontModel">rowFontModel/columnFontModel</a>
+          <div id="shapeModel" class="collapse">
+            <div class="top-level-description">Describes how annotation values
+              are mapped to font weights. The keys in the object are the
+              annotation names. The values are one of {"weight":"400"}, {"weight":"700"}, or {"weight":"900"}
+            </div>
+            <div class="example">
+              <div class="description">Map "a" to font weight 700
+              </div>
+              <code>{"type":{"a":{"weight":"700"}}</code></div>
+          </div>
+        </li>
+
         <li><a data-toggle="collapse" href="#dendrogram"
                aria-expanded="false"
                aria-controls="dendrogram">rowDendrogram/columnDendrogram</a>
@@ -508,7 +542,8 @@
                 <div class="description">"text" to render annotation as
                   text, "color" to render annotation as
                   color, "bar" to render annotation as
-                  bar chart
+                  bar chart, "text_and_font" to encode text using font weight, "text_and_color" to encode text
+                  using color.
                 </div>
               </li>
               <li>highlightMatchingValues <code>Boolean</code> (default:false)
@@ -521,6 +556,12 @@
                 <div
                   class="description">Optional field name to
                   color this field by.
+                </div>
+              </li>
+              <li>fontField <code>String</code>
+                <div
+                  class="description">Optional field name to
+                  use for mapping values to font weights.
                 </div>
               </li>
               <li>min <code>Number</code>
@@ -536,6 +577,11 @@
               <li>max <code>Number</code>
                 <div
                   class="description">Optional maximum for bar chart.
+                </div>
+              </li>
+              <li>formatter <code>String</code>
+                <div
+                  class="description">Optional number format pattern, such as ".4f".
                 </div>
               </li>
 
