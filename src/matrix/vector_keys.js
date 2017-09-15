@@ -28,6 +28,9 @@ morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION = 'morpheus.recompute.funct.sel
 /**Number format spec/function */
 morpheus.VectorKeys.FORMATTER = 'morpheus.formatter';
 
+/** Whether vector values should be treated discretely or continuously */
+morpheus.VectorKeys.DISCRETE = 'morpheus.discrete';
+
 morpheus.VectorKeys.COPY_IGNORE = new morpheus.Set();
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.HEADER_SUMMARY);
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.DATA_TYPE);

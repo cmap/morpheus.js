@@ -8820,6 +8820,8 @@ morpheus.Project = function (dataset) {
   this.columnColorModel = new morpheus.VectorColorModel();
   this.rowShapeModel = new morpheus.VectorShapeModel();
   this.columnShapeModel = new morpheus.VectorShapeModel();
+  this.rowFontModel = new morpheus.VectorFontModel();
+  this.columnFontModel = new morpheus.VectorFontModel();
   this.hoverColumnIndex = -1;
   this.hoverRowIndex = -1;
   this.columnSelectionModel = new morpheus.SelectionModel(this, true);
@@ -8828,8 +8830,8 @@ morpheus.Project = function (dataset) {
   this.symmetricProjectListener = null;
   morpheus.Project._recomputeCalculatedColumnFields(this.originalDataset, morpheus.VectorKeys.RECOMPUTE_FUNCTION_NEW_HEAT_MAP);
   morpheus.Project
-  ._recomputeCalculatedColumnFields(new morpheus.TransposedDatasetView(
-    this.originalDataset), morpheus.VectorKeys.RECOMPUTE_FUNCTION_NEW_HEAT_MAP);
+    ._recomputeCalculatedColumnFields(new morpheus.TransposedDatasetView(
+      this.originalDataset), morpheus.VectorKeys.RECOMPUTE_FUNCTION_NEW_HEAT_MAP);
 };
 morpheus.Project.Events = {
   DATASET_CHANGED: 'datasetChanged',
@@ -8906,6 +8908,12 @@ morpheus.Project.prototype = {
   },
   getColumnShapeModel: function () {
     return this.columnShapeModel;
+  },
+  getRowFontModel: function () {
+    return this.rowFontModel;
+  },
+  getColumnFontModel: function () {
+    return this.columnFontModel;
   },
   getGroupRows: function () {
     return this.groupRows;
@@ -8992,7 +9000,7 @@ morpheus.Project.prototype = {
   getSortedFilteredDataset: function () {
     return morpheus.DatasetUtil.slicedView(this.getFullDataset(),
       this.rowIndexMapper.convertToView(), this.columnIndexMapper
-      .convertToView());
+        .convertToView());
   },
   getSelectedDataset: function (options) {
     options = $.extend({}, {
@@ -10649,16 +10657,19 @@ morpheus.VectorColorModel.FEMALE = '#ff99ff';
 morpheus.VectorColorModel.MALE = '#66ccff';
 
 // tableau 20-same as d3 category20
-morpheus.VectorColorModel.TWENTY_COLORS = ['#1f77b4', '#aec7e8', '#ff7f0e',
+morpheus.VectorColorModel.TWENTY_COLORS = [
+  '#1f77b4', '#aec7e8', '#ff7f0e',
   '#ffbb78', '#2ca02c', '#98df8a', '#d62728', '#ff9896', '#9467bd',
   '#c5b0d5', '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f',
   '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5'];
 morpheus.VectorColorModel.CATEGORY_20A = morpheus.VectorColorModel.TWENTY_COLORS;
-morpheus.VectorColorModel.CATEGORY_20B = ['#393b79', '#5254a3', '#6b6ecf',
+morpheus.VectorColorModel.CATEGORY_20B = [
+  '#393b79', '#5254a3', '#6b6ecf',
   '#9c9ede', '#637939', '#8ca252', '#b5cf6b', '#cedb9c', '#8c6d31',
   '#bd9e39', '#e7ba52', '#e7cb94', '#843c39', '#ad494a', '#d6616b',
   '#e7969c', '#7b4173', '#a55194', '#ce6dbd', '#de9ed6'];
-morpheus.VectorColorModel.CATEGORY_20C = ['#3182bd', '#6baed6', '#9ecae1',
+morpheus.VectorColorModel.CATEGORY_20C = [
+  '#3182bd', '#6baed6', '#9ecae1',
   '#c6dbef', '#e6550d', '#fd8d3c', '#fdae6b', '#fdd0a2', '#31a354',
   '#74c476', '#a1d99b', '#c7e9c0', '#756bb1', '#9e9ac8', '#bcbddc',
   '#dadaeb', '#636363', '#969696', '#bdbdbd', '#d9d9d9'];
@@ -10668,7 +10679,8 @@ morpheus.VectorColorModel.CATEGORY_ALL = [].concat(
   morpheus.VectorColorModel.CATEGORY_20B,
   morpheus.VectorColorModel.CATEGORY_20C);
 
-morpheus.VectorColorModel.TABLEAU10 = ['#1f77b4', '#ff7f0e', '#2ca02c',
+morpheus.VectorColorModel.TABLEAU10 = [
+  '#1f77b4', '#ff7f0e', '#2ca02c',
   '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22',
   '#17becf'];
 morpheus.VectorColorModel.STANDARD_COLORS = {
@@ -10728,7 +10740,7 @@ morpheus.VectorColorModel.prototype = {
     var _this = this;
     var json = {};
     tracks.forEach(function (track) {
-      if (track.settings.discrete) {
+      if (track.getFullVector().getProperties().get(morpheus.VectorKeys.DISCRETE)) {
         var colorMap = _this.vectorNameToColorMap.get(track.getName());
         if (colorMap != null) {
           json[track.getName()] = colorMap;
@@ -10769,11 +10781,11 @@ morpheus.VectorColorModel.prototype = {
     });
     this.vectorNameToColorScheme.forEach(function (colorScheme, name) {
       c.vectorNameToColorScheme.set(name, colorScheme
-      .copy(new morpheus.Project(new morpheus.Dataset({
-        name: '',
-        rows: 1,
-        columns: 1
-      }))));
+        .copy(new morpheus.Project(new morpheus.Dataset({
+          name: '',
+          rows: 1,
+          columns: 1
+        }))));
     });
     return c;
   },
@@ -10783,7 +10795,7 @@ morpheus.VectorColorModel.prototype = {
   },
   containsDiscreteColor: function (vector, value) {
     var metadataValueToColorMap = this.vectorNameToColorMap.get(vector
-    .getName());
+      .getName());
     if (metadataValueToColorMap === undefined) {
       return false;
     }
@@ -10813,13 +10825,14 @@ morpheus.VectorColorModel.prototype = {
         columns: 1
       })), {
       type: 'fixed',
-      map: [{
-        value: min,
-        color: colorbrewer.Greens[3][0]
-      }, {
-        value: max,
-        color: colorbrewer.Greens[3][2]
-      }]
+      map: [
+        {
+          value: min,
+          color: colorbrewer.Greens[3][0]
+        }, {
+          value: max,
+          color: colorbrewer.Greens[3][2]
+        }]
     });
     this.vectorNameToColorScheme.set(vector.getName(), cs);
     return cs;
@@ -10829,7 +10842,7 @@ morpheus.VectorColorModel.prototype = {
     var color = morpheus.VectorColorModel.getStandardColor(value);
     if (color == null) { // try to reuse existing color map
       var existingMetadataValueToColorMap = this.vectorNameToColorMap
-      .values();
+        .values();
       for (var i = 0, length = existingMetadataValueToColorMap.length; i < length; i++) {
         color = existingMetadataValueToColorMap[i].get(value);
         if (color !== undefined) {
@@ -10848,7 +10861,7 @@ morpheus.VectorColorModel.prototype = {
   },
   getMappedValue: function (vector, value) {
     var metadataValueToColorMap = this.vectorNameToColorMap.get(vector
-    .getName());
+      .getName());
     if (metadataValueToColorMap === undefined) {
       metadataValueToColorMap = new morpheus.Map();
       this.vectorNameToColorMap.set(vector.getName(),
@@ -10900,13 +10913,114 @@ morpheus.VectorColorModel.prototype = {
   },
   setMappedValue: function (vector, value, color) {
     var metadataValueToColorMap = this.vectorNameToColorMap.get(vector
-    .getName());
+      .getName());
     if (metadataValueToColorMap === undefined) {
       metadataValueToColorMap = new morpheus.Map();
       this.vectorNameToColorMap.set(vector.getName(),
         metadataValueToColorMap);
     }
     metadataValueToColorMap.set(value, color);
+  }
+};
+
+morpheus.VectorFontModel = function () {
+  this.vectorNameToMappedValue = new morpheus.Map();
+  this.fonts = morpheus.VectorFontModel.FONTS;
+
+};
+
+morpheus.VectorFontModel.FONTS = [{weight: 400}, {weight: 700}, {weight: 900}];
+// 400 (normal), 700 (bold), 900 (bolder)
+
+morpheus.VectorFontModel.prototype = {
+  toJSON: function (tracks) {
+    var _this = this;
+    var json = {};
+    tracks.forEach(function (track) {
+      if (track.isRenderAs(morpheus.VectorTrack.RENDER.TEXT) && track.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT)) {
+        var map = _this.vectorNameToMappedValue.get(track.getName());
+        if (map != null) {
+          json[track.getName()] = map;
+        }
+      }
+    });
+    return json;
+  },
+  fromJSON: function (json) {
+    for (var name in json) {
+      var obj = json[name];
+      this.vectorNameToMappedValue.set(name, morpheus.Map.fromJSON(obj));
+    }
+  },
+  clear: function (vector) {
+    this.vectorNameToMappedValue.remove(vector.getName());
+  },
+  copy: function () {
+    var c = new morpheus.VectorFontModel();
+    c.fonts = this.fonts.slice(0);
+    this.vectorNameToMappedValue.forEach(function (fontMap, name) {
+      var newFontMap = new morpheus.Map();
+      newFontMap.setAll(fontMap); // copy existing values
+      c.vectorNameToMappedValue.set(name, newFontMap);
+    });
+    return c;
+  },
+  clearAll: function () {
+    this.vectorNameToMappedValue = new morpheus.Map();
+  },
+  _getFontForValue: function (value) {
+    if (value == null) {
+      return morpheus.VectorFontModel.FONTS[0];
+    }
+    // try to reuse existing map
+    var existingMetadataValueToFontMap = this.vectorNameToMappedValue
+      .values();
+    for (var i = 0, length = existingMetadataValueToFontMap.length; i < length; i++) {
+      var font = existingMetadataValueToFontMap[i].get(value);
+      if (font !== undefined) {
+        return font;
+      }
+    }
+  },
+  getMap: function (name) {
+    return this.vectorNameToMappedValue.get(name);
+  },
+  getMappedValue: function (vector, value) {
+    var metadataValueToFontMap = this.vectorNameToMappedValue.get(vector
+      .getName());
+    if (metadataValueToFontMap === undefined) {
+      metadataValueToFontMap = new morpheus.Map();
+      this.vectorNameToMappedValue.set(vector.getName(),
+        metadataValueToFontMap);
+      // set all possible values
+      var values = morpheus.VectorUtil.getValues(vector);
+      for (var i = 0, nvalues = values.length; i < nvalues; i++) {
+        var font = this._getFontForValue(values[i]);
+        if (font == null) {
+          font = this.fonts[0]; // default is normal
+        }
+        metadataValueToFontMap.set(values[i], font);
+      }
+    }
+    var font = metadataValueToFontMap.get(value);
+    if (font == null) {
+      font = this._getFontForValue(value);
+      if (font == null) {
+        font = this.fonts[0]; // default is normal
+      }
+      metadataValueToFontMap.set(value, font);
+    }
+    return font;
+  },
+  setMappedValue: function (vector, value, font) {
+    var metadataValueToFontMap = this.vectorNameToMappedValue.get(vector
+      .getName());
+    if (metadataValueToFontMap === undefined) {
+      metadataValueToFontMap = new morpheus.Map();
+      this.vectorNameToMappedValue.set(vector.getName(),
+        metadataValueToFontMap);
+    }
+    metadataValueToFontMap.set(value, font);
   }
 };
 
@@ -10982,6 +11096,9 @@ morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION = 'morpheus.recompute.funct.sel
 /**Number format spec/function */
 morpheus.VectorKeys.FORMATTER = 'morpheus.formatter';
 
+/** Whether vector values should be treated discretely or continuously */
+morpheus.VectorKeys.DISCRETE = 'morpheus.discrete';
+
 morpheus.VectorKeys.COPY_IGNORE = new morpheus.Set();
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.HEADER_SUMMARY);
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.DATA_TYPE);
@@ -10995,10 +11112,11 @@ morpheus.VectorKeys.JSON_WHITELIST.add(morpheus.VectorKeys.TITLE);
 
 morpheus.VectorShapeModel = function () {
   this.shapes = morpheus.VectorShapeModel.SHAPES;
-  this.vectorNameToShapeMap = new morpheus.Map();
+  this.vectorNameToMappedValue = new morpheus.Map();
 };
 
-morpheus.VectorShapeModel.SHAPES = ['circle', 'square', 'plus', 'x',
+morpheus.VectorShapeModel.SHAPES = [
+  'circle', 'square', 'plus', 'x',
   'asterisk', 'diamond', 'triangle-up', 'triangle-down', 'triangle-left',
   'triangle-right', 'minus'];
 morpheus.VectorShapeModel.STANDARD_SHAPES = {
@@ -11010,22 +11128,41 @@ morpheus.VectorShapeModel.STANDARD_SHAPES = {
 };
 
 morpheus.VectorShapeModel.prototype = {
+  toJSON: function (tracks) {
+    var _this = this;
+    var json = {};
+    tracks.forEach(function (track) {
+      if (track.isRenderAs(morpheus.VectorTrack.RENDER.SHAPE)) {
+        var map = _this.vectorNameToMappedValue.get(track.getName());
+        if (map != null) {
+          json[track.getName()] = map;
+        }
+      }
+    });
+    return json;
+  },
+  fromJSON: function (json) {
+    for (var name in json) {
+      var obj = json[name];
+      this.vectorNameToMappedValue.set(name, morpheus.Map.fromJSON(obj));
+    }
+  },
   clear: function (vector) {
-    this.vectorNameToShapeMap.remove(vector.getName());
+    this.vectorNameToMappedValue.remove(vector.getName());
   },
   copy: function () {
     var c = new morpheus.VectorShapeModel();
     c.shapes = this.shapes.slice(0);
-    this.vectorNameToShapeMap.forEach(function (shapeMap, name) {
+    this.vectorNameToMappedValue.forEach(function (shapeMap, name) {
       var newShapeMap = new morpheus.Map();
       newShapeMap.setAll(shapeMap); // copy existing values
-      c.vectorNameToShapeMap.set(name, newShapeMap);
+      c.vectorNameToMappedValue.set(name, newShapeMap);
     });
 
     return c;
   },
   clearAll: function () {
-    this.vectorNameToShapeMap = new morpheus.Map();
+    this.vectorNameToMappedValue = new morpheus.Map();
   },
   _getShapeForValue: function (value) {
     if (value == null) {
@@ -11038,8 +11175,8 @@ morpheus.VectorShapeModel.prototype = {
     }
 
     // try to reuse existing map
-    var existingMetadataValueToShapeMap = this.vectorNameToShapeMap
-    .values();
+    var existingMetadataValueToShapeMap = this.vectorNameToMappedValue
+      .values();
     for (var i = 0, length = existingMetadataValueToShapeMap.length; i < length; i++) {
       var shape = existingMetadataValueToShapeMap[i].get(value);
       if (shape !== undefined) {
@@ -11049,14 +11186,14 @@ morpheus.VectorShapeModel.prototype = {
 
   },
   getMap: function (name) {
-    return this.vectorNameToShapeMap.get(name);
+    return this.vectorNameToMappedValue.get(name);
   },
   getMappedValue: function (vector, value) {
-    var metadataValueToShapeMap = this.vectorNameToShapeMap.get(vector
-    .getName());
+    var metadataValueToShapeMap = this.vectorNameToMappedValue.get(vector
+      .getName());
     if (metadataValueToShapeMap === undefined) {
       metadataValueToShapeMap = new morpheus.Map();
-      this.vectorNameToShapeMap.set(vector.getName(),
+      this.vectorNameToMappedValue.set(vector.getName(),
         metadataValueToShapeMap);
       // set all possible shapes
       var values = morpheus.VectorUtil.getValues(vector);
@@ -11080,11 +11217,11 @@ morpheus.VectorShapeModel.prototype = {
     return shape;
   },
   setMappedValue: function (vector, value, shape) {
-    var metadataValueToShapeMap = this.vectorNameToShapeMap.get(vector
-    .getName());
+    var metadataValueToShapeMap = this.vectorNameToMappedValue.get(vector
+      .getName());
     if (metadataValueToShapeMap === undefined) {
       metadataValueToShapeMap = new morpheus.Map();
-      this.vectorNameToShapeMap.set(vector.getName(),
+      this.vectorNameToMappedValue.set(vector.getName(),
         metadataValueToShapeMap);
     }
     metadataValueToShapeMap.set(value, shape);
@@ -18474,6 +18611,24 @@ morpheus.ActionManager = function () {
       }
     });
   });
+  this.add({
+    name: 'Edit Fonts',
+    ellipse: true,
+    cb: function (options) {
+      var trackInfo = options.heatMap.getLastSelectedTrackInfo();
+      var project = options.heatMap.getProject();
+      var model = trackInfo.isColumns ? project
+        .getColumnFontModel() : project
+        .getRowFontModel();
+      var chooser = new morpheus.FontChooser({fontModel: model, track: options.heatMap.getTrack(trackInfo.name, trackInfo.isColumns), heatMap: options.heatMap});
+      morpheus.FormBuilder.showInModal({
+        title: 'Edit Fonts',
+        html: chooser.$div,
+        close: 'Close',
+        focus: options.heatMap.getFocusEl()
+      });
+    }
+  });
 
 };
 morpheus.ActionManager.prototype = {
@@ -19116,6 +19271,126 @@ morpheus.CheckBoxList.prototype = {
       set: selection
     });
   }
+};
+
+/**
+ *
+ * @param options.colorModel
+ * @param options.track
+ * @param options.heatMap
+ * @constructor
+ */
+morpheus.ColorSchemeChooser = function (options) {
+  var colorModel = options.colorModel;
+  var track = options.track;
+  var heatMap = options.heatMap;
+  // ensure map exists
+  colorModel.getMappedValue(track.getVector(track.settings.colorByField), track.getVector(track.settings.colorByField).getValue(0));
+  var formBuilder = new morpheus.FormBuilder();
+  if (track.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)) {
+    formBuilder.append({
+      value: track.settings.colorByField != null,
+      type: 'checkbox',
+      name: 'use_another_annotation_to_determine_color'
+    });
+    var annotationNames = morpheus.MetadataUtil.getMetadataNames(
+      track.isColumns ? heatMap.getProject().getFullDataset().getColumnMetadata() : heatMap.getProject().getFullDataset().getRowMetadata());
+    annotationNames.splice(annotationNames.indexOf(track.getName()), 1);
+    formBuilder.append({
+      name: 'annotation_name',
+      type: 'bootstrap-select',
+      options: annotationNames,
+      search: annotationNames.length > 10,
+      value: track.settings.colorByField
+    });
+  }
+  formBuilder.append({
+    name: 'discrete',
+    type: 'checkbox',
+    value: track.getVector(track.settings.colorByField).getProperties().get(morpheus.VectorKeys.DISCRETE)
+  });
+  var dataType = morpheus.VectorUtil.getDataType(track.getVector(track.settings.colorByField));
+  var isNumber = dataType === 'number' || dataType === '[number]';
+  formBuilder.setVisible('discrete', isNumber);
+  formBuilder.setVisible('annotation_name', track.settings.colorByField != null);
+
+  var $chooser = $('<div></div>');
+  $chooser.appendTo(formBuilder.$form);
+  var updateChooser = function () {
+    var colorSchemeChooser;
+    var v = track
+      .getVector(track.settings.colorByField);
+    formBuilder.setValue('discrete', v.getProperties().get(morpheus.VectorKeys.DISCRETE));
+    if (v.getProperties().get(morpheus.VectorKeys.DISCRETE)) {
+      colorModel.getMappedValue(v, v.getValue(0)); // make sure color map exists
+      colorSchemeChooser = new morpheus.DiscreteColorSchemeChooser(
+        {
+          colorScheme: {
+            scale: colorModel
+              .getDiscreteColorScheme(track
+                .getVector(track.settings.colorByField))
+          }
+        });
+      colorSchemeChooser.on('change', function (event) {
+        colorModel.setMappedValue(track
+            .getVector(track.settings.colorByField), event.value,
+          event.color);
+        track.setInvalid(true);
+        track.repaint();
+      });
+    } else {
+      colorModel.getContinuousMappedValue(v, v.getValue(0)); // make sure color map exists
+      colorSchemeChooser = new morpheus.HeatMapColorSchemeChooser(
+        {
+          showRelative: false
+        });
+
+      colorSchemeChooser
+        .setColorScheme(colorModel
+          .getContinuousColorScheme(v));
+      colorSchemeChooser.on('change', function (event) {
+        track.setInvalid(true);
+        track.repaint();
+      });
+    }
+    $chooser.html(colorSchemeChooser.$div);
+    track.setInvalid();
+    track.repaint();
+  };
+  formBuilder.find('use_another_annotation_to_determine_color').on('change', function () {
+    var checked = $(this).prop('checked');
+    formBuilder.setValue('annotation_name', null);
+    formBuilder.setVisible('annotation_name', checked);
+    if (!checked) {
+      track.settings.colorByField = null;
+      updateChooser();
+    } else {
+      $chooser.empty();
+    }
+
+    formBuilder.setVisible('discrete', false);
+  });
+  formBuilder.find('annotation_name').on('change', function () {
+    var annotationName = $(this).val();
+    // ensure map exists
+    colorModel.getMappedValue(track.getVector(annotationName), track.getVector(annotationName).getValue(0));
+    track.settings.colorByField = annotationName;
+    var dataType = morpheus.VectorUtil.getDataType(track.getVector(track.settings.colorByField));
+    var isNumber = dataType === 'number' || dataType === '[number]';
+    formBuilder.setVisible('discrete', isNumber);
+    updateChooser();
+    track.setInvalid(true);
+    track.repaint();
+  });
+
+  formBuilder.find('discrete').on('change', function () {
+    track.getVector(track.settings.colorByField).getProperties().set(morpheus.VectorKeys.DISCRETE, $(this).prop('checked'));
+    updateChooser();
+    track.setInvalid(true);
+    track.repaint();
+  });
+  updateChooser();
+  this.$div = formBuilder.$form;
 };
 
 morpheus.ColumnDendrogram = function (heatMap, tree, positions, project) {
@@ -19979,22 +20254,13 @@ morpheus.DendrogramUtil.getLeafNodes = function (rootNode) {
 morpheus.DiscreteColorSchemeChooser = function (options) {
   var formBuilder = new morpheus.FormBuilder();
   var map = options.colorScheme.scale;
-  var html = ['<select name="colorPicker" class="selectpicker" data-live-search="true">'];
-  map.forEach(function (val, key) {
-    html.push('<option');
-    html.push(' value="');
-    html.push(key);
-    html.push('">');
-    html.push(key);
-    html.push('</option>');
-  });
-  html.push('</select>');
+
   formBuilder.append({
     name: 'selected_value',
-    type: 'custom',
-    value: html.join('')
+    type: 'bootstrap-select',
+    options: map.keys()
   });
-  var $select = formBuilder.$form.find('[name=colorPicker]');
+  var $select = formBuilder.find('selected_value');
   formBuilder.append({
     style: 'max-width:50px;',
     name: 'selected_color',
@@ -20002,7 +20268,7 @@ morpheus.DiscreteColorSchemeChooser = function (options) {
   });
   var selectedVal = $select.val();
   var _this = this;
-  var $color = formBuilder.$form.find('[name=selected_color]');
+  var $color = formBuilder.find('selected_color');
   $color.val(map.get(selectedVal));
   $color.on('change', function (e) {
     var color = $(this).val();
@@ -20012,18 +20278,14 @@ morpheus.DiscreteColorSchemeChooser = function (options) {
       color: color
     });
   });
-  $select.selectpicker().change(function () {
-    // var optionIndex = sel.prop("selectedIndex");
+  $select.on('change', function () {
     selectedVal = $select.val();
     var c = map.get(selectedVal);
     $color.val(c);
   });
   this.$div = formBuilder.$form;
 };
-morpheus.DiscreteColorSchemeChooser.prototype = {
-  dispose: function () {
-  }
-};
+morpheus.DiscreteColorSchemeChooser.prototype = {};
 morpheus.Util.extend(morpheus.DiscreteColorSchemeChooser, morpheus.Events);
 
 morpheus.DiscreteColorSupplier = function () {
@@ -20975,6 +21237,95 @@ morpheus.FilterUI.prototype = {
     return html.join('');
   }
 };
+
+/**
+ *
+ * @param options.fontModel
+ * @param options.track
+ * @param options.heatMap
+ * @constructor
+ */
+morpheus.FontChooser = function (options) {
+  var _this = this;
+  var fontModel = options.fontModel;
+  var track = options.track;
+  var heatMap = options.heatMap;
+  // ensure map exists
+  fontModel.getMappedValue(track.getVector(track.settings.fontField), track.getVector(track.settings.fontField).getValue(0));
+  var formBuilder = new morpheus.FormBuilder();
+  formBuilder.append({
+    value: track.settings.fontField != null,
+    type: 'checkbox',
+    name: 'use_another_annotation_to_determine_font'
+  });
+  var annotationNames = morpheus.MetadataUtil.getMetadataNames(
+    track.isColumns ? heatMap.getProject().getFullDataset().getColumnMetadata() : heatMap.getProject().getFullDataset().getRowMetadata());
+  annotationNames.splice(annotationNames.indexOf(track.getName()), 1);
+  formBuilder.append({
+    name: 'annotation_name',
+    type: 'bootstrap-select',
+    options: annotationNames,
+    search: annotationNames.length > 10,
+    value: track.settings.fontField
+  });
+  formBuilder.setVisible('annotation_name', track.settings.fontField != null);
+  formBuilder.append({
+    name: 'selected_value',
+    type: 'bootstrap-select',
+    search: true,
+    options: fontModel.getMap(track.settings.fontField != null ? track.settings.fontField : track.getName()).keys()
+  });
+  var $selectedValue = formBuilder.find('selected_value');
+  formBuilder.append({
+    name: 'selected_font',
+    type: 'bootstrap-select',
+    options: [{name: 'normal', value: 400}, {name: 'bold', value: 700}, {name: 'bolder', value: 900}]
+  });
+
+  var repaint = function () {
+    track.setInvalid(true);
+    track.repaint();
+  };
+  formBuilder.find('use_another_annotation_to_determine_font').on('change', function () {
+    var checked = $(this).prop('checked');
+    formBuilder.setValue('annotation_name', null);
+    formBuilder.setValue('selected_value', null);
+    formBuilder.setVisible('annotation_name', checked);
+    if (!checked) {
+      track.settings.fontField = null;
+    }
+    repaint();
+  });
+  formBuilder.find('annotation_name').on('change', function () {
+    var annotationName = $(this).val();
+    fontModel.getMappedValue(track.getVector(annotationName), track.getVector(annotationName).getValue(0));
+    track.settings.fontField = annotationName;
+    // ensure map exists
+    formBuilder.setOptions('selected_value', fontModel.getMap(track.settings.fontField != null ? track.settings.fontField : track.getName()).keys());
+    formBuilder.setValue('selected_value', null);
+    repaint();
+  });
+
+  var $selectedFont = formBuilder.find('selected_font');
+  $selectedFont.on('change', function (e) {
+    fontModel.setMappedValue(track.getVector(track.settings.fontField), $selectedValue.val(), {weight: $(this).val()});
+    repaint();
+  });
+
+  var updateMappedValue = function () {
+    var selectedVal = $selectedValue.val();
+    var mappedValue = fontModel.getMappedValue(track.getVector(track.settings.fontField), selectedVal);
+    formBuilder.setValue('selected_font', mappedValue.weight);
+  };
+  $selectedValue.on('change', function () {
+    // update displayed value
+    updateMappedValue();
+  });
+  updateMappedValue();
+  this.$div = formBuilder.$form;
+
+};
+morpheus.Util.extend(morpheus.FontChooser, morpheus.Events);
 
 morpheus.FormBuilder = function (options) {
   var _this = this;
@@ -27170,12 +27521,9 @@ morpheus.HeatMapTrackColorLegend.prototype = {
     for (var i = 0; i < tracks.length; i++) {
       ypix = 0;
       var maxWidth = 0;
-      var vector = tracks[i].getVector();
-      var map = colorModel.getDiscreteColorScheme(vector);
-      if (map == null) { // continuous
-        maxWidth = 220;
-        ypix += 40;
-      } else {
+      var vector = tracks[i].getVector(tracks[i].settings.colorByField);
+      if (vector.getProperties().get(morpheus.VectorKeys.DISCRETE)) {
+        var map = colorModel.getDiscreteColorScheme(vector);
         map.forEach(function (color, key) {
           var width = context.measureText(key).width;
           if (!isNaN(width)) {
@@ -27183,6 +27531,10 @@ morpheus.HeatMapTrackColorLegend.prototype = {
           }
           ypix += 14;
         });
+      } else {
+        maxWidth = 220;
+        ypix += 40;
+
       }
       maxWidth = Math.max(maxWidth,
         context.measureText(vector.getName()).width);
@@ -27201,7 +27553,7 @@ morpheus.HeatMapTrackColorLegend.prototype = {
     // legends are placed side by side
     for (var i = 0; i < tracks.length; i++) {
       var ypix = 0;
-      var vector = tracks[i].getVector();
+      var vector = tracks[i].getVector(tracks[i].settings.colorByField);
       context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
       context.font = '12px ' + morpheus.CanvasUtil.getFontFamily(context);
       context.textAlign = 'left';
@@ -27216,17 +27568,7 @@ morpheus.HeatMapTrackColorLegend.prototype = {
         maxWidth = Math.max(0, textWidth);
       }
       ypix += 14;
-
-      if (colorModel.isContinuous(vector)) { // draw continuous color legend
-        var scheme = colorModel.getContinuousColorScheme(vector);
-        context.save();
-        context.translate(xpix, ypix);
-        morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
-          scheme, 200);
-        context.restore();
-        maxWidth = Math.max(maxWidth, 220);
-        ypix += 40;
-      } else {
+      if (vector.getProperties().get(morpheus.VectorKeys.DISCRETE)) {
         var toStringFunction = morpheus.VectorTrack.vectorToString(vector);
         var map = colorModel.getDiscreteColorScheme(vector);
         var values = map.keys().sort(morpheus.SortKey.ASCENDING_COMPARATOR);
@@ -27246,12 +27588,99 @@ morpheus.HeatMapTrackColorLegend.prototype = {
             ypix += 14;
           }
         });
+      } else {
+        var scheme = colorModel.getContinuousColorScheme(vector);
+        context.save();
+        context.translate(xpix, ypix);
+        morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
+          scheme, 200);
+        context.restore();
+        maxWidth = Math.max(maxWidth, 220);
+        ypix += 40;
       }
       xpix += maxWidth + 10 + 14; // space between tracks + color chip
     }
   }
 };
 morpheus.Util.extend(morpheus.HeatMapTrackColorLegend, morpheus.AbstractCanvas);
+
+morpheus.HeatMapTrackFontLegend = function (tracks, model) {
+  morpheus.AbstractCanvas.call(this, false);
+  this.tracks = tracks;
+  this.model = model;
+  this.canvas.style.position = '';
+};
+morpheus.HeatMapTrackFontLegend.prototype = {
+  getPreferredSize: function () {
+    var tracks = this.tracks;
+    var model = this.model;
+    var canvas = this.canvas;
+    var context = canvas.getContext('2d');
+    context.font = '900 12px ' + morpheus.CanvasUtil.getFontFamily(context);
+    var xpix = 0;
+    var ypix = 0;
+    var maxYPix = 0;
+    for (var i = 0; i < tracks.length; i++) {
+      ypix = 0;
+      var maxWidth = 0;
+      var vector = tracks[i].getVector(tracks[i].settings.fontField);
+      var map = model.getMap(vector.getName());
+
+      map.forEach(function (color, key) {
+        var width = context.measureText(key).width;
+        if (!isNaN(width)) {
+          maxWidth = Math.max(maxWidth, width);
+        }
+        ypix += 14;
+      });
+
+      xpix += maxWidth + 6;
+      maxYPix = Math.max(maxYPix, ypix);
+    }
+    return {
+      width: xpix,
+      height: maxYPix > 0 ? (maxYPix + 30) : 0
+    };
+  },
+  draw: function (clip, context) {
+    // draw legends horizontally
+    var tracks = this.tracks;
+    var model = this.model;
+    var xpix = 0;
+    var ypix = 0;
+    context.textAlign = 'left';
+    context.textBaseline = 'top';
+    context.font = '12px ' + morpheus.CanvasUtil.getFontFamily(context);
+    context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
+    context.strokeStyle = 'black';
+    var font = context.font;
+    for (var i = 0; i < tracks.length; i++) {
+      ypix = 0;
+      var maxWidth = 0;
+      var textVector = tracks[i].getVector();
+      var fontVector = tracks[i].getVector(tracks[i].settings.fontField);
+      context.font = font;
+      context.fillText(textVector.getName(), xpix, ypix); // vector name
+      maxWidth = Math.max(maxWidth,
+        context.measureText(textVector.getName()).width);
+      ypix += 14;
+      var map = model.getMap(fontVector.getName());
+      var values = map.keys().sort(morpheus.SortKey.ASCENDING_COMPARATOR);
+      values.forEach(function (key) {
+        context.font = model.getMappedValue(fontVector, key).weight + ' ' + font;
+        var width = context.measureText(key).width;
+        if (!isNaN(width)) {
+          maxWidth = Math.max(maxWidth, width);
+        }
+        context.fillText(key, xpix, ypix);
+        ypix += 14;
+      });
+
+      xpix += maxWidth + 6; // space between tracks
+    }
+  }
+};
+morpheus.Util.extend(morpheus.HeatMapTrackFontLegend, morpheus.AbstractCanvas);
 
 morpheus.HeatMapTrackShapeLegend = function (tracks, shapeModel) {
   morpheus.AbstractCanvas.call(this, false);
@@ -28445,8 +28874,15 @@ morpheus.HeatMap.prototype = {
 
     json.name = this.options.name;
 
-    // TODO shapes
     json.showRowNumber = this.isShowRowNumber();
+
+    // annotation shapes
+    json.rowShapeModel = this.getProject().getRowShapeModel().toJSON(this.rowTracks);
+    json.columnShapeModel = this.getProject().getColumnShapeModel().toJSON(this.columnTracks);
+
+    // annotation font
+    json.rowFontModel = this.getProject().getRowFontModel().toJSON(this.rowTracks);
+    json.columnFontModel = this.getProject().getColumnFontModel().toJSON(this.columnTracks);
 
     // annotation colors
     json.rowColorModel = this.getProject().getRowColorModel().toJSON(this.rowTracks);
@@ -29117,11 +29553,14 @@ morpheus.HeatMap.prototype = {
           }
 
         }
+        if (option.formatter) {
+          v.getProperties().set(morpheus.VectorKeys.FORMATTER, morpheus.Util.createNumberFormat(option.formatter));
+        }
         if (track.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
           && option.color) {
           var m = isColumns ? _this.project.getColumnColorModel()
             : _this.project.getRowColorModel();
-          if (track.isDiscrete()) {
+          if (track.getFullVector().getProperties.get(morpheus.VectorKeys.DISCRETE)) {
             _.each(options.color, function (p) {
               m.setMappedValue(v, p.value, p.color);
             });
@@ -29319,6 +29758,18 @@ morpheus.HeatMap.prototype = {
     }
     if (this.options.columnColorModel) {
       this.getProject().getColumnColorModel().fromJSON(this.options.columnColorModel);
+    }
+    if (this.options.rowShapeModel) {
+      this.getProject().getRowShapeModel().fromJSON(this.options.rowShapeModel);
+    }
+    if (this.options.columnShapeModel) {
+      this.getProject().getColumnShapeModel().fromJSON(this.options.columnShapeModel);
+    }
+    if (this.options.rowFontModel) {
+      this.getProject().getRowFontModel().fromJSON(this.options.rowFontModel);
+    }
+    if (this.options.columnFontModel) {
+      this.getProject().getColumnFontModel().fromJSON(this.options.columnFontModel);
     }
     if (this.options.rowSize === 'fit' || this.options.columnSize === 'fit') {
       // note that we have to revalidate twice because column sizes are
@@ -30708,6 +31159,9 @@ morpheus.HeatMap.prototype = {
   getSelectedTrackName: function (isColumns) {
     return isColumns ? this.selectedColumnTrackName : this.selectedRowTrackName;
   },
+  getLastSelectedTrackInfo: function () {
+    return this.selectedTrackInfo;
+  },
   setSelectedTrack: function (name, isColumns) {
     var previousName = isColumns ? this.selectedColumnTrackName : this.selectedRowTrackName;
     if (name !== previousName) {
@@ -30717,8 +31171,10 @@ morpheus.HeatMap.prototype = {
       }
       if (isColumns) {
         this.selectedColumnTrackName = name;
+        this.selectedTrackInfo = {name: name, isColumns: true};
       } else {
         this.selectedRowTrackName = name;
+        this.selectedTrackInfo = {name: name, isColumns: false};
       }
 
       var index = this.getTrackIndex(name, isColumns);
@@ -31510,16 +31966,21 @@ morpheus.HeatMap.copyFromParent = function (project, options) {
   project.rowShapeModel = options.parent.getProject().getRowShapeModel().copy();
   project.columnShapeModel = options.parent.getProject().getColumnShapeModel().copy();
 
+  project.rowFontModel = options.parent.getProject().getRowFontModel().copy();
+  project.columnFontModel = options.parent.getProject().getColumnFontModel().copy();
+
   var parentRowTracks = options.parent.rowTracks || [];
   var parentColumnTracks = options.parent.columnTracks || [];
   if (options.inheritFromParentOptions.rows) { // row similarity matrix
     project.columnShapeModel = project.rowShapeModel;
     project.columnColorModel = project.rowColorModel;
+    project.columnFontModel = project.rowFontModel;
     parentColumnTracks = parentRowTracks.slice().reverse();
   }
   if (options.inheritFromParentOptions.columns) { // column similarity matrix
     project.rowShapeModel = project.columnShapeModel;
     project.rowColorModel = project.columnColorModel;
+    project.rowFontModel = project.columnFontModel;
     parentRowTracks = parentColumnTracks.slice().reverse();
   }
 
@@ -31531,6 +31992,10 @@ morpheus.HeatMap.copyFromParent = function (project, options) {
     tmp = project.rowColorModel;
     project.rowColorModel = project.columnColorModel;
     project.columnColorModel = tmp;
+
+    tmp = project.rowFontModel;
+    project.rowFontModel = project.columnFontModel;
+    project.columnFontModel = tmp;
 
     tmp = parentRowTracks.slice().reverse();
     // swap tracks
@@ -34819,7 +35284,7 @@ morpheus.VectorTrackHeader.prototype = {
   },
   getPreferredSize: function () {
     var size = this.getPrintSize();
-    size.width += 22; // leave space for sort, drag icon
+    size.width += 24; // leave space for sort, drag icon, lock
 
     if (!this.isColumns) {
       size.height = this.defaultFontHeight
@@ -35286,15 +35751,13 @@ morpheus.VectorTrack = function (project, name, positions, isColumns, heatmap) {
     squished: false,
     inlineTooltip: false,
     tooltip: true,
-    discrete: true, // will be set automatically if
-    // discreteAutoDetermined is false
     highlightMatchingValues: false,
-    discreteAutoDetermined: false,
     colorBarSize: 12,
     stackedBar: false,
     display: [],
     selectionColor: 'rgb(182,213,253)',
-    colorByField: null, // color this vector by another vector
+    colorByField: null, // color this vector by another vector, used in bar plot and text
+    fontField: null, // use a different field for determining font
     barColor: '#bdbdbd',
     barSize: 40,
     min: undefined,
@@ -35312,6 +35775,7 @@ morpheus.VectorTrack.RENDER = {
   BAR: 'bar',
   MOLECULE: 'molecule',
   TEXT_AND_COLOR: 'text_and_color',
+  TEXT_AND_FONT: 'text_and_font',
   SHAPE: 'shape',
   ARC: 'arc',
   BOX_PLOT: 'box_plot',
@@ -35369,6 +35833,7 @@ morpheus.VectorTrack.vectorToString = function (vector) {
 
 morpheus.VectorTrack.prototype = {
   settingFromConfig: function (conf) {
+    var _this = this;
     var settings = this.settings;
     // new style= rows:[{field: 'test', display:['text']}]
     // old style= rows:[{field: 'test', display:'text,color'}]
@@ -35382,11 +35847,9 @@ morpheus.VectorTrack.prototype = {
         if (mapped !== undefined) {
           settings.display.push(mapped);
         } else if (method === 'DISCRETE') {
-          settings.discrete = true;
-          settings.discreteAutoDetermined = true;
+          _this.getFullVector().getProperties().get(morpheus.VectorKeys.DISCRETE, true);
         } else if (method === 'CONTINUOUS') {
-          settings.discrete = false;
-          settings.discreteAutoDetermined = true;
+          _this.getFullVector().getProperties().set(morpheus.VectorKeys.DISCRETE, false);
         } else if (method === 'HIGHLIGHT') {
           settings.highlightMatchingValues = true;
         } else if (method === 'STACKED_BAR') {
@@ -35437,7 +35900,7 @@ morpheus.VectorTrack.prototype = {
         settings = $.extend({}, settings, userSuppliedSettings);
         settings.maxTextWidth = undefined;
         if (userSuppliedSettings.discrete != null) {
-          settings.discreteAutoDetermined = true;
+          _this.getFullVector().getProperties().get(morpheus.VectorKeys.DISCRETE, userSuppliedSettings.discrete);
         }
 
         if (_.isArray(userSuppliedSettings.display)) {
@@ -35450,13 +35913,14 @@ morpheus.VectorTrack.prototype = {
           delete settings.render;
         }
       }
+      if (!this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT) &&
+        (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR) || this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT))) {
+        settings.display.push(morpheus.VectorTrack.RENDER.TEXT);
+      }
       this.settings = settings;
     }
     this._update();
 
-  },
-  isDiscrete: function () {
-    return this.settings.discrete;
   },
   setShowTooltip: function (value) {
     this.settings.tooltip = value;
@@ -35498,8 +35962,7 @@ morpheus.VectorTrack.prototype = {
   _computePreferredSize: function (forPrint) {
     var width = 0;
     var height = 0;
-    if (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)
-      || this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)) {
+    if (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)) {
       if (this.positions.getSize() >= 6) {
         var context = this.canvas.getContext('2d');
         var textWidth = morpheus.CanvasUtil.getVectorStringWidth(
@@ -35573,7 +36036,7 @@ morpheus.VectorTrack.prototype = {
   _setChartMinMax: function () {
     if (this.isRenderAs(morpheus.VectorTrack.RENDER.BAR)
       || this.isRenderAs(morpheus.VectorTrack.RENDER.BOX_PLOT)) {
-      if (!this.settings.stackedBar && this.settings.discrete
+      if (!this.settings.stackedBar && this.getFullVector().getProperties().get(morpheus.VectorKeys.DISCRETE)
         && !this.isRenderAs(morpheus.VectorTrack.RENDER.BOX_PLOT)) {
         if (!this.discreteValueMap) {
           this._createDiscreteValueMap();
@@ -35608,23 +36071,25 @@ morpheus.VectorTrack.prototype = {
   },
 
   _update: function () {
-    if (!this.settings.discreteAutoDetermined
+    if (this.getFullVector().getProperties().get(morpheus.VectorKeys.DISCRETE) == null
       && (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
         || this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || this
           .isRenderAs(morpheus.VectorTrack.RENDER.BAR))) {
       if ((this.isColumns ? this.project.getColumnColorModel() : this.project.getRowColorModel()).getContinuousColorScheme(this.getFullVector()) != null) {
-        this.settings.discrete = false;
+        this.getFullVector().getProperties().set(morpheus.VectorKeys.DISCRETE, false);
         this.settings.highlightMatchingValues = false;
       } else if ((this.isColumns ? this.project.getColumnColorModel() : this.project.getRowColorModel()).getDiscreteColorScheme(this.getFullVector()) != null) {
-        this.settings.discrete = true;
+        this.getFullVector().getProperties().set(morpheus.VectorKeys.DISCRETE, true);
         this.settings.highlightMatchingValues = true;
       } else if (this.getFullVector().getProperties().has(
           morpheus.VectorKeys.FIELDS)
         || morpheus.VectorUtil.getDataType(this.getFullVector()) === 'number' || morpheus.VectorUtil.getDataType(this.getFullVector()) === '[number]') {
-        this.settings.discrete = false;
+        this.getFullVector().getProperties().set(morpheus.VectorKeys.DISCRETE, false);
         this.settings.highlightMatchingValues = false;
       }
-      this.settings.discreteAutoDetermined = true;
+    }
+    if (this.getFullVector().getProperties().get(morpheus.VectorKeys.DISCRETE) == null) {
+      this.getFullVector().getProperties().set(morpheus.VectorKeys.DISCRETE, true);
     }
     if (this.isRenderAs(morpheus.VectorTrack.RENDER.MOLECULE)) {
       this.project.off(this.events, this.updateSpanMapFunction);
@@ -36010,7 +36475,7 @@ morpheus.VectorTrack.prototype = {
     if (this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)) {
       this.renderColor(context, vector, start, end, clip,
         this.isColumns ? availableSpace : 0,
-        !this.settings.discrete);
+        !this.getFullVector().getProperties().get(morpheus.VectorKeys.DISCRETE));
       offset += this.settings.colorBarSize + 2;
       availableSpace -= offset;
     }
@@ -36081,24 +36546,26 @@ morpheus.VectorTrack.prototype = {
 
     }
     if (!this.settings.squished
-      && this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)) {
+      && this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT) &&
+      (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR) || this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT))) {
       context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
-      this.renderText(context, vector, true, start, end, clip, this.isColumns ? (fullAvailableSpace - offset) : offset);
+      this.renderText(context, vector, this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR), this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT),
+        start, end, clip, this.isColumns ? (fullAvailableSpace - offset) : offset);
       offset += this.settings.maxTextWidth + 2;
       availableSpace -= offset;
     }
     if (!this.settings.squished
-      && this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)) {
+      && this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT) && !this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
+      && !this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT)) {
       context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
       var dataType = morpheus.VectorUtil.getDataType(vector);
       if (dataType === 'url') {
         context.fillStyle = 'blue';
         this.canvas.style.cursor = 'pointer';
       }
-      this.renderText(context, vector, false, start, end, clip, this.isColumns ? (fullAvailableSpace - offset) : offset);
+      this.renderText(context, vector, false, false, start, end, clip, this.isColumns ? (fullAvailableSpace - offset) : offset);
 
     }
-
   }
   ,
   showPopup: function (e, isHeader) {
@@ -36134,7 +36601,8 @@ morpheus.VectorTrack.prototype = {
     var DISPLAY_TEXT = 'Show Text';
     var DISPLAY_SHAPE = 'Show Shape';
     var DISPLAY_ARC = 'Show Arc';
-    var DISPLAY_TEXT_AND_COLOR = 'Show Colored Text';
+    var DISPLAY_TEXT_AND_COLOR = 'Encode Text Using Color';
+    var DISPLAY_TEXT_AND_FONT = 'Encode Text Using Font';
     var DISPLAY_STRUCTURE = 'Show Chemical Structure';
     var DISPLAY_CONTINUOUS = 'Continuous';
     var positions = this.positions;
@@ -36240,13 +36708,28 @@ morpheus.VectorTrack.prototype = {
       sectionToItems.Display.push({
         name: FIELDS
       });
-
     }
+
     if (dataType !== 'url') {
+      // text and text_and_color are mutually exclusive
       sectionToItems.Display.push({
         name: DISPLAY_TEXT,
         checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)
       });
+      if (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)) {
+        sectionToItems.Display.push({
+          name: DISPLAY_TEXT_AND_COLOR,
+          checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
+        });
+        sectionToItems.Display.push({
+          name: DISPLAY_TEXT_AND_FONT,
+          checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT)
+        });
+      }
+      sectionToItems.Display.push({
+        separator: true
+      });
+
       sectionToItems.Display.push({
         name: DISPLAY_COLOR,
         checked: this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
@@ -36288,10 +36771,10 @@ morpheus.VectorTrack.prototype = {
       });
     }
     if (dataType !== 'url') {
-      sectionToItems.Display.push({
-        name: 'Squished',
-        checked: this.settings.squished
-      });
+      // sectionToItems.Display.push({
+      //   name: 'Squished',
+      //   checked: this.settings.squished
+      // });
     }
     if (this.isRenderAs(morpheus.VectorTrack.RENDER.BAR)
       || this.isRenderAs(morpheus.VectorTrack.RENDER.BOX_PLOT)) {
@@ -36311,7 +36794,7 @@ morpheus.VectorTrack.prototype = {
       });
     }
     if (this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
-      || this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
+      || this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR) || this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT)
       || this.isRenderAs(morpheus.VectorTrack.RENDER.BAR)
       || this.isRenderAs(morpheus.VectorTrack.RENDER.SHAPE)) {
       sectionToItems.Display.push({
@@ -36320,7 +36803,7 @@ morpheus.VectorTrack.prototype = {
       if (isNumber) {
         sectionToItems.Display.push({
           name: DISPLAY_CONTINUOUS,
-          checked: !this.settings.discrete
+          checked: !this.getFullVector().getProperties().get(morpheus.VectorKeys.DISCRETE)
         });
       }
       if (this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
@@ -36338,6 +36821,13 @@ morpheus.VectorTrack.prototype = {
         });
 
       }
+      if (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT)) {
+        sectionToItems.Display.push({
+          name: 'Edit Fonts...'
+        });
+
+      }
+
       if (this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
         || this
           .isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
@@ -36352,6 +36842,12 @@ morpheus.VectorTrack.prototype = {
     if (this.isRenderAs(morpheus.VectorTrack.RENDER.SHAPE)) {
       sectionToItems.Display.push({
         name: 'Shape Key',
+        icon: 'fa fa-key'
+      });
+    }
+    if (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT)) {
+      sectionToItems.Display.push({
+        name: 'Font Key',
         icon: 'fa fa-key'
       });
     }
@@ -36775,7 +37271,6 @@ morpheus.VectorTrack.prototype = {
             _this.settings.squished = !_this.settings.squished;
             heatmap.revalidate();
           } else if (item === 'Color Key') {
-
             var legend = new morpheus.HeatMapTrackColorLegend(
               [_this], isColumns ? _this.project
                   .getColumnColorModel()
@@ -36805,6 +37300,22 @@ morpheus.VectorTrack.prototype = {
               html: legend.canvas,
               focus: heatmap.getFocusEl()
             });
+          } else if (item === 'Font Key') {
+            var legend = new morpheus.HeatMapTrackFontLegend(
+              [_this], isColumns ? _this.project
+                  .getColumnFontModel()
+                : _this.project
+                  .getRowFontModel());
+            var size = legend.getPreferredSize();
+            legend.setBounds(size);
+            legend.repaint();
+            morpheus.FormBuilder.showInModal({
+              title: 'Font Key',
+              html: legend.canvas,
+              focus: heatmap.getFocusEl()
+            });
+          } else if (item === 'Edit Fonts...') {
+            heatmap.getActionManager().execute('Edit Fonts');
           } else if (item === 'Edit Shapes...') {
             var shapeFormBuilder = new morpheus.FormBuilder();
             var shapeModel = isColumns ? _this.project
@@ -36828,48 +37339,15 @@ morpheus.VectorTrack.prototype = {
               focus: heatmap.getFocusEl()
             });
           } else if (item === 'Edit Colors...') {
-            var colorSchemeChooser;
             var colorModel = isColumns ? _this.project
               .getColumnColorModel() : _this.project
               .getRowColorModel();
-            if (_this.settings.discrete) {
-              colorSchemeChooser = new morpheus.DiscreteColorSchemeChooser(
-                {
-                  colorScheme: {
-                    scale: colorModel
-                      .getDiscreteColorScheme(_this
-                        .getFullVector())
-                  }
-                });
-              colorSchemeChooser.on('change', function (event) {
-                colorModel.setMappedValue(_this
-                    .getFullVector(), event.value,
-                  event.color);
-                _this.setInvalid(true);
-                _this.repaint();
-              });
-            } else {
-              colorSchemeChooser = new morpheus.HeatMapColorSchemeChooser(
-                {
-                  showRelative: false
-                });
-              colorSchemeChooser
-                .setColorScheme(colorModel
-                  .getContinuousColorScheme(_this
-                    .getFullVector()));
-              colorSchemeChooser.on('change', function (event) {
-                _this.setInvalid(true);
-                _this.repaint();
-              });
-            }
+            var colorSchemeChooser = new morpheus.ColorSchemeChooser({track: _this, heatMap: _this.heatmap, colorModel: colorModel});
             morpheus.FormBuilder.showInModal({
               title: 'Edit Colors',
               html: colorSchemeChooser.$div,
               close: 'Close',
-              focus: heatmap.getFocusEl(),
-              onClose: function () {
-                colorSchemeChooser.dispose();
-              }
+              focus: heatmap.getFocusEl()
             });
           } else if (item === TOOLTIP) {
             _this.settings.inlineTooltip = !_this.settings.inlineTooltip;
@@ -36900,7 +37378,8 @@ morpheus.VectorTrack.prototype = {
             }
 
           } else if (item === DISPLAY_CONTINUOUS) {
-            _this.settings.discrete = !_this.settings.discrete;
+            var discrete = _this.getFullVector().getProperties().get(morpheus.VectorKeys.DISCRETE) || false;
+            _this.getFullVector().getProperties().set(morpheus.VectorKeys.DISCRETE, !discrete);
             _this._setChartMinMax();
             _this.setInvalid(true);
             _this.repaint();
@@ -36932,6 +37411,8 @@ morpheus.VectorTrack.prototype = {
               item = morpheus.VectorTrack.RENDER.TEXT;
             } else if (item === DISPLAY_TEXT_AND_COLOR) {
               item = morpheus.VectorTrack.RENDER.TEXT_AND_COLOR;
+            } else if (item === DISPLAY_TEXT_AND_FONT) {
+              item = morpheus.VectorTrack.RENDER.TEXT_AND_FONT;
             } else if (item === DISPLAY_STRUCTURE) {
               item = morpheus.VectorTrack.RENDER.MOLECULE;
             } else if (item === DISPLAY_SHAPE) {
@@ -36944,13 +37425,34 @@ morpheus.VectorTrack.prototype = {
               console.log('Unknown item ' + item);
             }
             var show = !_this.isRenderAs(item);
+            var remove;
             if (!show) {
               _this.settings.display.splice(_this.settings.display.indexOf(item), 1);
+              // if no longer rendering as text, remove TEXT_AND_COLOR and TEXT_AND_FONT
+              if (item === morpheus.VectorTrack.RENDER.TEXT) {
+                remove = [morpheus.VectorTrack.RENDER.TEXT_AND_FONT, morpheus.VectorTrack.RENDER.TEXT_AND_COLOR];
+              }
             } else {
+              if (item === morpheus.VectorTrack.RENDER.COLOR) {
+                remove = [morpheus.VectorTrack.RENDER.TEXT_AND_COLOR];
+              } else if (item === morpheus.VectorTrack.RENDER.TEXT_AND_COLOR) {
+                remove = [morpheus.VectorTrack.RENDER.COLOR];
+              }
               _this.settings.display.push(item);
+            }
+            if (remove) {
+              remove.forEach(function (key) {
+                var index = _this.settings.display.indexOf(key);
+                if (index !== -1) {
+                  _this.settings.display.splice(index, 1);
+                }
+              });
             }
             _this._update();
             heatmap.revalidate();
+            if (show && item === morpheus.VectorTrack.RENDER.TEXT_AND_FONT) {
+              heatmap.getActionManager().execute('Edit Fonts');
+            }
           }
         });
   }
@@ -37269,7 +37771,7 @@ morpheus.VectorTrack.prototype = {
     var scale = this.createChartScale(availableSpace);
     var midPix = scale(this.settings.mid);
     var settings = this.settings;
-    var discrete = settings.discrete && this.discreteValueMap != null;
+    var discrete = vector.getProperties().get(morpheus.VectorKeys.DISCRETE) && this.discreteValueMap != null;
     var colorByVector = this.settings.colorByField != null ? this
       .getVector(this.settings.colorByField) : null;
     var colorModel = isColumns ? this.project.getColumnColorModel()
@@ -37554,7 +38056,7 @@ morpheus.VectorTrack.prototype = {
     }
   }
   ,
-  renderText: function (context, vector, isColor, start, end, clip, offset,
+  renderText: function (context, vector, isColor, isFont, start, end, clip, offset,
                         canvasSize) {
 
     context.textBaseline = 'middle';
@@ -37567,10 +38069,24 @@ morpheus.VectorTrack.prototype = {
     var colorModel = isColumns ? this.project.getColumnColorModel()
       : this.project.getRowColorModel();
 
+    var fontModel = isColumns ? this.project.getColumnFontModel()
+      : this.project.getRowFontModel();
+
     if (isColumns) {
       context.translate(clip.x, clip.y); // reset transform, needed for export to svg
     }
+    var colorByVector = this.settings.colorByField != null ? this
+      .getVector(this.settings.colorByField) : vector;
+    var getColor;
+    if (colorByVector.getProperties().get(morpheus.VectorKeys.DISCRETE)) {
+      getColor = _.bind(colorModel.getMappedValue, colorModel);
+    } else {
+      getColor = _.bind(colorModel.getContinuousMappedValue, colorModel);
+    }
+    var fontVector = this.settings.fontField != null ? this
+      .getVector(this.settings.fontField) : vector;
     var toStringFunction = morpheus.VectorTrack.vectorToString(vector);
+    var font = context.font;
     for (var i = start; i < end; i++) {
       var size = this.positions.getItemSize(i);
       if (size < 6) {
@@ -37578,24 +38094,27 @@ morpheus.VectorTrack.prototype = {
       }
       var value = vector.getValue(i);
       if (value != null) {
-        value = toStringFunction(value);
+        var stringValue = toStringFunction(value);
         var position = positions.getPosition(i);
         if (isColor) {
-          context.fillStyle = colorModel
-            .getMappedValue(vector, value);
+          context.fillStyle = getColor(colorByVector, colorByVector.getValue(i));
+        }
+        if (isFont) {
+          context.font = fontModel.getMappedValue(fontVector, fontVector.getValue(i)).weight + ' ' + font;
         }
         if (isColumns) {
           context.save();
           context.translate(position + size / 2 - clip.x,
             offset - clip.y);
           context.rotate(-Math.PI / 2);
-          context.fillText(value, 0, 0);
+          context.fillText(stringValue, 0, 0);
           context.restore();
         } else {
-          context.fillText(value, offset, position + size / 2);
+          context.fillText(stringValue, offset, position + size / 2);
         }
       }
     }
+    context.font = font;
   }
 };
 morpheus.Util.extend(morpheus.VectorTrack, morpheus.AbstractCanvas);

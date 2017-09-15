@@ -17,12 +17,9 @@ morpheus.HeatMapTrackColorLegend.prototype = {
     for (var i = 0; i < tracks.length; i++) {
       ypix = 0;
       var maxWidth = 0;
-      var vector = tracks[i].getVector();
-      var map = colorModel.getDiscreteColorScheme(vector);
-      if (map == null) { // continuous
-        maxWidth = 220;
-        ypix += 40;
-      } else {
+      var vector = tracks[i].getVector(tracks[i].settings.colorByField);
+      if (vector.getProperties().get(morpheus.VectorKeys.DISCRETE)) {
+        var map = colorModel.getDiscreteColorScheme(vector);
         map.forEach(function (color, key) {
           var width = context.measureText(key).width;
           if (!isNaN(width)) {
@@ -30,6 +27,10 @@ morpheus.HeatMapTrackColorLegend.prototype = {
           }
           ypix += 14;
         });
+      } else {
+        maxWidth = 220;
+        ypix += 40;
+
       }
       maxWidth = Math.max(maxWidth,
         context.measureText(vector.getName()).width);
@@ -48,7 +49,7 @@ morpheus.HeatMapTrackColorLegend.prototype = {
     // legends are placed side by side
     for (var i = 0; i < tracks.length; i++) {
       var ypix = 0;
-      var vector = tracks[i].getVector();
+      var vector = tracks[i].getVector(tracks[i].settings.colorByField);
       context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
       context.font = '12px ' + morpheus.CanvasUtil.getFontFamily(context);
       context.textAlign = 'left';
@@ -63,17 +64,7 @@ morpheus.HeatMapTrackColorLegend.prototype = {
         maxWidth = Math.max(0, textWidth);
       }
       ypix += 14;
-
-      if (colorModel.isContinuous(vector)) { // draw continuous color legend
-        var scheme = colorModel.getContinuousColorScheme(vector);
-        context.save();
-        context.translate(xpix, ypix);
-        morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
-          scheme, 200);
-        context.restore();
-        maxWidth = Math.max(maxWidth, 220);
-        ypix += 40;
-      } else {
+      if (vector.getProperties().get(morpheus.VectorKeys.DISCRETE)) {
         var toStringFunction = morpheus.VectorTrack.vectorToString(vector);
         var map = colorModel.getDiscreteColorScheme(vector);
         var values = map.keys().sort(morpheus.SortKey.ASCENDING_COMPARATOR);
@@ -93,6 +84,15 @@ morpheus.HeatMapTrackColorLegend.prototype = {
             ypix += 14;
           }
         });
+      } else {
+        var scheme = colorModel.getContinuousColorScheme(vector);
+        context.save();
+        context.translate(xpix, ypix);
+        morpheus.HeatMapColorSchemeLegend.drawColorScheme(context,
+          scheme, 200);
+        context.restore();
+        maxWidth = Math.max(maxWidth, 220);
+        ypix += 40;
       }
       xpix += maxWidth + 10 + 14; // space between tracks + color chip
     }

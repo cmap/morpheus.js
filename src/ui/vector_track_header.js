@@ -329,7 +329,7 @@ morpheus.VectorTrackHeader.prototype = {
   },
   getPreferredSize: function () {
     var size = this.getPrintSize();
-    size.width += 22; // leave space for sort, drag icon
+    size.width += 24; // leave space for sort, drag icon, lock
 
     if (!this.isColumns) {
       size.height = this.defaultFontHeight

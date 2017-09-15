@@ -941,6 +941,24 @@ morpheus.ActionManager = function () {
       }
     });
   });
+  this.add({
+    name: 'Edit Fonts',
+    ellipse: true,
+    cb: function (options) {
+      var trackInfo = options.heatMap.getLastSelectedTrackInfo();
+      var project = options.heatMap.getProject();
+      var model = trackInfo.isColumns ? project
+        .getColumnFontModel() : project
+        .getRowFontModel();
+      var chooser = new morpheus.FontChooser({fontModel: model, track: options.heatMap.getTrack(trackInfo.name, trackInfo.isColumns), heatMap: options.heatMap});
+      morpheus.FormBuilder.showInModal({
+        title: 'Edit Fonts',
+        html: chooser.$div,
+        close: 'Close',
+        focus: options.heatMap.getFocusEl()
+      });
+    }
+  });
 
 };
 morpheus.ActionManager.prototype = {

@@ -9,16 +9,19 @@ morpheus.VectorColorModel.FEMALE = '#ff99ff';
 morpheus.VectorColorModel.MALE = '#66ccff';
 
 // tableau 20-same as d3 category20
-morpheus.VectorColorModel.TWENTY_COLORS = ['#1f77b4', '#aec7e8', '#ff7f0e',
+morpheus.VectorColorModel.TWENTY_COLORS = [
+  '#1f77b4', '#aec7e8', '#ff7f0e',
   '#ffbb78', '#2ca02c', '#98df8a', '#d62728', '#ff9896', '#9467bd',
   '#c5b0d5', '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f',
   '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5'];
 morpheus.VectorColorModel.CATEGORY_20A = morpheus.VectorColorModel.TWENTY_COLORS;
-morpheus.VectorColorModel.CATEGORY_20B = ['#393b79', '#5254a3', '#6b6ecf',
+morpheus.VectorColorModel.CATEGORY_20B = [
+  '#393b79', '#5254a3', '#6b6ecf',
   '#9c9ede', '#637939', '#8ca252', '#b5cf6b', '#cedb9c', '#8c6d31',
   '#bd9e39', '#e7ba52', '#e7cb94', '#843c39', '#ad494a', '#d6616b',
   '#e7969c', '#7b4173', '#a55194', '#ce6dbd', '#de9ed6'];
-morpheus.VectorColorModel.CATEGORY_20C = ['#3182bd', '#6baed6', '#9ecae1',
+morpheus.VectorColorModel.CATEGORY_20C = [
+  '#3182bd', '#6baed6', '#9ecae1',
   '#c6dbef', '#e6550d', '#fd8d3c', '#fdae6b', '#fdd0a2', '#31a354',
   '#74c476', '#a1d99b', '#c7e9c0', '#756bb1', '#9e9ac8', '#bcbddc',
   '#dadaeb', '#636363', '#969696', '#bdbdbd', '#d9d9d9'];
@@ -28,7 +31,8 @@ morpheus.VectorColorModel.CATEGORY_ALL = [].concat(
   morpheus.VectorColorModel.CATEGORY_20B,
   morpheus.VectorColorModel.CATEGORY_20C);
 
-morpheus.VectorColorModel.TABLEAU10 = ['#1f77b4', '#ff7f0e', '#2ca02c',
+morpheus.VectorColorModel.TABLEAU10 = [
+  '#1f77b4', '#ff7f0e', '#2ca02c',
   '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22',
   '#17becf'];
 morpheus.VectorColorModel.STANDARD_COLORS = {
@@ -88,7 +92,7 @@ morpheus.VectorColorModel.prototype = {
     var _this = this;
     var json = {};
     tracks.forEach(function (track) {
-      if (track.settings.discrete) {
+      if (track.getFullVector().getProperties().get(morpheus.VectorKeys.DISCRETE)) {
         var colorMap = _this.vectorNameToColorMap.get(track.getName());
         if (colorMap != null) {
           json[track.getName()] = colorMap;
@@ -129,11 +133,11 @@ morpheus.VectorColorModel.prototype = {
     });
     this.vectorNameToColorScheme.forEach(function (colorScheme, name) {
       c.vectorNameToColorScheme.set(name, colorScheme
-      .copy(new morpheus.Project(new morpheus.Dataset({
-        name: '',
-        rows: 1,
-        columns: 1
-      }))));
+        .copy(new morpheus.Project(new morpheus.Dataset({
+          name: '',
+          rows: 1,
+          columns: 1
+        }))));
     });
     return c;
   },
@@ -143,7 +147,7 @@ morpheus.VectorColorModel.prototype = {
   },
   containsDiscreteColor: function (vector, value) {
     var metadataValueToColorMap = this.vectorNameToColorMap.get(vector
-    .getName());
+      .getName());
     if (metadataValueToColorMap === undefined) {
       return false;
     }
@@ -173,13 +177,14 @@ morpheus.VectorColorModel.prototype = {
         columns: 1
       })), {
       type: 'fixed',
-      map: [{
-        value: min,
-        color: colorbrewer.Greens[3][0]
-      }, {
-        value: max,
-        color: colorbrewer.Greens[3][2]
-      }]
+      map: [
+        {
+          value: min,
+          color: colorbrewer.Greens[3][0]
+        }, {
+          value: max,
+          color: colorbrewer.Greens[3][2]
+        }]
     });
     this.vectorNameToColorScheme.set(vector.getName(), cs);
     return cs;
@@ -189,7 +194,7 @@ morpheus.VectorColorModel.prototype = {
     var color = morpheus.VectorColorModel.getStandardColor(value);
     if (color == null) { // try to reuse existing color map
       var existingMetadataValueToColorMap = this.vectorNameToColorMap
-      .values();
+        .values();
       for (var i = 0, length = existingMetadataValueToColorMap.length; i < length; i++) {
         color = existingMetadataValueToColorMap[i].get(value);
         if (color !== undefined) {
@@ -208,7 +213,7 @@ morpheus.VectorColorModel.prototype = {
   },
   getMappedValue: function (vector, value) {
     var metadataValueToColorMap = this.vectorNameToColorMap.get(vector
-    .getName());
+      .getName());
     if (metadataValueToColorMap === undefined) {
       metadataValueToColorMap = new morpheus.Map();
       this.vectorNameToColorMap.set(vector.getName(),
@@ -260,7 +265,7 @@ morpheus.VectorColorModel.prototype = {
   },
   setMappedValue: function (vector, value, color) {
     var metadataValueToColorMap = this.vectorNameToColorMap.get(vector
-    .getName());
+      .getName());
     if (metadataValueToColorMap === undefined) {
       metadataValueToColorMap = new morpheus.Map();
       this.vectorNameToColorMap.set(vector.getName(),

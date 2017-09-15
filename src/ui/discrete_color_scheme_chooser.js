@@ -1,22 +1,13 @@
 morpheus.DiscreteColorSchemeChooser = function (options) {
   var formBuilder = new morpheus.FormBuilder();
   var map = options.colorScheme.scale;
-  var html = ['<select name="colorPicker" class="selectpicker" data-live-search="true">'];
-  map.forEach(function (val, key) {
-    html.push('<option');
-    html.push(' value="');
-    html.push(key);
-    html.push('">');
-    html.push(key);
-    html.push('</option>');
-  });
-  html.push('</select>');
+
   formBuilder.append({
     name: 'selected_value',
-    type: 'custom',
-    value: html.join('')
+    type: 'bootstrap-select',
+    options: map.keys()
   });
-  var $select = formBuilder.$form.find('[name=colorPicker]');
+  var $select = formBuilder.find('selected_value');
   formBuilder.append({
     style: 'max-width:50px;',
     name: 'selected_color',
@@ -24,7 +15,7 @@ morpheus.DiscreteColorSchemeChooser = function (options) {
   });
   var selectedVal = $select.val();
   var _this = this;
-  var $color = formBuilder.$form.find('[name=selected_color]');
+  var $color = formBuilder.find('selected_color');
   $color.val(map.get(selectedVal));
   $color.on('change', function (e) {
     var color = $(this).val();
@@ -34,16 +25,12 @@ morpheus.DiscreteColorSchemeChooser = function (options) {
       color: color
     });
   });
-  $select.selectpicker().change(function () {
-    // var optionIndex = sel.prop("selectedIndex");
+  $select.on('change', function () {
     selectedVal = $select.val();
     var c = map.get(selectedVal);
     $color.val(c);
   });
   this.$div = formBuilder.$form;
 };
-morpheus.DiscreteColorSchemeChooser.prototype = {
-  dispose: function () {
-  }
-};
+morpheus.DiscreteColorSchemeChooser.prototype = {};
 morpheus.Util.extend(morpheus.DiscreteColorSchemeChooser, morpheus.Events);

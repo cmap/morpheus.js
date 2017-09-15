@@ -13,6 +13,8 @@ morpheus.Project = function (dataset) {
   this.columnColorModel = new morpheus.VectorColorModel();
   this.rowShapeModel = new morpheus.VectorShapeModel();
   this.columnShapeModel = new morpheus.VectorShapeModel();
+  this.rowFontModel = new morpheus.VectorFontModel();
+  this.columnFontModel = new morpheus.VectorFontModel();
   this.hoverColumnIndex = -1;
   this.hoverRowIndex = -1;
   this.columnSelectionModel = new morpheus.SelectionModel(this, true);
@@ -21,8 +23,8 @@ morpheus.Project = function (dataset) {
   this.symmetricProjectListener = null;
   morpheus.Project._recomputeCalculatedColumnFields(this.originalDataset, morpheus.VectorKeys.RECOMPUTE_FUNCTION_NEW_HEAT_MAP);
   morpheus.Project
-  ._recomputeCalculatedColumnFields(new morpheus.TransposedDatasetView(
-    this.originalDataset), morpheus.VectorKeys.RECOMPUTE_FUNCTION_NEW_HEAT_MAP);
+    ._recomputeCalculatedColumnFields(new morpheus.TransposedDatasetView(
+      this.originalDataset), morpheus.VectorKeys.RECOMPUTE_FUNCTION_NEW_HEAT_MAP);
 };
 morpheus.Project.Events = {
   DATASET_CHANGED: 'datasetChanged',
@@ -99,6 +101,12 @@ morpheus.Project.prototype = {
   },
   getColumnShapeModel: function () {
     return this.columnShapeModel;
+  },
+  getRowFontModel: function () {
+    return this.rowFontModel;
+  },
+  getColumnFontModel: function () {
+    return this.columnFontModel;
   },
   getGroupRows: function () {
     return this.groupRows;
@@ -185,7 +193,7 @@ morpheus.Project.prototype = {
   getSortedFilteredDataset: function () {
     return morpheus.DatasetUtil.slicedView(this.getFullDataset(),
       this.rowIndexMapper.convertToView(), this.columnIndexMapper
-      .convertToView());
+        .convertToView());
   },
   getSelectedDataset: function (options) {
     options = $.extend({}, {
