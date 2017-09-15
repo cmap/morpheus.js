@@ -238,11 +238,11 @@ morpheus.VectorTrack.prototype = {
           delete settings.render;
         }
       }
-      if (!this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT) &&
-        (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR) || this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT))) {
-        settings.display.push(morpheus.VectorTrack.RENDER.TEXT);
-      }
       this.settings = settings;
+    }
+    if (!this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT) &&
+      (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR) || this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT))) {
+      settings.display.push(morpheus.VectorTrack.RENDER.TEXT);
     }
     this._update();
 
