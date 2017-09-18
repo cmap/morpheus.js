@@ -6657,7 +6657,7 @@ morpheus.Dataset = function (options) {
 
   this.seriesNames.push(options.name);
   this.seriesArrays.push(options.array ? options.array : morpheus.Dataset
-  .createArray(options));
+    .createArray(options));
   this.seriesDataTypes.push(options.dataType);
 };
 /**
@@ -6691,7 +6691,7 @@ morpheus.Dataset.toJSON = function (dataset, options) {
       }
     }
   }
-  var vectortoJSON = function (vector) {
+  var vectorToJSON = function (vector) {
     var array = [];
     for (var i = 0, size = vector.size(); i < size; i++) {
       array[i] = vector.getValue(i);
@@ -6719,12 +6719,14 @@ morpheus.Dataset.toJSON = function (dataset, options) {
     }
     for (var i = 0, count = metadata.getMetadataCount(); i < count; i++) {
       var v = metadata.get(i);
-      if (filter) {
-        if (filter.has(v.getName())) {
-          vectors.push(vectortoJSON(v));
+      if (!v.getProperties().has(morpheus.VectorKeys.IS_INDEX)) {
+        if (filter) {
+          if (filter.has(v.getName())) {
+            vectors.push(vectorToJSON(v));
+          }
+        } else {
+          vectors.push(vectorToJSON(v));
         }
-      } else {
-        vectors.push(vectortoJSON(v));
       }
     }
     return vectors;
@@ -11093,6 +11095,9 @@ morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION = 'morpheus.recompute.funct.sel
 
 /**Number format spec/function */
 morpheus.VectorKeys.FORMATTER = 'morpheus.formatter';
+
+/* Indicates that a "fake" vector to show row/column number */
+morpheus.VectorKeys.IS_INDEX = 'morpheus.isIndex';
 
 /** Whether vector values should be treated discretely or continuously */
 morpheus.VectorKeys.DISCRETE = 'morpheus.discrete';
@@ -28870,20 +28875,18 @@ morpheus.HeatMap.prototype = {
     json.showRowNumber = this.isShowRowNumber();
 
     // annotation shapes
-    json.rowShapeModel = this.getProject().getRowShapeModel().toJSON(this.rowTracks);
-    json.columnShapeModel = this.getProject().getColumnShapeModel().toJSON(this.columnTracks);
+    json.rowShapeModel = this.getProject().getRowShapeModel().toJSON(this.getVisibleTracks(false));
+    json.columnShapeModel = this.getProject().getColumnShapeModel().toJSON(this.getVisibleTracks(true));
 
     // annotation font
-    json.rowFontModel = this.getProject().getRowFontModel().toJSON(this.rowTracks);
-    json.columnFontModel = this.getProject().getColumnFontModel().toJSON(this.columnTracks);
+    json.rowFontModel = this.getProject().getRowFontModel().toJSON(this.getVisibleTracks(false));
+    json.columnFontModel = this.getProject().getColumnFontModel().toJSON(this.getVisibleTracks(true));
 
     // annotation colors
-    json.rowColorModel = this.getProject().getRowColorModel().toJSON(this.rowTracks);
-    json.columnColorModel = this.getProject().getColumnColorModel().toJSON(this.columnTracks);
+    json.rowColorModel = this.getProject().getRowColorModel().toJSON(this.getVisibleTracks(false));
+    json.columnColorModel = this.getProject().getColumnColorModel().toJSON(this.getVisibleTracks(true));
     // annotation display
-    json.rows = this.rowTracks.filter(function (track) {
-      return track.isVisible();
-    }).map(function (track) {
+    json.rows = this.getVisibleTracks(false).map(function (track) {
       var size = morpheus.CanvasUtil.getPreferredSize(_this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), false), false));
       var obj = track.settings;
       obj.field = track.getName();
@@ -28892,9 +28895,7 @@ morpheus.HeatMap.prototype = {
       };
       return obj;
     });
-    json.columns = this.columnTracks.filter(function (track) {
-      return track.isVisible();
-    }).map(function (track) {
+    json.columns = this.getVisibleTracks(true).map(function (track) {
       var size = morpheus.CanvasUtil.getPreferredSize(_this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), true), true));
       var obj = track.settings;
       obj.field = track.getName();
@@ -30915,14 +30916,15 @@ morpheus.HeatMap.prototype = {
   }
   ,
   getVisibleTrackNames: function (isColumns) {
-    var names = [];
+    this.getVisibleTracks(isColumns).map(function (track) {
+      return track.name;
+    });
+  },
+  getVisibleTracks: function (isColumns) {
     var tracks = isColumns ? this.columnTracks : this.rowTracks;
-    for (var i = 0, length = tracks.length; i < length; i++) {
-      if (tracks[i].isVisible() && tracks[i].getFullVector() != null) { // don't return row #
-        names.push(tracks[i].name);
-      }
-    }
-    return names;
+    return tracks.filter(function (track) {
+      return track.isVisible() && !track.getFullVector().getProperties().has(morpheus.VectorKeys.IS_INDEX);
+    });
   },
   isShowRowNumber: function () {
     return this.options.showRowNumber;
@@ -30942,7 +30944,12 @@ morpheus.HeatMap.prototype = {
         return v;
       };
       track.getFullVector = function () {
-
+        var v = new morpheus.AbstractVector('#', this.project.getFullDataset().getRowCount());
+        v.getProperties().set(morpheus.VectorKeys.FORMATTER, {pattern: 'i'});
+        v.getValue = function (index) {
+          return index + 1;
+        };
+        return v;
       };
 
       track.showPopup = function (e, isHeader) {
@@ -35906,11 +35913,11 @@ morpheus.VectorTrack.prototype = {
           delete settings.render;
         }
       }
-      if (!this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT) &&
-        (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR) || this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT))) {
-        settings.display.push(morpheus.VectorTrack.RENDER.TEXT);
-      }
       this.settings = settings;
+    }
+    if (!this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT) &&
+      (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR) || this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT))) {
+      settings.display.push(morpheus.VectorTrack.RENDER.TEXT);
     }
     this._update();
 

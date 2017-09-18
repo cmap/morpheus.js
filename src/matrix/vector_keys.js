@@ -28,6 +28,9 @@ morpheus.VectorKeys.RECOMPUTE_FUNCTION_SELECTION = 'morpheus.recompute.funct.sel
 /**Number format spec/function */
 morpheus.VectorKeys.FORMATTER = 'morpheus.formatter';
 
+/* Indicates that a "fake" vector to show row/column number */
+morpheus.VectorKeys.IS_INDEX = 'morpheus.isIndex';
+
 /** Whether vector values should be treated discretely or continuously */
 morpheus.VectorKeys.DISCRETE = 'morpheus.discrete';
 

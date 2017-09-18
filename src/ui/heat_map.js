@@ -1117,20 +1117,18 @@ morpheus.HeatMap.prototype = {
     json.showRowNumber = this.isShowRowNumber();
 
     // annotation shapes
-    json.rowShapeModel = this.getProject().getRowShapeModel().toJSON(this.rowTracks);
-    json.columnShapeModel = this.getProject().getColumnShapeModel().toJSON(this.columnTracks);
+    json.rowShapeModel = this.getProject().getRowShapeModel().toJSON(this.getVisibleTracks(false));
+    json.columnShapeModel = this.getProject().getColumnShapeModel().toJSON(this.getVisibleTracks(true));
 
     // annotation font
-    json.rowFontModel = this.getProject().getRowFontModel().toJSON(this.rowTracks);
-    json.columnFontModel = this.getProject().getColumnFontModel().toJSON(this.columnTracks);
+    json.rowFontModel = this.getProject().getRowFontModel().toJSON(this.getVisibleTracks(false));
+    json.columnFontModel = this.getProject().getColumnFontModel().toJSON(this.getVisibleTracks(true));
 
     // annotation colors
-    json.rowColorModel = this.getProject().getRowColorModel().toJSON(this.rowTracks);
-    json.columnColorModel = this.getProject().getColumnColorModel().toJSON(this.columnTracks);
+    json.rowColorModel = this.getProject().getRowColorModel().toJSON(this.getVisibleTracks(false));
+    json.columnColorModel = this.getProject().getColumnColorModel().toJSON(this.getVisibleTracks(true));
     // annotation display
-    json.rows = this.rowTracks.filter(function (track) {
-      return track.isVisible();
-    }).map(function (track) {
+    json.rows = this.getVisibleTracks(false).map(function (track) {
       var size = morpheus.CanvasUtil.getPreferredSize(_this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), false), false));
       var obj = track.settings;
       obj.field = track.getName();
@@ -1139,9 +1137,7 @@ morpheus.HeatMap.prototype = {
       };
       return obj;
     });
-    json.columns = this.columnTracks.filter(function (track) {
-      return track.isVisible();
-    }).map(function (track) {
+    json.columns = this.getVisibleTracks(true).map(function (track) {
       var size = morpheus.CanvasUtil.getPreferredSize(_this.getTrackHeaderByIndex(_this.getTrackIndex(track.getName(), true), true));
       var obj = track.settings;
       obj.field = track.getName();
@@ -3162,14 +3158,15 @@ morpheus.HeatMap.prototype = {
   }
   ,
   getVisibleTrackNames: function (isColumns) {
-    var names = [];
+    this.getVisibleTracks(isColumns).map(function (track) {
+      return track.name;
+    });
+  },
+  getVisibleTracks: function (isColumns) {
     var tracks = isColumns ? this.columnTracks : this.rowTracks;
-    for (var i = 0, length = tracks.length; i < length; i++) {
-      if (tracks[i].isVisible() && tracks[i].getFullVector() != null) { // don't return row #
-        names.push(tracks[i].name);
-      }
-    }
-    return names;
+    return tracks.filter(function (track) {
+      return track.isVisible() && !track.getFullVector().getProperties().has(morpheus.VectorKeys.IS_INDEX);
+    });
   },
   isShowRowNumber: function () {
     return this.options.showRowNumber;
@@ -3189,7 +3186,12 @@ morpheus.HeatMap.prototype = {
         return v;
       };
       track.getFullVector = function () {
-
+        var v = new morpheus.AbstractVector('#', this.project.getFullDataset().getRowCount());
+        v.getProperties().set(morpheus.VectorKeys.FORMATTER, {pattern: 'i'});
+        v.getValue = function (index) {
+          return index + 1;
+        };
+        return v;
       };
 
       track.showPopup = function (e, isHeader) {
