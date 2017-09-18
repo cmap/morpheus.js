@@ -734,7 +734,7 @@ morpheus.SortKey.fromJSON = function (project, json) {
       if (key.preservesDendrogram != null) {
         sortKey.setPreservesDendrogram(key.preservesDendrogram);
       }
-      if (key.lockOrder !== 0) {
+      if (key.lockOrder != null && key.lockOrder !== 0) {
         sortKey.setLockOrder(key.lockOrder);
         sortKey.setUnlockable(key.unlockable);
       }

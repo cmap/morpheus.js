@@ -44,7 +44,7 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
   var cs = json.stepped ? new morpheus.SteppedColorSupplier()
     : new morpheus.GradientColorSupplier();
 
-  if (json.scalingMode == null) {
+  if (json.scalingMode == null && json.type != null) {
     json.scalingMode = json.type; // old
   }
   if (json.scalingMode === 'relative' || json.scalingMode === 0) {
