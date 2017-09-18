@@ -20,12 +20,15 @@ morpheus.HeatMapTrackFontLegend.prototype = {
       var vector = tracks[i].getVector(tracks[i].settings.fontField);
       var map = model.getMap(vector.getName());
 
-      map.forEach(function (color, key) {
-        var width = context.measureText(key).width;
-        if (!isNaN(width)) {
-          maxWidth = Math.max(maxWidth, width);
+      map.forEach(function (font, key) {
+        // skip normal font weight
+        if (font != null && font.weight != '400') {
+          var width = context.measureText(key).width;
+          if (!isNaN(width)) {
+            maxWidth = Math.max(maxWidth, width);
+          }
+          ypix += 14;
         }
-        ypix += 14;
       });
 
       xpix += maxWidth + 6;
@@ -61,13 +64,16 @@ morpheus.HeatMapTrackFontLegend.prototype = {
       var map = model.getMap(fontVector.getName());
       var values = map.keys().sort(morpheus.SortKey.ASCENDING_COMPARATOR);
       values.forEach(function (key) {
-        context.font = model.getMappedValue(fontVector, key).weight + ' ' + font;
-        var width = context.measureText(key).width;
-        if (!isNaN(width)) {
-          maxWidth = Math.max(maxWidth, width);
+        var mappedFont = model.getMappedValue(fontVector, key);
+        if (mappedFont != null && mappedFont.weight != '400') {
+          context.font = mappedFont.weight + ' ' + font;
+          var width = context.measureText(key).width;
+          if (!isNaN(width)) {
+            maxWidth = Math.max(maxWidth, width);
+          }
+          context.fillText(key, xpix, ypix);
+          ypix += 14;
         }
-        context.fillText(key, xpix, ypix);
-        ypix += 14;
       });
 
       xpix += maxWidth + 6; // space between tracks

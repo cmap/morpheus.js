@@ -27494,10 +27494,14 @@ morpheus.HeatMapTrackColorLegend.prototype = {
               maxWidth = Math.max(maxWidth, textWidth);
             }
             context.fillStyle = color;
-            context.fillRect(xpix, ypix, 12, 12);
-            context.strokeRect(xpix, ypix, 12, 12);
-            context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
-            context.fillText(key, xpix + 16, ypix);
+            var xoffset = 0;
+            if (tracks[i].isRenderAs(morpheus.VectorTrack.RENDER.COLOR)) {
+              context.fillRect(xpix, ypix, 12, 12);
+              context.strokeRect(xpix, ypix, 12, 12);
+              context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
+              xoffset = 16;
+            }
+            context.fillText(key, xpix + xoffset, ypix);
             ypix += 14;
           }
         });
@@ -27539,12 +27543,15 @@ morpheus.HeatMapTrackFontLegend.prototype = {
       var vector = tracks[i].getVector(tracks[i].settings.fontField);
       var map = model.getMap(vector.getName());
 
-      map.forEach(function (color, key) {
-        var width = context.measureText(key).width;
-        if (!isNaN(width)) {
-          maxWidth = Math.max(maxWidth, width);
+      map.forEach(function (font, key) {
+        // skip normal font weight
+        if (font != null && font.weight != '400') {
+          var width = context.measureText(key).width;
+          if (!isNaN(width)) {
+            maxWidth = Math.max(maxWidth, width);
+          }
+          ypix += 14;
         }
-        ypix += 14;
       });
 
       xpix += maxWidth + 6;
@@ -27580,13 +27587,16 @@ morpheus.HeatMapTrackFontLegend.prototype = {
       var map = model.getMap(fontVector.getName());
       var values = map.keys().sort(morpheus.SortKey.ASCENDING_COMPARATOR);
       values.forEach(function (key) {
-        context.font = model.getMappedValue(fontVector, key).weight + ' ' + font;
-        var width = context.measureText(key).width;
-        if (!isNaN(width)) {
-          maxWidth = Math.max(maxWidth, width);
+        var mappedFont = model.getMappedValue(fontVector, key);
+        if (mappedFont != null && mappedFont.weight != '400') {
+          context.font = mappedFont.weight + ' ' + font;
+          var width = context.measureText(key).width;
+          if (!isNaN(width)) {
+            maxWidth = Math.max(maxWidth, width);
+          }
+          context.fillText(key, xpix, ypix);
+          ypix += 14;
         }
-        context.fillText(key, xpix, ypix);
-        ypix += 14;
       });
 
       xpix += maxWidth + 6; // space between tracks
@@ -31325,13 +31335,12 @@ morpheus.HeatMap.prototype = {
       //   .getColorScheme().getNames().length * 14
       //   : 40;
     }
-
-    context.save();
     var legendOffset = 15;
-    context.translate(legendOffset, legendHeight);
     var maxLegendHeight = 0;
-    // column color legend
+
+    // color legend
     context.save();
+    context.translate(legendOffset, legendHeight);
     var trackLegend = new morpheus.HeatMapTrackColorLegend(
       _.filter(
         this.columnTracks,
@@ -31340,13 +31349,14 @@ morpheus.HeatMap.prototype = {
             && (track.isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || track.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR));
         }), this.getProject().getColumnColorModel());
     trackLegend.draw({}, context);
-    context.restore();
     var legendSize = trackLegend.getPreferredSize();
+    legendOffset += legendSize.width;
     maxLegendHeight = Math.max(maxLegendHeight, legendSize.height);
+    context.restore();
 
     // shape legend
     context.save();
-    context.translate(legendOffset + legendSize.width, legendHeight);
+    context.translate(legendOffset, legendHeight);
     trackLegend = new morpheus.HeatMapTrackShapeLegend(
       _.filter(
         this.columnTracks,
@@ -31355,13 +31365,14 @@ morpheus.HeatMap.prototype = {
             && (track.isRenderAs(morpheus.VectorTrack.RENDER.SHAPE));
         }), this.getProject().getColumnShapeModel());
     trackLegend.draw({}, context);
-    context.restore();
     legendSize = trackLegend.getPreferredSize();
+    legendOffset += legendSize.width;
     maxLegendHeight = Math.max(maxLegendHeight, legendSize.height);
+    context.restore();
 
     // font legend
     context.save();
-    context.translate(legendOffset + legendSize.width, legendHeight);
+    context.translate(legendOffset, legendHeight);
     trackLegend = new morpheus.HeatMapTrackFontLegend(
       _.filter(
         this.columnTracks,
@@ -31370,13 +31381,14 @@ morpheus.HeatMap.prototype = {
             && (track.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT));
         }), this.getProject().getColumnFontModel());
     trackLegend.draw({}, context);
-    context.restore();
     legendSize = trackLegend.getPreferredSize();
+    legendOffset += legendSize.width;
     maxLegendHeight = Math.max(maxLegendHeight, legendSize.height);
+    context.restore();
 
     // row color legend
     context.save();
-    context.translate(legendOffset + legendSize.width, legendHeight);
+    context.translate(legendOffset, legendHeight);
     trackLegend = new morpheus.HeatMapTrackColorLegend(
       _.filter(
         this.rowTracks,
@@ -31385,13 +31397,14 @@ morpheus.HeatMap.prototype = {
             && (track.isRenderAs(morpheus.VectorTrack.RENDER.COLOR) || track.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR));
         }), this.getProject().getRowColorModel());
     trackLegend.draw({}, context);
-    context.restore();
     legendSize = trackLegend.getPreferredSize();
+    legendOffset += legendSize.width;
     maxLegendHeight = Math.max(maxLegendHeight, legendSize.height);
+    context.restore();
 
     // shape legend
     context.save();
-    context.translate(legendOffset + legendSize.width, legendHeight);
+    context.translate(legendOffset, legendHeight);
     trackLegend = new morpheus.HeatMapTrackShapeLegend(
       _.filter(
         this.rowTracks,
@@ -31400,13 +31413,14 @@ morpheus.HeatMap.prototype = {
             && (track.isRenderAs(morpheus.VectorTrack.RENDER.SHAPE));
         }), this.getProject().getRowShapeModel());
     trackLegend.draw({}, context);
-    context.restore();
     legendSize = trackLegend.getPreferredSize();
+    legendOffset += legendSize.width;
     maxLegendHeight = Math.max(maxLegendHeight, legendSize.height);
+    context.restore();
 
     // font legend
     context.save();
-    context.translate(legendOffset + legendSize.width, legendHeight);
+    context.translate(legendOffset, legendHeight);
     trackLegend = new morpheus.HeatMapTrackFontLegend(
       _.filter(
         this.rowTracks,
@@ -31415,9 +31429,10 @@ morpheus.HeatMap.prototype = {
             && (track.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT));
         }), this.getProject().getRowFontModel());
     trackLegend.draw({}, context);
-    context.restore();
     legendSize = trackLegend.getPreferredSize();
+    legendOffset += legendSize.width;
     maxLegendHeight = Math.max(maxLegendHeight, legendSize.height);
+    context.restore();
 
     legendHeight += maxLegendHeight;
 

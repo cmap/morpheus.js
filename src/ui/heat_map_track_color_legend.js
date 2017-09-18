@@ -77,10 +77,14 @@ morpheus.HeatMapTrackColorLegend.prototype = {
               maxWidth = Math.max(maxWidth, textWidth);
             }
             context.fillStyle = color;
-            context.fillRect(xpix, ypix, 12, 12);
-            context.strokeRect(xpix, ypix, 12, 12);
-            context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
-            context.fillText(key, xpix + 16, ypix);
+            var xoffset = 0;
+            if (tracks[i].isRenderAs(morpheus.VectorTrack.RENDER.COLOR)) {
+              context.fillRect(xpix, ypix, 12, 12);
+              context.strokeRect(xpix, ypix, 12, 12);
+              context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
+              xoffset = 16;
+            }
+            context.fillText(key, xpix + xoffset, ypix);
             ypix += 14;
           }
         });
