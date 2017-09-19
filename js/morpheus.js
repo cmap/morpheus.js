@@ -12041,14 +12041,13 @@ morpheus.SampleDatasets.getTcgaDataset = function (options) {
   }
 
   datasetOptions.mrnaClust = baseUrl + 'bestclus.txt';
-
-  // datasetOptions.columnAnnotations = [
-  //   {
-  //     file: baseUrl + 'All_CDEs.txt',
-  //     datasetField: 'participant_id',
-  //     fileField: 'patient_id', // e.g. tcga-5l-aat0
-  //     transposed: false
-  //   }];
+  datasetOptions.columnAnnotations = [
+    {
+      file: baseUrl + 'All_CDEs.txt',
+      datasetField: 'participant_id',
+      fileField: 'patient_id', // e.g. tcga-5l-aat0
+      transposed: false
+    }];
   return morpheus.TcgaUtil.getDataset(datasetOptions);
 
 };
