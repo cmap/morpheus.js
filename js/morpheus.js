@@ -16695,6 +16695,9 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
       var ltf = function () {
         return true;
       };
+      if (condition.seriesName == null) {
+        condition.seriesName = condition.series; // series is deprecated
+      }
       if (condition.v1 != null && !isNaN(condition.v1)) {
         gtf = condition.v1Op === 'gt' ? function (val) {
           return val > condition.v1;
@@ -19517,7 +19520,7 @@ morpheus.ConditionalRenderingUI = function (heatmap) {
     // add after
     var index = $row.index();
     var condition = {
-      series: null,
+      seriesName: null,
       color: 'rgb(0,0,0)',
       shape: null,
       inheritColor: true,
@@ -19569,13 +19572,13 @@ morpheus.ConditionalRenderingUI.prototype = {
     // shape: shapes and line
     // color: if no color cell is drawn using this shape, otherwise draw
     // shape on top of cell
-    // series name
+    // seriesName name
     // value >= x and <= x
     var html = [];
     html.push('<div style="border-top:1px solid LightGrey;padding-bottom:6px;padding-top:6px;"' +
       ' class="morpheus-entry">');
     html.push('<form class="form-horizontal">');
-    // series
+    // seriesName
     html.push('<div class="form-group">');
     html
       .push('<label class="col-xs-2">Series</label>');
@@ -19650,7 +19653,7 @@ morpheus.ConditionalRenderingUI.prototype = {
     var $inherit_color = $el.find('[name=inherit_color]');
     $color.prop('disabled', condition.inheritColor);
     $color.val(condition.color);
-    $series.val(condition.series);
+    $series.val(condition.seriesName);
     shapeField.setShapeValue(condition.shape);
     if (condition.v1 != null && !isNaN(condition.v1)) {
       $v1.val(condition.v1);
@@ -19724,10 +19727,10 @@ morpheus.ConditionalRenderingUI.prototype = {
       _this.heatmap.revalidate();
     });
     $series.on('change', function (e) {
-      condition.series = $(this).val();
+      condition.seriesName = $(this).val();
       _this.heatmap.revalidate();
     });
-    condition.series = $series.val();
+    condition.seriesName = $series.val();
     return $el;
 
   }
@@ -23600,7 +23603,7 @@ morpheus.HeatMapColorScheme.ScalingMode = {
 
 morpheus.HeatMapConditions = function () {
   this.array = [];
-  // each condition is a object with: series, shape, color and
+  // each condition is a object with: seriesName (series is old deprecated field), shape, color and
   // accept(val) function
 
 };
@@ -24284,7 +24287,7 @@ morpheus.HeatMapElementCanvas.prototype = {
           conditions = colorScheme.getConditions().getConditions();
           for (var ci = 0, nconditions = conditions.length; ci < nconditions; ci++) {
             conditionSeriesIndices
-              .push(seriesNameToIndex[conditions[ci].series]);
+              .push(seriesNameToIndex[conditions[ci].seriesName]);
           }
 
         }

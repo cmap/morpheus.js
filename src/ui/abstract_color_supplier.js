@@ -123,6 +123,9 @@ morpheus.AbstractColorSupplier.fromJSON = function (json) {
       var ltf = function () {
         return true;
       };
+      if (condition.seriesName == null) {
+        condition.seriesName = condition.series; // series is deprecated
+      }
       if (condition.v1 != null && !isNaN(condition.v1)) {
         gtf = condition.v1Op === 'gt' ? function (val) {
           return val > condition.v1;

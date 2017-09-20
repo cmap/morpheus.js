@@ -8,7 +8,7 @@ morpheus.ConditionalRenderingUI = function (heatmap) {
     // add after
     var index = $row.index();
     var condition = {
-      series: null,
+      seriesName: null,
       color: 'rgb(0,0,0)',
       shape: null,
       inheritColor: true,
@@ -60,13 +60,13 @@ morpheus.ConditionalRenderingUI.prototype = {
     // shape: shapes and line
     // color: if no color cell is drawn using this shape, otherwise draw
     // shape on top of cell
-    // series name
+    // seriesName name
     // value >= x and <= x
     var html = [];
     html.push('<div style="border-top:1px solid LightGrey;padding-bottom:6px;padding-top:6px;"' +
       ' class="morpheus-entry">');
     html.push('<form class="form-horizontal">');
-    // series
+    // seriesName
     html.push('<div class="form-group">');
     html
       .push('<label class="col-xs-2">Series</label>');
@@ -141,7 +141,7 @@ morpheus.ConditionalRenderingUI.prototype = {
     var $inherit_color = $el.find('[name=inherit_color]');
     $color.prop('disabled', condition.inheritColor);
     $color.val(condition.color);
-    $series.val(condition.series);
+    $series.val(condition.seriesName);
     shapeField.setShapeValue(condition.shape);
     if (condition.v1 != null && !isNaN(condition.v1)) {
       $v1.val(condition.v1);
@@ -215,10 +215,10 @@ morpheus.ConditionalRenderingUI.prototype = {
       _this.heatmap.revalidate();
     });
     $series.on('change', function (e) {
-      condition.series = $(this).val();
+      condition.seriesName = $(this).val();
       _this.heatmap.revalidate();
     });
-    condition.series = $series.val();
+    condition.seriesName = $series.val();
     return $el;
 
   }

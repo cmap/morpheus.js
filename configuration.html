@@ -357,7 +357,9 @@
                 <div class="description">Array of colors</div>
               </li>
               <li>size<code>Object</code>
-                <div class="description">Optional object that describes how to size an element in the heat map</div>
+                <div class="description">Optional object that describes the mapping of value to size for an element in
+                  the heat map
+                </div>
                 <ul>
                   <li>seriesName<code>String</code>
                     <div class="description">Dataset series name to map value to size</div>
@@ -370,6 +372,44 @@
                   </li>
                 </ul>
               </li>
+              <li>conditions<code>[Object]</code>
+                <div class="description">Optional array of objects that describe the mapping of value to shape for
+                  an element in the heat map
+                </div>
+                <ul>
+                  <li>seriesName<code>String</code>
+                    <div class="description">Dataset series name to map value to a condition</div>
+                  </li>
+                  <li>color<code>String</code>
+                    <div class="description">Shape color</div>
+                  </li>
+                  <li>shape<code>String</code>
+                    <div class="description">Shape name ("circle", "square", "diamond", "triangle-up",
+                      "triangle-down", "triangle-left", "triangle-right")
+                    </div>
+                  </li>
+                  <li>inheritColor<code>Boolean</code>
+                    <div class="description">Whether shape inherits color from color scheme</div>
+                  </li>
+                  <li>color<code>String</code>
+                    <div class="description">Shape color when inheritColor is false</div>
+                  </li>
+                  <li>v1<code>Number</code>
+                    <div class="description">Condition one value</div>
+                  </li>
+                  <li>v2<code>Number</code>
+                    <div class="description">Condition two value</div>
+                  </li>
+                  <li>v1Op<code>String</code>
+                    <div class="description">Condition one operation ("gte", "gt")</div>
+                  </li>
+                  <li>v2Op<code>Number</code>
+                    <div class="description">Condition two operation ("lte", "lt")</div>
+                  </li>
+
+                </ul>
+              </li>
+
             </ul>
             <div class="example">
               <div class="description">Use a fixed

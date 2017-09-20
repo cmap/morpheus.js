@@ -118,7 +118,7 @@ morpheus.HeatMapColorScheme.ScalingMode = {
 
 morpheus.HeatMapConditions = function () {
   this.array = [];
-  // each condition is a object with: series, shape, color and
+  // each condition is a object with: seriesName (series is old deprecated field), shape, color and
   // accept(val) function
 
 };
