@@ -33,9 +33,6 @@ morpheus.HeatMapOptions = function (heatMap) {
           name: 'MAF',
           value: 'MAF'
         }, {
-          name: 'fixed (-1, -0.5, 0.5, 1)',
-          value: '-1_to_1'
-        }, {
           name: 'fixed (-1.5, -0.1, 0.1, 1.5)',
           value: 'cn'
         }]
@@ -506,71 +503,30 @@ morpheus.HeatMapOptions = function (heatMap) {
       function (e) {
         var val = $(this).val();
         if (val !== '') {
-          if (val === 'gene') {
+          if (val === 'relative') {
             heatMap.heatmap
               .getColorScheme()
               .setColorSupplierForCurrentValue(
-                morpheus.HeatMapColorScheme
-                  .createColorSupplier(morpheus.HeatMapColorScheme.Predefined
-                    .RELATIVE()));
+                morpheus.AbstractColorSupplier.fromJSON(morpheus.HeatMapColorScheme.Predefined
+                  .RELATIVE()));
           } else if (val === 'cn') {
             heatMap.heatmap
               .getColorScheme()
               .setColorSupplierForCurrentValue(
-                morpheus.HeatMapColorScheme
-                  .createColorSupplier(morpheus.HeatMapColorScheme.Predefined
-                    .CN()));
-          } else if (val === 'wtcs') {
-            heatMap.heatmap.getColorScheme()
-              .setColorSupplierForCurrentValue(
-                morpheus.HeatMapColorScheme
-                  .createColorSupplier({
-                    type: 'fixed',
-                    map: [
-                      {
-                        value: -1,
-                        color: 'blue'
-                      }, {
-                        value: -0.5,
-                        color: 'white'
-                      }, {
-                        value: 0.5,
-                        color: 'white'
-                      }, {
-                        value: 1,
-                        color: 'red'
-                      }]
-                  }));
+                morpheus.AbstractColorSupplier.fromJSON(morpheus.HeatMapColorScheme.Predefined
+                  .CN()));
           } else if (val === 'MAF') {
             heatMap.heatmap
               .getColorScheme()
               .setColorSupplierForCurrentValue(
-                morpheus.HeatMapColorScheme
-                  .createColorSupplier(morpheus.HeatMapColorScheme.Predefined
-                    .MAF()));
+                morpheus.AbstractColorSupplier.fromJSON(morpheus.HeatMapColorScheme.Predefined
+                  .MAF()));
           } else if (val === 'binary') {
             heatMap.heatmap
               .getColorScheme()
               .setColorSupplierForCurrentValue(
-                morpheus.HeatMapColorScheme
-                  .createColorSupplier(morpheus.HeatMapColorScheme.Predefined
-                    .BINARY()));
-          } else if (val === '100scale1') {
-            heatMap.heatmap
-              .getColorScheme()
-              .setColorSupplierForCurrentValue(
-                morpheus.HeatMapColorScheme
-                  .createColorSupplier(morpheus.HeatMapColorScheme.Predefined
-                    .SUMMLY()));
-
-          } else if (val === '100scale2') {
-            heatMap.heatmap
-              .getColorScheme()
-              .setColorSupplierForCurrentValue(
-                morpheus.HeatMapColorScheme
-                  .createColorSupplier(morpheus.HeatMapColorScheme.Predefined
-                    .SUMMLY2()));
-
+                morpheus.AbstractColorSupplier.fromJSON(morpheus.HeatMapColorScheme.Predefined
+                  .BINARY()));
           } else {
             console.log('not found');
           }
