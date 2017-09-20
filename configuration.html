@@ -356,7 +356,20 @@
               <li>colors<code>Boolean</code>
                 <div class="description">Array of colors</div>
               </li>
-
+              <li>size<code>Object</code>
+                <div class="description">Optional object that describes how to size an element in the heat map</div>
+                <ul>
+                  <li>seriesName<code>String</code>
+                    <div class="description">Dataset series name to map value to size</div>
+                  </li>
+                  <li>min<code>Number</code>
+                    <div class="description">Minimum value in series used for mapping value to size</div>
+                  </li>
+                  <li>max<code>Number</code>
+                    <div class="description">Maximum value in series used for mapping value to size</div>
+                  </li>
+                </ul>
+              </li>
             </ul>
             <div class="example">
               <div class="description">Use a fixed
@@ -508,23 +521,6 @@
           </div>
         </li>
 
-
-        <li><a data-toggle="collapse" href="#overrideDefaults"
-               aria-expanded="false"
-               aria-controls="overrideDefaults">overrideRowDefaults
-          /overrideColumnDefaults</a>
-          <div id="overrideDefaults" class="collapse">
-            <ul>
-              <li><code>Boolean</code> (default: true)
-                <div class="description">Whether to override default row/column
-                  display when <a href="#metadata">rows
-                    /columns</a> is specified.
-                </div>
-
-              </li>
-            </ul>
-          </div>
-        </li>
         <li><a data-toggle="collapse" href="#metadata"
                aria-expanded="false"
                aria-controls="metadata">rows/columns</a>
