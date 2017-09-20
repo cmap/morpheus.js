@@ -141,7 +141,7 @@ morpheus.SampleDatasets = function (options) {
       var disease = diseases[i];
       tcga.push('<div>');
       tcga.push('<a data-toggle="collapse" href="#' + id + '" aria-expanded="false"' +
-        ' aria-controls="' + id + '">' + disease.name + '</a>');
+        ' aria-controls="' + id + '">' + disease.name + ' (' + disease.type + ')</a>');
       tcga.push('<div class="collapse" id="' + id + '">');
 
       for (var j = 0; j < morpheus.SampleDatasets.TCGA_DISEASE_TYPES_INFO.length; j++) {
