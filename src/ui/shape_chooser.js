@@ -17,7 +17,7 @@ morpheus.ShapeChooser = function (options) {
     value: html.join('')
   });
 
-  var shapeField = new morpheus.ShapeField();
+  var shapeField = new morpheus.ShapeField({showNone: true});
 
   formBuilder.append({
     style: 'max-width:50px;',

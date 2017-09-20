@@ -35,12 +35,12 @@ morpheus.ConditionalRenderingUI = function (heatmap) {
   });
   var html = [];
   html
-  .push('<div class="morpheus-entry">');
+    .push('<div class="morpheus-entry">');
   html.push('<div class="row">');
   html
-  .push('<div style="padding-bottom:20px;" class="col-xs-8"><a class="btn btn-default btn-xs"' +
-    ' role="button"' +
-    ' data-name="add" href="#">Add Condition</a></div>');
+    .push('<div style="padding-bottom:20px;" class="col-xs-8"><a class="btn btn-default btn-xs"' +
+      ' role="button"' +
+      ' data-name="add" href="#">Add Condition</a></div>');
 
   html.push('</div>');
   html.push('</div>');
@@ -69,12 +69,12 @@ morpheus.ConditionalRenderingUI.prototype = {
     // series
     html.push('<div class="form-group">');
     html
-    .push('<label class="col-xs-2">Series</label>');
+      .push('<label class="col-xs-2">Series</label>');
     html.push('<div class="col-xs-6">');
     html
-    .push('<select class="form-control morpheus-form-control-inline" name="cond_series">');
+      .push('<select class="form-control morpheus-form-control-inline" name="cond_series">');
     html.push(morpheus.Util.createOptions(morpheus.DatasetUtil
-    .getSeriesNames(this.heatmap.getProject().getFullDataset())));
+      .getSeriesNames(this.heatmap.getProject().getFullDataset())));
     html.push('</select>');
     html.push('</div>');
     html.push('</div>');
@@ -84,23 +84,21 @@ morpheus.ConditionalRenderingUI.prototype = {
     html.push('<label class="col-xs-2">Condition</label>');
     html.push('<div class="col-xs-6">');
     html
-    .push('<select class="form-control morpheus-form-control-inline" name="lower"><option value="gte">&gt;=</option><option value="gt">&gt;</option></select>');
+      .push('<select class="form-control morpheus-form-control-inline" name="lower"><option value="gte">&gt;=</option><option value="gt">&gt;</option></select>');
     html
-    .push('<input class="form-control morpheus-form-control-inline" name="v1" size="5" type="text">');
+      .push('<input class="form-control morpheus-form-control-inline" name="v1" size="5" type="text">');
     html.push('<span style="margin-right:1em;">and</span>');
     html
-    .push('<select class="form-control morpheus-form-control-inline" name="upper"><option value="lte">&lt;=</option><option value="lt">&lt;</option></select>');
+      .push('<select class="form-control morpheus-form-control-inline" name="upper"><option value="lte">&lt;=</option><option value="lt">&lt;</option></select>');
     html
-    .push('<input class="form-control morpheus-form-control-inline" name="v2" size="5" type="text">');
+      .push('<input class="form-control morpheus-form-control-inline" name="v2" size="5" type="text">');
     html.push('</div>');
     html.push('</div>');
 
     // shape
     html.push('<div class="form-group">');
     html.push('<label class="col-xs-2">Shape</label>');
-    var shapeField = new morpheus.ShapeField(['circle', 'square',
-      'diamond', 'triangle-up', 'triangle-down', 'triangle-left',
-      'triangle-right']);
+    var shapeField = new morpheus.ShapeField({shapes: morpheus.VectorShapeModel.FILLED_SHAPES, showNone: false});
     html.push('<div class="col-xs-4">');
     html.push('<div style="display:inline;" data-name="shapeHolder"></div>');
     html.push('</div>');
@@ -117,18 +115,22 @@ morpheus.ConditionalRenderingUI.prototype = {
     html.push('<label class="col-xs-2">Color</label>');
     html.push('<div class="col-xs-4">');
     html
-    .push('<input class="form-control" type="color" name="color" style="display:inline;' +
-      ' width:6em;" disabled>');
+      .push('<input class="form-control" type="color" name="color" style="display:inline;' +
+        ' width:6em;" disabled>');
     html.push('</div>');
     html.push('</div>');
 
     html.push('<div class="row"><div class="col-xs-11">');
     html
-    .push('<a class="btn btn-default btn-xs" role="button" data-name="delete"' +
-      ' href="#">Delete Condition</a>');
+      .push('<a class="btn btn-default btn-xs" role="button" data-name="delete"' +
+        ' href="#">Delete Condition</a>');
     html.push('</div></div>');
     html.push('</div>'); // morpheus-entry
     var $el = $(html.join(''));
+    console.log($el.find('form').length);
+    $el.find('form').on('submit', function (e) {
+      e.preventDefault();
+    });
     shapeField.$el.appendTo($el.find('[data-name=shapeHolder]'));
     var $color = $el.find('[name=color]');
     var $series = $el.find('[name=cond_series]');
@@ -149,6 +151,7 @@ morpheus.ConditionalRenderingUI.prototype = {
     }
     $v1Op.val(condition.v1Op);
     $v2Op.val(condition.v2Op);
+
     function updateAccept() {
       var v1 = parseFloat($($v1).val());
       var v2 = parseFloat($($v2).val());
@@ -166,18 +169,18 @@ morpheus.ConditionalRenderingUI.prototype = {
       };
       if (!isNaN(v1)) {
         gtf = v1Op === 'gt' ? function (val) {
-            return val > v1;
-          } : function (val) {
-            return val >= v1;
-          };
+          return val > v1;
+        } : function (val) {
+          return val >= v1;
+        };
       }
 
       if (!isNaN(v2)) {
         ltf = v2Op === 'lt' ? function (val) {
-            return val < v2;
-          } : function (val) {
-            return val <= v2;
-          };
+          return val < v2;
+        } : function (val) {
+          return val <= v2;
+        };
       }
       condition.accept = function (val) {
         return gtf(val) && ltf(val);

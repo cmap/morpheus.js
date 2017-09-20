@@ -6,14 +6,11 @@ morpheus.VectorShapeModel = function () {
 morpheus.VectorShapeModel.SHAPES = [
   'circle', 'square', 'plus', 'x',
   'asterisk', 'diamond', 'triangle-up', 'triangle-down', 'triangle-left',
-  'triangle-right', 'minus'];
-morpheus.VectorShapeModel.STANDARD_SHAPES = {
-  cp: 'diamond',
-  oe: 'plus',
-  pcl: 'asterisk',
-  kd: 'minus',
-  ctrl: 'circle'
-};
+  'triangle-right', 'circle-minus'];
+
+morpheus.VectorShapeModel.FILLED_SHAPES = [
+  'circle', 'square', 'diamond', 'triangle-up', 'triangle-down', 'triangle-left',
+  'triangle-right'];
 
 morpheus.VectorShapeModel.prototype = {
   toJSON: function (tracks) {
@@ -55,11 +52,6 @@ morpheus.VectorShapeModel.prototype = {
   _getShapeForValue: function (value) {
     if (value == null) {
       return 'none';
-    }
-    var str = value.toString().toLowerCase();
-    var mapped = morpheus.VectorShapeModel.STANDARD_SHAPES[str];
-    if (mapped !== undefined) {
-      return mapped;
     }
 
     // try to reuse existing map

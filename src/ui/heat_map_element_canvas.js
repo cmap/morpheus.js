@@ -345,7 +345,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 
     var conditions;
     var conditionSeriesIndices;
-    var minSize = 2;
+    var sizeFractionRemapper = d3.scale.linear().domain([0, 1]).range([0.2, 1]);
     for (var row = top; row < bottom; row++) {
       var rowSize = rowPositions.getItemSize(row);
       var py = rowPositions.getPosition(row);
@@ -376,9 +376,12 @@ morpheus.HeatMapElementCanvas.prototype = {
           var sizeByValue = dataset.getValue(row, column,
             sizeBySeriesIndex);
           if (!isNaN(sizeByValue)) {
-            var f = sizer.valueToFraction(sizeByValue);
-            cellRowSize = Math.min(rowSize, Math.max(minSize, cellRowSize * f));
-            yoffset = rowSize - cellRowSize;
+            var sizeFraction = sizeFractionRemapper(sizer.valueToFraction(sizeByValue)); // remap 0-1 to 0.2-1
+            cellRowSize = cellRowSize * sizeFraction;
+            yoffset = (rowSize - cellRowSize) / 2;
+
+            cellColumnSize = cellColumnSize * sizeFraction;
+            xoffset = (columnSize - cellColumnSize) / 2;
 
           }
         }
@@ -399,17 +402,16 @@ morpheus.HeatMapElementCanvas.prototype = {
             if (condition.shape != null) {
               if (condition.inheritColor) {
                 if (sizeBySeriesIndex === undefined) {
-                  xoffset = 0.5;
-                  yoffset = 0.5;
-                  cellRowSize -= 1;
-                  cellColumnSize -= 1;
+                  xoffset = 1;
+                  yoffset = 1;
+                  cellRowSize -= 2;
+                  cellColumnSize -= 2;
                 }
                 var x = px + xoffset + cellRowSize / 2;
                 var y = py + yoffset + cellColumnSize / 2;
                 morpheus.CanvasUtil.drawShape(context, condition.shape,
-                  x, y, Math.min(cellColumnSize, cellRowSize) / 2);
-                context.fill();
-              } else {
+                  x, y, Math.min(cellColumnSize, cellRowSize) / 2, true);
+              } else { // e.g. filled circle on top of heat map
                 context.fillRect(px + xoffset, py + yoffset, cellColumnSize,
                   cellRowSize);
                 // x and y are at center
@@ -417,8 +419,7 @@ morpheus.HeatMapElementCanvas.prototype = {
                 var y = py + yoffset + cellColumnSize / 2;
                 context.fillStyle = condition.color;
                 morpheus.CanvasUtil.drawShape(context, condition.shape,
-                  x, y, Math.min(cellColumnSize, cellRowSize) / 4);
-                context.fill();
+                  x, y, Math.min(cellColumnSize, cellRowSize) / 4, true);
               }
 
             } else {

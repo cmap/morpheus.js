@@ -11121,14 +11121,11 @@ morpheus.VectorShapeModel = function () {
 morpheus.VectorShapeModel.SHAPES = [
   'circle', 'square', 'plus', 'x',
   'asterisk', 'diamond', 'triangle-up', 'triangle-down', 'triangle-left',
-  'triangle-right', 'minus'];
-morpheus.VectorShapeModel.STANDARD_SHAPES = {
-  cp: 'diamond',
-  oe: 'plus',
-  pcl: 'asterisk',
-  kd: 'minus',
-  ctrl: 'circle'
-};
+  'triangle-right', 'circle-minus'];
+
+morpheus.VectorShapeModel.FILLED_SHAPES = [
+  'circle', 'square', 'diamond', 'triangle-up', 'triangle-down', 'triangle-left',
+  'triangle-right'];
 
 morpheus.VectorShapeModel.prototype = {
   toJSON: function (tracks) {
@@ -11170,11 +11167,6 @@ morpheus.VectorShapeModel.prototype = {
   _getShapeForValue: function (value) {
     if (value == null) {
       return 'none';
-    }
-    var str = value.toString().toLowerCase();
-    var mapped = morpheus.VectorShapeModel.STANDARD_SHAPES[str];
-    if (mapped !== undefined) {
-      return mapped;
     }
 
     // try to reuse existing map
@@ -18711,12 +18703,12 @@ morpheus.CanvasUtil.setBounds = function (canvas, bounds) {
   }
 };
 
-morpheus.CanvasUtil.drawShape = function (context, shape, x, y, size2) {
+morpheus.CanvasUtil.drawShape = function (context, shape, x, y, size2, isFill) {
   if (size2 < 0) {
     return;
   }
   context.beginPath();
-  if (shape === 'minus') {
+  if (shape === 'circle-minus') {
     context.arc(x, y, size2, 0, 2 * Math.PI, false);
     context.moveTo(x - size2, y);
     context.lineTo(x + size2, y);
@@ -18790,7 +18782,7 @@ morpheus.CanvasUtil.drawShape = function (context, shape, x, y, size2) {
     context.lineTo(x - size2, y - size2);
     context.lineTo(x + size2, y);
   }
-  context.stroke();
+  isFill ? context.fill() : context.stroke();
 
 };
 morpheus.CanvasUtil.drawLine = function (context, x1, y1, x2, y2) {
@@ -19552,12 +19544,12 @@ morpheus.ConditionalRenderingUI = function (heatmap) {
   });
   var html = [];
   html
-  .push('<div class="morpheus-entry">');
+    .push('<div class="morpheus-entry">');
   html.push('<div class="row">');
   html
-  .push('<div style="padding-bottom:20px;" class="col-xs-8"><a class="btn btn-default btn-xs"' +
-    ' role="button"' +
-    ' data-name="add" href="#">Add Condition</a></div>');
+    .push('<div style="padding-bottom:20px;" class="col-xs-8"><a class="btn btn-default btn-xs"' +
+      ' role="button"' +
+      ' data-name="add" href="#">Add Condition</a></div>');
 
   html.push('</div>');
   html.push('</div>');
@@ -19586,12 +19578,12 @@ morpheus.ConditionalRenderingUI.prototype = {
     // series
     html.push('<div class="form-group">');
     html
-    .push('<label class="col-xs-2">Series</label>');
+      .push('<label class="col-xs-2">Series</label>');
     html.push('<div class="col-xs-6">');
     html
-    .push('<select class="form-control morpheus-form-control-inline" name="cond_series">');
+      .push('<select class="form-control morpheus-form-control-inline" name="cond_series">');
     html.push(morpheus.Util.createOptions(morpheus.DatasetUtil
-    .getSeriesNames(this.heatmap.getProject().getFullDataset())));
+      .getSeriesNames(this.heatmap.getProject().getFullDataset())));
     html.push('</select>');
     html.push('</div>');
     html.push('</div>');
@@ -19601,23 +19593,21 @@ morpheus.ConditionalRenderingUI.prototype = {
     html.push('<label class="col-xs-2">Condition</label>');
     html.push('<div class="col-xs-6">');
     html
-    .push('<select class="form-control morpheus-form-control-inline" name="lower"><option value="gte">&gt;=</option><option value="gt">&gt;</option></select>');
+      .push('<select class="form-control morpheus-form-control-inline" name="lower"><option value="gte">&gt;=</option><option value="gt">&gt;</option></select>');
     html
-    .push('<input class="form-control morpheus-form-control-inline" name="v1" size="5" type="text">');
+      .push('<input class="form-control morpheus-form-control-inline" name="v1" size="5" type="text">');
     html.push('<span style="margin-right:1em;">and</span>');
     html
-    .push('<select class="form-control morpheus-form-control-inline" name="upper"><option value="lte">&lt;=</option><option value="lt">&lt;</option></select>');
+      .push('<select class="form-control morpheus-form-control-inline" name="upper"><option value="lte">&lt;=</option><option value="lt">&lt;</option></select>');
     html
-    .push('<input class="form-control morpheus-form-control-inline" name="v2" size="5" type="text">');
+      .push('<input class="form-control morpheus-form-control-inline" name="v2" size="5" type="text">');
     html.push('</div>');
     html.push('</div>');
 
     // shape
     html.push('<div class="form-group">');
     html.push('<label class="col-xs-2">Shape</label>');
-    var shapeField = new morpheus.ShapeField(['circle', 'square',
-      'diamond', 'triangle-up', 'triangle-down', 'triangle-left',
-      'triangle-right']);
+    var shapeField = new morpheus.ShapeField({shapes: morpheus.VectorShapeModel.FILLED_SHAPES, showNone: false});
     html.push('<div class="col-xs-4">');
     html.push('<div style="display:inline;" data-name="shapeHolder"></div>');
     html.push('</div>');
@@ -19634,18 +19624,22 @@ morpheus.ConditionalRenderingUI.prototype = {
     html.push('<label class="col-xs-2">Color</label>');
     html.push('<div class="col-xs-4">');
     html
-    .push('<input class="form-control" type="color" name="color" style="display:inline;' +
-      ' width:6em;" disabled>');
+      .push('<input class="form-control" type="color" name="color" style="display:inline;' +
+        ' width:6em;" disabled>');
     html.push('</div>');
     html.push('</div>');
 
     html.push('<div class="row"><div class="col-xs-11">');
     html
-    .push('<a class="btn btn-default btn-xs" role="button" data-name="delete"' +
-      ' href="#">Delete Condition</a>');
+      .push('<a class="btn btn-default btn-xs" role="button" data-name="delete"' +
+        ' href="#">Delete Condition</a>');
     html.push('</div></div>');
     html.push('</div>'); // morpheus-entry
     var $el = $(html.join(''));
+    console.log($el.find('form').length);
+    $el.find('form').on('submit', function (e) {
+      e.preventDefault();
+    });
     shapeField.$el.appendTo($el.find('[data-name=shapeHolder]'));
     var $color = $el.find('[name=color]');
     var $series = $el.find('[name=cond_series]');
@@ -19666,6 +19660,7 @@ morpheus.ConditionalRenderingUI.prototype = {
     }
     $v1Op.val(condition.v1Op);
     $v2Op.val(condition.v2Op);
+
     function updateAccept() {
       var v1 = parseFloat($($v1).val());
       var v2 = parseFloat($($v2).val());
@@ -19683,18 +19678,18 @@ morpheus.ConditionalRenderingUI.prototype = {
       };
       if (!isNaN(v1)) {
         gtf = v1Op === 'gt' ? function (val) {
-            return val > v1;
-          } : function (val) {
-            return val >= v1;
-          };
+          return val > v1;
+        } : function (val) {
+          return val >= v1;
+        };
       }
 
       if (!isNaN(v2)) {
         ltf = v2Op === 'lt' ? function (val) {
-            return val < v2;
-          } : function (val) {
-            return val <= v2;
-          };
+          return val < v2;
+        } : function (val) {
+          return val <= v2;
+        };
       }
       condition.accept = function (val) {
         return gtf(val) && ltf(val);
@@ -24270,7 +24265,7 @@ morpheus.HeatMapElementCanvas.prototype = {
 
     var conditions;
     var conditionSeriesIndices;
-    var minSize = 2;
+    var sizeFractionRemapper = d3.scale.linear().domain([0, 1]).range([0.2, 1]);
     for (var row = top; row < bottom; row++) {
       var rowSize = rowPositions.getItemSize(row);
       var py = rowPositions.getPosition(row);
@@ -24301,9 +24296,12 @@ morpheus.HeatMapElementCanvas.prototype = {
           var sizeByValue = dataset.getValue(row, column,
             sizeBySeriesIndex);
           if (!isNaN(sizeByValue)) {
-            var f = sizer.valueToFraction(sizeByValue);
-            cellRowSize = Math.min(rowSize, Math.max(minSize, cellRowSize * f));
-            yoffset = rowSize - cellRowSize;
+            var sizeFraction = sizeFractionRemapper(sizer.valueToFraction(sizeByValue)); // remap 0-1 to 0.2-1
+            cellRowSize = cellRowSize * sizeFraction;
+            yoffset = (rowSize - cellRowSize) / 2;
+
+            cellColumnSize = cellColumnSize * sizeFraction;
+            xoffset = (columnSize - cellColumnSize) / 2;
 
           }
         }
@@ -24324,17 +24322,16 @@ morpheus.HeatMapElementCanvas.prototype = {
             if (condition.shape != null) {
               if (condition.inheritColor) {
                 if (sizeBySeriesIndex === undefined) {
-                  xoffset = 0.5;
-                  yoffset = 0.5;
-                  cellRowSize -= 1;
-                  cellColumnSize -= 1;
+                  xoffset = 1;
+                  yoffset = 1;
+                  cellRowSize -= 2;
+                  cellColumnSize -= 2;
                 }
                 var x = px + xoffset + cellRowSize / 2;
                 var y = py + yoffset + cellColumnSize / 2;
                 morpheus.CanvasUtil.drawShape(context, condition.shape,
-                  x, y, Math.min(cellColumnSize, cellRowSize) / 2);
-                context.fill();
-              } else {
+                  x, y, Math.min(cellColumnSize, cellRowSize) / 2, true);
+              } else { // e.g. filled circle on top of heat map
                 context.fillRect(px + xoffset, py + yoffset, cellColumnSize,
                   cellRowSize);
                 // x and y are at center
@@ -24342,8 +24339,7 @@ morpheus.HeatMapElementCanvas.prototype = {
                 var y = py + yoffset + cellColumnSize / 2;
                 context.fillStyle = condition.color;
                 morpheus.CanvasUtil.drawShape(context, condition.shape,
-                  x, y, Math.min(cellColumnSize, cellRowSize) / 4);
-                context.fill();
+                  x, y, Math.min(cellColumnSize, cellRowSize) / 4, true);
               }
 
             } else {
@@ -32864,7 +32860,7 @@ morpheus.ShapeChooser = function (options) {
     value: html.join('')
   });
 
-  var shapeField = new morpheus.ShapeField();
+  var shapeField = new morpheus.ShapeField({showNone: true});
 
   formBuilder.append({
     style: 'max-width:50px;',
@@ -32898,18 +32894,29 @@ morpheus.ShapeChooser.prototype = {};
 
 morpheus.Util.extend(morpheus.ShapeChooser, morpheus.Events);
 
-morpheus.ShapeField = function (shapes) {
-  shapes = shapes || morpheus.VectorShapeModel.SHAPES;
+/**
+ *
+ * @param options.shapes Array of shape names or null to use morpheus.VectorShapeModel.SHAPES
+ * @param options.showNone Whether none should be an option
+ * @constructor
+ */
+morpheus.ShapeField = function (options) {
+  var shapes = options.shapes || morpheus.VectorShapeModel.SHAPES;
+
   var _this = this;
   var html = [];
   var size2 = 8;
   var x = 4;
   var y = 4;
   html
-  .push('<div style="margin-bottom:1em;" class="btn-group">');
+    .push('<div style="margin-bottom:1em;" class="btn-group">');
   html
-  .push('<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span data-name="selection"></span> <span class="fa fa-caret-down"></span></button>');
+    .push(
+      '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span data-name="selection"></span> <span class="fa fa-caret-down"></span></button>');
   html.push('<ul class="dropdown-menu" role="menu">');
+  if (options.showNone) {
+    html.push('<li><a data-name="none" href="#">(None)</a></li>');
+  }
   for (var i = 0; i < shapes.length; i++) {
     var context = new C2S(size2 * 2, size2 * 2);
     context.translate(4, 4);
@@ -32918,11 +32925,12 @@ morpheus.ShapeField = function (shapes) {
     html.push('<li><a data-name="' + shapes[i] + '" href="#">' + svg
       + '</a></li>');
   }
-  html.push('<li><a data-name="none" href="#">(None)</a></li>');
+
   html.push('</ul></div>');
   var $el = $(html.join(''));
   var $header = $el.find('[data-name=selection]');
   $el.on('click', 'li > a', function (e) {
+    e.preventDefault();
     var shape = $(this).data('name');
     setShapeValue(shape);
     _this.trigger('change', {
