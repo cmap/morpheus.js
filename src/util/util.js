@@ -868,6 +868,7 @@ morpheus.Util.sheetToArray = function (sheet, delim) {
   }
   for (var R = r.s.r; R <= r.e.r; ++R) {
     var row = [];
+    var isRowEmpty = true;
     for (var C = r.s.c; C <= r.e.c; ++C) {
       var val = sheet[XLSX.utils.encode_cell({
         c: C,
@@ -877,7 +878,7 @@ morpheus.Util.sheetToArray = function (sheet, delim) {
         row.push('');
         continue;
       }
-
+      isRowEmpty = false;
       var txt = String(XLSX.utils.format_cell(val));
       if (val.s != null && val.s.fgColor != null) {
         var color = '#' + val.s.fgColor.rgb;
@@ -889,9 +890,10 @@ morpheus.Util.sheetToArray = function (sheet, delim) {
       }
       row.push(txt);
     }
-    rows.push(delim ? row.join(delim) : row);
+    if (!isRowEmpty) {
+      rows.push(delim ? row.join(delim) : row);
+    }
   }
-
   rows.colors = colors;
   return rows;
 };
