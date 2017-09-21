@@ -42,8 +42,8 @@
       <h2 style="padding-left: 4px; display:inline-block;">Configuration</h2>
       <p class="text-muted">Load Morpheus with a pre-configured matrix</p>
       <p>
-        The Morpheus website the request parameters <code>json</code>,
-        a URI encoded JSON configuration object and <code>url</code>, a URL to a
+        Pass the request parameters <code>json</code>,
+        a URI encoded JSON configuration object or <code>url</code>, a URL to a
         JSON configuration file. <br/> Please note that the correct HTTP <a target="_blank"
                                                                             href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a>
         headers must be set if any of your resources are hosted on a
@@ -181,20 +181,6 @@
               <li><code>Number|String</code> (default: 13)
                 <div class="description">Heat map row size in pixels or 'fit' to fit
                   heat map to current height.
-                </div>
-
-              </li>
-            </ul>
-          </div>
-        </li>
-        <li><a data-toggle="collapse" href="#el"
-               aria-expanded="false"
-               aria-controls="el">el</a>
-          <div id="el" class="collapse">
-            <ul>
-              <li><code>Element</code>
-                <div class="description">The element in which to render to the
-                  heat map.
                 </div>
 
               </li>
@@ -651,6 +637,22 @@
 
           </div>
         </li>
+
+        <li><a data-toggle="collapse" href="#el"
+               aria-expanded="false"
+               aria-controls="el">el</a>
+          <div id="el" class="collapse">
+            <ul>
+              <li><code>Element</code>
+                <div class="description">The element in which to render to the
+                  heat map.
+                </div>
+
+              </li>
+            </ul>
+          </div>
+        </li>
+
       </ul>
     </div>
   </div>
