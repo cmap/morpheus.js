@@ -30057,6 +30057,7 @@ morpheus.HeatMap.prototype = {
       options.tooltipSeriesIndices = this.options.tooltipSeriesIndices;
     }
     if (options.heatMapLens) {
+      var maxSelectedCount = 20;
       // don't draw lens if currently visible
       // row lens
       var $wrapper = $('<div></div>');
@@ -30064,11 +30065,20 @@ morpheus.HeatMap.prototype = {
       var wrapperWidth = 0;
       var found = false;
       var inline = [];
+      var indicesForLens = [];
+      // only draw heat map lens if less than maxSelectedCount indices selected
       if (rowIndex != null && rowIndex.length > 0) {
         for (var hoverIndex = 0; hoverIndex < rowIndex.length; hoverIndex++) {
           var row = rowIndex[hoverIndex];
           if (row >= 0 && (row >= this.heatmap.lastPosition.bottom || row < this.heatmap.lastPosition.top)) {
-            found = true;
+            indicesForLens.push(row);
+          } else {
+            inline.push(row);
+          }
+        }
+        if (indicesForLens.length < maxSelectedCount) {
+          for (var hoverIndex = 0; hoverIndex < indicesForLens.length; hoverIndex++) {
+            var row = indicesForLens[hoverIndex];
             var heatMapWidth = this.heatmap.getUnscaledWidth();
             var top = row; // Math.max(0, rowIndex - 1);
             var bottom = row + 1; //Math.min(rowIndex + 1, this.heatmap.rowPositions.getLength());
@@ -30127,35 +30137,40 @@ morpheus.HeatMap.prototype = {
             canvas.style.top = wrapperHeight + 'px';
             wrapperHeight += parseFloat(canvas.style.height);
             wrapperWidth = parseFloat(canvas.style.width);
-          } else {
-            inline.push(row);
+
           }
-
         }
-        if (found) {
-          $wrapper.css({
-            height: wrapperHeight,
-            width: wrapperWidth
-          });
 
-          var rect = this.$parent[0].getBoundingClientRect();
-          this.$tipFollow.html($wrapper).css({
-            display: '',
-            left: Math.round(parseFloat(this.heatmap.canvas.style.left) - 1) + 'px',
-            top: (options.event.clientY - rect.top - wrapperHeight / 2) + 'px'
-          });
+        if (indicesForLens.length > 0) {
+          if (indicesForLens.length < maxSelectedCount) {
+            $wrapper.css({
+              height: wrapperHeight,
+              width: wrapperWidth
+            });
+
+            var rect = this.$parent[0].getBoundingClientRect();
+            this.$tipFollow.html($wrapper).css({
+              display: '',
+              left: Math.round(parseFloat(this.heatmap.canvas.style.left) - 1) + 'px',
+              top: (options.event.clientY - rect.top - wrapperHeight / 2) + 'px'
+            });
+          } else {
+            this.$tipFollow.html('');
+          }
           return;
         } else {
           var tipText = [];
           var tipFollowText = [];
-          for (var hoverIndex = 0; hoverIndex < inline.length; hoverIndex++) {
-            this.tooltipProvider(this, inline[hoverIndex], -1,
-              options, this.options.tooltipMode === 0 ? '&nbsp;&nbsp;&nbsp;'
-                : '<br />', false, tipText);
-            if (this.options.inlineTooltip) {
+          if (inline.length < maxSelectedCount) {
+            for (var hoverIndex = 0; hoverIndex < inline.length; hoverIndex++) {
               this.tooltipProvider(this, inline[hoverIndex], -1,
-                options, '<br />', true, tipFollowText);
+                options, this.options.tooltipMode === 0 ? '&nbsp;&nbsp;&nbsp;'
+                  : '<br />', false, tipText);
+              if (this.options.inlineTooltip) {
+                this.tooltipProvider(this, inline[hoverIndex], -1,
+                  options, '<br />', true, tipFollowText);
 
+              }
             }
           }
           var text = tipFollowText.join('');
@@ -30163,11 +30178,18 @@ morpheus.HeatMap.prototype = {
         }
       }
       if (columnIndex != null && columnIndex.length > 0) {
-
         for (var hoverIndex = 0; hoverIndex < columnIndex.length; hoverIndex++) {
           var column = columnIndex[hoverIndex];
           if (column >= 0 && (column >= this.heatmap.lastPosition.right || column < this.heatmap.lastPosition.left)) {
-            found = true;
+            indicesForLens.push(column);
+          } else {
+            inline.push(column);
+          }
+        }
+
+        if (indicesForLens.length < maxSelectedCount) {
+          for (var hoverIndex = 0; hoverIndex < indicesForLens.length; hoverIndex++) {
+            var column = indicesForLens[hoverIndex];
             var heatMapHeight = this.heatmap.getUnscaledHeight();
             var left = column; // Math.max(0, rowIndex - 1);
             var right = column + 1; //Math.min(rowIndex + 1, this.heatmap.rowPositions.getLength());
@@ -30232,34 +30254,38 @@ morpheus.HeatMap.prototype = {
             wrapperWidth += parseFloat(canvas.style.width);
             wrapperHeight = parseFloat(canvas.style.height);
             $(canvas).appendTo($wrapper);
-          } else {
-            inline.push(column);
           }
         }
+        if (indicesForLens.length > 0) {
+          if (indicesForLens.length < maxSelectedCount) {
+            $wrapper.css({
+              height: wrapperHeight,
+              width: wrapperWidth
+            });
 
-        if (found) {
-          $wrapper.css({
-            height: wrapperHeight,
-            width: wrapperWidth
-          });
+            var rect = this.$parent[0].getBoundingClientRect();
+            this.$tipFollow.html($wrapper).css({
+              top: parseFloat(this.heatmap.canvas.style.top) - trackHeight - morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS - 1,
+              left: (options.event.clientX - rect.left) - (wrapperWidth / 2),
+              display: ''
+            });
 
-          var rect = this.$parent[0].getBoundingClientRect();
-          this.$tipFollow.html($wrapper).css({
-            top: parseFloat(this.heatmap.canvas.style.top) - trackHeight - morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS - 1,
-            left: (options.event.clientX - rect.left) - (wrapperWidth / 2),
-            display: ''
-          });
+          } else {
+            this.$tipFollow.html('');
+          }
           return;
         } else {
           var tipText = [];
           var tipFollowText = [];
-          for (var hoverIndex = 0; hoverIndex < inline.length; hoverIndex++) {
-            this.tooltipProvider(this, -1, inline[hoverIndex],
-              options, this.options.tooltipMode === 0 ? '&nbsp;&nbsp;&nbsp;'
-                : '<br />', false, tipText);
-            if (this.options.inlineTooltip) {
+          if (inline.length < maxSelectedCount) {
+            for (var hoverIndex = 0; hoverIndex < inline.length; hoverIndex++) {
               this.tooltipProvider(this, -1, inline[hoverIndex],
-                options, '<br />', true, tipFollowText);
+                options, this.options.tooltipMode === 0 ? '&nbsp;&nbsp;&nbsp;'
+                  : '<br />', false, tipText);
+              if (this.options.inlineTooltip) {
+                this.tooltipProvider(this, -1, inline[hoverIndex],
+                  options, '<br />', true, tipFollowText);
+              }
             }
           }
           var text = tipFollowText.join('');
