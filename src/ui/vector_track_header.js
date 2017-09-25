@@ -1,10 +1,13 @@
 morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
   morpheus.AbstractCanvas.call(this);
+  this.font = {weight: '400'};
   this.project = project;
   this.name = name;
   this.isColumns = isColumns;
   var canvas = this.canvas;
   this.heatMap = heatMap;
+  this.selectedBackgroundColor = '#c8c8c8';
+  this.backgroundColor = 'rgb(255,255,255)';
   var vector = (isColumns ? project.getFullDataset().getColumnMetadata()
     : project.getFullDataset().getRowMetadata()).getByName(name);
   if (vector && vector.getProperties().has(morpheus.VectorKeys.TITLE)) {
@@ -91,8 +94,7 @@ morpheus.VectorTrackHeader = function (project, name, isColumns, heatMap) {
     track.showPopup(e, true);
     return false;
   };
-  this.selectedBackgroundColor = '#c8c8c8';
-  this.backgroundColor = 'rgb(255,255,255)';
+
   $(this.canvas).css({'background-color': this.backgroundColor}).on(
     'mousemove.morpheus', mouseMove).on('mouseout.morpheus', mouseExit)
     .on('mouseenter.morpheus', mouseMove).on('contextmenu.morpheus', showPopup).addClass('morpheus-track-header ' + (isColumns ? 'morpheus-columns' : 'morpheus-rows'));
@@ -355,7 +357,7 @@ morpheus.VectorTrackHeader.prototype = {
   },
   getPrintSize: function () {
     var context = this.canvas.getContext('2d');
-    context.font = this.defaultFontHeight + 'px '
+    context.font = this.fontWeight + ' ' + this.defaultFontHeight + 'px '
       + morpheus.CanvasUtil.getFontFamily(context);
     var textWidth = 4 + context.measureText(this.name).width;
     return {
@@ -468,7 +470,7 @@ morpheus.VectorTrackHeader.prototype = {
     context.textBaseline = 'bottom';
     if (this.isColumns) {
       context.textAlign = 'right';
-      context.font = Math.min(this.defaultFontHeight, clip.height
+      context.font = this.font.weight + ' ' + Math.min(this.defaultFontHeight, clip.height
         - morpheus.VectorTrackHeader.FONT_OFFSET)
         + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
     } else {
@@ -509,11 +511,7 @@ morpheus.VectorTrackHeader.prototype = {
       context.stroke();
       context.textAlign = 'left';
     }
-    var fontHeight = Math.min(this.defaultFontHeight, this
-        .getUnscaledHeight()
-      - morpheus.VectorTrackHeader.FONT_OFFSET);
-    fontHeight = Math.min(fontHeight, morpheus.VectorTrack.MAX_FONT_SIZE);
-    context.font = fontHeight + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
+
     var textWidth = context.measureText(name).width;
     var isColumns = this.isColumns;
     var xpix = this.isColumns ? this.getUnscaledWidth() - 2 : 10;
@@ -542,136 +540,12 @@ morpheus.VectorTrackHeader.prototype = {
         }
       }
     }
-
+    var fontHeight = Math.min(this.defaultFontHeight, this
+        .getUnscaledHeight()
+      - morpheus.VectorTrackHeader.FONT_OFFSET);
+    fontHeight = Math.min(fontHeight, morpheus.VectorTrack.MAX_FONT_SIZE);
+    context.font = this.font.weight + ' ' + fontHeight + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
     context.fillText(name, xpix, ypix);
-    // var vector = (this.isColumns ? this.project.getFullDataset()
-    // .getColumnMetadata() : this.project.getFullDataset()
-    // .getRowMetadata()).getByName(this.name);
-    // if (vector
-    // && vector.getProperties().get(
-    // morpheus.VectorKeys.SHOW_HEADER_SUMMARY)) {
-    // var summary = vector.getProperties().get(
-    // morpheus.VectorKeys.HEADER_SUMMARY);
-    // var track = this.heatMap.getTrack(this.name, this.isColumns);
-    // if (summary == null) {
-    // var visibleFieldIndices = vector.getProperties().get(
-    // morpheus.VectorKeys.VISIBLE_FIELDS);
-    //
-    // if (visibleFieldIndices == null) {
-    // visibleFieldIndices = morpheus.Util
-    // .seq(vector.getProperties().get(
-    // morpheus.VectorKeys.FIELDS).length);
-    // }
-    // var bigArray = [];
-    // var min = Number.MAX_VALUE;
-    // var max = Number.MAX_VALUE;
-    // for (var i = 0, size = vector.size(); i < size; i++) {
-    // var array = vector.getValue(i);
-    // if (array != null) {
-    // for (var j = 0, length = visibleFieldIndices.length; j < length; j++)
-    // {
-    // var value = array[visibleFieldIndices[j]];
-    // if (!isNaN(value)) {
-    // bigArray.push(value);
-    // min = value < min ? value : min;
-    // max = value > max ? value : max;
-    // }
-    // }
-    // }
-    // }
-    // var nbins = Math.ceil(morpheus.Log2(bigArray.length) + 1);
-    // var binSize = (max - min) / nbins;
-    // var binNumberToOccurences = new Uint32Array(nbins);
-    // var maxOccurences = 0;
-    // for (var i = 0, size = bigArray.length; i < size; i++) {
-    // var value = bigArray[i];
-    // var bin = Math.floor((value - min) / binSize);
-    // if (bin < 0) {
-    // bin = 0;
-    // } else if (bin >= binNumberToOccurences.length) {
-    // bin = binNumberToOccurences.length - 1;
-    // }
-    // binNumberToOccurences[bin]++;
-    // maxOccurences = Math.max(maxOccurences,
-    // binNumberToOccurences[bin]);
-    // }
-    // summary = {
-    // box : morpheus.BoxPlotItem(morpheus.VectorUtil
-    // .arrayAsVector(bigArray)),
-    // histogram : {
-    // binSize : binSize,
-    // total : bigArray.length,
-    // binNumberToOccurences : binNumberToOccurences,
-    // maxOccurences : maxOccurences,
-    // min : min,
-    // max : max
-    // }
-    //
-    // };
-    //
-    // vector.getProperties().set(morpheus.VectorKeys.HEADER_SUMMARY,
-    // summary);
-    // }
-    // var box = summary.box;
-    // context.save();
-    // context.translate(1, 0);
-    //
-    // var scale = track.createChartScale(this.getUnscaledWidth() - 2); //
-    // TODO
-    // // make
-    // // sure
-    // // scale
-    // // is
-    // // the
-    // // same
-    // // as
-    // // track
-    // var itemSize = 12;
-    // var pix = 1;
-    // var start = pix + 1;
-    // var end = pix + itemSize - 1;
-    // var center = (start + end) / 2;
-    // var _itemSize = itemSize - 2;
-    // var lineHeight = Math.max(2, _itemSize - 8);
-    // context.fillStyle = 'black';
-    // // box from q1 (25th q) to q3
-    // context.fillRect(Math.min(scale(box.q1), scale(box.q3)), start,
-    // Math.abs(scale(box.q1) - scale(box.q3)), _itemSize);
-    // // draw line from q1 to lav
-    // context.fillRect(Math.min(scale(box.q1),
-    // scale(box.lowerAdjacentValue)), center - lineHeight / 2,
-    // Math.abs(scale(box.q1) - scale(box.lowerAdjacentValue)),
-    // lineHeight);
-    // // draw line from q3 to uav
-    // context.fillRect(Math.min(scale(box.q3),
-    // scale(box.upperAdjacentValue)), center - lineHeight / 2,
-    // Math.abs(scale(box.q3) - scale(box.upperAdjacentValue)),
-    // lineHeight);
-    // var histogram = summary.histogram;
-    // var yscale = d3.scale.linear().domain([ 0, 1 ]).range([ 48, 14 ])
-    // .clamp(true);
-    // var xscale = d3.scale.linear().domain(
-    // [ histogram.min, histogram.max + histogram.binSize ])
-    // .range([ 1, this.getUnscaledWidth() - 2 ]).clamp(true);
-    // // context.beginPath();
-    // // context.moveTo(xscale(0), yscale(0));
-    //
-    // for (var i = 0, nbins = histogram.binNumberToOccurences.length; i <
-    // nbins; i++) {
-    // var n = histogram.binNumberToOccurences[i];
-    // if (n > 0) {
-    // var x = histogram.min + (i * histogram.binSize);
-    // var xend = histogram.min + (i * histogram.binSize)
-    // + histogram.binSize;
-    // var xstart = histogram.min + (i * histogram.binSize);
-    // var ypix = yscale(n / histogram.total);
-    // context.fillRect(xscale(xstart), ypix, xscale(xend)
-    // - xscale(xstart), Math.abs(ypix - yscale(0)));
-    // }
-    // }
-    //
-    // context.restore();
-    // }
     context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
     if (existingSortKeyIndex !== null) {
       // draw arrow
