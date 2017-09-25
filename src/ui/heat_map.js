@@ -1743,7 +1743,10 @@ morpheus.HeatMap.prototype = {
               header.setPrefWidth(option.size.width);
             }
           }
-
+        }
+        if (option.header && option.header.font) {
+          var header = _this.getTrackHeaderByIndex(_this.getTrackIndex(name, isColumns), isColumns);
+          header.font = option.header.font;
         }
         if (option.formatter) {
           v.getProperties().set(morpheus.VectorKeys.FORMATTER, morpheus.Util.createNumberFormat(option.formatter));
