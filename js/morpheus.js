@@ -13441,7 +13441,7 @@ morpheus.CreateAnnotation.prototype = {
     var isColumns = options.input.annotate == 'Columns';
     var __formula = options.input.formula;
     var __dataset = options.input.use_selected_rows_and_columns_only ? __project
-    .getSelectedDataset()
+        .getSelectedDataset()
       : __project.getSortedFilteredDataset();
     if (isColumns) {
       __dataset = morpheus.DatasetUtil.transposedView(__dataset);
@@ -13491,6 +13491,7 @@ morpheus.CreateAnnotation.prototype = {
       }
       __vector.setValue(__index, __val);
     }
+    morpheus.VectorUtil.maybeConvertStringToNumber(__vector);
     __project.trigger('trackChanged', {
       vectors: [__vector],
       display: ['text'],
