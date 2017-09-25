@@ -32,30 +32,22 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
   var mouseHoldTimeout = 50;
 
   function mouseleave(e) {
+
     // listen for mouse hold events
     var scroll = function () {
       var now = new Date().getTime();
       if (now - lastScrollTime >= mouseHoldTimeout) {
         var rect = canvas.getBoundingClientRect();
-        var doPan = true;
+        var doPan = false;
         if (!isColumns) {
-          if (e.clientY > rect.bottom) {
-            e.clientY += 20;
-          } else if (e.clientY < rect.top) {
-            e.clientY -= 20;
-          } else {
-            doPan = false;
+          if (e.clientY > rect.bottom || e.clientY < rect.top) {
+            doPan = true;
           }
         } else {
-          if (e.clientX > rect.right) {
-            e.clientX += 20;
-          } else if (e.clientX < rect.left) {
-            e.clientX -= 20;
-          } else {
-            doPan = false;
+          if (e.clientX > rect.right || e.clientX < rect.left) {
+            doPan = true;
           }
         }
-
         if (doPan) {
           _this.panmove(e);
         }
