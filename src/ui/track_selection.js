@@ -29,38 +29,37 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
   var scrollIntervalId;
   var lastScrollTime = new Date().getTime();
   var _this = this;
-  var mouseHoldTimeout = 50;
+  var throttlePanMove = 50;
 
   function mouseleave(e) {
 
     // listen for mouse hold events
     var scroll = function () {
       var now = new Date().getTime();
-      if (now - lastScrollTime >= mouseHoldTimeout) {
-        var rect = canvas.getBoundingClientRect();
-        var doPan = false;
-        if (!isColumns) {
-          if (e.clientY > rect.bottom || e.clientY < rect.top) {
-            doPan = true;
-          }
-        } else {
-          if (e.clientX > rect.right || e.clientX < rect.left) {
-            doPan = true;
-          }
+      var rect = canvas.getBoundingClientRect();
+      var doPan = false;
+      if (!isColumns) {
+        if (e.clientY > rect.bottom || e.clientY < rect.top) {
+          doPan = true;
         }
-        if (doPan) {
-          _this.panmove(e);
+      } else {
+        if (e.clientX > rect.right || e.clientX < rect.left) {
+          doPan = true;
         }
       }
+      if (doPan) {
+        _this.panmove(e);
+        scrollIntervalId = setTimeout(scroll, throttlePanMove);
+      }
     };
-    scrollIntervalId = setInterval(scroll, mouseHoldTimeout);
+    scrollIntervalId = setTimeout(scroll, throttlePanMove);
     $(canvas).one('mouseover', mouseover);
   }
 
   function mouseover() {
     // on mouse exit, see if mouse held
     // on mouse enter, stop listening
-    clearInterval(scrollIntervalId);
+    clearTimeout(scrollIntervalId);
     $(canvas).one('mouseleave', mouseleave);
   }
 
@@ -80,9 +79,12 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
     .on(
       'panmove',
       this.panmove = function (event) {
-        if (event.srcEvent != null) {
-          lastScrollTime = new Date().getTime();
+        var now = new Date().getTime();
+        var elapsed = now - lastScrollTime;
+        if (elapsed < throttlePanMove) {
+          return;
         }
+
         var position = getPosition(event);
         var endIndex = positions.getIndex(position[coord],
           false);
@@ -102,21 +104,21 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
         selectionModel.setViewIndices(viewIndices, true);
         if (!isColumns) {
           var scrollTop = heatMap.scrollTop();
-          var scrollBottom = scrollTop
-            + heatMap.heatmap.getUnscaledHeight();
-          if (position.y > scrollBottom) {
-            heatMap.scrollTop(scrollTop + 8);
+          var heatMapHeight = heatMap.heatmap.getUnscaledHeight();
+          var scrollBottom = scrollTop + heatMapHeight;
+          if (position.y > scrollBottom) { // scroll down
+            heatMap.scrollTop(position.y + 8 - heatMapHeight);
           } else if (position.y < scrollTop) {
-            heatMap.scrollTop(scrollTop - 8);
+            heatMap.scrollTop(position.y - 8);
           }
         } else {
           var scrollLeft = heatMap.scrollLeft();
-          var scrollRight = scrollLeft
-            + heatMap.heatmap.getUnscaledWidth();
+          var heatMapWidth = heatMap.heatmap.getUnscaledWidth();
+          var scrollRight = scrollLeft + heatMapWidth;
           if (position.x > scrollRight) {
-            heatMap.scrollLeft(scrollLeft + 8);
+            heatMap.scrollLeft(position.x + 8 - heatMapWidth);
           } else if (position.x < scrollLeft) {
-            heatMap.scrollLeft(scrollLeft - 8);
+            heatMap.scrollLeft(position.x - 8);
           }
         }
         event.preventDefault();
@@ -124,6 +126,7 @@ morpheus.TrackSelection = function (track, positions, selectionModel, isColumns,
           event.srcEvent.stopPropagation();
           event.srcEvent.stopImmediatePropagation();
         }
+        lastScrollTime = new Date().getTime();
       })
     .on('panstart', this.panstart = function (event) {
       heatMap.setSelectedTrack(track.name, isColumns);
