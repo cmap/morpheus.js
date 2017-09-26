@@ -12116,8 +12116,20 @@ morpheus.SampleDatasets.prototype = {
     });
   },
   openCCLE: function (options) {
+    var name = [];
+    if (options.sig_genes) {
+      name.push('Mut');
+    }
+    if (options.cn) {
+      name.push('CN');
+    }
+    if (options.mrna) {
+      name.push('Exp');
+    }
+    if (options.ach) {
+      name.push('Ach');
+    }
     this.callback({
-      name: 'CCLE',
       rows: [
         {
           field: 'id',
@@ -12143,7 +12155,8 @@ morpheus.SampleDatasets.prototype = {
           field: 'site',
           display: 'color, highlight'
         }],
-      dataset: morpheus.SampleDatasets.getCCLEDataset(options)
+      dataset: morpheus.SampleDatasets.getCCLEDataset(options),
+      name: 'CCLE - ' + name.join(', ')
     });
   }
 };
