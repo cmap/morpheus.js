@@ -12048,7 +12048,7 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
     datasets.push('https://software.broadinstitute.org/morpheus/preloaded-datasets/CCLE_expression_081117.rpkm.gct');
   }
   if (options.ach) {
-    datasets.push('https://software.broadinstitute.org/morpheus/preloaded-datasets/Achilles_QC_v2.4.3.rnai.Gs.gct');
+    datasets.push('https://software.broadinstitute.org/morpheus/preloaded-datasets/Achilles_v2.20.2_GeneSolutions.gct');
   }
 
   var d = $.Deferred();
