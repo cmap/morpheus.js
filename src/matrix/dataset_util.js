@@ -835,10 +835,10 @@ morpheus.DatasetUtil.join = function (datasets, field) {
   }
   if (datasets.length === 1) {
     var name = datasets[0].getName();
-    // var sourceVector = datasets[0].getRowMetadata().add('Source');
-    // for (var i = 0, size = sourceVector.size(); i < size; i++) {
-    //   sourceVector.setValue(i, name);
-    // }
+    var sourceVector = datasets[0].getRowMetadata().add('Source');
+    for (var i = 0, size = sourceVector.size(); i < size; i++) {
+      sourceVector.setValue(i, name);
+    }
     return datasets[0];
   }
   // take union of all ids
