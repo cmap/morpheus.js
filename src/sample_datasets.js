@@ -225,8 +225,10 @@ morpheus.SampleDatasets.getCCLEDataset = function (options) {
     for (var j = 0, ncols = siteVector.size(); j < ncols; j++) {
       var id = idVector.getValue(j);
       var index = id.indexOf('_');
-      idVector.setValue(j, id.substring(0, index));
-      siteVector.setValue(j, id.substring(index + 1));
+      if (index !== -1) {
+        idVector.setValue(j, id.substring(0, index));
+        siteVector.setValue(j, id.substring(index + 1));
+      }
     }
     d.resolve(dataset);
   }).fail(function (err) {
