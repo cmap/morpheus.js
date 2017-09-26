@@ -39,27 +39,47 @@
           <rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/>
         </g>
       </svg>
-      <h2 style="padding-left: 4px; display:inline-block;">Configuration</h2>
-      <p class="text-muted">Load Morpheus with a pre-configured matrix</p>
+
+      <h2 style="padding-left: 4px; display:inline-block;">Configuration
+        <small>Load Morpheus with a pre-configured
+          matrix
+        </small>
+      </h2>
+
       <p>
-        Pass the request parameters <code>json</code>,
-        a URI encoded JSON configuration object or <code>url</code>, a URL to a
-        JSON configuration file. <br/> Please note that the correct HTTP <a target="_blank"
-                                                                            href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a>
+        There are two options to loading a pre-configured matrix.
+        <br/> <br/>
+        1. Pass the request parameters <code>json</code>, a URI encoded JSON configuration object, or <code>url</code>,
+        a URL to a
+        JSON configuration file, to
+        https://software.broadinstitute.org/morpheus/ (can be embedded using an iframe).
+
+        <br/> Note that the correct HTTP <a target="_blank"
+                                            href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a>
         headers must be set if any of your resources are hosted on a
-        different domain.<br/> <a href="#" name="open">Example</a><br/>
+        different domain.
+
+        <br/> <a href="#" name="open">Example</a><br/>
         <code>
           {
           columnAnnotations : [ { file :
-          "//s3.amazonaws.com/data.clue.io/morpheus/Achilles_v2.4_SampleInfo_small.txt",
+          "https://software.broadinstitute.org/morpheus/preloaded-datasets/Achilles_v2.4_SampleInfo_small.txt",
           datasetField : "id", fileField : "id" } ],
-          <br/> columns : [ { field : "id", display : "text" }, { field : "Site_primary",
-          display :"color" }
+          <br/> columns : [ { field : "id", display : ["text"] }, { field : "primary_site",
+          display :["color"], highlightMatchingValues:true }
           ],
           <br/> dataset :
-          "//s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct"
+          "https://software.broadinstitute.org/morpheus/preloaded-datasets/Achilles_QC_v2.4.3.rnai.Gs.gct"
           }
         </code>
+
+        <br/> <br/>
+        2. Include morpheus-latest.min.css, morpheus-external-latest.min.js, morpheus-latest.min.js in your HTML.
+        Construct a new <code>morpheus.HeatMap</code> object with the <code>el</code> parameter, the element in which to
+        render
+        the heat map.
+      </p>
+
 
     </div>
   </div>
@@ -638,20 +658,6 @@
           </div>
         </li>
 
-        <li><a data-toggle="collapse" href="#el"
-               aria-expanded="false"
-               aria-controls="el">el</a>
-          <div id="el" class="collapse">
-            <ul>
-              <li><code>Element</code>
-                <div class="description">The element in which to render to the
-                  heat map.
-                </div>
-
-              </li>
-            </ul>
-          </div>
-        </li>
 
       </ul>
     </div>
@@ -670,21 +676,22 @@
       var json = {
         columnAnnotations: [
           {
-            file: '//s3.amazonaws.com/data.clue.io/morpheus/Achilles_v2.4_SampleInfo_small.txt',
+            file: 'https://software.broadinstitute.org/morpheus/preloaded-datasets/Achilles_v2.4_SampleInfo_small.txt',
             datasetField: 'id',
             fileField: 'id'
           }],
         columns: [
           {
             field: 'id',
-            display: 'text'
+            display: ['text']
           }, {
-            field: 'Site_primary',
-            display: 'color'
+            field: 'primary_site',
+            display: ['color'],
+            highlightMatchingValues: true
           }],
-        dataset: '//s3.amazonaws.com/data.clue.io/morpheus/Achilles_QC_v2.4.3.rnai.Gs.gct'
+        dataset: 'https://software.broadinstitute.org/morpheus/preloaded-datasets/Achilles_QC_v2.4.3.rnai.Gs.gct'
       };
-      window.location.href = 'http://www.broadinstitute.org/cancer/software/morpheus?json='
+      window.location.href = 'https://software.broadinstitute.org/morpheus/?json='
         + encodeURIComponent(JSON.stringify(json));
 
     });
