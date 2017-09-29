@@ -15,33 +15,6 @@ morpheus.HeatMapOptions = function (heatMap) {
       required: true,
       type: 'select',
       options: []
-    }, {
-      name: 'load_predefined_scheme',
-      required: true,
-      type: 'select',
-      options: [
-        {
-          name: '',
-          value: ''
-        }, {
-          name: 'relative',
-          value: 'relative'
-        }, {
-          name: 'binary',
-          value: 'binary'
-        }, {
-          name: 'MAF',
-          value: 'MAF'
-        }, {
-          name: 'fixed (-1.5, -0.1, 0.1, 1.5)',
-          value: 'cn'
-        }]
-    }, {
-      name: 'save_color_scheme',
-      type: 'button'
-    }, {
-      name: 'load_color_scheme',
-      type: 'file'
     }];
 
   items.push({
@@ -69,6 +42,48 @@ morpheus.HeatMapOptions = function (heatMap) {
   items.push({
     name: 'conditional_rendering',
     required: true,
+    type: 'button'
+  });
+
+  items.push({type: 'separator'});
+
+  var createColorSchemeOptions = function () {
+    var colorSchemeOptions = [
+      {
+        name: 'relative',
+        value: 'relative'
+      }, {
+        name: 'binary',
+        value: 'binary'
+      }, {
+        name: 'MAF',
+        value: 'MAF'
+      }, {
+        name: 'fixed (-1.5, -0.1, 0.1, 1.5)',
+        value: 'cn'
+      }];
+    var savedColorSchemeKeys = [];
+    if (localStorage.getItem('morpheus-colorScheme') != null) {
+      savedColorSchemeKeys = _.keys(JSON.parse(localStorage.getItem('morpheus-colorScheme')));
+    }
+    if (savedColorSchemeKeys.length > 0) {
+      colorSchemeOptions.push({divider: true});
+      colorSchemeOptions = colorSchemeOptions.concat(savedColorSchemeKeys);
+    }
+    colorSchemeOptions.push({divider: true});
+    colorSchemeOptions.push('My Computer...');
+    return colorSchemeOptions;
+  };
+
+  items.push([
+    {
+      name: 'saved_color_scheme',
+      required: true,
+      type: 'bootstrap-select',
+      options: createColorSchemeOptions()
+    }, {name: 'load_color_scheme', type: 'button'}, {name: 'delete_color_scheme', type: 'button'}]);
+  items.push({
+    name: 'save_color_scheme',
     type: 'button'
   });
 
@@ -467,80 +482,139 @@ morpheus.HeatMapOptions = function (heatMap) {
 
   colorSchemeFormBuilder.find('save_color_scheme').on('click', function (e) {
     e.preventDefault();
-    var blob = new Blob([JSON.stringify(heatMap.heatmap.getColorScheme().toJSON())], {
-      type: 'application/json'
+    // prompt to save to file or local storage
+    var saveColorSchemeFormBuilder = new morpheus.FormBuilder();
+    saveColorSchemeFormBuilder.append({name: 'save_to', type: 'radio', value: 'Browser Storage', options: ['Browser Storage', 'File']});
+    saveColorSchemeFormBuilder.append({name: 'color_scheme_name', type: 'text'});
+    saveColorSchemeFormBuilder.append({name: 'file_name', type: 'text'});
+    saveColorSchemeFormBuilder.setVisible('file_name', false);
+    saveColorSchemeFormBuilder.find('save_to').on('change', function () {
+      var isBrowser = $(this).val() === 'Browser Storage';
+      saveColorSchemeFormBuilder.setVisible('file_name', !isBrowser);
+      saveColorSchemeFormBuilder.setVisible('color_scheme_name', isBrowser);
     });
-    saveAs(blob, 'color_scheme.json');
-  });
-  colorSchemeFormBuilder.on('change', function (e) {
-    if (e.name === 'load_color_scheme') {
-      if (e.value !== '' && e.value != null) {
-        morpheus.Util.getText(e.value).done(
-          function (text) {
-            var json = JSON.parse($.trim(text));
-            heatMap.heatmap.getColorScheme().fromJSON(json);
-            colorSchemeChooser
-              .setColorScheme(heatMap.heatmap
-                .getColorScheme());
-            heatMap.heatmap.setInvalid(true);
-            heatMap.heatmap.repaint();
-
-          }).fail(function () {
-          morpheus.FormBuilder.showInModal({
-            title: 'Error',
-            html: 'Unable to read saved color scheme.'
-          });
-        });
-
-      }
-    }
-  });
-
-  colorSchemeFormBuilder.$form
-    .on(
-      'change',
-      '[name=load_predefined_scheme]',
-      function (e) {
-        var val = $(this).val();
-        if (val !== '') {
-          if (val === 'relative') {
-            heatMap.heatmap
-              .getColorScheme()
-              .setColorSupplierForCurrentValue(
-                morpheus.AbstractColorSupplier.fromJSON(morpheus.HeatMapColorScheme.Predefined
-                  .RELATIVE()));
-          } else if (val === 'cn') {
-            heatMap.heatmap
-              .getColorScheme()
-              .setColorSupplierForCurrentValue(
-                morpheus.AbstractColorSupplier.fromJSON(morpheus.HeatMapColorScheme.Predefined
-                  .CN()));
-          } else if (val === 'MAF') {
-            heatMap.heatmap
-              .getColorScheme()
-              .setColorSupplierForCurrentValue(
-                morpheus.AbstractColorSupplier.fromJSON(morpheus.HeatMapColorScheme.Predefined
-                  .MAF()));
-          } else if (val === 'binary') {
-            heatMap.heatmap
-              .getColorScheme()
-              .setColorSupplierForCurrentValue(
-                morpheus.AbstractColorSupplier.fromJSON(morpheus.HeatMapColorScheme.Predefined
-                  .BINARY()));
-          } else {
-            console.log('not found');
+    morpheus.FormBuilder.showOkCancel({
+      title: 'Save Color Scheme',
+      ok: true,
+      cancel: true,
+      draggable: true,
+      content: saveColorSchemeFormBuilder.$form,
+      appendTo: heatMap.getContentEl(),
+      align: 'right',
+      okCallback: function () {
+        var colorSchemeText = JSON.stringify(heatMap.heatmap.getColorScheme().toJSON());
+        if (saveColorSchemeFormBuilder.getValue('save_to') === 'Browser Storage') {
+          var name = saveColorSchemeFormBuilder.getValue('color_scheme_name').trim();
+          if (name === '') {
+            name = 'my color scheme';
           }
-          colorSchemeChooser
-            .setColorScheme(heatMap.heatmap
-              .getColorScheme());
-          heatMap.heatmap.setInvalid(true);
-          heatMap.heatmap.repaint();
-          $(this).val('');
+          var colorSchemeObject = localStorage.getItem('morpheus-colorScheme');
+          if (colorSchemeObject == null) {
+            colorSchemeObject = {};
+          } else {
+            colorSchemeObject = JSON.parse(colorSchemeObject);
+          }
+          colorSchemeObject[name] = colorSchemeText;
+          localStorage.setItem('morpheus-colorScheme', JSON.stringify(colorSchemeObject));
+          colorSchemeFormBuilder.setOptions('saved_color_scheme', createColorSchemeOptions());
         } else {
-          console.log('empty option selected');
+          var name = saveColorSchemeFormBuilder.getValue('file_name').trim();
+          if (name === '') {
+            name = 'color_scheme.json';
+          }
+          var blob = new Blob([colorSchemeText], {
+            type: 'application/json'
+          });
+          saveAs(blob, name);
         }
-        colorSchemeChooser.restoreCurrentValue();
-      });
+      },
+      focus: heatMap.getFocusEl()
+    });
+  });
+
+  colorSchemeFormBuilder.setEnabled('delete_color_scheme', false);
+  colorSchemeFormBuilder.find('delete_color_scheme').on('click', function () {
+    var key = colorSchemeFormBuilder.getValue('saved_color_scheme');
+    var savedColorSchemes = JSON.parse(localStorage.getItem('morpheus-colorScheme'));
+    delete savedColorSchemes[key];
+    localStorage.setItem('morpheus-colorScheme', JSON.stringify(savedColorSchemes));
+    colorSchemeFormBuilder.setOptions('saved_color_scheme', createColorSchemeOptions());
+
+  });
+  colorSchemeFormBuilder.find('saved_color_scheme').on('change', function () {
+    colorSchemeFormBuilder.setEnabled('delete_color_scheme', ['relative', 'cn', 'MAF', 'binary', 'My Computer...'].indexOf(
+      colorSchemeFormBuilder.getValue('saved_color_scheme')) === -1);
+  });
+  colorSchemeFormBuilder.find('load_color_scheme').on('click',
+    function (e) {
+      var val = colorSchemeFormBuilder.getValue('saved_color_scheme');
+      var repaint = true;
+      if (val === 'relative') {
+        heatMap.heatmap
+          .getColorScheme()
+          .setColorSupplierForCurrentValue(
+            morpheus.AbstractColorSupplier.fromJSON(morpheus.HeatMapColorScheme.Predefined
+              .RELATIVE()));
+      } else if (val === 'cn') {
+        heatMap.heatmap
+          .getColorScheme()
+          .setColorSupplierForCurrentValue(
+            morpheus.AbstractColorSupplier.fromJSON(morpheus.HeatMapColorScheme.Predefined
+              .CN()));
+      } else if (val === 'MAF') {
+        heatMap.heatmap
+          .getColorScheme()
+          .setColorSupplierForCurrentValue(
+            morpheus.AbstractColorSupplier.fromJSON(morpheus.HeatMapColorScheme.Predefined
+              .MAF()));
+      } else if (val === 'binary') {
+        heatMap.heatmap
+          .getColorScheme()
+          .setColorSupplierForCurrentValue(
+            morpheus.AbstractColorSupplier.fromJSON(morpheus.HeatMapColorScheme.Predefined
+              .BINARY()));
+      } else if (val === 'My Computer...') {
+        repaint = false;
+        var $file = $('<input style="display:none;" type="file">');
+        $file.appendTo(heatMap.getContentEl());
+        $file.click();
+        $file.on('change', function (evt) {
+          var files = evt.target.files;
+          morpheus.Util.getText(evt.target.files[0]).done(
+            function (text) {
+              var json = JSON.parse($.trim(text));
+              heatMap.heatmap.getColorScheme().fromJSON(json);
+              colorSchemeChooser
+                .setColorScheme(heatMap.heatmap
+                  .getColorScheme());
+              heatMap.heatmap.setInvalid(true);
+              heatMap.heatmap.repaint();
+
+            }).fail(function () {
+            morpheus.FormBuilder.showInModal({
+              title: 'Error',
+              html: 'Unable to read color scheme.'
+            });
+          }).always(function () {
+            $file.remove();
+          });
+
+        });
+      } else {
+        var savedColorSchemes = JSON.parse(localStorage.getItem('morpheus-colorScheme'));
+        var scheme = JSON.parse(savedColorSchemes[val]);
+        heatMap.heatmap.getColorScheme().fromJSON(scheme);
+        // saved in local storage
+      }
+      if (repaint) {
+        colorSchemeChooser
+          .setColorScheme(heatMap.heatmap
+            .getColorScheme());
+        heatMap.heatmap.setInvalid(true);
+        heatMap.heatmap.repaint();
+      }
+      colorSchemeChooser.restoreCurrentValue();
+    });
   colorSchemeFormBuilder.$form
     .find('[name=color_by]')
     .on(

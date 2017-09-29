@@ -600,12 +600,10 @@ morpheus.FormBuilder.prototype = {
         options = options.concat(field.options);
 
       }
-      // data types are file, dropbox, url, and predefined
+
       options.push('My Computer');
       options.push('URL');
-      if (typeof Dropbox !== 'undefined') {
-        options.push('Dropbox');
-      }
+
       if (field.text != null) {
         options.push(field.text);
       }
@@ -839,17 +837,20 @@ morpheus.FormBuilder.prototype = {
       var html = [];
       var selection = $select.val();
       _.each(options, function (choice) {
-        html.push('<option value="');
         var isChoiceObject = _.isObject(choice)
           && choice.value !== undefined;
-        var optionValue = isChoiceObject ? choice.value : choice;
-        var optionText = isChoiceObject ? choice.name : choice;
-        html.push(optionValue);
-        html.push('"');
-
-        html.push('>');
-        html.push(optionText);
-        html.push('</option>');
+        if (choice && choice.divider) {
+          html.push('<option data-divider="true"></option>');
+        } else {
+          html.push('<option value="');
+          var optionValue = isChoiceObject ? choice.value : choice;
+          var optionText = isChoiceObject ? choice.name : choice;
+          html.push(optionValue);
+          html.push('"');
+          html.push('>');
+          html.push(optionText);
+          html.push('</option>');
+        }
       });
       $select.html(html.join(''));
       $select.val(selection);
@@ -857,7 +858,6 @@ morpheus.FormBuilder.prototype = {
         if ($select[0].options.length > 0) {
           $select.val($select[0].options[0].value);
         }
-
       }
       if ($select.hasClass('selectpicker')) {
         $select.selectpicker('refresh');
