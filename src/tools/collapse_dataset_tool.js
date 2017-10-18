@@ -1,7 +1,8 @@
 morpheus.CollapseDatasetTool = function () {
 };
 morpheus.CollapseDatasetTool.Functions = [morpheus.Mean, morpheus.Median,
-  new morpheus.MaxPercentiles([25, 75]), morpheus.Min, morpheus.Max, morpheus.Percentile, morpheus.Sum];
+  new morpheus.MaxPercentiles([25, 75]), morpheus.Min, morpheus.Max, morpheus.Percentile, morpheus.Sum,
+  morpheus.MaximumMeanProbe, morpheus.MaximumMedianProbe];
 morpheus.CollapseDatasetTool.Functions.fromString = function (s) {
   for (var i = 0; i < morpheus.CollapseDatasetTool.Functions.length; i++) {
     if (morpheus.CollapseDatasetTool.Functions[i].toString() === s) {
@@ -28,6 +29,7 @@ morpheus.CollapseDatasetTool.prototype = {
     form.setVisible('percentile', false);
     form.$form.find('[name=collapse_method]').on('change', function (e) {
       form.setVisible('percentile', $(this).val() === morpheus.Percentile.toString());
+      form.setVisible('collapse', !morpheus.CollapseDatasetTool.Functions.fromString($(this).val()).selectOne);
     });
 
     setValue('Rows');
@@ -76,7 +78,8 @@ morpheus.CollapseDatasetTool.prototype = {
     }
     var allFields = morpheus.MetadataUtil.getMetadataNames(dataset
     .getRowMetadata());
-    dataset = morpheus.CollapseDataset(dataset, collapseToFields, f, true);
+    var collapseMethod = f.selectOne ? morpheus.SelectRow : morpheus.CollapseDataset;
+    dataset = collapseMethod(dataset, collapseToFields, f, true);
     if (!rows) {
       dataset = new morpheus.TransposedDatasetView(dataset);
     }
@@ -88,9 +91,9 @@ morpheus.CollapseDatasetTool.prototype = {
       set.remove(field);
     });
     // hide fields that were not part of collapse to
-    set.forEach(function (val, name) {
-      heatMap.setTrackVisible(name, false, !rows);
-    });
+    // set.forEach(function (val, name) {
+    //   heatMap.setTrackVisible(name, false, !rows);
+    // });
     return new morpheus.HeatMap({
       name: heatMap.getName(),
       dataset: dataset,
