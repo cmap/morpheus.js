@@ -8591,6 +8591,43 @@ morpheus.MolarConcentration.CONCENTRATIONS = [
 
 
 
+morpheus.MaximumMeanProbe = function(probes) {
+  return morpheus.MaximumUnivariateFunction(probes, morpheus.Mean);
+};
+
+morpheus.MaximumMeanProbe.toString = function() {
+  return "Maximum Mean Probe";
+};
+
+morpheus.MaximumMeanProbe.selectOne = true;
+
+morpheus.MaximumMedianProbe = function(probes) {
+  return morpheus.MaximumUnivariateFunction(probes, morpheus.Median);
+};
+
+morpheus.MaximumMedianProbe.toString = function() {
+  return "Maximum Median Probe";
+};
+
+morpheus.MaximumMedianProbe.selectOne = true;
+
+morpheus.MaximumUnivariateFunction = function(rowView, fun) {
+  var curMax = Number.NEGATIVE_INFINITY;
+  var curIndex = -1;
+  for (var i = 0; i < rowView.dataset.getRowCount(); i++) {
+    rowView.setIndex(i);
+    var mean = fun(rowView);
+    if (mean > curMax) {
+      curMax = mean;
+      curIndex = i;
+    }
+  }
+  return {
+    value : curMax,
+    index : curIndex
+  }
+};
+
 morpheus.Positions = function () {
   this.spaces = undefined;
   this.defaultPositionFunction = function (index) {
@@ -13317,7 +13354,8 @@ morpheus.ChartTool.getTooltip = function (options) {
 morpheus.CollapseDatasetTool = function () {
 };
 morpheus.CollapseDatasetTool.Functions = [morpheus.Mean, morpheus.Median,
-  new morpheus.MaxPercentiles([25, 75]), morpheus.Min, morpheus.Max, morpheus.Percentile, morpheus.Sum];
+  new morpheus.MaxPercentiles([25, 75]), morpheus.Min, morpheus.Max, morpheus.Percentile, morpheus.Sum,
+  morpheus.MaximumMeanProbe, morpheus.MaximumMedianProbe];
 morpheus.CollapseDatasetTool.Functions.fromString = function (s) {
   for (var i = 0; i < morpheus.CollapseDatasetTool.Functions.length; i++) {
     if (morpheus.CollapseDatasetTool.Functions[i].toString() === s) {
@@ -13344,6 +13382,7 @@ morpheus.CollapseDatasetTool.prototype = {
     form.setVisible('percentile', false);
     form.$form.find('[name=collapse_method]').on('change', function (e) {
       form.setVisible('percentile', $(this).val() === morpheus.Percentile.toString());
+      form.setVisible('collapse', !morpheus.CollapseDatasetTool.Functions.fromString($(this).val()).selectOne);
     });
 
     setValue('Rows');
@@ -13392,7 +13431,8 @@ morpheus.CollapseDatasetTool.prototype = {
     }
     var allFields = morpheus.MetadataUtil.getMetadataNames(dataset
     .getRowMetadata());
-    dataset = morpheus.CollapseDataset(dataset, collapseToFields, f, true);
+    var collapseMethod = f.selectOne ? morpheus.SelectRow : morpheus.CollapseDataset;
+    dataset = collapseMethod(dataset, collapseToFields, f, true);
     if (!rows) {
       dataset = new morpheus.TransposedDatasetView(dataset);
     }
@@ -13404,9 +13444,9 @@ morpheus.CollapseDatasetTool.prototype = {
       set.remove(field);
     });
     // hide fields that were not part of collapse to
-    set.forEach(function (val, name) {
-      heatMap.setTrackVisible(name, false, !rows);
-    });
+    // set.forEach(function (val, name) {
+    //   heatMap.setTrackVisible(name, false, !rows);
+    // });
     return new morpheus.HeatMap({
       name: heatMap.getName(),
       dataset: dataset,
@@ -38053,6 +38093,86 @@ morpheus.CollapseDataset = function (dataset, collapseToFields,
       }
     });
   }
+  return collapsedDataset;
+};
+
+
+morpheus.SelectRow = function (dataset, collapseToFields,
+                                summarizeFunction, shallowCopy) {
+  var vectors = [];
+  var nfields = collapseToFields.length;
+
+  for (var i = 0; i < nfields; i++) {
+    var v = dataset.getRowMetadata().getByName(collapseToFields[i]);
+    if (!v) {
+      throw collapseToFields[i]
+      + ' not found. Available fields are '
+      + morpheus.MetadataUtil.getMetadataNames(dataset
+        .getRowMetadata());
+    }
+    vectors.push(v);
+  }
+
+  var idToIndices = morpheus.VectorUtil.createValuesToIndicesMap(vectors);
+
+  var collapsedDataset = new morpheus.Dataset({
+    name: dataset.getName(),
+    rows: idToIndices.size(),
+    columns: dataset.getColumnCount(),
+    dataType: 'Float32'
+  });
+
+
+  var nseries = dataset.getSeriesCount();
+  for (var series = 1; series < nseries; series++) {
+    collapsedDataset.addSeries({
+      name: dataset.getName(i),
+      dataType: 'Float32'
+    });
+  }
+  if (shallowCopy) {
+    collapsedDataset.setColumnMetadata(dataset.getColumnMetadata());
+  } else {
+    morpheus.MetadataUtil.copy(dataset.getColumnMetadata(),
+      collapsedDataset.getColumnMetadata());
+  }
+
+  var names = morpheus.MetadataUtil.getMetadataNames(dataset.getRowMetadata());
+  var collapseToVectors = [];
+  var allvectors = [];
+  for (var i = 0; i < names.length; i++) {
+    var v = dataset.getRowMetadata().getByName(names[i]);
+    collapseToVectors.push(collapsedDataset.getRowMetadata().add(names[i]));
+    allvectors.push(v);
+  }
+
+  var counter = 0;
+
+  idToIndices
+    .forEach(function (rowIndices, key) {
+      var slice = morpheus.DatasetUtil.slicedView(dataset,
+        rowIndices, null);
+      var view = new morpheus.DatasetRowView(slice);
+      var indexInDataset;
+      for (var series = 0; series < nseries; series++) {
+        view.setSeriesIndex(series);
+        var chosenIndex = summarizeFunction(view).index;
+        view.setIndex(chosenIndex);
+        indexInDataset = view.dataset.rowIndices[chosenIndex];
+
+        for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+          collapsedDataset.setValue(counter, j,
+            view.getValue(j), series);
+        }
+      }
+      for (var i = 0; i < names.length; i++) {
+        var collapsedToVector = collapseToVectors[i];
+        var vector = allvectors[i];
+        collapsedToVector.setValue(counter, vector
+          .getValue(indexInDataset));
+      }
+      counter++;
+    });
   return collapsedDataset;
 };
 
