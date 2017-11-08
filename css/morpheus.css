@@ -17,13 +17,32 @@
   overflow-y: hidden;
   overflow-x: hidden;
 }
+.dropdown-checkbox {
+  margin-left: -16px !important;
+}
+
+.nav-tabs.compact > li > a {
+  font-size: 0.9em;
+  padding: 1px 5px;
+  margin-right: 4px;
+  line-height: 16px;
+}
+
+.morpheus-form-compact .form-control {
+  padding: 0px 2px;
+  height: 22px;
+  font-size: 13px;
+}
+
+.btn-xxs {
+  padding: 1px 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
 
 .morpheus-sep {
   border-top: 1px solid #eee;
-}
-
-.dropdown-checkbox {
-  margin-left: -16px !important;
 }
 
 .morpheus-button-divider {
@@ -86,26 +105,6 @@
   color: #777 ! important;
   padding: 2px !important;
   background-color: white !important;
-}
-
-.nav-tabs.compact > li > a {
-  font-size: 0.9em;
-  padding: 1px 5px;
-  margin-right: 4px;
-  line-height: 16px;
-}
-
-.form-compact .form-control {
-  padding: 0px 2px;
-  height: 22px;
-  font-size: 13px;
-}
-
-.btn-xxs {
-  padding: 1px 4px;
-  font-size: 12px;
-  line-height: 1.5;
-  border-radius: 3px;
 }
 
 .morpheus.form-horizontal .help-block {
