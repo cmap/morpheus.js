@@ -363,7 +363,7 @@ morpheus.RowStats = function (dataset) {
   this.cachedRow = -1;
   this.rowCachedMax = 0;
   this.rowCachedMin = 0;
-  this.rowCachedStandardDeviation = -1;
+  this.rowCachedStandardDeviation = NaN;
   this.rowCachedMean = -1;
 };
 morpheus.RowStats.prototype = {
@@ -373,6 +373,9 @@ morpheus.RowStats.prototype = {
     this.datasetRowView.setIndex(row);
     this.rowCachedMean = meanFunction(this.datasetRowView);
     this.rowCachedStandardDeviation = stdevFunction(this.datasetRowView, this.rowCachedMean);
+    if (this.rowCachedStandardDeviation === 0) {
+      this.rowCachedStandardDeviation = NaN;
+    }
   },
   maybeUpdateRelative: function (row) {
     if (this.cachedRow !== row) {

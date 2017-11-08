@@ -14,35 +14,36 @@ morpheus.AdjustDataTool.prototype = {
   },
   gui: function () {
     // z-score, robust z-score, log2, inverse log2
-    return [{
-      name: 'scale_column_sum',
-      type: 'checkbox',
-      help: 'Whether to scale each column sum to a specified value'
-    }, {
-      name: 'column_sum',
-      type: 'text',
-      style: 'max-width:150px;'
-    }, {
-      name: 'log_2',
-      type: 'checkbox'
-    }, {
-      name: 'inverse_log_2',
-      type: 'checkbox'
-    }, {
-      name: 'quantile_normalize',
-      type: 'checkbox'
-    }, {
-      name: 'z-score',
-      type: 'checkbox',
-      help: 'Subtract mean, divide by standard deviation'
-    }, {
-      name: 'robust_z-score',
-      type: 'checkbox',
-      help: 'Subtract median, divide by median absolute deviation'
-    }, {
-      name: 'use_selected_rows_and_columns_only',
-      type: 'checkbox'
-    }];
+    return [
+      {
+        name: 'scale_column_sum',
+        type: 'checkbox',
+        help: 'Whether to scale each column sum to a specified value'
+      }, {
+        name: 'column_sum',
+        type: 'text',
+        style: 'max-width:150px;'
+      }, {
+        name: 'log_2',
+        type: 'checkbox'
+      }, {
+        name: 'inverse_log_2',
+        type: 'checkbox'
+      }, {
+        name: 'quantile_normalize',
+        type: 'checkbox'
+      }, {
+        name: 'z-score',
+        type: 'checkbox',
+        help: 'Subtract mean, divide by standard deviation'
+      }, {
+        name: 'robust_z-score',
+        type: 'checkbox',
+        help: 'Subtract median, divide by median absolute deviation'
+      }, {
+        name: 'use_selected_rows_and_columns_only',
+        type: 'checkbox'
+      }];
   },
   execute: function (options) {
     var project = options.project;
@@ -52,20 +53,20 @@ morpheus.AdjustDataTool.prototype = {
       || options.input['z-score'] || options.input['robust_z-score'] || options.input.quantile_normalize || options.input.scale_column_sum) {
       // clone the values 1st
       var sortedFilteredDataset = morpheus.DatasetUtil.copy(project
-      .getSortedFilteredDataset());
+        .getSortedFilteredDataset());
       var rowIndices = project.getRowSelectionModel()
-      .getViewIndices().values().sort(
-        function (a, b) {
-          return (a === b ? 0 : (a < b ? -1 : 1));
-        });
+        .getViewIndices().values().sort(
+          function (a, b) {
+            return (a === b ? 0 : (a < b ? -1 : 1));
+          });
       if (rowIndices.length === 0) {
         rowIndices = null;
       }
       var columnIndices = project.getColumnSelectionModel()
-      .getViewIndices().values().sort(
-        function (a, b) {
-          return (a === b ? 0 : (a < b ? -1 : 1));
-        });
+        .getViewIndices().values().sort(
+          function (a, b) {
+            return (a === b ? 0 : (a < b ? -1 : 1));
+          });
       if (columnIndices.length === 0) {
         columnIndices = null;
       }
@@ -119,7 +120,7 @@ morpheus.AdjustDataTool.prototype = {
           var mean = morpheus.Mean(rowView);
           var stdev = Math.sqrt(morpheus.Variance(rowView));
           for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-            dataset.setValue(i, j, (dataset.getValue(i, j) - mean)
+            dataset.setValue(i, j, stdev === 0 ? NaN : (dataset.getValue(i, j) - mean)
               / stdev);
           }
         }
@@ -131,7 +132,7 @@ morpheus.AdjustDataTool.prototype = {
           var mad = morpheus.MAD(rowView, median);
           for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
             dataset.setValue(i, j,
-              (dataset.getValue(i, j) - median) / mad);
+              mad === 0 ? NaN : (dataset.getValue(i, j) - median) / mad);
           }
         }
       }

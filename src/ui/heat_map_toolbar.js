@@ -15,7 +15,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
     '<form style="display:inline-block;margin-right:14px;" name="searchForm"' +
     ' class="form' +
     ' form-inline' +
-    ' form-compact"' +
+    ' morpheus-form-compact"' +
     ' role="search"></form>');
   $searchForm.on('submit', function (e) {
     e.preventDefault();
