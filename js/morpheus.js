@@ -2396,10 +2396,10 @@ morpheus.Array2dReaderInteractive.prototype = {
         if (name == null || name === '' || name === 'na') {
           name = 'id';
         }
-        var unique = 1;
+        var counter = 1;
         while (dataset.getColumnMetadata().getByName(name) != null) {
-          name = name + '-' + unique;
-          unique++;
+          name = name + '-' + counter;
+          counter++;
         }
         var v = dataset.getColumnMetadata().add(name);
         var nonEmpty = false;
@@ -2423,11 +2423,12 @@ morpheus.Array2dReaderInteractive.prototype = {
         if (name == null || name === '') {
           name = 'id';
         }
-        var unique = 1;
-        while (dataset.getRowMetadata().get(name) != null) {
-          name = name + '-' + unique;
-          unique++;
+        var counter = 1;
+        while (dataset.getRowMetadata().getByName(name) != null) {
+          name = name + '-' + counter;
+          counter++;
         }
+
         dataset.getRowMetadata().add(name);
 
       }
@@ -24726,7 +24727,7 @@ morpheus.HeatMapKeyListener = function (heatMap) {
 
       }
     });
-  
+
   $keyelement.on('mousewheel', function (e) {
     var scrolly = e.deltaY * e.deltaFactor;
     var scrollx = e.deltaX * e.deltaFactor;
