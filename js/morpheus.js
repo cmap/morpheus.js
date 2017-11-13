@@ -25719,26 +25719,35 @@ morpheus.HeatMapToolBar = function (heatMap) {
     searchHtml.push('</div>');
   }
 
-  if (heatMap.options.toolbar.searchRows ||
-    heatMap.options.toolbar.searchColumns ||
-    heatMap.options.toolbar.searchValues) {
+  if (typeof heatMap.options.toolbar.indexOf === 'undefined') {
+    heatMap.options.toolbar.indexOf = function () {
+      return -1;
+    };
+  }
+  var searchRows = heatMap.options.toolbar.indexOf('Search Rows') !== -1;
+  var searchColumns = heatMap.options.toolbar.indexOf('Search Columns') !== -1;
+  var searchValues = heatMap.options.toolbar.indexOf('Search Values') !== -1;
+
+  if (searchRows ||
+    searchColumns ||
+    searchValues) {
     createSearchOptionsMenu();
   }
-  if (heatMap.options.toolbar.searchRows) {
+  if (searchRows) {
     createSearchMenu('searchRowsGroup', true);
   }
-  if (heatMap.options.toolbar.searchColumns) {
+  if (searchColumns) {
     createSearchMenu('searchColumnsGroup', true);
   }
 
-  if (heatMap.options.toolbar.searchValues) {
+  if (searchValues) {
     createSearchMenu('searchValuesGroup', false);
   }
   createSearchMenu('searchRowDendrogramGroup', false);
   createSearchMenu('searchColumnDendrogramGroup', false);
 
   // dimensions
-  if (heatMap.options.toolbar.dimensions) {
+  if (heatMap.options.toolbar.indexOf('Dimensions') !== -1) {
     searchHtml.push('<div class="form-group">');
     searchHtml.push(
       '<h6 style="display: inline; margin-left:10px;" data-name="dim"></h6>');
@@ -25833,7 +25842,7 @@ morpheus.HeatMapToolBar = function (heatMap) {
   var toolbarHtml = ['<div style="display: inline;">'];
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
   // zoom
-  if (heatMap.options.toolbar.zoom) {
+  if (heatMap.options.toolbar.indexOf('Zoom') !== -1) {
 
     var dropdownId = _.uniqueId('morpheus');
     toolbarHtml.push('<div style="display:inline-block;" class="dropdown">');
@@ -25873,12 +25882,8 @@ morpheus.HeatMapToolBar = function (heatMap) {
     toolbarHtml.push('</div>');
   }
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
-  if (heatMap.options.toolbar.sort) {
-    toolbarHtml.push(
-      '<button data-toggle="tooltip" title="Sort" name="Sort" type="button" class="btn' +
-      ' btn-default btn-xxs"><span class="fa fa-sort-alpha-asc"></span></button>');
-  }
-  if (heatMap.options.toolbar.options) {
+
+  if (heatMap.options.toolbar.indexOf('Options') !== -1) {
     toolbarHtml.push(
       '<button data-action="Options" data-toggle="tooltip" title="Options" type="button"' +
       ' class="btn btn-default btn-xxs"><span class="fa fa-cog"></span></button>');
@@ -25886,47 +25891,22 @@ morpheus.HeatMapToolBar = function (heatMap) {
   }
 
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
-  if (heatMap.options.toolbar.openFile) {
-    toolbarHtml.push(
-      '<button data-action="Open File" data-toggle="tooltip" title="Open File ('
-      + morpheus.Util.COMMAND_KEY
-      +
-      'O)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-folder-open-o"></span></button>');
-  }
-  if (heatMap.options.toolbar.saveImage) {
+  if (heatMap.options.toolbar.indexOf('Save Image') !== -1) {
     toolbarHtml.push(
       '<button data-action="Save Image" data-toggle="tooltip" title="Save Image ('
       + morpheus.Util.COMMAND_KEY
       +
       'S)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-file-image-o"></span></button>');
   }
-  if (heatMap.options.toolbar.saveDataset) {
-    toolbarHtml.push(
-      '<button data-action="Save Dataset" data-toggle="tooltip" title="Save Dataset ('
-      + morpheus.Util.COMMAND_KEY
-      +
-      'Shift+S)" type="button" class="btn btn-default btn-xxs"><span class="fa fa-floppy-o"></span></button>');
-  }
-  if (heatMap.options.toolbar.saveSession) {
-    toolbarHtml.push(
-      '<button data-action="Save Session" data-toggle="tooltip" title="Save Session" type="button"' +
-      ' class="btn btn-default btn-xxs"><span class="fa fa-anchor"></span></button>');
-  }
 
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
-  if (heatMap.options.toolbar.filter) {
+  if (heatMap.options.toolbar.indexOf('Filter') !== -1) {
     toolbarHtml.push(
       '<button data-action="Filter" data-toggle="tooltip" title="Filter" type="button"' +
       ' class="btn btn-default btn-xxs"><span class="fa fa-filter"></span></button>');
   }
-  if (heatMap.options.toolbar.chart && typeof echarts !== 'undefined') {
-    toolbarHtml.push(
-      '<button data-action="Chart" data-toggle="tooltip" title="Chart" type="button" class="btn' +
-      ' btn-default btn-xxs"><span class="fa fa-line-chart"></span></button>');
-
-  }
   // legend
-  if (heatMap.options.toolbar.colorKey) {
+  if (heatMap.options.toolbar.indexOf('Color Key') !== -1) {
     toolbarHtml.push('<div class="morpheus-button-divider"></div>');
     toolbarHtml.push('<div class="btn-group">');
     toolbarHtml.push(
@@ -26126,16 +26106,16 @@ morpheus.HeatMapToolBar = function (heatMap) {
     });
 
   // set button and search controls visibility
-  if (!heatMap.options.toolbar.searchRows) {
+  if (!searchRows) {
     this.rowSearchObject.$toggleButton.hide();
     this.rowSearchObject.$group.css('display', 'none');
   }
 
-  if (!heatMap.options.toolbar.searchColumns) {
+  if (!searchColumns) {
     this.columnSearchObject.$toggleButton.hide();
     this.columnSearchObject.$group.css('display', 'none');
   }
-  if (!heatMap.options.toolbar.searchValues) {
+  if (!searchValues) {
     this.valueSearchObject.$toggleButton.hide();
     this.valueSearchObject.$group.css('display', 'none');
   }
@@ -27816,67 +27796,8 @@ morpheus.HeatMap = function (options) {
       // Prevent mousewheel default (stops accidental page back on Mac), but also prevents page
       // scrolling
       standalone: false,
-      $loadingImage: morpheus.Util.createLoadingEl(),
-      menu: {
-        File: [
-          'Open', null, 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', null, 'Rename' +
-          ' Tab'],
-        Tools: [
-          'New Heat Map',
-          null,
-          'Hierarchical Clustering',
-          'KMeans Clustering',
-          null,
-          'Marker Selection',
-          'Nearest Neighbors',
-          'Create Calculated Annotation',
-          null,
-          'Adjust',
-          'Collapse',
-          'Similarity Matrix',
-          'Transpose',
-          null,
-          'Chart',
-          null,
-          'Sort/Group',
-          'Filter',
-          null,
-          'API'],
-        View: ['Zoom In', 'Zoom Out', null, 'Fit To Window', 'Fit Rows To Window', 'Fit Columns To Window', null, '100%', null, 'Options'],
-        Edit: [
-          'Copy Image',
-          'Copy Selected Dataset',
-          null,
-          'Move Selected Rows To Top',
-          'Annotate Selected Rows',
-          'Copy Selected Rows',
-          'Invert' +
-          ' Selected Rows',
-          'Select All Rows',
-          'Clear Selected Rows',
-          null,
-          'Move Selected Columns To Top',
-          'Annotate Selected Columns',
-          'Copy Selected Columns',
-          'Invert' +
-          ' Selected Columns',
-          'Select All Columns',
-          'Clear Selected Columns'],
-        Help: [
-          'Search Menus', null, 'Contact', 'Configuration', 'Tutorial', 'Source Code', null, 'Keyboard' +
-          ' Shortcuts']
-      },
-      toolbar: {
-        dimensions: true,
-        zoom: true,
-        searchRows: true,
-        searchColumns: true,
-        searchValues: false,
-        options: true,
-        saveImage: true,
-        filter: true,
-        colorKey: true
-      }
+      $loadingImage: morpheus.Util.createLoadingEl()
+
     }, options);
 
   for (var i = 0; i < dontExtend.length; i++) {
@@ -27884,10 +27805,62 @@ morpheus.HeatMap = function (options) {
     options[field] = cache[i];
   }
   if (options.menu == null) {
-    options.menu = {};
+    options.menu = {
+      File: [
+        'Open', null, 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', null, 'Rename' +
+        ' Tab'],
+      Tools: [
+        'New Heat Map',
+        null,
+        'Hierarchical Clustering',
+        'KMeans Clustering',
+        null,
+        'Marker Selection',
+        'Nearest Neighbors',
+        'Create Calculated Annotation',
+        null,
+        'Adjust',
+        'Collapse',
+        'Similarity Matrix',
+        'Transpose',
+        null,
+        'Chart',
+        null,
+        'Sort/Group',
+        'Filter',
+        null,
+        'API'],
+      View: [
+        'Zoom In', 'Zoom Out', null, 'Fit To Window', 'Fit Rows To Window', 'Fit Columns To Window', null, '100%', null,
+        'Options'],
+      Edit: [
+        'Copy Image',
+        'Copy Selected Dataset',
+        null,
+        'Move Selected Rows To Top',
+        'Annotate Selected Rows',
+        'Copy Selected Rows',
+        'Invert' +
+        ' Selected Rows',
+        'Select All Rows',
+        'Clear Selected Rows',
+        null,
+        'Move Selected Columns To Top',
+        'Annotate Selected Columns',
+        'Copy Selected Columns',
+        'Invert' +
+        ' Selected Columns',
+        'Select All Columns',
+        'Clear Selected Columns'],
+      Help: [
+        'Search Menus', null, 'Contact', 'Configuration', 'Tutorial', 'Source Code', null, 'Keyboard' +
+        ' Shortcuts']
+    };
   }
   if (options.toolbar == null) {
-    options.toolbar = {};
+    options.toolbar = [
+      'Search Rows', 'Search Columns', 'Dimensions', 'Zoom', 'Options', 'Save Image', 'Filter',
+      'Sort/Group', 'Color Key'];
   }
 
   this.options = options;

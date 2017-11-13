@@ -249,67 +249,8 @@ morpheus.HeatMap = function (options) {
       // Prevent mousewheel default (stops accidental page back on Mac), but also prevents page
       // scrolling
       standalone: false,
-      $loadingImage: morpheus.Util.createLoadingEl(),
-      menu: {
-        File: [
-          'Open', null, 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', null, 'Rename' +
-          ' Tab'],
-        Tools: [
-          'New Heat Map',
-          null,
-          'Hierarchical Clustering',
-          'KMeans Clustering',
-          null,
-          'Marker Selection',
-          'Nearest Neighbors',
-          'Create Calculated Annotation',
-          null,
-          'Adjust',
-          'Collapse',
-          'Similarity Matrix',
-          'Transpose',
-          null,
-          'Chart',
-          null,
-          'Sort/Group',
-          'Filter',
-          null,
-          'API'],
-        View: ['Zoom In', 'Zoom Out', null, 'Fit To Window', 'Fit Rows To Window', 'Fit Columns To Window', null, '100%', null, 'Options'],
-        Edit: [
-          'Copy Image',
-          'Copy Selected Dataset',
-          null,
-          'Move Selected Rows To Top',
-          'Annotate Selected Rows',
-          'Copy Selected Rows',
-          'Invert' +
-          ' Selected Rows',
-          'Select All Rows',
-          'Clear Selected Rows',
-          null,
-          'Move Selected Columns To Top',
-          'Annotate Selected Columns',
-          'Copy Selected Columns',
-          'Invert' +
-          ' Selected Columns',
-          'Select All Columns',
-          'Clear Selected Columns'],
-        Help: [
-          'Search Menus', null, 'Contact', 'Configuration', 'Tutorial', 'Source Code', null, 'Keyboard' +
-          ' Shortcuts']
-      },
-      toolbar: {
-        dimensions: true,
-        zoom: true,
-        searchRows: true,
-        searchColumns: true,
-        searchValues: false,
-        options: true,
-        saveImage: true,
-        filter: true,
-        colorKey: true
-      }
+      $loadingImage: morpheus.Util.createLoadingEl()
+
     }, options);
 
   for (var i = 0; i < dontExtend.length; i++) {
@@ -317,10 +258,62 @@ morpheus.HeatMap = function (options) {
     options[field] = cache[i];
   }
   if (options.menu == null) {
-    options.menu = {};
+    options.menu = {
+      File: [
+        'Open', null, 'Save Image', 'Save Dataset', 'Save Session', null, 'Close Tab', null, 'Rename' +
+        ' Tab'],
+      Tools: [
+        'New Heat Map',
+        null,
+        'Hierarchical Clustering',
+        'KMeans Clustering',
+        null,
+        'Marker Selection',
+        'Nearest Neighbors',
+        'Create Calculated Annotation',
+        null,
+        'Adjust',
+        'Collapse',
+        'Similarity Matrix',
+        'Transpose',
+        null,
+        'Chart',
+        null,
+        'Sort/Group',
+        'Filter',
+        null,
+        'API'],
+      View: [
+        'Zoom In', 'Zoom Out', null, 'Fit To Window', 'Fit Rows To Window', 'Fit Columns To Window', null, '100%', null,
+        'Options'],
+      Edit: [
+        'Copy Image',
+        'Copy Selected Dataset',
+        null,
+        'Move Selected Rows To Top',
+        'Annotate Selected Rows',
+        'Copy Selected Rows',
+        'Invert' +
+        ' Selected Rows',
+        'Select All Rows',
+        'Clear Selected Rows',
+        null,
+        'Move Selected Columns To Top',
+        'Annotate Selected Columns',
+        'Copy Selected Columns',
+        'Invert' +
+        ' Selected Columns',
+        'Select All Columns',
+        'Clear Selected Columns'],
+      Help: [
+        'Search Menus', null, 'Contact', 'Configuration', 'Tutorial', 'Source Code', null, 'Keyboard' +
+        ' Shortcuts']
+    };
   }
   if (options.toolbar == null) {
-    options.toolbar = {};
+    options.toolbar = [
+      'Search Rows', 'Search Columns', 'Dimensions', 'Zoom', 'Options', 'Save Image', 'Filter',
+      'Sort/Group', 'Color Key'];
   }
 
   this.options = options;
