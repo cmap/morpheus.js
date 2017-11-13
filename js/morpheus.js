@@ -24726,27 +24726,7 @@ morpheus.HeatMapKeyListener = function (heatMap) {
 
       }
     });
-  $keyelement.on('paste.morpheus',
-    function (e) {
-      if (heatMap.options.toolbar.openFile) {
-        var tagName = e.target.tagName;
-        if (tagName == 'INPUT' || tagName == 'SELECT'
-          || tagName == 'TEXTAREA') {
-          return;
-        }
-        var text = e.originalEvent.clipboardData.getData('text/plain');
-        if (text != null && text.length > 0) {
-          e.preventDefault();
-          e.stopPropagation();
-          var blob = new Blob([text]);
-          var url = window.URL.createObjectURL(blob);
-          morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
-            file: url
-          }), heatMap);
-        }
-      }
-    });
-
+  
   $keyelement.on('mousewheel', function (e) {
     var scrolly = e.deltaY * e.deltaFactor;
     var scrollx = e.deltaX * e.deltaFactor;
@@ -36653,7 +36633,7 @@ morpheus.VectorTrack.prototype = {
     });
     if (!isHeader) {
       addSection('Selection');
-    } else if (this.heatmap.options.toolbar.options) {
+    } else if (this.heatmap.options.toolbar.indexOf('Options') !== -1) {
       addSection('Display');
     }
 

@@ -1215,7 +1215,7 @@ morpheus.VectorTrack.prototype = {
     });
     if (!isHeader) {
       addSection('Selection');
-    } else if (this.heatmap.options.toolbar.options) {
+    } else if (this.heatmap.options.toolbar.indexOf('Options') !== -1) {
       addSection('Display');
     }
 

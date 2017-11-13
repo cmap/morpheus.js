@@ -333,26 +333,6 @@ morpheus.HeatMapKeyListener = function (heatMap) {
 
       }
     });
-  $keyelement.on('paste.morpheus',
-    function (e) {
-      if (heatMap.options.toolbar.openFile) {
-        var tagName = e.target.tagName;
-        if (tagName == 'INPUT' || tagName == 'SELECT'
-          || tagName == 'TEXTAREA') {
-          return;
-        }
-        var text = e.originalEvent.clipboardData.getData('text/plain');
-        if (text != null && text.length > 0) {
-          e.preventDefault();
-          e.stopPropagation();
-          var blob = new Blob([text]);
-          var url = window.URL.createObjectURL(blob);
-          morpheus.HeatMap.showTool(new morpheus.OpenFileTool({
-            file: url
-          }), heatMap);
-        }
-      }
-    });
 
   $keyelement.on('mousewheel', function (e) {
     var scrolly = e.deltaY * e.deltaFactor;
