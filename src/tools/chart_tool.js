@@ -113,7 +113,9 @@ morpheus.ChartTool = function (chartOptions) {
   formBuilder.append({
     name: 'group_by',
     type: 'bootstrap-select',
-    options: options
+    options: options,
+    multiple: true,
+    search: true
   });
 
   formBuilder.append({
@@ -557,7 +559,6 @@ morpheus.ChartTool.prototype = {
    */
   _createBoxPlot: function (options) {
     var _this = this;
-    var showPoints = options.showPoints;
     var datasets = options.datasets;
     var ids = options.ids;
     var heatmap = this.heatmap;
@@ -788,18 +789,57 @@ morpheus.ChartTool.prototype = {
     } else if (chartType === 'boxplot') {
       var datasets = [];//1-d array of datasets
       var ids = []; // 1-d array of grouping values
-      if (groupBy) {
-        var groupByInfo = morpheus.ChartTool
-          .getVectorInfo(groupBy);
-        var vector = groupByInfo.isColumns ? dataset
-            .getColumnMetadata().getByName(groupByInfo.field)
-          : dataset.getRowMetadata().getByName(
-            groupByInfo.field);
-        var isArray = morpheus.VectorUtil.getDataType(vector)[0] === '[';
-        var valueToIndices = morpheus.VectorUtil.createValueToIndicesMap(vector, true);
-        valueToIndices.forEach(function (indices, value) {
-          datasets.push(new morpheus.SlicedDatasetView(dataset, groupByInfo.isColumns ? null : indices, groupByInfo.isColumns ? indices : null));
-          ids.push(value);
+      if (groupBy && groupBy.length > 0) {
+        var columnVectors = [];
+        var rowVectors = [];
+        groupBy.forEach(function (name) {
+          var groupByInfo = morpheus.ChartTool
+            .getVectorInfo(name);
+          if (groupByInfo.isColumns) {
+            var vector = dataset
+              .getColumnMetadata().getByName(groupByInfo.field);
+            if (vector != null) {
+              columnVectors.push(vector);
+            } else {
+              console.log(vector.getName() + ' not found');
+            }
+          } else {
+            var vector = dataset
+              .getRowMetadata().getByName(groupByInfo.field);
+            if (vector != null) {
+              rowVectors.push(vector);
+            } else {
+              console.log(vector.getName() + ' not found');
+            }
+          }
+        });
+        var columnValueToIndices;
+        if (columnVectors.length === 0) {
+          columnValueToIndices = new morpheus.Map();
+          columnValueToIndices.set('', null);
+        } else {
+          columnValueToIndices = morpheus.VectorUtil.createValuesToIndicesMap(columnVectors);
+        }
+        var rowValueToIndices;
+        if (rowVectors.length === 0) {
+          rowValueToIndices = new morpheus.Map();
+          rowValueToIndices.set('', null);
+        } else {
+          console.log(rowVectors);
+          rowValueToIndices = morpheus.VectorUtil.createValuesToIndicesMap(rowVectors);
+        }
+
+        columnValueToIndices.forEach(function (columnIndices, columnValue) {
+          rowValueToIndices.forEach(function (rowIndices, rowValue) {
+            datasets.push(new morpheus.SlicedDatasetView(dataset, rowIndices, columnIndices));
+            var id = columnValue;
+            if (id !== '') {
+              id += ' ';
+            }
+            id += rowValue;
+            ids.push(id);
+          });
+
         });
       } else {
         datasets.push(dataset);
