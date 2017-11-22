@@ -28421,6 +28421,10 @@ morpheus.HeatMap.prototype = {
       colorScheme = morpheus.HeatMapColorScheme.Predefined.MAF();
       var rowMutProfile = this.project.getFullDataset().getRowMetadata().getByName('mutation_summary');
       var fieldNames = rowMutProfile.getProperties().get(morpheus.VectorKeys.FIELDS);
+      if (fieldNames == null) {
+        fieldNames = morpheus.MafFileReader.FIELD_NAMES;
+        rowMutProfile.getProperties().set(morpheus.VectorKeys.FIELDS, fieldNames);
+      }
       var useMafColorMap = true;
       if (fieldNames.length !== morpheus.MafFileReader.FIELD_NAMES.length) {
         useMafColorMap = false;
