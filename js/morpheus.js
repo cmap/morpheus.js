@@ -3917,6 +3917,127 @@ morpheus.MafFileReader.prototype = {
   }
 };
 
+morpheus.MtxReader = function () {
+
+};
+
+morpheus.MtxReader.prototype = {
+  getFormatName: function () {
+    return 'mtx';
+  },
+  read: function (fileOrUrl, callback) {
+    var _this = this;
+    if (morpheus.Util.isFile(fileOrUrl)) {
+      this._readChunking(fileOrUrl, callback, false);
+    } else {
+      if (morpheus.Util.isFetchStreamingSupported()) {
+        this._readChunking(fileOrUrl, callback, true);
+      } else {
+        this._readNoChunking(fileOrUrl, callback);
+      }
+    }
+  },
+  _readChunking: function (fileOrUrl, callback, useFetch) {
+    var _this = this;
+    var isHeader = true;
+    var dataset;
+    var matrix;
+    var handleTokens = function (tokens) {
+      if (tokens[0][0] !== '%' && tokens.length !== 1) {
+        if (isHeader) {
+          isHeader = false;
+          matrix = [];
+          var nrows = parseInt(tokens[0]);
+          var ncols = parseInt(tokens[1]);
+          for (var i = 0; i < nrows; i++) {
+            matrix.push([]);
+          }
+          dataset = new morpheus.Dataset({
+            rows: nrows, columns: ncols, name: morpheus.Util.getBaseFileName(morpheus.Util
+              .getFileName(fileOrUrl)), array: matrix, dataType: 'Float32'
+          });
+          // rows, columns, entries
+        } else {
+          var rowIndex = parseInt(tokens[0]) - 1;
+          var dataRow = matrix[rowIndex];
+          var columnIndex = parseInt(tokens[1]) - 1;
+          dataRow[columnIndex] = parseFloat(tokens[2]);
+        }
+      }
+    };
+    (useFetch ? morpheus.BufferedReader : Papa).parse(fileOrUrl, {
+      delimiter: ' ',	// auto-detect
+      newline: '',	// auto-detect
+      header: false,
+      dynamicTyping: false,
+      preview: 0,
+      encoding: '',
+      worker: false,
+      comments: false,
+      handleTokens: handleTokens,
+      step: function (result) {
+        handleTokens(result.data[0]);
+      },
+      complete: function () {
+        callback(null, dataset);
+      },
+      error: function (err) {
+        callback(err);
+      },
+      download: !morpheus.Util.isFile(fileOrUrl),
+      skipEmptyLines: false,
+      chunk: undefined,
+      fastMode: true,
+      beforeFirstChunk: undefined,
+      withCredentials: undefined
+    });
+  },
+  _read: function (datasetName, reader) {
+    var delim = / /;
+    var isHeader = true;
+    var dataset;
+    var matrix;
+    var s;
+    while ((s = reader.readLine()) !== null) {
+      if (s[0] !== '%') {
+        var tokens = s.split(delim);
+        if (isHeader) {
+          isHeader = false;
+          matrix = [];
+          dataset = new morpheus.Dataset({
+            rows: parseInt(tokens[0]), columns: parseInt(tokens[1]), name: datasetName, array: matrix, dataType: 'Float32'
+          });
+          for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+            matrix.push({});
+          }
+          // rows, columns, entries
+        } else {
+          var dataRow = matrix[parseInt(tokens[0]) - 1];
+          dataRow[parseInt(tokens[1]) - 1] = parseFloat(tokens[2]);
+        }
+      }
+    }
+
+    return dataset;
+
+  }
+  ,
+  _readNoChunking: function (fileOrUrl, callback) {
+    var _this = this;
+    var name = morpheus.Util.getBaseFileName(morpheus.Util
+      .getFileName(fileOrUrl));
+    morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err, arrayBuffer) {
+      if (err) {
+        callback(err);
+      } else {
+        callback(null, _this._read(name,
+          new morpheus.ArrayBufferReader(new Uint8Array(
+            arrayBuffer))));
+      }
+    });
+  }
+};
+
 morpheus.SegTabReader = function () {
   this.regions = null;
 };
@@ -5755,6 +5876,8 @@ morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
     datasetReader = new morpheus.JsonDatasetReader();
   } else if (ext === 'gct') {
     datasetReader = new morpheus.GctReader();
+  } else if (ext === 'mtx') {
+    datasetReader = new morpheus.MtxReader();
   }
   return datasetReader;
 };
@@ -11801,34 +11924,72 @@ morpheus.LandingPage.prototype = {
       }
     });
   },
-  openFile: function (value) {
-    var _this = this;
-    var fileName = morpheus.Util.getFileName(value);
-    if (fileName.toLowerCase().indexOf('.json') === fileName.length - 5) {
-      morpheus.Util.getText(value).done(function (text) {
-        _this.open(JSON.parse(text));
-      }).fail(function (err) {
-        morpheus.FormBuilder.showMessageModal({
-          title: 'Error',
-          message: 'Unable to load session'
+  openFile: function (files) {
+    if (files.length === 1) {
+      var _this = this;
+      var file = files[0];
+      var fileName = morpheus.Util.getFileName(file);
+      if (fileName.toLowerCase().indexOf('.json') === fileName.length - 5) {
+        morpheus.Util.getText(file).done(function (text) {
+          _this.open(JSON.parse(text));
+        }).fail(function (err) {
+          morpheus.FormBuilder.showMessageModal({
+            title: 'Error',
+            message: 'Unable to load session'
+          });
         });
-      });
+      } else {
+        var options = {
+          dataset: {
+            file: file,
+            options: {interactive: true}
+          }
+        };
+
+        morpheus.OpenDatasetTool.fileExtensionPrompt(fileName, function (readOptions) {
+          if (readOptions) {
+            for (var key in readOptions) {
+              options.dataset.options[key] = readOptions[key];
+            }
+          }
+          _this.open(options);
+        });
+      }
     } else {
+      // matrixFile, genesFile, barcodesFile
       var options = {
         dataset: {
-          file: value,
+          file: files[0],
           options: {interactive: true}
         }
       };
-
-      morpheus.OpenDatasetTool.fileExtensionPrompt(fileName, function (readOptions) {
-        if (readOptions) {
-          for (var key in readOptions) {
-            options.dataset.options[key] = readOptions[key];
-          }
-        }
-        _this.open(options);
+      var genesPromise = morpheus.Util.readLines(files[1]);
+      var geneLines;
+      var barcodeLines;
+      genesPromise.done(function (lines) {
+        geneLines = lines;
       });
+      var barcodesPromise = morpheus.Util.readLines(files[2]);
+      barcodesPromise.done(function (lines) {
+        barcodeLines = lines;
+      });
+      options.promises = [genesPromise, barcodesPromise];
+      options.datasetReady = function (dataset) {
+        var columnIds = dataset.getColumnMetadata().add('id');
+        var tab = /\t/;
+        for (var j = 0, size = dataset.getColumnCount(); j < size; j++) {
+          columnIds.setValue(j, barcodeLines[j].split(tab)[0]);
+        }
+        // var nrowTokens = geneLines[0].split(tab).length;
+        var rowIds = dataset.getRowMetadata().add('id');
+        var geneSymbols = dataset.getRowMetadata().add('symbol');
+        for (var i = 0, size = dataset.getRowCount(); i < size; i++) {
+          var tokens = geneLines[i].split(tab);
+          rowIds.setValue(i, tokens[0]);
+          geneSymbols.setValue(i, tokens[1]);
+        }
+      };
+      this.open(options);
     }
   }
 };
@@ -20850,9 +21011,28 @@ morpheus.FilePicker = function (options) {
           e.preventDefault();
           e.stopPropagation();
           var files = e.originalEvent.dataTransfer.files;
-          for (var i = 0; i < files.length; i++) {
-            options.fileCallback(files[i]);
+          if (files.length === 3) {
+            var genesFile = null;
+            var barcodesFile = null;
+            var matrixFile = null;
+            for (var i = 0; i < files.length; i++) {
+              if (files[i].name === 'genes.tsv') {
+                genesFile = files[i];
+              } else if (files[i].name === 'barcodes.tsv') {
+                barcodesFile = files[i];
+              } else if (files[i].name === 'matrix.mtx') {
+                matrixFile = files[i];
+              }
+            }
+            if (matrixFile != null && genesFile != null && barcodesFile != null) {
+              options.fileCallback([matrixFile, genesFile, barcodesFile]);
+            } else {
+              for (var i = 0; i < files.length; i++) {
+                options.fileCallback(files[i]);
+              }
+            }
           }
+
         } else {
           var url = e.originalEvent.dataTransfer.getData('URL');
           options.fileCallback(url);

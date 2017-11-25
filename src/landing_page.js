@@ -103,34 +103,72 @@ morpheus.LandingPage.prototype = {
       }
     });
   },
-  openFile: function (value) {
-    var _this = this;
-    var fileName = morpheus.Util.getFileName(value);
-    if (fileName.toLowerCase().indexOf('.json') === fileName.length - 5) {
-      morpheus.Util.getText(value).done(function (text) {
-        _this.open(JSON.parse(text));
-      }).fail(function (err) {
-        morpheus.FormBuilder.showMessageModal({
-          title: 'Error',
-          message: 'Unable to load session'
+  openFile: function (files) {
+    if (files.length === 1) {
+      var _this = this;
+      var file = files[0];
+      var fileName = morpheus.Util.getFileName(file);
+      if (fileName.toLowerCase().indexOf('.json') === fileName.length - 5) {
+        morpheus.Util.getText(file).done(function (text) {
+          _this.open(JSON.parse(text));
+        }).fail(function (err) {
+          morpheus.FormBuilder.showMessageModal({
+            title: 'Error',
+            message: 'Unable to load session'
+          });
         });
-      });
+      } else {
+        var options = {
+          dataset: {
+            file: file,
+            options: {interactive: true}
+          }
+        };
+
+        morpheus.OpenDatasetTool.fileExtensionPrompt(fileName, function (readOptions) {
+          if (readOptions) {
+            for (var key in readOptions) {
+              options.dataset.options[key] = readOptions[key];
+            }
+          }
+          _this.open(options);
+        });
+      }
     } else {
+      // matrixFile, genesFile, barcodesFile
       var options = {
         dataset: {
-          file: value,
+          file: files[0],
           options: {interactive: true}
         }
       };
-
-      morpheus.OpenDatasetTool.fileExtensionPrompt(fileName, function (readOptions) {
-        if (readOptions) {
-          for (var key in readOptions) {
-            options.dataset.options[key] = readOptions[key];
-          }
-        }
-        _this.open(options);
+      var genesPromise = morpheus.Util.readLines(files[1]);
+      var geneLines;
+      var barcodeLines;
+      genesPromise.done(function (lines) {
+        geneLines = lines;
       });
+      var barcodesPromise = morpheus.Util.readLines(files[2]);
+      barcodesPromise.done(function (lines) {
+        barcodeLines = lines;
+      });
+      options.promises = [genesPromise, barcodesPromise];
+      options.datasetReady = function (dataset) {
+        var columnIds = dataset.getColumnMetadata().add('id');
+        var tab = /\t/;
+        for (var j = 0, size = dataset.getColumnCount(); j < size; j++) {
+          columnIds.setValue(j, barcodeLines[j].split(tab)[0]);
+        }
+        // var nrowTokens = geneLines[0].split(tab).length;
+        var rowIds = dataset.getRowMetadata().add('id');
+        var geneSymbols = dataset.getRowMetadata().add('symbol');
+        for (var i = 0, size = dataset.getRowCount(); i < size; i++) {
+          var tokens = geneLines[i].split(tab);
+          rowIds.setValue(i, tokens[0]);
+          geneSymbols.setValue(i, tokens[1]);
+        }
+      };
+      this.open(options);
     }
   }
 };

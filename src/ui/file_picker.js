@@ -272,9 +272,28 @@ morpheus.FilePicker = function (options) {
           e.preventDefault();
           e.stopPropagation();
           var files = e.originalEvent.dataTransfer.files;
-          for (var i = 0; i < files.length; i++) {
-            options.fileCallback(files[i]);
+          if (files.length === 3) {
+            var genesFile = null;
+            var barcodesFile = null;
+            var matrixFile = null;
+            for (var i = 0; i < files.length; i++) {
+              if (files[i].name === 'genes.tsv') {
+                genesFile = files[i];
+              } else if (files[i].name === 'barcodes.tsv') {
+                barcodesFile = files[i];
+              } else if (files[i].name === 'matrix.mtx') {
+                matrixFile = files[i];
+              }
+            }
+            if (matrixFile != null && genesFile != null && barcodesFile != null) {
+              options.fileCallback([matrixFile, genesFile, barcodesFile]);
+            } else {
+              for (var i = 0; i < files.length; i++) {
+                options.fileCallback(files[i]);
+              }
+            }
           }
+
         } else {
           var url = e.originalEvent.dataTransfer.getData('URL');
           options.fileCallback(url);
