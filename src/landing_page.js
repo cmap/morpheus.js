@@ -48,8 +48,8 @@ morpheus.LandingPage = function (pageOptions) {
     ' browser and never sent to any server.</small></div>').appendTo($input);
 
   var filePicker = new morpheus.FilePicker({
-    fileCallback: function (file) {
-      _this.openFile(file);
+    fileCallback: function (files) {
+      _this.openFile(files);
     },
     optionsCallback: function (opt) {
       _this.open(opt);
@@ -104,7 +104,7 @@ morpheus.LandingPage.prototype = {
     });
   },
   openFile: function (files) {
-    if (files.length === 1) {
+    if (files.length !== 3) {
       var _this = this;
       var file = files[0];
       var fileName = morpheus.Util.getFileName(file);

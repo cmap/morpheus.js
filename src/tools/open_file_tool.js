@@ -83,10 +83,10 @@ morpheus.OpenFileTool.prototype = {
         _this.ok();
       });
       var filePicker = new morpheus.FilePicker({
-        fileCallback: function (fileOrUrl) {
+        fileCallback: function (files) {
           $div.hide();
           $ok.show();
-          _this.options.file = fileOrUrl;
+          _this.options.file = files[0];
           // if it's a file, check file type and update choices
           var extension = morpheus.Util.getExtension(
             morpheus.Util.getFileName(_this.options.file));

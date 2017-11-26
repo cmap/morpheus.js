@@ -3950,7 +3950,7 @@ morpheus.MtxReader.prototype = {
           var nrows = parseInt(tokens[0]);
           var ncols = parseInt(tokens[1]);
           for (var i = 0; i < nrows; i++) {
-            matrix.push([]);
+            matrix.push({});
           }
           dataset = new morpheus.Dataset({
             rows: nrows, columns: ncols, name: morpheus.Util.getBaseFileName(morpheus.Util
@@ -11869,8 +11869,8 @@ morpheus.LandingPage = function (pageOptions) {
     ' browser and never sent to any server.</small></div>').appendTo($input);
 
   var filePicker = new morpheus.FilePicker({
-    fileCallback: function (file) {
-      _this.openFile(file);
+    fileCallback: function (files) {
+      _this.openFile(files);
     },
     optionsCallback: function (opt) {
       _this.open(opt);
@@ -11925,7 +11925,7 @@ morpheus.LandingPage.prototype = {
     });
   },
   openFile: function (files) {
-    if (files.length === 1) {
+    if (files.length !== 3) {
       var _this = this;
       var file = files[0];
       var fileName = morpheus.Util.getFileName(file);
@@ -15624,10 +15624,10 @@ morpheus.OpenFileTool.prototype = {
         _this.ok();
       });
       var filePicker = new morpheus.FilePicker({
-        fileCallback: function (fileOrUrl) {
+        fileCallback: function (files) {
           $div.hide();
           $ok.show();
-          _this.options.file = fileOrUrl;
+          _this.options.file = files[0];
           // if it's a file, check file type and update choices
           var extension = morpheus.Util.getExtension(
             morpheus.Util.getFileName(_this.options.file));
@@ -20851,14 +20851,14 @@ morpheus.FilePicker = function (options) {
     if (evt.which === 13) {
       var text = $.trim($(this).val());
       if (text !== '') {
-        options.fileCallback(text);
+        options.fileCallback([text]);
       }
     }
   });
   $el.find('[name=openUrl]').on('click', function (evt) {
     var text = $.trim($url.val());
     if (text !== '') {
-      options.fileCallback(text);
+      options.fileCallback([text]);
     }
   });
 
@@ -20867,7 +20867,7 @@ morpheus.FilePicker = function (options) {
     Dropbox.choose({
       success: function (results) {
         var val = results[0].link;
-        options.fileCallback(val);
+        options.fileCallback([val]);
       },
       linkType: 'direct',
       multiselect: false
@@ -20935,7 +20935,7 @@ morpheus.FilePicker = function (options) {
         var url = new String('https://www.googleapis.com/drive/v3/files/' + file.id + '?alt=media');
         url.name = fileName;
         url.headers = {'Authorization': 'Bearer ' + accessToken};
-        options.fileCallback(url);
+        options.fileCallback([url]);
       }
 
     }
@@ -20945,7 +20945,7 @@ morpheus.FilePicker = function (options) {
   $file.on('change', function (evt) {
     var files = evt.target.files; // FileList object
     for (var i = 0; i < files.length; i++) {
-      options.fileCallback(files[i]);
+      options.fileCallback([files[i]]);
     }
   });
 
@@ -20963,7 +20963,7 @@ morpheus.FilePicker = function (options) {
           url = new String(window.URL.createObjectURL(blob));
           url.name = 'clipboard';
         }
-        options.fileCallback(url);
+        options.fileCallback([url]);
       }
     }
   });
@@ -21010,6 +21010,7 @@ morpheus.FilePicker = function (options) {
         if (e.originalEvent.dataTransfer.files.length) {
           e.preventDefault();
           e.stopPropagation();
+          var isMtx = false;
           var files = e.originalEvent.dataTransfer.files;
           if (files.length === 3) {
             var genesFile = null;
@@ -21026,16 +21027,17 @@ morpheus.FilePicker = function (options) {
             }
             if (matrixFile != null && genesFile != null && barcodesFile != null) {
               options.fileCallback([matrixFile, genesFile, barcodesFile]);
-            } else {
-              for (var i = 0; i < files.length; i++) {
-                options.fileCallback(files[i]);
-              }
+              isMtx = true;
             }
           }
-
+          if (!isMtx) {
+            for (var i = 0; i < files.length; i++) {
+              options.fileCallback([files[i]]);
+            }
+          }
         } else {
           var url = e.originalEvent.dataTransfer.getData('URL');
-          options.fileCallback(url);
+          options.fileCallback([url]);
           e.preventDefault();
           e.stopPropagation();
         }

@@ -31,7 +31,7 @@ morpheus.MtxReader.prototype = {
           var nrows = parseInt(tokens[0]);
           var ncols = parseInt(tokens[1]);
           for (var i = 0; i < nrows; i++) {
-            matrix.push([]);
+            matrix.push({});
           }
           dataset = new morpheus.Dataset({
             rows: nrows, columns: ncols, name: morpheus.Util.getBaseFileName(morpheus.Util
