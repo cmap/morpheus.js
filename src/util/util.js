@@ -1471,8 +1471,9 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
       deferred.reject('Unable to read file');
     };
     reader.onload = function (event) {
+      var arrayBuffer = event.target.result;
+      var data = new Uint8Array(arrayBuffer);
       if (ext === 'xlsx' || ext === 'xls') {
-        var data = new Uint8Array(event.target.result);
         var arr = [];
         for (var i = 0; i != data.length; ++i) {
           arr[i] = String.fromCharCode(data[i]);
@@ -1486,15 +1487,21 @@ morpheus.Util.readLines = function (fileOrUrl, interactive) {
             deferred.resolve(lines);
           });
       } else {
-        deferred.resolve(morpheus.Util.splitOnNewLine(event.target.result));
+        var br = new morpheus.ArrayBufferReader(data);
+        var s;
+        var lines = [];
+        var rtrim = /\s+$/;
+        while ((s = br.readLine()) !== null) {
+          var line = s.replace(rtrim, '');
+          if (line !== '') {
+            lines.push(line);
+          }
+        }
+        deferred.resolve(lines);
       }
 
     };
-    if (ext === 'xlsx' || ext === 'xls') {
-      reader.readAsArrayBuffer(fileOrUrl);
-    } else {
-      reader.readAsText(fileOrUrl);
-    }
+    reader.readAsArrayBuffer(fileOrUrl);
   } else { // it's already lines?
     deferred.resolve(fileOrUrl);
   }

@@ -167,6 +167,18 @@ morpheus.LandingPage.prototype = {
           rowIds.setValue(i, tokens[0]);
           geneSymbols.setValue(i, tokens[1]);
         }
+        // remove genes that are all empty
+        var rowIndices = [];
+        for (var i = 0, nrows = dataset.getRowCount(); i < size; i++) {
+          for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+            if (!isNaN(dataset.getValue(i, j))) {
+              rowIndices.push(i);
+              break;
+            }
+          }
+        }
+        console.log(rowIndices.length);
+        return new morpheus.SlicedDatasetView(dataset, rowIndices, null);
       };
       this.open(options);
     }

@@ -14,9 +14,10 @@ morpheus.TxtReader.prototype = {
   read: function (fileOrUrl, callback) {
     var _this = this;
     var name = morpheus.Util.getBaseFileName(morpheus.Util
-    .getFileName(fileOrUrl));
-    morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
-                                                                   arrayBuffer) {
+      .getFileName(fileOrUrl));
+    morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (
+      err,
+      arrayBuffer) {
       if (err) {
         callback(err);
       } else {
@@ -70,24 +71,44 @@ morpheus.TxtReader.prototype = {
     for (var i = 0; i < dataColumnStart; i++) {
       arrayOfRowArrays.push([]);
     }
+    var isSparse = false;
+    if (testLine == null) {
+      testLine = reader.readLine();
+    }
     if (testLine != null) {
-      var array = new Float32Array(ncols);
-      matrix.push(array);
+      var tmp = new Float32Array(ncols);
+
       var tokens = testLine.split(tab);
       for (var j = 0; j < dataColumnStart; j++) {
         // row metadata
         arrayOfRowArrays[j].push(morpheus.Util.copyString(tokens[j]));
       }
+      var nzero = 0;
       for (var j = dataColumnStart, k = 0; k < ncols; j++, k++) {
         var token = tokens[j];
-        array[j - dataColumnStart] = parseFloat(token);
+        var value = parseFloat(token);
+        if (value === 0) {
+          nzero++;
+        }
+        tmp[j - dataColumnStart] = value;
       }
+      if (nzero / tmp.length > 0.25) {
+        isSparse = true;
+        var sparse = {};
+        for (var j = 0; j < tmp.length; j++) {
+          if (tmp[j] !== 0) {
+            sparse[j] = tmp[j];
+          }
+        }
+        tmp = sparse;
+      }
+      matrix.push(tmp);
     }
     while ((s = reader.readLine()) !== null) {
       s = s.trim();
       if (s !== '') {
-        var array = new Float32Array(ncols);
-        matrix.push(array);
+        var dataRow = isSparse ? {} : new Float32Array(ncols);
+        matrix.push(dataRow);
         var tokens = s.split(tab);
         for (var j = 0; j < dataColumnStart; j++) {
           // row metadata
@@ -95,7 +116,15 @@ morpheus.TxtReader.prototype = {
         }
         for (var j = dataColumnStart, k = 0; k < ncols; j++, k++) {
           var token = tokens[j];
-          array[j - dataColumnStart] = parseFloat(token);
+          var value = parseFloat(token);
+          if (isSparse) {
+            if (value !== 0.0) {
+              dataRow[j - dataColumnStart] = value;
+            }
+          } else {
+            dataRow[j - dataColumnStart] = value;
+          }
+
         }
       }
     }
