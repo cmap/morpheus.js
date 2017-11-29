@@ -11972,7 +11972,6 @@ morpheus.LandingPage.prototype = {
             }
           }
         }
-        console.log(rowIndices.length);
         return new morpheus.SlicedDatasetView(dataset, rowIndices, null);
       };
       this.open(options);
@@ -24124,7 +24123,7 @@ morpheus.HeatMapElementCanvas = function (project) {
     _this.repaint();
   });
   this.gridColor = morpheus.HeatMapElementCanvas.GRID_COLOR;
-  this.gridThickness = 0.1;
+  this.gridThickness = 0.5;
   this.elementDrawCallback = null;
   this.drawCallback = null;
   this.drawValuesFormat = morpheus.Util.createNumberFormat('.2f');

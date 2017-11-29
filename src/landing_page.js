@@ -177,7 +177,6 @@ morpheus.LandingPage.prototype = {
             }
           }
         }
-        console.log(rowIndices.length);
         return new morpheus.SlicedDatasetView(dataset, rowIndices, null);
       };
       this.open(options);
