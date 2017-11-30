@@ -3,6 +3,37 @@ morpheus.Array2dReaderInteractive = function () {
 };
 
 morpheus.Array2dReaderInteractive.prototype = {
+
+  _getReader: function (fileOrUrl, callback) {
+    var name = morpheus.Util.getFileName(fileOrUrl);
+    var ext = morpheus.Util.getExtension(name);
+    morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err, arrayBuffer) {
+      // show 1st 100 lines in table
+      if (err) {
+        console.log(err);
+        return callback(err);
+      }
+      var dataArray = new Uint8Array(arrayBuffer);
+      if (ext === 'xls' || ext === 'xlsx') {
+        var arr = [];
+        for (var i = 0; i != dataArray.length; ++i) {
+          arr[i] = String.fromCharCode(dataArray[i]);
+        }
+        var bstr = arr.join('');
+        morpheus.Util
+          .xlsxTo1dArray({
+            data: bstr,
+            prompt: true
+          }, function (err, lines) {
+            callback(err, new morpheus.LineReader(lines));
+          });
+
+      } else {
+        callback(null, new morpheus.ArrayBufferReader(dataArray));
+      }
+
+    });
+  },
   read: function (fileOrUrl, callback) {
     var _this = this;
     var name = morpheus.Util.getBaseFileName(morpheus.Util.getFileName(fileOrUrl));
@@ -26,13 +57,13 @@ morpheus.Array2dReaderInteractive.prototype = {
     html.push('<div class="slick-bordered-table" style="width:550px;height:300px;"></div>');
     html.push('</div>');
     var $el = $(html.join(''));
-    morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err, arrayBuffer) {
+    this._getReader(fileOrUrl, function (err, br) {
       // show 1st 100 lines in table
       if (err) {
         console.log(err);
         return callback(err);
       }
-      var br = new morpheus.ArrayBufferReader(new Uint8Array(arrayBuffer));
+
       var s;
       var lines = [];
       // show in table
