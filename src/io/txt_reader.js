@@ -2,6 +2,7 @@
  *
  * @param options.dataRowStart
  * @param options.dataColumnStart
+ * @param options.columnMetadata Whether rows before dataRowStart contain column metadata
  * @constructor
  */
 morpheus.TxtReader = function (options) {
@@ -41,9 +42,28 @@ morpheus.TxtReader.prototype = {
     }
     var tab = /\t/;
     var header = reader.readLine().trim().split(tab);
+    var columnVectors = [];
+    var ncols = header.length - dataColumnStart;
     if (dataRowStart > 1) {
-      for (var i = 1; i < dataRowStart; i++) {
-        reader.readLine(); // skip
+      if (this.options.columnMetadata) {
+        // add additional column metadata
+        for (var row = 1; row < dataRowStart; row++) {
+          var line = reader.readLine();
+          var columnTokens = line.split(tab);
+          var name = columnTokens[0];
+          if (name == null || name === '' || name === 'na') {
+            name = 'id';
+          }
+          var v = new morpheus.Vector(name, ncols);
+          for (var i = 0, j = dataColumnStart; i < ncols; i++, j++) {
+            v.setValue(i, morpheus.Util.copyString(columnTokens[j]));
+          }
+          columnVectors.push(v);
+        }
+      } else {
+        for (var i = 1; i < dataRowStart; i++) {
+          reader.readLine(); // skip
+        }
       }
     }
     var testLine = null;
@@ -64,7 +84,6 @@ morpheus.TxtReader.prototype = {
       }
     }
 
-    var ncols = header.length - dataColumnStart;
     var matrix = [];
     var s;
     var arrayOfRowArrays = [];
@@ -140,6 +159,15 @@ morpheus.TxtReader.prototype = {
     for (var i = 0, j = dataColumnStart; i < ncols; i++, j++) {
       columnIds.setValue(i, morpheus.Util.copyString(header[j]));
     }
+    columnVectors.forEach(function (v) {
+      var unique = 1;
+      var name = v.getName();
+      while (dataset.getColumnMetadata().getByName(name) != null) {
+        name = name + '-' + unique;
+        unique++;
+      }
+      dataset.getColumnMetadata().add(name).array = v.array;
+    });
     var rowIdVector = dataset.getRowMetadata().add('id');
     rowIdVector.array = arrayOfRowArrays[0];
     // add additional row metadata

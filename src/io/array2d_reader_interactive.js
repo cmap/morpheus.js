@@ -192,7 +192,7 @@ morpheus.Array2dReaderInteractive.prototype = {
 
   },
   _read: function (datasetName, bufferedReader, dataColumnStart, dataRowStart, cb) {
-    var dataset = new morpheus.TxtReader({dataRowStart: dataRowStart, dataColumnStart: dataColumnStart})._read(datasetName, bufferedReader);
+    var dataset = new morpheus.TxtReader({columnMetadata: true, dataRowStart: dataRowStart, dataColumnStart: dataColumnStart})._read(datasetName, bufferedReader);
     cb(null, dataset);
   }
 };
