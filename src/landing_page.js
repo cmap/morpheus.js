@@ -171,7 +171,7 @@ morpheus.LandingPage.prototype = {
         var rowIndices = [];
         for (var i = 0, nrows = dataset.getRowCount(); i < size; i++) {
           for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-            if (!isNaN(dataset.getValue(i, j))) {
+            if (dataset.getValue(i, j) > 0) {
               rowIndices.push(i);
               break;
             }
