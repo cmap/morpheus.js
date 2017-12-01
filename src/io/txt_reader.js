@@ -41,9 +41,28 @@ morpheus.TxtReader.prototype = {
       dataRowStart = 1;
     }
     var tab = /\t/;
+    var testLine = null;
     var header = reader.readLine().trim().split(tab);
+    if (dataColumnStart == null) { // try to figure out where data starts by finding 1st
+      // numeric column
+      testLine = reader.readLine().trim();
+      var tokens = testLine.split(tab);
+      for (var i = 1; i < tokens.length; i++) {
+        var token = tokens[i];
+        if (token === '' || token === 'NA' || token === 'NaN' || $.isNumeric(token)) {
+          dataColumnStart = i;
+          break;
+        }
+      }
+
+      if (dataColumnStart == null) {
+        dataColumnStart = 1;
+      }
+    }
+
     var columnVectors = [];
     var ncols = header.length - dataColumnStart;
+
     if (dataRowStart > 1) {
       if (this.options.columnMetadata) {
         // add additional column metadata
@@ -64,23 +83,6 @@ morpheus.TxtReader.prototype = {
         for (var i = 1; i < dataRowStart; i++) {
           reader.readLine(); // skip
         }
-      }
-    }
-    var testLine = null;
-    if (dataColumnStart == null) { // try to figure out where data starts by finding 1st
-      // numeric column
-      testLine = reader.readLine().trim();
-      var tokens = testLine.split(tab);
-      for (var i = 1; i < tokens.length; i++) {
-        var token = tokens[i];
-        if (token === '' || token === 'NA' || token === 'NaN' || $.isNumeric(token)) {
-          dataColumnStart = i;
-          break;
-        }
-      }
-
-      if (dataColumnStart == null) {
-        dataColumnStart = 1;
       }
     }
 

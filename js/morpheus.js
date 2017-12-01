@@ -3939,7 +3939,7 @@ morpheus.MtxReader.prototype = {
     var matrix = [];
     var nrows;
     var ncols;
-    var dataType = 'Float32';
+    var dataType = 'Int16';
     var columnsAreSorted = true;
     var lastRowIndex = -1;
     var lastColumnIndex = -1;
@@ -3950,7 +3950,7 @@ morpheus.MtxReader.prototype = {
         if (obj.values != null) {
           // trim to size
           var values = new Uint16Array(obj.length);
-          var indices = new Uint16Array(obj.length);
+          var indices = new Uint32Array(obj.length);
           values.set(obj.values.slice(0, obj.length));
           indices.set(obj.indices.slice(0, obj.length));
           matrix[i] = {values: values, indices: indices};
@@ -3979,15 +3979,15 @@ morpheus.MtxReader.prototype = {
           var value = parseInt(tokens[2]);
           var obj = matrix[rowIndex];
           if (obj.values == null) {
-            var initalCapacity = Math.max(1, Math.floor(ncols * 0.15));
+            var initalCapacity = Math.max(1, Math.min(100, Math.floor(ncols * 0.01)));
             obj.values = new Uint16Array(initalCapacity);
-            obj.indices = new Uint16Array(initalCapacity);
+            obj.indices = new Uint32Array(initalCapacity);
             obj.length = 0;
           }
           if (obj.length >= obj.values.length) {
-            var newCapacity = Math.floor((obj.values.length * 3) / 2 + 1);
+            var newCapacity = Math.min(ncols, Math.floor(obj.values.length * 1.1));
             var values = new Uint16Array(newCapacity);
-            var indices = new Uint16Array(newCapacity);
+            var indices = new Uint32Array(newCapacity);
             values.set(obj.values);
             indices.set(obj.indices);
             obj.values = values;
@@ -4654,9 +4654,28 @@ morpheus.TxtReader.prototype = {
       dataRowStart = 1;
     }
     var tab = /\t/;
+    var testLine = null;
     var header = reader.readLine().trim().split(tab);
+    if (dataColumnStart == null) { // try to figure out where data starts by finding 1st
+      // numeric column
+      testLine = reader.readLine().trim();
+      var tokens = testLine.split(tab);
+      for (var i = 1; i < tokens.length; i++) {
+        var token = tokens[i];
+        if (token === '' || token === 'NA' || token === 'NaN' || $.isNumeric(token)) {
+          dataColumnStart = i;
+          break;
+        }
+      }
+
+      if (dataColumnStart == null) {
+        dataColumnStart = 1;
+      }
+    }
+
     var columnVectors = [];
     var ncols = header.length - dataColumnStart;
+
     if (dataRowStart > 1) {
       if (this.options.columnMetadata) {
         // add additional column metadata
@@ -4677,23 +4696,6 @@ morpheus.TxtReader.prototype = {
         for (var i = 1; i < dataRowStart; i++) {
           reader.readLine(); // skip
         }
-      }
-    }
-    var testLine = null;
-    if (dataColumnStart == null) { // try to figure out where data starts by finding 1st
-      // numeric column
-      testLine = reader.readLine().trim();
-      var tokens = testLine.split(tab);
-      for (var i = 1; i < tokens.length; i++) {
-        var token = tokens[i];
-        if (token === '' || token === 'NA' || token === 'NaN' || $.isNumeric(token)) {
-          dataColumnStart = i;
-          break;
-        }
-      }
-
-      if (dataColumnStart == null) {
-        dataColumnStart = 1;
       }
     }
 
