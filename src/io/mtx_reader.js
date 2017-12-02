@@ -30,8 +30,11 @@ morpheus.MtxReader.prototype = {
     var lastRowIndex = -1;
     var lastColumnIndex = -1;
     // for each row we store values and indices
+
     var _complete = function () {
-      for (var i = 0, nrows = matrix.length; i < nrows; i++) {
+      var rowCounts = new Uint32Array(nrows);
+      var columnCounts = new Uint32Array(ncols);
+      for (var i = 0; i < nrows; i++) {
         var obj = matrix[i];
         if (obj.values != null) {
           // trim to size
@@ -40,13 +43,21 @@ morpheus.MtxReader.prototype = {
           values.set(obj.values.slice(0, obj.length));
           indices.set(obj.indices.slice(0, obj.length));
           matrix[i] = {values: values, indices: indices};
+          rowCounts[i] = values.length;
+          for (var j = 0; j < obj.length; j++) {
+            columnCounts[indices[j]] += 1;
+          }
         }
       }
       dataset = new morpheus.Dataset({
         rows: nrows, columns: ncols, name: morpheus.Util.getBaseFileName(morpheus.Util
           .getFileName(fileOrUrl)), array: matrix, dataType: dataType, defaultValue: 0
       });
+
+      dataset.getRowMetadata().add('count>0').array = rowCounts;
+      dataset.getColumnMetadata().add('count>0').array = columnCounts;
     };
+
     var handleTokens = function (tokens) {
       if (tokens[0][0] !== '%' && tokens.length !== 1) {
         if (isHeader) {
@@ -145,4 +156,5 @@ morpheus.MtxReader.prototype = {
       });
     }
   }
-};
+}
+;

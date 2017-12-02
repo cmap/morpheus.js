@@ -167,17 +167,14 @@ morpheus.LandingPage.prototype = {
           rowIds.setValue(i, tokens[0]);
           geneSymbols.setValue(i, tokens[1]);
         }
-        // remove genes that are all empty
-        var rowIndices = [];
-        for (var i = 0, nrows = dataset.getRowCount(); i < size; i++) {
-          for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-            if (dataset.getValue(i, j) > 0) {
-              rowIndices.push(i);
-              break;
-            }
-          }
-        }
-        return new morpheus.SlicedDatasetView(dataset, rowIndices, null);
+        // var rowIndices = [];
+        // var countVector = dataset.getRowMetadata().getByName('count>0');
+        // for (var i = 0, nrows = dataset.getRowCount(); i < size; i++) {
+        //   if (countVector.getValue(i) > 0) {
+        //     rowIndices.push(i);
+        //   }
+        // }
+        // return new morpheus.SlicedDatasetView(dataset, rowIndices, null);
       };
       this.open(options);
     }
