@@ -287,7 +287,7 @@ morpheus.Dataset.prototype = {
   },
   setValue: function (i, j, value, seriesIndex) {
     seriesIndex = seriesIndex || 0;
-    this.seriesArrays[seriesIndex][i][j].setValue(i, j, value);
+    this.seriesArrays[seriesIndex].setValue(i, j, value);
   },
   addSeries: function (options) {
     options = $.extend({}, {
