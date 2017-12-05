@@ -14,12 +14,14 @@ morpheus.Array2dReaderInteractive.prototype = {
         return callback(err);
       }
       var dataArray = new Uint8Array(arrayBuffer);
+
       if (ext === 'xls' || ext === 'xlsx') {
         var arr = [];
         for (var i = 0; i != dataArray.length; ++i) {
           arr[i] = String.fromCharCode(dataArray[i]);
         }
         var bstr = arr.join('');
+
         morpheus.Util
           .xlsxTo1dArray({
             data: bstr,

@@ -42,10 +42,11 @@ morpheus.TxtReader.prototype = {
     }
     var tab = /\t/;
     var testLine = null;
-    var header = reader.readLine().trim().split(tab);
+    var rtrim = /\s+$/;
+    var header = reader.readLine().replace(rtrim, '').split(tab);
     if (dataColumnStart == null) { // try to figure out where data starts by finding 1st
       // numeric column
-      testLine = reader.readLine().trim();
+      testLine = reader.readLine().replace(rtrim, '');
       var tokens = testLine.split(tab);
       for (var i = 1; i < tokens.length; i++) {
         var token = tokens[i];
@@ -62,7 +63,6 @@ morpheus.TxtReader.prototype = {
 
     var columnVectors = [];
     var ncols = header.length - dataColumnStart;
-
     if (dataRowStart > 1) {
       if (this.options.columnMetadata) {
         // add additional column metadata
@@ -126,7 +126,7 @@ morpheus.TxtReader.prototype = {
       matrix.push(tmp);
     }
     while ((s = reader.readLine()) !== null) {
-      s = s.trim();
+      s = s.replace(rtrim, '');
       if (s !== '') {
         var dataRow = isSparse ? {} : new Float32Array(ncols);
         matrix.push(dataRow);
