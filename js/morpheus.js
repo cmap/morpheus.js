@@ -4803,8 +4803,14 @@ morpheus.TxtReader.prototype = {
     for (var i = 1; i < dataColumnStart; i++) {
       var v = dataset.getRowMetadata().add(header[i]);
       v.array = arrayOfRowArrays[i];
-    }
 
+    } 
+    for (var i = 0; i < dataset.getRowMetadata().getMetadataCount(); i++) {
+      morpheus.VectorUtil.maybeConvertStringToNumber(dataset.getRowMetadata().get(i));
+    }
+    for (var i = 0; i < dataset.getColumnMetadata().getMetadataCount(); i++) {
+      morpheus.VectorUtil.maybeConvertStringToNumber(dataset.getColumnMetadata().get(i));
+    }
     return dataset;
   }
 };
