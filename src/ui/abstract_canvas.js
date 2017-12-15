@@ -104,7 +104,9 @@ morpheus.AbstractCanvas.prototype = {
         oc.clearRect(0, 0, width, height);
         this.draw(clip, oc);
       }
-      context.drawImage(this.offscreenCanvas, 0, 0, width, height);
+      if (width > 0 && height > 0) {
+        context.drawImage(this.offscreenCanvas, 0, 0, width, height);
+      }
     } else {
       this.draw(clip, context);
     }
