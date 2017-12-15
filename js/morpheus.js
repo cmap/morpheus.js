@@ -16841,7 +16841,9 @@ morpheus.AbstractCanvas.prototype = {
         oc.clearRect(0, 0, width, height);
         this.draw(clip, oc);
       }
-      context.drawImage(this.offscreenCanvas, 0, 0, width, height);
+      if (width>0 && height>0) {
+        context.drawImage(this.offscreenCanvas, 0, 0, width, height);
+      }
     } else {
       this.draw(clip, context);
     }
@@ -18456,6 +18458,13 @@ morpheus.ActionManager = function () {
     cb: function () {
       window
         .open('https://software.broadinstitute.org/morpheus/tutorial.html');
+    }
+  });
+  this.add({
+    name: 'ICV Tutorial',
+    cb: function () {
+      window
+        .open('/icv-tutorial');
     }
   });
   this.add({
@@ -38644,12 +38653,12 @@ morpheus.HCluster = function (distmatrix, linkageAlgorithm) {
  * Searches the distance matrix to find the pair with the shortest distance
  * between them. The indices of the pair are returned in ip and jp; the distance
  * itself is returned by the function.
- * 
+ *
  * @param n The number of elements in the distance matrix.
- * 
+ *
  * @param distmatrix. A ragged array containing the distance matrix. The number
  * of columns in each row is one less than the row index.
- * 
+ *
  * @return The first and second indices of the pair with the shortest distance.
  */
 morpheus.HCluster.findClosestPair = function (n, distmatrix, r) {
