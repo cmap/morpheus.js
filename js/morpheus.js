@@ -16841,7 +16841,9 @@ morpheus.AbstractCanvas.prototype = {
         oc.clearRect(0, 0, width, height);
         this.draw(clip, oc);
       }
-      context.drawImage(this.offscreenCanvas, 0, 0, width, height);
+      if (width > 0 && height > 0) {
+        context.drawImage(this.offscreenCanvas, 0, 0, width, height);
+      }
     } else {
       this.draw(clip, context);
     }
@@ -28131,6 +28133,9 @@ morpheus.HeatMap = function (options) {
        * Heat map grid thickness in pixels
        */
       gridThickness: 0.1,
+
+      rowDendrogramLineWidth: 0.7,
+      columnDendrogramLineWidth: 0.7,
       height: 'window', // set the available height for the
       // heat map. If not
       // set, it will be determined automatically
@@ -29060,6 +29065,7 @@ morpheus.HeatMap.prototype = {
       });
       json.rowDendrogram = out.join('');
       json.rowDendrogramField = null;
+      json.rowDendrogramLineWidth = this.rowDendrogram.lineWidth;
     }
     if (this.columnDendrogram != null) {
       var out = [];
@@ -29068,6 +29074,7 @@ morpheus.HeatMap.prototype = {
       });
       json.columnDendrogram = out.join('');
       json.columnDendrogramField = null;
+      json.columnDendrogramLineWidth = this.columnDendrogram.lineWidth;
     }
     if (options.dataset) {
       json.dataset = morpheus.Dataset.toJSON(this.getProject().getFullDataset());
@@ -29418,6 +29425,7 @@ morpheus.HeatMap.prototype = {
         // }
       }
       this.rowDendrogram = new morpheus.RowDendrogram(this, tree, heatmap.getRowPositions(), this.project, true);
+      this.rowDendrogram.lineWidth = this.options.rowDendrogramLineWidth;
       this.rowDendrogram.appendTo(this.$parent);
       this.rowDendrogram.$label.appendTo(this.$parent);
       this.rowDendrogram.$squishedLabel.appendTo(this.$parent);
@@ -29477,6 +29485,7 @@ morpheus.HeatMap.prototype = {
       }
       this.columnDendrogram = new morpheus.ColumnDendrogram(this, tree,
         heatmap.getColumnPositions(), this.project, true);
+      this.columnDendrogram.lineWidth = this.options.columnDendrogramLineWidth;
       this.columnDendrogram.appendTo(this.$parent);
       this.columnDendrogram.$label.appendTo(this.$parent);
       this.columnDendrogram.$squishedLabel.appendTo(this.$parent);
