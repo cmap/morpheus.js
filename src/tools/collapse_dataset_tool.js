@@ -1,6 +1,7 @@
 morpheus.CollapseDatasetTool = function () {
 };
-morpheus.CollapseDatasetTool.Functions = [morpheus.Mean, morpheus.Median,
+morpheus.CollapseDatasetTool.Functions = [
+  morpheus.Mean, morpheus.Median,
   new morpheus.MaxPercentiles([25, 75]), morpheus.Min, morpheus.Max, morpheus.Percentile, morpheus.Sum];
 morpheus.CollapseDatasetTool.Functions.fromString = function (s) {
   for (var i = 0; i < morpheus.CollapseDatasetTool.Functions.length; i++) {
@@ -18,8 +19,8 @@ morpheus.CollapseDatasetTool.prototype = {
     var setValue = function (val) {
       var isRows = val === 'Rows';
       var names = morpheus.MetadataUtil.getMetadataNames(isRows ? project
-      .getFullDataset().getRowMetadata() : project
-      .getFullDataset().getColumnMetadata());
+        .getFullDataset().getRowMetadata() : project
+        .getFullDataset().getColumnMetadata());
       form.setOptions('collapse_to_fields', names);
     };
     form.$form.find('[name=collapse]').on('change', function (e) {
@@ -31,37 +32,62 @@ morpheus.CollapseDatasetTool.prototype = {
     });
 
     setValue('Rows');
+
+    form.setVisible('percentile', false);
+    form.$form.find('[name=collapse_method]').on('change', function (e) {
+      form.setVisible('percentile', $(this).val() === morpheus.Percentile.toString());
+    });
+    form.$form.find('[name=filter_values]').on('change', function (e) {
+      form.setVisible('filter_operator', form.getValue('filter_values'));
+      form.setVisible('filter_value', form.getValue('filter_values'));
+    });
+    form.setVisible('filter_operator', false);
+    form.setVisible('filter_value', false);
   },
-  gui: function () {
-    return [{
-      name: 'collapse_method',
-      options: morpheus.CollapseDatasetTool.Functions,
-      value: morpheus.CollapseDatasetTool.Functions[1].toString(),
-      type: 'select'
-    }, {
-      name: 'percentile',
-      value: 75,
-      type: 'text'
-    }, {
-      name: 'collapse',
-      options: ['Columns', 'Rows'],
-      value: 'Rows',
-      type: 'radio'
-    }, {
-      name: 'collapse_to_fields',
-      options: [],
-      type: 'select',
-      multiple: true
-    }];
+
+  gui: function (project) {
+    return [
+      {
+        name: 'collapse_method',
+        options: morpheus.CollapseDatasetTool.Functions,
+        value: morpheus.CollapseDatasetTool.Functions[1].toString(),
+        type: 'select',
+      }, {
+        name: 'percentile',
+        value: 75,
+        type: 'text',
+      }, {
+        name: 'collapse',
+        options: ['Columns', 'Rows'],
+        value: 'Rows',
+        type: 'radio'
+      }, {
+        name: 'collapse_to_fields',
+        options: [],
+        type: 'select',
+        multiple: true
+      }];
+    // {
+    //   name: 'filter_values',
+    //     type: 'checkbox',
+    //   help: 'Optionally filter values before collapsing'
+    // },
+    // {
+    //   name: 'filter_operator',
+    //     options: ['>=', '>', '<', '<='],
+    //   type: 'bootstrap-select',
+    //   showLabel: false
+    // }, {
+    //   name: 'filter_value',
+    //     type: 'text'
+    // }
   },
   execute: function (options) {
     var project = options.project;
-    var heatMap = options.heatMap;
-    var f = morpheus.CollapseDatasetTool.Functions
-    .fromString(options.input.collapse_method);
-    if (f.toString() === morpheus.Percentile.toString()) {
+    var collapseToFunction = morpheus.CollapseDatasetTool.Functions.fromString(options.input.collapse_method);
+    if (collapseToFunction.toString() === morpheus.Percentile.toString()) {
       var p = parseFloat(options.input.percentile);
-      f = function (vector) {
+      collapseToFunction = function (vector) {
         return morpheus.Percentile(vector, p);
       };
     }
@@ -69,17 +95,49 @@ morpheus.CollapseDatasetTool.prototype = {
     if (collapseToFields.length === 0) {
       throw new Error('Please select one or more fields to collapse to');
     }
+
     var dataset = project.getFullDataset();
     var rows = options.input.collapse == 'Rows';
     if (!rows) {
       dataset = new morpheus.TransposedDatasetView(dataset);
     }
-    var allFields = morpheus.MetadataUtil.getMetadataNames(dataset
-    .getRowMetadata());
-    dataset = morpheus.CollapseDataset(dataset, collapseToFields, f, true);
+    var allFields = morpheus.MetadataUtil.getMetadataNames(dataset.getRowMetadata());
+    var filterFunction = null;
+    if (options.input.filter_values) {
+      var filterValue = parseFloat(options.input.filter_value);
+      if (!isNaN(filterValue)) {
+        var op = options.input.filter_operator;
+        if (op === '>=') {
+          filterFunction = function (value) {
+            return value >= filterValue;
+          };
+        } else if (op === '>') {
+          filterFunction = function (value) {
+            return value > filterValue;
+          };
+        } else if (op === '<=') {
+          filterFunction = function (value) {
+            return value <= filterValue;
+          };
+        } else if (op === '<') {
+          filterFunction = function (value) {
+            return value < filterValue;
+          };
+        }
+      }
+    }
+    dataset = morpheus.CollapseDataset(dataset, collapseToFields, collapseToFunction, true, filterFunction);
     if (!rows) {
       dataset = new morpheus.TransposedDatasetView(dataset);
     }
+
+    var heatMap = new morpheus.HeatMap({
+      name: options.heatMap.getName(),
+      dataset: dataset,
+      parent: options.heatMap,
+      symmetric: false,
+    });
+
     var set = new morpheus.Map();
     _.each(allFields, function (field) {
       set.set(field, true);
@@ -89,13 +147,18 @@ morpheus.CollapseDatasetTool.prototype = {
     });
     // hide fields that were not part of collapse to
     set.forEach(function (val, name) {
-      heatMap.setTrackVisible(name, false, !rows);
+      heatMap.setTrackVisible(name, false, false);
     });
-    return new morpheus.HeatMap({
-      name: heatMap.getName(),
-      dataset: dataset,
-      parent: heatMap,
-      symmetric: false
-    });
-  }
+
+
+    if (filterFunction != null) {
+      heatMap.heatmap.colorScheme.getSizer()
+        .setSeriesName('percent_passed_filter');
+      heatMap.heatmap.colorScheme.getSizer()
+        .setMin(0);
+      heatMap.heatmap.colorScheme.getSizer()
+        .setMax(75);
+    }
+    return heatMap;
+  },
 };

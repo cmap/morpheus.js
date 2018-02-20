@@ -1,5 +1,5 @@
 morpheus.CollapseDataset = function (dataset, collapseToFields,
-                                     summarizeFunction, shallowCopy) {
+                                     summarizeFunction, shallowCopy, filterFunction) {
   var vectors = [];
   for (var i = 0; i < collapseToFields.length; i++) {
     var v = dataset.getRowMetadata().getByName(collapseToFields[i]);
@@ -7,7 +7,7 @@ morpheus.CollapseDataset = function (dataset, collapseToFields,
       throw collapseToFields[i]
       + ' not found. Available fields are '
       + morpheus.MetadataUtil.getMetadataNames(dataset
-      .getRowMetadata());
+        .getRowMetadata());
     }
     vectors.push(v);
   }
@@ -25,6 +25,9 @@ morpheus.CollapseDataset = function (dataset, collapseToFields,
       dataType: 'Float32'
     });
   }
+  if (filterFunction != null) {
+    collapsedDataset.addSeries({name: 'percent_passed'});
+  }
   if (shallowCopy) {
     collapsedDataset.setColumnMetadata(dataset.getColumnMetadata());
   } else {
@@ -39,27 +42,42 @@ morpheus.CollapseDataset = function (dataset, collapseToFields,
   }
   var counter = 0;
   idToIndices
-  .forEach(function (rowIndices, key) {
-    // collapse each column separately
-    var slice = morpheus.DatasetUtil.slicedView(dataset,
-      rowIndices, null);
-    var view = new morpheus.DatasetColumnView(slice);
-    for (var series = 0; series < nseries; series++) {
-      view.setSeriesIndex(series);
+    .forEach(function (rowIndices, key) {
+      // collapse each column separately
+      var slice = morpheus.DatasetUtil.slicedView(dataset,
+        rowIndices, null);
+      var view = new morpheus.DatasetColumnView(slice);
+      // for (var series = 0; series < nseries; series++) {
+      //   view.setSeriesIndex(series);
       for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
         view.setIndex(j);
-        collapsedDataset.setValue(counter, j,
-          summarizeFunction(view), series);
+        if (filterFunction != null) {
+          var array = new Float32Array(view.size());
+          var npass = 0;
+          for (var i = 0, size = view.size(); i < size; i++) {
+            var value = view.getValue(i);
+            if (filterFunction(value)) {
+              array[npass] = value;
+              npass++;
+            }
+          }
+          vector = morpheus.Vector.fromArray('', array, npass);
+          collapsedDataset.setValue(counter, j, summarizeFunction(vector));
+          collapsedDataset.setValue(counter, j, (npass / view.size()) * 100);
+        } else {
+          collapsedDataset.setValue(counter, j, summarizeFunction(view));
+        }
+
       }
-    }
-    for (var i = 0; i < nfields; i++) {
-      var collapsedToVector = collapseToVectors[i];
-      var vector = vectors[i];
-      collapsedToVector.setValue(counter, vector
-      .getValue(rowIndices[0]));
-    }
-    counter++;
-  });
+      // }
+      for (var i = 0; i < nfields; i++) {
+        var collapsedToVector = collapseToVectors[i];
+        var vector = vectors[i];
+        collapsedToVector.setValue(counter, vector
+          .getValue(rowIndices[0]));
+      }
+      counter++;
+    });
   if (nfields === 1) {
     var newVector = collapseToVectors[0];
     vectors[0].getProperties().forEach(function (val, key) {
