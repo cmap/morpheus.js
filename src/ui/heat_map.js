@@ -193,11 +193,11 @@ morpheus.HeatMap = function (options) {
       /*
        * Heat map row size in pixels or 'fit' to fit heat map to current height.
        */
-      rowSize: 13,
+      rowSize: 14,
       /*
        * Heat map column size in pixels or 'fit' to fit heat map to current width.
        */
-      columnSize: 13,
+      columnSize: 14,
       rowGapSize: 10,
       columnGapSize: 10,
       /*
@@ -214,6 +214,9 @@ morpheus.HeatMap = function (options) {
        * Heat map grid thickness in pixels
        */
       gridThickness: 0.1,
+
+      rowDendrogramLineWidth: 0.7,
+      columnDendrogramLineWidth: 0.7,
       height: 'window', // set the available height for the
       // heat map. If not
       // set, it will be determined automatically
@@ -853,6 +856,10 @@ morpheus.HeatMap.prototype = {
       colorScheme = morpheus.HeatMapColorScheme.Predefined.MAF();
       var rowMutProfile = this.project.getFullDataset().getRowMetadata().getByName('mutation_summary');
       var fieldNames = rowMutProfile.getProperties().get(morpheus.VectorKeys.FIELDS);
+      if (fieldNames == null) {
+        fieldNames = morpheus.MafFileReader.FIELD_NAMES;
+        rowMutProfile.getProperties().set(morpheus.VectorKeys.FIELDS, fieldNames);
+      }
       var useMafColorMap = true;
       if (fieldNames.length !== morpheus.MafFileReader.FIELD_NAMES.length) {
         useMafColorMap = false;
@@ -1139,6 +1146,7 @@ morpheus.HeatMap.prototype = {
       });
       json.rowDendrogram = out.join('');
       json.rowDendrogramField = null;
+      json.rowDendrogramLineWidth = this.rowDendrogram.lineWidth;
     }
     if (this.columnDendrogram != null) {
       var out = [];
@@ -1147,6 +1155,7 @@ morpheus.HeatMap.prototype = {
       });
       json.columnDendrogram = out.join('');
       json.columnDendrogramField = null;
+      json.columnDendrogramLineWidth = this.columnDendrogram.lineWidth;
     }
     if (options.dataset) {
       json.dataset = morpheus.Dataset.toJSON(this.getProject().getFullDataset());
@@ -1497,6 +1506,7 @@ morpheus.HeatMap.prototype = {
         // }
       }
       this.rowDendrogram = new morpheus.RowDendrogram(this, tree, heatmap.getRowPositions(), this.project, true);
+      this.rowDendrogram.lineWidth = this.options.rowDendrogramLineWidth;
       this.rowDendrogram.appendTo(this.$parent);
       this.rowDendrogram.$label.appendTo(this.$parent);
       this.rowDendrogram.$squishedLabel.appendTo(this.$parent);
@@ -1556,6 +1566,7 @@ morpheus.HeatMap.prototype = {
       }
       this.columnDendrogram = new morpheus.ColumnDendrogram(this, tree,
         heatmap.getColumnPositions(), this.project, true);
+      this.columnDendrogram.lineWidth = this.options.columnDendrogramLineWidth;
       this.columnDendrogram.appendTo(this.$parent);
       this.columnDendrogram.$label.appendTo(this.$parent);
       this.columnDendrogram.$squishedLabel.appendTo(this.$parent);
@@ -2362,9 +2373,8 @@ morpheus.HeatMap.prototype = {
       'pinch',
       this.pinch = function (event) {
         var scale = event.scale;
-        _this.heatmap.getRowPositions().setSize(13 * scale);
-        _this.heatmap.getColumnPositions().setSize(
-          13 * scale);
+        _this.heatmap.getRowPositions().setSize(14 * scale);
+        _this.heatmap.getColumnPositions().setSize(14 * scale);
         var reval = {};
         if (_this.project.getHoverRowIndex() !== -1) {
           reval.scrollTop = this.heatmap.getRowPositions().getPosition(
@@ -2818,7 +2828,7 @@ morpheus.HeatMap.prototype = {
     var top = options.event.clientY - parentRect.top + offset;
     // default is bottom-right
     var scrollBarSize = 18;
-    if ((left + tipWidth) >= ( parentRect.right - parentRect.left - scrollBarSize)) { // offscreen
+    if ((left + tipWidth) >= (parentRect.right - parentRect.left - scrollBarSize)) { // offscreen
       // right, place tip on
       // left
       left = options.event.clientX - parentRect.left - offset - tipWidth;
@@ -3869,8 +3879,8 @@ morpheus.HeatMap.prototype = {
     var heatmap = this.heatmap;
     var rowSizes = heatmap.getRowPositions();
     var columnSizes = heatmap.getColumnPositions();
-    rowSizes.setSize(13);
-    columnSizes.setSize(13);
+    rowSizes.setSize(14);
+    columnSizes.setSize(14);
     var reval = {};
     if (this.project.getHoverRowIndex() !== -1) {
       reval.scrollTop = this.heatmap.getRowPositions().getPosition(
@@ -3887,7 +3897,7 @@ morpheus.HeatMap.prototype = {
     var heatmap = this.heatmap;
     var availablePixels = this.getAvailableWidth();
     if (availablePixels === -1) {
-      return 13;
+      return 14;
     }
     if (this.rowDendrogram) {
       availablePixels -= this.rowDendrogram.getUnscaledWidth();
@@ -3915,7 +3925,7 @@ morpheus.HeatMap.prototype = {
       + positions.getPosition(positions.getLength() - 1);
     var size = positions.getSize();
     size = size * (availablePixels / totalCurrent);
-    size = Math.min(13, size);
+    size = Math.min(14, size);
     return size;
   }
   ,
@@ -3923,7 +3933,7 @@ morpheus.HeatMap.prototype = {
     var heatmap = this.heatmap;
     var availablePixels = this.getAvailableHeight();
     if (availablePixels === -1) {
-      return 13;
+      return 14;
     }
     if (this.columnDendrogram) {
       availablePixels -= this.columnDendrogram.getUnscaledHeight();
@@ -3942,7 +3952,7 @@ morpheus.HeatMap.prototype = {
 
     var size = positions.getSize();
     size = size * (availablePixels / totalCurrent);
-    size = Math.min(13, size);
+    size = Math.min(14, size);
     return size;
   }
   ,

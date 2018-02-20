@@ -112,14 +112,14 @@ morpheus.FilePicker = function (options) {
     if (evt.which === 13) {
       var text = $.trim($(this).val());
       if (text !== '') {
-        options.fileCallback(text);
+        options.fileCallback([text]);
       }
     }
   });
   $el.find('[name=openUrl]').on('click', function (evt) {
     var text = $.trim($url.val());
     if (text !== '') {
-      options.fileCallback(text);
+      options.fileCallback([text]);
     }
   });
 
@@ -128,7 +128,7 @@ morpheus.FilePicker = function (options) {
     Dropbox.choose({
       success: function (results) {
         var val = results[0].link;
-        options.fileCallback(val);
+        options.fileCallback([val]);
       },
       linkType: 'direct',
       multiselect: false
@@ -196,7 +196,7 @@ morpheus.FilePicker = function (options) {
         var url = new String('https://www.googleapis.com/drive/v3/files/' + file.id + '?alt=media');
         url.name = fileName;
         url.headers = {'Authorization': 'Bearer ' + accessToken};
-        options.fileCallback(url);
+        options.fileCallback([url]);
       }
 
     }
@@ -206,7 +206,7 @@ morpheus.FilePicker = function (options) {
   $file.on('change', function (evt) {
     var files = evt.target.files; // FileList object
     for (var i = 0; i < files.length; i++) {
-      options.fileCallback(files[i]);
+      options.fileCallback([files[i]]);
     }
   });
 
@@ -224,7 +224,7 @@ morpheus.FilePicker = function (options) {
           url = new String(window.URL.createObjectURL(blob));
           url.name = 'clipboard';
         }
-        options.fileCallback(url);
+        options.fileCallback([url]);
       }
     }
   });
@@ -271,13 +271,34 @@ morpheus.FilePicker = function (options) {
         if (e.originalEvent.dataTransfer.files.length) {
           e.preventDefault();
           e.stopPropagation();
+          var isMtx = false;
           var files = e.originalEvent.dataTransfer.files;
-          for (var i = 0; i < files.length; i++) {
-            options.fileCallback(files[i]);
+          if (files.length === 3) {
+            var genesFile = null;
+            var barcodesFile = null;
+            var matrixFile = null;
+            for (var i = 0; i < files.length; i++) {
+              if (files[i].name === 'genes.tsv') {
+                genesFile = files[i];
+              } else if (files[i].name === 'barcodes.tsv') {
+                barcodesFile = files[i];
+              } else if (files[i].name === 'matrix.mtx') {
+                matrixFile = files[i];
+              }
+            }
+            if (matrixFile != null && genesFile != null && barcodesFile != null) {
+              options.fileCallback([matrixFile, genesFile, barcodesFile]);
+              isMtx = true;
+            }
+          }
+          if (!isMtx) {
+            for (var i = 0; i < files.length; i++) {
+              options.fileCallback([files[i]]);
+            }
           }
         } else {
           var url = e.originalEvent.dataTransfer.getData('URL');
-          options.fileCallback(url);
+          options.fileCallback([url]);
           e.preventDefault();
           e.stopPropagation();
         }

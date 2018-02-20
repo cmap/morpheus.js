@@ -347,50 +347,30 @@ morpheus.VectorTrack.prototype = {
   getPrintSize: function () {
     return this._computePreferredSize(true);
   },
-  _createDiscreteValueMap: function () {
-    var values = morpheus.VectorUtil.getValues(this.getFullVector());
-    values.sort(morpheus.SortKey.ASCENDING_COMPARATOR);
-    this.discreteValueMap = new morpheus.Map();
-    for (var i = 0, length = values.length; i < length; i++) {
-      this.discreteValueMap.set(values[i], i + 1);
-    }
-    this.settings.min = 0;
-    this.settings.mid = 0;
-    this.settings.max = values.length;
-  },
   _setChartMinMax: function () {
     if (this.isRenderAs(morpheus.VectorTrack.RENDER.BAR)
       || this.isRenderAs(morpheus.VectorTrack.RENDER.BOX_PLOT)) {
-      if (!this.settings.stackedBar && this.getFullVector().getProperties().get(morpheus.VectorKeys.DISCRETE)
-        && !this.isRenderAs(morpheus.VectorTrack.RENDER.BOX_PLOT)) {
-        if (!this.discreteValueMap) {
-          this._createDiscreteValueMap();
+      if (this.settings.autoscaleAlways || this.settings.min == null || this.settings.max == null
+        || this.settings.mid == null) {
+        var vector = this.getFullVector();
+        var minMax = morpheus.VectorUtil.getMinMax(vector);
+        var min = minMax.min;
+        var max = minMax.max;
+        if (this.settings.minMaxReversed) {
+          var tmp = max;
+          max = min;
+          min = tmp;
         }
-      } else {
-        if (this.settings.autoscaleAlways || this.settings.min == null || this.settings.max == null
-          || this.settings.mid == null) {
-          var vector = this.getFullVector();
-
-          var minMax = morpheus.VectorUtil.getMinMax(vector);
-          var min = minMax.min;
-          var max = minMax.max;
-          if (this.settings.minMaxReversed) {
-            var tmp = max;
-            max = min;
-            min = tmp;
-          }
-          if (this.settings.autoscaleAlways || this.settings.min == null) {
-            this.settings.min = Math.min(0, min);
-          }
-          if (this.settings.autoscaleAlways || this.settings.max == null) {
-            this.settings.max = Math.max(0, max);
-          }
-          if (this.settings.autoscaleAlways || this.settings.mid == null) {
-            this.settings.mid = this.settings.min < 0 ? 0
-              : this.settings.min;
-          }
+        if (this.settings.autoscaleAlways || this.settings.min == null) {
+          this.settings.min = Math.min(0, min);
         }
-
+        if (this.settings.autoscaleAlways || this.settings.max == null) {
+          this.settings.max = Math.max(0, max);
+        }
+        if (this.settings.autoscaleAlways || this.settings.mid == null) {
+          this.settings.mid = this.settings.min < 0 ? 0
+            : this.settings.min;
+        }
       }
     }
   },

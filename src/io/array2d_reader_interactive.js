@@ -3,15 +3,48 @@ morpheus.Array2dReaderInteractive = function () {
 };
 
 morpheus.Array2dReaderInteractive.prototype = {
+
+  _getReader: function (fileOrUrl, callback) {
+    var name = morpheus.Util.getFileName(fileOrUrl);
+    var ext = morpheus.Util.getExtension(name);
+    morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err, arrayBuffer) {
+      // show 1st 100 lines in table
+      if (err) {
+        console.log(err);
+        return callback(err);
+      }
+      var dataArray = new Uint8Array(arrayBuffer);
+
+      if (ext === 'xls' || ext === 'xlsx') {
+        var arr = [];
+        for (var i = 0; i != dataArray.length; ++i) {
+          arr[i] = String.fromCharCode(dataArray[i]);
+        }
+        var bstr = arr.join('');
+
+        morpheus.Util
+          .xlsxTo1dArray({
+            data: bstr,
+            prompt: true
+          }, function (err, lines) {
+            callback(err, new morpheus.LineReader(lines));
+          });
+
+      } else {
+        callback(null, new morpheus.ArrayBufferReader(dataArray));
+      }
+
+    });
+  },
   read: function (fileOrUrl, callback) {
     var _this = this;
     var name = morpheus.Util.getBaseFileName(morpheus.Util.getFileName(fileOrUrl));
     var html = [];
     html.push('<div>');
     html.push('<label>Click the table cell containing the first data row and column.</label>');
-    html.push('<div class="checkbox"> <label> <input name="transpose" type="checkbox">' +
-      ' Tranpose </label>' +
-      ' </div>');
+    // html.push('<div class="checkbox"> <label> <input name="transpose" type="checkbox">' +
+    //   ' Tranpose </label>' +
+    //   ' </div>');
 
     html.push('<div' +
       ' style="display:inline-block;width:10px;height:10px;background-color:#b3cde3;"></div><span> Data Matrix</span>');
@@ -26,13 +59,21 @@ morpheus.Array2dReaderInteractive.prototype = {
     html.push('<div class="slick-bordered-table" style="width:550px;height:300px;"></div>');
     html.push('</div>');
     var $el = $(html.join(''));
+    this._getReader(fileOrUrl, function (err, br) {
+      // show 1st 100 lines in table
+      if (err) {
+        console.log(err);
+        return callback(err);
+      }
 
-    morpheus.Util.readLines(fileOrUrl, true).done(function (lines) {
+      var s;
+      var lines = [];
       // show in table
       var tab = /\t/;
-      for (var i = 0, nrows = lines.length; i < nrows; i++) {
-        lines[i] = lines[i].split(tab);
+      while ((s = br.readLine()) !== null && lines.length < 100) {
+        lines.push(s.split(tab));
       }
+
       var grid;
       var columns = [];
       for (var j = 0, ncols = lines[0].length; j < ncols; j++) {
@@ -143,90 +184,17 @@ morpheus.Array2dReaderInteractive.prototype = {
           callback(null);
         },
         okCallback: function () {
-          _this._read(name, lines, dataColumnStart, dataRowStart, callback);
+          br.reset();
+          _this._read(name, br, dataColumnStart, dataRowStart, callback);
         }
       });
       grid.resizeCanvas();
 
-    }).fail(function (err) {
-      callback(err);
     });
 
   },
-  _read: function (datasetName, lines, dataColumnStart, dataRowStart, cb) {
-    var columnCount = lines[0].length;
-    var columns = columnCount - dataColumnStart;
-    var rows = lines.length - dataRowStart;
-    var dataset = new morpheus.Dataset({
-      name: datasetName,
-      rows: rows,
-      columns: columns,
-      dataType: 'Float32'
-    });
-
-    // column metadata names are in 1st
-    // column
-    if (dataColumnStart > 0) {
-      for (var i = 0; i < dataRowStart; i++) {
-        var name = lines[i][0];
-        if (name == null || name === '' || name === 'na') {
-          name = 'id';
-        }
-        var counter = 1;
-        while (dataset.getColumnMetadata().getByName(name) != null) {
-          name = name + '-' + counter;
-          counter++;
-        }
-        var v = dataset.getColumnMetadata().add(name);
-        var nonEmpty = false;
-        for (var j = 0; j < columns; j++) {
-          var s = lines[i][j + dataColumnStart];
-          if (s != null && s !== '') {
-            nonEmpty = true;
-            v.setValue(j, s);
-          }
-        }
-        if (!nonEmpty) {
-          dataset.getColumnMetadata().remove(morpheus.MetadataUtil.indexOf(dataset.getColumnMetadata(), v.getName()));
-        }
-
-      }
-    }
-    if (dataRowStart > 0) {
-      // row metadata names are in first row
-      for (var j = 0; j < dataColumnStart; j++) {
-        var name = lines[0][j];
-        if (name == null || name === '') {
-          name = 'id';
-        }
-        var counter = 1;
-        while (dataset.getRowMetadata().getByName(name) != null) {
-          name = name + '-' + counter;
-          counter++;
-        }
-
-        dataset.getRowMetadata().add(name);
-
-      }
-    }
-
-    for (var i = 0; i < rows; i++) {
-      for (var j = 0, k = 0; k < dataset.getRowMetadata().getMetadataCount(); j++, k++) {
-        var metaDataValue = lines[i + dataRowStart][j];
-        dataset.getRowMetadata().get(j).setValue(i, metaDataValue);
-      }
-    }
-
-    for (var i = 0; i < rows; i++) {
-      for (var j = 0; j < columns; j++) {
-        var s = lines[i + dataRowStart][j + dataColumnStart];
-        dataset.setValue(i, j, parseFloat(s));
-      }
-    }
-
-    morpheus.MetadataUtil.maybeConvertStrings(dataset.getRowMetadata(), 1);
-    morpheus.MetadataUtil.maybeConvertStrings(dataset.getColumnMetadata(),
-      1);
+  _read: function (datasetName, bufferedReader, dataColumnStart, dataRowStart, cb) {
+    var dataset = new morpheus.TxtReader({columnMetadata: true, dataRowStart: dataRowStart, dataColumnStart: dataColumnStart})._read(datasetName, bufferedReader);
     cb(null, dataset);
   }
 };

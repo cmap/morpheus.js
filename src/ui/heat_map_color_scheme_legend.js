@@ -5,27 +5,27 @@ morpheus.HeatMapColorSchemeLegend = function (heatMap, $keyContent) {
   $keyContent.empty();
   var ntracks = colorByValues.length;
   colorByValues
-  .forEach(function (value) {
-    if (value != null || ntracks === 1) {
-      if (value != 'null') { // values are stored as string
-        var $label = $('<div style="overflow:hidden;text-overflow:' +
-          ' ellipsis;width:250px;max-width:250px;">'
-          + value + '</div>');
-        $keyContent.append($label);
-        totalHeight += $label.height();
+    .forEach(function (value) {
+      if (value != null || ntracks === 1) {
+        if (value != 'null') { // values are stored as string
+          var $label = $('<div style="overflow:hidden;text-overflow:' +
+            ' ellipsis;width:250px;max-width:250px;">'
+            + value + '</div>');
+          $keyContent.append($label);
+          totalHeight += $label.height();
+        }
+        var trackLegend = new morpheus.ColorSupplierLegend(
+          colorScheme, value);
+        $(trackLegend.canvas).css('position', '');
+        trackLegend.repaint();
+        trackLegend.on('selectionChanged', function () {
+          heatMap.heatmap.setInvalid(true);
+          heatMap.heatmap.repaint();
+        });
+        $keyContent.append($(trackLegend.canvas));
+        totalHeight += trackLegend.getUnscaledHeight();
       }
-      var trackLegend = new morpheus.ColorSupplierLegend(
-        colorScheme, value);
-      $(trackLegend.canvas).css('position', '');
-      trackLegend.repaint();
-      trackLegend.on('selectionChanged', function () {
-        heatMap.heatmap.setInvalid(true);
-        heatMap.heatmap.repaint();
-      });
-      $keyContent.append($(trackLegend.canvas));
-      totalHeight += trackLegend.getUnscaledHeight();
-    }
-  });
+    });
   if (heatMap.options.$key) {
     $keyContent.append(heatMap.options.$key);
     totalHeight += heatMap.options.$key.height();
@@ -66,7 +66,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
       colorScheme, colorScheme.getHiddenValues(), printing);
   } else {
     morpheus.HeatMapColorSchemeLegend.draw(context, colorScheme
-      .getFractions(), colorScheme.getColors(), width, legendHeight,
+        .getFractions(), colorScheme.getColors(), width, legendHeight,
       colorScheme.isStepped());
     context.strokeStyle = 'LightGrey';
     context.strokeRect(0, 0, width, legendHeight);
@@ -96,7 +96,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
         var text = '';
         if (hasNames) {
           text = names[i] != '' ? (names[i] + ' ('
-          + fractionToValue(fractions[i]) + ')') : names[i];
+            + fractionToValue(fractions[i]) + ')') : names[i];
         } else {
           text = morpheus.Util.nf(fractionToValue(fractions[i]));
         }
@@ -112,7 +112,7 @@ morpheus.HeatMapColorSchemeLegend.drawColorScheme = function (context,
         var text = '';
         if (hasNames) {
           text = names[i] != '' ? (names[i] + ' ('
-          + fractionToValue(fractions[i]) + ')') : names[i];
+            + fractionToValue(fractions[i]) + ')') : names[i];
         } else {
           text = morpheus.Util.nf(fractionToValue(fractions[i]));
         }
@@ -151,9 +151,13 @@ morpheus.HeatMapColorSchemeLegend.drawColorSchemeVertically = function (context,
       context.fillStyle = morpheus.CanvasUtil.FONT_COLOR;
       if (hiddenValues && !printing) {
         var value = fractionToValue(fractions[i]);
-        context.font = '12px FontAwesome';
-        if (!hiddenValues.has(value)) {
-          context.fillText('\uf00c', -14, ypix); // checked
+        try {
+          context.font = '12px FontAwesome';
+          if (!hiddenValues.has(value)) {
+            context.fillText('\uf00c', -14, ypix); // checked
+          }
+        } catch (x) {
+          // unable to get font
         }
         // else {
         // context.fillText("\uf096", -14, ypix); // unchecked
@@ -208,29 +212,30 @@ morpheus.ColorSupplierLegend = function (colorScheme, value) {
   this.setBounds(bounds);
   if (hasNames && hiddenValues) {
     $(this.canvas)
-    .on(
-      'click',
-      function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var clickedRow = Math
-        .floor((e.clientY - _this.canvas
-          .getBoundingClientRect().top) / 14);
-        var fractionToValue = d3.scale.linear().domain(
-          [0, 1]).range(
-          [colorScheme.getMin(),
-            colorScheme.getMax()]).clamp(true);
-        var fractions = colorScheme.getFractions();
-        var value = fractionToValue(fractions[clickedRow]);
-        if (!hiddenValues.has(value)) {
-          hiddenValues.add(value);
-        } else {
-          hiddenValues.remove(value);
+      .on(
+        'click',
+        function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var clickedRow = Math
+            .floor((e.clientY - _this.canvas
+              .getBoundingClientRect().top) / 14);
+          var fractionToValue = d3.scale.linear().domain(
+            [0, 1]).range(
+            [
+              colorScheme.getMin(),
+              colorScheme.getMax()]).clamp(true);
+          var fractions = colorScheme.getFractions();
+          var value = fractionToValue(fractions[clickedRow]);
+          if (!hiddenValues.has(value)) {
+            hiddenValues.add(value);
+          } else {
+            hiddenValues.remove(value);
 
-        }
-        _this.trigger('selectionChanged');
-        _this.repaint();
-      });
+          }
+          _this.trigger('selectionChanged');
+          _this.repaint();
+        });
   }
 };
 

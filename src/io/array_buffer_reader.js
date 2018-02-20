@@ -6,6 +6,9 @@ morpheus.ArrayBufferReader = function (buffer) {
 };
 
 morpheus.ArrayBufferReader.prototype = {
+  reset: function () {
+    this.index = 0;
+  },
   readLine: function () {
     var index = this.index;
     var bufferLength = this.bufferLength;

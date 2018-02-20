@@ -69,6 +69,8 @@ morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
     datasetReader = new morpheus.JsonDatasetReader();
   } else if (ext === 'gct') {
     datasetReader = new morpheus.GctReader();
+  } else if (ext === 'mtx') {
+    datasetReader = new morpheus.MtxReader();
   }
   return datasetReader;
 };

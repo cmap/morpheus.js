@@ -17,8 +17,7 @@ morpheus.Dataset = function (options) {
   }
 
   this.seriesNames.push(options.name);
-  this.seriesArrays.push(options.array ? options.array : morpheus.Dataset
-    .createArray(options));
+  this.seriesArrays.push(morpheus.Dataset.createMatrix(options));
   this.seriesDataTypes.push(options.dataType);
 };
 /**
@@ -135,30 +134,6 @@ morpheus.Dataset.fromJSON = function (options) {
   // }
   // }
 
-  if (options.seriesMappings) {
-    for (var seriesIndex = 0; seriesIndex < options.seriesMappings.length; seriesIndex++) {
-      // map ordinal values
-      if (options.seriesMappings[seriesIndex]) {
-
-        var map = options.seriesMappings[seriesIndex]; // e.g. foo:1, bar:3
-        var valueMap = new morpheus.Map();
-        for (var key in map) {
-          var value = map[key];
-          valueMap.set(value, morpheus.Util.wrapNumber(value, key));
-        }
-
-        var array = options.seriesArrays[seriesIndex];
-        for (var i = 0; i < options.rows; i++) {
-          for (var j = 0; j < options.columns; j++) {
-            var value = array[i][j];
-            array[i][j] = valueMap.get(value);
-          }
-        }
-        options.seriesDataTypes[seriesIndex] = 'Number';
-      }
-    }
-  }
-
   for (var seriesIndex = 0; seriesIndex < options.seriesArrays.length; seriesIndex++) {
     var array = options.seriesArrays[seriesIndex];
     for (var i = 0; i < options.rows; i++) {
@@ -204,7 +179,83 @@ morpheus.Dataset.fromJSON = function (options) {
   }
   return dataset;
 };
-morpheus.Dataset.createArray = function (options) {
+
+morpheus.RowMajorMatrix = function (options) {
+  this.options = options;
+};
+morpheus.RowMajorMatrix.prototype = {
+  getValue: function (i, j) {
+    return this.options.array[i][j];
+  },
+  setValue: function (i, j, value) {
+    this.options.array[i][j] = value;
+  },
+  toJSON: function () {
+    var data = [];
+    var nrows = this.options.rows;
+    var ncols = this.options.columns;
+    var array = this.options.array;
+    for (var i = 0; i < nrows; i++) {
+      var row = [];
+      data.push(row);
+      for (var j = 0; j < ncols; j++) {
+        row[j] = array[i][j];
+      }
+    }
+    return data;
+  }
+};
+
+morpheus.SparseMatrix = function (options) {
+  this.options = options;
+};
+
+morpheus.SparseMatrix.binarySearch = function (array, value, minIndex, maxIndex) {
+  var index;
+  var v;
+  while (minIndex <= maxIndex) {
+    index = (minIndex + maxIndex) / 2 | 0;
+    v = array[index];
+
+    if (v < value) {
+      minIndex = index + 1;
+    }
+    else if (v > value) {
+      maxIndex = index - 1;
+    }
+    else {
+      return index;
+    }
+  }
+
+  return -1;
+};
+
+morpheus.SparseMatrix.prototype = {
+  getValue: function (i, j) {
+    var obj = this.options.array[i];
+    if (obj.values === undefined) {
+      return this.options.defaultValue;
+    }
+    var k = morpheus.SparseMatrix.binarySearch(obj.indices, j, 0, obj.values.length - 1);
+    return k >= 0 ? obj.values[k] : this.options.defaultValue;
+  },
+  setValue: function (i, j, value) {
+    var obj = this.options.array[i];
+    if (obj.values === undefined) {
+      throw 'Invalid index';
+    }
+    var k = morpheus.SparseMatrix.binarySearch(obj.indices, j, 0, obj.values.length - 1);
+    if (k < 0) {
+      throw 'Invalid index';
+    }
+    obj.values[k] = value;
+  }
+};
+morpheus.Dataset.createMatrix = function (options) {
+  if (options.array) {
+    return options.defaultValue != null ? new morpheus.SparseMatrix(options) : new morpheus.RowMajorMatrix(options);
+  }
   var array = [];
   if (options.dataType == null || options.dataType === 'Float32') {
     for (var i = 0; i < options.rows; i++) {
@@ -223,19 +274,20 @@ morpheus.Dataset.createArray = function (options) {
       array.push([]);
     }
   }
-  return array;
+  options.array = array;
+  return new morpheus.RowMajorMatrix(options);
 };
 morpheus.Dataset.prototype = {
   getValue: function (i, j, seriesIndex) {
     seriesIndex = seriesIndex || 0;
-    return this.seriesArrays[seriesIndex][i][j];
+    return this.seriesArrays[seriesIndex].getValue(i, j);
   },
   toString: function () {
     return this.getName();
   },
   setValue: function (i, j, value, seriesIndex) {
     seriesIndex = seriesIndex || 0;
-    this.seriesArrays[seriesIndex][i][j] = value;
+    this.seriesArrays[seriesIndex].setValue(i, j, value);
   },
   addSeries: function (options) {
     options = $.extend({}, {
@@ -245,8 +297,7 @@ morpheus.Dataset.prototype = {
     }, options);
     this.seriesDataTypes.push(options.dataType);
     this.seriesNames.push(options.name);
-    this.seriesArrays.push(options.array != null ? options.array
-      : morpheus.Dataset.createArray(options));
+    this.seriesArrays.push(morpheus.Dataset.createMatrix(options));
     return this.seriesNames.length - 1;
   }
 };

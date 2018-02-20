@@ -1,4 +1,5 @@
 morpheus.HeatMapOptions = function (heatMap) {
+
   var items = [
     {
       name: 'color_by',
@@ -63,7 +64,7 @@ morpheus.HeatMapOptions = function (heatMap) {
         value: 'cn'
       }];
     var savedColorSchemeKeys = [];
-    if (localStorage.getItem('morpheus-colorScheme') != null) {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('morpheus-colorScheme') != null) {
       savedColorSchemeKeys = _.keys(JSON.parse(localStorage.getItem('morpheus-colorScheme')));
     }
     if (savedColorSchemeKeys.length > 0) {
