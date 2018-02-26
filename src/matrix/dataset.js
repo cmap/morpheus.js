@@ -180,6 +180,98 @@ morpheus.Dataset.fromJSON = function (options) {
   return dataset;
 };
 
+morpheus.RowMajorMatrix1DFileBacked = function (options) {
+  this.options = options;
+
+  let file = options.file;
+  let h5lt = require('hdf5').h5lt;
+  let type = this.options.file.getDataType('matrix');
+  let H5Type = require('hdf5/lib/globals.js').H5Type;
+
+  if (type === H5Type.H5T_IEEE_F64LE) {
+    this.getter = 'readDoubleLE';
+    this.offset = 8;
+  } else if (type === H5Type.H5T_IEEE_F64BE) {
+    this.getter = 'readDoubleBE';
+    this.offset = 8;
+  } else if (type === H5Type.H5T_IEEE_F32LE) {
+    this.getter = 'readFloatLE';
+    this.offset = 4;
+  } else if (type === H5Type.H5T_IEEE_F32BE) {
+    this.getter = 'readFloatBE';
+    this.offset = 4;
+  } else {
+    throw new Error('Unsupported data type');
+  }
+  this.cachedBuffer = h5lt.readDatasetAsBuffer(this.options.file.id, 'matrix', {
+    start: [0, 0],
+    stride: [1, 1],
+    count: [1, this.options.columns]
+  });
+  let cachedRowIndex = 0;
+  let ncols = this.options.columns;
+  let _this = this;
+  this.getValue = function (i, j) {
+    if (cachedRowIndex !== i) {
+      // var array = this.h5lt.readDataset(this.options.file.id, 'matrix', {start: [1, 2], stride: [1, 1], count: [3, 4]});
+      _this.cachedBuffer = h5lt.readDatasetAsBuffer(file.id, 'matrix', {
+        start: [i, 0],
+        stride: [1, 1],
+        count: [1, ncols]
+      });
+      cachedRowIndex = i;
+    }
+    return _this.cachedBuffer[_this.getter](j * _this.offset);
+  };
+
+};
+morpheus.RowMajorMatrix1DFileBacked.prototype = {
+
+  setValue: function (i, j, value) {
+    throw new Error('Unsupported operation.');
+  },
+  toJSON: function () {
+    var data = [];
+    var nrows = this.options.rows;
+    var ncols = this.options.columns;
+    var array = this.options.array;
+    for (var i = 0; i < nrows; i++) {
+      var row = [];
+      data.push(row);
+      for (var j = 0; j < ncols; j++) {
+        row[j] = this.getValue(i, j);
+      }
+    }
+    return data;
+  }
+};
+
+morpheus.RowMajorMatrix1D = function (options) {
+  this.options = options;
+};
+morpheus.RowMajorMatrix1D.prototype = {
+  getValue: function (i, j) {
+    return this.options.array[i * this.options.columns + j];
+  },
+  setValue: function (i, j, value) {
+    this.options.array[i * this.options.columns + j] = value;
+  },
+  toJSON: function () {
+    var data = [];
+    var nrows = this.options.rows;
+    var ncols = this.options.columns;
+    var array = this.options.array;
+    for (var i = 0; i < nrows; i++) {
+      var row = [];
+      data.push(row);
+      for (var j = 0; j < ncols; j++) {
+        row[j] = this.getValue(i, j);
+      }
+    }
+    return data;
+  }
+};
+
 morpheus.RowMajorMatrix = function (options) {
   this.options = options;
 };
@@ -254,8 +346,19 @@ morpheus.SparseMatrix.prototype = {
 };
 morpheus.Dataset.createMatrix = function (options) {
   if (options.array) {
-    return options.defaultValue != null ? new morpheus.SparseMatrix(options) : new morpheus.RowMajorMatrix(options);
+    if (options.defaultValue != null) {
+      return new morpheus.SparseMatrix(options);
+    } else {
+      if (options.type === '1d') {
+        return new morpheus.RowMajorMatrix1D(options);
+      } else {
+        return new morpheus.RowMajorMatrix(options);
+      }
+    }
+  } else if (options.type === '1d_file') {
+    return new morpheus.RowMajorMatrix1DFileBacked(options);
   }
+
   var array = [];
   if (options.dataType == null || options.dataType === 'Float32') {
     for (var i = 0; i < options.rows; i++) {

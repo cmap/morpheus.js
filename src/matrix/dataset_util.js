@@ -41,38 +41,65 @@ morpheus.DatasetUtil.max = function (dataset, seriesIndex) {
   return max;
 };
 
+morpheus.DatasetUtil.extensionToReader = new morpheus.Map();
+morpheus.DatasetUtil.registerDatasetReader = function (ext, f) {
+  if (morpheus.Util.isArray(ext)) {
+    for (var i = 0; i < ext.length; i++) {
+      morpheus.DatasetUtil.extensionToReader.set(ext[i], f);
+    }
+  } else {
+    morpheus.DatasetUtil.extensionToReader.set(ext, f);
+  }
+};
+
+morpheus.DatasetUtil.registerDatasetReader('maf', function (options) {
+  var datasetReader = new morpheus.MafFileReader();
+  if (options && options.mafGeneFilter) {
+    datasetReader.setGeneFilter(options.mafGeneFilter);
+  }
+  return datasetReader;
+});
+
+
+if (morpheus.Util.isNode()) {
+  morpheus.DatasetUtil.registerDatasetReader('loom', function (options) {
+    return new morpheus.LoomReader();
+  });
+}
+
+morpheus.DatasetUtil.registerDatasetReader('gct', function (options) {
+  // datasetReader = new morpheus.StreamingGctReader();
+  return new morpheus.GctReader();
+});
+
+morpheus.DatasetUtil.registerDatasetReader('gmt', function (options) {
+  return new morpheus.GmtDatasetReader();
+});
+morpheus.DatasetUtil.registerDatasetReader(['xlsx', 'xls'], function (options) {
+  return options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.XlsxDatasetReader();
+});
+morpheus.DatasetUtil.registerDatasetReader(['segtab', 'seg'], function (options) {
+  return new morpheus.SegTabReader();
+});
+morpheus.DatasetUtil.registerDatasetReader(['txt', 'tsv', 'csv'], function (options) {
+  return options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.TxtReader();
+});
+morpheus.DatasetUtil.registerDatasetReader('json', function (options) {
+  return new morpheus.JsonDatasetReader();
+});
+morpheus.DatasetUtil.registerDatasetReader('mtx', function (options) {
+  return new morpheus.MtxReader();
+});
+
 morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
   if (options == null) {
     options = {};
   }
   var datasetReader = null;
-  if (ext === 'maf') {
-    datasetReader = new morpheus.MafFileReader();
-    if (options && options.mafGeneFilter) {
-      datasetReader.setGeneFilter(options.mafGeneFilter);
-    }
-  } else if (ext === 'gct') {
-    datasetReader = new morpheus.GctReader();
-    // datasetReader = new morpheus.StreamingGctReader();
-  } else if (ext === 'gmt') {
-    datasetReader = new morpheus.GmtDatasetReader();
-  } else if (ext === 'xlsx' || ext === 'xls') {
-    datasetReader = options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.XlsxDatasetReader();
-  } else if (ext === 'segtab' || ext === 'seg') {
-    datasetReader = new morpheus.SegTabReader();
-    if (options && options.regions) {
-      datasetReader.setRegions(options.regions);
-    }
-  } else if (ext === 'txt' || ext === 'tsv' || ext === 'csv') {
-    datasetReader = options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.TxtReader();
-  } else if (ext === 'json') {
-    datasetReader = new morpheus.JsonDatasetReader();
-  } else if (ext === 'gct') {
-    datasetReader = new morpheus.GctReader();
-  } else if (ext === 'mtx') {
-    datasetReader = new morpheus.MtxReader();
+  var f = morpheus.DatasetUtil.extensionToReader.get(ext)
+  if (f != null) {
+    return f(options);
   }
-  return datasetReader;
 };
 
 morpheus.DatasetUtil.readDatasetArray = function (datasets) {

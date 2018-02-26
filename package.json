@@ -3,6 +3,7 @@
   "description": "JavaScript matrix visualization and analysis",
   "license": "BSD-3-Clause",
   "version": "1.0.5",
+  "main": "main.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/cmap/morpheus.js.git"
@@ -13,6 +14,22 @@
   },
   "author": {
     "name": "Joshua Gould"
+  },
+  "build": {
+    "appId": "org.broadinstitute.software.morpheus",
+    "mac": {
+      "category": "public.app-category.graphics-design",
+      "target": [
+        "zip"
+      ]
+    },
+    "productName": "Morpheus",
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://software.broadinstitute.org/morpheus/dist/"
+      }
+    ]
   },
   "keywords": [
     "graphing",
@@ -28,9 +45,15 @@
   "scripts": {
     "test:js": "grunt concat:morpheus concat:extJs concat:extJsAll uglify",
     "test:karma": "./node_modules/.bin/karma start --single-run",
-    "test": "npm run test:js && npm run test:karma"
+    "test": "npm run test:js && npm run test:karma",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps",
+    "publish": "build -p always"
   },
   "devDependencies": {
+    "electron": "^1.8.2",
+    "electron-builder": "^20.2.0",
     "finalhandler": "^1.1.0",
     "grunt": "^1.0.2",
     "grunt-contrib-concat": "^1.0.1",
@@ -46,5 +69,9 @@
     "promise-polyfill": "^6.0.2",
     "serve-static": "^1.13.2",
     "whatwg-fetch": "^2.0.3"
+  },
+  "dependencies": {
+    "electron-updater": "^2.21.0",
+    "hdf5": "^0.3.3"
   }
 }

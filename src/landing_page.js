@@ -97,11 +97,13 @@ morpheus.LandingPage.prototype = {
   show: function () {
     var _this = this;
     this.$el.show();
-    $(window).on('beforeunload.morpheus', function () {
-      if (_this.tabManager.getTabCount() > 0) {
-        return 'Are you sure you want to close Morpheus?';
-      }
-    });
+    if (!morpheus.Util.isNode()) {
+      $(window).on('beforeunload.morpheus', function () {
+        if (_this.tabManager.getTabCount() > 0) {
+          return 'Are you sure you want to close Morpheus?';
+        }
+      });
+    }
   },
   openFile: function (files) {
     if (files.length !== 3) {

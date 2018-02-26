@@ -15,6 +15,14 @@ if (typeof module !== 'undefined' && module.exports) {
 morpheus.Util = function () {
 };
 
+morpheus.Util.isNode = function () {
+  // Only Node.JS has a process variable that is of [[Class]] process
+  try {
+    return Object.prototype.toString.call(global.process) === '[object process]'
+  } catch (e) {
+  }
+  return false;
+};
 morpheus.Util.RIGHT_ARROW = String.fromCharCode(8594);
 /**
  * Add properties in c2 to c1
@@ -995,6 +1003,7 @@ morpheus.Util.xlsxTo1dArray = function (options, callback) {
   }
 
 };
+
 
 /**
  * Returns a promise that resolves to a string
