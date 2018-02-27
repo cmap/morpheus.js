@@ -37,12 +37,12 @@ morpheus.CollapseDatasetTool.prototype = {
     form.$form.find('[name=collapse_method]').on('change', function (e) {
       form.setVisible('percentile', $(this).val() === morpheus.Percentile.toString());
     });
-    form.$form.find('[name=filter_values]').on('change', function (e) {
-      form.setVisible('filter_operator', form.getValue('filter_values'));
-      form.setVisible('filter_value', form.getValue('filter_values'));
+    form.$form.find('[name=compute_percent]').on('change', function (e) {
+      form.setVisible('percent_operator', form.getValue('compute_percent'));
+      form.setVisible('percent_value', form.getValue('compute_percent'));
     });
-    form.setVisible('filter_operator', false);
-    form.setVisible('filter_value', false);
+    form.setVisible('percent_operator', false);
+    form.setVisible('percent_value', false);
   },
 
   gui: function (project) {
@@ -66,21 +66,22 @@ morpheus.CollapseDatasetTool.prototype = {
         options: [],
         type: 'select',
         multiple: true
+      },
+      {
+        name: 'compute_percent',
+        type: 'checkbox',
+        help: 'Whether to calculate the percentage of items in a collapsed group that passed an expression'
+      },
+      {
+        name: 'percent_operator',
+        options: ['>=', '>', '<', '<='],
+        type: 'bootstrap-select',
+        showLabel: false
+      }, {
+        name: 'percent_value',
+        type: 'text',
+        help: 'The corresponding value for "percent operator"'
       }];
-    // {
-    //   name: 'filter_values',
-    //     type: 'checkbox',
-    //   help: 'Optionally filter values before collapsing'
-    // },
-    // {
-    //   name: 'filter_operator',
-    //     options: ['>=', '>', '<', '<='],
-    //   type: 'bootstrap-select',
-    //   showLabel: false
-    // }, {
-    //   name: 'filter_value',
-    //     type: 'text'
-    // }
   },
   execute: function (options) {
     var project = options.project;
@@ -103,10 +104,10 @@ morpheus.CollapseDatasetTool.prototype = {
     }
     var allFields = morpheus.MetadataUtil.getMetadataNames(dataset.getRowMetadata());
     var filterFunction = null;
-    if (options.input.filter_values) {
-      var filterValue = parseFloat(options.input.filter_value);
+    if (options.input.compute_percent) {
+      var filterValue = parseFloat(options.input.percent_value);
       if (!isNaN(filterValue)) {
-        var op = options.input.filter_operator;
+        var op = options.input.percent_operator;
         if (op === '>=') {
           filterFunction = function (value) {
             return value >= filterValue;
@@ -153,7 +154,7 @@ morpheus.CollapseDatasetTool.prototype = {
 
     if (filterFunction != null) {
       heatMap.heatmap.colorScheme.getSizer()
-        .setSeriesName('percent_passed_filter');
+        .setSeriesName('percent');
       heatMap.heatmap.colorScheme.getSizer()
         .setMin(0);
       heatMap.heatmap.colorScheme.getSizer()

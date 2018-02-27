@@ -24,6 +24,7 @@ morpheus.HeatMapElementCanvas = function (project) {
   this.elementDrawCallback = null;
   this.drawCallback = null;
   this.drawValuesFormat = morpheus.Util.createNumberFormat('.2f');
+  this.shape = 'square';
 };
 morpheus.HeatMapElementCanvas.GRID_COLOR = '#808080';
 morpheus.HeatMapElementCanvas.prototype = {
@@ -46,6 +47,12 @@ morpheus.HeatMapElementCanvas.prototype = {
     if (repaint) {
       this.repaint();
     }
+  },
+  getShape: function () {
+    return this.shape;
+  },
+  setShape: function (shape) {
+    this.shape = shape;
   },
   setGridColor: function (gridColor) {
     this.gridColor = gridColor;
@@ -331,7 +338,7 @@ morpheus.HeatMapElementCanvas.prototype = {
       var fontSize = columnPositions.getSize();
       context.font = fontSize + 'px ' + fontFamily;
       var textWidth = context.measureText('-99.9').width;
-      fontSize = ( (columnPositions.getSize() - 1) / textWidth) * fontSize;
+      fontSize = ((columnPositions.getSize() - 1) / textWidth) * fontSize;
       fontSize = Math.min(fontSize, 17);
       context.font = fontSize + 'px ' + morpheus.CanvasUtil.getFontFamily(context);
     }
@@ -346,6 +353,19 @@ morpheus.HeatMapElementCanvas.prototype = {
     var conditions;
     var conditionSeriesIndices;
     var sizeFractionRemapper = d3.scale.linear().domain([0, 1]).range([0.2, 1]);
+    var drawFunction;
+    if (this.shape === 'circle') {
+      drawFunction = function (x, y, w, h) {
+        context.beginPath();
+        context.arc(x + w / 2, y + h / 2, Math.min(w, h) / 2, 0, 2 * Math.PI, false);
+        context.fill();
+      };
+
+    } else {
+      drawFunction = function (x, y, w, h) {
+        context.fillRect(x, y, w, h);
+      };
+    }
     for (var row = top; row < bottom; row++) {
       var rowSize = rowPositions.getItemSize(row);
       var py = rowPositions.getPosition(row);
@@ -372,6 +392,7 @@ morpheus.HeatMapElementCanvas.prototype = {
         var xoffset = 0;
         var cellRowSize = rowSize;
         var cellColumnSize = columnSize;
+
         if (sizeBySeriesIndex !== undefined) {
           var sizeByValue = dataset.getValue(row, column,
             sizeBySeriesIndex);
@@ -412,7 +433,7 @@ morpheus.HeatMapElementCanvas.prototype = {
                 morpheus.CanvasUtil.drawShape(context, condition.shape,
                   x, y, Math.min(cellColumnSize, cellRowSize) / 2, true);
               } else { // e.g. filled circle on top of heat map
-                context.fillRect(px + xoffset, py + yoffset, cellColumnSize,
+                drawFunction(px + xoffset, py + yoffset, cellColumnSize,
                   cellRowSize);
                 // x and y are at center
                 var x = px + xoffset + cellRowSize / 2;
@@ -421,17 +442,16 @@ morpheus.HeatMapElementCanvas.prototype = {
                 morpheus.CanvasUtil.drawShape(context, condition.shape,
                   x, y, Math.min(cellColumnSize, cellRowSize) / 4, true);
               }
-
-            } else {
-              context.fillRect(px + xoffset, py + yoffset, cellColumnSize,
+            } else { // default shape when no condition passed
+              drawFunction(px + xoffset, py + yoffset, cellColumnSize,
                 cellRowSize);
             }
           } else {
-            context.fillRect(px + xoffset, py + yoffset, cellColumnSize,
+            drawFunction(px + xoffset, py + yoffset, cellColumnSize,
               cellRowSize);
           }
         } else {
-          context.fillRect(px + xoffset, py + yoffset, cellColumnSize, cellRowSize);
+          drawFunction(px + xoffset, py + yoffset, cellColumnSize, cellRowSize);
         }
         if (drawValues && cellColumnSize > 7 && cellRowSize > 7 && !isNaN(value)) {
           context.fillStyle = 'rgb(0,0,0)';

@@ -26,8 +26,8 @@ morpheus.ActionManager = function () {
   var $filterModal = null;
   var windowOpen = function (url) {
     if (morpheus.Util.isNode()) {
-      const remote = require('electron').remote;
-      const BrowserWindow = remote.BrowserWindow;
+      var remote = require('electron').remote;
+      var BrowserWindow = remote.BrowserWindow;
       var newWindow = new BrowserWindow({
         fullscreenable: false
       });

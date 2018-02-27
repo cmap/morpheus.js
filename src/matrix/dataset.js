@@ -183,10 +183,10 @@ morpheus.Dataset.fromJSON = function (options) {
 morpheus.RowMajorMatrix1DFileBacked = function (options) {
   this.options = options;
 
-  let file = options.file;
-  let h5lt = require('hdf5').h5lt;
-  let type = this.options.file.getDataType('matrix');
-  let H5Type = require('hdf5/lib/globals.js').H5Type;
+  var file = options.file;
+  var h5lt = require('hdf5').h5lt;
+  var type = this.options.file.getDataType('matrix');
+  var H5Type = require('hdf5/lib/globals.js').H5Type;
 
   if (type === H5Type.H5T_IEEE_F64LE) {
     this.getter = 'readDoubleLE';
@@ -208,9 +208,9 @@ morpheus.RowMajorMatrix1DFileBacked = function (options) {
     stride: [1, 1],
     count: [1, this.options.columns]
   });
-  let cachedRowIndex = 0;
-  let ncols = this.options.columns;
-  let _this = this;
+  var cachedRowIndex = 0;
+  var ncols = this.options.columns;
+  var _this = this;
   this.getValue = function (i, j) {
     if (cachedRowIndex !== i) {
       // var array = this.h5lt.readDataset(this.options.file.id, 'matrix', {start: [1, 2], stride: [1, 1], count: [3, 4]});

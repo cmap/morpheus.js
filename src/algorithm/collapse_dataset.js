@@ -18,15 +18,16 @@ morpheus.CollapseDataset = function (dataset, collapseToFields,
     columns: dataset.getColumnCount(),
     dataType: 'Float32'
   });
-  var nseries = dataset.getSeriesCount();
-  for (var series = 1; series < nseries; series++) {
-    collapsedDataset.addSeries({
-      name: dataset.getName(i),
-      dataType: 'Float32'
-    });
-  }
+  // var nseries = dataset.getSeriesCount();
+  // for (var series = 1; series < nseries; series++) {
+  //   collapsedDataset.addSeries({
+  //     name: dataset.getName(i),
+  //     dataType: 'Float32'
+  //   });
+  // }
+  var percentPassedSeriesIndex;
   if (filterFunction != null) {
-    collapsedDataset.addSeries({name: 'percent_passed'});
+    percentPassedSeriesIndex = collapsedDataset.addSeries({name: 'percent'});
   }
   if (shallowCopy) {
     collapsedDataset.setColumnMetadata(dataset.getColumnMetadata());
@@ -52,18 +53,13 @@ morpheus.CollapseDataset = function (dataset, collapseToFields,
       for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
         view.setIndex(j);
         if (filterFunction != null) {
-          var array = new Float32Array(view.size());
           var npass = 0;
           for (var i = 0, size = view.size(); i < size; i++) {
-            var value = view.getValue(i);
-            if (filterFunction(value)) {
-              array[npass] = value;
+            if (filterFunction(view.getValue(i))) {
               npass++;
             }
           }
-          vector = morpheus.Vector.fromArray('', array, npass);
-          collapsedDataset.setValue(counter, j, summarizeFunction(vector));
-          collapsedDataset.setValue(counter, j, (npass / view.size()) * 100);
+          collapsedDataset.setValue(counter, j, (npass / view.size()) * 100, percentPassedSeriesIndex);
         } else {
           collapsedDataset.setValue(counter, j, summarizeFunction(view));
         }

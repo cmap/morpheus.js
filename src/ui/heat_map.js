@@ -1129,6 +1129,7 @@ morpheus.HeatMap.prototype = {
     json.gridColor = this.heatmap.getGridColor();
     json.gridThickness = this.heatmap.getGridThickness();
     json.drawValues = this.heatmap.isDrawValues();
+    json.shape = this.heatmap.getShape();
 
     // selection
     json.rowSelection = this.getProject().getRowSelectionModel().toModelIndices();
@@ -1592,7 +1593,9 @@ morpheus.HeatMap.prototype = {
     if (this.options.drawValues != null) {
       this.heatmap.setDrawValues(this.options.drawValues);
     }
-
+    if (this.options.shape != null) {
+      this.heatmap.setDrawValues(this.options.shape);
+    }
     if (rowDendrogramSortKey != null) {
       this.project.setRowSortKeys([rowDendrogramSortKey]);
     }
