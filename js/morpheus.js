@@ -29556,6 +29556,9 @@ morpheus.HeatMap.prototype = {
       _this.project.setRowFilter(_this.project.getRowFilter(), true);
     }
     if (this.options.columnFilter) {
+      this.options.columnFilter.forEach(function (filter) {
+        filter.isColumns = true;
+      });
       morpheus.CombinedFilter.fromJSON(_this.project.getColumnFilter(), this.options.columnFilter);
       _this.project.setColumnFilter(_this.project.getColumnFilter(), true);
     }
