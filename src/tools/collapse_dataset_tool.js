@@ -137,6 +137,7 @@ morpheus.CollapseDatasetTool.prototype = {
       dataset: dataset,
       parent: options.heatMap,
       symmetric: false,
+      shape: filterFunction != null ? 'circle' : null
     });
 
     var set = new morpheus.Map();
