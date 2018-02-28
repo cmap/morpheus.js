@@ -1,9 +1,22 @@
 const autoUpdater = require("electron-updater").autoUpdater
-autoUpdater.checkForUpdatesAndNotify();
-const {app, BrowserWindow, dialog} = require('electron');
+const {app, BrowserWindow, dialog, shell} = require('electron');
 app.showExitPrompt = true;
 const path = require('path');
 const url = require('url');
+autoUpdater.autoDownload = false;
+
+autoUpdater.on('update-available', () => {
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'Morpheus Update',
+    message: 'Found updates, do you want to download?',
+    buttons: ['Yes', 'No']
+  }, (buttonIndex) => {
+    if (buttonIndex === 0) {
+      shell.openExternal('https://software.broadinstitute.org/morpheus/', {activate: true});
+    }
+  })
+});
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -16,6 +29,7 @@ function createWindow() {
   win.once('ready-to-show', () => {
     win.maximize();
     win.show();
+    autoUpdater.checkForUpdates();
   });
   // Hide the menu
   win.setMenu(null);
@@ -25,6 +39,7 @@ function createWindow() {
     protocol: 'file:',
     slashes: true
   }));
+
   win.on('close', (e) => {
     if (app.showExitPrompt) {
       e.preventDefault() // Prevents the window from closing
@@ -55,9 +70,9 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', function()  {
+app.on('ready', function () {
   createWindow();
-  autoUpdater.checkForUpdatesAndNotify();
+
 });
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -77,5 +92,4 @@ app.on('activate', () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+
