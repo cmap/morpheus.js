@@ -62,8 +62,11 @@ morpheus.DatasetUtil.registerDatasetReader('maf', function (options) {
 
 
 if (morpheus.Util.isNode()) {
+  morpheus.DatasetUtil.registerDatasetReader('gctx', function (options) {
+    return morpheus.Hdf5Reader.getGctxInstance();
+  });
   morpheus.DatasetUtil.registerDatasetReader('loom', function (options) {
-    return new morpheus.LoomReader();
+    return morpheus.Hdf5Reader.getLoomInstance();
   });
 }
 

@@ -27,7 +27,7 @@
     "publish": [
       {
         "provider": "generic",
-        "url": "https://software.broadinstitute.org/morpheus/dist/"
+        "url": "https://software.broadinstitute.org/morpheus/app/"
       }
     ]
   },
