@@ -44,8 +44,7 @@ morpheus.LandingPage = function (pageOptions) {
     .appendTo($input);
   $('<div style="margin-bottom:20px;"><small>All' +
     ' data is' +
-    ' processed in the' +
-    ' browser and never sent to any server.</small></div>').appendTo($input);
+    ' processed on your computer and never sent to any server.</small></div>').appendTo($input);
 
   var filePicker = new morpheus.FilePicker({
     fileCallback: function (files) {
