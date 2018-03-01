@@ -35,6 +35,7 @@ morpheus.HeatMapElementCanvas.prototype = {
     this.gridThickness = parentHeatMapElementCanvas.gridThickness;
     this.gridColor = parentHeatMapElementCanvas.gridColor;
     this.drawValues = parentHeatMapElementCanvas.drawValues;
+    this.shape = parentHeatMapElementCanvas.shape;
   },
   updateRowSelectionCache: function (repaint) {
     this.selectedRowElements = morpheus.HeatMapElementCanvas.getSelectedSpans(this.project.getRowSelectionModel().getViewIndices());

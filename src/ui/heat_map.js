@@ -1597,7 +1597,7 @@ morpheus.HeatMap.prototype = {
       this.heatmap.setDrawValues(this.options.drawValues);
     }
     if (this.options.shape != null) {
-      this.heatmap.setDrawValues(this.options.shape);
+      this.heatmap.setShape(this.options.shape);
     }
     if (rowDendrogramSortKey != null) {
       this.project.setRowSortKeys([rowDendrogramSortKey]);
