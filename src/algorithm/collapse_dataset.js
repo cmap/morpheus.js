@@ -60,9 +60,8 @@ morpheus.CollapseDataset = function (dataset, collapseToFields,
             }
           }
           collapsedDataset.setValue(counter, j, (npass / view.size()) * 100, percentPassedSeriesIndex);
-        } else {
-          collapsedDataset.setValue(counter, j, summarizeFunction(view));
         }
+        collapsedDataset.setValue(counter, j, summarizeFunction(view));
 
       }
       // }
