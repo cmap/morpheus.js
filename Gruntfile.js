@@ -68,7 +68,7 @@ module.exports = function (grunt) {
           'js/FileSaver.min.js', 'js/colorbrewer.js',
           'js/jquery.event.drag-2.2.js', 'js/slick.min.js', 'js/canvas-toBlob.js',
           'js/js.cookie.js', 'js/jstat.min.js', 'js/blob-stream.js',
-          'js/canvas2pdf.js', 'js/pdfkit.js']
+          'js/canvas2pdf.js', 'js/pdfkit.js', 'js/polyfill.min.js', 'js/fetch.js']
       },
       morpheus: {
         options: {
