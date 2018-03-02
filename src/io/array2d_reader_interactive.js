@@ -73,7 +73,11 @@ morpheus.Array2dReaderInteractive.prototype = {
       while ((s = br.readLine()) !== null && lines.length < 100) {
         lines.push(s.split(tab));
       }
-
+      if (lines[0][0] === '#1.3') {
+        br.reset();
+        callback(null, new morpheus.GctReader()._read(name, br));
+        return;
+      }
       var grid;
       var columns = [];
       for (var j = 0, ncols = lines[0].length; j < ncols; j++) {
@@ -194,7 +198,11 @@ morpheus.Array2dReaderInteractive.prototype = {
 
   },
   _read: function (datasetName, bufferedReader, dataColumnStart, dataRowStart, cb) {
-    var dataset = new morpheus.TxtReader({columnMetadata: true, dataRowStart: dataRowStart, dataColumnStart: dataColumnStart})._read(datasetName, bufferedReader);
+    var dataset = new morpheus.TxtReader({
+      columnMetadata: true,
+      dataRowStart: dataRowStart,
+      dataColumnStart: dataColumnStart
+    })._read(datasetName, bufferedReader);
     cb(null, dataset);
   }
 };

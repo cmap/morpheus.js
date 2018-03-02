@@ -1,3 +1,9 @@
+/**
+ *
+ * @param options.file Prespecified file
+ * @param options.clipboard Whether the prespecified file was from the clipboard
+ * @constructor
+ */
 morpheus.OpenFileTool = function (options) {
   this.options = options || {};
 };
@@ -33,7 +39,13 @@ morpheus.OpenFileTool.OPEN_FILE_ACTION_OPTIONS = [
 
 morpheus.OpenFileTool.prototype = {
   toString: function () {
-    return 'Open' + (this.options.file != null ? (' - ' + this.options.file.name) : '');
+    var file = '';
+    if (this.options.file != null && this.options.file.name != null) {
+      file = ' - ' + this.options.file.name;
+    } else if (this.options.clipboard) {
+      file = ' - Clipboard';
+    }
+    return 'Open' + file;
   },
   gui: function () {
     var params = [
@@ -56,7 +68,7 @@ morpheus.OpenFileTool.prototype = {
       if (extension === 'json') { // TODO no gui needed
         params[0].options = params[0].options.filter(function (opt) {
           return opt.value != null &&
-            ( opt.value === 'Open session' || opt.value === 'open' ||
+            (opt.value === 'Open session' || opt.value === 'open' ||
               opt.value === 'overlay' || opt.value.indexOf('append') !== -1);
         });
       } else if (extension === 'gct') {
@@ -136,6 +148,7 @@ morpheus.OpenFileTool.prototype = {
     var heatMap = options.heatMap;
     if (!isInteractive) {
       options.input.file = this.options.file;
+      options.input.clipboard = this.options.clipboard;
     }
 
     var project = options.project;
@@ -179,9 +192,8 @@ morpheus.OpenFileTool.prototype = {
             isAnnotateColumns, lines);
         });
       } else if (morpheus.Util.endsWith(fileName, '.gmt')) {
-        morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (
-          err,
-          buf) {
+        morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
+                                                                       buf) {
           d.resolve();
           if (err) {
             throw new Error('Unable to read ' + fileOrUrl);

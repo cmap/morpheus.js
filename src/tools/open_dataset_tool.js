@@ -240,7 +240,6 @@ morpheus.OpenDatasetTool.prototype = {
                 });
               });
         } else if (action === 'open') { // new tab
-          console.log('open');
           new morpheus.HeatMap({
             dataset: newDataset,
             parent: heatMap,

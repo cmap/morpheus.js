@@ -2156,6 +2156,7 @@ morpheus.HeatMap.prototype = {
           }
           morpheus.HeatMap.showTool(
             new morpheus.OpenFileTool({
+              clipboard: true,
               file: url
             }), _this);
         }

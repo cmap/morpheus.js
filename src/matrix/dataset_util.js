@@ -223,7 +223,8 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
   var ext = options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
   var datasetReader;
   var str = fileOrUrl.toString();
-  if (ext === '' && str != null && str.indexOf('blob:') === 0) {
+  if ((ext === '' && str != null && str.indexOf('blob:') === 0) || options.clipboard) {
+    // can be txt or gct
     datasetReader = options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.TxtReader(); // copy from clipboard
   } else {
     datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
