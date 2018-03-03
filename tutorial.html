@@ -1,190 +1,190 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport"
-          content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
-    <title>Morpheus - Tutorial</title>
-    <link rel="stylesheet" href="css/morpheus-latest.min.css">
-    <script type="text/javascript" src="js/morpheus-external-latest.min.js"></script>
-    <script src="js/morpheus-latest.min.js"></script>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport"
+        content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Morpheus - Tutorial</title>
+  <link rel="stylesheet" href="css/morpheus-latest.min.css">
+  <script type="text/javascript" src="js/morpheus-external-latest.min.js"></script>
+  <script src="js/morpheus-latest.min.js"></script>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-xs-12">
-            <svg width="32px" height="32px">
-                <g>
-                    <rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/>
-                    <rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/>
-                </g>
-            </svg>
-            <h2 style="padding-left: 4px; display:inline-block;">Tutorial</h2>
-            <p>This tutorial uses data from <a target="_blank"
-                                               href="http://www.broadinstitute.org/achilles">Project
-                Achilles</a>.</p>
-            <hr/>
-        </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <svg width="32px" height="32px">
+        <g>
+          <rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/>
+          <rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/>
+        </g>
+      </svg>
+      <h2 style="padding-left: 4px; display:inline-block;">Tutorial</h2>
+      <p>This tutorial uses data from <a target="_blank"
+                                         href="http://www.broadinstitute.org/achilles">Project
+        Achilles</a>.</p>
+      <hr/>
     </div>
-    <div id="header" class="row">
-        <div class="col-xs-12">
-            <input type="button" class="btn btn-default btn-sm"
-                   value="Expand All" name="expand"> <input type="button"
-                                                            class="btn btn-default btn-sm"
-                                                            value="Collapse All" name="collapse">
-        </div>
+  </div>
+  <div id="header" class="row">
+    <div class="col-xs-12">
+      <input type="button" class="btn btn-default btn-sm"
+             value="Expand All" name="expand"> <input type="button"
+                                                      class="btn btn-default btn-sm"
+                                                      value="Collapse All" name="collapse">
     </div>
+  </div>
 
-    <div class="row">
-        <div class="col-xs-12">
+  <div class="row">
+    <div class="col-xs-12">
 
-            <a data-toggle="collapse"
-               style="font-size: 1.2em; display: block; font-weight: 800;">Open
-                Project Achilles Gene Essentiality Scores</a>
-            <p class="collapse">Open the Project Achilles "Gene Essentiality"
-                scores under the preloaded datasets section. Project Achilles facilitates the
-                discovery of genes that when knocked down effect the viability of particular cell
-                lines.<br/>Morpheus can also open data from Excel, text files,
-                the clipboard, a URL, Google Drive, and Dropbox.</p>
-
-
-            <a data-toggle="collapse"
-               style="font-size: 1.2em; display: block; font-weight: 800;">Median
-                Absolute Deviation (MAD)</a>
-            <p class="collapse">
-                Click Tools > Create Calculated Annotation. <br/> Enter "MAD" for
-                the "Annotation name". <br/> Enter "MAD()" for "Formula" and
-                click "OK". <br/> A new row annotation named "MAD" will appear to
-                the right of the heat map.
-            </p>
-
-            <a data-toggle="collapse"
-               style="font-size: 1.2em; display: block; font-weight: 800;">Filter
-                Rows</a>
-            <p class="collapse">
-                Show only the top 500 most variable genes by the median absolute
-                deviation <br/> Click Tools > Filter to open the filter dialog. <br/>Click the "Add"
-                button and set the field name to "MAD". <br/>Click
-                "Switch to top N filter" and enter "500" for "N". Note that 523
-                rows are now shown because of ties in the median absolute
-                deviation.
-            </p>
-
-            <a data-toggle="collapse"
-               style="font-size: 1.2em; display: block; font-weight: 800;">Hierarchical
-                Clustering</a>
-            <p class="collapse">
-                Click Tools > Hierarchical Clustering. Change "Cluster" to "Rows and
-                columns". Click "OK" to run the analysis. <br/> Do haematopoietic
-                cell lines cluster together? Hover over the primary_site
-                annotations to highlight cell lines from the same primary site. You
-                can dynamically cut the dendrogram by dragging the dashed line at
-                the top of the dendrogram. <br/>Hierarchical clustering
-                recursively merges objects based on their pair-wise distance.
-                Objects closest together are merged first, objects furthest apart
-                are merged last. The result is a tree structure, referred to as a
-                dendogram, where the leaf nodes represent the original items and
-                internal (higher) nodes represent the merges that occurred. Click <a
-                    target="_black"
-                    href="http://www.mathworks.com/help/stats/hierarchical-clustering.html">here</a>
-                for a more detailed description of the hierarchical clustering
-                algorithm and <a target="_blank"
-                                 href="http://support.minitab.com/en-us/minitab-express/1/help-and-how-to/modeling-statistics/regression/supporting-topics/basics/a-comparison-of-the-pearson-and-spearman-correlation-methods/">here</a>
-                for a comparison of the Pearson and Spearman correlation methods.
-            </p>
-
-            <a data-toggle="collapse"
-               style="font-size: 1.2em; display: block; font-weight: 800;">Compress
-                Heat Map</a>
-            <p class="collapse">
-                Click View > Fit To Window to compress the heat map. Select View > 100%
-                to return to the original heat map size.
-            </p>
-
-            <a data-toggle="collapse"
-               style="font-size: 1.2em; display: block; font-weight: 800;">Remove
-                Row Filter</a>
-            <p class="collapse">
-                Select Tools > Filter and delete the median absolute deviation filter to show all
-                rows.
-            </p>
-
-            <a data-toggle="collapse"
-               style="font-size: 1.2em; display: block; font-weight: 800;">Remove
-                Dendrograms</a>
-            <p class="collapse">Right-click on the column dendrogram and
-                select "Delete". Do the same for the row dendrogram.</p>
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Open
+        Project Achilles Gene Essentiality Scores</a>
+      <p class="collapse">Open the Project Achilles "Gene Essentiality"
+        scores under the preloaded datasets section. Project Achilles facilitates the
+        discovery of genes that when knocked down effect the viability of particular cell
+        lines.<br/>Morpheus can also open data from Excel, text files,
+        the clipboard, a URL, Google Drive, and Dropbox.</p>
 
 
-            <a data-toggle="collapse"
-               style="font-size: 1.2em; display: block; font-weight: 800;">Sort
-                Rows</a>
-            <p class="collapse">
-                Click the MAD row annotation header in the heat map once to sort
-                the heat map in ascending order by the median absolute deviation.
-                Click it again to sort the heat map in descending order. Note that
-                you can shift-click to sort multiple columns simultaneously.
-            </p>
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Median
+        Absolute Deviation (MAD)</a>
+      <p class="collapse">
+        Click Tools > Create Calculated Annotation. <br/> Enter "MAD" for
+        the "Annotation name". <br/> Enter "MAD()" for "Formula" and
+        click "OK". <br/> A new row annotation named "MAD" will appear to
+        the right of the heat map.
+      </p>
 
-            <a data-toggle="collapse"
-               style="font-size: 1.2em; display: block; font-weight: 800;">Search
-                Results To Top</a>
-            <p class="collapse">
-                Enter "BRAF" in the row search box. <br/> Click
-                <button type="button" class="btn btn-default btn-xs">
-                    <i class="fa fa-level-up"></i>
-                </button>
-                to bring the matches to the top of the heat map.
-            </p>
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Filter
+        Rows</a>
+      <p class="collapse">
+        Show only the top 500 most variable genes by the median absolute
+        deviation <br/> Click Tools > Filter to open the filter dialog. <br/>Click the "Add"
+        button and set the field name to "MAD". <br/>Click
+        "Switch to top N filter" and enter "500" for "N". Note that 523
+        rows are now shown because of ties in the median absolute
+        deviation.
+      </p>
+
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Hierarchical
+        Clustering</a>
+      <p class="collapse">
+        Click Tools > Hierarchical Clustering. Change "Cluster" to "Rows and
+        columns". Click "OK" to run the analysis. <br/> Do haematopoietic
+        cell lines cluster together? Hover over the primary_site
+        annotations to highlight cell lines from the same primary site. You
+        can dynamically cut the dendrogram by dragging the dashed line at
+        the top of the dendrogram. <br/>Hierarchical clustering
+        recursively merges objects based on their pair-wise distance.
+        Objects closest together are merged first, objects furthest apart
+        are merged last. The result is a tree structure, referred to as a
+        dendogram, where the leaf nodes represent the original items and
+        internal (higher) nodes represent the merges that occurred. Click <a
+        target="_black"
+        href="http://www.mathworks.com/help/stats/hierarchical-clustering.html">here</a>
+        for a more detailed description of the hierarchical clustering
+        algorithm and <a target="_blank"
+                         href="http://support.minitab.com/en-us/minitab-express/1/help-and-how-to/modeling-statistics/regression/supporting-topics/basics/a-comparison-of-the-pearson-and-spearman-correlation-methods/">here</a>
+        for a comparison of the Pearson and Spearman correlation methods.
+      </p>
+
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Compress
+        Heat Map</a>
+      <p class="collapse">
+        Click View > Fit To Window to compress the heat map. Select View > 100%
+        to return to the original heat map size.
+      </p>
+
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Remove
+        Row Filter</a>
+      <p class="collapse">
+        Select Tools > Filter and delete the median absolute deviation filter to show all
+        rows.
+      </p>
+
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Remove
+        Dendrograms</a>
+      <p class="collapse">Right-click on the column dendrogram and
+        select "Delete". Do the same for the row dendrogram.</p>
 
 
-            <a data-toggle="collapse"
-               style="font-size: 1.2em; display: block; font-weight: 800;">Visual
-                Enrichment</a>
-            <p class="collapse">
-                Double-click on BRAF row to sort by dependency score. <br/>
-                Search columns for "skin". <br/> Do skin cell lines seem to be
-                more dependent on BRAF than cell lines from other lineages? <br/>
-                You can optionally limit your search to within a field by typing
-                the field name followed by a colon ":" and then the term you are
-                looking for.
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Sort
+        Rows</a>
+      <p class="collapse">
+        Click the MAD row annotation header in the heat map once to sort
+        the heat map in ascending order by the median absolute deviation.
+        Click it again to sort the heat map in descending order. Note that
+        you can shift-click to sort multiple columns simultaneously.
+      </p>
 
-            </p>
-
-            <a data-toggle="collapse"
-               style="font-size: 1.2em; display: block; font-weight: 800;">Nearest
-                Neighbors</a>
-            <p class="collapse">
-                Click Tools > Nearest Neighbors. Click "OK" to run the analysis. <br/>
-                A new row annotation named "Pearson correlation" will appear. <br/>
-                What genes correlate with BRAF?
-            </p>
-
-
-            <a data-toggle="collapse"
-               style="font-size: 1.2em; display: block; font-weight: 800;">Scatter
-                Plot Matrix</a>
-            <p class="collapse">
-                Select the first three rows in order to select the top 3 most
-                correlated genes with BRAF and all samples. Click Tools > Chart. Change the
-                chart type to "row scatter" to assess the
-                relationships between BRAF, FXR2, and ZNF781 simultaneously.
-            </p>
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Search
+        Results To Top</a>
+      <p class="collapse">
+        Enter "BRAF" in the row search box. <br/> Click
+        <button type="button" class="btn btn-default btn-xs">
+          <i class="fa fa-level-up"></i>
+        </button>
+        to bring the matches to the top of the heat map.
+      </p>
 
 
-        </div>
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Visual
+        Enrichment</a>
+      <p class="collapse">
+        Double-click on BRAF row to sort by dependency score. <br/>
+        Search columns for "skin". <br/> Do skin cell lines seem to be
+        more dependent on BRAF than cell lines from other lineages? <br/>
+        You can optionally limit your search to within a field by typing
+        the field name followed by a colon ":" and then the term you are
+        looking for.
+
+      </p>
+
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Nearest
+        Neighbors</a>
+      <p class="collapse">
+        Click Tools > Nearest Neighbors. Click "OK" to run the analysis. <br/>
+        A new row annotation named "Pearson correlation" will appear. <br/>
+        What genes correlate with BRAF?
+      </p>
+
+
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Scatter
+        Plot Matrix</a>
+      <p class="collapse">
+        Select the first three rows in order to select BRAF and the top 2 most
+        correlated genes. Select all samples. Click Tools > Chart. Change the
+        chart type to "row scatter" to assess the
+        relationships among these genes.
+      </p>
+
+
     </div>
-    <div class="row"></div>
-    <div class="row"></div>
-    <div class="row"></div>
-    <div class="row"></div>
-    <div class="row"></div>
-    <div class="row"></div>
-    <div class="row">
-        <div class="col-xs-12 morpheus-footer"></div>
-    </div>
+  </div>
+  <div class="row"></div>
+  <div class="row"></div>
+  <div class="row"></div>
+  <div class="row"></div>
+  <div class="row"></div>
+  <div class="row"></div>
+  <div class="row">
+    <div class="col-xs-12 morpheus-footer"></div>
+  </div>
 </div>
 <script type="text/javascript">new morpheus.HelpMenu().$el.appendTo($('.morpheus-footer'));
 var links = $(document.body).find('[data-toggle=collapse]');
