@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport"
+        content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Morpheus - App</title>
+  <link rel="stylesheet" href="css/morpheus-latest.min.css">
+  <script type="text/javascript" src="js/morpheus-external-latest.min.js"></script>
+  <script src="js/morpheus-latest.min.js"></script>
+  <script src="js/morpheus.js"></script>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <style>
+    ul {
+      margin: 0;
+      list-style-type: none;
+      padding-left: 20px;
+    }
+
+    .example {
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    .description {
+      color: Grey;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12">
+      <svg width="32px" height="32px">
+        <g>
+          <rect x="0" y="0" width="32" height="14" style="fill:#ca0020;stroke:none"/>
+          <rect x="0" y="18" width="32" height="14" style="fill:#0571b0;stroke:none"/>
+        </g>
+      </svg>
+
+      <h2 style="padding-left: 4px; display:inline-block;">App (Beta)
+        <small>Download the Morpheus App
+        </small>
+      </h2>
+
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <div style="font-size:1.5em"><a
+        href="https://software.broadinstitute.org/morpheus/app/Morpheus-1.0.6-mac.zip">Mac</a></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <div style="font-size:1.5em"><a
+        href="https://software.broadinstitute.org/morpheus/app/Morpheus Setup 1.0.6.exe">Windows</a></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12 morpheus-footer"></div>
+  </div>
+
+</div>
+<script type="text/javascript">
+  new morpheus.HelpMenu().$el.appendTo($('.morpheus-footer'));
+</script>
+</body>
+</html>

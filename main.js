@@ -1,6 +1,6 @@
 const autoUpdater = require("electron-updater").autoUpdater
 const {app, BrowserWindow, dialog, shell} = require('electron');
-// app.showExitPrompt = true;
+app.showExitPrompt = true;
 const path = require('path');
 const url = require('url');
 autoUpdater.autoDownload = false;
@@ -34,7 +34,7 @@ function createWindow() {
     win.show();
     autoUpdater.checkForUpdates();
   });
-  // Hide the menu
+
   win.setMenu(null);
   // and load the index.html of the app.
   win.loadURL(url.format({
@@ -42,24 +42,23 @@ function createWindow() {
     protocol: 'file:',
     slashes: true
   }));
-  win.webContents.openDevTools();
 
-  // win.on('close', (e) => {
-  //   if (app.showExitPrompt) {
-  //     e.preventDefault() // Prevents the window from closing
-  //     dialog.showMessageBox({
-  //       type: 'question',
-  //       buttons: ['Yes', 'No'],
-  //       title: 'Confirm',
-  //       message: 'Are you sure you want to close Morpheus?'
-  //     }, function (response) {
-  //       if (response === 0) { // Runs the following if 'Yes' is clicked
-  //         app.showExitPrompt = false
-  //         win.close();
-  //       }
-  //     })
-  //   }
-  // })
+  win.on('close', (e) => {
+    if (app.showExitPrompt) {
+      e.preventDefault() // Prevents the window from closing
+      dialog.showMessageBox({
+        type: 'question',
+        buttons: ['Yes', 'No'],
+        title: 'Confirm',
+        message: 'Are you sure you want to close Morpheus?'
+      }, function (response) {
+        if (response === 0) { // Runs the following if 'Yes' is clicked
+          app.showExitPrompt = false
+          win.close();
+        }
+      })
+    }
+  })
 
   win.on('closed', () => {
     win = null;
