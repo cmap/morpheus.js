@@ -151,7 +151,6 @@
   border: 1px solid #707070;
   min-height: 300px;
   max-height: 400px;
-  overflow: auto;
 }
 
 .morpheus-file-drop.drag {

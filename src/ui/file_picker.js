@@ -51,7 +51,7 @@ morpheus.FilePicker = function (options) {
   html.push('</ul>');
 
   html.push('<div class="tab-content"' +
-    ' style="text-align:center;cursor:pointer;height:300px;">');
+    ' style="text-align:center;cursor:pointer;height:300px;overflow: auto;">');
 
   html.push('<div role="tabpanel" class="tab-pane active" id="' + myComputer + '">');
   html.push('<div data-name="drop" class="morpheus-file-drop morpheus-landing-panel">');

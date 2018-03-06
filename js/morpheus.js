@@ -21293,7 +21293,7 @@ morpheus.FilePicker = function (options) {
   html.push('</ul>');
 
   html.push('<div class="tab-content"' +
-    ' style="text-align:center;cursor:pointer;height:300px;">');
+    ' style="text-align:center;cursor:pointer;height:300px;overflow: auto;">');
 
   html.push('<div role="tabpanel" class="tab-pane active" id="' + myComputer + '">');
   html.push('<div data-name="drop" class="morpheus-file-drop morpheus-landing-panel">');
@@ -28902,7 +28902,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       formBuilder: formBuilder
     });
     var okCallback = function () {
-      var $dialogContent = $('<div><span>' + tool.toString() + '...</span><button class="btn' +
+      var $dialogContent = $('<div><span>' + tool.toString() + '...</span><div><progress></progress></div><button class="btn' +
         ' btn-xs btn-default" style="margin-left:6px;display: none;">Cancel</button></div>');
       var value = null;
 
@@ -28965,12 +28965,12 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
 
         }
       }, 20);
-      setTimeout(function () {
-        // in case an exception was thrown
-        if (!(value instanceof Worker)) {
-          $dialog.remove();
-        }
-      }, 5000);
+      // setTimeout(function () {
+      //   // in case an exception was thrown
+      //   if (!(value instanceof Worker)) {
+      //     $dialog.remove();
+      //   }
+      // }, 5000);
 
     };
     var $formDiv;
@@ -32627,15 +32627,17 @@ morpheus.HelpMenu = function () {
   html.push('<li><a data-name="contact" href="#">Contact</a></li>');
   html.push('<li><a target="_blank" href="documentation.html">Documentation</a></li>');
   html.push('<li><a target="_blank" href="tutorial.html">Tutorial</a></li>');
-
   html.push(
     '<li><a href="configuration.html">Configuration</a></li>');
 
-  html.push(
-    '<li><a target="_blank" href="https://github.com/cmap/morpheus.js">Source Code</a></li>');
+  html.push('<li><a target="_blank" href="app.html">App</a></li>');
+
+
   html.push(
     '<li><a target="_blank" href="https://github.com/cmap/morpheus.R">R Interface</a></li>');
   html.push('<li><a target="_blank" href="https://github.com/cmap/morpheus-export">Command Line</a></li>');
+  html.push(
+    '<li><a target="_blank" href="https://github.com/cmap/morpheus.js">Source Code</a></li>');
   html.push('</ul>');
   this.$el = $(html.join(''));
   this.$el.find('[data-name=contact]').on('click', function (e) {

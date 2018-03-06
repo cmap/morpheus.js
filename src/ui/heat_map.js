@@ -667,7 +667,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       formBuilder: formBuilder
     });
     var okCallback = function () {
-      var $dialogContent = $('<div><span>' + tool.toString() + '...</span><button class="btn' +
+      var $dialogContent = $('<div><span>' + tool.toString() + '...</span><div><progress></progress></div><button class="btn' +
         ' btn-xs btn-default" style="margin-left:6px;display: none;">Cancel</button></div>');
       var value = null;
 
@@ -730,12 +730,12 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
 
         }
       }, 20);
-      setTimeout(function () {
-        // in case an exception was thrown
-        if (!(value instanceof Worker)) {
-          $dialog.remove();
-        }
-      }, 5000);
+      // setTimeout(function () {
+      //   // in case an exception was thrown
+      //   if (!(value instanceof Worker)) {
+      //     $dialog.remove();
+      //   }
+      // }, 5000);
 
     };
     var $formDiv;
