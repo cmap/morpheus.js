@@ -389,6 +389,7 @@ if (typeof navigator !== 'undefined') {
     : false;
 }
 morpheus.Util.COMMAND_KEY = morpheus.Util.IS_MAC ? '&#8984;' : 'Ctrl+';
+morpheus.Util.SHIFT_KEY = morpheus.Util.IS_MAC ? '&#8679;' : 'Shift+';
 
 morpheus.Util.hammer = function (el, recognizers) {
   if (typeof Hammer !== 'undefined') {

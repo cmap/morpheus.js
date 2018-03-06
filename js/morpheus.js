@@ -391,6 +391,7 @@ if (typeof navigator !== 'undefined') {
     : false;
 }
 morpheus.Util.COMMAND_KEY = morpheus.Util.IS_MAC ? '&#8984;' : 'Ctrl+';
+morpheus.Util.SHIFT_KEY = morpheus.Util.IS_MAC ? '&#8679;' : 'Shift+';
 
 morpheus.Util.hammer = function (el, recognizers) {
   if (typeof Hammer !== 'undefined') {
@@ -4730,9 +4731,8 @@ morpheus.TxtReader.prototype = {
     var _this = this;
     var name = morpheus.Util.getBaseFileName(morpheus.Util
       .getFileName(fileOrUrl));
-    morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (
-      err,
-      arrayBuffer) {
+    morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
+                                                                   arrayBuffer) {
       if (err) {
         callback(err);
       } else {
@@ -4801,6 +4801,7 @@ morpheus.TxtReader.prototype = {
     }
 
     var matrix = [];
+    // if sparse, array of {indices, values}
     var s;
     var arrayOfRowArrays = [];
     for (var i = 0; i < dataColumnStart; i++) {
@@ -4810,6 +4811,8 @@ morpheus.TxtReader.prototype = {
     if (testLine == null) {
       testLine = reader.readLine();
     }
+    var percentSparse = 0;
+
     if (testLine != null) {
       var tmp = new Float32Array(ncols);
 
@@ -4827,39 +4830,56 @@ morpheus.TxtReader.prototype = {
         }
         tmp[j - dataColumnStart] = value;
       }
-      if (nzero / tmp.length > 0.25) {
+      percentSparse = nzero / tmp.length;
+      if (percentSparse > 0.3) {
         isSparse = true;
-        var sparse = {};
-        for (var j = 0; j < tmp.length; j++) {
-          if (tmp[j] !== 0) {
-            sparse[j] = tmp[j];
+        var obj = {values: new Float32Array(tmp.length), indices: new Uint32Array(tmp.length)};
+        for (var j = 0, k = 0; j < tmp.length; j++) {
+          if (tmp[j] !== 0.0) {
+            obj.values[k] = tmp[j];
+            obj.indices[k] = j;
+            k++;
           }
         }
-        tmp = sparse;
+        tmp = obj;
       }
       matrix.push(tmp);
     }
+
     while ((s = reader.readLine()) !== null) {
       s = s.replace(rtrim, '');
       if (s !== '') {
-        var dataRow = isSparse ? {} : new Float32Array(ncols);
-        matrix.push(dataRow);
+
+
         var tokens = s.split(tab);
         for (var j = 0; j < dataColumnStart; j++) {
           // row metadata
           arrayOfRowArrays[j].push(morpheus.Util.copyString(tokens[j]));
         }
+        var values = new Float32Array(ncols);
         for (var j = dataColumnStart, k = 0; k < ncols; j++, k++) {
           var token = tokens[j];
           var value = parseFloat(token);
-          if (isSparse) {
-            if (value !== 0.0) {
-              dataRow[j - dataColumnStart] = value;
+          values[j - dataColumnStart] = value;
+        }
+        if (isSparse) {
+          var count = 0;
+          for (var j = 0, k = 0; j < ncols; j++) {
+            if (values[j] !== 0.0) {
+              count++;
             }
-          } else {
-            dataRow[j - dataColumnStart] = value;
           }
-
+          var obj = {values: new Float32Array(count), indices: new Uint32Array(count)};
+          for (var j = 0, k = 0; j < ncols; j++) {
+            if (values[j] !== 0.0) {
+              obj.values[k] = values[j];
+              obj.indices[k] = j;
+              k++;
+            }
+          }
+          matrix.push(obj);
+        } else {
+          matrix.push(values);
         }
       }
     }
@@ -4868,7 +4888,8 @@ morpheus.TxtReader.prototype = {
       rows: matrix.length,
       columns: ncols,
       array: matrix,
-      dataType: 'Float32'
+      dataType: 'Float32',
+      defaultValue: isSparse ? 0 : undefined
     });
 
     var columnIds = dataset.getColumnMetadata().add('id');
@@ -12262,13 +12283,13 @@ morpheus.LandingPage = function (pageOptions) {
       }
       document.title = title;
     });
-
     this.tabManager.$nav.appendTo($(this.pageOptions.el));
     this.tabManager.$tabContent.appendTo($(this.pageOptions.el));
   }
 
 }
 ;
+
 
 morpheus.LandingPage.prototype = {
   open: function (openOptions) {
@@ -18791,7 +18812,7 @@ morpheus.ActionManager = function () {
     ellipsis: true,
     shiftKey: true,
     commandKey: true,
-    name: 'Search Menus',
+    name: 'Find Action',
     cb: function (options) {
       if ($findModal == null) {
         var findModal = [];
@@ -26491,88 +26512,13 @@ morpheus.HeatMapToolBar = function (heatMap) {
     searchHtml.push('</div>');
   }
 
-  var $menus = $(
-    '<div style="display: inline-block;margin-right:14px;"></div>');
-
-  function createMenu(menuName, actions, minWidth) {
-    if (!minWidth) {
-      minWidth = '0px';
-    }
-    var menu = [];
-    var dropdownId = _.uniqueId('morpheus');
-    menu.push('<div class="dropdown morpheus-menu">');
-    menu.push(
-      '<a class="dropdown-toggle morpheus-black-link morpheus-black-link-background" type="button"' +
-      ' id="' + dropdownId +
-      '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">');
-    menu.push(menuName);
-
-    menu.push('</a>');
-    menu.push('<ul style="min-width:' + minWidth +
-      ';" class="dropdown-menu" aria-labelledby="' + dropdownId + '">');
-    actions.forEach(function (name) {
-      if (name == null) {
-        menu.push('<li role="separator" class="divider"></li>');
-      } else {
-        var action = heatMap.getActionManager().getAction(name);
-        if (action != null) {
-          menu.push('<li>');
-          menu.push(
-            '<a class="morpheus-menu-item" data-action="' + action.name +
-            '" href="#">');
-          menu.push(action.name);
-          if (action.ellipsis) {
-            menu.push('...');
-          }
-          if (action.icon) {
-            menu.push('<span class="' + action.icon +
-              ' morpheus-menu-item-icon"></span> ');
-          }
-          if (action.which) {
-            menu.push('<span class="pull-right">');
-            if (action.commandKey) {
-              menu.push(morpheus.Util.COMMAND_KEY);
-            }
-            if (action.shiftKey) {
-              menu.push('Shift+');
-            }
-            menu.push(morpheus.KeyboardCharMap[action.which[0]]);
-            menu.push('</span>');
-          }
-
-          menu.push('</a>');
-          menu.push('</li>');
-        }
-      }
-    });
-
-    menu.push('</ul>');
-    menu.push('</div>');
-    $(menu.join('')).appendTo($menus);
-  }
-
-  if (heatMap.options.menu) {
-    if (heatMap.options.menu.File) {
-      createMenu('File', heatMap.options.menu.File, '240px');
-    }
-    if (heatMap.options.menu.View) {
-      createMenu('Edit', heatMap.options.menu.Edit);
-    }
-    if (heatMap.options.menu.View) {
-      createMenu('View', heatMap.options.menu.View, '170px');
-    }
-    if (heatMap.options.menu.Tools) {
-      createMenu('Tools', heatMap.options.menu.Tools);
-    }
-    if (heatMap.options.menu.Help) {
-      createMenu('Help', heatMap.options.menu.Help, '220px');
-    }
-  }
 
   $(searchHtml.join('')).appendTo($searchForm);
   var $lineOneColumn = $el.find('[data-name=toolbar]');
 
-  $menus.appendTo($lineOneColumn);
+  if (!morpheus.Util.isNode()) {
+    heatMap.menu.applicationMenu.appendTo($lineOneColumn);
+  }
   $searchForm.appendTo($lineOneColumn);
   var toolbarHtml = ['<div style="display: inline;">'];
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
@@ -26611,8 +26557,13 @@ morpheus.HeatMapToolBar = function (heatMap) {
     toolbarHtml.push(
       '<li><a class="morpheus-menu-item" href="#" data-action="Fit Columns To Window">Fit Columns To Window</a></li>');
     toolbarHtml.push('<li role="separator" class="divider"></li>');
+
     toolbarHtml.push(
-      '<li><a class="morpheus-menu-item" href="#" data-action="100%">100%</a></li>');
+      '<li><a class="morpheus-menu-item" href="#" data-action="100%">100%<span' +
+      ' class="fa' +
+      ' fa-compress morpheus-menu-item-icon"></span><span class="pull-right">' +
+      morpheus.Util.SHIFT_KEY + morpheus.Util.COMMAND_KEY +
+      morpheus.KeyboardCharMap[heatMap.getActionManager().getAction('100%').which[0]] + '</span> </a></li>');
     toolbarHtml.push('</ul>');
     toolbarHtml.push('</div>');
   }
@@ -26662,14 +26613,16 @@ morpheus.HeatMapToolBar = function (heatMap) {
       heatMap.focus();
     }
   });
-  $menus.on('click', 'li > a', function (e) {
-    e.preventDefault();
-    heatMap.getActionManager().execute($(this).data('action'));
-  }).on('blur', function (e) {
-    if (document.activeElement === document.body) {
-      heatMap.focus();
-    }
-  });
+  if (!morpheus.Util.isNode()) {
+    heatMap.menu.applicationMenu.on('click', 'li > a', function (e) {
+      e.preventDefault();
+      heatMap.getActionManager().execute($(this).data('action'));
+    }).on('blur', function (e) {
+      if (document.activeElement === document.body) {
+        heatMap.focus();
+      }
+    });
+  }
   if (heatMap.options.toolbar.$customButtons) {
     heatMap.options.toolbar.$customButtons.appendTo($toolbar);
   }
@@ -28591,7 +28544,7 @@ morpheus.HeatMap = function (options) {
         'Select All Columns',
         'Clear Selected Columns'],
       Help: [
-        'Search Menus', null, 'Contact', 'Configuration', 'Tutorial', 'Source Code', null, 'Keyboard' +
+        'Find Action', null, 'Contact', 'Configuration', 'Tutorial', 'Source Code', null, 'Keyboard' +
         ' Shortcuts']
     };
   }
@@ -28708,6 +28661,7 @@ morpheus.HeatMap = function (options) {
     _this.dispose();
   });
   if (!morpheus.Util.isHeadless()) {
+    this.menu = new morpheus.HeatMapMenu(this);
     var tab = this.tabManager.add({
       $el: this.$content,
       closeable: this.options.closeable,
@@ -32960,6 +32914,192 @@ morpheus.LegendWithStops.prototype = {
 };
 morpheus.Util.extend(morpheus.LegendWithStops, morpheus.AbstractCanvas);
 morpheus.Util.extend(morpheus.LegendWithStops, morpheus.Events);
+
+morpheus.HeatMapMenu = function (heatMap) {
+
+  var isNode = morpheus.Util.isNode();
+  var menuTemplate;
+  if (isNode) {
+    var remote = require('electron').remote;
+    var Menu = remote.Menu;
+    var MenuItem = remote.MenuItem;
+    menuTemplate = [];
+  }
+  var $menus = $(
+    '<div style="display: inline-block;margin-right:14px;"></div>');
+
+  function createMenu(menuName, actions, minWidth) {
+    if (isNode) {
+
+      var submenu = []
+      actions.forEach(function (name) {
+        if (name == null) {
+          submenu.push({type: 'separator'});
+        } else {
+          var action = heatMap.getActionManager().getAction(name);
+          if (action != null) {
+            var name = action.name;
+
+            if (action.ellipsis) {
+              name += '...';
+            }
+            // if (action.icon) {
+            //   menu.push('<span class="' + action.icon +
+            //     ' morpheus-menu-item-icon"></span> ');
+            // }
+            var accel = null;
+            if (action.which) {
+              accel = '';
+
+              if (action.commandKey) {
+                accel += 'CmdOrCtrl';
+              }
+              if (action.shiftKey) {
+                if (accel.length > 0) {
+                  accel += '+';
+                }
+                accel += 'Shift';
+              }
+              if (accel.length > 0) {
+                accel += '+';
+              }
+              var key = morpheus.KeyboardCharMap[action.which[0]];
+              if (key === '+') {
+                key = 'Plus';
+              }
+              accel += key;
+
+            }
+            submenu.push({
+              accelerator: accel,
+              label: name,
+              click: function (menuItem, browserWindow, event) {
+                heatMap.getActionManager().execute(action.name);
+              }
+            });
+
+          }
+        }
+
+      });
+      menuTemplate.push({label: menuName, submenu: submenu});
+    } else {
+      if (!minWidth) {
+        minWidth = '0px';
+      }
+      var menu = [];
+      var dropdownId = _.uniqueId('morpheus');
+      menu.push('<div class="dropdown morpheus-menu">');
+      menu.push(
+        '<a class="dropdown-toggle morpheus-black-link morpheus-black-link-background" type="button"' +
+        ' id="' + dropdownId +
+        '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">');
+      menu.push(menuName);
+
+      menu.push('</a>');
+      menu.push('<ul style="min-width:' + minWidth +
+        ';" class="dropdown-menu" aria-labelledby="' + dropdownId + '">');
+      actions.forEach(function (name) {
+        if (name == null) {
+          menu.push('<li role="separator" class="divider"></li>');
+        } else {
+          var action = heatMap.getActionManager().getAction(name);
+          if (action != null) {
+            menu.push('<li>');
+            menu.push(
+              '<a class="morpheus-menu-item" data-action="' + action.name +
+              '" href="#">');
+            menu.push(action.name);
+            if (action.ellipsis) {
+              menu.push('...');
+            }
+            if (action.icon) {
+              menu.push('<span class="' + action.icon +
+                ' morpheus-menu-item-icon"></span> ');
+            }
+            if (action.which) {
+              menu.push('<span class="pull-right">');
+              if (action.commandKey) {
+                menu.push(morpheus.Util.COMMAND_KEY);
+              }
+              if (action.shiftKey) {
+                menu.push('Shift+');
+              }
+              menu.push(morpheus.KeyboardCharMap[action.which[0]]);
+              menu.push('</span>');
+            }
+
+            menu.push('</a>');
+            menu.push('</li>');
+          }
+        }
+      });
+
+      menu.push('</ul>');
+      menu.push('</div>');
+      $(menu.join('')).appendTo($menus);
+    }
+  }
+
+
+  if (heatMap.options.menu) {
+    if (heatMap.options.menu.File) {
+      createMenu('File', heatMap.options.menu.File, '240px');
+    }
+
+    if (heatMap.options.menu.View) {
+      createMenu('Edit', heatMap.options.menu.Edit);
+    }
+    if (heatMap.options.menu.View) {
+      createMenu('View', heatMap.options.menu.View, '170px');
+    }
+    if (heatMap.options.menu.Tools) {
+      createMenu('Tools', heatMap.options.menu.Tools);
+    }
+    if (heatMap.options.menu.Help) {
+      createMenu('Help', heatMap.options.menu.Help, '220px');
+    }
+
+
+  }
+  if (isNode) {
+    if (global.process.platform === 'darwin') {
+      menuTemplate.unshift({
+        label: 'Morpheus',
+        submenu: [
+          {role: 'about'},
+          {type: 'separator'},
+          {role: 'services', submenu: []},
+          {type: 'separator'},
+          {role: 'hide'},
+          {role: 'hideothers'},
+          {role: 'unhide'},
+          {type: 'separator'},
+          {role: 'quit'}
+        ]
+      });
+    }
+    this.applicationMenu = Menu.buildFromTemplate(menuTemplate);
+
+    if (!morpheus.HeatMapMenu.TAB_MANAGER_LISTENER_ADDED) {
+      morpheus.HeatMapMenu.TAB_MANAGER_LISTENER_ADDED = true;
+      heatMap.tabManager.on('add change remove', function (e) {
+        var activeTab = heatMap.tabManager.getTabObject(heatMap.tabManager.getActiveTabId());
+        if (activeTab == null) {
+          Menu.setApplicationMenu(null);
+        } else if (activeTab.menu != null) {
+          Menu.setApplicationMenu(activeTab.menu.applicationMenu);
+        } else {
+          Menu.setApplicationMenu(null);
+        }
+      });
+    }
+  } else {
+    this.applicationMenu = $menus;
+  }
+};
+
+morpheus.HeatMapMenu.TAB_MANAGER_LISTENER_ADDED = false;
 
 morpheus.Popup = {};
 morpheus.Popup.initted = false;

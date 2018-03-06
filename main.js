@@ -1,10 +1,13 @@
 const autoUpdater = require("electron-updater").autoUpdater
 const {app, BrowserWindow, dialog, shell} = require('electron');
-app.showExitPrompt = true;
+// app.showExitPrompt = true;
 const path = require('path');
 const url = require('url');
 autoUpdater.autoDownload = false;
+const {systemPreferences} = require('electron')
 
+systemPreferences.setUserDefault('NSDisabledDictationMenuItem', 'boolean', true)
+systemPreferences.setUserDefault('NSDisabledCharacterPaletteMenuItem', 'boolean', true)
 autoUpdater.on('update-available', () => {
   dialog.showMessageBox({
     type: 'info',
@@ -39,37 +42,31 @@ function createWindow() {
     protocol: 'file:',
     slashes: true
   }));
+  win.webContents.openDevTools();
 
-  win.on('close', (e) => {
-    if (app.showExitPrompt) {
-      e.preventDefault() // Prevents the window from closing
-      dialog.showMessageBox({
-        type: 'question',
-        buttons: ['Yes', 'No'],
-        title: 'Confirm',
-        message: 'Are you sure you want to close Morpheus?'
-      }, function (response) {
-        if (response === 0) { // Runs the following if 'Yes' is clicked
-          app.showExitPrompt = false
-          win.close();
-        }
-      })
-    }
-  })
+  // win.on('close', (e) => {
+  //   if (app.showExitPrompt) {
+  //     e.preventDefault() // Prevents the window from closing
+  //     dialog.showMessageBox({
+  //       type: 'question',
+  //       buttons: ['Yes', 'No'],
+  //       title: 'Confirm',
+  //       message: 'Are you sure you want to close Morpheus?'
+  //     }, function (response) {
+  //       if (response === 0) { // Runs the following if 'Yes' is clicked
+  //         app.showExitPrompt = false
+  //         win.close();
+  //       }
+  //     })
+  //   }
+  // })
 
-  // Emitted when the window is closed.
   win.on('closed', () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
     win = null;
     app.quit();
   });
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.on('ready', function () {
   createWindow();
 

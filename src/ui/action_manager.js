@@ -494,7 +494,7 @@ morpheus.ActionManager = function () {
     ellipsis: true,
     shiftKey: true,
     commandKey: true,
-    name: 'Search Menus',
+    name: 'Find Action',
     cb: function (options) {
       if ($findModal == null) {
         var findModal = [];

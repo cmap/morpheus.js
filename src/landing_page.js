@@ -67,13 +67,13 @@ morpheus.LandingPage = function (pageOptions) {
       }
       document.title = title;
     });
-
     this.tabManager.$nav.appendTo($(this.pageOptions.el));
     this.tabManager.$tabContent.appendTo($(this.pageOptions.el));
   }
 
 }
 ;
+
 
 morpheus.LandingPage.prototype = {
   open: function (openOptions) {

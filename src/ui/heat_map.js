@@ -309,7 +309,7 @@ morpheus.HeatMap = function (options) {
         'Select All Columns',
         'Clear Selected Columns'],
       Help: [
-        'Search Menus', null, 'Contact', 'Configuration', 'Tutorial', 'Source Code', null, 'Keyboard' +
+        'Find Action', null, 'Contact', 'Configuration', 'Tutorial', 'Source Code', null, 'Keyboard' +
         ' Shortcuts']
     };
   }
@@ -426,6 +426,7 @@ morpheus.HeatMap = function (options) {
     _this.dispose();
   });
   if (!morpheus.Util.isHeadless()) {
+    this.menu = new morpheus.HeatMapMenu(this);
     var tab = this.tabManager.add({
       $el: this.$content,
       closeable: this.options.closeable,
