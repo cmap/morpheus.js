@@ -23,7 +23,17 @@
         "zip"
       ]
     },
+    "files": [
+      "*.html",
+      "main.js",
+      "js/",
+      "css/",
+      "fonts/"
+    ],
     "productName": "Morpheus",
+    "extraMetadata": {
+      "name": "Morpheus"
+    },
     "publish": [
       {
         "provider": "generic",
