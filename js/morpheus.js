@@ -20923,6 +20923,37 @@ morpheus.DendrogramUtil.getLeafNodes = function (rootNode) {
   return leafNodes;
 };
 
+morpheus.DialogUtil = function () {
+
+};
+
+morpheus.DialogUtil.DIALOGS = [];
+
+morpheus.DialogUtil.add = function (d) {
+  morpheus.DialogUtil.DIALOGS.push(d);
+};
+
+morpheus.DialogUtil.remove = function (d) {
+  var found = false;
+  for (var i = 0, n = morpheus.DialogUtil.DIALOGS.length; i < n; i++) {
+    if (d === morpheus.DialogUtil.DIALOGS[i]) {
+      morpheus.DialogUtil.DIALOGS.splice(i, 1);
+      found = true;
+      break;
+    }
+  }
+  if (!found) {
+    console.log('Dialog not found.');
+  }
+};
+
+morpheus.DialogUtil.clear = function () {
+  morpheus.DialogUtil.DIALOGS.forEach(function (d) {
+    d.remove();
+  });
+  morpheus.DialogUtil.DIALOGS = [];
+};
+
 morpheus.DiscreteColorSchemeChooser = function (options) {
   var formBuilder = new morpheus.FormBuilder();
   var map = options.colorScheme.scale;
@@ -28911,6 +28942,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
         appendTo: heatMap.getContentEl(),
         width: 'auto'
       });
+      morpheus.DialogUtil.add($dialog);
       var input = {};
       _.each(gui, function (item) {
         input[item.name] = formBuilder.getValue(item.name);
@@ -28924,6 +28956,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
           input: input
         });
         if (value instanceof Worker) {
+          morpheus.DialogUtil.remove($dialog);
           $dialogContent.find('button').css('display', '').on('click', function () {
             value.terminate();
           });
@@ -28955,12 +28988,14 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
                 callback(input);
               }
               $dialog.remove();
+              morpheus.DialogUtil.remove($dialog);
             });
           } else {
             if (callback) {
               callback(input);
             }
             $dialog.remove();
+            morpheus.DialogUtil.remove($dialog);
           }
 
         }

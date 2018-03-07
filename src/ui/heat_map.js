@@ -676,6 +676,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
         appendTo: heatMap.getContentEl(),
         width: 'auto'
       });
+      morpheus.DialogUtil.add($dialog);
       var input = {};
       _.each(gui, function (item) {
         input[item.name] = formBuilder.getValue(item.name);
@@ -689,6 +690,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
           input: input
         });
         if (value instanceof Worker) {
+          morpheus.DialogUtil.remove($dialog);
           $dialogContent.find('button').css('display', '').on('click', function () {
             value.terminate();
           });
@@ -720,12 +722,14 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
                 callback(input);
               }
               $dialog.remove();
+              morpheus.DialogUtil.remove($dialog);
             });
           } else {
             if (callback) {
               callback(input);
             }
             $dialog.remove();
+            morpheus.DialogUtil.remove($dialog);
           }
 
         }
