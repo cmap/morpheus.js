@@ -13,6 +13,9 @@ morpheus.OpenDatasetTool.prototype = {
     var action = options.input.open_file_action;
     var dataset = project.getSortedFilteredDataset();
     deferred.fail(function (err) {
+      if (err.message === 'Cancel') {
+        return;
+      }
       var message = [
         'Error opening ' + morpheus.Util.getFileName(file)
         + '.'];

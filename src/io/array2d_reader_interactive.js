@@ -41,7 +41,7 @@ morpheus.Array2dReaderInteractive.prototype = {
     var name = morpheus.Util.getBaseFileName(morpheus.Util.getFileName(fileOrUrl));
     var html = [];
     html.push('<div>');
-    html.push('<label>Click the table cell containing the first data row and column.</label>');
+    html.push('<label>Click the table cell containing the first data row and column.</label><br />');
     // html.push('<div class="checkbox"> <label> <input name="transpose" type="checkbox">' +
     //   ' Tranpose </label>' +
     //   ' </div>');
@@ -185,7 +185,7 @@ morpheus.Array2dReaderInteractive.prototype = {
         close: false,
         focus: document.activeElement,
         cancelCallback: function () {
-          callback(null);
+          callback(new Error('Cancel'), null);
         },
         okCallback: function () {
           br.reset();

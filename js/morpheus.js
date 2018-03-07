@@ -2285,7 +2285,7 @@ morpheus.Array2dReaderInteractive.prototype = {
     var name = morpheus.Util.getBaseFileName(morpheus.Util.getFileName(fileOrUrl));
     var html = [];
     html.push('<div>');
-    html.push('<label>Click the table cell containing the first data row and column.</label>');
+    html.push('<label>Click the table cell containing the first data row and column.</label><br />');
     // html.push('<div class="checkbox"> <label> <input name="transpose" type="checkbox">' +
     //   ' Tranpose </label>' +
     //   ' </div>');
@@ -2429,7 +2429,7 @@ morpheus.Array2dReaderInteractive.prototype = {
         close: false,
         focus: document.activeElement,
         cancelCallback: function () {
-          callback(null);
+          callback(new Error('Cancel'), null);
         },
         okCallback: function () {
           br.reset();
@@ -15489,6 +15489,9 @@ morpheus.OpenDatasetTool.prototype = {
     var action = options.input.open_file_action;
     var dataset = project.getSortedFilteredDataset();
     deferred.fail(function (err) {
+      if (err.message === 'Cancel') {
+        return;
+      }
       var message = [
         'Error opening ' + morpheus.Util.getFileName(file)
         + '.'];
@@ -33123,11 +33126,39 @@ morpheus.HeatMapMenu = function (heatMap) {
       heatMap.tabManager.on('add change remove', function (e) {
         var activeTab = heatMap.tabManager.getTabObject(heatMap.tabManager.getActiveTabId());
         if (activeTab == null) {
-          Menu.setApplicationMenu(null);
+          var template = []
+          if (process.platform === 'darwin') {
+            template.unshift({
+              label: 'Morpheus',
+              submenu: [
+                {
+                  role: 'about'
+                },
+                {
+                  role: 'quit',
+                }
+              ]
+            });
+          }
+          Menu.setApplicationMenu(Menu.buildFromTemplate(template));
         } else if (activeTab.menu != null) {
           Menu.setApplicationMenu(activeTab.menu.applicationMenu);
         } else {
-          Menu.setApplicationMenu(null);
+          var template = []
+          if (process.platform === 'darwin') {
+            template.unshift({
+              label: 'Morpheus',
+              submenu: [
+                {
+                  role: 'about'
+                },
+                {
+                  role: 'quit',
+                }
+              ]
+            });
+          }
+          Menu.setApplicationMenu(Menu.buildFromTemplate(template));
         }
       });
     }
@@ -33137,6 +33168,8 @@ morpheus.HeatMapMenu = function (heatMap) {
 };
 
 morpheus.HeatMapMenu.TAB_MANAGER_LISTENER_ADDED = false;
+
+
 
 morpheus.Popup = {};
 morpheus.Popup.initted = false;
