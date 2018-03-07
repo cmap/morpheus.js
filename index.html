@@ -36,6 +36,7 @@
 <script type="text/javascript">
   morpheus.Util.loadTrackingCode();
   window.onerror = function () {
+    morpheus.DialogUtil.clear();
     morpheus.FormBuilder.showInModal({
       title: 'Error',
       html: 'Oops, something went wrong. Please try again.',
