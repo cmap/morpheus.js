@@ -169,11 +169,39 @@ morpheus.HeatMapMenu = function (heatMap) {
       heatMap.tabManager.on('add change remove', function (e) {
         var activeTab = heatMap.tabManager.getTabObject(heatMap.tabManager.getActiveTabId());
         if (activeTab == null) {
-          Menu.setApplicationMenu(null);
+          var template = []
+          if (process.platform === 'darwin') {
+            template.unshift({
+              label: 'Morpheus',
+              submenu: [
+                {
+                  role: 'about'
+                },
+                {
+                  role: 'quit',
+                }
+              ]
+            });
+          }
+          Menu.setApplicationMenu(Menu.buildFromTemplate(template));
         } else if (activeTab.menu != null) {
           Menu.setApplicationMenu(activeTab.menu.applicationMenu);
         } else {
-          Menu.setApplicationMenu(null);
+          var template = []
+          if (process.platform === 'darwin') {
+            template.unshift({
+              label: 'Morpheus',
+              submenu: [
+                {
+                  role: 'about'
+                },
+                {
+                  role: 'quit',
+                }
+              ]
+            });
+          }
+          Menu.setApplicationMenu(Menu.buildFromTemplate(template));
         }
       });
     }
@@ -183,3 +211,5 @@ morpheus.HeatMapMenu = function (heatMap) {
 };
 
 morpheus.HeatMapMenu.TAB_MANAGER_LISTENER_ADDED = false;
+
+

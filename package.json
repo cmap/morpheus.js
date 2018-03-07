@@ -52,7 +52,7 @@
     "publish": "build -p always"
   },
   "devDependencies": {
-    "electron": "^1.8.2",
+    "electron": "^1.8.3",
     "electron-builder": "^20.2.0",
     "finalhandler": "^1.1.0",
     "grunt": "^1.0.2",
