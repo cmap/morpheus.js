@@ -4,10 +4,12 @@ app.showExitPrompt = true;
 const path = require('path');
 const url = require('url');
 autoUpdater.autoDownload = false;
-const {systemPreferences} = require('electron')
+if (process.platform === 'darwin') {
+  const {systemPreferences} = require('electron')
 
-systemPreferences.setUserDefault('NSDisabledDictationMenuItem', 'boolean', true)
-systemPreferences.setUserDefault('NSDisabledCharacterPaletteMenuItem', 'boolean', true)
+  systemPreferences.setUserDefault('NSDisabledDictationMenuItem', 'boolean', true)
+  systemPreferences.setUserDefault('NSDisabledCharacterPaletteMenuItem', 'boolean', true)
+}
 autoUpdater.on('update-available', () => {
   dialog.showMessageBox({
     type: 'info',
