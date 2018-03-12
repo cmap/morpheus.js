@@ -26,8 +26,9 @@
     "files": [
       "*.html",
       "main.js",
-      "js/",
-      "css/",
+      "js/morpheus-latest.min.js",
+      "js/morpheus-external-latest.min.js",
+      "css/morpheus-latest.min.css",
       "fonts/"
     ],
     "productName": "Morpheus",
