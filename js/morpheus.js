@@ -202,6 +202,10 @@ morpheus.Util.getScriptPath = function (name) {
     if (index !== -1) {
       src = src.substring(index + 1);
     }
+    index = src.lastIndexOf('?rel=');
+    if (index !== -1) {
+      src = src.substring(0, index);
+    }
     if (src === name) {
       return scripts[i].src;
     }
@@ -39246,12 +39250,12 @@ morpheus.HCluster = function (distmatrix, linkageAlgorithm) {
  * Searches the distance matrix to find the pair with the shortest distance
  * between them. The indices of the pair are returned in ip and jp; the distance
  * itself is returned by the function.
- * 
+ *
  * @param n The number of elements in the distance matrix.
- * 
+ *
  * @param distmatrix. A ragged array containing the distance matrix. The number
  * of columns in each row is one less than the row index.
- * 
+ *
  * @return The first and second indices of the pair with the shortest distance.
  */
 morpheus.HCluster.findClosestPair = function (n, distmatrix, r) {
