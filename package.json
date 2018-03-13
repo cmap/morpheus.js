@@ -59,13 +59,12 @@
     "test": "npm run test:js && npm run test:karma",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "postinstall": "electron-builder install-app-deps",
-    "publish": "build -p always"
+    "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
     "electron": "^1.8.3",
-    "electron-builder": "^20.2.0",
-    "finalhandler": "^1.1.0",
+    "electron-builder": "^20.5.0",
+    "finalhandler": "^1.1.1",
     "grunt": "^1.0.2",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",
@@ -82,7 +81,7 @@
     "whatwg-fetch": "^2.0.3"
   },
   "dependencies": {
-    "electron-updater": "^2.21.0",
+    "electron-updater": "^2.21.1",
     "hdf5": "^0.3.3"
   }
 }
