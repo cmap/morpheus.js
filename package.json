@@ -80,8 +80,5 @@
     "serve-static": "^1.13.2",
     "whatwg-fetch": "^2.0.3"
   },
-  "dependencies": {
-    //    "electron-updater": "^2.21.1",
-    //    "hdf5": "^0.3.3"
-  }
+  "dependencies": {}
 }
