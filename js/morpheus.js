@@ -13542,6 +13542,100 @@ morpheus.ChartTool.prototype = {
     var myChart = echarts.init(options.el);
     myChart.setOption(chart);
   },
+
+  /**
+   *
+   * @param options.dataset
+   * @param options.colorByVector
+   * @param options.colorModel
+   * @param options.transpose
+   * @param options.chartWidth
+   * @param options.chartHeight
+   * @param options.xVector
+   * @param options.yVector
+   * @private
+   */
+
+  _createXY: function (options) {
+    var _this = this;
+    var dataset = options.dataset;
+    var colorByVector = options.colorByVector;
+    var colorModel = options.colorModel;
+    var heatmap = this.heatmap;
+    var chartWidth = options.chartWidth;
+    var chartHeight = options.chartHeight;
+    var axisLabelVector = options.axisLabelVector; // for row scatter, row vector
+    var transpose = options.transpose;
+    var axisLabel = [];
+    for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+      axisLabel.push(axisLabelVector != null ? axisLabelVector.getValue(j) : '' + j);
+    }
+    var series = [];
+    var colorMap = morpheus.VectorColorModel.getColorMapForNumber(dataset.getRowCount());
+    for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+      // each row is a new trace
+      var colorByValue = colorByVector != null ? colorByVector.getValue(i) : '' + i;
+      var color = colorByVector != null ? colorModel.getMappedValue(colorByVector, colorByValue) : colorMap[i % colorMap.length];
+      var data = [];
+      for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+        data.push([j, dataset.getValue(i, j), i]);
+      }
+      series.push({
+        name: colorByValue,
+        type: 'line',
+        data: data,
+        tooltip: {
+          formatter: function (obj) {
+            var value = obj.value;
+            var s = [];
+            s.push(_this.heatmap.getHeatMapElementComponent().getDrawValuesFormat()(value[1]));
+            morpheus.ChartTool.getTooltip({
+              text: s,
+              tooltip: _this.tooltip,
+              dataset: dataset,
+              rowIndex: value[2],
+              columnIndex: value[0]
+            });
+            return s.join('');
+          }
+        }
+      });
+    }
+
+    var chart = {
+      legend: {
+        orient: 'vertical',
+        left: 'right',
+        top: 2,
+        itemWidth: 14,
+        height: dataset.getRowCount() * 20,
+        data: series.map(function (s) {
+          return s.name;
+        })
+      },
+      animation: false,
+      tooltip: {
+        trigger: 'item'
+      },
+      xAxis: {
+        type: 'category',
+        data: axisLabel
+      },
+      yAxis: {
+        axisLine: {
+          show: true,
+          onZero: false
+        },
+        type: 'value',
+        name: ''
+      },
+      grid: {right: 120},
+      series: series
+    };
+
+    var myChart = echarts.init(options.el);
+    myChart.setOption(chart);
+  },
   /**
    *
    * @param options.datasets 1-d array of datasets
@@ -31773,7 +31867,7 @@ morpheus.HeatMap.prototype = {
       var track = this.rowTracks[i];
       if (track.isVisible()) {
         var headerSize = this.rowTrackHeaders[i].getPrintSize();
-        totalSize.width += Math.max(headerSize.width, track.getPrintSize().width);
+        totalSize.width += headerSize.width;
         maxRowHeaderHeight = Math.max(maxRowHeaderHeight, headerSize.height);
       }
     }
@@ -31782,9 +31876,9 @@ morpheus.HeatMap.prototype = {
     for (var i = 0, length = this.columnTracks.length; i < length; i++) {
       var track = this.columnTracks[i];
       if (track.isVisible()) {
-        columnTrackHeightSum += track.getPrintSize().height;
-        maxColumnHeaderWidth = Math.max(maxColumnHeaderWidth,
-          this.columnTrackHeaders[i].getPrintSize().width);
+        var size = this.columnTrackHeaders[i].getPrintSize();
+        columnTrackHeightSum += size.height;
+        maxColumnHeaderWidth = Math.max(maxColumnHeaderWidth, size.width);
       }
     }
     totalSize.height += Math.max(columnTrackHeightSum, maxRowHeaderHeight) + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
@@ -32081,19 +32175,21 @@ morpheus.HeatMap.prototype = {
       var track = this.columnTracks[i];
       if (track.isVisible()) {
         context.save();
+        var header = this.columnTrackHeaders[i];
+        var headerSize = header.getPrintSize();
         context.translate(heatmapX, columnTrackY);
         var trackClip = {
           x: 0,
           y: 0,
           width: heatmapPrefSize.width,
-          height: track.getPrintSize().height
+          height: headerSize.height
         };
         track.print(trackClip, context);
         context.restore();
         // draw header
-        var header = this.columnTrackHeaders[i];
+
         context.save();
-        var headerSize = header.getPrintSize();
+
         var headerClip = {
           x: 0,
           y: 0,
@@ -32123,10 +32219,12 @@ morpheus.HeatMap.prototype = {
         context.save();
         var tx = morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS + heatmapX + heatmapPrefSize.width + rowTrackWidthSum;
         var ty = heatmapY;
+        var header = this.rowTrackHeaders[i];
+        var headerSize = header.getPrintSize();
         var trackClip = {
           x: 0,
           y: 0,
-          width: track.getPrintSize().width,
+          width: headerSize.width,
           height: heatmapPrefSize.height
         };
         context.translate(tx, ty);
@@ -32139,9 +32237,9 @@ morpheus.HeatMap.prototype = {
         track.print(trackClip, context);
         context.restore();
         // draw header
-        var header = this.rowTrackHeaders[i];
+
         context.save();
-        var headerSize = header.getPrintSize();
+
         var headerClip = {
           x: 0,
           y: 0,
@@ -36165,12 +36263,21 @@ morpheus.VectorTrackHeader.prototype = {
     var context = this.canvas.getContext('2d');
     context.font = this.fontWeight + ' ' + this.defaultFontHeight + 'px '
       + morpheus.CanvasUtil.getFontFamily(context);
-    var textWidth = 4 + context.measureText(this.name).width;
-    return {
+    var track = this.heatMap.getTrack(this.name, this.isColumns);
+    var trackSize = track.getPrintSize();
+    var textWidth = context.measureText(this.name).width;
+    var size = {
       width: textWidth,
-      height: this.defaultFontHeight
-      + morpheus.VectorTrackHeader.FONT_OFFSET
+      height: this.defaultFontHeight + morpheus.VectorTrackHeader.FONT_OFFSET
     };
+    if (this.isColumns) {
+      size.height = Math.max(size.height, trackSize.height);
+      size.height += 6;
+    } else {
+      size.width = Math.max(size.width, trackSize.width);
+      size.width += 6;
+    }
+    return size;
   },
   getSortKeys: function () {
     return this.isColumns ? this.project.getColumnSortKeys() : this.project
