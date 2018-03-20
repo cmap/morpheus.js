@@ -1,0 +1,68 @@
+{
+  "name": "morpheus-electron",
+  "description": "JavaScript matrix visualization and analysis",
+  "license": "BSD-3-Clause",
+  "version": "1.0.7",
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cmap/morpheus.js.git"
+  },
+  "homepage": "https://cmap.github.io/morpheus.js/",
+  "bugs": {
+    "url": "https://github.com/cmap/morpheus.js/issues"
+  },
+  "author": {
+    "name": "Joshua Gould"
+  },
+  "build": {
+    "appId": "org.broadinstitute.software.morpheus",
+    "mac": {
+      "category": "public.app-category.graphics-design",
+      "target": [
+        "zip"
+      ]
+    },
+    "files": [
+      "main.js",
+      "node_modules/morpheus-app/*.html",
+      "node_modules/morpheus-app/js/morpheus-latest.min.js",
+      "node_modules/morpheus-app/js/morpheus-external-latest.min.js",
+      "node_modules/morpheus-app/css/morpheus-latest.min.css",
+      "node_modules/morpheus-app/fonts/"
+    ],
+    "productName": "Morpheus",
+    "extraMetadata": {
+      "name": "Morpheus"
+    },
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://software.broadinstitute.org/morpheus/app/"
+      }
+    ]
+  },
+  "keywords": [
+    "graphing",
+    "plotting",
+    "data",
+    "matrix",
+    "heatmap",
+    "heat map",
+    "visualization",
+    "morpheus.js",
+    "morpheus"
+  ],
+  "scripts": {
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^1.8.3",
+    "electron-builder": "^20.5.1",
+    "morpheus-app": "^1.0.8"
+  },
+  "dependencies": {
+    "electron-updater": "^2.21.1",
+    "hdf5": "git+https://github.com/HDF-NI/hdf5.node.git"
+  }
+}
