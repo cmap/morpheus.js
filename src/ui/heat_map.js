@@ -3504,7 +3504,7 @@ morpheus.HeatMap.prototype = {
       var track = this.rowTracks[i];
       if (track.isVisible()) {
         var headerSize = this.rowTrackHeaders[i].getPrintSize();
-        totalSize.width += Math.max(headerSize.width, track.getPrintSize().width);
+        totalSize.width += headerSize.width;
         maxRowHeaderHeight = Math.max(maxRowHeaderHeight, headerSize.height);
       }
     }
@@ -3513,9 +3513,9 @@ morpheus.HeatMap.prototype = {
     for (var i = 0, length = this.columnTracks.length; i < length; i++) {
       var track = this.columnTracks[i];
       if (track.isVisible()) {
-        columnTrackHeightSum += track.getPrintSize().height;
-        maxColumnHeaderWidth = Math.max(maxColumnHeaderWidth,
-          this.columnTrackHeaders[i].getPrintSize().width);
+        var size = this.columnTrackHeaders[i].getPrintSize();
+        columnTrackHeightSum += size.height;
+        maxColumnHeaderWidth = Math.max(maxColumnHeaderWidth, size.width);
       }
     }
     totalSize.height += Math.max(columnTrackHeightSum, maxRowHeaderHeight) + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
@@ -3812,19 +3812,21 @@ morpheus.HeatMap.prototype = {
       var track = this.columnTracks[i];
       if (track.isVisible()) {
         context.save();
+        var header = this.columnTrackHeaders[i];
+        var headerSize = header.getPrintSize();
         context.translate(heatmapX, columnTrackY);
         var trackClip = {
           x: 0,
           y: 0,
           width: heatmapPrefSize.width,
-          height: track.getPrintSize().height
+          height: headerSize.height
         };
         track.print(trackClip, context);
         context.restore();
         // draw header
-        var header = this.columnTrackHeaders[i];
+
         context.save();
-        var headerSize = header.getPrintSize();
+
         var headerClip = {
           x: 0,
           y: 0,
@@ -3854,10 +3856,12 @@ morpheus.HeatMap.prototype = {
         context.save();
         var tx = morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS + heatmapX + heatmapPrefSize.width + rowTrackWidthSum;
         var ty = heatmapY;
+        var header = this.rowTrackHeaders[i];
+        var headerSize = header.getPrintSize();
         var trackClip = {
           x: 0,
           y: 0,
-          width: track.getPrintSize().width,
+          width: headerSize.width,
           height: heatmapPrefSize.height
         };
         context.translate(tx, ty);
@@ -3870,9 +3874,9 @@ morpheus.HeatMap.prototype = {
         track.print(trackClip, context);
         context.restore();
         // draw header
-        var header = this.rowTrackHeaders[i];
+
         context.save();
-        var headerSize = header.getPrintSize();
+
         var headerClip = {
           x: 0,
           y: 0,

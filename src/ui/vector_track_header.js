@@ -359,12 +359,21 @@ morpheus.VectorTrackHeader.prototype = {
     var context = this.canvas.getContext('2d');
     context.font = this.fontWeight + ' ' + this.defaultFontHeight + 'px '
       + morpheus.CanvasUtil.getFontFamily(context);
-    var textWidth = 4 + context.measureText(this.name).width;
-    return {
+    var track = this.heatMap.getTrack(this.name, this.isColumns);
+    var trackSize = track.getPrintSize();
+    var textWidth = context.measureText(this.name).width;
+    var size = {
       width: textWidth,
-      height: this.defaultFontHeight
-      + morpheus.VectorTrackHeader.FONT_OFFSET
+      height: this.defaultFontHeight + morpheus.VectorTrackHeader.FONT_OFFSET
     };
+    if (this.isColumns) {
+      size.height = Math.max(size.height, trackSize.height);
+      size.height += 6;
+    } else {
+      size.width = Math.max(size.width, trackSize.width);
+      size.width += 6;
+    }
+    return size;
   },
   getSortKeys: function () {
     return this.isColumns ? this.project.getColumnSortKeys() : this.project
