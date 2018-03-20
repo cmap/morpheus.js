@@ -3764,8 +3764,9 @@ morpheus.HeatMap.prototype = {
       var track = this.columnTracks[i];
       if (track.isVisible()) {
         var header = this.columnTrackHeaders[i];
-        heatmapX = Math.max(heatmapX, header.getPrintSize().width);
-        heatmapY += track.getPrintSize().height;
+        var size = header.getPrintSize();
+        heatmapX = Math.max(heatmapX, size.width);
+        heatmapY += size.height;
         isColumnTrackVisible = true;
       }
     }
