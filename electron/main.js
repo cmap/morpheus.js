@@ -44,7 +44,7 @@ function createWindow() {
     protocol: 'file:',
     slashes: true
   }));
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
   win.on('close', (e) => {
     if (app.showExitPrompt) {
       e.preventDefault() // Prevents the window from closing

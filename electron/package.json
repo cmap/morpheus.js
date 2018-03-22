@@ -2,7 +2,7 @@
   "name": "morpheus-electron",
   "description": "JavaScript matrix visualization and analysis",
   "license": "BSD-3-Clause",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "main": "main.js",
   "repository": {
     "type": "git",
@@ -16,6 +16,8 @@
     "name": "Joshua Gould"
   },
   "build": {
+    "npmRebuild": true,
+    "npmArgs": "--hdf5_home_mac=/Users/jgould/git/morpheus.js/native/hdf5-1.10.1/build --link_type=static",
     "appId": "org.broadinstitute.software.morpheus",
     "mac": {
       "category": "public.app-category.graphics-design",
@@ -24,12 +26,7 @@
       ]
     },
     "files": [
-      "main.js",
-      "node_modules/morpheus-app/*.html",
-      "node_modules/morpheus-app/js/morpheus-latest.min.js",
-      "node_modules/morpheus-app/js/morpheus-external-latest.min.js",
-      "node_modules/morpheus-app/css/morpheus-latest.min.css",
-      "node_modules/morpheus-app/fonts/"
+      "main.js"
     ],
     "productName": "Morpheus",
     "extraMetadata": {
@@ -54,15 +51,18 @@
     "morpheus"
   ],
   "scripts": {
-    "dist": "electron-builder"
+    "postinstall": "electron-builder install-app-deps",
+    "dist": "electron-builder",
+    "pack": "electron-builder --dir"
   },
   "devDependencies": {
     "electron": "^1.8.3",
-    "electron-builder": "^20.5.1",
-    "morpheus-app": "^1.0.8"
+    "electron-builder": "^20.7.1",
+    "electron-rebuild": "^1.7.3"
   },
   "dependencies": {
-    "electron-updater": "^2.21.1",
-    "hdf5": "git+https://github.com/HDF-NI/hdf5.node.git"
+    "electron-updater": "^2.21.3",
+    "hdf5": "git+https://github.com/HDF-NI/hdf5.node.git",
+    "morpheus-app": "^1.0.11"
   }
 }
