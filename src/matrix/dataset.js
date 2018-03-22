@@ -246,6 +246,32 @@ morpheus.RowMajorMatrix1DFileBacked.prototype = {
   }
 };
 
+morpheus.ColumnMajorMatrix1D = function (options) {
+  this.options = options;
+};
+morpheus.ColumnMajorMatrix1D.prototype = {
+  getValue: function (i, j) {
+    return this.options.array[j * this.options.rows + i];
+  },
+  setValue: function (i, j, value) {
+    this.options.array[j * this.options.rows + i] = value;
+  },
+  toJSON: function () {
+    var data = [];
+    var nrows = this.options.rows;
+    var ncols = this.options.columns;
+    var array = this.options.array;
+    for (var i = 0; i < nrows; i++) {
+      var row = [];
+      data.push(row);
+      for (var j = 0; j < ncols; j++) {
+        row[j] = this.getValue(i, j);
+      }
+    }
+    return data;
+  }
+};
+
 morpheus.RowMajorMatrix1D = function (options) {
   this.options = options;
 };
@@ -350,7 +376,7 @@ morpheus.Dataset.createMatrix = function (options) {
       return new morpheus.SparseMatrix(options);
     } else {
       if (options.type === '1d') {
-        return new morpheus.RowMajorMatrix1D(options);
+        return options.columnMajorOrder ? new morpheus.ColumnMajorMatrix1D(options) : new morpheus.RowMajorMatrix1D(options);
       } else {
         return new morpheus.RowMajorMatrix(options);
       }

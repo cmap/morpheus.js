@@ -3481,7 +3481,6 @@ morpheus.Hdf5Reader = function (options) {
 };
 morpheus.Hdf5Reader.prototype = {
 
-
   read: function (fileOrUrl, callback) {
     var hdf5 = require('hdf5').hdf5;
     var h5lt = require('hdf5').h5lt;
@@ -3491,14 +3490,16 @@ morpheus.Hdf5Reader.prototype = {
     var file = new hdf5.File(fileOrUrl.path, Access.ACC_RDONLY);
 
     var dim = file.getDatasetDimensions(this.options.dataset);
+
     var dataset = new morpheus.Dataset({
       name: name,
-      rows: dim[0],
+      rows: this.options.columnMajorOrder ? dim[1] : dim[0],
       file: file,
-      columns: dim[1],
+      columns: this.options.columnMajorOrder ? dim[0] : dim[1],
       dataType: 'Float32',
       type: '1d',
-      array: h5lt.readDataset(file.id, this.options.dataset)
+      array: h5lt.readDataset(file.id, this.options.dataset),
+      columnMajorOrder: this.options.columnMajorOrder
     });
     //
     var group = file.openGroup(this.options.rowMeta);
@@ -3530,7 +3531,12 @@ morpheus.Hdf5Reader.prototype = {
 };
 
 morpheus.Hdf5Reader.getGctxInstance = function () {
-  return new morpheus.Hdf5Reader({dataset: '0/DATA/0/matrix', rowMeta: '0/META/ROW/', colMeta: '0/META/COL/'});
+  return new morpheus.Hdf5Reader({
+    dataset: '0/DATA/0/matrix',
+    rowMeta: '0/META/ROW/',
+    colMeta: '0/META/COL/',
+    columnMajorOrder: true
+  });
 };
 
 morpheus.Hdf5Reader.getLoomInstance = function () {
@@ -7252,6 +7258,32 @@ morpheus.RowMajorMatrix1DFileBacked.prototype = {
   }
 };
 
+morpheus.ColumnMajorMatrix1D = function (options) {
+  this.options = options;
+};
+morpheus.ColumnMajorMatrix1D.prototype = {
+  getValue: function (i, j) {
+    return this.options.array[j * this.options.rows + i];
+  },
+  setValue: function (i, j, value) {
+    this.options.array[j * this.options.rows + i] = value;
+  },
+  toJSON: function () {
+    var data = [];
+    var nrows = this.options.rows;
+    var ncols = this.options.columns;
+    var array = this.options.array;
+    for (var i = 0; i < nrows; i++) {
+      var row = [];
+      data.push(row);
+      for (var j = 0; j < ncols; j++) {
+        row[j] = this.getValue(i, j);
+      }
+    }
+    return data;
+  }
+};
+
 morpheus.RowMajorMatrix1D = function (options) {
   this.options = options;
 };
@@ -7356,7 +7388,7 @@ morpheus.Dataset.createMatrix = function (options) {
       return new morpheus.SparseMatrix(options);
     } else {
       if (options.type === '1d') {
-        return new morpheus.RowMajorMatrix1D(options);
+        return options.columnMajorOrder ? new morpheus.ColumnMajorMatrix1D(options) : new morpheus.RowMajorMatrix1D(options);
       } else {
         return new morpheus.RowMajorMatrix(options);
       }

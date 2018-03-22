@@ -10,7 +10,6 @@ morpheus.Hdf5Reader = function (options) {
 };
 morpheus.Hdf5Reader.prototype = {
 
-
   read: function (fileOrUrl, callback) {
     var hdf5 = require('hdf5').hdf5;
     var h5lt = require('hdf5').h5lt;
@@ -20,14 +19,16 @@ morpheus.Hdf5Reader.prototype = {
     var file = new hdf5.File(fileOrUrl.path, Access.ACC_RDONLY);
 
     var dim = file.getDatasetDimensions(this.options.dataset);
+
     var dataset = new morpheus.Dataset({
       name: name,
-      rows: dim[0],
+      rows: this.options.columnMajorOrder ? dim[1] : dim[0],
       file: file,
-      columns: dim[1],
+      columns: this.options.columnMajorOrder ? dim[0] : dim[1],
       dataType: 'Float32',
       type: '1d',
-      array: h5lt.readDataset(file.id, this.options.dataset)
+      array: h5lt.readDataset(file.id, this.options.dataset),
+      columnMajorOrder: this.options.columnMajorOrder
     });
     //
     var group = file.openGroup(this.options.rowMeta);
@@ -59,7 +60,12 @@ morpheus.Hdf5Reader.prototype = {
 };
 
 morpheus.Hdf5Reader.getGctxInstance = function () {
-  return new morpheus.Hdf5Reader({dataset: '0/DATA/0/matrix', rowMeta: '0/META/ROW/', colMeta: '0/META/COL/'});
+  return new morpheus.Hdf5Reader({
+    dataset: '0/DATA/0/matrix',
+    rowMeta: '0/META/ROW/',
+    colMeta: '0/META/COL/',
+    columnMajorOrder: true
+  });
 };
 
 morpheus.Hdf5Reader.getLoomInstance = function () {
