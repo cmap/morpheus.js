@@ -1469,62 +1469,63 @@ morpheus.HeatMap.prototype = {
     if (rowDendrogram != null) {
       var tree = rowDendrogram;
       if (tree.leafNodes.length !== this.project.getSortedFilteredDataset().getRowCount()) {
-        throw '# leaf nodes in row dendrogram ' + tree.leafNodes.length
-        + ' != ' + this.project.getSortedFilteredDataset().getRowCount();
-      }
-      var rowIndices = null;
-      // when saving a session the dataset is reordered to reflect the clustering
-      if (this.options.rowDendrogramField != null) {
-        var vector = dataset.getRowMetadata().getByName(
-          this.options.rowDendrogramField);
-        rowIndices = [];
-        var map = new morpheus.Map();
-        var re = /[,:]/g;
-        for (var j = 0, size = vector.size(); j < size; j++) {
-          var key = vector.getValue(j);
-          map.set(key.replace(re, ''), j);
-        }
-        // need to replace special characters to match ids in newick
-        // file
-
-        for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-          var index = map.get(tree.leafNodes[i].name);
-          if (index === undefined) {
-            throw 'Unable to find row dendrogram id '
-            + tree.leafNodes[i].name
-            + ' in row annotations';
-          }
-          rowIndices.push(index);
-        }
+        console.log('# leaf nodes in row dendrogram ' + tree.leafNodes.length
+          + ' != ' + this.project.getSortedFilteredDataset().getRowCount());
       } else {
-        // see if leaf node ids are indices
-        // for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-        //   var newickId = tree.leafNodes[i].name;
-        //   newickId = parseInt(newickId);
-        //   if (!isNaN(newickId)) {
-        //     rowIndices.push(newickId);
-        //   } else {
-        //     break;
-        //   }
-        // }
-        // if (rowIndices.length !== tree.leafNodes.length) {
-        //   rowIndices = [];
-        //   for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-        //     rowIndices.push(i);
-        //   }
-        // }
-      }
-      this.rowDendrogram = new morpheus.RowDendrogram(this, tree, heatmap.getRowPositions(), this.project, true);
-      this.rowDendrogram.lineWidth = this.options.rowDendrogramLineWidth;
-      this.rowDendrogram.appendTo(this.$parent);
-      this.rowDendrogram.$label.appendTo(this.$parent);
-      this.rowDendrogram.$squishedLabel.appendTo(this.$parent);
-      if (rowIndices != null) {
-        rowDendrogramSortKey = new morpheus.SpecifiedModelSortOrder(
-          rowIndices, rowIndices.length, 'dendrogram');
-        rowDendrogramSortKey.setLockOrder(2);
-        rowDendrogramSortKey.setUnlockable(false);
-        rowDendrogramSortKey.setPreservesDendrogram(true);
+        var rowIndices = null;
+        // when saving a session the dataset is reordered to reflect the clustering
+        if (this.options.rowDendrogramField != null) {
+          var vector = dataset.getRowMetadata().getByName(
+            this.options.rowDendrogramField);
+          rowIndices = [];
+          var map = new morpheus.Map();
+          var re = /[,:]/g;
+          for (var j = 0, size = vector.size(); j < size; j++) {
+            var key = vector.getValue(j);
+            map.set(key.replace(re, ''), j);
+          }
+          // need to replace special characters to match ids in newick
+          // file
+
+          for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
+            var index = map.get(tree.leafNodes[i].name);
+            if (index === undefined) {
+              throw 'Unable to find row dendrogram id '
+              + tree.leafNodes[i].name
+              + ' in row annotations';
+            }
+            rowIndices.push(index);
+          }
+        } else {
+          // see if leaf node ids are indices
+          // for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
+          //   var newickId = tree.leafNodes[i].name;
+          //   newickId = parseInt(newickId);
+          //   if (!isNaN(newickId)) {
+          //     rowIndices.push(newickId);
+          //   } else {
+          //     break;
+          //   }
+          // }
+          // if (rowIndices.length !== tree.leafNodes.length) {
+          //   rowIndices = [];
+          //   for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
+          //     rowIndices.push(i);
+          //   }
+          // }
+        }
+        this.rowDendrogram = new morpheus.RowDendrogram(this, tree, heatmap.getRowPositions(), this.project, true);
+        this.rowDendrogram.lineWidth = this.options.rowDendrogramLineWidth;
+        this.rowDendrogram.appendTo(this.$parent);
+        this.rowDendrogram.$label.appendTo(this.$parent);
+        this.rowDendrogram.$squishedLabel.appendTo(this.$parent);
+        if (rowIndices != null) {
+          rowDendrogramSortKey = new morpheus.SpecifiedModelSortOrder(
+            rowIndices, rowIndices.length, 'dendrogram');
+          rowDendrogramSortKey.setLockOrder(2);
+          rowDendrogramSortKey.setUnlockable(false);
+          rowDendrogramSortKey.setPreservesDendrogram(true);
+        }
       }
     }
     var columnDendrogramSortKey = null;
