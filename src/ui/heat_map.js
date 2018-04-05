@@ -1532,59 +1532,59 @@ morpheus.HeatMap.prototype = {
       var tree = columnDendrogram;
 
       if (tree.leafNodes.length !== this.project.getSortedFilteredDataset().getColumnCount()) {
-        throw '# leaf nodes ' + tree.leafNodes.length + ' != '
-        + this.project.getSortedFilteredDataset().getColumnCount();
-      }
-      var columnIndices = null;
-      if (this.options.columnDendrogramField != null) {
-        columnIndices = [];
-        var vector = dataset.getColumnMetadata().getByName(
-          this.options.columnDendrogramField);
-        var map = new morpheus.Map();
-        var re = /[,:]/g;
-        for (var j = 0, size = vector.size(); j < size; j++) {
-          var key = vector.getValue(j);
-          map.set(key.replace(re, ''), j);
-        }
-
-        for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-          var index = map.get(tree.leafNodes[i].name);
-          if (index === undefined) {
-            throw 'Unable to find column dendrogram id '
-            + tree.leafNodes[i].name
-            + ' in column annotations';
-          }
-          columnIndices.push(index);
-        }
+        console.log('# leaf nodes ' + tree.leafNodes.length + ' != ' + this.project.getSortedFilteredDataset().getColumnCount());
       } else {
-        // for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-        //   var newickId = tree.leafNodes[i].name;
-        //   newickId = parseInt(newickId);
-        //   if (!isNaN(newickId)) {
-        //     columnIndices.push(newickId);
-        //   } else {
-        //     break;
-        //   }
-        // }
-        // if (columnIndices.length !== tree.leafNodes.length) {
-        //   columnIndices = [];
-        //   for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-        //     columnIndices.push(i);
-        //   }
-        // }
-      }
-      this.columnDendrogram = new morpheus.ColumnDendrogram(this, tree,
-        heatmap.getColumnPositions(), this.project, true);
-      this.columnDendrogram.lineWidth = this.options.columnDendrogramLineWidth;
-      this.columnDendrogram.appendTo(this.$parent);
-      this.columnDendrogram.$label.appendTo(this.$parent);
-      this.columnDendrogram.$squishedLabel.appendTo(this.$parent);
-      if (columnIndices != null) {
-        columnDendrogramSortKey = new morpheus.SpecifiedModelSortOrder(
-          columnIndices, columnIndices.length, 'dendrogram');
-        columnDendrogramSortKey.setLockOrder(2);
-        columnDendrogramSortKey.setUnlockable(false);
-        columnDendrogramSortKey.setPreservesDendrogram(true);
+        var columnIndices = null;
+        if (this.options.columnDendrogramField != null) {
+          columnIndices = [];
+          var vector = dataset.getColumnMetadata().getByName(
+            this.options.columnDendrogramField);
+          var map = new morpheus.Map();
+          var re = /[,:]/g;
+          for (var j = 0, size = vector.size(); j < size; j++) {
+            var key = vector.getValue(j);
+            map.set(key.replace(re, ''), j);
+          }
+
+          for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
+            var index = map.get(tree.leafNodes[i].name);
+            if (index === undefined) {
+              throw 'Unable to find column dendrogram id '
+              + tree.leafNodes[i].name
+              + ' in column annotations';
+            }
+            columnIndices.push(index);
+          }
+        } else {
+          // for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
+          //   var newickId = tree.leafNodes[i].name;
+          //   newickId = parseInt(newickId);
+          //   if (!isNaN(newickId)) {
+          //     columnIndices.push(newickId);
+          //   } else {
+          //     break;
+          //   }
+          // }
+          // if (columnIndices.length !== tree.leafNodes.length) {
+          //   columnIndices = [];
+          //   for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
+          //     columnIndices.push(i);
+          //   }
+          // }
+        }
+        this.columnDendrogram = new morpheus.ColumnDendrogram(this, tree,
+          heatmap.getColumnPositions(), this.project, true);
+        this.columnDendrogram.lineWidth = this.options.columnDendrogramLineWidth;
+        this.columnDendrogram.appendTo(this.$parent);
+        this.columnDendrogram.$label.appendTo(this.$parent);
+        this.columnDendrogram.$squishedLabel.appendTo(this.$parent);
+        if (columnIndices != null) {
+          columnDendrogramSortKey = new morpheus.SpecifiedModelSortOrder(
+            columnIndices, columnIndices.length, 'dendrogram');
+          columnDendrogramSortKey.setLockOrder(2);
+          columnDendrogramSortKey.setUnlockable(false);
+          columnDendrogramSortKey.setPreservesDendrogram(true);
+        }
       }
     }
 
