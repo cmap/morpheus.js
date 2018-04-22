@@ -18,7 +18,7 @@ autoUpdater.on('update-available', () => {
     buttons: ['Yes', 'No']
   }, (buttonIndex) => {
     if (buttonIndex === 0) {
-      shell.openExternal('https://software.broadinstitute.org/morpheus/', {activate: true});
+      shell.openExternal('https://software.broadinstitute.org/morpheus/app.html', {activate: true});
     }
   })
 });
