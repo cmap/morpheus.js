@@ -273,7 +273,7 @@ morpheus.HeatMapKeyListener = function (heatMap) {
     var altKey = e.altKey;
     var shiftKey = e.shiftKey;
     var which = e.which;
-    var isInputField = (tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA');
+    var isInputField = tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA';
     var acceptOptions = {
       isInputField: isInputField,
       heatMap: heatMap
