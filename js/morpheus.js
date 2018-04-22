@@ -12512,8 +12512,8 @@ morpheus.SampleDatasets = function (options) {
     var exampleHtml = [];
     var id = _.uniqueId('morpheus');
     exampleHtml.push('<div>');
-    exampleHtml.push('<a data-toggle="collapse" href="#' + id + '" aria-expanded="false" aria-controls="' + id +
-      '">Cancer Dependency Map</a>');
+    exampleHtml.push('<h4><a data-toggle="collapse" href="#' + id + '" aria-expanded="false" aria-controls="' + id +
+      '">Cancer Dependency Map</a></h4>');
     exampleHtml.push('<div class="collapse in" id="' + id + '">');
 
 
@@ -12581,11 +12581,8 @@ morpheus.SampleDatasets = function (options) {
 
     exampleHtml.push('<hr>');
     exampleHtml.push(
-      '<div>TCGA data <a target="_blank" href="https://confluence.broadinstitute.org/display/GDAC/Dashboard-Stddata">(Broad GDAC 1/28/2016)</a></div><span>Please adhere to the' +
-      ' <a target="_blank"' +
-      ' href="http://cancergenome.nih.gov/abouttcga/policies/publicationguidelines">TCGA' +
-      ' publication guidelines</a></u> when using TCGA data in your publications.</span>');
-    exampleHtml.push('<br />');
+      '<div><h4>TCGA data <a target="_blank" href="https://confluence.broadinstitute.org/display/GDAC/Dashboard-Stddata">(Broad GDAC 1/28/2016)</a></h4></div>');
+
     // Gene Expression	GISTIC Copy Number	Copy Number By Gene	Mutations	Proteomics	Methylation
     exampleHtml.push('<div data-name="tcga"></div>');
     $(exampleHtml.join('')).appendTo($el);
