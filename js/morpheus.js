@@ -2313,9 +2313,22 @@ morpheus.Array2dReaderInteractive.prototype = {
       var s;
       var lines = [];
       // show in table
-      var tab = /\t/;
+      var separator = /\t/;
+      var testLine = br.readLine();
+      var separators = ['\t', ',', ' '];
+      for (var i = 0; i < separators.length; i++) {
+        var sep = separators[i];
+        var tokens = testLine.split(new RegExp(sep));
+        if (tokens.length > 1) {
+          separator = sep;
+          lines.push(tokens);
+          break;
+        }
+      }
+
+
       while ((s = br.readLine()) !== null && lines.length < 100) {
-        lines.push(s.split(tab));
+        lines.push(s.split(separator));
       }
       if (lines[0][0] === '#1.3') {
         br.reset();
@@ -2433,7 +2446,7 @@ morpheus.Array2dReaderInteractive.prototype = {
         },
         okCallback: function () {
           br.reset();
-          _this._read(name, br, dataColumnStart, dataRowStart, callback);
+          _this._read(name, br, dataColumnStart, dataRowStart, separator, callback);
         }
       });
       grid.resizeCanvas();
@@ -2441,8 +2454,9 @@ morpheus.Array2dReaderInteractive.prototype = {
     });
 
   },
-  _read: function (datasetName, bufferedReader, dataColumnStart, dataRowStart, cb) {
+  _read: function (datasetName, bufferedReader, dataColumnStart, dataRowStart, separator, cb) {
     var dataset = new morpheus.TxtReader({
+      separator: separator,
       columnMetadata: true,
       dataRowStart: dataRowStart,
       dataColumnStart: dataColumnStart
@@ -4760,14 +4774,26 @@ morpheus.TxtReader.prototype = {
     if (dataRowStart == null) {
       dataRowStart = 1;
     }
-    var tab = /\t/;
+    var separator = /\t/;
+    var separators = ['\t', ',', ' '];
+    var headerLine = reader.readLine().replace(rtrim, '');
+    for (var i = 0; i < separators.length; i++) {
+      var sep = separators[i];
+      var tokens = headerLine.split(new RegExp(sep));
+      if (tokens.length > 1) {
+        separator = sep;
+        break;
+      }
+    }
+
+
     var testLine = null;
     var rtrim = /\s+$/;
-    var header = reader.readLine().replace(rtrim, '').split(tab);
+    var header = headerLine.split(separator);
     if (dataColumnStart == null) { // try to figure out where data starts by finding 1st
       // numeric column
       testLine = reader.readLine().replace(rtrim, '');
-      var tokens = testLine.split(tab);
+      var tokens = testLine.split(separator);
       for (var i = 1; i < tokens.length; i++) {
         var token = tokens[i];
         if (token === '' || token === 'NA' || token === 'NaN' || $.isNumeric(token)) {
@@ -4788,7 +4814,7 @@ morpheus.TxtReader.prototype = {
         // add additional column metadata
         for (var row = 1; row < dataRowStart; row++) {
           var line = reader.readLine();
-          var columnTokens = line.split(tab);
+          var columnTokens = line.split(separator);
           var name = columnTokens[0];
           if (name == null || name === '' || name === 'na') {
             name = 'id';
@@ -4822,7 +4848,7 @@ morpheus.TxtReader.prototype = {
     if (testLine != null) {
       var tmp = new Float32Array(ncols);
 
-      var tokens = testLine.split(tab);
+      var tokens = testLine.split(separator);
       for (var j = 0; j < dataColumnStart; j++) {
         // row metadata
         arrayOfRowArrays[j].push(morpheus.Util.copyString(tokens[j]));
@@ -4857,7 +4883,7 @@ morpheus.TxtReader.prototype = {
       if (s !== '') {
 
 
-        var tokens = s.split(tab);
+        var tokens = s.split(separator);
         for (var j = 0; j < dataColumnStart; j++) {
           // row metadata
           arrayOfRowArrays[j].push(morpheus.Util.copyString(tokens[j]));

@@ -69,9 +69,22 @@ morpheus.Array2dReaderInteractive.prototype = {
       var s;
       var lines = [];
       // show in table
-      var tab = /\t/;
+      var separator = /\t/;
+      var testLine = br.readLine();
+      var separators = ['\t', ',', ' '];
+      for (var i = 0; i < separators.length; i++) {
+        var sep = separators[i];
+        var tokens = testLine.split(new RegExp(sep));
+        if (tokens.length > 1) {
+          separator = sep;
+          lines.push(tokens);
+          break;
+        }
+      }
+
+
       while ((s = br.readLine()) !== null && lines.length < 100) {
-        lines.push(s.split(tab));
+        lines.push(s.split(separator));
       }
       if (lines[0][0] === '#1.3') {
         br.reset();
@@ -189,7 +202,7 @@ morpheus.Array2dReaderInteractive.prototype = {
         },
         okCallback: function () {
           br.reset();
-          _this._read(name, br, dataColumnStart, dataRowStart, callback);
+          _this._read(name, br, dataColumnStart, dataRowStart, separator, callback);
         }
       });
       grid.resizeCanvas();
@@ -197,8 +210,9 @@ morpheus.Array2dReaderInteractive.prototype = {
     });
 
   },
-  _read: function (datasetName, bufferedReader, dataColumnStart, dataRowStart, cb) {
+  _read: function (datasetName, bufferedReader, dataColumnStart, dataRowStart, separator, cb) {
     var dataset = new morpheus.TxtReader({
+      separator: separator,
       columnMetadata: true,
       dataRowStart: dataRowStart,
       dataColumnStart: dataColumnStart
