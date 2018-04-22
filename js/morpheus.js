@@ -21509,7 +21509,7 @@ morpheus.FilePicker = function (options) {
   html.push('</ul>');
 
   html.push('<div class="tab-content"' +
-    ' style="text-align:center;cursor:pointer;height:300px;overflow: auto;">');
+    ' style="text-align:center;cursor:pointer;height:300px;">');
 
   html.push('<div role="tabpanel" class="tab-pane active" id="' + myComputer + '">');
   html.push('<div data-name="drop" class="morpheus-file-drop morpheus-landing-panel">');
@@ -21548,7 +21548,7 @@ morpheus.FilePicker = function (options) {
   }
   if (navigator.onLine) {
     html.push('<div role="tabpanel" class="tab-pane" id="' + preloaded + '">');
-    html.push('<div class="morpheus-landing-panel">');
+    html.push('<div style="height:300px;overflow: auto;" class="morpheus-landing-panel">');
     html.push('</div>');
     html.push('</div>');
   }
