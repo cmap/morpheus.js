@@ -17,7 +17,7 @@
   },
   "build": {
     "npmRebuild": true,
-    "npmArgs": "--hdf5_home_mac=/Users/jgould/git/morpheus.js/native/hdf5-1.10.1/build --link_type=static",
+    "npmArgs": "--link_type=static",
     "appId": "org.broadinstitute.software.morpheus",
     "mac": {
       "category": "public.app-category.graphics-design",
@@ -63,7 +63,7 @@
   },
   "dependencies": {
     "electron-updater": "^2.21.8",
-    "hdf5": "git+https://github.com/HDF-NI/hdf5.node.git",
+    "hdf5": "^0.3.3",
     "morpheus-app": "^1.0.13"
   }
 }
