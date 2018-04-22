@@ -12514,7 +12514,7 @@ morpheus.SampleDatasets = function (options) {
     exampleHtml.push('<div>');
     exampleHtml.push('<a data-toggle="collapse" href="#' + id + '" aria-expanded="false" aria-controls="' + id +
       '">Cancer Dependency Map</a>');
-    exampleHtml.push('<div class="collapse" id="' + id + '">');
+    exampleHtml.push('<div class="collapse in" id="' + id + '">');
 
 
     var depMapDatasets = [];
