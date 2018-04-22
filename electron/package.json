@@ -64,6 +64,6 @@
   "dependencies": {
     "electron-updater": "^2.21.8",
     "hdf5": "git+https://github.com/HDF-NI/hdf5.node.git",
-    "morpheus-app": "^1.0.12"
+    "morpheus-app": "^1.0.13"
   }
 }
