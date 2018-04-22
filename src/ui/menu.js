@@ -57,11 +57,7 @@ morpheus.HeatMapMenu = function (heatMap) {
               accelerator: accel,
               label: name,
               click: function (menuItem, browserWindow, event) {
-                var tagName = event.target.tagName;
-                var isInputField = tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA';
-                if (!isInputField) {
-                  heatMap.getActionManager().execute(action.name);
-                }
+                // no-op, handled in keydown
               }
             });
 
