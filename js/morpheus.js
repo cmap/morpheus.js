@@ -12469,7 +12469,7 @@ morpheus.SampleDatasets = function (options) {
       files.push($(c).data('file'));
     });
 
-    _this.openCCLE(files);
+    _this.openDepMap(files);
     e.preventDefault();
   });
 
@@ -12784,7 +12784,7 @@ morpheus.SampleDatasets.prototype = {
       dataset: morpheus.SampleDatasets.getTcgaDataset(options)
     });
   },
-  openCCLE: function (files) {
+  openDepMap: function (files) {
     this.callback({
       rows: [
         {
@@ -12826,10 +12826,6 @@ morpheus.SampleDatasets.TCGA_DISEASE_TYPES_INFO = [
     id: 'gistic',
     name: 'GISTIC COPY NUMBER',
     type: 'gistic'
-  }, {
-    id: 'gistic',
-    name: 'COPY NUMBER BY GENE',
-    type: 'gisticGene'
   }, {
     id: 'sig_genes',
     name: 'MUTATION',
