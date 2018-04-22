@@ -53,15 +53,16 @@
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
     "dist": "electron-builder",
-    "pack": "electron-builder --dir"
+    "pack": "electron-builder --dir",
+    "start": "electron ."
   },
   "devDependencies": {
     "electron": "^1.8.3",
-    "electron-builder": "^20.7.1",
+    "electron-builder": "^20.10.0",
     "electron-rebuild": "^1.7.3"
   },
   "dependencies": {
-    "electron-updater": "^2.21.3",
+    "electron-updater": "^2.21.8",
     "hdf5": "git+https://github.com/HDF-NI/hdf5.node.git",
     "morpheus-app": "^1.0.11"
   }
