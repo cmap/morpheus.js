@@ -62,10 +62,8 @@ morpheus.MatchesOnTopSortKey = function (project, modelIndices, name, columns) {
   morpheus.AbstractSortKey.call(this, name, columns);
   var highlightedModelIndices = {};
   var p = project;
-  var viewIndices = [];
   for (var i = 0, j = modelIndices.length, length = modelIndices.length; i < length; i++, j--) {
     highlightedModelIndices[modelIndices[i]] = -1; // tie
-    viewIndices.push(i);
   }
   this.comparator = function (i1, i2) {
     var a = highlightedModelIndices[i1];
@@ -78,7 +76,7 @@ morpheus.MatchesOnTopSortKey = function (project, modelIndices, name, columns) {
     }
     return (a === b ? 0 : (a < b ? -1 : 1));
   };
-  this.indices = viewIndices;
+  this.modelIndices = modelIndices;
 };
 morpheus.MatchesOnTopSortKey.prototype = {
   toString: function () {
@@ -779,6 +777,8 @@ morpheus.SortKey.toJSON = function (sortKeys) {
         modelIndices: key.modelIndices,
         name: key.name
       };
+    } else {
+      console.log('Unknown sort key type ' + sortKey);
     }
     if (sortKey != null) {
       sortKey.preservesDendrogram = key.isPreservesDendrogram();
