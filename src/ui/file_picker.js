@@ -138,6 +138,7 @@ morpheus.FilePicker = function (options) {
 
   var $google = $el.find('[name=google]');
   $google.on('click', function () {
+
     var developerKey = 'AIzaSyBCRqn5xgdUsJZcC6oJnIInQubaaL3aYvI';
     var clientId = '936482190815-85k6k06b98ihv272n0b7f7fm33v5mmfa.apps.googleusercontent.com';
     var scope = ['https://www.googleapis.com/auth/drive'];
@@ -167,6 +168,7 @@ morpheus.FilePicker = function (options) {
     }
 
     function handleAuthResult(authResult) {
+
       if (authResult && !authResult.error) {
         oauthToken = authResult.access_token;
         createPicker();
