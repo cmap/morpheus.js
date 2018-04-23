@@ -903,11 +903,12 @@ morpheus.HeatMapToolBar.prototype = {
       return this.columnSearchObject.$search;
     } else if (type === morpheus.HeatMapToolBar.ROW_SEARCH_FIELD) {
       return this.rowSearchObject.$search;
-    } else if (type ===
-      morpheus.HeatMapToolBar.COLUMN_DENDROGRAM_SEARCH_FIELD) {
+    } else if (type === morpheus.HeatMapToolBar.COLUMN_DENDROGRAM_SEARCH_FIELD) {
       return this.columnDendrogramSearchObject.$search;
     } else if (type === morpheus.HeatMapToolBar.ROW_DENDROGRAM_SEARCH_FIELD) {
       return this.rowDendrogramSearchObject.$search;
+    } else {
+      console.log('Unknown field');
     }
   },
   setSearchText: function (options) {
@@ -1205,6 +1206,6 @@ morpheus.HeatMapToolBar.prototype = {
   }
 };
 morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD = 'column';
-morpheus.HeatMapToolBar.ROW_SEARCH_FIELD = 'column';
+morpheus.HeatMapToolBar.ROW_SEARCH_FIELD = 'row';
 morpheus.HeatMapToolBar.COLUMN_DENDROGRAM_SEARCH_FIELD = 'column_dendrogram';
 morpheus.HeatMapToolBar.ROW_DENDROGRAM_SEARCH_FIELD = 'row_dendrogram';

@@ -9974,10 +9974,8 @@ morpheus.MatchesOnTopSortKey = function (project, modelIndices, name, columns) {
   morpheus.AbstractSortKey.call(this, name, columns);
   var highlightedModelIndices = {};
   var p = project;
-  var viewIndices = [];
   for (var i = 0, j = modelIndices.length, length = modelIndices.length; i < length; i++, j--) {
     highlightedModelIndices[modelIndices[i]] = -1; // tie
-    viewIndices.push(i);
   }
   this.comparator = function (i1, i2) {
     var a = highlightedModelIndices[i1];
@@ -9990,7 +9988,7 @@ morpheus.MatchesOnTopSortKey = function (project, modelIndices, name, columns) {
     }
     return (a === b ? 0 : (a < b ? -1 : 1));
   };
-  this.indices = viewIndices;
+  this.modelIndices = modelIndices;
 };
 morpheus.MatchesOnTopSortKey.prototype = {
   toString: function () {
@@ -10691,6 +10689,8 @@ morpheus.SortKey.toJSON = function (sortKeys) {
         modelIndices: key.modelIndices,
         name: key.name
       };
+    } else {
+      console.log('Unknown sort key type ' + sortKey);
     }
     if (sortKey != null) {
       sortKey.preservesDendrogram = key.isPreservesDendrogram();
@@ -27481,11 +27481,12 @@ morpheus.HeatMapToolBar.prototype = {
       return this.columnSearchObject.$search;
     } else if (type === morpheus.HeatMapToolBar.ROW_SEARCH_FIELD) {
       return this.rowSearchObject.$search;
-    } else if (type ===
-      morpheus.HeatMapToolBar.COLUMN_DENDROGRAM_SEARCH_FIELD) {
+    } else if (type === morpheus.HeatMapToolBar.COLUMN_DENDROGRAM_SEARCH_FIELD) {
       return this.columnDendrogramSearchObject.$search;
     } else if (type === morpheus.HeatMapToolBar.ROW_DENDROGRAM_SEARCH_FIELD) {
       return this.rowDendrogramSearchObject.$search;
+    } else {
+      console.log('Unknown field');
     }
   },
   setSearchText: function (options) {
@@ -27783,7 +27784,7 @@ morpheus.HeatMapToolBar.prototype = {
   }
 };
 morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD = 'column';
-morpheus.HeatMapToolBar.ROW_SEARCH_FIELD = 'column';
+morpheus.HeatMapToolBar.ROW_SEARCH_FIELD = 'row';
 morpheus.HeatMapToolBar.COLUMN_DENDROGRAM_SEARCH_FIELD = 'column_dendrogram';
 morpheus.HeatMapToolBar.ROW_DENDROGRAM_SEARCH_FIELD = 'row_dendrogram';
 
@@ -30093,12 +30094,12 @@ morpheus.HeatMap.prototype = {
       }
       this.project.getColumnSelectionModel().setViewIndices(indices, false);
     }
-    // if (this.options.rowSearchTerm != null && this.options.rowSearchTerm !== '') {
-    //   this.toolbar.getSearchField(morpheus.HeatMapToolBar.ROW_SEARCH_FIELD).val(this.options.rowSearchTerm);
-    // }
-    // if (this.options.columnSearchTerm != null && this.options.columnSearchTerm !== '') {
-    //   this.toolbar.getSearchField(morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD).val(this.options.columnSearchTerm);
-    // }
+    if (this.options.rowSearchTerm != null && this.options.rowSearchTerm !== '') {
+      this.toolbar.getSearchField(morpheus.HeatMapToolBar.ROW_SEARCH_FIELD).val(this.options.rowSearchTerm);
+    }
+    if (this.options.columnSearchTerm != null && this.options.columnSearchTerm !== '') {
+      this.toolbar.getSearchField(morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD).val(this.options.columnSearchTerm);
+    }
 
     this.vSortByValuesIndicator = new morpheus.SortByValuesIndicator(
       this.project, true, heatmap.getRowPositions());
@@ -30338,7 +30339,7 @@ morpheus.HeatMap.prototype = {
       if (ext === 'maf' && !this.options.rowSortBy) {
         var sortKeys = [];
         if (this.project.getFullDataset().getRowMetadata().getByName(
-            'order')) {
+          'order')) {
           sortKeys.push(new morpheus.SortKey('order',
             morpheus.SortKey.SortOrder.ASCENDING));
         }
@@ -30500,7 +30501,7 @@ morpheus.HeatMap.prototype = {
           for (var i = 0; i < _this.rowTracks.length; i++) {
             var track = _this.rowTracks[i];
             if (!dataset.getRowMetadata().getByName(
-                track.getName())) {
+              track.getName())) {
               _this.removeTrack(track.getName(),
                 false);
               i--;
@@ -30509,7 +30510,7 @@ morpheus.HeatMap.prototype = {
           for (var i = 0; i < _this.columnTracks.length; i++) {
             var track = _this.columnTracks[i];
             if (!dataset.getColumnMetadata().getByName(
-                track.getName())) {
+              track.getName())) {
               _this.removeTrack(track.getName(),
                 true);
               i--;

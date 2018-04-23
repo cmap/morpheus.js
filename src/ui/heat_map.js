@@ -1643,12 +1643,12 @@ morpheus.HeatMap.prototype = {
       }
       this.project.getColumnSelectionModel().setViewIndices(indices, false);
     }
-    // if (this.options.rowSearchTerm != null && this.options.rowSearchTerm !== '') {
-    //   this.toolbar.getSearchField(morpheus.HeatMapToolBar.ROW_SEARCH_FIELD).val(this.options.rowSearchTerm);
-    // }
-    // if (this.options.columnSearchTerm != null && this.options.columnSearchTerm !== '') {
-    //   this.toolbar.getSearchField(morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD).val(this.options.columnSearchTerm);
-    // }
+    if (this.options.rowSearchTerm != null && this.options.rowSearchTerm !== '') {
+      this.toolbar.getSearchField(morpheus.HeatMapToolBar.ROW_SEARCH_FIELD).val(this.options.rowSearchTerm);
+    }
+    if (this.options.columnSearchTerm != null && this.options.columnSearchTerm !== '') {
+      this.toolbar.getSearchField(morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD).val(this.options.columnSearchTerm);
+    }
 
     this.vSortByValuesIndicator = new morpheus.SortByValuesIndicator(
       this.project, true, heatmap.getRowPositions());
@@ -1888,7 +1888,7 @@ morpheus.HeatMap.prototype = {
       if (ext === 'maf' && !this.options.rowSortBy) {
         var sortKeys = [];
         if (this.project.getFullDataset().getRowMetadata().getByName(
-            'order')) {
+          'order')) {
           sortKeys.push(new morpheus.SortKey('order',
             morpheus.SortKey.SortOrder.ASCENDING));
         }
@@ -2050,7 +2050,7 @@ morpheus.HeatMap.prototype = {
           for (var i = 0; i < _this.rowTracks.length; i++) {
             var track = _this.rowTracks[i];
             if (!dataset.getRowMetadata().getByName(
-                track.getName())) {
+              track.getName())) {
               _this.removeTrack(track.getName(),
                 false);
               i--;
@@ -2059,7 +2059,7 @@ morpheus.HeatMap.prototype = {
           for (var i = 0; i < _this.columnTracks.length; i++) {
             var track = _this.columnTracks[i];
             if (!dataset.getColumnMetadata().getByName(
-                track.getName())) {
+              track.getName())) {
               _this.removeTrack(track.getName(),
                 true);
               i--;
