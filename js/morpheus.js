@@ -12558,6 +12558,17 @@ morpheus.SampleDatasets = function (options) {
       file: 'portal-rppa-2018-04-11.csv',
       help: 'CCLE Reverse Phase Protein Array (RPPA) data'
     });
+    depMapDatasets.push({
+      name: 'DRUG SENSITIVITY IC50',
+      file: 'portal-GDSC_IC50-2018-04-11.csv',
+      help: 'Fitted dose response data, log(IC50) values'
+    });
+    depMapDatasets.push({
+      name: 'DRUG SENSITIVITY AUC',
+      file: 'portal-GDSC_AUC-2018-04-11.csv',
+      help: 'Fitted dose response data, AUC values'
+    });
+
 
     for (var j = 0; j < depMapDatasets.length; j++) {
       var info = depMapDatasets[j];
@@ -12567,7 +12578,7 @@ morpheus.SampleDatasets = function (options) {
         }
         exampleHtml.push('<div style="margin: 6px 0 0 20px;display: inline-block;vertical-align:top;">');
       }
-      exampleHtml.push('<label title="' + info.help + '"><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-file="' + info.file + '"' + '>' + info.name + '</label>');
+      exampleHtml.push('<label title="' + info.help + '"><input type="checkbox" style="margin-left:4px;" data-toggle="dataTypeToggle" data-file="' + info.file + '"' + '> ' + info.name + '</label>');
     }
 
     // portal-GDSC_AUC-2018-04-11.csv
@@ -12645,7 +12656,7 @@ morpheus.SampleDatasets = function (options) {
         }
         tcga.push('<label><input type="checkbox" style="margin-left:4px;"' +
           ' data-toggle="dataTypeToggle"' +
-          ' data-type="' + info.type + '"' + (!disease[info.id] ? ' disabled' : '') + '>' + info.name + '</label>');
+          ' data-type="' + info.type + '"' + (!disease[info.id] ? ' disabled' : '') + '> ' + info.name + '</label>');
       }
       tcga.push('</div>');
 
