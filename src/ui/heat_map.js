@@ -132,12 +132,12 @@ morpheus.HeatMap = function (options) {
        * Column metadata field in dataset used to match leaf
        * node ids in column dendrogram Newick file
        */
-      columnDendrogramField: 'id',
+      columnDendrogramField: null,
       /*
        * Row metadata field in dataset used to match leaf node
        * ids in row dendrogram Newick file
        */
-      rowDendrogramField: 'id',
+      rowDendrogramField: null,
       /*
        * Array of objects describing how to display row
        * metadata fields. Each object in the array must have
@@ -502,6 +502,7 @@ morpheus.HeatMap = function (options) {
     }
 
   }
+
   var heatMapLoaded = function () {
     if (typeof window !== 'undefined') {
       $(window).on('orientationchange.morpheus resize.morpheus', _this.resizeListener = function () {
@@ -3165,6 +3166,9 @@ morpheus.HeatMap.prototype = {
   },
   getVisibleTracks: function (isColumns) {
     var tracks = isColumns ? this.columnTracks : this.rowTracks;
+    if (tracks == null) {
+      tracks = [];
+    }
     return tracks.filter(function (track) {
       return track.isVisible() && !track.getFullVector().getProperties().has(morpheus.VectorKeys.IS_INDEX);
     });
