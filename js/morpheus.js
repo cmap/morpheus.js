@@ -12301,18 +12301,18 @@ morpheus.LandingPage = function (pageOptions) {
   html.push('<div class="row"><div class="col-xs-12 morpheus-footer"></div></div>');
   html.push('</div>'); // container
 
+
   var $el = $(html.join(''));
   new morpheus.HelpMenu().$el.appendTo($el.find('.morpheus-footer'));
   this.$el = $el;
   var $description = $el.find('[data-name=desc]');
   morpheus.Util.createMorpheusHeader().appendTo($description);
   $('<p>Versatile matrix visualization and analysis software</p><p>View your dataset as a heat' +
-    ' map,' +
-    ' then explore' +
-    ' the' +
-    ' interactive tools in Morpheus. Cluster, create new annotations, search, filter, sort, display charts, and more.</p><p style="color:#586069;">30,000+ users <br />100,000+' +
-    ' matrices analyzed</p>')
+    ' map, then explore the interactive tools in Morpheus. Cluster, create new annotations, search, filter, sort, display charts, and more.</p>' +
+    '<p style="color:#586069;">30,000+ users <br />100,000+' +
+    ' matrices analyzed.</p><p style="font-size:12px;">If you use Morpheus for published work, please cite:<br />Morpheus, https://software.broadinstitute.org/morpheus</p>')
     .appendTo($description);
+
 
   var $input = $el.find('[data-name=input]');
 
