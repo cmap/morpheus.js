@@ -43,11 +43,21 @@
       <a data-toggle="collapse"
          style="font-size: 1.2em; display: block; font-weight: 800;">Open
         Project Achilles Gene Essentiality Scores</a>
-      <p class="collapse">Open the Project Achilles "Gene Essentiality"
-        scores under the preloaded datasets section. Project Achilles facilitates the
-        discovery of genes that when knocked down effect the viability of particular cell
+      <p class="collapse">Open the CRISPR (Broad Avana)
+        dataset under the Cancer Dependency Map preloaded datasets section. Project Achilles facilitates the
+        discovery of genes that when knocked down/out effect the viability of particular cell
         lines.<br/>Morpheus can also open data from Excel, text files,
-        the clipboard, a URL, Google Drive, and Dropbox.</p>
+        the clipboard, a URL, and Dropbox.</p>
+
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Adjust Color Scheme</a>
+      <p class="collapse">Select View > Options to edit the color scale. By default,
+        values in the heat map are mapped to colors
+        using the minimum and maximum of each row independently.
+        With z-scored data, a fixed scale should be used. Set the range of the fixed color scale to -2, 2.
+
+        <br/><a target="_blank" href="https://youtu.be/zIEHPaz7PhY">Video <i
+          class="fa fa-video-camera" aria-hidden="true"></i></a></p>
 
 
       <a data-toggle="collapse"
@@ -67,9 +77,7 @@
         Show only the top 500 most variable genes by the median absolute
         deviation <br/> Click Tools > Filter to open the filter dialog. <br/>Click the "Add"
         button and set the field name to "MAD". <br/>Click
-        "Switch to top N filter" and enter "500" for "N". Note that 523
-        rows are now shown because of ties in the median absolute
-        deviation.
+        "Switch to top N filter" and enter "500" for "N".
       </p>
 
       <a data-toggle="collapse"
@@ -164,13 +172,38 @@
 
 
       <a data-toggle="collapse"
-         style="font-size: 1.2em; display: block; font-weight: 800;">Scatter
-        Plot Matrix</a>
+         style="font-size: 1.2em; display: block; font-weight: 800;">Append Dataset</a>
       <p class="collapse">
-        Select the first three rows in order to select BRAF and the top 2 most
-        correlated genes. Select all samples. Click Tools > Chart. Change the
-        chart type to "row scatter" to assess the
-        relationships among these genes.
+        Select File > Open. Select the AUC drug sensitivity
+        dataset under the Cancer Dependency Map preloaded datasets section. Change "Open File Action" to "Append rows to
+        current dataset". Match the cell line ids in the CRISPR dataset with the cell line ids in the drug sensitivity
+        dataset.
+      </p>
+
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Repeat Nearest
+        Neighbors With drug sensitivity dataset</a>
+      <p class="collapse">
+        Create a new tab with BRAF CRISPR dependency scores and drug sensitivity scores by searching rows for
+        "Source:portal-GDSC_AUC-2018-04-11 BRAF". Ensure that all columns are selected. Click Tools > New Heat Map to
+        create a new tab.
+        In the new tab, search for BRAF and bring the matches to the top. Select the BRAF dependency scores. Click Tools
+        > Nearest Neighbors.
+        Click "OK" to run the analysis. <br/>
+        A new row annotation named "Pearson correlation" will appear. <br/>
+        What drugs correlate with BRAF dependency scores?
+      </p>
+
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Overlay RNAi data on top of CRISPR data to create
+        dot plots</a>
+      <p class="collapse">
+        Create a new tab with the CRISPR dependency scores only. Select File > Open. Select the Broad RNAi
+        dataset under the Cancer Dependency Map preloaded datasets section. Change "Open File Action" to "Overlay onto
+        current dataset". Match the cell line ids in the CRISPR dataset with the cell line ids in the RNAi
+        dataset and the gene ids in the CRISPR dataset with the gene ids in the RNAi dataset. Select View > Options to
+        edit the color scale. Change "shape" to "circle" and "size by" to the RNAi dataset. Set the size by minimum to 2
+        and the maximum to -2.
       </p>
 
 
