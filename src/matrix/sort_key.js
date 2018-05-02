@@ -245,7 +245,7 @@ morpheus.SortByValuesKey.prototype = {
   init: function (dataset, visibleModelIndices) {
     // isColumnSort-sort columns by selected rows
     // dataset is transposed if !isColumnSort
-    this.dataset = morpheus.DatasetUtil.slicedView(dataset, null,
+    this.dataset = new morpheus.SlicedDatasetView(dataset, null,
       this.modelIndices);
     this.rowView = new morpheus.DatasetRowView(this.dataset);
     this.summaryFunction = this.modelIndices.length > 1 ? morpheus.Median

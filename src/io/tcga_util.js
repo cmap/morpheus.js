@@ -314,9 +314,13 @@ morpheus.TcgaUtil.getDataset = function (options) {
         var mutationDataset = new morpheus.SlicedDatasetView(
           datasetToReturn, sourceToIndices
             .get('mutations_merged.maf'));
+
+
         new morpheus.OpenFileTool()
-          .annotate(sigGenesLines, mutationDataset, false,
-            null, 'id', 'gene', ['q']);
+          .annotate({
+            lines: sigGenesLines, dataset: mutationDataset, isColumns: false,
+            metadataName: 'id', fileColumnName: 'gene', fileColumnNamesToInclude: ['q']
+          });
         var qVector = mutationDataset.getRowMetadata().getByName(
           'q');
         var qValueVector = mutationDataset.getRowMetadata()

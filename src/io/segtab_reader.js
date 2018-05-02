@@ -45,7 +45,7 @@ morpheus.SegTabReader.binByRegion = function (dataset, regions) {
       }
     }
     if (rowIndices.length > 0) {
-      var slice = morpheus.DatasetUtil.slicedView(dataset, rowIndices,
+      var slice = new morpheus.SlicedDatasetView(dataset, rowIndices,
         null);
       var columnView = new morpheus.DatasetColumnView(slice);
       for (var j = 0; j < dataset.getColumnCount(); j++) {

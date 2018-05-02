@@ -19,7 +19,7 @@ morpheus.HClusterGroupBy = function (dataset, groupByFieldNames, distanceFunctio
   idToIndices
   .forEach(function (rowIndices, id) {
     var originalIndicesForGroup = idToIndices.get(id);
-    var subset = morpheus.DatasetUtil.slicedView(dataset,
+    var subset = new morpheus.SlicedDatasetView(dataset,
       originalIndicesForGroup, null);
     var hcl;
     var distanceMatrix = morpheus.HCluster.computeDistanceMatrix(

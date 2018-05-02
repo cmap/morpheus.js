@@ -1,6 +1,11 @@
 /**
  *
  * @constructor
+ * @param options.dataset
+ * @param options.columnMajorOrder
+ * @param options.rowMeta
+ * @param options.colMeta
+ *
  */
 morpheus.Hdf5Reader = function (options) {
   if (options == null) {

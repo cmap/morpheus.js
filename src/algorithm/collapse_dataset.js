@@ -45,7 +45,7 @@ morpheus.CollapseDataset = function (dataset, collapseToFields,
   idToIndices
     .forEach(function (rowIndices, key) {
       // collapse each column separately
-      var slice = morpheus.DatasetUtil.slicedView(dataset,
+      var slice = new morpheus.SlicedDatasetView(dataset,
         rowIndices, null);
       var view = new morpheus.DatasetColumnView(slice);
       // for (var series = 0; series < nseries; series++) {

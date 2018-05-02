@@ -19,13 +19,8 @@ morpheus.DatasetUtil.min = function (dataset, seriesIndex) {
   }
   return min;
 };
-morpheus.DatasetUtil.slicedView = function (dataset, rows, columns) {
-  return new morpheus.SlicedDatasetView(dataset, rows, columns);
-};
-morpheus.DatasetUtil.transposedView = function (dataset) {
-  return dataset instanceof morpheus.TransposedDatasetView ? dataset
-    .getDataset() : new morpheus.TransposedDatasetView(dataset);
-};
+
+
 morpheus.DatasetUtil.max = function (dataset, seriesIndex) {
   seriesIndex = seriesIndex || 0;
   var max = -Number.MAX_VALUE;
@@ -159,9 +154,13 @@ morpheus.DatasetUtil.annotate = function (options) {
   _.each(options.annotations, function (ann, annotationIndex) {
     if (morpheus.Util.isArray(ann.file)) { // already parsed text
       functions[annotationIndex] = function (dataset) {
-        new morpheus.OpenFileTool().annotate(ann.file, dataset,
-          isColumns, null, ann.datasetField, ann.fileField,
-          ann.include);
+
+
+        new morpheus.OpenFileTool().annotate({
+          lines: ann.file, dataset: dataset,
+          isColumns: isColumns, metadataName: ann.datasetField, fileColumnName: ann.fileField,
+          fileColumnNamesToInclude: ann.include
+        });
       };
     } else {
       var result = morpheus.Util.readLines(ann.file);
@@ -188,9 +187,13 @@ morpheus.DatasetUtil.annotate = function (options) {
           deferred.resolve();
         } else {
           functions[annotationIndex] = function (dataset) {
-            new morpheus.OpenFileTool().annotate(lines, dataset,
-              isColumns, null, ann.datasetField,
-              ann.fileField, ann.include, ann.transposed);
+
+
+            new morpheus.OpenFileTool().annotate({
+              lines: lines, dataset: dataset,
+              isColumns: isColumns, metadataName: ann.datasetField,
+              fileColumnName: ann.fileField, fileColumnNamesToInclude: ann.include, transposed: ann.transposed
+            });
           };
           deferred.resolve();
         }
@@ -337,77 +340,7 @@ morpheus.DatasetUtil.toObjectArray = function (dataset, options) {
   }
   return array;
 };
-morpheus.DatasetUtil.fixL1K = function (dataset) {
-  var names = {
-    'cell_id': 'Cell Line',
-    'pert_idose': 'Dose (\u00B5M)',
-    'pert_iname': 'Name',
-    'pert_itime': 'Time (hr)',
-    'distil_ss': 'Signature Strength',
-    'pert_type': 'Type',
-    'cell_lineage': 'Lineage',
-    'cell_histology': 'Histology',
-    'cell_type': 'Cell Type'
-  };
-  var fixNames = function (metadata) {
-    for (var i = 0, count = metadata.getMetadataCount(); i < count; i++) {
-      var v = metadata.get(i);
-      var name = v.getName();
-      var mapped = names[name];
-      if (mapped) {
-        v.setName(mapped);
-      }
-    }
-  };
-  fixNames(dataset.getRowMetadata());
-  fixNames(dataset.getColumnMetadata());
-  var fix666 = function (metadata) {
-    for (var i = 0, count = metadata.getMetadataCount(); i < count; i++) {
-      var v = metadata.get(i);
-      if (v.getName() == 'Dose (\u00B5M)') { // convert to number
-        for (var j = 0, size = v.size(); j < size; j++) {
-          var value = v.getValue(j);
-          if (value != null) {
-            v.setValue(j, parseFloat(value));
-          }
-        }
-      }
-      var isNumber = false;
-      for (var j = 0, size = v.size(); j < size; j++) {
-        var value = v.getValue(j);
-        if (value != null) {
-          isNumber = _.isNumber(value);
-          break;
-        }
-      }
-      var newValue = isNumber || v.getName() == 'Dose (\u00B5M)' ? 0 : '';
-      for (var j = 0, size = v.size(); j < size; j++) {
-        var value = v.getValue(j);
-        if (value != null && value == '-666') {
-          v.setValue(j, newValue);
-        }
-      }
-    }
-  };
-  fix666(dataset.getRowMetadata());
-  fix666(dataset.getColumnMetadata());
-  var fixCommas = function (metadata) {
-    var regex = /(,)([^ ])/g;
-    _.each(['Lineage', 'Histology'], function (name) {
-      var v = metadata.getByName(name);
-      if (v != null) {
-        for (var i = 0, size = v.size(); i < size; i++) {
-          var val = v.getValue(i);
-          if (val) {
-            v.setValue(i, val.replace(regex, ', $2'));
-          }
-        }
-      }
-    });
-  };
-  fixCommas(dataset.getRowMetadata());
-  fixCommas(dataset.getColumnMetadata());
-};
+
 morpheus.DatasetUtil.geneSetsToDataset = function (name, sets) {
   var uniqueIds = new morpheus.Map();
   for (var i = 0, length = sets.length; i < length; i++) {
@@ -908,12 +841,14 @@ morpheus.DatasetUtil.shallowCopy = function (dataset) {
     .getRowMetadata());
   var columnMetadataModel = morpheus.MetadataUtil.shallowCopy(dataset
     .getColumnMetadata());
+
   dataset.getRowMetadata = function () {
     return rowMetadataModel;
   };
   dataset.getColumnMetadata = function () {
     return columnMetadataModel;
   };
+
   return dataset;
 };
 

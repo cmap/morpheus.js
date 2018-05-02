@@ -103,7 +103,7 @@ morpheus.NearestNeighbors.prototype = {
 
     if (isColumns) {
       // compute the nearest neighbors of row, so need to transpose
-      dataset = morpheus.DatasetUtil.transposedView(dataset);
+      dataset = new morpheus.TransposedDatasetView(dataset);
     }
     var selectedIndices = (isColumns ? project.getColumnSelectionModel()
       : project.getRowSelectionModel()).getViewIndices().values();
@@ -115,10 +115,10 @@ morpheus.NearestNeighbors.prototype = {
     if (options.input.use_selected_only) {
       spaceIndices = (!isColumns ? project.getColumnSelectionModel()
         : project.getRowSelectionModel()).getViewIndices().values();
-      dataset = morpheus.DatasetUtil.slicedView(dataset, null,
+      dataset = new morpheus.SlicedDatasetView(dataset, null,
         spaceIndices);
     }
-    var d1 = morpheus.DatasetUtil.slicedView(dataset, selectedIndices, null);
+    var d1 = new morpheus.SlicedDatasetView(dataset, selectedIndices, null);
     var nearestNeighborsList;
     if (isAnnotation) {
       nearestNeighborsList = dataset.getColumnMetadata().getByName(options.input.annotation);

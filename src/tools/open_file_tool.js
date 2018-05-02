@@ -220,7 +220,7 @@ morpheus.OpenFileTool.prototype = {
   },
   annotateCls: function (heatMap, dataset, fileName, isColumns, lines) {
     if (isColumns) {
-      dataset = morpheus.DatasetUtil.transposedView(dataset);
+      dataset = new morpheus.TransposedDatasetView(dataset);
     }
     var assignments = new morpheus.ClsReader().read(lines);
     if (assignments.length !== dataset.getRowCount()) {
@@ -244,7 +244,7 @@ morpheus.OpenFileTool.prototype = {
   annotateSets: function (dataset, isColumns, sets,
                           datasetMetadataName, setSourceFileName) {
     if (isColumns) {
-      dataset = morpheus.DatasetUtil.transposedView(dataset);
+      dataset = new morpheus.TransposedDatasetView(dataset);
     }
     var vector = dataset.getRowMetadata().getByName(datasetMetadataName);
     var idToIndices = morpheus.VectorUtil.createValueToIndicesMap(vector);
@@ -287,17 +287,30 @@ morpheus.OpenFileTool.prototype = {
    *            null to include all
    * @param tranposed For text/Excel files only. If <code>true</code>, different annotations are on each row.
    */
-  annotate: function (lines, dataset, isColumns, sets, metadataName,
-                      fileColumnName, fileColumnNamesToInclude, transposed) {
+  annotate: function (options) {
+    var lines = options.lines;
+    var dataset = options.dataset;
+    var isColumns = options.isColumns;
+    var sets = options.sets;
+    var metadataName = options.metadataName;
+    var fileColumnName = options.fileColumnName;
+    var fileColumnNamesToInclude = options.fileColumnNamesToInclude;
+    var transposed = options.transposed;
+    var separator = options.separator;
+
+
+    if (separator == null) {
+      separator = /\t/;
+    }
     if (isColumns) {
-      dataset = morpheus.DatasetUtil.transposedView(dataset);
+      dataset = new morpheus.TransposedDatasetView(dataset);
     }
     var vector = dataset.getRowMetadata().getByName(metadataName);
     if (!vector) {
       throw new Error('vector ' + metadataName + ' not found.');
     }
     var fileColumnNamesToIncludeSet = null;
-    if (fileColumnNamesToInclude) {
+    if (fileColumnNamesToInclude != null) {
       fileColumnNamesToIncludeSet = new morpheus.Set();
       fileColumnNamesToInclude.forEach(function (name) {
         fileColumnNamesToIncludeSet.add(name);
@@ -328,9 +341,9 @@ morpheus.OpenFileTool.prototype = {
             });
         });
     } else {
-      var tab = /\t/;
+
       if (!transposed) {
-        var header = lines[0].split(tab);
+        var header = lines[0].split(separator);
         var fileMatchOnColumnIndex = _.indexOf(header, fileColumnName);
         if (fileMatchOnColumnIndex === -1) {
           throw new Error(fileColumnName + ' not found in header:'
@@ -356,7 +369,7 @@ morpheus.OpenFileTool.prototype = {
         }
         var nheaders = columnIndices.length;
         for (var i = 1, nrows = lines.length; i < nrows; i++) {
-          var line = lines[i].split(tab);
+          var line = lines[i].split(separator);
           var id = line[fileMatchOnColumnIndex];
           var indices = idToIndices.get(id);
           if (indices !== undefined) {
@@ -376,7 +389,7 @@ morpheus.OpenFileTool.prototype = {
         var splitLines = [];
         var matchOnLine;
         for (var i = 0, nrows = lines.length; i < nrows; i++) {
-          var line = lines[i].split(tab);
+          var line = lines[i].split(separator);
           var name = line[0];
           if (fileColumnName === name) {
             matchOnLine = line;
@@ -455,12 +468,31 @@ morpheus.OpenFileTool.prototype = {
   prompt: function (lines, dataset, heatMap, isColumns) {
     var promptTool = {};
     var _this = this;
-    var header = lines != null ? lines[0].split('\t') : null;
+    var separator = /\t/;
+
+    if (lines != null) {
+      var separators = ['\t', ',', ' '];
+      var headerLine = lines[0].trim();
+      for (var i = 0; i < separators.length; i++) {
+        var sep = separators[i];
+        var tokens = headerLine.split(new RegExp(sep));
+        if (tokens.length > 1) {
+          separator = sep;
+          break;
+        }
+      }
+    }
+
+    var header = lines != null ? lines[0].split(separator) : null;
     promptTool.execute = function (options) {
       var metadataName = options.input.dataset_field_name;
       var fileColumnName = options.input.file_field_name;
-      var vectors = _this.annotate(lines, dataset, isColumns, null,
-        metadataName, fileColumnName);
+
+
+      var vectors = _this.annotate({
+        lines: lines, dataset: dataset, isColumns: isColumns,
+        metadataName: metadataName, fileColumnName: fileColumnName, transposed: false, separator: separator
+      });
 
       var nameToIndex = new morpheus.Map();
       var display = [];

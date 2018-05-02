@@ -44,7 +44,7 @@ morpheus.OpenDendrogramTool.prototype = {
     .done(function (text) {
       var dataset = options.project.getSortedFilteredDataset();
       if (isColumns) {
-        dataset = morpheus.DatasetUtil.transposedView(dataset);
+        dataset = new morpheus.TransposedDatasetView(dataset);
       }
       var tree = morpheus.DendrogramUtil.parseNewick(text);
       if (tree.leafNodes.length !== dataset.getRowCount()) {
