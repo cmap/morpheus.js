@@ -693,7 +693,7 @@ morpheus.ChartTool.prototype = {
         type: 'scatter',
         data: data,
         large: false,
-        symbolSize: 6,
+        symbolSize: 2,
         tooltip: {
           formatter: function (obj) {
             var value = obj.value;
