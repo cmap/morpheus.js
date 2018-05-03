@@ -42,6 +42,7 @@ module.exports = {
     "Clipboard": true,
     "Newick": true,
     "Slick": true,
-    "C2S": true
+    "C2S": true,
+    'echarts': true
   }
 };

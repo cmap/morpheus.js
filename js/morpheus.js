@@ -12793,6 +12793,50 @@ morpheus.SampleDatasets.TCGA_DISEASE_TYPES_INFO = [
 
 morpheus.AdjustDataTool = function () {
 };
+
+morpheus.AdjustDataTool.log2 = function (dataset) {
+  for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+    for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+      dataset.setValue(i, j, morpheus.Log2(dataset.getValue(
+        i, j)));
+    }
+  }
+};
+
+morpheus.AdjustDataTool.log2_plus = function (dataset) {
+  for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+    for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+      dataset.setValue(i, j, morpheus.Log2(dataset.getValue(
+        i, j) + 1));
+    }
+  }
+};
+
+morpheus.AdjustDataTool.zScore = function (dataset) {
+  var rowView = new morpheus.DatasetRowView(dataset);
+  for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+    rowView.setIndex(i);
+    var mean = morpheus.Mean(rowView);
+    var stdev = Math.sqrt(morpheus.Variance(rowView));
+    for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+      dataset.setValue(i, j, stdev === 0 ? NaN : (dataset.getValue(i, j) - mean)
+        / stdev);
+    }
+  }
+};
+morpheus.AdjustDataTool.robustZScore = function (dataset) {
+  var rowView = new morpheus.DatasetRowView(dataset);
+  for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
+    rowView.setIndex(i);
+    var median = morpheus.Median(rowView);
+    var mad = morpheus.MAD(rowView, median);
+    for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
+      dataset.setValue(i, j,
+        mad === 0 ? NaN : (dataset.getValue(i, j) - median) / mad);
+    }
+  }
+};
+
 morpheus.AdjustDataTool.prototype = {
   toString: function () {
     return 'Adjust';
@@ -12820,6 +12864,10 @@ morpheus.AdjustDataTool.prototype = {
         name: 'log_2',
         type: 'checkbox'
       }, {
+        name: 'one_plus_log_2',
+        type: 'checkbox',
+        help: 'Take log2(1 + x)'
+      }, {
         name: 'inverse_log_2',
         type: 'checkbox'
       }, {
@@ -12843,7 +12891,8 @@ morpheus.AdjustDataTool.prototype = {
     var heatMap = options.heatMap;
 
     if (options.input.log_2 || options.input.inverse_log_2
-      || options.input['z-score'] || options.input['robust_z-score'] || options.input.quantile_normalize || options.input.scale_column_sum) {
+      || options.input['z-score'] || options.input['robust_z-score'] || options.input.quantile_normalize || options.input.scale_column_sum || options.input.one_plus_log_2
+    ) {
       // clone the values 1st
       var sortedFilteredDataset = morpheus.DatasetUtil.copy(project
         .getSortedFilteredDataset());
@@ -12887,12 +12936,10 @@ morpheus.AdjustDataTool.prototype = {
         }
       }
       if (options.input.log_2) {
-        for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-          for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-            dataset.setValue(i, j, morpheus.Log2(dataset.getValue(
-              i, j)));
-          }
-        }
+        morpheus.AdjustDataTool.log2(dataset);
+      }
+      if (options.input.one_plus_log_2) {
+        morpheus.AdjustDataTool.log2_plus(dataset);
       }
       if (options.input.inverse_log_2) {
         for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
@@ -12908,26 +12955,10 @@ morpheus.AdjustDataTool.prototype = {
         morpheus.QNorm.execute(dataset);
       }
       if (options.input['z-score']) {
-        for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-          rowView.setIndex(i);
-          var mean = morpheus.Mean(rowView);
-          var stdev = Math.sqrt(morpheus.Variance(rowView));
-          for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-            dataset.setValue(i, j, stdev === 0 ? NaN : (dataset.getValue(i, j) - mean)
-              / stdev);
-          }
-        }
+        morpheus.AdjustDataTool.zScore(dataset);
       }
       if (options.input['robust_z-score']) {
-        for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-          rowView.setIndex(i);
-          var median = morpheus.Median(rowView);
-          var mad = morpheus.MAD(rowView, median);
-          for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-            dataset.setValue(i, j,
-              mad === 0 ? NaN : (dataset.getValue(i, j) - median) / mad);
-          }
-        }
+        morpheus.AdjustDataTool.robustZScore(dataset);
       }
 
       return new morpheus.HeatMap({
@@ -13192,6 +13223,14 @@ morpheus.ChartTool = function (chartOptions) {
     options: numericColumnOptions
   });
 
+
+  formBuilder.append({
+    name: 'transform_values',
+    type: 'bootstrap-select',
+    multiple: true,
+    options: ['log2', 'log2(1+x)', 'z-score', 'robust z-score']
+  });
+
   formBuilder.append({
     name: 'symbol_size',
     type: 'text',
@@ -13227,7 +13266,8 @@ morpheus.ChartTool = function (chartOptions) {
       color: ['Selected Rows', 'columns'],
       x_axis: 'columns',
       y_axis: 'columns',
-      symbol_size: true
+      symbol_size: true,
+      transform_values: true
     },
     'column profile': {
       axis_label: 'rows',
@@ -13260,6 +13300,7 @@ morpheus.ChartTool = function (chartOptions) {
         true);
 
     }
+    formBuilder.setVisible('transform_values', chartOptions.transform_values && formBuilder.getValue('color') === 'Selected Rows');
     formBuilder.setVisible('symbol_size', chartOptions.symbol_size);
     formBuilder.setVisible('x_axis', chartOptions.x_axis != null);
     formBuilder.setVisible('y_axis', chartOptions.y_axis != null);
@@ -13642,6 +13683,7 @@ morpheus.ChartTool.prototype = {
     var xVector = options.xVector;
     var yVector = options.yVector;
     var symbolSize = options.symbolSize;
+    var dataTransformations = options.dataTransformations;
     if (xVector == null || yVector == null) {
       return;
     }
@@ -13656,6 +13698,15 @@ morpheus.ChartTool.prototype = {
     if (selectedDataset != null) {
       collapsed = new Float32Array(selectedDataset.getColumnCount());
       var summarizeFunction = morpheus.Max;
+      if (dataTransformations.length > 0) {
+        selectedDataset = morpheus.DatasetUtil.copy(selectedDataset);
+        dataTransformations.forEach(function (f) {
+          f(selectedDataset);
+        });
+
+      }
+
+
       var view = new morpheus.DatasetColumnView(selectedDataset);
       for (var j = 0, ncols = selectedDataset.getColumnCount(); j < ncols; j++) {
         collapsed[j] = summarizeFunction(view.setIndex(j));
@@ -13977,12 +14028,33 @@ morpheus.ChartTool.prototype = {
       var yVector = yaxisInfo.isColumns ? dataset.getColumnMetadata().getByName(yaxisInfo.field) : dataset.getRowMetadata().getByName(
         yaxisInfo.field);
 
+      var transformValues = this.formBuilder.getValue('transform_values');
+      if (transformValues == null) {
+        transformValues = [];
+      }
+      var dataTransformations = [];
+      //  options: ['log2', 'log2(1+x), z-score, robust z-score']
+      if (transformValues.indexOf('log2') !== -1) {
+        dataTransformations.push(morpheus.AdjustDataTool.log2);
+      }
+      if (transformValues.indexOf('log2(1+x)') !== -1) {
+        dataTransformations.push(morpheus.AdjustDataTool.log2_plus);
+      }
+      if (transformValues.indexOf('z-score') !== -1) {
+        dataTransformations.push(morpheus.AdjustDataTool.zScore);
+      }
+      if (transformValues.indexOf('robust z-score') !== -1) {
+        dataTransformations.push(morpheus.AdjustDataTool.robustZScore);
+      }
+
+
       var $chart = $('<div style="width: ' + (gridWidth) + 'px;height:' + (gridHeight + 120) + 'px;"></div>');
       $chart.appendTo(this.$chart);
       this._createEmbedding({
         xVector: xVector,
         yVector: yVector,
         width: gridWidth,
+        dataTransformations: dataTransformations,
         symbolSize: parseFloat(this.formBuilder.getValue('symbol_size')),
         el: $chart[0],
         fullDataset: dataset,

@@ -164,6 +164,14 @@ morpheus.ChartTool = function (chartOptions) {
     options: numericColumnOptions
   });
 
+
+  formBuilder.append({
+    name: 'transform_values',
+    type: 'bootstrap-select',
+    multiple: true,
+    options: ['log2', 'log2(1+x)', 'z-score', 'robust z-score']
+  });
+
   formBuilder.append({
     name: 'symbol_size',
     type: 'text',
@@ -199,7 +207,8 @@ morpheus.ChartTool = function (chartOptions) {
       color: ['Selected Rows', 'columns'],
       x_axis: 'columns',
       y_axis: 'columns',
-      symbol_size: true
+      symbol_size: true,
+      transform_values: true
     },
     'column profile': {
       axis_label: 'rows',
@@ -232,6 +241,7 @@ morpheus.ChartTool = function (chartOptions) {
         true);
 
     }
+    formBuilder.setVisible('transform_values', chartOptions.transform_values && formBuilder.getValue('color') === 'Selected Rows');
     formBuilder.setVisible('symbol_size', chartOptions.symbol_size);
     formBuilder.setVisible('x_axis', chartOptions.x_axis != null);
     formBuilder.setVisible('y_axis', chartOptions.y_axis != null);
@@ -614,6 +624,7 @@ morpheus.ChartTool.prototype = {
     var xVector = options.xVector;
     var yVector = options.yVector;
     var symbolSize = options.symbolSize;
+    var dataTransformations = options.dataTransformations;
     if (xVector == null || yVector == null) {
       return;
     }
@@ -628,6 +639,15 @@ morpheus.ChartTool.prototype = {
     if (selectedDataset != null) {
       collapsed = new Float32Array(selectedDataset.getColumnCount());
       var summarizeFunction = morpheus.Max;
+      if (dataTransformations.length > 0) {
+        selectedDataset = morpheus.DatasetUtil.copy(selectedDataset);
+        dataTransformations.forEach(function (f) {
+          f(selectedDataset);
+        });
+
+      }
+
+
       var view = new morpheus.DatasetColumnView(selectedDataset);
       for (var j = 0, ncols = selectedDataset.getColumnCount(); j < ncols; j++) {
         collapsed[j] = summarizeFunction(view.setIndex(j));
@@ -949,12 +969,33 @@ morpheus.ChartTool.prototype = {
       var yVector = yaxisInfo.isColumns ? dataset.getColumnMetadata().getByName(yaxisInfo.field) : dataset.getRowMetadata().getByName(
         yaxisInfo.field);
 
+      var transformValues = this.formBuilder.getValue('transform_values');
+      if (transformValues == null) {
+        transformValues = [];
+      }
+      var dataTransformations = [];
+      //  options: ['log2', 'log2(1+x), z-score, robust z-score']
+      if (transformValues.indexOf('log2') !== -1) {
+        dataTransformations.push(morpheus.AdjustDataTool.log2);
+      }
+      if (transformValues.indexOf('log2(1+x)') !== -1) {
+        dataTransformations.push(morpheus.AdjustDataTool.log2_plus);
+      }
+      if (transformValues.indexOf('z-score') !== -1) {
+        dataTransformations.push(morpheus.AdjustDataTool.zScore);
+      }
+      if (transformValues.indexOf('robust z-score') !== -1) {
+        dataTransformations.push(morpheus.AdjustDataTool.robustZScore);
+      }
+
+
       var $chart = $('<div style="width: ' + (gridWidth) + 'px;height:' + (gridHeight + 120) + 'px;"></div>');
       $chart.appendTo(this.$chart);
       this._createEmbedding({
         xVector: xVector,
         yVector: yVector,
         width: gridWidth,
+        dataTransformations: dataTransformations,
         symbolSize: parseFloat(this.formBuilder.getValue('symbol_size')),
         el: $chart[0],
         fullDataset: dataset,
