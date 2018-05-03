@@ -396,6 +396,7 @@ morpheus.GctReader.prototype = {
       morpheus.MetadataUtil.maybeConvertStrings(dataset.getRowMetadata(), 1);
       morpheus.MetadataUtil.maybeConvertStrings(dataset.getColumnMetadata(),
         1);
+
       return dataset;
 
     } else {

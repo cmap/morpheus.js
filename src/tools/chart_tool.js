@@ -624,6 +624,7 @@ morpheus.ChartTool.prototype = {
       }
       var v = morpheus.Vector.fromArray('', collapsed);
       var stats = morpheus.VectorUtil.getMinMax(v);
+
       visualMap = {
         min: stats.min,
         max: stats.max,
@@ -634,7 +635,7 @@ morpheus.ChartTool.prototype = {
         text: ['', ''],
         calculable: true,
         inRange: {
-          color: ['#fee0d2', '#de2d26']
+          color: ['#ffeda0', '#feb24c', '#f03b20']
         }
       };
     }
@@ -643,7 +644,7 @@ morpheus.ChartTool.prototype = {
     var colors = [];
     var isContinuous = false;
     if (colorByVector != null) {
-      isContinuous = colorModel.isContinuous(colorByVector);
+      isContinuous = !colorByVector.getProperties().get(morpheus.VectorKeys.DISCRETE);
     }
     for (var j = 0, size = xVector.size(); j < size; j++) {
       if (selectedDataset != null) {

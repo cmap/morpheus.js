@@ -1715,10 +1715,7 @@ morpheus.HeatMap.prototype = {
         if (displaySpecified && option == null) {
           continue;
         }
-        if (morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS.has(name)
-          && option == null) {
-          continue;
-        }
+
         var count = isColumns ? dataset.getColumnCount() : dataset.getRowCount();
         if (option == null && !displaySpecified && count > 1
           && !morpheus.VectorUtil.containsMoreThanOneValue(v)) {

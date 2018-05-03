@@ -47,28 +47,7 @@ morpheus.VectorColorModel.STANDARD_COLORS = {
   'male': morpheus.VectorColorModel.MALE,
   'm': morpheus.VectorColorModel.MALE,
   'female': morpheus.VectorColorModel.FEMALE,
-  'f': morpheus.VectorColorModel.FEMALE,
-  'kd': '#C675A8',
-  'oe': '#56b4e9',
-  'cp': '#FF9933',
-  'pcl': '#003B4A',
-  'trt_sh.cgs': '#C675A8',
-  'trt_oe': '#56b4e9',
-  'trt_cp': '#FF9933',
-  'a375': '#1490C1',
-  'a549': '#AAC8E9',
-  'hcc515': '#1C9C2A',
-  'hepg2': '#94DC89',
-  'ht29': '#946DBE',
-  'mcf7': '#C5B2D5',
-  'pc3': '#38C697',
-  'asc': '#FF8000',
-  'cd34': '#FFBB75',
-  'ha1e': '#FB4124',
-  'neu': '#FF9A94',
-  'npc': '#E57AC6',
-  'cancer': '#1490C1',
-  'immortalized normal': '#FF8000'
+  'f': morpheus.VectorColorModel.FEMALE
 };
 morpheus.VectorColorModel.getStandardColor = function (value) {
   if (value == null) {
@@ -162,9 +141,6 @@ morpheus.VectorColorModel.prototype = {
   getContinuousColorScheme: function (vector) {
     return this.vectorNameToColorScheme.get(vector.getName());
   },
-  isContinuous: function (vector) {
-    return this.vectorNameToColorScheme.has(vector.getName());
-  },
   getDiscreteColorScheme: function (vector) {
     return this.vectorNameToColorMap.get(vector.getName());
   },
@@ -172,6 +148,7 @@ morpheus.VectorColorModel.prototype = {
     var minMax = morpheus.VectorUtil.getMinMax(vector);
     var min = minMax.min;
     var max = minMax.max;
+
     var cs = new morpheus.HeatMapColorScheme(new morpheus.Project(
       new morpheus.Dataset({
         name: '',
@@ -182,10 +159,13 @@ morpheus.VectorColorModel.prototype = {
       map: [
         {
           value: min,
-          color: colorbrewer.Greens[3][0]
+          color: '#ffeda0'
+        }, {
+          value: (max - min) / 2,
+          color: '#feb24c'
         }, {
           value: max,
-          color: colorbrewer.Greens[3][2]
+          color: '#f03b20'
         }]
     });
     this.vectorNameToColorScheme.set(vector.getName(), cs);

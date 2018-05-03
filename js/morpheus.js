@@ -3055,6 +3055,7 @@ morpheus.GctReader.prototype = {
       morpheus.MetadataUtil.maybeConvertStrings(dataset.getRowMetadata(), 1);
       morpheus.MetadataUtil.maybeConvertStrings(dataset.getColumnMetadata(),
         1);
+
       return dataset;
 
     } else {
@@ -9023,33 +9024,12 @@ morpheus.MetadataUtil.indexOf = function (metadataModel, name) {
   return -1;
 };
 
-morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS = ['target', 'gene_target', 'moa'];
-
-morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS = new morpheus.Set();
-['pr_analyte_id', 'pr_gene_title', 'pr_gene_id', 'pr_analyte_num',
-  'pr_bset_id', 'pr_lua_id', 'pr_pool_id', 'pr_is_bing', 'pr_is_inf',
-  'pr_is_lmark', 'qc_slope', 'qc_f_logp', 'qc_iqr', 'bead_batch',
-  'bead_revision', 'bead_set', 'det_mode', 'det_plate', 'det_well',
-  'mfc_plate_dim', 'mfc_plate_id', 'mfc_plate_name', 'mfc_plate_quad',
-  'mfc_plate_well', 'pert_dose_unit', 'pert_id_vendor', 'pert_mfc_desc',
-  'pert_mfc_id', 'pert_time', 'pert_time_unit', 'pert_univ_id',
-  'pert_vehicle', 'pool_id', 'rna_plate', 'rna_well', 'count_mean',
-  'count_cv', 'provenance_code'].forEach(function (name) {
-  morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS.add(name);
-});
 
 morpheus.MetadataUtil.maybeConvertStrings = function (metadata,
                                                       metadataStartIndex) {
   for (var i = metadataStartIndex, count = metadata.getMetadataCount(); i < count; i++) {
     morpheus.VectorUtil.maybeConvertStringToNumber(metadata.get(i));
   }
-  morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS.forEach(function (field) {
-    if (metadata.getByName(field)) {
-      morpheus.VectorUtil.maybeConvertToStringArray(metadata
-      .getByName(field), ',');
-    }
-  });
-
 };
 morpheus.MetadataUtil.copy = function (src, dest) {
   if (src.getItemCount() != dest.getItemCount()) {
@@ -9081,9 +9061,9 @@ morpheus.MetadataUtil.getMatchingIndices = function (metadataModel, tokens) {
   for (var itemIndex = 0, nitems = metadataModel.getItemCount(); itemIndex < nitems; itemIndex++) {
     var matches = false;
     for (var metadataIndex = 0, metadataCount = metadataModel
-    .getMetadataCount(); metadataIndex < metadataCount && !matches; metadataIndex++) {
+      .getMetadataCount(); metadataIndex < metadataCount && !matches; metadataIndex++) {
       var vector = metadataModel.get(metadataModel
-      .getColumnName(metadataIndex));
+        .getColumnName(metadataIndex));
       var value = vector.getValue(itemIndex);
       for (var i = 0, length = tokens.length; i < length; i++) {
         if (tokens[i] == value) {
@@ -11252,28 +11232,7 @@ morpheus.VectorColorModel.STANDARD_COLORS = {
   'male': morpheus.VectorColorModel.MALE,
   'm': morpheus.VectorColorModel.MALE,
   'female': morpheus.VectorColorModel.FEMALE,
-  'f': morpheus.VectorColorModel.FEMALE,
-  'kd': '#C675A8',
-  'oe': '#56b4e9',
-  'cp': '#FF9933',
-  'pcl': '#003B4A',
-  'trt_sh.cgs': '#C675A8',
-  'trt_oe': '#56b4e9',
-  'trt_cp': '#FF9933',
-  'a375': '#1490C1',
-  'a549': '#AAC8E9',
-  'hcc515': '#1C9C2A',
-  'hepg2': '#94DC89',
-  'ht29': '#946DBE',
-  'mcf7': '#C5B2D5',
-  'pc3': '#38C697',
-  'asc': '#FF8000',
-  'cd34': '#FFBB75',
-  'ha1e': '#FB4124',
-  'neu': '#FF9A94',
-  'npc': '#E57AC6',
-  'cancer': '#1490C1',
-  'immortalized normal': '#FF8000'
+  'f': morpheus.VectorColorModel.FEMALE
 };
 morpheus.VectorColorModel.getStandardColor = function (value) {
   if (value == null) {
@@ -11367,9 +11326,6 @@ morpheus.VectorColorModel.prototype = {
   getContinuousColorScheme: function (vector) {
     return this.vectorNameToColorScheme.get(vector.getName());
   },
-  isContinuous: function (vector) {
-    return this.vectorNameToColorScheme.has(vector.getName());
-  },
   getDiscreteColorScheme: function (vector) {
     return this.vectorNameToColorMap.get(vector.getName());
   },
@@ -11377,6 +11333,7 @@ morpheus.VectorColorModel.prototype = {
     var minMax = morpheus.VectorUtil.getMinMax(vector);
     var min = minMax.min;
     var max = minMax.max;
+
     var cs = new morpheus.HeatMapColorScheme(new morpheus.Project(
       new morpheus.Dataset({
         name: '',
@@ -11387,10 +11344,13 @@ morpheus.VectorColorModel.prototype = {
       map: [
         {
           value: min,
-          color: colorbrewer.Greens[3][0]
+          color: '#ffeda0'
+        }, {
+          value: (max - min) / 2,
+          color: '#feb24c'
         }, {
           value: max,
-          color: colorbrewer.Greens[3][2]
+          color: '#f03b20'
         }]
     });
     this.vectorNameToColorScheme.set(vector.getName(), cs);
@@ -12059,6 +12019,7 @@ morpheus.VectorUtil.maybeConvertStringToNumber = function (vector) {
   for (var i = 0, nrows = newValues.length; i < nrows; i++) {
     vector.setValue(i, newValues[i]);
   }
+  vector.getProperties().set(morpheus.VectorKeys.DISCRETE, false);
   vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, 'number');
   return true;
 };
@@ -13691,6 +13652,7 @@ morpheus.ChartTool.prototype = {
       }
       var v = morpheus.Vector.fromArray('', collapsed);
       var stats = morpheus.VectorUtil.getMinMax(v);
+
       visualMap = {
         min: stats.min,
         max: stats.max,
@@ -13701,7 +13663,7 @@ morpheus.ChartTool.prototype = {
         text: ['', ''],
         calculable: true,
         inRange: {
-          color: ['#fee0d2', '#de2d26']
+          color: ['#ffeda0', '#feb24c', '#f03b20']
         }
       };
     }
@@ -13710,7 +13672,7 @@ morpheus.ChartTool.prototype = {
     var colors = [];
     var isContinuous = false;
     if (colorByVector != null) {
-      isContinuous = colorModel.isContinuous(colorByVector);
+      isContinuous = !colorByVector.getProperties().get(morpheus.VectorKeys.DISCRETE);
     }
     for (var j = 0, size = xVector.size(); j < size; j++) {
       if (selectedDataset != null) {
@@ -30304,10 +30266,7 @@ morpheus.HeatMap.prototype = {
         if (displaySpecified && option == null) {
           continue;
         }
-        if (morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS.has(name)
-          && option == null) {
-          continue;
-        }
+
         var count = isColumns ? dataset.getColumnCount() : dataset.getRowCount();
         if (option == null && !displaySpecified && count > 1
           && !morpheus.VectorUtil.containsMoreThanOneValue(v)) {

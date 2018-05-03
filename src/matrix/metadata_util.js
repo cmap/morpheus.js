@@ -380,33 +380,12 @@ morpheus.MetadataUtil.indexOf = function (metadataModel, name) {
   return -1;
 };
 
-morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS = ['target', 'gene_target', 'moa'];
-
-morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS = new morpheus.Set();
-['pr_analyte_id', 'pr_gene_title', 'pr_gene_id', 'pr_analyte_num',
-  'pr_bset_id', 'pr_lua_id', 'pr_pool_id', 'pr_is_bing', 'pr_is_inf',
-  'pr_is_lmark', 'qc_slope', 'qc_f_logp', 'qc_iqr', 'bead_batch',
-  'bead_revision', 'bead_set', 'det_mode', 'det_plate', 'det_well',
-  'mfc_plate_dim', 'mfc_plate_id', 'mfc_plate_name', 'mfc_plate_quad',
-  'mfc_plate_well', 'pert_dose_unit', 'pert_id_vendor', 'pert_mfc_desc',
-  'pert_mfc_id', 'pert_time', 'pert_time_unit', 'pert_univ_id',
-  'pert_vehicle', 'pool_id', 'rna_plate', 'rna_well', 'count_mean',
-  'count_cv', 'provenance_code'].forEach(function (name) {
-  morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS.add(name);
-});
 
 morpheus.MetadataUtil.maybeConvertStrings = function (metadata,
                                                       metadataStartIndex) {
   for (var i = metadataStartIndex, count = metadata.getMetadataCount(); i < count; i++) {
     morpheus.VectorUtil.maybeConvertStringToNumber(metadata.get(i));
   }
-  morpheus.MetadataUtil.DEFAULT_STRING_ARRAY_FIELDS.forEach(function (field) {
-    if (metadata.getByName(field)) {
-      morpheus.VectorUtil.maybeConvertToStringArray(metadata
-      .getByName(field), ',');
-    }
-  });
-
 };
 morpheus.MetadataUtil.copy = function (src, dest) {
   if (src.getItemCount() != dest.getItemCount()) {
@@ -438,9 +417,9 @@ morpheus.MetadataUtil.getMatchingIndices = function (metadataModel, tokens) {
   for (var itemIndex = 0, nitems = metadataModel.getItemCount(); itemIndex < nitems; itemIndex++) {
     var matches = false;
     for (var metadataIndex = 0, metadataCount = metadataModel
-    .getMetadataCount(); metadataIndex < metadataCount && !matches; metadataIndex++) {
+      .getMetadataCount(); metadataIndex < metadataCount && !matches; metadataIndex++) {
       var vector = metadataModel.get(metadataModel
-      .getColumnName(metadataIndex));
+        .getColumnName(metadataIndex));
       var value = vector.getValue(itemIndex);
       for (var i = 0, length = tokens.length; i < length; i++) {
         if (tokens[i] == value) {
