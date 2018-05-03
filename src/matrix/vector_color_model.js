@@ -159,7 +159,7 @@ morpheus.VectorColorModel.prototype = {
       map: [
         {
           value: min,
-          color: '#ffeda0'
+          color: 'white'
         }, {
           value: (max + min) / 2,
           color: '#feb24c'

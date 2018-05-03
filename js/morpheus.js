@@ -11344,7 +11344,7 @@ morpheus.VectorColorModel.prototype = {
       map: [
         {
           value: min,
-          color: '#ffeda0'
+          color: 'white'
         }, {
           value: (max + min) / 2,
           color: '#feb24c'
@@ -13292,7 +13292,6 @@ morpheus.ChartTool = function (chartOptions) {
       color: 'rows',
     },
     'embedding': {
-      tooltip: 'columns',
       color: ['Selected Rows', 'columns'],
       x_axis: 'columns',
       y_axis: 'columns',
@@ -13339,6 +13338,7 @@ morpheus.ChartTool = function (chartOptions) {
     formBuilder.setVisible('axis_label', chartOptions.axis_label != null);
     formBuilder.setVisible('group_by', chartOptions.group_by);
     formBuilder.setVisible('show_outliers', chartOptions.show_outliers);
+    formBuilder.setVisible('tooltip', chartOptions.tooltip != null);
     formBuilder.setOptions('tooltip', chartOptions.tooltip === 'rows' ? rowOptions.slice(1) : (chartOptions.tooltip === 'columns' ? columnOptions.slice(1) : options));
     formBuilder.setOptions('x_axis', numericColumnOptions);
     formBuilder.setOptions('y_axis', numericColumnOptions);
@@ -14052,12 +14052,14 @@ morpheus.ChartTool.prototype = {
       if (colorByVector != null && chartType === 'embedding' && !colorByVector.getProperties().get(morpheus.VectorKeys.DISCRETE)) {
 
         var legendContext = _this.legend.getCanvas().getContext('2d');
+
         var scheme = _this.heatmap.getProject().getColumnColorModel().getContinuousColorScheme(colorByVector);
         if (scheme == null) {
           scheme = _this.heatmap.getProject().getColumnColorModel().createContinuousColorMap(colorByVector);
         }
         morpheus.CanvasUtil.resetTransform(legendContext);
         legendContext.clearRect(0, 0, _this.legend.getUnscaledWidth(), _this.legend.getUnscaledWidth());
+        legendContext.translate(15, 0); // make space for negative numbers
         morpheus.HeatMapColorSchemeLegend.drawColorScheme(legendContext, scheme, 200);
         _this.$legend.show();
 
