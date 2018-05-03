@@ -11346,7 +11346,7 @@ morpheus.VectorColorModel.prototype = {
           value: min,
           color: '#ffeda0'
         }, {
-          value: (max - min) / 2,
+          value: (max + min) / 2,
           color: '#feb24c'
         }, {
           value: max,
@@ -14050,8 +14050,12 @@ morpheus.ChartTool.prototype = {
       colorByVector = colorByInfo.isColumns ? dataset.getColumnMetadata().getByName(colorByInfo.field) : dataset.getRowMetadata().getByName(
         colorByInfo.field);
       if (colorByVector != null && chartType === 'embedding' && !colorByVector.getProperties().get(morpheus.VectorKeys.DISCRETE)) {
+
         var legendContext = _this.legend.getCanvas().getContext('2d');
         var scheme = _this.heatmap.getProject().getColumnColorModel().getContinuousColorScheme(colorByVector);
+        if (scheme == null) {
+          scheme = _this.heatmap.getProject().getColumnColorModel().createContinuousColorMap(colorByVector);
+        }
         morpheus.CanvasUtil.resetTransform(legendContext);
         legendContext.clearRect(0, 0, _this.legend.getUnscaledWidth(), _this.legend.getUnscaledWidth());
         morpheus.HeatMapColorSchemeLegend.drawColorScheme(legendContext, scheme, 200);

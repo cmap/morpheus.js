@@ -161,7 +161,7 @@ morpheus.VectorColorModel.prototype = {
           value: min,
           color: '#ffeda0'
         }, {
-          value: (max - min) / 2,
+          value: (max + min) / 2,
           color: '#feb24c'
         }, {
           value: max,
