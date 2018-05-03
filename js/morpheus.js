@@ -11621,6 +11621,7 @@ morpheus.VectorKeys.IS_INDEX = 'morpheus.isIndex';
 /** Whether vector values should be treated discretely or continuously */
 morpheus.VectorKeys.DISCRETE = 'morpheus.discrete';
 
+
 morpheus.VectorKeys.COPY_IGNORE = new morpheus.Set();
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.HEADER_SUMMARY);
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.DATA_TYPE);
@@ -13071,7 +13072,7 @@ morpheus.ChartTool = function (chartOptions) {
     + '<div class="row">'
     + '<div data-name="configPane" class="col-xs-2"></div>'
     + '<div class="col-xs-10"><div style="position:relative;" data-name="chartDiv"></div></div>'
-    + '</div></div>');
+    + '</div><div data-name="legend"></div></div>');
 
   var formBuilder = new morpheus.FormBuilder({
     formStyle: 'vertical'
@@ -13237,6 +13238,35 @@ morpheus.ChartTool = function (chartOptions) {
     value: '2',
     style: 'width:50px;'
   });
+  this.legend = new morpheus.AbstractCanvas(false);
+  $(this.legend.getCanvas()).css('position', '');
+  this.legend.setBounds({width: 300, height: 30});
+
+  this.$legend = this.$el.find('[data-name=legend]')
+  this.$legend.hide();
+  $(this.legend.getCanvas()).appendTo(this.$legend);
+
+  var $edit = $('<div><button class="btn btn-default">Edit</button></div>');
+  $edit.appendTo(this.$legend);
+  $edit.find('button').on('click', function (e) {
+    var colorSchemeChooser = new morpheus.ColorSchemeChooser({
+      isColumns: true,
+      heatMap: _this.heatmap,
+    });
+    var colorByInfo = morpheus.ChartTool.getVectorInfo(formBuilder.getValue('color'));
+    colorSchemeChooser.setAnnotationName(colorByInfo.field);
+    colorSchemeChooser.on('change', function () {
+      draw();
+    });
+    morpheus.FormBuilder.showInModal({
+      title: 'Edit Colors',
+      html: colorSchemeChooser.$div,
+      close: 'Close',
+      onClose: function () {
+        colorSchemeChooser.off('change');
+      }
+    });
+  });
 
   formBuilder.append({
     name: 'chart_width',
@@ -13298,8 +13328,9 @@ morpheus.ChartTool = function (chartOptions) {
       formBuilder.setOptions('axis_label',
         chartOptions.axis_label === 'rows' ? rowOptions : columnOptions,
         true);
-
     }
+
+    _this.$legend.css('display', (chartType === 'embedding' && formBuilder.getValue('color') != null && formBuilder.getValue('color') !== 'Selected Rows') ? '' : 'none');
     formBuilder.setVisible('transform_values', chartOptions.transform_values && formBuilder.getValue('color') === 'Selected Rows');
     formBuilder.setVisible('symbol_size', chartOptions.symbol_size);
     formBuilder.setVisible('x_axis', chartOptions.x_axis != null);
@@ -13789,7 +13820,7 @@ morpheus.ChartTool.prototype = {
         name: ''
       }],
       series: [{
-        type: 'scatter',
+        type: 'scatterGL',
         data: data,
         large: false,
         symbolSize: symbolSize,
@@ -14018,6 +14049,18 @@ morpheus.ChartTool.prototype = {
         : this.project.getColumnColorModel();
       colorByVector = colorByInfo.isColumns ? dataset.getColumnMetadata().getByName(colorByInfo.field) : dataset.getRowMetadata().getByName(
         colorByInfo.field);
+      if (colorByVector != null && chartType === 'embedding' && !colorByVector.getProperties().get(morpheus.VectorKeys.DISCRETE)) {
+        var legendContext = _this.legend.getCanvas().getContext('2d');
+        var scheme = _this.heatmap.getProject().getColumnColorModel().getContinuousColorScheme(colorByVector);
+        morpheus.CanvasUtil.resetTransform(legendContext);
+        legendContext.clearRect(0, 0, _this.legend.getUnscaledWidth(), _this.legend.getUnscaledWidth());
+        morpheus.HeatMapColorSchemeLegend.drawColorScheme(legendContext, scheme, 200);
+        _this.$legend.show();
+
+      } else {
+        _this.$legend.hide();
+      }
+
     }
 
     if (chartType === 'embedding') {
@@ -14027,6 +14070,7 @@ morpheus.ChartTool.prototype = {
       var yaxisInfo = morpheus.ChartTool.getVectorInfo(this.formBuilder.getValue('y_axis'));
       var yVector = yaxisInfo.isColumns ? dataset.getColumnMetadata().getByName(yaxisInfo.field) : dataset.getRowMetadata().getByName(
         yaxisInfo.field);
+
 
       var transformValues = this.formBuilder.getValue('transform_values');
       if (transformValues == null) {
@@ -20315,123 +20359,106 @@ morpheus.CheckBoxList.prototype = {
 
 /**
  *
- * @param options.colorModel
- * @param options.track
  * @param options.heatMap
+ * @param options.isColumns
  * @constructor
  */
 morpheus.ColorSchemeChooser = function (options) {
-  var colorModel = options.colorModel;
-  var track = options.track;
-  var heatMap = options.heatMap;
-  // ensure map exists
-  colorModel.getMappedValue(track.getVector(track.settings.colorByField), track.getVector(track.settings.colorByField).getValue(0));
-  var formBuilder = new morpheus.FormBuilder();
-  if (track.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)) {
-    formBuilder.append({
-      value: track.settings.colorByField != null,
-      type: 'checkbox',
-      name: 'use_another_annotation_to_determine_color'
-    });
-    var annotationNames = morpheus.MetadataUtil.getMetadataNames(
-      track.isColumns ? heatMap.getProject().getFullDataset().getColumnMetadata() : heatMap.getProject().getFullDataset().getRowMetadata());
-    annotationNames.splice(annotationNames.indexOf(track.getName()), 1);
-    formBuilder.append({
-      name: 'annotation_name',
-      type: 'bootstrap-select',
-      options: annotationNames,
-      search: annotationNames.length > 10,
-      value: track.settings.colorByField
-    });
-  }
-  formBuilder.append({
-    name: 'discrete',
-    type: 'checkbox',
-    value: track.getVector(track.settings.colorByField).getProperties().get(morpheus.VectorKeys.DISCRETE)
-  });
-  var dataType = morpheus.VectorUtil.getDataType(track.getVector(track.settings.colorByField));
-  var isNumber = dataType === 'number' || dataType === '[number]';
-  formBuilder.setVisible('discrete', isNumber);
-  formBuilder.setVisible('annotation_name', track.settings.colorByField != null);
-
-  var $chooser = $('<div></div>');
-  $chooser.appendTo(formBuilder.$form);
-  var updateChooser = function () {
-    var colorSchemeChooser;
-    var v = track
-      .getVector(track.settings.colorByField);
-    formBuilder.setValue('discrete', v.getProperties().get(morpheus.VectorKeys.DISCRETE));
-    if (v.getProperties().get(morpheus.VectorKeys.DISCRETE)) {
-      colorModel.getMappedValue(v, v.getValue(0)); // make sure color map exists
-      colorSchemeChooser = new morpheus.DiscreteColorSchemeChooser(
-        {
-          colorScheme: {
-            scale: colorModel
-              .getDiscreteColorScheme(track
-                .getVector(track.settings.colorByField))
-          }
-        });
-      colorSchemeChooser.on('change', function (event) {
-        colorModel.setMappedValue(track
-            .getVector(track.settings.colorByField), event.value,
-          event.color);
-        track.setInvalid(true);
-        track.repaint();
-      });
-    } else {
-      colorModel.getContinuousMappedValue(v, v.getValue(0)); // make sure color map exists
-      colorSchemeChooser = new morpheus.HeatMapColorSchemeChooser(
-        {
-          showRelative: false
-        });
-
-      colorSchemeChooser
-        .setColorScheme(colorModel
-          .getContinuousColorScheme(v));
-      colorSchemeChooser.on('change', function (event) {
-        track.setInvalid(true);
-        track.repaint();
-      });
-    }
-    $chooser.html(colorSchemeChooser.$div);
-    track.setInvalid();
-    track.repaint();
-  };
-  formBuilder.find('use_another_annotation_to_determine_color').on('change', function () {
-    var checked = $(this).prop('checked');
-    formBuilder.setValue('annotation_name', null);
-    formBuilder.setVisible('annotation_name', checked);
-    if (!checked) {
-      track.settings.colorByField = null;
-      updateChooser();
-    } else {
-      $chooser.empty();
-    }
-
-    formBuilder.setVisible('discrete', false);
-  });
-  formBuilder.find('annotation_name').on('change', function () {
-    var annotationName = $(this).val();
-    // ensure map exists
-    colorModel.getMappedValue(track.getVector(annotationName), track.getVector(annotationName).getValue(0));
-    track.settings.colorByField = annotationName;
-    var dataType = morpheus.VectorUtil.getDataType(track.getVector(track.settings.colorByField));
-    var isNumber = dataType === 'number' || dataType === '[number]';
-    formBuilder.setVisible('discrete', isNumber);
-    updateChooser();
-    track.setInvalid(true);
-    track.repaint();
-  });
-
-  formBuilder.find('discrete').on('change', function () {
-    track.getVector(track.settings.colorByField).getProperties().set(morpheus.VectorKeys.DISCRETE, $(this).prop('checked'));
-    updateChooser();
-    track.setInvalid(true);
-    track.repaint();
-  });
-  updateChooser();
-  this.$div = formBuilder.$form;
+  this.options = options;
+  this.init();
 };
+
+morpheus.ColorSchemeChooser.prototype = {
+  init: function () {
+    var heatMap = this.options.heatMap;
+    var isColumns = this.options.isColumns;
+    var colorModel = isColumns ? heatMap.getProject().getColumnColorModel() : heatMap.getProject().getRowColorModel();
+    var metadataModel = isColumns ? heatMap.getProject().getFullDataset().getColumnMetadata() : heatMap.getProject().getFullDataset().getRowMetadata();
+    var annotationName;
+    this.setAnnotationName = function (name) {
+      annotationName = name;
+      updateChooser();
+    };
+
+    var _this = this;
+    var formBuilder = new morpheus.FormBuilder();
+    // if (track.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)) {
+    //   formBuilder.append({
+    //     value: track.settings.colorByField != null,
+    //     type: 'checkbox',
+    //     name: 'use_another_annotation_to_determine_color'
+    //   });
+    //   var annotationNames = morpheus.MetadataUtil.getMetadataNames(metadataModel);
+    //   annotationNames.splice(annotationNames.indexOf(vector.getName()), 1);
+    //   formBuilder.append({
+    //     name: 'annotation_name',
+    //     type: 'bootstrap-select',
+    //     options: annotationNames,
+    //     search: annotationNames.length > 10,
+    //     value: track.settings.colorByField
+    //   });
+    // }
+
+
+    var $chooser = $('<div></div>');
+    $chooser.appendTo(formBuilder.$form);
+    formBuilder.append({
+      name: 'discrete',
+      type: 'checkbox'
+    });
+    var updateChooser = function () {
+      var colorSchemeChooser;
+      var v = metadataModel.getByName(annotationName);
+      if (v == null) {
+        console.log(annotationName + ' not found.');
+        return;
+      }
+      var dataType = morpheus.VectorUtil.getDataType(metadataModel.getByName(annotationName));
+      var isNumber = dataType === 'number' || dataType === '[number]';
+      formBuilder.setVisible('discrete', isNumber);
+      formBuilder.setValue('discrete', v.getProperties().get(morpheus.VectorKeys.DISCRETE));
+      if (v.getProperties().get(morpheus.VectorKeys.DISCRETE)) {
+        colorModel.getMappedValue(v, v.getValue(0)); // make sure color map exists
+        colorSchemeChooser = new morpheus.DiscreteColorSchemeChooser(
+          {
+            colorScheme: {
+              scale: colorModel
+                .getDiscreteColorScheme(metadataModel.getByName(annotationName))
+            }
+          });
+        colorSchemeChooser.on('change', function (event) {
+          colorModel.setMappedValue(metadataModel.getByName(annotationName), event.value,
+            event.color);
+
+          _this.trigger('change');
+        });
+      } else {
+        colorModel.getContinuousMappedValue(v, v.getValue(0)); // make sure color map exists
+        colorSchemeChooser = new morpheus.HeatMapColorSchemeChooser(
+          {
+            showRelative: false
+          });
+
+        colorSchemeChooser
+          .setColorScheme(colorModel
+            .getContinuousColorScheme(v));
+        colorSchemeChooser.on('change', function (event) {
+          _this.trigger('change');
+        });
+      }
+      $chooser.html(colorSchemeChooser.$div);
+
+    };
+
+    formBuilder.find('discrete').on('change', function () {
+      metadataModel.getByName(annotationName).getProperties().set(morpheus.VectorKeys.DISCRETE, $(this).prop('checked'));
+      updateChooser();
+      _this.trigger('change');
+    });
+    this.$div = formBuilder.$form;
+  }
+};
+morpheus.Util.extend(morpheus.ColorSchemeChooser, morpheus.Events);
 
 morpheus.ColumnDendrogram = function (heatMap, tree, positions, project) {
   morpheus.AbstractDendrogram.call(this, heatMap, tree, positions,
@@ -23980,9 +24007,9 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
   this.currentValue = null;
   this.legend = new morpheus.LegendWithStops();
   this.colorScheme = options.colorScheme || new morpheus.HeatMapColorScheme(new morpheus.Project(new morpheus.Dataset({
-      rows: 0,
-      columns: 0
-    })));
+    rows: 0,
+    columns: 0
+  })));
   this.legend.on('added', function (e) {
     var fractions = _this.colorScheme.getFractions();
     fractions.push(e.fraction);
@@ -24012,17 +24039,17 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
       });
       _this.legend.selectedIndex = _this.getFractionIndex(e.fraction, color);
       var fractionToValue = d3.scale.linear().domain([0, 1])
-      .range(
-        [_this.colorScheme.getMin(),
-          _this.colorScheme.getMax()])
-      .clamp(true);
+        .range(
+          [_this.colorScheme.getMin(),
+            _this.colorScheme.getMax()])
+        .clamp(true);
       _this.formBuilder.setValue('selected_value',
         fractionToValue(fractions[_this.legend.selectedIndex]));
       _this.fireChanged();
     });
   var $row = $('<div></div>');
   $row.css('height', '50px').css('width', '300px').css('margin-left', 'auto')
-  .css('margin-right', 'auto');
+    .css('margin-right', 'auto');
   $row.appendTo(this.$div);
 
   $(this.legend.canvas).appendTo($row);
@@ -24083,12 +24110,12 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
     style: 'max-width: 50px;'
   });
   items
-  .push({
-    name: 'stepped_colors',
-    type: 'checkbox',
-    value: false,
-    help: 'Intervals include left end point and exclude right end point, except for the highest interval'
-  });
+    .push({
+      name: 'stepped_colors',
+      type: 'checkbox',
+      value: false,
+      help: 'Intervals include left end point and exclude right end point, except for the highest interval'
+    });
   _.each(items, function (item) {
     formBuilder.append(item);
   });
@@ -24102,7 +24129,10 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
     }
     return -1;
   };
-  this.$div.append(formBuilder.$form);
+  var id = _.uniqueId('morpheus');
+  var $collapse = $('<div><a class="btn btn-default btn-sm" role="button" data-toggle="collapse" href="#' + id + '" aria-expanded="false" aria-controls="' + id + '">More Options</a><div class="collapse" id="' + id + '"></div></div>');
+  formBuilder.$form.appendTo($collapse.find('.collapse'));
+  this.$div.append($collapse);
   formBuilder.$form.find('[name^=selected],[name=delete]').prop('disabled',
     true);
   formBuilder.$form.find('[name=add]').on('click', function (e) {
@@ -24173,21 +24203,21 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
 
   }, 100));
   formBuilder.$form
-  .on(
-    'change',
-    '[name=relative_color_scheme]',
-    _
-    .throttle(
-      function (e) {
-        _this.legend.selectedIndex = -1;
-        // FIXME set fixed min and max
-        var scalingMode = $(this).prop('checked') ? morpheus.HeatMapColorScheme.ScalingMode.RELATIVE
-          : morpheus.HeatMapColorScheme.ScalingMode.FIXED;
-        _this.colorScheme
-        .setScalingMode(scalingMode);
-        _this.setColorScheme(_this.colorScheme);
-        _this.fireChanged();
-      }, 100));
+    .on(
+      'change',
+      '[name=relative_color_scheme]',
+      _
+        .throttle(
+          function (e) {
+            _this.legend.selectedIndex = -1;
+            // FIXME set fixed min and max
+            var scalingMode = $(this).prop('checked') ? morpheus.HeatMapColorScheme.ScalingMode.RELATIVE
+              : morpheus.HeatMapColorScheme.ScalingMode.FIXED;
+            _this.colorScheme
+              .setScalingMode(scalingMode);
+            _this.setColorScheme(_this.colorScheme);
+            _this.fireChanged();
+          }, 100));
   this.formBuilder = formBuilder;
   // selection: delete, color, value
   // general: add, min, max, relative or global
@@ -24210,7 +24240,7 @@ morpheus.HeatMapColorSchemeChooser.prototype = {
   setSelectedValue: function (val) {
     var valueToFraction = d3.scale.linear().domain(
       [this.colorScheme.getMin(), this.colorScheme.getMax()])
-    .range([0, 1]).clamp(true);
+      .range([0, 1]).clamp(true);
     var fractions = this.colorScheme.getFractions();
     var fraction = valueToFraction(val);
     fractions[this.legend.selectedIndex] = fraction;
@@ -24233,7 +24263,7 @@ morpheus.HeatMapColorSchemeChooser.prototype = {
     if (this.legend.selectedIndex !== -1) {
       var fractionToValue = d3.scale.linear().domain([0, 1]).range(
         [this.colorScheme.getMin(), this.colorScheme.getMax()])
-      .clamp(true);
+        .clamp(true);
       formBuilder.setValue('selected_value',
         fractionToValue(fractions[this.legend.selectedIndex]));
       var context = this.legend.canvas.getContext('2d');
@@ -24276,24 +24306,24 @@ morpheus.HeatMapColorSchemeChooser.prototype = {
       colorScheme.setCurrentValue(this.currentValue);
     }
     this.formBuilder
-    .setValue(
-      'relative_color_scheme',
-      colorScheme.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE ? true
-        : false);
+      .setValue(
+        'relative_color_scheme',
+        colorScheme.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE ? true
+          : false);
     this.formBuilder.setValue('transform_values', colorScheme.getTransformValues());
     this.formBuilder.setEnabled('transform_values', colorScheme.getScalingMode() !== morpheus.HeatMapColorScheme.ScalingMode.RELATIVE);
 
     this.formBuilder.$form
-    .find('[name=minimum],[name=maximum]')
-    .prop(
-      'disabled',
-      colorScheme.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE);
+      .find('[name=minimum],[name=maximum]')
+      .prop(
+        'disabled',
+        colorScheme.getScalingMode() === morpheus.HeatMapColorScheme.ScalingMode.RELATIVE);
     this.formBuilder.setValue('minimum', this.colorScheme.getMin());
     this.formBuilder.setValue('maximum', this.colorScheme.getMax());
     this.formBuilder.setValue('stepped_colors', this.colorScheme
-    .isStepped());
+      .isStepped());
     this.formBuilder.setValue('missing_color', this.colorScheme
-    .getMissingColor());
+      .getMissingColor());
     this.draw();
   },
   getFractionToStopPix: function () {
@@ -37171,7 +37201,7 @@ morpheus.VectorTrack.prototype = {
         this.getFullVector().getProperties().set(morpheus.VectorKeys.DISCRETE, true);
         this.settings.highlightMatchingValues = true;
       } else if (this.getFullVector().getProperties().has(
-          morpheus.VectorKeys.FIELDS)
+        morpheus.VectorKeys.FIELDS)
         || morpheus.VectorUtil.getDataType(this.getFullVector()) === 'number' || morpheus.VectorUtil.getDataType(this.getFullVector()) === '[number]') {
         this.getFullVector().getProperties().set(morpheus.VectorKeys.DISCRETE, false);
         this.settings.highlightMatchingValues = false;
@@ -37720,7 +37750,7 @@ morpheus.VectorTrack.prototype = {
       name: MOVE_TO_TOP
     });
     if (this.heatmap.options.menu.Edit && this.heatmap.options.menu.Edit.indexOf('Annotate' +
-        ' Selected Rows') !== -1) {
+      ' Selected Rows') !== -1) {
       sectionToItems.Selection.push({
         name: ANNOTATE_SELECTION
       });
@@ -38431,24 +38461,36 @@ morpheus.VectorTrack.prototype = {
             var colorModel = isColumns ? _this.project
               .getColumnColorModel() : _this.project
               .getRowColorModel();
-            var colorSchemeChooser = new morpheus.ColorSchemeChooser({track: _this, heatMap: _this.heatmap, colorModel: colorModel});
+            var colorSchemeChooser = new morpheus.ColorSchemeChooser({
+              isColumns: _this.isColumns,
+              heatMap: _this.heatmap,
+              colorModel: colorModel
+            });
+            colorSchemeChooser.setAnnotationName(_this.getName())
+            colorSchemeChooser.on('change', function () {
+              _this.setInvalid(true);
+              _this.repaint();
+            });
             morpheus.FormBuilder.showInModal({
               title: 'Edit Colors',
               html: colorSchemeChooser.$div,
               close: 'Close',
-              focus: heatmap.getFocusEl()
+              focus: heatmap.getFocusEl(),
+              onClose: function () {
+                colorSchemeChooser.off('change');
+              }
             });
           } else if (item === TOOLTIP) {
             _this.settings.inlineTooltip = !_this.settings.inlineTooltip;
           } else if (item === HIGHLIGHT_MATCHING_VALUES) {
             _this.settings.highlightMatchingValues = !_this.settings.highlightMatchingValues;
           } else if ((customItem = _
-              .find(
-                customItems,
-                function (customItem) {
-                  return customItem.name === item
-                    && customItem.columns === isColumns;
-                }))) {
+            .find(
+              customItems,
+              function (customItem) {
+                return customItem.name === item
+                  && customItem.columns === isColumns;
+              }))) {
             if (customItem.task) {
               // add task
               var task = {
@@ -38565,7 +38607,7 @@ morpheus.VectorTrack.prototype = {
     }
 
     if (vector.getProperties().get(
-        morpheus.VectorKeys.FIELDS) != null) {
+      morpheus.VectorKeys.FIELDS) != null) {
       var visibleFieldIndices = vector.getProperties().get(
         morpheus.VectorKeys.VISIBLE_FIELDS);
       if (visibleFieldIndices == null) {

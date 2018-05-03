@@ -12,7 +12,7 @@ morpheus.ChartTool = function (chartOptions) {
     + '<div class="row">'
     + '<div data-name="configPane" class="col-xs-2"></div>'
     + '<div class="col-xs-10"><div style="position:relative;" data-name="chartDiv"></div></div>'
-    + '</div></div>');
+    + '</div><div data-name="legend"></div></div>');
 
   var formBuilder = new morpheus.FormBuilder({
     formStyle: 'vertical'
@@ -178,6 +178,35 @@ morpheus.ChartTool = function (chartOptions) {
     value: '2',
     style: 'width:50px;'
   });
+  this.legend = new morpheus.AbstractCanvas(false);
+  $(this.legend.getCanvas()).css('position', '');
+  this.legend.setBounds({width: 300, height: 30});
+
+  this.$legend = this.$el.find('[data-name=legend]')
+  this.$legend.hide();
+  $(this.legend.getCanvas()).appendTo(this.$legend);
+
+  var $edit = $('<div><button class="btn btn-default">Edit</button></div>');
+  $edit.appendTo(this.$legend);
+  $edit.find('button').on('click', function (e) {
+    var colorSchemeChooser = new morpheus.ColorSchemeChooser({
+      isColumns: true,
+      heatMap: _this.heatmap,
+    });
+    var colorByInfo = morpheus.ChartTool.getVectorInfo(formBuilder.getValue('color'));
+    colorSchemeChooser.setAnnotationName(colorByInfo.field);
+    colorSchemeChooser.on('change', function () {
+      draw();
+    });
+    morpheus.FormBuilder.showInModal({
+      title: 'Edit Colors',
+      html: colorSchemeChooser.$div,
+      close: 'Close',
+      onClose: function () {
+        colorSchemeChooser.off('change');
+      }
+    });
+  });
 
   formBuilder.append({
     name: 'chart_width',
@@ -239,8 +268,9 @@ morpheus.ChartTool = function (chartOptions) {
       formBuilder.setOptions('axis_label',
         chartOptions.axis_label === 'rows' ? rowOptions : columnOptions,
         true);
-
     }
+
+    _this.$legend.css('display', (chartType === 'embedding' && formBuilder.getValue('color') != null && formBuilder.getValue('color') !== 'Selected Rows') ? '' : 'none');
     formBuilder.setVisible('transform_values', chartOptions.transform_values && formBuilder.getValue('color') === 'Selected Rows');
     formBuilder.setVisible('symbol_size', chartOptions.symbol_size);
     formBuilder.setVisible('x_axis', chartOptions.x_axis != null);
@@ -730,7 +760,7 @@ morpheus.ChartTool.prototype = {
         name: ''
       }],
       series: [{
-        type: 'scatter',
+        type: 'scatterGL',
         data: data,
         large: false,
         symbolSize: symbolSize,
@@ -959,6 +989,18 @@ morpheus.ChartTool.prototype = {
         : this.project.getColumnColorModel();
       colorByVector = colorByInfo.isColumns ? dataset.getColumnMetadata().getByName(colorByInfo.field) : dataset.getRowMetadata().getByName(
         colorByInfo.field);
+      if (colorByVector != null && chartType === 'embedding' && !colorByVector.getProperties().get(morpheus.VectorKeys.DISCRETE)) {
+        var legendContext = _this.legend.getCanvas().getContext('2d');
+        var scheme = _this.heatmap.getProject().getColumnColorModel().getContinuousColorScheme(colorByVector);
+        morpheus.CanvasUtil.resetTransform(legendContext);
+        legendContext.clearRect(0, 0, _this.legend.getUnscaledWidth(), _this.legend.getUnscaledWidth());
+        morpheus.HeatMapColorSchemeLegend.drawColorScheme(legendContext, scheme, 200);
+        _this.$legend.show();
+
+      } else {
+        _this.$legend.hide();
+      }
+
     }
 
     if (chartType === 'embedding') {
@@ -968,6 +1010,7 @@ morpheus.ChartTool.prototype = {
       var yaxisInfo = morpheus.ChartTool.getVectorInfo(this.formBuilder.getValue('y_axis'));
       var yVector = yaxisInfo.isColumns ? dataset.getColumnMetadata().getByName(yaxisInfo.field) : dataset.getRowMetadata().getByName(
         yaxisInfo.field);
+
 
       var transformValues = this.formBuilder.getValue('transform_values');
       if (transformValues == null) {

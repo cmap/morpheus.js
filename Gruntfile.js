@@ -50,7 +50,7 @@ module.exports = function (grunt) {
         nonull: true,
         src: [
           'js/morpheus-external.js',
-          'js/echarts.min.js', 'js/papaparse.min.js'],
+          'js/echarts.min.js', 'js/echarts-gl.min.js', 'js/papaparse.min.js'],
         dest: 'js/morpheus-external-latest.min.js'
       },
       extJs: {

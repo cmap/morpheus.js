@@ -387,7 +387,7 @@ morpheus.VectorTrack.prototype = {
         this.getFullVector().getProperties().set(morpheus.VectorKeys.DISCRETE, true);
         this.settings.highlightMatchingValues = true;
       } else if (this.getFullVector().getProperties().has(
-          morpheus.VectorKeys.FIELDS)
+        morpheus.VectorKeys.FIELDS)
         || morpheus.VectorUtil.getDataType(this.getFullVector()) === 'number' || morpheus.VectorUtil.getDataType(this.getFullVector()) === '[number]') {
         this.getFullVector().getProperties().set(morpheus.VectorKeys.DISCRETE, false);
         this.settings.highlightMatchingValues = false;
@@ -936,7 +936,7 @@ morpheus.VectorTrack.prototype = {
       name: MOVE_TO_TOP
     });
     if (this.heatmap.options.menu.Edit && this.heatmap.options.menu.Edit.indexOf('Annotate' +
-        ' Selected Rows') !== -1) {
+      ' Selected Rows') !== -1) {
       sectionToItems.Selection.push({
         name: ANNOTATE_SELECTION
       });
@@ -1647,24 +1647,36 @@ morpheus.VectorTrack.prototype = {
             var colorModel = isColumns ? _this.project
               .getColumnColorModel() : _this.project
               .getRowColorModel();
-            var colorSchemeChooser = new morpheus.ColorSchemeChooser({track: _this, heatMap: _this.heatmap, colorModel: colorModel});
+            var colorSchemeChooser = new morpheus.ColorSchemeChooser({
+              isColumns: _this.isColumns,
+              heatMap: _this.heatmap,
+              colorModel: colorModel
+            });
+            colorSchemeChooser.setAnnotationName(_this.getName())
+            colorSchemeChooser.on('change', function () {
+              _this.setInvalid(true);
+              _this.repaint();
+            });
             morpheus.FormBuilder.showInModal({
               title: 'Edit Colors',
               html: colorSchemeChooser.$div,
               close: 'Close',
-              focus: heatmap.getFocusEl()
+              focus: heatmap.getFocusEl(),
+              onClose: function () {
+                colorSchemeChooser.off('change');
+              }
             });
           } else if (item === TOOLTIP) {
             _this.settings.inlineTooltip = !_this.settings.inlineTooltip;
           } else if (item === HIGHLIGHT_MATCHING_VALUES) {
             _this.settings.highlightMatchingValues = !_this.settings.highlightMatchingValues;
           } else if ((customItem = _
-              .find(
-                customItems,
-                function (customItem) {
-                  return customItem.name === item
-                    && customItem.columns === isColumns;
-                }))) {
+            .find(
+              customItems,
+              function (customItem) {
+                return customItem.name === item
+                  && customItem.columns === isColumns;
+              }))) {
             if (customItem.task) {
               // add task
               var task = {
@@ -1781,7 +1793,7 @@ morpheus.VectorTrack.prototype = {
     }
 
     if (vector.getProperties().get(
-        morpheus.VectorKeys.FIELDS) != null) {
+      morpheus.VectorKeys.FIELDS) != null) {
       var visibleFieldIndices = vector.getProperties().get(
         morpheus.VectorKeys.VISIBLE_FIELDS);
       if (visibleFieldIndices == null) {
