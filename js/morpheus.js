@@ -2715,7 +2715,8 @@ morpheus.GctReader.prototype = {
     var columnIdFieldName = 'id';
     var rowIdFieldName = 'id';
     var columnNamesArray;
-
+    var isSparse = false;
+    var percentSparse = null;
     var handleTokens = function (tokens) {
       if (lineNumber === 0) {
         var text = tokens[0].trim();
@@ -2812,8 +2813,11 @@ morpheus.GctReader.prototype = {
           }
         } else { // data lines
           if (tokens[0] !== '') {
+            // if sparse, array of {indices, values}
+
+
             var array = new Float32Array(ncols);
-            matrix.push(array);
+
             // we iterate to numRowAnnotations + 1 to include id row
             // metadata field
             for (var rowAnnotationIndex = 0; rowAnnotationIndex <= numRowAnnotations; rowAnnotationIndex++) {
@@ -2826,6 +2830,35 @@ morpheus.GctReader.prototype = {
             for (var columnIndex = 0; columnIndex < ncols; columnIndex++) {
               var token = tokens[columnIndex + dataColumnStart];
               array[columnIndex] = parseFloat(token);
+            }
+            if (percentSparse == null) {
+              var nzero = 0;
+              for (var j = 0; j < ncols; j++) {
+                if (array[0] === 0) {
+                  nzero++;
+                }
+              }
+              percentSparse = nzero / array.length;
+              isSparse = percentSparse > 0.3;
+            }
+            if (isSparse) {
+              var count = 0;
+              for (var j = 0; j < ncols; j++) {
+                if (array[j] !== 0.0) {
+                  count++;
+                }
+              }
+              var obj = {values: new Float32Array(count), indices: new Uint32Array(count)};
+              for (var j = 0, k = 0; j < ncols; j++) {
+                if (array[j] !== 0.0) {
+                  obj.values[k] = array[j];
+                  obj.indices[k] = j;
+                  k++;
+                }
+              }
+              matrix.push(obj);
+            } else {
+              matrix.push(array);
             }
           }
         }
@@ -2853,7 +2886,8 @@ morpheus.GctReader.prototype = {
           rows: matrix.length,
           columns: ncols,
           array: matrix,
-          dataType: 'Float32'
+          dataType: 'Float32',
+          defaultValue: isSparse ? 0 : undefined
         });
         for (var i = 0; i < rowMetadataNames.length; i++) {
           dataset.getRowMetadata().add(rowMetadataNames[i]).array = rowMetadata[i];
@@ -3486,6 +3520,11 @@ morpheus.GmtReader.prototype = {
 /**
  *
  * @constructor
+ * @param options.dataset
+ * @param options.columnMajorOrder
+ * @param options.rowMeta
+ * @param options.colMeta
+ *
  */
 morpheus.Hdf5Reader = function (options) {
   if (options == null) {
@@ -4230,7 +4269,7 @@ morpheus.SegTabReader.binByRegion = function (dataset, regions) {
       }
     }
     if (rowIndices.length > 0) {
-      var slice = morpheus.DatasetUtil.slicedView(dataset, rowIndices,
+      var slice = new morpheus.SlicedDatasetView(dataset, rowIndices,
         null);
       var columnView = new morpheus.DatasetColumnView(slice);
       for (var j = 0; j < dataset.getColumnCount(); j++) {
@@ -4704,9 +4743,13 @@ morpheus.TcgaUtil.getDataset = function (options) {
         var mutationDataset = new morpheus.SlicedDatasetView(
           datasetToReturn, sourceToIndices
             .get('mutations_merged.maf'));
+
+
         new morpheus.OpenFileTool()
-          .annotate(sigGenesLines, mutationDataset, false,
-            null, 'id', 'gene', ['q']);
+          .annotate({
+            lines: sigGenesLines, dataset: mutationDataset, isColumns: false,
+            metadataName: 'id', fileColumnName: 'gene', fileColumnNamesToInclude: ['q']
+          });
         var qVector = mutationDataset.getRowMetadata().getByName(
           'q');
         var qValueVector = mutationDataset.getRowMetadata()
@@ -6068,13 +6111,8 @@ morpheus.DatasetUtil.min = function (dataset, seriesIndex) {
   }
   return min;
 };
-morpheus.DatasetUtil.slicedView = function (dataset, rows, columns) {
-  return new morpheus.SlicedDatasetView(dataset, rows, columns);
-};
-morpheus.DatasetUtil.transposedView = function (dataset) {
-  return dataset instanceof morpheus.TransposedDatasetView ? dataset
-    .getDataset() : new morpheus.TransposedDatasetView(dataset);
-};
+
+
 morpheus.DatasetUtil.max = function (dataset, seriesIndex) {
   seriesIndex = seriesIndex || 0;
   var max = -Number.MAX_VALUE;
@@ -6208,9 +6246,13 @@ morpheus.DatasetUtil.annotate = function (options) {
   _.each(options.annotations, function (ann, annotationIndex) {
     if (morpheus.Util.isArray(ann.file)) { // already parsed text
       functions[annotationIndex] = function (dataset) {
-        new morpheus.OpenFileTool().annotate(ann.file, dataset,
-          isColumns, null, ann.datasetField, ann.fileField,
-          ann.include);
+
+
+        new morpheus.OpenFileTool().annotate({
+          lines: ann.file, dataset: dataset,
+          isColumns: isColumns, metadataName: ann.datasetField, fileColumnName: ann.fileField,
+          fileColumnNamesToInclude: ann.include
+        });
       };
     } else {
       var result = morpheus.Util.readLines(ann.file);
@@ -6237,9 +6279,13 @@ morpheus.DatasetUtil.annotate = function (options) {
           deferred.resolve();
         } else {
           functions[annotationIndex] = function (dataset) {
-            new morpheus.OpenFileTool().annotate(lines, dataset,
-              isColumns, null, ann.datasetField,
-              ann.fileField, ann.include, ann.transposed);
+
+
+            new morpheus.OpenFileTool().annotate({
+              lines: lines, dataset: dataset,
+              isColumns: isColumns, metadataName: ann.datasetField,
+              fileColumnName: ann.fileField, fileColumnNamesToInclude: ann.include, transposed: ann.transposed
+            });
           };
           deferred.resolve();
         }
@@ -6386,77 +6432,7 @@ morpheus.DatasetUtil.toObjectArray = function (dataset, options) {
   }
   return array;
 };
-morpheus.DatasetUtil.fixL1K = function (dataset) {
-  var names = {
-    'cell_id': 'Cell Line',
-    'pert_idose': 'Dose (\u00B5M)',
-    'pert_iname': 'Name',
-    'pert_itime': 'Time (hr)',
-    'distil_ss': 'Signature Strength',
-    'pert_type': 'Type',
-    'cell_lineage': 'Lineage',
-    'cell_histology': 'Histology',
-    'cell_type': 'Cell Type'
-  };
-  var fixNames = function (metadata) {
-    for (var i = 0, count = metadata.getMetadataCount(); i < count; i++) {
-      var v = metadata.get(i);
-      var name = v.getName();
-      var mapped = names[name];
-      if (mapped) {
-        v.setName(mapped);
-      }
-    }
-  };
-  fixNames(dataset.getRowMetadata());
-  fixNames(dataset.getColumnMetadata());
-  var fix666 = function (metadata) {
-    for (var i = 0, count = metadata.getMetadataCount(); i < count; i++) {
-      var v = metadata.get(i);
-      if (v.getName() == 'Dose (\u00B5M)') { // convert to number
-        for (var j = 0, size = v.size(); j < size; j++) {
-          var value = v.getValue(j);
-          if (value != null) {
-            v.setValue(j, parseFloat(value));
-          }
-        }
-      }
-      var isNumber = false;
-      for (var j = 0, size = v.size(); j < size; j++) {
-        var value = v.getValue(j);
-        if (value != null) {
-          isNumber = _.isNumber(value);
-          break;
-        }
-      }
-      var newValue = isNumber || v.getName() == 'Dose (\u00B5M)' ? 0 : '';
-      for (var j = 0, size = v.size(); j < size; j++) {
-        var value = v.getValue(j);
-        if (value != null && value == '-666') {
-          v.setValue(j, newValue);
-        }
-      }
-    }
-  };
-  fix666(dataset.getRowMetadata());
-  fix666(dataset.getColumnMetadata());
-  var fixCommas = function (metadata) {
-    var regex = /(,)([^ ])/g;
-    _.each(['Lineage', 'Histology'], function (name) {
-      var v = metadata.getByName(name);
-      if (v != null) {
-        for (var i = 0, size = v.size(); i < size; i++) {
-          var val = v.getValue(i);
-          if (val) {
-            v.setValue(i, val.replace(regex, ', $2'));
-          }
-        }
-      }
-    });
-  };
-  fixCommas(dataset.getRowMetadata());
-  fixCommas(dataset.getColumnMetadata());
-};
+
 morpheus.DatasetUtil.geneSetsToDataset = function (name, sets) {
   var uniqueIds = new morpheus.Map();
   for (var i = 0, length = sets.length; i < length; i++) {
@@ -6957,12 +6933,14 @@ morpheus.DatasetUtil.shallowCopy = function (dataset) {
     .getRowMetadata());
   var columnMetadataModel = morpheus.MetadataUtil.shallowCopy(dataset
     .getColumnMetadata());
+
   dataset.getRowMetadata = function () {
     return rowMetadataModel;
   };
   dataset.getColumnMetadata = function () {
     return columnMetadataModel;
   };
+
   return dataset;
 };
 
@@ -7156,7 +7134,7 @@ morpheus.Dataset.fromJSON = function (options) {
   // vectors: Array[3]
   // array: Array[7251]
   // n: 7251
-  // name: "pert_id"
+  // name: "id"
   // properties: Object
   // columns: 7251
   // rowMetadataModel: Object
@@ -9577,7 +9555,7 @@ morpheus.Project.prototype = {
     return this.columnColorModel;
   },
   getSortedFilteredDataset: function () {
-    return morpheus.DatasetUtil.slicedView(this.getFullDataset(),
+    return new morpheus.SlicedDatasetView(this.getFullDataset(),
       this.rowIndexMapper.convertToView(), this.columnIndexMapper
         .convertToView());
   },
@@ -10157,7 +10135,7 @@ morpheus.SortByValuesKey.prototype = {
   init: function (dataset, visibleModelIndices) {
     // isColumnSort-sort columns by selected rows
     // dataset is transposed if !isColumnSort
-    this.dataset = morpheus.DatasetUtil.slicedView(dataset, null,
+    this.dataset = new morpheus.SlicedDatasetView(dataset, null,
       this.modelIndices);
     this.rowView = new morpheus.DatasetRowView(this.dataset);
     this.summaryFunction = this.modelIndices.length > 1 ? morpheus.Median
@@ -13111,7 +13089,7 @@ morpheus.ChartTool = function (chartOptions) {
     name: 'chart_type',
     type: 'bootstrap-select',
     options: [
-      'boxplot', 'row profile', 'column profile', 'row scatter matrix', 'column scatter' +
+      'boxplot', 'embedding', 'row profile', 'column profile', 'row scatter matrix', 'column scatter' +
       ' matrix']
   });
   var rowOptions = [];
@@ -13221,7 +13199,8 @@ morpheus.ChartTool = function (chartOptions) {
   formBuilder.append({
     name: 'color',
     type: 'bootstrap-select',
-    options: options
+    options: options,
+    search: true
   });
 
   // formBuilder.append({
@@ -13235,6 +13214,21 @@ morpheus.ChartTool = function (chartOptions) {
     multiple: true,
     search: true,
     options: options.slice(1)
+  });
+
+  formBuilder.append({
+    name: 'x_axis',
+    type: 'bootstrap-select',
+    multiple: false,
+    search: true,
+    options: numericColumnOptions
+  });
+  formBuilder.append({
+    name: 'y_axis',
+    type: 'bootstrap-select',
+    multiple: false,
+    search: true,
+    options: numericColumnOptions
   });
 
   formBuilder.append({
@@ -13258,7 +13252,13 @@ morpheus.ChartTool = function (chartOptions) {
     'row profile': {
       axis_label: 'columns',
       tooltip: 'columns',
-      color: 'rows'
+      color: 'rows',
+    },
+    'embedding': {
+      tooltip: 'columns',
+      color: ['Selected Rows', 'columns'],
+      x_axis: 'columns',
+      y_axis: 'columns'
     },
     'column profile': {
       axis_label: 'rows',
@@ -13291,12 +13291,24 @@ morpheus.ChartTool = function (chartOptions) {
         true);
 
     }
+    formBuilder.setVisible('x_axis', chartOptions.x_axis != null);
+    formBuilder.setVisible('y_axis', chartOptions.y_axis != null);
     formBuilder.setVisible('color', chartOptions.color != null);
     formBuilder.setVisible('axis_label', chartOptions.axis_label != null);
     formBuilder.setVisible('group_by', chartOptions.group_by);
     formBuilder.setVisible('show_outliers', chartOptions.show_outliers);
     formBuilder.setOptions('tooltip', chartOptions.tooltip === 'rows' ? rowOptions.slice(1) : (chartOptions.tooltip === 'columns' ? columnOptions.slice(1) : options));
-    formBuilder.setOptions('color', chartOptions.color === 'rows' ? rowOptions : (chartOptions.color === 'columns' ? columnOptions : options));
+    formBuilder.setOptions('x_axis', numericColumnOptions);
+    formBuilder.setOptions('y_axis', numericColumnOptions);
+    if (chartOptions.color != null) {
+      if (chartOptions.color === 'rows') {
+        formBuilder.setOptions('color', rowOptions);
+      } else if (chartOptions.color === 'columns') {
+        formBuilder.setOptions('color', columnOptions);
+      } else if (_.isArray(chartOptions.color)) {
+        formBuilder.setOptions('color', columnOptions.concat([chartOptions.color[0]])); // TODO hack
+      }
+    }
   }
 
   this.tooltip = [];
@@ -13652,81 +13664,134 @@ morpheus.ChartTool.prototype = {
    * @private
    */
 
-  _createXY: function (options) {
+  _createEmbedding: function (options) {
     var _this = this;
-    var dataset = options.dataset;
+    var fullDataset = options.fullDataset;
+    var selectedDataset = options.dataset;
+    var transpose = options.transpose;
+    var xVector = options.xVector;
+    var yVector = options.yVector;
+    if (xVector == null || yVector == null) {
+      return;
+    }
     var colorByVector = options.colorByVector;
     var colorModel = options.colorModel;
+
     var heatmap = this.heatmap;
     var chartWidth = options.chartWidth;
     var chartHeight = options.chartHeight;
-    var axisLabelVector = options.axisLabelVector; // for row scatter, row vector
-    var transpose = options.transpose;
-    var axisLabel = [];
-    for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-      axisLabel.push(axisLabelVector != null ? axisLabelVector.getValue(j) : '' + j);
-    }
-    var series = [];
-    var colorMap = morpheus.VectorColorModel.getColorMapForNumber(dataset.getRowCount());
-    for (var i = 0, nrows = dataset.getRowCount(); i < nrows; i++) {
-      // each row is a new trace
-      var colorByValue = colorByVector != null ? colorByVector.getValue(i) : '' + i;
-      var color = colorByVector != null ? colorModel.getMappedValue(colorByVector, colorByValue) : colorMap[i % colorMap.length];
-      var data = [];
-      for (var j = 0, ncols = dataset.getColumnCount(); j < ncols; j++) {
-        data.push([j, dataset.getValue(i, j), i]);
+    var visualMap = undefined;
+    var collapsed;
+    if (selectedDataset != null) {
+      collapsed = new Float32Array(selectedDataset.getColumnCount());
+      var summarizeFunction = morpheus.Max;
+      var view = new morpheus.DatasetColumnView(selectedDataset);
+      for (var j = 0, ncols = selectedDataset.getColumnCount(); j < ncols; j++) {
+        collapsed[j] = summarizeFunction(view.setIndex(j));
       }
-      series.push({
-        name: colorByValue,
-        type: 'line',
-        data: data,
-        tooltip: {
-          formatter: function (obj) {
-            var value = obj.value;
-            var s = [];
-            s.push(_this.heatmap.getHeatMapElementComponent().getDrawValuesFormat()(value[1]));
-            morpheus.ChartTool.getTooltip({
-              text: s,
-              tooltip: _this.tooltip,
-              dataset: dataset,
-              rowIndex: value[2],
-              columnIndex: value[0]
-            });
-            return s.join('');
-          }
+      var v = morpheus.Vector.fromArray('', collapsed);
+      var stats = morpheus.VectorUtil.getMinMax(v);
+      visualMap = {
+        min: stats.min,
+        max: stats.max,
+        dimension: 3,
+        orient: 'horizontal',
+        left: 0,
+        top: 'bottom',
+        text: ['', ''],
+        calculable: true,
+        inRange: {
+          color: ['#fee0d2', '#de2d26']
         }
-      });
+      };
     }
 
+    var data = [];
+    var colors = [];
+    var isContinuous = false;
+    if (colorByVector != null) {
+      isContinuous = colorModel.isContinuous(colorByVector);
+    }
+    for (var j = 0, size = xVector.size(); j < size; j++) {
+      if (selectedDataset != null) {
+        data.push([xVector.getValue(j), yVector.getValue(j), j, collapsed[j]]);
+      } else if (colorByVector != null) {
+        if (isContinuous) {
+          colors.push(colorModel.getContinuousMappedValue(colorByVector, colorByVector.getValue(j)));
+        } else {
+          colors.push(colorModel.getMappedValue(colorByVector, colorByVector.getValue(j)));
+        }
+        data.push([xVector.getValue(j), yVector.getValue(j), j]);
+      } else {
+        data.push([xVector.getValue(j), yVector.getValue(j), j]);
+      }
+    }
+
+
     var chart = {
-      legend: {
-        orient: 'vertical',
-        left: 'right',
-        top: 2,
-        itemWidth: 14,
-        height: dataset.getRowCount() * 20,
-        data: series.map(function (s) {
-          return s.name;
-        })
-      },
       animation: false,
       tooltip: {
         trigger: 'item'
       },
-      xAxis: {
-        type: 'category',
-        data: axisLabel
-      },
-      yAxis: {
+      xAxis: [{
         axisLine: {
           show: true,
           onZero: false
         },
+        splitLine: {
+          show: false
+        },
+        boundaryGap: false,
         type: 'value',
         name: ''
-      },
-      grid: {right: 120},
-      series: series
+      }],
+      visualMap: visualMap,
+      yAxis: [{
+        axisLine: {
+          show: true,
+          onZero: false
+        }, splitLine: {
+          show: false
+        },
+        boundaryGap: false,
+        type: 'value',
+        name: ''
+      }],
+      series: [{
+        type: 'scatter',
+        data: data,
+        large: false,
+        symbolSize: 2,
+        tooltip: {
+          formatter: function (obj) {
+            var value = obj.value;
+            var s = [];
+            if (transpose) {
+              morpheus.ChartTool.getTooltip({
+                text: s,
+                tooltip: _this.tooltip,
+                dataset: new morpheus.TransposedDatasetView(fullDataset),
+                rowIndex: value[2],
+                columnIndex: -1
+              });
+            } else {
+              morpheus.ChartTool.getTooltip({
+                text: s,
+                tooltip: _this.tooltip,
+                dataset: fullDataset,
+                rowIndex: -1,
+                columnIndex: value[2]
+              });
+            }
+            return s.join('');
+          }
+        },
+        itemStyle: {
+          color: function (param) {
+            return colors.length === 0 ? '#1f78b4' : colors[param.dataIndex];
+          }
+        }
+      }]
     };
 
     var myChart = echarts.init(options.el);
@@ -13878,24 +13943,27 @@ morpheus.ChartTool.prototype = {
     // var sizeBy = this.formBuilder.getValue('size');
     var chartType = this.formBuilder.getValue('chart_type');
 
-    var dataset = this.project.getSelectedDataset({
+
+    var dataset = chartType !== 'embedding' ? this.project.getSelectedDataset({
       emptyToAll: false
-    });
+    }) : this.project.getFullDataset();
 
     this.dataset = dataset;
-    if (dataset.getRowCount() === 0 && dataset.getColumnCount() === 0) {
-      $('<h4>Please select rows and columns in the heat map.</h4>')
-        .appendTo(this.$chart);
-      return;
-    } else if (dataset.getRowCount() === 0) {
-      $('<h4>Please select rows in the heat map.</h4>')
-        .appendTo(this.$chart);
-      return;
-    }
-    if (dataset.getColumnCount() === 0) {
-      $('<h4>Please select columns in the heat map.</h4>')
-        .appendTo(this.$chart);
-      return;
+    if (chartType !== 'embedding') {
+      if (dataset.getRowCount() === 0 && dataset.getColumnCount() === 0) {
+        $('<h4>Please select rows and columns in the heat map.</h4>')
+          .appendTo(this.$chart);
+        return;
+      } else if (dataset.getRowCount() === 0) {
+        $('<h4>Please select rows in the heat map.</h4>')
+          .appendTo(this.$chart);
+        return;
+      }
+      if (dataset.getColumnCount() === 0) {
+        $('<h4>Please select columns in the heat map.</h4>')
+          .appendTo(this.$chart);
+        return;
+      }
     }
 
     var heatmap = this.heatmap;
@@ -13913,7 +13981,7 @@ morpheus.ChartTool.prototype = {
     var colorBy = this.formBuilder.getValue('color');
     var colorByVector = null;
     var colorModel = null;
-    if (colorBy != null) {
+    if (colorBy != null && colorBy !== 'Selected Rows') {
       var colorByInfo = morpheus.ChartTool.getVectorInfo(colorBy);
       colorModel = !colorByInfo.isColumns ? this.project.getRowColorModel()
         : this.project.getColumnColorModel();
@@ -13921,7 +13989,34 @@ morpheus.ChartTool.prototype = {
         colorByInfo.field);
     }
 
-    if (chartType === 'row profile' || chartType === 'column profile') {
+    if (chartType === 'embedding') {
+      var xaxisInfo = morpheus.ChartTool.getVectorInfo(this.formBuilder.getValue('x_axis'));
+      var xVector = xaxisInfo.isColumns ? dataset.getColumnMetadata().getByName(xaxisInfo.field) : dataset.getRowMetadata().getByName(
+        xaxisInfo.field);
+      var yaxisInfo = morpheus.ChartTool.getVectorInfo(this.formBuilder.getValue('y_axis'));
+      var yVector = yaxisInfo.isColumns ? dataset.getColumnMetadata().getByName(yaxisInfo.field) : dataset.getRowMetadata().getByName(
+        yaxisInfo.field);
+
+      var $chart = $('<div style="width: ' + (gridWidth) + 'px;height:' + (gridHeight + 120) + 'px;"></div>');
+      $chart.appendTo(this.$chart);
+      this._createEmbedding({
+        xVector: xVector,
+        yVector: yVector,
+        width: gridWidth,
+        el: $chart[0],
+        fullDataset: dataset,
+        dataset: colorBy === 'Selected Rows' ? this.project.getSelectedDataset({
+          emptyToAll: false,
+          selectedColumns: false
+        }) : null,
+        chartWidth: gridWidth,
+        chartHeight: gridHeight,
+        transpose: false,
+        colorModel: colorModel,
+        colorByVector: colorByVector
+      });
+    }
+    else if (chartType === 'row profile' || chartType === 'column profile') {
       var transpose = chartType === 'column profile';
       if (transpose) {
         dataset = new morpheus.TransposedDatasetView(dataset);
@@ -14321,7 +14416,7 @@ morpheus.CreateAnnotation.prototype = {
         .getSelectedDataset()
       : __project.getSortedFilteredDataset();
     if (isColumns) {
-      __dataset = morpheus.DatasetUtil.transposedView(__dataset);
+      __dataset = new morpheus.TransposedDatasetView(__dataset);
     }
     var __rowView = new morpheus.DatasetRowView(__dataset);
     var __vector = __dataset.getRowMetadata().add(
@@ -15483,7 +15578,7 @@ morpheus.NearestNeighbors.prototype = {
 
     if (isColumns) {
       // compute the nearest neighbors of row, so need to transpose
-      dataset = morpheus.DatasetUtil.transposedView(dataset);
+      dataset = new morpheus.TransposedDatasetView(dataset);
     }
     var selectedIndices = (isColumns ? project.getColumnSelectionModel()
       : project.getRowSelectionModel()).getViewIndices().values();
@@ -15495,10 +15590,10 @@ morpheus.NearestNeighbors.prototype = {
     if (options.input.use_selected_only) {
       spaceIndices = (!isColumns ? project.getColumnSelectionModel()
         : project.getRowSelectionModel()).getViewIndices().values();
-      dataset = morpheus.DatasetUtil.slicedView(dataset, null,
+      dataset = new morpheus.SlicedDatasetView(dataset, null,
         spaceIndices);
     }
-    var d1 = morpheus.DatasetUtil.slicedView(dataset, selectedIndices, null);
+    var d1 = new morpheus.SlicedDatasetView(dataset, selectedIndices, null);
     var nearestNeighborsList;
     if (isAnnotation) {
       nearestNeighborsList = dataset.getColumnMetadata().getByName(options.input.annotation);
@@ -16153,7 +16248,7 @@ morpheus.OpenDendrogramTool.prototype = {
     .done(function (text) {
       var dataset = options.project.getSortedFilteredDataset();
       if (isColumns) {
-        dataset = morpheus.DatasetUtil.transposedView(dataset);
+        dataset = new morpheus.TransposedDatasetView(dataset);
       }
       var tree = morpheus.DendrogramUtil.parseNewick(text);
       if (tree.leafNodes.length !== dataset.getRowCount()) {
@@ -16422,7 +16517,7 @@ morpheus.OpenFileTool.prototype = {
   },
   annotateCls: function (heatMap, dataset, fileName, isColumns, lines) {
     if (isColumns) {
-      dataset = morpheus.DatasetUtil.transposedView(dataset);
+      dataset = new morpheus.TransposedDatasetView(dataset);
     }
     var assignments = new morpheus.ClsReader().read(lines);
     if (assignments.length !== dataset.getRowCount()) {
@@ -16446,7 +16541,7 @@ morpheus.OpenFileTool.prototype = {
   annotateSets: function (dataset, isColumns, sets,
                           datasetMetadataName, setSourceFileName) {
     if (isColumns) {
-      dataset = morpheus.DatasetUtil.transposedView(dataset);
+      dataset = new morpheus.TransposedDatasetView(dataset);
     }
     var vector = dataset.getRowMetadata().getByName(datasetMetadataName);
     var idToIndices = morpheus.VectorUtil.createValueToIndicesMap(vector);
@@ -16489,17 +16584,30 @@ morpheus.OpenFileTool.prototype = {
    *            null to include all
    * @param tranposed For text/Excel files only. If <code>true</code>, different annotations are on each row.
    */
-  annotate: function (lines, dataset, isColumns, sets, metadataName,
-                      fileColumnName, fileColumnNamesToInclude, transposed) {
+  annotate: function (options) {
+    var lines = options.lines;
+    var dataset = options.dataset;
+    var isColumns = options.isColumns;
+    var sets = options.sets;
+    var metadataName = options.metadataName;
+    var fileColumnName = options.fileColumnName;
+    var fileColumnNamesToInclude = options.fileColumnNamesToInclude;
+    var transposed = options.transposed;
+    var separator = options.separator;
+
+
+    if (separator == null) {
+      separator = /\t/;
+    }
     if (isColumns) {
-      dataset = morpheus.DatasetUtil.transposedView(dataset);
+      dataset = new morpheus.TransposedDatasetView(dataset);
     }
     var vector = dataset.getRowMetadata().getByName(metadataName);
     if (!vector) {
       throw new Error('vector ' + metadataName + ' not found.');
     }
     var fileColumnNamesToIncludeSet = null;
-    if (fileColumnNamesToInclude) {
+    if (fileColumnNamesToInclude != null) {
       fileColumnNamesToIncludeSet = new morpheus.Set();
       fileColumnNamesToInclude.forEach(function (name) {
         fileColumnNamesToIncludeSet.add(name);
@@ -16530,9 +16638,9 @@ morpheus.OpenFileTool.prototype = {
             });
         });
     } else {
-      var tab = /\t/;
+
       if (!transposed) {
-        var header = lines[0].split(tab);
+        var header = lines[0].split(separator);
         var fileMatchOnColumnIndex = _.indexOf(header, fileColumnName);
         if (fileMatchOnColumnIndex === -1) {
           throw new Error(fileColumnName + ' not found in header:'
@@ -16558,7 +16666,7 @@ morpheus.OpenFileTool.prototype = {
         }
         var nheaders = columnIndices.length;
         for (var i = 1, nrows = lines.length; i < nrows; i++) {
-          var line = lines[i].split(tab);
+          var line = lines[i].split(separator);
           var id = line[fileMatchOnColumnIndex];
           var indices = idToIndices.get(id);
           if (indices !== undefined) {
@@ -16578,7 +16686,7 @@ morpheus.OpenFileTool.prototype = {
         var splitLines = [];
         var matchOnLine;
         for (var i = 0, nrows = lines.length; i < nrows; i++) {
-          var line = lines[i].split(tab);
+          var line = lines[i].split(separator);
           var name = line[0];
           if (fileColumnName === name) {
             matchOnLine = line;
@@ -16657,12 +16765,31 @@ morpheus.OpenFileTool.prototype = {
   prompt: function (lines, dataset, heatMap, isColumns) {
     var promptTool = {};
     var _this = this;
-    var header = lines != null ? lines[0].split('\t') : null;
+    var separator = /\t/;
+
+    if (lines != null) {
+      var separators = ['\t', ',', ' '];
+      var headerLine = lines[0].trim();
+      for (var i = 0; i < separators.length; i++) {
+        var sep = separators[i];
+        var tokens = headerLine.split(new RegExp(sep));
+        if (tokens.length > 1) {
+          separator = sep;
+          break;
+        }
+      }
+    }
+
+    var header = lines != null ? lines[0].split(separator) : null;
     promptTool.execute = function (options) {
       var metadataName = options.input.dataset_field_name;
       var fileColumnName = options.input.file_field_name;
-      var vectors = _this.annotate(lines, dataset, isColumns, null,
-        metadataName, fileColumnName);
+
+
+      var vectors = _this.annotate({
+        lines: lines, dataset: dataset, isColumns: isColumns,
+        metadataName: metadataName, fileColumnName: fileColumnName, transposed: false, separator: separator
+      });
 
       var nameToIndex = new morpheus.Map();
       var display = [];
@@ -30156,7 +30283,7 @@ morpheus.HeatMap.prototype = {
       // see if default fields found
       if (!displaySpecified) {
         var defaultFieldsToShow = new morpheus.Set();
-        ['pert_iname', 'moa', 'target', 'description', 'cell_id', 'pert_type'].forEach(function (field) {
+        ['id', 'name', 'description'].forEach(function (field) {
           defaultFieldsToShow.add(field);
         });
         for (var i = 0, metadataCount = displayMetadata.getMetadataCount(); i < metadataCount; i++) {
@@ -30195,7 +30322,7 @@ morpheus.HeatMap.prototype = {
         }
 
         if (option.display == null) {
-          if (name === 'pert_iname' || name === 'id' || isFirst) {
+          if (name === 'name' || name === 'id' || isFirst) {
             option.inlineTooltip = true;
             option.display = ['text'];
           } else {
@@ -39158,7 +39285,7 @@ morpheus.CollapseDataset = function (dataset, collapseToFields,
   idToIndices
     .forEach(function (rowIndices, key) {
       // collapse each column separately
-      var slice = morpheus.DatasetUtil.slicedView(dataset,
+      var slice = new morpheus.SlicedDatasetView(dataset,
         rowIndices, null);
       var view = new morpheus.DatasetColumnView(slice);
       // for (var series = 0; series < nseries; series++) {
@@ -39265,7 +39392,7 @@ morpheus.HClusterGroupBy = function (dataset, groupByFieldNames, distanceFunctio
   idToIndices
   .forEach(function (rowIndices, id) {
     var originalIndicesForGroup = idToIndices.get(id);
-    var subset = morpheus.DatasetUtil.slicedView(dataset,
+    var subset = new morpheus.SlicedDatasetView(dataset,
       originalIndicesForGroup, null);
     var hcl;
     var distanceMatrix = morpheus.HCluster.computeDistanceMatrix(

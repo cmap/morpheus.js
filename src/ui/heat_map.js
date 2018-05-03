@@ -1694,7 +1694,7 @@ morpheus.HeatMap.prototype = {
       // see if default fields found
       if (!displaySpecified) {
         var defaultFieldsToShow = new morpheus.Set();
-        ['pert_iname', 'moa', 'target', 'description', 'cell_id', 'pert_type'].forEach(function (field) {
+        ['id', 'name', 'description'].forEach(function (field) {
           defaultFieldsToShow.add(field);
         });
         for (var i = 0, metadataCount = displayMetadata.getMetadataCount(); i < metadataCount; i++) {
@@ -1733,7 +1733,7 @@ morpheus.HeatMap.prototype = {
         }
 
         if (option.display == null) {
-          if (name === 'pert_iname' || name === 'id' || isFirst) {
+          if (name === 'name' || name === 'id' || isFirst) {
             option.inlineTooltip = true;
             option.display = ['text'];
           } else {

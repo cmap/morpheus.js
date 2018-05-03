@@ -118,7 +118,7 @@ morpheus.Dataset.fromJSON = function (options) {
   // vectors: Array[3]
   // array: Array[7251]
   // n: 7251
-  // name: "pert_id"
+  // name: "id"
   // properties: Object
   // columns: 7251
   // rowMetadataModel: Object

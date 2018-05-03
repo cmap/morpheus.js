@@ -132,7 +132,8 @@ morpheus.ChartTool = function (chartOptions) {
   formBuilder.append({
     name: 'color',
     type: 'bootstrap-select',
-    options: options
+    options: options,
+    search: true
   });
 
   // formBuilder.append({
