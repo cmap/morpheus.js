@@ -126,10 +126,8 @@ morpheus.HeatMapColorSchemeChooser = function (options) {
     }
     return -1;
   };
-  var id = _.uniqueId('morpheus');
-  var $collapse = $('<div><a class="btn btn-default btn-sm" role="button" data-toggle="collapse" href="#' + id + '" aria-expanded="false" aria-controls="' + id + '">More Options</a><div class="collapse" id="' + id + '"></div></div>');
-  formBuilder.$form.appendTo($collapse.find('.collapse'));
-  this.$div.append($collapse);
+
+  formBuilder.$form.appendTo(this.$div);
   formBuilder.$form.find('[name^=selected],[name=delete]').prop('disabled',
     true);
   formBuilder.$form.find('[name=add]').on('click', function (e) {
