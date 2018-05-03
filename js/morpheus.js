@@ -13232,11 +13232,13 @@ morpheus.ChartTool = function (chartOptions) {
     options: ['log2', 'log2(1+x)', 'z-score', 'robust z-score']
   });
 
+  var combinedValues = morpheus.CollapseDatasetTool.Functions;
+  combinedValues.splice(morpheus.CollapseDatasetTool.Functions.indexOf(morpheus.Percentile), 1);
   formBuilder.append({
     name: 'combine_values',
     type: 'bootstrap-select',
     multiple: false,
-    options: morpheus.CollapseDatasetTool.Functions,
+    options: combinedValues,
     value: morpheus.Max
   });
 
@@ -14115,7 +14117,7 @@ morpheus.ChartTool.prototype = {
         xVector: xVector,
         yVector: yVector,
         width: gridWidth,
-        combine_values: morpheus.CollapseDatasetTool.Functions.fromString(this.formBuilder.getValue('combine_values')),
+        collapseFunction: morpheus.CollapseDatasetTool.Functions.fromString(this.formBuilder.getValue('combine_values')),
         dataTransformations: dataTransformations,
         symbolSize: parseFloat(this.formBuilder.getValue('symbol_size')),
         el: $chart[0],
