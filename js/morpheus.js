@@ -14594,7 +14594,7 @@ morpheus.HClusterTool.createLinkageMethod = function (linkageString) {
 morpheus.HClusterTool.execute = function (dataset, input) {
   // note: in worker here
   var linkageMethod = morpheus.HClusterTool
-  .createLinkageMethod(input.linkage_method);
+    .createLinkageMethod(input.linkage_method);
   var f = morpheus.HClusterTool.Functions.fromString(input.metric);
   if (f === morpheus.HClusterTool.PRECOMPUTED_DIST) {
     f = 0;
@@ -14608,7 +14608,7 @@ morpheus.HClusterTool.execute = function (dataset, input) {
     return (groupByFields && groupByFields.length > 0) ? new morpheus.HClusterGroupBy(
       d, groupByFields, f, linkageMethod)
       : new morpheus.HCluster(morpheus.HCluster
-      .computeDistanceMatrix(d, f), linkageMethod);
+        .computeDistanceMatrix(d, f), linkageMethod);
   };
 
   var rowsHcl;
@@ -14622,8 +14622,7 @@ morpheus.HClusterTool.execute = function (dataset, input) {
   }
   if (columns) {
     columnsHcl = doCluster(
-      morpheus.DatasetUtil
-      .transposedView(input.selectedRowsToUseForClusteringColumns ? new morpheus.SlicedDatasetView(
+      new morpheus.TransposedDatasetView(input.selectedRowsToUseForClusteringColumns ? new morpheus.SlicedDatasetView(
         dataset, input.selectedRowsToUseForClusteringColumns, null)
         : dataset), input.group_columns_by);
 
@@ -14639,15 +14638,15 @@ morpheus.HClusterTool.prototype = {
   },
   init: function (project, form) {
     form.setOptions('group_rows_by', morpheus.MetadataUtil
-    .getMetadataNames(project.getFullDataset().getRowMetadata()));
+      .getMetadataNames(project.getFullDataset().getRowMetadata()));
     form
-    .setOptions('group_columns_by', morpheus.MetadataUtil
-    .getMetadataNames(project.getFullDataset()
-    .getColumnMetadata()));
+      .setOptions('group_columns_by', morpheus.MetadataUtil
+        .getMetadataNames(project.getFullDataset()
+          .getColumnMetadata()));
     form.setVisible('group_rows_by', false);
     form
-    .setVisible('cluster_rows_in_space_of_selected_columns_only',
-      false);
+      .setVisible('cluster_rows_in_space_of_selected_columns_only',
+        false);
     form.$form.find('[name=cluster]').on(
       'change',
       function (e) {
@@ -14710,13 +14709,13 @@ morpheus.HClusterTool.prototype = {
     var project = options.project;
     var heatmap = options.heatMap;
     var selectedRowsToUseForClusteringColumns = options.input.cluster_columns_in_space_of_selected_rows_only ? project
-    .getRowSelectionModel().getViewIndices().values()
+        .getRowSelectionModel().getViewIndices().values()
       : null;
     if (selectedRowsToUseForClusteringColumns != null && selectedRowsToUseForClusteringColumns.length === 0) {
       selectedRowsToUseForClusteringColumns = null;
     }
     var selectedColumnsToUseForClusteringRows = options.input.cluster_rows_in_space_of_selected_columns_only ? project
-    .getColumnSelectionModel().getViewIndices().values()
+        .getColumnSelectionModel().getViewIndices().values()
       : null;
     if (selectedColumnsToUseForClusteringRows != null && selectedColumnsToUseForClusteringRows.length === 0) {
       selectedColumnsToUseForClusteringRows = null;
@@ -14732,6 +14731,7 @@ morpheus.HClusterTool.prototype = {
       options.input.background = true;
     }
     options.input.background = options.input.background && typeof Worker !== 'undefined';
+
     var rowModelOrder;
     var columnModelOrder;
     if (rows) {
@@ -14852,8 +14852,7 @@ morpheus.KMeansTool.execute = function (dataset, input) {
   }
   if (columns) {
     columnAssignments = doCluster(
-      morpheus.DatasetUtil
-      .transposedView(input.selectedRowsToUseForClusteringColumns ? new morpheus.SlicedDatasetView(
+      new morpheus.TransposedDatasetView(input.selectedRowsToUseForClusteringColumns ? new morpheus.SlicedDatasetView(
         dataset, input.selectedRowsToUseForClusteringColumns, null)
         : dataset));
 
@@ -14870,8 +14869,8 @@ morpheus.KMeansTool.prototype = {
   },
   init: function (project, form) {
     form
-    .setVisible('cluster_rows_in_space_of_selected_columns_only',
-      false);
+      .setVisible('cluster_rows_in_space_of_selected_columns_only',
+        false);
     form.$form.find('[name=cluster]').on(
       'change',
       function (e) {
@@ -14928,13 +14927,13 @@ morpheus.KMeansTool.prototype = {
     options.input.number_of_clusters = parseInt(options.input.number_of_clusters);
     options.input.maximum_iterations = parseInt(options.input.maximum_iterations);
     var selectedRowsToUseForClusteringColumns = options.input.cluster_columns_in_space_of_selected_rows_only ? project
-    .getRowSelectionModel().getViewIndices().values()
+        .getRowSelectionModel().getViewIndices().values()
       : null;
     if (selectedRowsToUseForClusteringColumns != null && selectedRowsToUseForClusteringColumns.length === 0) {
       selectedRowsToUseForClusteringColumns = null;
     }
     var selectedColumnsToUseForClusteringRows = options.input.cluster_rows_in_space_of_selected_columns_only ? project
-    .getColumnSelectionModel().getViewIndices().values()
+        .getColumnSelectionModel().getViewIndices().values()
       : null;
     if (selectedColumnsToUseForClusteringRows != null && selectedColumnsToUseForClusteringRows.length === 0) {
       selectedColumnsToUseForClusteringRows = null;
@@ -14948,6 +14947,7 @@ morpheus.KMeansTool.prototype = {
     var dataset = project.getSortedFilteredDataset();
 
     options.input.background = options.input.background && typeof Worker !== 'undefined';
+
     function addAssignments(d, assignments, k) {
       var v = d.getColumnMetadata().add('k_means_' + k);
       for (var i = 0; i < assignments.length; i++) {
@@ -19443,10 +19443,8 @@ morpheus.ActionManager = function () {
           var fullDataset = project
             .getFullDataset();
           if (isColumns) {
-            dataset = morpheus.DatasetUtil
-              .transposedView(dataset);
-            fullDataset = morpheus.DatasetUtil
-              .transposedView(fullDataset);
+            dataset = new morpheus.TransposedDatasetView(dataset);
+            fullDataset = new morpheus.TransposedDatasetView(fullDataset);
           }
 
           var existingVector = fullDataset

@@ -843,10 +843,8 @@ morpheus.ActionManager = function () {
           var fullDataset = project
             .getFullDataset();
           if (isColumns) {
-            dataset = morpheus.DatasetUtil
-              .transposedView(dataset);
-            fullDataset = morpheus.DatasetUtil
-              .transposedView(fullDataset);
+            dataset = new morpheus.TransposedDatasetView(dataset);
+            fullDataset = new morpheus.TransposedDatasetView(fullDataset);
           }
 
           var existingVector = fullDataset
