@@ -147,7 +147,10 @@ morpheus.FormBuilder.showInDraggableDiv = function (options) {
     //handle: '[name=header]',
     containment: 'document'
   });
-  // $div.resizable();
+
+  // if (options.resizable) {
+  //   $div.resizable();
+  // }
   $div.appendTo(options.appendTo != null ? options.appendTo : $(document.body));
   return $div;
 };
@@ -243,7 +246,7 @@ morpheus.FormBuilder._showInModal = function (options) {
  * @param options.modalClass
  */
 morpheus.FormBuilder.showInModal = function (options) {
-  return morpheus.FormBuilder
+  var $div = morpheus.FormBuilder
     ._showInModal({
       modalClass: options.modalClass,
       title: options.title,
@@ -257,11 +260,11 @@ morpheus.FormBuilder.showInModal = function (options) {
       size: options.size,
       focus: options.focus
     });
-  // if (options.draggable) {
-  // $div.draggable({
-  // handle : $div.find(".modal-header")
-  // });
-  // }
+  if (options.draggable) {
+    $div.draggable({
+      handle: $div.find('.modal-header')
+    });
+  }
 };
 
 /**

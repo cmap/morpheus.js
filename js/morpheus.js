@@ -13233,6 +13233,14 @@ morpheus.ChartTool = function (chartOptions) {
   });
 
   formBuilder.append({
+    name: 'combine_values',
+    type: 'bootstrap-select',
+    multiple: false,
+    options: morpheus.CollapseDatasetTool.Functions,
+    value: morpheus.Max
+  });
+
+  formBuilder.append({
     name: 'symbol_size',
     type: 'text',
     value: '2',
@@ -13262,6 +13270,7 @@ morpheus.ChartTool = function (chartOptions) {
       title: 'Edit Colors',
       html: colorSchemeChooser.$div,
       close: 'Close',
+      draggable: true,
       onClose: function () {
         colorSchemeChooser.off('change');
       }
@@ -13292,6 +13301,7 @@ morpheus.ChartTool = function (chartOptions) {
       color: 'rows',
     },
     'embedding': {
+      combine_values: true,
       color: ['Selected Rows', 'columns'],
       x_axis: 'columns',
       y_axis: 'columns',
@@ -13330,6 +13340,7 @@ morpheus.ChartTool = function (chartOptions) {
     }
 
     _this.$legend.css('display', (chartType === 'embedding' && formBuilder.getValue('color') != null && formBuilder.getValue('color') !== 'Selected Rows') ? '' : 'none');
+    formBuilder.setVisible('combine_values', chartOptions.combine_values && formBuilder.getValue('color') === 'Selected Rows');
     formBuilder.setVisible('transform_values', chartOptions.transform_values && formBuilder.getValue('color') === 'Selected Rows');
     formBuilder.setVisible('symbol_size', chartOptions.symbol_size);
     formBuilder.setVisible('x_axis', chartOptions.x_axis != null);
@@ -13713,6 +13724,7 @@ morpheus.ChartTool.prototype = {
     var transpose = options.transpose;
     var xVector = options.xVector;
     var yVector = options.yVector;
+    var collapseFunction = options.collapseFunction;
     var symbolSize = options.symbolSize;
     var dataTransformations = options.dataTransformations;
     if (xVector == null || yVector == null) {
@@ -13728,7 +13740,6 @@ morpheus.ChartTool.prototype = {
     var collapsed;
     if (selectedDataset != null) {
       collapsed = new Float32Array(selectedDataset.getColumnCount());
-      var summarizeFunction = morpheus.Max;
       if (dataTransformations.length > 0) {
         selectedDataset = morpheus.DatasetUtil.copy(selectedDataset);
         dataTransformations.forEach(function (f) {
@@ -13740,7 +13751,7 @@ morpheus.ChartTool.prototype = {
 
       var view = new morpheus.DatasetColumnView(selectedDataset);
       for (var j = 0, ncols = selectedDataset.getColumnCount(); j < ncols; j++) {
-        collapsed[j] = summarizeFunction(view.setIndex(j));
+        collapsed[j] = collapseFunction(view.setIndex(j));
       }
       var v = morpheus.Vector.fromArray('', collapsed);
       var stats = morpheus.VectorUtil.getMinMax(v);
@@ -14104,6 +14115,7 @@ morpheus.ChartTool.prototype = {
         xVector: xVector,
         yVector: yVector,
         width: gridWidth,
+        combine_values: morpheus.CollapseDatasetTool.Functions.fromString(this.formBuilder.getValue('combine_values')),
         dataTransformations: dataTransformations,
         symbolSize: parseFloat(this.formBuilder.getValue('symbol_size')),
         el: $chart[0],
@@ -22606,7 +22618,10 @@ morpheus.FormBuilder.showInDraggableDiv = function (options) {
     //handle: '[name=header]',
     containment: 'document'
   });
-  // $div.resizable();
+
+  // if (options.resizable) {
+  //   $div.resizable();
+  // }
   $div.appendTo(options.appendTo != null ? options.appendTo : $(document.body));
   return $div;
 };
@@ -22702,7 +22717,7 @@ morpheus.FormBuilder._showInModal = function (options) {
  * @param options.modalClass
  */
 morpheus.FormBuilder.showInModal = function (options) {
-  return morpheus.FormBuilder
+  var $div = morpheus.FormBuilder
     ._showInModal({
       modalClass: options.modalClass,
       title: options.title,
@@ -22716,11 +22731,11 @@ morpheus.FormBuilder.showInModal = function (options) {
       size: options.size,
       focus: options.focus
     });
-  // if (options.draggable) {
-  // $div.draggable({
-  // handle : $div.find(".modal-header")
-  // });
-  // }
+  if (options.draggable) {
+    $div.draggable({
+      handle: $div.find('.modal-header')
+    });
+  }
 };
 
 /**
