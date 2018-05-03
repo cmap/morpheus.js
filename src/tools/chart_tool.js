@@ -165,6 +165,13 @@ morpheus.ChartTool = function (chartOptions) {
   });
 
   formBuilder.append({
+    name: 'symbol_size',
+    type: 'text',
+    value: '2',
+    style: 'width:50px;'
+  });
+
+  formBuilder.append({
     name: 'chart_width',
     type: 'range',
     value: 400,
@@ -191,7 +198,8 @@ morpheus.ChartTool = function (chartOptions) {
       tooltip: 'columns',
       color: ['Selected Rows', 'columns'],
       x_axis: 'columns',
-      y_axis: 'columns'
+      y_axis: 'columns',
+      symbol_size: true
     },
     'column profile': {
       axis_label: 'rows',
@@ -224,6 +232,7 @@ morpheus.ChartTool = function (chartOptions) {
         true);
 
     }
+    formBuilder.setVisible('symbol_size', chartOptions.symbol_size);
     formBuilder.setVisible('x_axis', chartOptions.x_axis != null);
     formBuilder.setVisible('y_axis', chartOptions.y_axis != null);
     formBuilder.setVisible('color', chartOptions.color != null);
@@ -604,6 +613,7 @@ morpheus.ChartTool.prototype = {
     var transpose = options.transpose;
     var xVector = options.xVector;
     var yVector = options.yVector;
+    var symbolSize = options.symbolSize;
     if (xVector == null || yVector == null) {
       return;
     }
@@ -626,6 +636,7 @@ morpheus.ChartTool.prototype = {
       var stats = morpheus.VectorUtil.getMinMax(v);
 
       visualMap = {
+        type: 'continuous',
         min: stats.min,
         max: stats.max,
         dimension: 3,
@@ -636,6 +647,9 @@ morpheus.ChartTool.prototype = {
         calculable: true,
         inRange: {
           color: ['#ffeda0', '#feb24c', '#f03b20']
+        },
+        outOfRange: {
+          color: ['#d9d9d9']
         }
       };
     }
@@ -668,6 +682,8 @@ morpheus.ChartTool.prototype = {
         trigger: 'item'
       },
       xAxis: [{
+        axisTick: {show: false},
+        axisLabel: {show: false},
         axisLine: {
           show: true,
           onZero: false
@@ -681,6 +697,8 @@ morpheus.ChartTool.prototype = {
       }],
       visualMap: visualMap,
       yAxis: [{
+        axisTick: {show: false},
+        axisLabel: {show: false},
         axisLine: {
           show: true,
           onZero: false
@@ -695,7 +713,7 @@ morpheus.ChartTool.prototype = {
         type: 'scatter',
         data: data,
         large: false,
-        symbolSize: 2,
+        symbolSize: symbolSize,
         tooltip: {
           formatter: function (obj) {
             var value = obj.value;
@@ -937,6 +955,7 @@ morpheus.ChartTool.prototype = {
         xVector: xVector,
         yVector: yVector,
         width: gridWidth,
+        symbolSize: parseFloat(this.formBuilder.getValue('symbol_size')),
         el: $chart[0],
         fullDataset: dataset,
         dataset: colorBy === 'Selected Rows' ? this.project.getSelectedDataset({
