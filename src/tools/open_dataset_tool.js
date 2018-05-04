@@ -153,6 +153,12 @@ morpheus.OpenDatasetTool.prototype = {
                           .getProject()
                           .getFullDataset()
                           .getColumnCount()));
+                  heatMap.addTrack('Source', !appendRows);
+                  morpheus.FormBuilder.showInModal({
+                    title: 'Append',
+                    html: 'Please scroll to the ' + (appendRows ? 'bottom' : 'right') + ' of the heat map to see the appended data.',
+                    focus: document.activeElement
+                  });
                   heatMap.revalidate();
                 });
           } else { // no need to prompt
@@ -213,6 +219,12 @@ morpheus.OpenDatasetTool.prototype = {
                 .getProject()
                 .getFullDataset()
                 .getColumnCount()));
+            heatMap.addTrack('Source', !appendRows);
+            morpheus.FormBuilder.showInModal({
+              title: 'Append',
+              html: 'Please scroll to the ' + (appendRows ? 'bottom' : 'right') + ' of the heat map to see the appended data.',
+              focus: document.activeElement
+            });
             heatMap.revalidate();
           }
 
@@ -240,6 +252,11 @@ morpheus.OpenDatasetTool.prototype = {
                   newRowAnnotationName: appendOptions.new_dataset_row_annotation_name,
                   columnAnnotationName: appendOptions.current_dataset_column_annotation_name,
                   newColumnAnnotationName: appendOptions.new_dataset_column_annotation_name
+                });
+                morpheus.FormBuilder.showInModal({
+                  title: 'Overlay',
+                  html: 'Select View > Options to change how the overlayed data is displayed.',
+                  focus: document.activeElement
                 });
               });
         } else if (action === 'open') { // new tab

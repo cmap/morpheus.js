@@ -712,7 +712,8 @@ morpheus.ChartTool.prototype = {
           color: ['#ffeda0', '#feb24c', '#f03b20']
         },
         outOfRange: {
-          color: ['#d9d9d9']
+          color: ['rgb(217,217,217)'],
+          opacity: 0.5
         }
       };
     }

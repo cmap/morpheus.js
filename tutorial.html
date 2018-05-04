@@ -61,12 +61,11 @@
 
 
       <a data-toggle="collapse"
-         style="font-size: 1.2em; display: block; font-weight: 800;">Median
-        Absolute Deviation (MAD)</a>
+         style="font-size: 1.2em; display: block; font-weight: 800;">Variance</a>
       <p class="collapse">
-        Click Tools > Create Calculated Annotation. <br/> Enter "MAD" for
-        the "Annotation name". <br/> Enter "MAD()" for "Formula" and
-        click "OK". <br/> A new row annotation named "MAD" will appear to
+        Click Tools > Create Calculated Annotation. <br/> Enter "variance" for
+        the "Annotation name". <br/> Enter "VARIANCE()" for "Formula" and
+        click "OK". <br/> A new row annotation named "variance" will appear to
         the right of the heat map.
       </p>
 
@@ -74,9 +73,9 @@
          style="font-size: 1.2em; display: block; font-weight: 800;">Filter
         Rows</a>
       <p class="collapse">
-        Show only the top 500 most variable genes by the median absolute
-        deviation <br/> Click Tools > Filter to open the filter dialog. <br/>Click the "Add"
-        button and set the field name to "MAD". <br/>Click
+        Show only the top 500 most variable genes by variance <br/> Click Tools > Filter to open the filter dialog.
+        <br/>Click the "Add"
+        button and set the field name to "variance". <br/>Click
         "Switch to top N filter" and enter "500" for "N".
       </p>
 
@@ -115,7 +114,7 @@
          style="font-size: 1.2em; display: block; font-weight: 800;">Remove
         Row Filter</a>
       <p class="collapse">
-        Select Tools > Filter and delete the median absolute deviation filter to show all
+        Select Tools > Filter and delete the variance filter to show all
         rows.
       </p>
 
@@ -131,7 +130,7 @@
         Rows</a>
       <p class="collapse">
         Click the MAD row annotation header in the heat map once to sort
-        the heat map in ascending order by the median absolute deviation.
+        the heat map in ascending order by the variance.
         Click it again to sort the heat map in descending order. Note that
         you can shift-click to sort multiple columns simultaneously.
       </p>
