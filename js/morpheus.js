@@ -9938,8 +9938,10 @@ morpheus.MatchesOnTopSortKey = function (project, modelIndices, name, columns) {
   morpheus.AbstractSortKey.call(this, name, columns);
   var highlightedModelIndices = {};
   var p = project;
+  var viewIndices = [];
   for (var i = 0, j = modelIndices.length, length = modelIndices.length; i < length; i++, j--) {
     highlightedModelIndices[modelIndices[i]] = -1; // tie
+    viewIndices.push(i);
   }
   this.comparator = function (i1, i2) {
     var a = highlightedModelIndices[i1];
@@ -9953,6 +9955,7 @@ morpheus.MatchesOnTopSortKey = function (project, modelIndices, name, columns) {
     return (a === b ? 0 : (a < b ? -1 : 1));
   };
   this.modelIndices = modelIndices;
+  this.indices = viewIndices;
 };
 morpheus.MatchesOnTopSortKey.prototype = {
   toString: function () {
