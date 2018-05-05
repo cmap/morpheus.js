@@ -15231,7 +15231,7 @@ morpheus.MarkerSelection.prototype = {
     var _this = this;
     var updateAB = function (fieldNames) {
       var ids = [];
-      if (fieldNames != null) {
+      if (fieldNames != null && fieldNames.length > 0) {
         var vectors = morpheus.MetadataUtil.getVectors(project
           .getFullDataset().getColumnMetadata(), fieldNames);
         var idToIndices = morpheus.VectorUtil
@@ -15285,24 +15285,30 @@ morpheus.MarkerSelection.prototype = {
       {
         name: 'field',
         options: fields,
-        type: 'select',
-        multiple: true
+        type: 'bootstrap-select',
+        search: true,
+        multiple: true,
+        selectAll: true
       },
       {
         name: 'class_a',
         title: 'Class A',
         options: [],
         value: '',
-        type: 'checkbox-list',
-        multiple: true
+        type: 'bootstrap-select',
+        search: true,
+        multiple: true,
+        selectAll: true
       },
       {
         name: 'class_b',
         title: 'Class B',
         options: [],
         value: '',
-        type: 'checkbox-list',
-        multiple: true
+        type: 'bootstrap-select',
+        search: true,
+        multiple: true,
+        selectAll: true
       },
       {
         name: 'number_of_markers',
@@ -37770,6 +37776,7 @@ morpheus.VectorTrack.prototype = {
     var DISPLAY_TEXT_AND_COLOR = 'Encode Text Using Color';
     var DISPLAY_TEXT_AND_FONT = 'Encode Text Using Font';
     var DISPLAY_STRUCTURE = 'Show Chemical Structure';
+    var USE_ANOTHER_ANNOTATION_TEXT_COLOR = 'Use another annotation to determine text color';
     var DISPLAY_CONTINUOUS = 'Continuous';
     var positions = this.positions;
     var heatmap = this.heatmap;
@@ -37888,9 +37895,19 @@ morpheus.VectorTrack.prototype = {
           checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
         });
         sectionToItems.Display.push({
+          name: USE_ANOTHER_ANNOTATION_TEXT_COLOR,
+          checked: this.settings.colorByField != null
+        });
+        sectionToItems.Display.push({
+          separator: true
+        });
+
+        sectionToItems.Display.push({
           name: DISPLAY_TEXT_AND_FONT,
           checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT)
         });
+
+
       }
       sectionToItems.Display.push({
         separator: true
@@ -37973,13 +37990,15 @@ morpheus.VectorTrack.prototype = {
         });
       }
       if (this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
-        || this
-          .isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
         || (this.isRenderAs(morpheus.VectorTrack.RENDER.BAR) && isArray)) {
         sectionToItems.Display.push({
           name: 'Edit Colors...'
         });
-
+      }
+      if (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR) && this.settings.colorByField != null) {
+        sectionToItems.Display.push({
+          name: 'Edit Text Colors...'
+        });
       }
       if (this.isRenderAs(morpheus.VectorTrack.RENDER.SHAPE)) {
         sectionToItems.Display.push({
@@ -38504,7 +38523,7 @@ morpheus.VectorTrack.prototype = {
               close: 'Close',
               focus: heatmap.getFocusEl()
             });
-          } else if (item === 'Edit Colors...') {
+          } else if (item === 'Edit Text Colors...' || item === 'Edit Colors...') {
             var colorModel = isColumns ? _this.project
               .getColumnColorModel() : _this.project
               .getRowColorModel();
@@ -38513,7 +38532,7 @@ morpheus.VectorTrack.prototype = {
               heatMap: _this.heatmap,
               colorModel: colorModel
             });
-            colorSchemeChooser.setAnnotationName(_this.getName())
+            colorSchemeChooser.setAnnotationName(item === 'Edit Text Colors...' ? _this.settings.colorByField : _this.getName())
             colorSchemeChooser.on('change', function () {
               _this.setInvalid(true);
               _this.repaint();

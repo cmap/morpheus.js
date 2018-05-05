@@ -46,7 +46,7 @@ morpheus.MarkerSelection.prototype = {
     var _this = this;
     var updateAB = function (fieldNames) {
       var ids = [];
-      if (fieldNames != null) {
+      if (fieldNames != null && fieldNames.length > 0) {
         var vectors = morpheus.MetadataUtil.getVectors(project
           .getFullDataset().getColumnMetadata(), fieldNames);
         var idToIndices = morpheus.VectorUtil
@@ -100,24 +100,30 @@ morpheus.MarkerSelection.prototype = {
       {
         name: 'field',
         options: fields,
-        type: 'select',
-        multiple: true
+        type: 'bootstrap-select',
+        search: true,
+        multiple: true,
+        selectAll: true
       },
       {
         name: 'class_a',
         title: 'Class A',
         options: [],
         value: '',
-        type: 'checkbox-list',
-        multiple: true
+        type: 'bootstrap-select',
+        search: true,
+        multiple: true,
+        selectAll: true
       },
       {
         name: 'class_b',
         title: 'Class B',
         options: [],
         value: '',
-        type: 'checkbox-list',
-        multiple: true
+        type: 'bootstrap-select',
+        search: true,
+        multiple: true,
+        selectAll: true
       },
       {
         name: 'number_of_markers',
