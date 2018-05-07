@@ -37779,7 +37779,7 @@ morpheus.VectorTrack.prototype = {
     var DISPLAY_TEXT_AND_COLOR = 'Encode Text Using Color';
     var DISPLAY_TEXT_AND_FONT = 'Encode Text Using Font';
     var DISPLAY_STRUCTURE = 'Show Chemical Structure';
-    var USE_ANOTHER_ANNOTATION_TEXT_COLOR = 'Use another annotation to determine text color';
+    var USE_ANOTHER_ANNOTATION_TEXT_COLOR = 'Text Color Annotation';
     var DISPLAY_CONTINUOUS = 'Continuous';
     var positions = this.positions;
     var heatmap = this.heatmap;
@@ -37806,8 +37806,7 @@ morpheus.VectorTrack.prototype = {
     sectionToItems.Selection.push({
       name: MOVE_TO_TOP
     });
-    if (this.heatmap.options.menu.Edit && this.heatmap.options.menu.Edit.indexOf('Annotate' +
-      ' Selected Rows') !== -1) {
+    if (this.heatmap.options.menu.Edit && this.heatmap.options.menu.Edit.indexOf('Annotate Selected Rows') !== -1) {
       sectionToItems.Selection.push({
         name: ANNOTATE_SELECTION
       });
@@ -37892,26 +37891,22 @@ morpheus.VectorTrack.prototype = {
         name: DISPLAY_TEXT,
         checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)
       });
-      if (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)) {
-        sectionToItems.Display.push({
-          name: DISPLAY_TEXT_AND_COLOR,
-          checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
-        });
+      sectionToItems.Display.push({
+        name: DISPLAY_TEXT_AND_COLOR,
+        checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
+      });
+      if (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)) {
         sectionToItems.Display.push({
           name: USE_ANOTHER_ANNOTATION_TEXT_COLOR,
           checked: this.settings.colorByField != null
         });
-        sectionToItems.Display.push({
-          separator: true
-        });
-
-        sectionToItems.Display.push({
-          name: DISPLAY_TEXT_AND_FONT,
-          checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT)
-        });
-
-
       }
+
+      sectionToItems.Display.push({
+        name: DISPLAY_TEXT_AND_FONT,
+        checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT)
+      });
+
       sectionToItems.Display.push({
         separator: true
       });
@@ -37956,12 +37951,7 @@ morpheus.VectorTrack.prototype = {
         checked: this.settings.highlightMatchingValues
       });
     }
-    if (dataType !== 'url') {
-      // sectionToItems.Display.push({
-      //   name: 'Squished',
-      //   checked: this.settings.squished
-      // });
-    }
+
     if (this.isRenderAs(morpheus.VectorTrack.RENDER.BAR)
       || this.isRenderAs(morpheus.VectorTrack.RENDER.BOX_PLOT)) {
       sectionToItems.Display.push({
@@ -38227,6 +38217,35 @@ morpheus.VectorTrack.prototype = {
                 },
                 content: list.$el
               });
+          } else if (item === USE_ANOTHER_ANNOTATION_TEXT_COLOR) {
+            var formBuilder = new morpheus.FormBuilder();
+            var fields = morpheus.MetadataUtil.getMetadataNames(isColumns ? _this.project.getFullDataset().getColumnMetadata() : _this.project.getFullDataset().getRowMetadata());
+            fields.splice(fields.indexOf(_this.name), 1);
+            fields = ['(None)'].concat(fields)
+            formBuilder.append({
+              name: 'annotation',
+              type: 'bootstrap-select',
+              help: 'Use another annotation to determine text color',
+              search: true,
+              options: fields,
+              value: _this.settings.colorByField == null ? '(None)' : _this.settings.colorByField
+            });
+            formBuilder.find('annotation').on(
+              'change',
+              function () {
+                _this.settings.colorByField = $(this).val();
+                if (_this.settings.colorByField === '(None)') {
+                  _this.settings.colorByField = null;
+                }
+                _this.setInvalid(true);
+                _this.repaint();
+              });
+            morpheus.FormBuilder.showInModal({
+              title: 'Text Color Annotation',
+              close: 'Close',
+              html: formBuilder.$form,
+              focus: heatmap.getFocusEl()
+            });
           } else if (item === 'Edit Bar Color...') {
             var formBuilder = new morpheus.FormBuilder();
             formBuilder.append({
@@ -38632,13 +38651,6 @@ morpheus.VectorTrack.prototype = {
               if (item === morpheus.VectorTrack.RENDER.TEXT) {
                 remove = [morpheus.VectorTrack.RENDER.TEXT_AND_FONT, morpheus.VectorTrack.RENDER.TEXT_AND_COLOR];
               }
-            } else {
-              if (item === morpheus.VectorTrack.RENDER.COLOR) {
-                remove = [morpheus.VectorTrack.RENDER.TEXT_AND_COLOR];
-              } else if (item === morpheus.VectorTrack.RENDER.TEXT_AND_COLOR) {
-                remove = [morpheus.VectorTrack.RENDER.COLOR];
-              }
-              _this.settings.display.push(item);
             }
             if (remove) {
               remove.forEach(function (key) {
