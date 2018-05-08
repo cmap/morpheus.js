@@ -117,7 +117,7 @@ morpheus.SampleDatasets = function (options) {
 
     for (var j = 0; j < depMapDatasets.length; j++) {
       var info = depMapDatasets[j];
-      if (j % 2 === 0) {
+      if (j % 3 === 0) {
         if (j > 0) {
           exampleHtml.push('</div>');
         }

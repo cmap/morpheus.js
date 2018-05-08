@@ -1781,6 +1781,8 @@ morpheus.VectorTrack.prototype = {
               if (item === morpheus.VectorTrack.RENDER.TEXT) {
                 remove = [morpheus.VectorTrack.RENDER.TEXT_AND_FONT, morpheus.VectorTrack.RENDER.TEXT_AND_COLOR];
               }
+            } else {
+              _this.settings.display.push(item);
             }
             if (remove) {
               remove.forEach(function (key) {
