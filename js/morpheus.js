@@ -268,12 +268,28 @@ morpheus.Util.getFileName = function (fileOrUrl) {
 morpheus.Util.prefixWithZero = function (value) {
   return value < 10 ? '0' + value : value;
 };
+
+morpheus.Util.detectSeparator = function (line) {
+  var separators = ['\t', ',', ' '];
+  var separator = separators[0];
+  var rtrim = /\s+$/;
+  var headerLine = line.replace(rtrim, '');
+  for (var i = 0; i < separators.length; i++) {
+    var sep = separators[i];
+    var tokens = headerLine.split(new RegExp(sep));
+    if (tokens.length > 1) {
+      separator = sep;
+      break;
+    }
+  }
+  return separator;
+};
 morpheus.Util.getExtension = function (name) {
   name = '' + name;
   var dotIndex = name.lastIndexOf('.');
   if (dotIndex > 0) {
     var suffix = name.substring(dotIndex + 1).toLowerCase();
-    if (suffix === 'txt' || suffix === 'gz' || suffix === 'tsv') { // see if file is in
+    if (suffix === 'txt' || suffix === 'gz' || suffix === 'tsv' || suffix === 'csv') { // see if file is in
       // the form
       // name.gct.txt
       var newPath = name.substring(0, dotIndex);
@@ -3762,8 +3778,9 @@ morpheus.MafFileReader.prototype = {
   },
   _getGeneLevelDataset: function (datasetName, reader) {
     var _this = this;
-    var tab = /\t/;
-    var header = reader.readLine().split(tab);
+    var headerLine = reader.readLine();
+    var separator = morpheus.Util.detectSeparator(headerLine);
+    var header = headerLine.split(separator);
     var headerToIndex = {};
     for (var i = 0, length = header.length; i < length; i++) {
       headerToIndex[header[i].toLowerCase()] = i;
@@ -3778,7 +3795,7 @@ morpheus.MafFileReader.prototype = {
     //   'Tumor_Sample_UUID', 'encoding'];
     //
     var sampleField = morpheus.MafFileReader.getField([
-        'Tumor_Sample_Barcode', 'tumor_name', 'Tumor_Sample_UUID'],
+        'Tumor_Sample_Barcode', 'tumor_name', 'Tumor_Sample_UUID', 'cell_line_name'],
       headerToIndex);
     var encodingField = morpheus.MafFileReader.getField([
         'encoding'],
@@ -3837,7 +3854,7 @@ morpheus.MafFileReader.prototype = {
 
     var hasMutationInfo = chromosomeColumn !== undefined && startPositionColumn !== undefined && refAlleleColumn !== undefined && tumorAllelColumn !== undefined;
     while ((s = reader.readLine()) !== null) {
-      var tokens = s.split(tab);
+      var tokens = s.split(separator);
       var sample = String(tokens[sampleIdColumnIndex]);
       var columnIndex = sampleIdToIndex.get(sample);
       if (columnIndex === undefined) {
@@ -4818,18 +4835,8 @@ morpheus.TxtReader.prototype = {
     if (dataRowStart == null) {
       dataRowStart = 1;
     }
-    var separator = /\t/;
-    var separators = ['\t', ',', ' '];
-    var headerLine = reader.readLine().replace(rtrim, '');
-    for (var i = 0; i < separators.length; i++) {
-      var sep = separators[i];
-      var tokens = headerLine.split(new RegExp(sep));
-      if (tokens.length > 1) {
-        separator = sep;
-        break;
-      }
-    }
-
+    var headerLine = reader.readLine();
+    var separator = morpheus.Util.detectSeparator(headerLine);
 
     var testLine = null;
     var rtrim = /\s+$/;
@@ -12499,7 +12506,7 @@ morpheus.SampleDatasets = function (options) {
     });
     depMapDatasets.push({
       name: 'MUTATION',
-      file: 'portal-mutation-2018-05-07.csv',
+      file: 'portal-mutation-2018-05-07.maf.csv',
       help: 'Merged mutation calls (coding region, germline filtered)'
     });
     depMapDatasets.push({

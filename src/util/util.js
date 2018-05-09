@@ -266,12 +266,28 @@ morpheus.Util.getFileName = function (fileOrUrl) {
 morpheus.Util.prefixWithZero = function (value) {
   return value < 10 ? '0' + value : value;
 };
+
+morpheus.Util.detectSeparator = function (line) {
+  var separators = ['\t', ',', ' '];
+  var separator = separators[0];
+  var rtrim = /\s+$/;
+  var headerLine = line.replace(rtrim, '');
+  for (var i = 0; i < separators.length; i++) {
+    var sep = separators[i];
+    var tokens = headerLine.split(new RegExp(sep));
+    if (tokens.length > 1) {
+      separator = sep;
+      break;
+    }
+  }
+  return separator;
+};
 morpheus.Util.getExtension = function (name) {
   name = '' + name;
   var dotIndex = name.lastIndexOf('.');
   if (dotIndex > 0) {
     var suffix = name.substring(dotIndex + 1).toLowerCase();
-    if (suffix === 'txt' || suffix === 'gz' || suffix === 'tsv') { // see if file is in
+    if (suffix === 'txt' || suffix === 'gz' || suffix === 'tsv' || suffix === 'csv') { // see if file is in
       // the form
       // name.gct.txt
       var newPath = name.substring(0, dotIndex);

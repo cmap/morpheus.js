@@ -107,8 +107,9 @@ morpheus.MafFileReader.prototype = {
   },
   _getGeneLevelDataset: function (datasetName, reader) {
     var _this = this;
-    var tab = /\t/;
-    var header = reader.readLine().split(tab);
+    var headerLine = reader.readLine();
+    var separator = morpheus.Util.detectSeparator(headerLine);
+    var header = headerLine.split(separator);
     var headerToIndex = {};
     for (var i = 0, length = header.length; i < length; i++) {
       headerToIndex[header[i].toLowerCase()] = i;
@@ -123,7 +124,7 @@ morpheus.MafFileReader.prototype = {
     //   'Tumor_Sample_UUID', 'encoding'];
     //
     var sampleField = morpheus.MafFileReader.getField([
-        'Tumor_Sample_Barcode', 'tumor_name', 'Tumor_Sample_UUID'],
+        'Tumor_Sample_Barcode', 'tumor_name', 'Tumor_Sample_UUID', 'cell_line_name'],
       headerToIndex);
     var encodingField = morpheus.MafFileReader.getField([
         'encoding'],
@@ -182,7 +183,7 @@ morpheus.MafFileReader.prototype = {
 
     var hasMutationInfo = chromosomeColumn !== undefined && startPositionColumn !== undefined && refAlleleColumn !== undefined && tumorAllelColumn !== undefined;
     while ((s = reader.readLine()) !== null) {
-      var tokens = s.split(tab);
+      var tokens = s.split(separator);
       var sample = String(tokens[sampleIdColumnIndex]);
       var columnIndex = sampleIdToIndex.get(sample);
       if (columnIndex === undefined) {

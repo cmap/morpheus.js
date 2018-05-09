@@ -39,18 +39,8 @@ morpheus.TxtReader.prototype = {
     if (dataRowStart == null) {
       dataRowStart = 1;
     }
-    var separator = /\t/;
-    var separators = ['\t', ',', ' '];
-    var headerLine = reader.readLine().replace(rtrim, '');
-    for (var i = 0; i < separators.length; i++) {
-      var sep = separators[i];
-      var tokens = headerLine.split(new RegExp(sep));
-      if (tokens.length > 1) {
-        separator = sep;
-        break;
-      }
-    }
-
+    var headerLine = reader.readLine();
+    var separator = morpheus.Util.detectSeparator(headerLine);
 
     var testLine = null;
     var rtrim = /\s+$/;

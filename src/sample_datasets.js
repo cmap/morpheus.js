@@ -90,7 +90,7 @@ morpheus.SampleDatasets = function (options) {
     });
     depMapDatasets.push({
       name: 'MUTATION',
-      file: 'portal-mutation-2018-05-07.csv',
+      file: 'portal-mutation-2018-05-07.maf.csv',
       help: 'Merged mutation calls (coding region, germline filtered)'
     });
     depMapDatasets.push({
