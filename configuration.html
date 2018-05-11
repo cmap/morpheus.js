@@ -59,21 +59,7 @@
         headers must be set if any of your resources are hosted on a
         different domain.
 
-        <br/> <a href="#" name="open">Example</a><br/>
-        <code>
-          {
-          columnAnnotations : [ { file :
-          "https://software.broadinstitute.org/morpheus/preloaded-datasets/Achilles_v2.4_SampleInfo_small.txt",
-          datasetField : "id", fileField : "id" } ],
-          <br/> columns : [ { field : "id", display : ["text"] }, { field : "primary_site",
-          display :["color"], highlightMatchingValues:true }
-          ],
-          <br/> dataset :
-          "https://software.broadinstitute.org/morpheus/preloaded-datasets/Achilles_QC_v2.4.3.rnai.Gs.gct"
-          }
-        </code>
-
-        <br/> <br/>
+        <br/><br/>
         2. Include morpheus-latest.min.css, morpheus-external-latest.min.js, morpheus-latest.min.js in your HTML.
         Construct a new <code>morpheus.HeatMap</code> object with the <code>el</code> parameter, the element in which to
         render
