@@ -37,7 +37,7 @@ morpheus.GctWriter.prototype = {
     }
     var rowMetadata = morpheus.GctWriter.idFirst(dataset.getRowMetadata());
     var columnMetadata = morpheus.GctWriter.idFirst(dataset
-    .getColumnMetadata());
+      .getColumnMetadata());
     this.writeHeader(rowMetadata, columnMetadata, pw);
     this.writeData(dataset, rowMetadata, pw);
     return pw.join('');
@@ -85,25 +85,25 @@ morpheus.GctWriter.prototype = {
       }
       pw.push(name);
     }
-    var toString = morpheus.VectorTrack.vectorToString(columnMetadata.get(0));
+    var columnIdToString = morpheus.VectorTrack.vectorToString(columnMetadata.get(0));
     for (var j = 0; j < ncols; j++) {
       pw.push('\t');
-      pw.push(toString(columnMetadata.get(0).getValue(j)));
+      pw.push(columnIdToString(columnMetadata.get(0).getValue(j)));
     }
     pw.push('\n');
     for (var columnMetadataIndex = 1, metadataSize = columnMetadata
-    .getMetadataCount(); columnMetadataIndex < metadataSize; columnMetadataIndex++) {
-      pw.push(columnMetadata.get(columnMetadataIndex).getName());
+      .getMetadataCount(); columnMetadataIndex < metadataSize; columnMetadataIndex++) {
+      var vector = columnMetadata.get(columnMetadataIndex);
+      pw.push(vector.getName());
       for (var i = 1; i < rowMetadataCount; i++) {
         pw.push('\t');
         pw.push('na');
       }
       for (var j = 0; j < ncols; j++) {
         pw.push('\t');
-        var vector = columnMetadata.get(columnMetadataIndex);
         var value = vector.getValue(j);
         if (value != null) {
-          toString = morpheus.VectorTrack.vectorToString(columnMetadata.get(0));
+          var toString = morpheus.VectorTrack.vectorToString(vector);
           pw.push(toString(value));
         }
       }
