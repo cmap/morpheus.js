@@ -284,7 +284,7 @@ morpheus.SampleDatasets.getDepMapDataset = function (files) {
       var id = idVector.getValue(j);
       var index = id.indexOf('_');
       if (index !== -1) {
-        idVector.setValue(j, id.substring(0, index));
+        // idVector.setValue(j, id.substring(0, index));
         siteVector.setValue(j, id.substring(index + 1));
       }
     }
