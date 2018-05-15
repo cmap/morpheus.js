@@ -19,7 +19,7 @@ morpheus.LandingPage = function (pageOptions) {
   html.push('<div class="clearfix"></div>');
   html.push('</div>'); // col
   html.push('<div data-name="desc" class="col-xs-12 col-md-3"><p><img' +
-    ' src="https://software.broadinstitute.org/morpheus/css/images/morpheus_landing_img.png" style="width:100%;"></p></div>');
+    ' src="https://software.broadinstitute.org/morpheus/css/morpheus_landing_img.png" style="width:100%;"></p></div>');
   html.push('</div>'); // row
 
   html.push('<div class="row"><div class="col-xs-12 morpheus-footer"></div></div>');

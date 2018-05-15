@@ -46,12 +46,17 @@ module.exports = function (grunt) {
           'css/animate.css', 'css/morpheus.css'],
         dest: 'css/morpheus.all.css'
       },
-      extJsAll: {
-        nonull: true,
+      morpheus: {
+        options: {
+          banner: '(function(global){\n\'use strict\';\n',
+          footer: '\n})(typeof window !== \'undefined\' ? window : this);\n'
+        },
+        dest: 'js/morpheus.js',
         src: [
-          'js/morpheus-external.js',
-          'js/echarts.min.js', 'js/echarts-gl.min.js', 'js/papaparse.min.js'],
-        dest: 'js/morpheus-external-latest.min.js'
+          'src/util/util.js', 'src/util/*.js',
+          'src/io/*.js', 'src/matrix/vector_adapter.js',
+          'src/matrix/*.js', 'src/*.js',
+          'src/tools/*.js', 'src/ui/*.js', 'src/**/*.js']
       },
       extJs: {
         nonull: true,
@@ -70,17 +75,35 @@ module.exports = function (grunt) {
           'js/js.cookie.js', 'js/jstat.min.js', 'js/blob-stream.js',
           'js/canvas2pdf.js', 'js/pdfkit.js', 'js/promise.polyfill.min.js', 'js/fetch.js']
       },
-      morpheus: {
-        options: {
-          banner: '(function(global){\n\'use strict\';\n',
-          footer: '\n})(typeof window !== \'undefined\' ? window : this);\n'
-        },
-        dest: 'js/morpheus.js',
+      extJsR: {
+        nonull: true,
+        dest: 'js/morpheus-external-r.js',
         src: [
-          'src/util/util.js', 'src/util/*.js',
-          'src/io/*.js', 'src/matrix/vector_adapter.js',
-          'src/matrix/*.js', 'src/*.js',
-          'src/tools/*.js', 'src/ui/*.js', 'src/**/*.js']
+          'js/d3.min.js', 'js/underscore-min.js',
+          'js/newick.js', 'js/hammer.min.js',
+          'js/jquery.mousewheel.min.js',
+          'js/bootstrap-select.min.js',
+          'js/xlsx.full.min.js', 'js/canvas2svg.js',
+          'js/canvg.js', 'js/rgbcolor.js',
+          'js/jquery-ui.min.js', 'js/parser.js',
+          'js/FileSaver.min.js', 'js/colorbrewer.js',
+          'js/jquery.event.drag-2.2.js', 'js/slick.min.js', 'js/canvas-toBlob.js',
+          'js/js.cookie.js', 'js/jstat.min.js', 'js/blob-stream.js',
+          'js/canvas2pdf.js', 'js/pdfkit.js', 'js/promise.polyfill.min.js', 'js/fetch.js']
+      },
+      extJsAll: {
+        nonull: true,
+        src: [
+          'js/morpheus-external.js',
+          'js/echarts.min.js', 'js/echarts-gl.min.js', 'js/papaparse.min.js'],
+        dest: 'js/morpheus-external-latest.min.js'
+      },
+      extJsAllR: {
+        nonull: true,
+        src: [
+          'js/morpheus-external-r.js',
+          'js/echarts.min.js', 'js/echarts-gl.min.js', 'js/papaparse.min.js'],
+        dest: 'js/morpheus-external-latest-r.min.js'
       }
     },
     watch: {
