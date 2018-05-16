@@ -12251,7 +12251,7 @@ morpheus.LandingPage = function (pageOptions) {
   html.push('<div class="clearfix"></div>');
   html.push('</div>'); // col
   html.push('<div data-name="desc" class="col-xs-12 col-md-3"><p><img' +
-    ' src="https://software.broadinstitute.org/morpheus/css/images/morpheus_landing_img.png" style="width:100%;"></p></div>');
+    ' src="https://software.broadinstitute.org/morpheus/css/morpheus_landing_img.png" style="width:100%;"></p></div>');
   html.push('</div>'); // row
 
   html.push('<div class="row"><div class="col-xs-12 morpheus-footer"></div></div>');
@@ -15265,10 +15265,10 @@ morpheus.MarkerSelection.prototype = {
       updateAB($(this).val());
     });
 
-    if ($field[0].options.length > 0) {
-      $field.val($field[0].options[0].value);
-    }
-    updateAB($field.val());
+    // if ($field[0].options.length > 0) {
+    //   $field.val($field[0].options[0].value);
+    // }
+    // updateAB($field.val());
     var $metric = form.$form.find('[name=metric]');
     $metric.on('change', function (e) {
       var isFishy = $(this).val() === 'Fisher Exact Test';
@@ -15309,7 +15309,6 @@ morpheus.MarkerSelection.prototype = {
         name: 'class_a',
         title: 'Class A',
         options: [],
-        value: '',
         type: 'bootstrap-select',
         search: true,
         multiple: true,
@@ -15319,7 +15318,6 @@ morpheus.MarkerSelection.prototype = {
         name: 'class_b',
         title: 'Class B',
         options: [],
-        value: '',
         type: 'bootstrap-select',
         search: true,
         multiple: true,

@@ -65,10 +65,10 @@ morpheus.MarkerSelection.prototype = {
       updateAB($(this).val());
     });
 
-    if ($field[0].options.length > 0) {
-      $field.val($field[0].options[0].value);
-    }
-    updateAB($field.val());
+    // if ($field[0].options.length > 0) {
+    //   $field.val($field[0].options[0].value);
+    // }
+    // updateAB($field.val());
     var $metric = form.$form.find('[name=metric]');
     $metric.on('change', function (e) {
       var isFishy = $(this).val() === 'Fisher Exact Test';
@@ -109,7 +109,6 @@ morpheus.MarkerSelection.prototype = {
         name: 'class_a',
         title: 'Class A',
         options: [],
-        value: '',
         type: 'bootstrap-select',
         search: true,
         multiple: true,
@@ -119,7 +118,6 @@ morpheus.MarkerSelection.prototype = {
         name: 'class_b',
         title: 'Class B',
         options: [],
-        value: '',
         type: 'bootstrap-select',
         search: true,
         multiple: true,
