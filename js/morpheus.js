@@ -3560,20 +3560,24 @@ morpheus.Hdf5Reader.prototype = {
     var file = new hdf5.File(fileOrUrl.path, Access.ACC_RDONLY);
 
     var dim = file.getDatasetDimensions(this.options.dataset);
-
+    var matrixType = '1d';
+    if (!this.options.columnMajorOrder && dim[0] * dim[1] > 20000000) {
+      matrixType = '1d_file';
+    }
     var dataset = new morpheus.Dataset({
       name: name,
       rows: this.options.columnMajorOrder ? dim[1] : dim[0],
       file: file,
       columns: this.options.columnMajorOrder ? dim[0] : dim[1],
       dataType: 'Float32',
-      type: '1d',
-      array: h5lt.readDataset(file.id, this.options.dataset),
+      type: matrixType,
+      array: matrixType === '1d_file' ? this.options.dataset : h5lt.readDataset(file.id, this.options.dataset),
       columnMajorOrder: this.options.columnMajorOrder
     });
-    //
+
+
     var group = file.openGroup(this.options.rowMeta);
-    var names = group.getMemberNames();
+    var names = group.getMemberNamesByCreationOrder();
     names.forEach(function (name) {
       try {
         var val = h5lt.readDataset(group.id, name);
@@ -3584,7 +3588,7 @@ morpheus.Hdf5Reader.prototype = {
     });
     group.close();
     group = file.openGroup(this.options.colMeta);
-    names = group.getMemberNames();
+    names = group.getMemberNamesByCreationOrder();
     names.forEach(function (name) {
       try {
         var val = h5lt.readDataset(group.id, name);
@@ -3594,7 +3598,9 @@ morpheus.Hdf5Reader.prototype = {
       }
     });
     group.close();
-    file.close();
+    if (matrixType !== '1d_file') {
+      file.close();
+    }
     callback(null, dataset);
   }
 
@@ -7209,7 +7215,8 @@ morpheus.RowMajorMatrix1DFileBacked = function (options) {
 
   var file = options.file;
   var h5lt = require('hdf5').h5lt;
-  var type = this.options.file.getDataType('matrix');
+  var datasetPath = this.options.array;
+  var type = this.options.file.getDataType(datasetPath);
   var H5Type = require('hdf5/lib/globals.js').H5Type;
 
   if (type === H5Type.H5T_IEEE_F64LE) {
@@ -7227,18 +7234,24 @@ morpheus.RowMajorMatrix1DFileBacked = function (options) {
   } else {
     throw new Error('Unsupported data type');
   }
-  this.cachedBuffer = h5lt.readDatasetAsBuffer(this.options.file.id, 'matrix', {
+  var ncols = this.options.columns;
+  var cachedRowIndex = 0;
+  this.cachedBuffer = h5lt.readDatasetAsBuffer(this.options.file.id, datasetPath, {
     start: [0, 0],
     stride: [1, 1],
-    count: [1, this.options.columns]
+    count: [1, ncols]
   });
-  var cachedRowIndex = 0;
-  var ncols = this.options.columns;
+
   var _this = this;
+
   this.getValue = function (i, j) {
     if (cachedRowIndex !== i) {
-      // var array = this.h5lt.readDataset(this.options.file.id, 'matrix', {start: [1, 2], stride: [1, 1], count: [3, 4]});
-      _this.cachedBuffer = h5lt.readDatasetAsBuffer(file.id, 'matrix', {
+      // var array = this.h5lt.readDataset(this.options.file.id, datasetPath, {
+      //   start: [i, 0],
+      //   stride: [1, 1],
+      //   count: [1, ncols]
+      // });
+      _this.cachedBuffer = h5lt.readDatasetAsBuffer(file.id, datasetPath, {
         start: [i, 0],
         stride: [1, 1],
         count: [1, ncols]
@@ -7399,14 +7412,15 @@ morpheus.Dataset.createMatrix = function (options) {
     if (options.defaultValue != null) {
       return new morpheus.SparseMatrix(options);
     } else {
-      if (options.type === '1d') {
+      if (options.type === '1d_file') {
+        return new morpheus.RowMajorMatrix1DFileBacked(options);
+      }
+      else if (options.type === '1d') {
         return options.columnMajorOrder ? new morpheus.ColumnMajorMatrix1D(options) : new morpheus.RowMajorMatrix1D(options);
       } else {
         return new morpheus.RowMajorMatrix(options);
       }
     }
-  } else if (options.type === '1d_file') {
-    return new morpheus.RowMajorMatrix1DFileBacked(options);
   }
 
   var array = [];

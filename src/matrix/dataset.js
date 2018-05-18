@@ -185,7 +185,8 @@ morpheus.RowMajorMatrix1DFileBacked = function (options) {
 
   var file = options.file;
   var h5lt = require('hdf5').h5lt;
-  var type = this.options.file.getDataType('matrix');
+  var datasetPath = this.options.array;
+  var type = this.options.file.getDataType(datasetPath);
   var H5Type = require('hdf5/lib/globals.js').H5Type;
 
   if (type === H5Type.H5T_IEEE_F64LE) {
@@ -203,18 +204,24 @@ morpheus.RowMajorMatrix1DFileBacked = function (options) {
   } else {
     throw new Error('Unsupported data type');
   }
-  this.cachedBuffer = h5lt.readDatasetAsBuffer(this.options.file.id, 'matrix', {
+  var ncols = this.options.columns;
+  var cachedRowIndex = 0;
+  this.cachedBuffer = h5lt.readDatasetAsBuffer(this.options.file.id, datasetPath, {
     start: [0, 0],
     stride: [1, 1],
-    count: [1, this.options.columns]
+    count: [1, ncols]
   });
-  var cachedRowIndex = 0;
-  var ncols = this.options.columns;
+
   var _this = this;
+
   this.getValue = function (i, j) {
     if (cachedRowIndex !== i) {
-      // var array = this.h5lt.readDataset(this.options.file.id, 'matrix', {start: [1, 2], stride: [1, 1], count: [3, 4]});
-      _this.cachedBuffer = h5lt.readDatasetAsBuffer(file.id, 'matrix', {
+      // var array = this.h5lt.readDataset(this.options.file.id, datasetPath, {
+      //   start: [i, 0],
+      //   stride: [1, 1],
+      //   count: [1, ncols]
+      // });
+      _this.cachedBuffer = h5lt.readDatasetAsBuffer(file.id, datasetPath, {
         start: [i, 0],
         stride: [1, 1],
         count: [1, ncols]
@@ -375,14 +382,15 @@ morpheus.Dataset.createMatrix = function (options) {
     if (options.defaultValue != null) {
       return new morpheus.SparseMatrix(options);
     } else {
-      if (options.type === '1d') {
+      if (options.type === '1d_file') {
+        return new morpheus.RowMajorMatrix1DFileBacked(options);
+      }
+      else if (options.type === '1d') {
         return options.columnMajorOrder ? new morpheus.ColumnMajorMatrix1D(options) : new morpheus.RowMajorMatrix1D(options);
       } else {
         return new morpheus.RowMajorMatrix(options);
       }
     }
-  } else if (options.type === '1d_file') {
-    return new morpheus.RowMajorMatrix1DFileBacked(options);
   }
 
   var array = [];

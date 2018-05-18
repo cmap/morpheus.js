@@ -24,20 +24,24 @@ morpheus.Hdf5Reader.prototype = {
     var file = new hdf5.File(fileOrUrl.path, Access.ACC_RDONLY);
 
     var dim = file.getDatasetDimensions(this.options.dataset);
-
+    var matrixType = '1d';
+    if (!this.options.columnMajorOrder && dim[0] * dim[1] > 20000000) {
+      matrixType = '1d_file';
+    }
     var dataset = new morpheus.Dataset({
       name: name,
       rows: this.options.columnMajorOrder ? dim[1] : dim[0],
       file: file,
       columns: this.options.columnMajorOrder ? dim[0] : dim[1],
       dataType: 'Float32',
-      type: '1d',
-      array: h5lt.readDataset(file.id, this.options.dataset),
+      type: matrixType,
+      array: matrixType === '1d_file' ? this.options.dataset : h5lt.readDataset(file.id, this.options.dataset),
       columnMajorOrder: this.options.columnMajorOrder
     });
-    //
+
+
     var group = file.openGroup(this.options.rowMeta);
-    var names = group.getMemberNames();
+    var names = group.getMemberNamesByCreationOrder();
     names.forEach(function (name) {
       try {
         var val = h5lt.readDataset(group.id, name);
@@ -48,7 +52,7 @@ morpheus.Hdf5Reader.prototype = {
     });
     group.close();
     group = file.openGroup(this.options.colMeta);
-    names = group.getMemberNames();
+    names = group.getMemberNamesByCreationOrder();
     names.forEach(function (name) {
       try {
         var val = h5lt.readDataset(group.id, name);
@@ -58,7 +62,9 @@ morpheus.Hdf5Reader.prototype = {
       }
     });
     group.close();
-    file.close();
+    if (matrixType !== '1d_file') {
+      file.close();
+    }
     callback(null, dataset);
   }
 
