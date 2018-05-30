@@ -180,7 +180,7 @@ morpheus.Dataset.fromJSON = function (options) {
   return dataset;
 };
 
-morpheus.RowMajorMatrix1DFileBacked = function (options) {
+morpheus.Matrix1DFileBacked = function (options) {
   this.options = options;
 
   var file = options.file;
@@ -205,34 +205,48 @@ morpheus.RowMajorMatrix1DFileBacked = function (options) {
     throw new Error('Unsupported data type');
   }
   var ncols = this.options.columns;
-  var cachedRowIndex = 0;
-  this.cachedBuffer = h5lt.readDatasetAsBuffer(this.options.file.id, datasetPath, {
-    start: [0, 0],
-    stride: [1, 1],
-    count: [1, ncols]
-  });
-
+  var nrows = this.options.rows;
+  var backedRows = this.options.backedRows;
   var _this = this;
 
-  this.getValue = function (i, j) {
-    if (cachedRowIndex !== i) {
-      // var array = this.h5lt.readDataset(this.options.file.id, datasetPath, {
-      //   start: [i, 0],
-      //   stride: [1, 1],
-      //   count: [1, ncols]
-      // });
-      _this.cachedBuffer = h5lt.readDatasetAsBuffer(file.id, datasetPath, {
-        start: [i, 0],
-        stride: [1, 1],
-        count: [1, ncols]
-      });
-      cachedRowIndex = i;
-    }
-    return _this.cachedBuffer[_this.getter](j * _this.offset);
-  };
+  var LRUMap = require('lru_map').LRUMap;
+  var cache = new LRUMap(100);
+
+  if (backedRows) {
+    this.getValue = function (i, j) {
+      var buffer = cache.get(i);
+      if (buffer == null) {
+        // var array = this.h5lt.readDataset(this.options.file.id, datasetPath, {
+        //   start: [i, 0],
+        //   stride: [1, 1],
+        //   count: [1, ncols]
+        // });
+        buffer = h5lt.readDatasetAsBuffer(file.id, datasetPath, {
+          start: [i, 0],
+          count: [1, ncols],
+          stride: [1, 1]
+        });
+        cache.set(i, buffer);
+      }
+      return buffer[_this.getter](j * _this.offset);
+    };
+  } else {
+    this.getValue = function (i, j) {
+      var buffer = cache.get(j);
+      if (buffer == null) {
+        buffer = h5lt.readDatasetAsBuffer(file.id, datasetPath, {
+          start: [0, j],
+          count: [nrows, 1],
+          stride: [1, 1]
+        });
+        cache.set(j, buffer);
+      }
+      return buffer[_this.getter](i * _this.offset);
+    };
+  }
 
 };
-morpheus.RowMajorMatrix1DFileBacked.prototype = {
+morpheus.Matrix1DFileBacked.prototype = {
 
   setValue: function (i, j, value) {
     throw new Error('Unsupported operation.');
@@ -382,8 +396,8 @@ morpheus.Dataset.createMatrix = function (options) {
     if (options.defaultValue != null) {
       return new morpheus.SparseMatrix(options);
     } else {
-      if (options.type === '1d_file') {
-        return new morpheus.RowMajorMatrix1DFileBacked(options);
+      if (options.type === '1d_backed') {
+        return new morpheus.Matrix1DFileBacked(options);
       }
       else if (options.type === '1d') {
         return options.columnMajorOrder ? new morpheus.ColumnMajorMatrix1D(options) : new morpheus.RowMajorMatrix1D(options);

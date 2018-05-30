@@ -1478,12 +1478,21 @@ morpheus.HeatMap.prototype = {
         if (this.options.rowDendrogramField != null) {
           var vector = dataset.getRowMetadata().getByName(
             this.options.rowDendrogramField);
+          if (vector == null) {
+            console.log(this.options.rowDendrogramField + ' not found in ' + morpheus.MetadataUtil.getMetadataNames(dataset.getRowMetadata()));
+            throw new Error(this.options.rowDendrogramField + ' not found');
+          }
+
           rowIndices = [];
           var map = new morpheus.Map();
           var re = /[,:]/g;
+          var isString = morpheus.VectorUtil.getDataType(vector) === 'string';
           for (var j = 0, size = vector.size(); j < size; j++) {
             var key = vector.getValue(j);
-            map.set(key.replace(re, ''), j);
+            if (isString) {
+              key = key.replace(re, '');
+            }
+            map.set(key, j);
           }
           // need to replace special characters to match ids in newick
           // file
@@ -1491,9 +1500,12 @@ morpheus.HeatMap.prototype = {
           for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
             var index = map.get(tree.leafNodes[i].name);
             if (index === undefined) {
-              throw 'Unable to find row dendrogram id '
-              + tree.leafNodes[i].name
-              + ' in row annotations';
+              console.log('Unable to find row dendrogram id '
+                + tree.leafNodes[i].name
+                + ' in row annotations');
+              throw new Error('Unable to find row dendrogram id '
+                + tree.leafNodes[i].name
+                + ' in row annotations');
             }
             rowIndices.push(index);
           }
@@ -1541,11 +1553,19 @@ morpheus.HeatMap.prototype = {
           columnIndices = [];
           var vector = dataset.getColumnMetadata().getByName(
             this.options.columnDendrogramField);
+          if (vector == null) {
+            console.log(this.options.columnDendrogramField + ' not found in ' + morpheus.MetadataUtil.getMetadataNames(dataset.getRowMetadata()));
+            throw new Error(this.options.columnDendrogramField + ' not found');
+          }
           var map = new morpheus.Map();
           var re = /[,:]/g;
+          var isString = morpheus.VectorUtil.getDataType(vector) === 'string';
           for (var j = 0, size = vector.size(); j < size; j++) {
             var key = vector.getValue(j);
-            map.set(key.replace(re, ''), j);
+            if (isString) {
+              key = key.replace(re, '');
+            }
+            map.set(key, j);
           }
 
           for (var i = 0, length = tree.leafNodes.length; i < length; i++) {

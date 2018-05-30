@@ -5,6 +5,7 @@
  * @param options.columnMajorOrder
  * @param options.rowMeta
  * @param options.colMeta
+ * @param options.transpose
  *
  */
 morpheus.Hdf5Reader = function (options) {
@@ -26,7 +27,7 @@ morpheus.Hdf5Reader.prototype = {
     var dim = file.getDatasetDimensions(this.options.dataset);
     var matrixType = '1d';
     if (!this.options.columnMajorOrder && dim[0] * dim[1] > 20000000) {
-      matrixType = '1d_file';
+      matrixType = '1d_backed';
     }
     var dataset = new morpheus.Dataset({
       name: name,
@@ -35,7 +36,8 @@ morpheus.Hdf5Reader.prototype = {
       columns: this.options.columnMajorOrder ? dim[0] : dim[1],
       dataType: 'Float32',
       type: matrixType,
-      array: matrixType === '1d_file' ? this.options.dataset : h5lt.readDataset(file.id, this.options.dataset),
+      backedRows: !this.options.transpose,
+      array: matrixType === '1d_backed' ? this.options.dataset : h5lt.readDataset(file.id, this.options.dataset),
       columnMajorOrder: this.options.columnMajorOrder
     });
 
@@ -62,8 +64,11 @@ morpheus.Hdf5Reader.prototype = {
       }
     });
     group.close();
-    if (matrixType !== '1d_file') {
+    if (matrixType !== '1d_backed') {
       file.close();
+    }
+    if (this.options.transpose) {
+      dataset = new morpheus.TransposedDatasetView(dataset);
     }
     callback(null, dataset);
   }
@@ -80,7 +85,10 @@ morpheus.Hdf5Reader.getGctxInstance = function () {
 };
 
 morpheus.Hdf5Reader.getLoomInstance = function () {
-  return new morpheus.Hdf5Reader({dataset: 'matrix', rowMeta: 'row_attrs', colMeta: 'col_attrs'});
+  return new morpheus.Hdf5Reader({dataset: 'matrix', rowMeta: 'row_attrs', colMeta: 'col_attrs', transpose: false});
+};
+morpheus.Hdf5Reader.getH5adInstance = function () {
+  return new morpheus.Hdf5Reader({dataset: 'X', rowMeta: 'obs', colMeta: 'var', transpose: false});
 };
 
 

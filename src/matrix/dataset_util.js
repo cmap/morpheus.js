@@ -63,6 +63,10 @@ if (morpheus.Util.isNode()) {
   morpheus.DatasetUtil.registerDatasetReader('loom', function (options) {
     return morpheus.Hdf5Reader.getLoomInstance();
   });
+
+  morpheus.DatasetUtil.registerDatasetReader('h5ad', function (options) {
+    return morpheus.Hdf5Reader.getH5adInstance();
+  });
 }
 
 morpheus.DatasetUtil.registerDatasetReader('gct', function (options) {
