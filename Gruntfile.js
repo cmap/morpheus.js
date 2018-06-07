@@ -62,7 +62,7 @@ module.exports = function (grunt) {
         nonull: true,
         dest: 'js/morpheus-external.js',
         src: [
-          'js/d3.min.js', 'js/jquery-2.2.4.min.js',
+          'js/d3.min.js', 'js/jquery-3.3.1.slim.min.js',
           'js/bootstrap.min.js', 'js/underscore-min.js',
           'js/newick.js', 'js/hammer.min.js',
           'js/jquery.mousewheel.min.js',
@@ -71,7 +71,7 @@ module.exports = function (grunt) {
           'js/canvg.js', 'js/rgbcolor.js',
           'js/jquery-ui.min.js', 'js/parser.js',
           'js/FileSaver.min.js', 'js/colorbrewer.js',
-          'js/jquery.event.drag-2.2.js', 'js/slick.min.js', 'js/canvas-toBlob.js',
+          'js/jquery.event.drag-2.3.0.js', 'js/slick.min.js', 'js/canvas-toBlob.js',
           'js/js.cookie.js', 'js/jstat.min.js', 'js/blob-stream.js',
           'js/canvas2pdf.js', 'js/pdfkit.js', 'js/promise.polyfill.min.js', 'js/fetch.js']
       },
@@ -87,7 +87,7 @@ module.exports = function (grunt) {
           'js/canvg.js', 'js/rgbcolor.js',
           'js/jquery-ui.min.js', 'js/parser.js',
           'js/FileSaver.min.js', 'js/colorbrewer.js',
-          'js/jquery.event.drag-2.2.js', 'js/slick.min.js', 'js/canvas-toBlob.js',
+          'js/jquery.event.drag-2.3.0.js', 'js/slick.min.js', 'js/canvas-toBlob.js',
           'js/js.cookie.js', 'js/jstat.min.js', 'js/blob-stream.js',
           'js/canvas2pdf.js', 'js/pdfkit.js', 'js/promise.polyfill.min.js', 'js/fetch.js']
       },
