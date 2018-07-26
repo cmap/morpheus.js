@@ -33,20 +33,20 @@ morpheus.FilePicker = function (options) {
   }
 
   var $sampleDatasetsEl = $('<div class="morpheus-preloaded"></div>');
-  if (navigator.onLine) {
-    html.push('<li role="presentation"><a href="#' + preloaded + '"' +
-      ' aria-controls="' + preloaded + '" role="tab" data-toggle="tab"><i class="fa fa-database"></i>' +
-      ' Preloaded Datasets</a></li>');
 
-    // lazy load
-    new morpheus.SampleDatasets({
-      $el: $sampleDatasetsEl,
-      show: true,
-      callback: function (heatMapOptions) {
-        options.optionsCallback(heatMapOptions);
-      }
-    });
-  }
+  html.push('<li role="presentation"><a href="#' + preloaded + '"' +
+    ' aria-controls="' + preloaded + '" role="tab" data-toggle="tab"><i class="fa fa-database"></i>' +
+    ' Preloaded Datasets</a></li>');
+
+  // lazy load
+  new morpheus.SampleDatasets({
+    $el: $sampleDatasetsEl,
+    show: true,
+    callback: function (heatMapOptions) {
+      options.optionsCallback(heatMapOptions);
+    }
+  });
+
 
   html.push('</ul>');
 
@@ -88,12 +88,12 @@ morpheus.FilePicker = function (options) {
     html.push('</div>');
     html.push('</div>');
   }
-  if (navigator.onLine) {
-    html.push('<div role="tabpanel" class="tab-pane" id="' + preloaded + '">');
-    html.push('<div style="height:300px;overflow: auto;" class="morpheus-landing-panel">');
-    html.push('</div>');
-    html.push('</div>');
-  }
+
+  html.push('<div role="tabpanel" class="tab-pane" id="' + preloaded + '">');
+  html.push('<div style="height:300px;overflow: auto;" class="morpheus-landing-panel">');
+  html.push('</div>');
+  html.push('</div>');
+
   html.push('</div>'); // tab-content
   html.push('</div>');
   var $el = $(html.join(''));

@@ -38,11 +38,11 @@ morpheus.CollapseDatasetTool.prototype = {
       form.setVisible('percentile', $(this).val() === morpheus.Percentile.toString());
     });
     form.$form.find('[name=compute_percent]').on('change', function (e) {
-      form.setVisible('percent_operator', form.getValue('compute_percent'));
-      form.setVisible('percent_value', form.getValue('compute_percent'));
+      form.setVisible('pass_expression', form.getValue('compute_percent'));
+      form.setVisible('pass_value', form.getValue('compute_percent'));
     });
-    form.setVisible('percent_operator', false);
-    form.setVisible('percent_value', false);
+    form.setVisible('pass_expression', false);
+    form.setVisible('pass_value', false);
   },
 
   gui: function (project) {
@@ -73,12 +73,11 @@ morpheus.CollapseDatasetTool.prototype = {
         help: 'Whether to calculate the percentage of items in a collapsed group that passed an expression'
       },
       {
-        name: 'percent_operator',
+        name: 'pass_expression',
         options: ['>=', '>', '<', '<='],
-        type: 'bootstrap-select',
-        showLabel: false
+        type: 'bootstrap-select'
       }, {
-        name: 'percent_value',
+        name: 'pass_value',
         type: 'text',
         help: 'The corresponding value for "percent operator"'
       }];
@@ -105,9 +104,9 @@ morpheus.CollapseDatasetTool.prototype = {
     var allFields = morpheus.MetadataUtil.getMetadataNames(dataset.getRowMetadata());
     var filterFunction = null;
     if (options.input.compute_percent) {
-      var filterValue = parseFloat(options.input.percent_value);
+      var filterValue = parseFloat(options.input.pass_value);
       if (!isNaN(filterValue)) {
-        var op = options.input.percent_operator;
+        var op = options.input.pass_expression;
         if (op === '>=') {
           filterFunction = function (value) {
             return value >= filterValue;
@@ -152,14 +151,14 @@ morpheus.CollapseDatasetTool.prototype = {
       heatMap.setTrackVisible(name, false, false);
     });
 
-
-    if (filterFunction != null) {
+    if (options.input.compute_percent) {
       heatMap.heatmap.colorScheme.getSizer()
         .setSeriesName('percent');
       heatMap.heatmap.colorScheme.getSizer()
         .setMin(0);
       heatMap.heatmap.colorScheme.getSizer()
         .setMax(75);
+      heatMap.revalidate();
     }
     return heatMap;
   },

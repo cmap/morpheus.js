@@ -8,7 +8,7 @@ morpheus.HelpMenu = function () {
   html.push(
     '<li><a href="configuration.html">Configuration</a></li>');
 
-  html.push('<li><a target="_blank" href="app.html">App</a></li>');
+  // html.push('<li><a target="_blank" href="app.html">App</a></li>');
 
 
   html.push(
