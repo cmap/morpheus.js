@@ -14553,7 +14553,9 @@ morpheus.CollapseDatasetTool.prototype = {
         .setMin(0);
       heatMap.heatmap.colorScheme.getSizer()
         .setMax(75);
-      heatMap.revalidate();
+      heatMap.heatmap.setShape('circle');
+      heatMap.heatmap.setInvalid(true);
+      heatMap.heatmap.repaint();
     }
     return heatMap;
   },
@@ -14587,8 +14589,8 @@ morpheus.CreateAnnotation.prototype = {
         placeholder: 'e.g MAD()',
         required: true,
         help: 'JavaScript formula. Built-in functions (case-sensitive): COUNTIF(expression),' +
-        ' MAD(), MAX(),' +
-        ' MEAN(), MEDIAN(), MIN(), PERCENTILE(p), SUM(), VARIANCE(). Refer to a field using FIELD(name)'
+          ' MAD(), MAX(),' +
+          ' MEAN(), MEDIAN(), MIN(), PERCENTILE(p), SUM(), VARIANCE(). Refer to a field using FIELD(name)'
       }, {
         name: 'use_selected_rows_and_columns_only',
         type: 'checkbox'

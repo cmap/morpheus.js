@@ -158,7 +158,9 @@ morpheus.CollapseDatasetTool.prototype = {
         .setMin(0);
       heatMap.heatmap.colorScheme.getSizer()
         .setMax(75);
-      heatMap.revalidate();
+      heatMap.heatmap.setShape('circle');
+      heatMap.heatmap.setInvalid(true);
+      heatMap.heatmap.repaint();
     }
     return heatMap;
   },
