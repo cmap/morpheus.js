@@ -14589,8 +14589,8 @@ morpheus.CreateAnnotation.prototype = {
         placeholder: 'e.g MAD()',
         required: true,
         help: 'JavaScript formula. Built-in functions (case-sensitive): COUNTIF(expression),' +
-          ' MAD(), MAX(),' +
-          ' MEAN(), MEDIAN(), MIN(), PERCENTILE(p), SUM(), VARIANCE(). Refer to a field using FIELD(name)'
+        ' MAD(), MAX(),' +
+        ' MEAN(), MEDIAN(), MIN(), PERCENTILE(p), SUM(), VARIANCE(). Refer to a field using FIELD(name)'
       }, {
         name: 'use_selected_rows_and_columns_only',
         type: 'checkbox'
@@ -35105,13 +35105,13 @@ morpheus.TabManager = function (options) {
 };
 morpheus.TabManager.prototype = {
   getTabText: function (id) {
-    return this.$nav.find('> li > a').filter('a[data-link=' + id + ']').contents().first().text();
+    return this.$nav.find('> li > a').filter('a[data-link=' + id + ']').contents().first().text().trim();
   },
   getTabItems: function () {
     var items = [];
     var $links = this.$nav.find('> li > a').each(function () {
       var $this = $(this);
-      var text = $this.contents().first().text();
+      var text = $this.contents().first().text().trim();
       var id = $this.data('link')
       var title = $this.attr('title');
       items.push({id: id, text: text, title: title});
