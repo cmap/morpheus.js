@@ -14527,7 +14527,7 @@ morpheus.CollapseDatasetTool.prototype = {
     }
 
     var heatMap = new morpheus.HeatMap({
-      name: options.heatMap.getName(),
+      name: options.input.name || options.heatMap.getName(),
       dataset: dataset,
       parent: options.heatMap,
       symmetric: false,
@@ -34965,7 +34965,7 @@ morpheus.TabManager = function (options) {
     html.push(' <span class="fa fa-angle-double-down"></span>');
     html.push('</button>');
     html
-    .push('<ul class="dropdown-menu dropdown-menu-right" role="menu">');
+      .push('<ul class="dropdown-menu dropdown-menu-right" role="menu">');
     html.push('</ul>');
     html.push('</div>');
     html.push('</li>');
@@ -35107,12 +35107,23 @@ morpheus.TabManager.prototype = {
   getTabText: function (id) {
     return this.$nav.find('> li > a').filter('a[data-link=' + id + ']').contents().first().text();
   },
+  getTabItems: function () {
+    var items = [];
+    var $links = this.$nav.find('> li > a').each(function () {
+      var $this = $(this);
+      var text = $this.contents().first().text();
+      var id = $this.data('link')
+      var title = $this.attr('title');
+      items.push({id: id, text: text, title: title});
+    });
+    return items;
+  },
   getTabCount: function () {
     return this.idToTabObject.size();
   },
   setTabText: function (id, text) {
     this.$nav.find('> li > a').filter('[data-link=' + id + ']').contents().first()
-    .replaceWith(text + '&nbsp;');
+      .replaceWith(text + '&nbsp;');
     this.idToTabObject.get(id).setName(name);
   },
   /**
@@ -35172,11 +35183,11 @@ morpheus.TabManager.prototype = {
     li.push('&nbsp;<i style="color:black;"></i>');
     if (options.closeable) {
       li
-      .push('&nbsp<button style="font-size: 18px;" type="button" class="close"' +
-        ' aria-label="Close"' +
-        ' data-target="#'
-        + id
-        + '"><span aria-hidden="true">×</span></button>');
+        .push('&nbsp<button style="font-size: 18px;" type="button" class="close"' +
+          ' aria-label="Close"' +
+          ' data-target="#'
+          + id
+          + '"><span aria-hidden="true">×</span></button>');
 
     }
     li.push('</a></li>');

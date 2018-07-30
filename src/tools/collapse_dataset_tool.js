@@ -132,7 +132,7 @@ morpheus.CollapseDatasetTool.prototype = {
     }
 
     var heatMap = new morpheus.HeatMap({
-      name: options.heatMap.getName(),
+      name: options.input.name || options.heatMap.getName(),
       dataset: dataset,
       parent: options.heatMap,
       symmetric: false,
