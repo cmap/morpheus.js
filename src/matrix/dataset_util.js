@@ -98,23 +98,21 @@ morpheus.DatasetUtil.getDatasetReader = function (ext, options) {
     options = {};
   }
   var datasetReader = null;
-  var f = morpheus.DatasetUtil.extensionToReader.get(ext)
+  var f = morpheus.DatasetUtil.extensionToReader.get(ext);
   if (f != null) {
     return f(options);
   }
 };
 
-morpheus.DatasetUtil.readDatasetArray = function (datasets) {
-  var retDef = $.Deferred();
+morpheus.DatasetUtil.readDatasetArray = function (urls) {
   var loadedDatasets = [];
   var promises = [];
-  _.each(datasets, function (url, i) {
+  urls.forEach(function (url, i) {
     var p = morpheus.DatasetUtil.read(url);
-    p.index = i;
-    p.done(function (dataset) {
-      loadedDatasets[this.index] = dataset;
-    });
-    p.fail(function (err) {
+    promises.push(p);
+    p.then(function (dataset) {
+      loadedDatasets[i] = dataset;
+    }).catch(function (err) {
       var message = [
         'Error opening ' + morpheus.Util
           .getFileName(url) + '.'];
@@ -122,22 +120,15 @@ morpheus.DatasetUtil.readDatasetArray = function (datasets) {
         message.push('<br />Cause: ');
         message.push(err.message);
       }
-      retDef.reject(message.join(''));
-
+      return Promise.reject(message.join(''));
     });
-    promises.push(p);
-  });
+  })
   if (promises.length === 0) {
-    retDef.reject('No datasets specified.');
+    return Promise.reject('No datasets specified');
   }
-
-  $.when
-    .apply($, promises)
-    .then(
-      function () {
-        retDef.resolve(morpheus.DatasetUtil.join(loadedDatasets, 'id'));
-      });
-  return retDef;
+  return Promise.all(promises).then(function () {
+    return Promise.resolve(morpheus.DatasetUtil.join(loadedDatasets, 'id'));
+  });
 };
 /**
  * Annotate a dataset from external file or text.
@@ -151,15 +142,13 @@ morpheus.DatasetUtil.readDatasetArray = function (datasets) {
  *         execute with a dataset parameter.
  */
 morpheus.DatasetUtil.annotate = function (options) {
-  var retDef = $.Deferred();
+
   var promises = [];
   var functions = [];
   var isColumns = options.isColumns;
   _.each(options.annotations, function (ann, annotationIndex) {
     if (morpheus.Util.isArray(ann.file)) { // already parsed text
       functions[annotationIndex] = function (dataset) {
-
-
         new morpheus.OpenFileTool().annotate({
           lines: ann.file, dataset: dataset,
           isColumns: isColumns, metadataName: ann.datasetField, fileColumnName: ann.fileField,
@@ -168,13 +157,9 @@ morpheus.DatasetUtil.annotate = function (options) {
       };
     } else {
       var result = morpheus.Util.readLines(ann.file);
+      promises.push(result);
       var fileName = morpheus.Util.getFileName(ann.file);
-      var deferred = $.Deferred();
-      promises.push(deferred);
-      result.fail(function (message) {
-        deferred.reject(message);
-      });
-      result.done(function (lines) {
+      result.then(function (lines) {
         if (morpheus.Util.endsWith(fileName, '.gmt')) {
           var sets = new morpheus.GmtReader().parseLines(lines);
           functions[annotationIndex] = function (dataset) {
@@ -182,32 +167,26 @@ morpheus.DatasetUtil.annotate = function (options) {
               isColumns, sets, ann.datasetField,
               ann.fileField);
           };
-          deferred.resolve();
         } else if (morpheus.Util.endsWith(fileName, '.cls')) {
           functions[annotationIndex] = function (dataset) {
             new morpheus.OpenFileTool().annotateCls(null, dataset,
               fileName, isColumns, lines);
           };
-          deferred.resolve();
         } else {
           functions[annotationIndex] = function (dataset) {
-
-
             new morpheus.OpenFileTool().annotate({
               lines: lines, dataset: dataset,
               isColumns: isColumns, metadataName: ann.datasetField,
               fileColumnName: ann.fileField, fileColumnNamesToInclude: ann.include, transposed: ann.transposed
             });
           };
-          deferred.resolve();
         }
       });
     }
   });
-  $.when.apply($, promises).then(function () {
-    retDef.resolve(functions);
+  return Promise.all(promises).then(function () {
+    return functions;
   });
-  return retDef;
 };
 /**
  * Reads a dataset at the specified URL or file
@@ -219,84 +198,81 @@ morpheus.DatasetUtil.annotate = function (options) {
  * @return A promise that resolves to morpheus.DatasetInterface
  */
 morpheus.DatasetUtil.read = function (fileOrUrl, options) {
-  if (fileOrUrl == null) {
-    throw 'File is null';
-  }
-  if (options == null) {
-    options = {};
-  }
-  var isFile = morpheus.Util.isFile(fileOrUrl);
-  var isString = morpheus.Util.isString(fileOrUrl);
-  var ext = options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
-  var datasetReader;
-  var str = fileOrUrl.toString();
-  if ((ext === '' && str != null && str.indexOf('blob:') === 0) || options.clipboard) {
-    // can be txt or gct
-    datasetReader = options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.TxtReader(); // copy from clipboard
-  } else {
-    datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
-    if (datasetReader == null) {
-      datasetReader = isFile ? (options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.TxtReader()) : new morpheus.GctReader();
+  return new Promise(function (resolve, reject) {
+    if (fileOrUrl == null) {
+      reject('File is null');
     }
-  }
-  if (isString || isFile) { // URL or file
-    var deferred = $.Deferred();
-    if (options.background) {
-      var path = morpheus.Util.getScriptPath();
-      var blob = new Blob(
-        [
-          'self.onmessage = function(e) {'
-          + 'importScripts(e.data.path);'
-          + 'var ext = morpheus.Util.getExtension(morpheus.Util'
-          + '.getFileName(e.data.fileOrUrl));'
-          + 'var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext,'
-          + '	e.data.options);'
-          + 'datasetReader.read(e.data.fileOrUrl, function(err,dataset) {'
-          + '	self.postMessage(dataset);' + '	});' + '}']);
-
-      var blobURL = window.URL.createObjectURL(blob);
-      var worker = new Worker(blobURL);
-      worker.addEventListener('message', function (e) {
-        deferred.resolve(morpheus.Dataset.fromJSON(e.data));
-        window.URL.revokeObjectURL(blobURL);
-      }, false);
-      // start the worker
-      worker.postMessage({
-        path: path,
-        fileOrUrl: fileOrUrl,
-        options: options
-      });
-
+    if (options == null) {
+      options = {};
+    }
+    var isFile = morpheus.Util.isFile(fileOrUrl);
+    var isString = morpheus.Util.isString(fileOrUrl);
+    var ext = options.extension ? options.extension : morpheus.Util.getExtension(morpheus.Util.getFileName(fileOrUrl));
+    var datasetReader;
+    var str = fileOrUrl.toString();
+    if ((ext === '' && str != null && str.indexOf('blob:') === 0) || options.clipboard) {
+      // can be txt or gct
+      datasetReader = options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.TxtReader(); // copy from clipboard
     } else {
-      datasetReader.read(fileOrUrl, function (err, dataset) {
-        if (err) {
-          deferred.reject(err);
-        } else {
-          deferred.resolve(dataset);
-        }
-      });
+      datasetReader = morpheus.DatasetUtil.getDatasetReader(ext, options);
+      if (datasetReader == null) {
+        datasetReader = isFile ? (options.interactive ? new morpheus.Array2dReaderInteractive() : new morpheus.TxtReader()) : new morpheus.GctReader();
+      }
     }
-    var pr = deferred.promise();
-    // override toString so can determine file name
-    pr.toString = function () {
-      return '' + fileOrUrl;
-    };
-    return pr;
-  } else if (typeof fileOrUrl.done === 'function') { // assume it's a
-    // deferred
-    return fileOrUrl;
-  } else { // it's already a dataset?
-    if (fileOrUrl.promise) { // it's a promise
-      return fileOrUrl;
+    if (isString || isFile) { // URL or file
+      if (options.background) {
+        var path = morpheus.Util.getScriptPath();
+        var blob = new Blob(
+          [
+            'self.onmessage = function(e) {'
+            + 'importScripts(e.data.path);'
+            + 'var ext = morpheus.Util.getExtension(morpheus.Util'
+            + '.getFileName(e.data.fileOrUrl));'
+            + 'var datasetReader = morpheus.DatasetUtil.getDatasetReader(ext,'
+            + '	e.data.options);'
+            + 'datasetReader.read(e.data.fileOrUrl, function(err,dataset) {'
+            + '	self.postMessage(dataset);' + '	});' + '}']);
+
+        var blobURL = window.URL.createObjectURL(blob);
+        var worker = new Worker(blobURL);
+        worker.addEventListener('message', function (e) {
+          resolve(morpheus.Dataset.fromJSON(e.data));
+          window.URL.revokeObjectURL(blobURL);
+        }, false);
+        // start the worker
+        worker.postMessage({
+          path: path,
+          fileOrUrl: fileOrUrl,
+          options: options
+        });
+
+      } else {
+        datasetReader.read(fileOrUrl, function (err, dataset) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(dataset);
+          }
+        });
+      }
+
+      // override toString so can determine file name
+      // this.toString = function () {
+      //   return '' + fileOrUrl;
+      // };
+    } else if (typeof fileOrUrl.then === 'function') { // assume it's a promise
+      return resolve(fileOrUrl);
+    } else { // it's already a dataset?
+      if (fileOrUrl.promise) { // it's a promise
+        return resolve(fileOrUrl);
+      }
+      if (fileOrUrl.getRowCount) { // it's a dataset
+        resolve(fileOrUrl);
+      } else { // JSON
+        resolve(morpheus.Dataset.fromJSON(fileOrUrl));
+      }
     }
-    var deferred = $.Deferred();
-    if (fileOrUrl.getRowCount) { // it's a dataset
-      deferred.resolve(fileOrUrl);
-    } else { // JSON
-      deferred.resolve(morpheus.Dataset.fromJSON(fileOrUrl));
-    }
-    return deferred.promise();
-  }
+  });
 
 };
 
@@ -553,7 +529,7 @@ morpheus.DatasetUtil.autocompleteValues = function (dataset) {
         matches.push({
           value: field + ':',
           label: '<span style="font-weight:300;">' + field
-          + ':</span>',
+            + ':</span>',
           show: true
         });
       });
@@ -626,7 +602,7 @@ morpheus.DatasetUtil.autocompleteValues = function (dataset) {
       matches.push({
         value: field + ':' + val,
         label: '<span style="font-weight:300;">' + field + ':</span>'
-        + '<span style="font-weight:900;">' + val + '</span>'
+          + '<span style="font-weight:900;">' + val + '</span>'
       });
 
     });
@@ -636,7 +612,7 @@ morpheus.DatasetUtil.autocompleteValues = function (dataset) {
           matches.push({
             value: field + ':',
             label: '<span style="font-weight:300;">' + field
-            + ':</span>',
+              + ':</span>',
             show: true
           });
         }

@@ -446,7 +446,7 @@ morpheus.VectorTrack.prototype = {
                     'representation': 'sdf'
                   },
                   url: 'http://cactus.nci.nih.gov/chemical/structure'
-                }).done(function (text) {
+                }).then(function (text) {
               _this.moleculeCache[this.smile] = text;
               if (values.length > 0) {
                 doRequest(values.pop());

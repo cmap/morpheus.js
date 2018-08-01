@@ -21,13 +21,13 @@ morpheus.GctReader.prototype = {
       // 	$.ajax({
       // 		url: fileOrUrl,
       // 		method: 'HEAD'
-      // 	}).done(function (data, textStatus, jqXHR) {
+      // 	}).then(function (data, textStatus, jqXHR) {
       // 		if ('gzip' === jqXHR.getResponseHeader('Content-Encoding')) {
       // 			_this._readNoChunking(fileOrUrl, callback);
       // 		} else {
       // 			_this._readChunking(fileOrUrl, callback, false);
       // 		}
-      // 	}).fail(function () {
+      // 	}).catch(function () {
       // 		_this._readNoChunking(fileOrUrl, callback);
       // 	});
       // } else {
@@ -521,9 +521,9 @@ morpheus.GctReader.prototype = {
     // $.ajax({
     // 	url: fileOrUrl,
     // 	dataType: 'text'
-    // }).done(function (text) {
+    // }).then(function (text) {
     // 	callback(null, _this.read(name, new morpheus.StringReader(text)));
-    // }).fail(function (err) {
+    // }).catch(function (err) {
     // 	callback(err);
     // });
 

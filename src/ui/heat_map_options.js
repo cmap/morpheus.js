@@ -593,7 +593,7 @@ morpheus.HeatMapOptions = function (heatMap) {
         $file.click();
         $file.on('change', function (evt) {
           var files = evt.target.files;
-          morpheus.Util.getText(evt.target.files[0]).done(
+          morpheus.Util.getText(evt.target.files[0]).then(
             function (text) {
               var json = JSON.parse($.trim(text));
               heatMap.heatmap.getColorScheme().fromJSON(json);
@@ -603,12 +603,12 @@ morpheus.HeatMapOptions = function (heatMap) {
               heatMap.heatmap.setInvalid(true);
               heatMap.heatmap.repaint();
 
-            }).fail(function () {
+            }).catch(function () {
             morpheus.FormBuilder.showInModal({
               title: 'Error',
               html: 'Unable to read color scheme.'
             });
-          }).always(function () {
+          }).finally(function () {
             $file.remove();
           });
 
@@ -676,7 +676,7 @@ morpheus.HeatMapOptions = function (heatMap) {
       });
   $colorByValue.on('change', function (e) {
     if (heatMap.heatmap.getColorScheme()
-        .getSeparateColorSchemeForRowMetadataField() == null) {
+      .getSeparateColorSchemeForRowMetadataField() == null) {
       colorSchemeChooser.setCurrentValue(null);
       heatMap.heatmap.getColorScheme().setCurrentValue(null);
       colorSchemeChooser.setColorScheme(heatMap.heatmap

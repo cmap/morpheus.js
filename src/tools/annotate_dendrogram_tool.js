@@ -29,7 +29,7 @@ morpheus.AnnotateDendrogramTool.prototype = {
         return true;
       });
     var tab = /\t/;
-    result.done(function (lines) {
+    result.then(function (lines) {
       var header = lines[0].split(tab);
       var promptTool = {};
       // node.info = {foo:['a', 'b'], bar:[3]}

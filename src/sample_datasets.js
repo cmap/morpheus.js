@@ -216,6 +216,12 @@ morpheus.SampleDatasets = function (options) {
     }
     $(tcga.join('')).appendTo($el.find('[data-name=tcga]'));
   }).catch(function (error) {
+    morpheus.FormBuilder.showInModal({
+      title: 'Error',
+      html: 'Unable to download data',
+      appendTo: _this.getContentEl(),
+      focus: _this.getFocusEl()
+    });
     console.log(error);
   });
 
@@ -275,24 +281,26 @@ morpheus.SampleDatasets.getDepMapDataset = function (files) {
   // portal-Avana-2018-04-11.csv
   //
 
-  var d = $.Deferred();
-  var datasetPromise = morpheus.DatasetUtil.readDatasetArray(datasets);
-  datasetPromise.done(function (dataset) {
-    var idVector = dataset.getColumnMetadata().get(0);
-    var siteVector = dataset.getColumnMetadata().add('site');
-    for (var j = 0, ncols = siteVector.size(); j < ncols; j++) {
-      var id = idVector.getValue(j);
-      var index = id.indexOf('_');
-      if (index !== -1) {
-        // idVector.setValue(j, id.substring(0, index));
-        siteVector.setValue(j, id.substring(index + 1));
+
+  return new Promise(function (resolve, reject) {
+    var datasetPromise = morpheus.DatasetUtil.readDatasetArray(datasets);
+    datasetPromise.then(function (dataset) {
+      var idVector = dataset.getColumnMetadata().get(0);
+      var siteVector = dataset.getColumnMetadata().add('site');
+      for (var j = 0, ncols = siteVector.size(); j < ncols; j++) {
+        var id = idVector.getValue(j);
+        var index = id.indexOf('_');
+        if (index !== -1) {
+          // idVector.setValue(j, id.substring(0, index));
+          siteVector.setValue(j, id.substring(index + 1));
+        }
       }
-    }
-    d.resolve(dataset);
-  }).fail(function (err) {
-    d.reject(err);
+      resolve(dataset);
+    }).catch(function (err) {
+      reject(err);
+    });
   });
-  return d;
+
 };
 morpheus.SampleDatasets.prototype = {
 

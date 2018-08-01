@@ -1026,31 +1026,31 @@ morpheus.Util.xlsxTo1dArray = function (options, callback) {
  * Returns a promise that resolves to a string
  */
 morpheus.Util.getText = function (fileOrUrl) {
-  var deferred = $.Deferred();
-  if (morpheus.Util.isString(fileOrUrl)) {
-    fetch(fileOrUrl).then(function (response) {
-      if (response.ok) {
-        return response.text();
-      } else {
-        deferred.reject(response.status + ' ' + response.statusText);
-      }
-    }).then(function (text) {
-      // var type = xhr.getResponseHeader('Content-Type');
-      deferred.resolve(text);
-    }).catch(function (err) {
-      deferred.reject(err);
-    });
-  } else if (morpheus.Util.isFile(fileOrUrl)) {
-    var reader = new FileReader();
-    reader.onload = function (event) {
-      deferred.resolve(event.target.result);
-    };
-    reader.readAsText(fileOrUrl);
-  } else {
-    // what is fileOrUrl?
-    deferred.resolve(fileOrUrl);
-  }
-  return deferred.promise();
+  return new Promise(function (resolve, reject) {
+    if (morpheus.Util.isString(fileOrUrl)) {
+      fetch(fileOrUrl).then(function (response) {
+        if (response.ok) {
+          return response.text();
+        } else {
+          reject(response.status + ' ' + response.statusText);
+        }
+      }).then(function (text) {
+        // var type = xhr.getResponseHeader('Content-Type');
+        resolve(text);
+      }).catch(function (err) {
+        reject(err);
+      });
+    } else if (morpheus.Util.isFile(fileOrUrl)) {
+      var reader = new FileReader();
+      reader.onload = function (event) {
+        resolve(event.target.result);
+      };
+      reader.readAsText(fileOrUrl);
+    } else {
+      // what is fileOrUrl?
+      resolve(fileOrUrl);
+    }
+  });
 };
 morpheus.Util.createOptions = function (values, none) {
   var html = [];
@@ -1438,100 +1438,103 @@ morpheus.Util.splitLines = function (lines) {
  * @return A deferred object that resolves to an array of strings
  */
 morpheus.Util.readLines = function (fileOrUrl, interactive) {
-  var isFile = morpheus.Util.isFile(fileOrUrl);
-  var isString = morpheus.Util.isString(fileOrUrl);
-  var name = morpheus.Util.getFileName(fileOrUrl);
-  var ext = morpheus.Util.getExtension(name);
-  var deferred = $.Deferred();
-  if (isString) { // URL
-    if (ext === 'xlsx') {
-      var fetchOptions = {};
-      if (fileOrUrl.headers) {
-        fetchOptions.headers = new Headers();
-        for (var header in fileOrUrl.headers) {
-          fetchOptions.headers.append(header, fileOrUrl.headers[header]);
+  return new Promise(function (resolve, reject) {
+    var isFile = morpheus.Util.isFile(fileOrUrl);
+    var isString = morpheus.Util.isString(fileOrUrl);
+    var name = morpheus.Util.getFileName(fileOrUrl);
+    var ext = morpheus.Util.getExtension(name);
+
+    if (isString) { // URL
+      if (ext === 'xlsx') {
+        var fetchOptions = {};
+        if (fileOrUrl.headers) {
+          fetchOptions.headers = new Headers();
+          for (var header in fileOrUrl.headers) {
+            fetchOptions.headers.append(header, fileOrUrl.headers[header]);
+          }
         }
+        fetch(fileOrUrl, fetchOptions).then(function (response) {
+          if (response.ok) {
+            return response.arrayBuffer();
+          } else {
+            deferred.reject(response);
+          }
+        }).then(function (arrayBuffer) {
+          if (arrayBuffer) {
+            var data = new Uint8Array(arrayBuffer);
+            var arr = [];
+            for (var i = 0; i != data.length; ++i) {
+              arr[i] = String.fromCharCode(data[i]);
+            }
+            var bstr = arr.join('');
+            morpheus.Util.xlsxTo1dArray({
+              data: bstr,
+              prompt: interactive
+            }, function (err, lines) {
+              deferred.resolve(lines);
+            });
+
+          } else {
+            deferred.reject();
+          }
+        });
+      } else {
+        fetch(fileOrUrl, fetchOptions).then(function (response) {
+          if (response.ok) {
+            return response.text();
+          } else {
+            reject();
+          }
+        }).then(function (text) {
+          resolve(morpheus.Util.splitOnNewLine(text));
+        }).catch(function (err) {
+          reject(err);
+        });
       }
-      fetch(fileOrUrl, fetchOptions).then(function (response) {
-        if (response.ok) {
-          return response.arrayBuffer();
-        } else {
-          deferred.reject(response);
-        }
-      }).then(function (arrayBuffer) {
-        if (arrayBuffer) {
-          var data = new Uint8Array(arrayBuffer);
+    } else if (isFile) {
+      var reader = new FileReader();
+      reader.onerror = function () {
+        console.log('Unable to read file');
+        reject('Unable to read file');
+      };
+      reader.onload = function (event) {
+        var arrayBuffer = event.target.result;
+        var data = new Uint8Array(arrayBuffer);
+        if (ext === 'xlsx' || ext === 'xls') {
           var arr = [];
           for (var i = 0; i != data.length; ++i) {
             arr[i] = String.fromCharCode(data[i]);
           }
           var bstr = arr.join('');
-          morpheus.Util.xlsxTo1dArray({
-            data: bstr,
-            prompt: interactive
-          }, function (err, lines) {
-            deferred.resolve(lines);
-          });
-
+          morpheus.Util
+            .xlsxTo1dArray({
+              data: bstr,
+              prompt: interactive
+            }, function (err, lines) {
+              resolve(lines);
+            });
         } else {
-          deferred.reject();
-        }
-      });
-    } else {
-      fetch(fileOrUrl, fetchOptions).then(function (response) {
-        if (response.ok) {
-          return response.text();
-        } else {
-          deferred.reject();
-        }
-      }).then(function (text) {
-        deferred.resolve(morpheus.Util.splitOnNewLine(text));
-      }).catch(function (err) {
-        deferred.reject(err);
-      });
-    }
-  } else if (isFile) {
-    var reader = new FileReader();
-    reader.onerror = function () {
-      console.log('Unable to read file');
-      deferred.reject('Unable to read file');
-    };
-    reader.onload = function (event) {
-      var arrayBuffer = event.target.result;
-      var data = new Uint8Array(arrayBuffer);
-      if (ext === 'xlsx' || ext === 'xls') {
-        var arr = [];
-        for (var i = 0; i != data.length; ++i) {
-          arr[i] = String.fromCharCode(data[i]);
-        }
-        var bstr = arr.join('');
-        morpheus.Util
-          .xlsxTo1dArray({
-            data: bstr,
-            prompt: interactive
-          }, function (err, lines) {
-            deferred.resolve(lines);
-          });
-      } else {
-        var br = new morpheus.ArrayBufferReader(data);
-        var s;
-        var lines = [];
-        var rtrim = /\s+$/;
-        while ((s = br.readLine()) !== null) {
-          var line = s.replace(rtrim, '');
-          if (line !== '') {
-            lines.push(line);
+          var br = new morpheus.ArrayBufferReader(data);
+          var s;
+          var lines = [];
+          var rtrim = /\s+$/;
+          while ((s = br.readLine()) !== null) {
+            var line = s.replace(rtrim, '');
+            if (line !== '') {
+              lines.push(line);
+            }
           }
+          resolve(lines);
         }
-        deferred.resolve(lines);
-      }
 
-    };
-    reader.readAsArrayBuffer(fileOrUrl);
-  } else { // it's already lines?
-    deferred.resolve(fileOrUrl);
-  }
-  return deferred;
+      };
+      reader.readAsArrayBuffer(fileOrUrl);
+    } else { // it's already lines?
+      resolve(fileOrUrl);
+    }
+  });
+
+
 };
 morpheus.Util.createValueToIndices = function (array, field) {
   var map = new morpheus.Map();

@@ -12,7 +12,7 @@ morpheus.OpenDatasetTool.prototype = {
     var file = options.input.file;
     var action = options.input.open_file_action;
     var dataset = project.getSortedFilteredDataset();
-    deferred.fail(function (err) {
+    deferred.catch(function (err) {
       if (err.message === 'Cancel') {
         return;
       }
@@ -30,7 +30,7 @@ morpheus.OpenDatasetTool.prototype = {
       });
     });
     deferred
-      .done(function (newDataset) {
+      .then(function (newDataset) {
 
         var extension = morpheus.Util.getExtension(morpheus.Util
           .getFileName(file));
@@ -276,23 +276,24 @@ morpheus.OpenDatasetTool.prototype = {
   execute: function (options) {
     var file = options.input.file;
     var _this = this;
-    var d = $.Deferred();
-    morpheus.OpenDatasetTool
-      .fileExtensionPrompt(file,
-        function (readOptions) {
-          if (!readOptions) {
-            readOptions = {};
-          }
-          readOptions.interactive = true;
-          var deferred = morpheus.DatasetUtil.read(file,
-            readOptions);
-          deferred.always(function () {
-            d.resolve();
-          });
-          _this._read(options, deferred);
+    return new Promise(function (resolve, reject) {
+      morpheus.OpenDatasetTool
+        .fileExtensionPrompt(file,
+          function (readOptions) {
+            if (!readOptions) {
+              readOptions = {};
+            }
+            readOptions.interactive = true;
+            var deferred = morpheus.DatasetUtil.read(file,
+              readOptions);
+            deferred.finally(function () {
+              resolve();
+            });
+            _this._read(options, deferred);
 
-        });
-    return d;
+          });
+    });
+
 
   }, // prompt for metadata field name in dataset and in file
   _matchAppend: function (newDatasetMetadataNames,

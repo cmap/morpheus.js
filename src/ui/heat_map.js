@@ -338,24 +338,26 @@ morpheus.HeatMap = function (options) {
       name: 'file',
       type: 'file'
     });
-    this.options.dataset = $.Deferred();
-    morpheus.FormBuilder.showOkCancel({
-      title: 'Dataset',
-      appendTo: this.getContentEl(),
-      focus: this.getFocusEl(),
-      content: datasetFormBuilder.$form,
-      okCallback: function () {
-        var file = datasetFormBuilder.getValue('file');
-        morpheus.DatasetUtil.read(file).done(function (dataset) {
-          _this.options.dataset.resolve(dataset);
-        }).fail(function (err) {
-          _this.options.dataset.reject(err);
-        });
-      },
-      cancelCallback: function () {
-        _this.options.dataset.reject('Session cancelled.');
-      }
+    this.options.dataset = new Promise(function (resolve, reject) {
+      morpheus.FormBuilder.showOkCancel({
+        title: 'Dataset',
+        appendTo: _this.getContentEl(),
+        focus: _this.getFocusEl(),
+        content: datasetFormBuilder.$form,
+        okCallback: function () {
+          var file = datasetFormBuilder.getValue('file');
+          morpheus.DatasetUtil.read(file).then(function (dataset) {
+            resolve(dataset);
+          }).catch(function (err) {
+            reject(err);
+          });
+        },
+        cancelCallback: function () {
+          reject('Session cancelled.');
+        }
+      });
     });
+
   }
   if (this.options.name == null) {
     this.options.name = morpheus.Util.getBaseFileName(morpheus.Util.getFileName(this.options.dataset.file ? this.options.dataset.file
@@ -459,7 +461,7 @@ morpheus.HeatMap = function (options) {
       annotations: options.rowAnnotations,
       isColumns: false
     });
-    rowDef.done(function (callbacks) {
+    rowDef.then(function (callbacks) {
       _this.whenLoaded = _this.whenLoaded.concat(callbacks);
     });
     promises.push(rowDef);
@@ -470,7 +472,7 @@ morpheus.HeatMap = function (options) {
       annotations: options.columnAnnotations,
       isColumns: true
     });
-    columnDef.done(function (callbacks) {
+    columnDef.then(function (callbacks) {
       _this.whenLoaded = _this.whenLoaded.concat(callbacks);
     });
     promises.push(columnDef);
@@ -482,7 +484,7 @@ morpheus.HeatMap = function (options) {
       _this.options.rowDendrogram = morpheus.DendrogramUtil.parseNewick(options.rowDendrogram);
     } else {
       var rowDendrogramDeferred = morpheus.Util.getText(options.rowDendrogram);
-      rowDendrogramDeferred.done(function (text) {
+      rowDendrogramDeferred.then(function (text) {
         _this.options.rowDendrogram = morpheus.DendrogramUtil.parseNewick(text);
       });
       promises.push(rowDendrogramDeferred);
@@ -495,7 +497,7 @@ morpheus.HeatMap = function (options) {
       _this.options.columnDendrogram = morpheus.DendrogramUtil.parseNewick(options.columnDendrogram);
     } else {
       var columnDendrogramDeferred = morpheus.Util.getText(options.columnDendrogram);
-      columnDendrogramDeferred.done(function (text) {
+      columnDendrogramDeferred.then(function (text) {
         _this.options.columnDendrogram = morpheus.DendrogramUtil.parseNewick(text);
       });
       promises.push(columnDendrogramDeferred);
@@ -526,7 +528,7 @@ morpheus.HeatMap = function (options) {
   };
   if (morpheus.Util.isArray(options.dataset)) {
     var d = morpheus.DatasetUtil.readDatasetArray(options.dataset);
-    d.fail(function (message) {
+    d.catch(function (message) {
       if (_this.options.$loadingImage) {
         _this.options.$loadingImage.remove();
       }
@@ -539,8 +541,7 @@ morpheus.HeatMap = function (options) {
         appendTo: _this.getContentEl(),
         focus: _this.getFocusEl()
       });
-    });
-    d.done(function (joined) {
+    }).then(function (joined) {
       if (_this.options.$loadingImage) {
         _this.options.$loadingImage.remove();
       }
@@ -582,10 +583,9 @@ morpheus.HeatMap = function (options) {
     var deferred = options.dataset.file ? morpheus.DatasetUtil.read(
       options.dataset.file, options.dataset.options)
       : morpheus.DatasetUtil.read(options.dataset);
-    deferred.done(function (dataset) {
+    deferred.then(function (dataset) {
       _this.options.dataset = dataset;
-    });
-    deferred.fail(function (err) {
+    }).catch(function (err) {
       _this.options.$loadingImage.remove();
       var message = [
         'Error opening '
@@ -613,13 +613,12 @@ morpheus.HeatMap = function (options) {
       var d = options.datasetOverlay.file ? morpheus.DatasetUtil.read(
         options.datasetOverlay.file, options.datasetOverlay.options)
         : morpheus.DatasetUtil.read(options.datasetOverlay);
-      d.done(function (dataset) {
+      d.then(function (dataset) {
         datasetOverlay = dataset;
       });
       promises.push(d);
     }
-    $.when.apply($, promises).done(function () {
-
+    Promise.all(promises).then(function () {
       if (_this.options.$loadingImage) {
         _this.options.$loadingImage.remove();
       }
@@ -648,7 +647,7 @@ morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS = 6;
  *
  * @param tool A tool instance
  * @param heatMap The calling heat map instance
- * @param callback Optional callback to invoke when tool is done
+ * @param callback Optional callback to invoke when tool is then
  */
 morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
   if (tool.gui) {
@@ -717,8 +716,8 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
             }
           };
         } else {
-          if (value != null && typeof value.done === 'function') { // promise
-            value.always(function () {
+          if (value != null && typeof value.then === 'function') { // promise
+            value.finally(function () {
               if (callback) {
                 callback(input);
               }

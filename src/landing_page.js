@@ -110,9 +110,9 @@ morpheus.LandingPage.prototype = {
       var file = files[0];
       var fileName = morpheus.Util.getFileName(file);
       if (fileName.toLowerCase().indexOf('.json') === fileName.length - 5) {
-        morpheus.Util.getText(file).done(function (text) {
+        morpheus.Util.getText(file).then(function (text) {
           _this.open(JSON.parse(text));
-        }).fail(function (err) {
+        }).catch(function (err) {
           morpheus.FormBuilder.showMessageModal({
             title: 'Error',
             message: 'Unable to load session'
@@ -146,11 +146,11 @@ morpheus.LandingPage.prototype = {
       var genesPromise = morpheus.Util.readLines(files[1]);
       var geneLines;
       var barcodeLines;
-      genesPromise.done(function (lines) {
+      genesPromise.then(function (lines) {
         geneLines = lines;
       });
       var barcodesPromise = morpheus.Util.readLines(files[2]);
-      barcodesPromise.done(function (lines) {
+      barcodesPromise.then(function (lines) {
         barcodeLines = lines;
       });
       options.promises = [genesPromise, barcodesPromise];

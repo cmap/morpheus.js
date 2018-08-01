@@ -153,14 +153,14 @@ morpheus.OpenFileTool.prototype = {
 
     var project = options.project;
     if (options.input.open_file_action === 'Open session') {
-      return morpheus.Util.getText(options.input.file).done(function (text) {
+      return morpheus.Util.getText(options.input.file).then(function (text) {
         var options = JSON.parse(text);
         options.tabManager = heatMap.getTabManager();
         options.focus = true;
         options.inheritFromParent = false;
         options.landingPage = heatMap.options.landingPage;
         new morpheus.HeatMap(options);
-      }).fail(function (err) {
+      }).catch(function (err) {
         morpheus.FormBuilder.showMessageModal({
           title: 'Error',
           message: 'Unable to load session',
@@ -176,45 +176,46 @@ morpheus.OpenFileTool.prototype = {
       morpheus.HeatMap.showTool(new morpheus.OpenDendrogramTool(
         options.input.file), options.heatMap);
     } else { // annotate rows or columns
-      var d = $.Deferred();
-      var isAnnotateColumns = options.input.open_file_action ==
-        'Annotate Columns';
-      var fileOrUrl = options.input.file;
-      var dataset = project.getFullDataset();
-      var fileName = morpheus.Util.getFileName(fileOrUrl);
-      if (morpheus.Util.endsWith(fileName, '.cls')) {
-        var result = morpheus.Util.readLines(fileOrUrl);
-        result.always(function () {
-          d.resolve();
-        });
-        result.done(function (lines) {
-          _this.annotateCls(heatMap, dataset, fileName,
-            isAnnotateColumns, lines);
-        });
-      } else if (morpheus.Util.endsWith(fileName, '.gmt')) {
-        morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
-                                                                       buf) {
-          d.resolve();
-          if (err) {
-            throw new Error('Unable to read ' + fileOrUrl);
-          }
-          var sets = new morpheus.GmtReader().read(
-            new morpheus.ArrayBufferReader(new Uint8Array(
-              buf)));
-          _this.promptSets(dataset, heatMap, isAnnotateColumns,
-            sets, morpheus.Util.getBaseFileName(
-              morpheus.Util.getFileName(fileOrUrl)));
-        });
+      return new Promise(function (resolve, reject) {
+        var isAnnotateColumns = options.input.open_file_action ==
+          'Annotate Columns';
+        var fileOrUrl = options.input.file;
+        var dataset = project.getFullDataset();
+        var fileName = morpheus.Util.getFileName(fileOrUrl);
+        if (morpheus.Util.endsWith(fileName, '.cls')) {
+          var result = morpheus.Util.readLines(fileOrUrl);
+          result.finally(function () {
+            resolve();
+          });
+          result.then(function (lines) {
+            _this.annotateCls(heatMap, dataset, fileName,
+              isAnnotateColumns, lines);
+          });
+        } else if (morpheus.Util.endsWith(fileName, '.gmt')) {
+          morpheus.ArrayBufferReader.getArrayBuffer(fileOrUrl, function (err,
+                                                                         buf) {
+            resolve();
+            if (err) {
+              throw new Error('Unable to read ' + fileOrUrl);
+            }
+            var sets = new morpheus.GmtReader().read(
+              new morpheus.ArrayBufferReader(new Uint8Array(
+                buf)));
+            _this.promptSets(dataset, heatMap, isAnnotateColumns,
+              sets, morpheus.Util.getBaseFileName(
+                morpheus.Util.getFileName(fileOrUrl)));
+          });
 
-      } else {
-        var result = morpheus.Util.readLines(fileOrUrl);
-        result.done(function (lines) {
-          _this.prompt(lines, dataset, heatMap, isAnnotateColumns);
-        }).always(function () {
-          d.resolve();
-        });
-        return d;
-      }
+        } else {
+          var result = morpheus.Util.readLines(fileOrUrl);
+          result.then(function (lines) {
+            _this.prompt(lines, dataset, heatMap, isAnnotateColumns);
+          }).finally(function () {
+            resolve();
+          });
+        }
+      });
+
 
     }
   },

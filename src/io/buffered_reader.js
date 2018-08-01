@@ -4,7 +4,7 @@ morpheus.BufferedReader = function (reader, callback, doneCallback) {
   var text = '';
   reader.read().then(function processResult(result) {
     // result contains a value which is an array of Uint8Array
-    text += (result.done ? '' : textDecoder(result.value, 0, result.value.length));
+    text += (result.then ? '' : textDecoder(result.value, 0, result.value.length));
     var start = 0;
     // TODO no need to search previous chunk of text
     for (var i = 0, length = text.length; i < length; i++) {
@@ -22,7 +22,7 @@ morpheus.BufferedReader = function (reader, callback, doneCallback) {
       }
     }
     text = start < text.length ? text.substring(start) : '';
-    if (!result.done) {
+    if (!result.then) {
       return reader.read().then(processResult);
     } else {
       if (text !== '' && text !== '\r') {

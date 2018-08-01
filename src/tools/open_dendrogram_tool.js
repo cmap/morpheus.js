@@ -41,7 +41,7 @@ morpheus.OpenDendrogramTool.prototype = {
     var heatMap = options.heatMap;
     var dendrogramDeferred = morpheus.Util.getText(fileOrUrl);
     dendrogramDeferred
-    .done(function (text) {
+    .then(function (text) {
       var dataset = options.project.getSortedFilteredDataset();
       if (isColumns) {
         dataset = new morpheus.TransposedDatasetView(dataset);
