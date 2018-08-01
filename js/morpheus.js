@@ -14496,7 +14496,6 @@ morpheus.CollapseDatasetTool.prototype = {
     if (!rows) {
       dataset = new morpheus.TransposedDatasetView(dataset);
     }
-    var allFields = morpheus.MetadataUtil.getMetadataNames(dataset.getRowMetadata());
     var filterFunction = null;
     if (options.input.compute_percent) {
       var filterValue = parseFloat(options.input.pass_value);
@@ -14534,17 +14533,6 @@ morpheus.CollapseDatasetTool.prototype = {
       shape: filterFunction != null ? 'circle' : null
     });
 
-    var set = new morpheus.Map();
-    _.each(allFields, function (field) {
-      set.set(field, true);
-    });
-    _.each(collapseToFields, function (field) {
-      set.remove(field);
-    });
-    // hide fields that were not part of collapse to
-    set.forEach(function (val, name) {
-      heatMap.setTrackVisible(name, false, false);
-    });
 
     if (options.input.compute_percent) {
       heatMap.heatmap.colorScheme.getSizer()
