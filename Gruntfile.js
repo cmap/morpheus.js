@@ -3,9 +3,9 @@ module.exports = function (grunt) {
     pkg: grunt.file.readJSON('package.json'),
     meta: {
       banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - '
-      + '<%= grunt.template.today("yyyy-mm-dd") %>\n'
-      + '<%= pkg.homepage ? "* " + pkg.homepage + "\n" : "" %>'
-      + '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>; %> */'
+        + '<%= grunt.template.today("yyyy-mm-dd") %>\n'
+        + '<%= pkg.homepage ? "* " + pkg.homepage + "\n" : "" %>'
+        + '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>; %> */'
     },
     uglify: {
       morpheus: {
@@ -62,7 +62,7 @@ module.exports = function (grunt) {
         nonull: true,
         dest: 'js/morpheus-external.js',
         src: [
-          'js/d3.min.js', 'js/jquery-3.3.1.slim.min.js',
+          'js/d3.min.js', 'js/jquery-3.3.1.min.js',
           'js/bootstrap.min.js', 'js/underscore-min.js',
           'js/newick.js', 'js/hammer.min.js',
           'js/jquery.mousewheel.min.js',
