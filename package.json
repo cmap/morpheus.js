@@ -1,6 +1,7 @@
 {
-  "name": "morpheus-app",
-  "description": "JavaScript matrix visualization and analysis",
+  "name": "tmp-es6-morpheus-app",
+  "description": "Experimental ES6 export for Morpheus.js",
+  "main": "js/morpheus-esm-latest.min.js",
   "license": "BSD-3-Clause",
   "version": "1.0.16",
   "repository": {
@@ -12,7 +13,7 @@
     "url": "https://github.com/cmap/morpheus.js/issues"
   },
   "author": {
-    "name": "Joshua Gould"
+    "name": "Eric Weitz"
   },
   "keywords": [
     "graphing",
@@ -39,7 +40,7 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "^2.2.1",
     "grunt-contrib-jasmine": "^1.1.0",
-    "grunt-contrib-uglify": "^3.3.0",
+    "grunt-contrib-uglify-es": "^3.3.0",
     "grunt-contrib-watch": "^1.0.0",
     "jasmine-core": "~2.6.4",
     "karma": "^1.7.1",
