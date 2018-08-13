@@ -3,10 +3,10 @@ morpheus.HeatMapMenu = function (heatMap) {
   var isNode = morpheus.Util.isNode();
   var menuTemplate;
   if (isNode) {
-    var remote = require('electron').remote;
-    var Menu = remote.Menu;
-    var MenuItem = remote.MenuItem;
-    menuTemplate = [];
+//    var remote = require('electron').remote;
+//    var Menu = remote.Menu;
+//    var MenuItem = remote.MenuItem;
+//    menuTemplate = [];
   }
   var $menus = $(
     '<div style="display: inline-block;margin-right:14px;"></div>');

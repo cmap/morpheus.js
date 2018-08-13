@@ -181,69 +181,71 @@ morpheus.Dataset.fromJSON = function (options) {
 };
 
 morpheus.Matrix1DFileBacked = function (options) {
-  this.options = options;
-
-  var file = options.file;
-  var h5lt = require('hdf5').h5lt;
-  var datasetPath = this.options.array;
-  var type = this.options.file.getDataType(datasetPath);
-  var H5Type = require('hdf5/lib/globals.js').H5Type;
-
-  if (type === H5Type.H5T_IEEE_F64LE) {
-    this.getter = 'readDoubleLE';
-    this.offset = 8;
-  } else if (type === H5Type.H5T_IEEE_F64BE) {
-    this.getter = 'readDoubleBE';
-    this.offset = 8;
-  } else if (type === H5Type.H5T_IEEE_F32LE) {
-    this.getter = 'readFloatLE';
-    this.offset = 4;
-  } else if (type === H5Type.H5T_IEEE_F32BE) {
-    this.getter = 'readFloatBE';
-    this.offset = 4;
-  } else {
-    throw new Error('Unsupported data type');
-  }
-  var ncols = this.options.columns;
-  var nrows = this.options.rows;
-  var backedRows = this.options.backedRows;
-  var _this = this;
-
-  var LRUMap = require('lru_map').LRUMap;
-  var cache = new LRUMap(100);
-
-  if (backedRows) {
-    this.getValue = function (i, j) {
-      var buffer = cache.get(i);
-      if (buffer == null) {
-        // var array = this.h5lt.readDataset(this.options.file.id, datasetPath, {
-        //   start: [i, 0],
-        //   stride: [1, 1],
-        //   count: [1, ncols]
-        // });
-        buffer = h5lt.readDatasetAsBuffer(file.id, datasetPath, {
-          start: [i, 0],
-          count: [1, ncols],
-          stride: [1, 1]
-        });
-        cache.set(i, buffer);
-      }
-      return buffer[_this.getter](j * _this.offset);
-    };
-  } else {
-    this.getValue = function (i, j) {
-      var buffer = cache.get(j);
-      if (buffer == null) {
-        buffer = h5lt.readDatasetAsBuffer(file.id, datasetPath, {
-          start: [0, j],
-          count: [nrows, 1],
-          stride: [1, 1]
-        });
-        cache.set(j, buffer);
-      }
-      return buffer[_this.getter](i * _this.offset);
-    };
-  }
+  return;
+//
+//  this.options = options;
+//
+//  var file = options.file;
+//  var h5lt = require('hdf5').h5lt;
+//  var datasetPath = this.options.array;
+//  var type = this.options.file.getDataType(datasetPath);
+//  var H5Type = require('hdf5/lib/globals.js').H5Type;
+//
+//  if (type === H5Type.H5T_IEEE_F64LE) {
+//    this.getter = 'readDoubleLE';
+//    this.offset = 8;
+//  } else if (type === H5Type.H5T_IEEE_F64BE) {
+//    this.getter = 'readDoubleBE';
+//    this.offset = 8;
+//  } else if (type === H5Type.H5T_IEEE_F32LE) {
+//    this.getter = 'readFloatLE';
+//    this.offset = 4;
+//  } else if (type === H5Type.H5T_IEEE_F32BE) {
+//    this.getter = 'readFloatBE';
+//    this.offset = 4;
+//  } else {
+//    throw new Error('Unsupported data type');
+//  }
+//  var ncols = this.options.columns;
+//  var nrows = this.options.rows;
+//  var backedRows = this.options.backedRows;
+//  var _this = this;
+//
+//  var LRUMap = require('lru_map').LRUMap;
+//  var cache = new LRUMap(100);
+//
+//  if (backedRows) {
+//    this.getValue = function (i, j) {
+//      var buffer = cache.get(i);
+//      if (buffer == null) {
+//        // var array = this.h5lt.readDataset(this.options.file.id, datasetPath, {
+//        //   start: [i, 0],
+//        //   stride: [1, 1],
+//        //   count: [1, ncols]
+//        // });
+//        buffer = h5lt.readDatasetAsBuffer(file.id, datasetPath, {
+//          start: [i, 0],
+//          count: [1, ncols],
+//          stride: [1, 1]
+//        });
+//        cache.set(i, buffer);
+//      }
+//      return buffer[_this.getter](j * _this.offset);
+//    };
+//  } else {
+//    this.getValue = function (i, j) {
+//      var buffer = cache.get(j);
+//      if (buffer == null) {
+//        buffer = h5lt.readDatasetAsBuffer(file.id, datasetPath, {
+//          start: [0, j],
+//          count: [nrows, 1],
+//          stride: [1, 1]
+//        });
+//        cache.set(j, buffer);
+//      }
+//      return buffer[_this.getter](i * _this.offset);
+//    };
+//  }
 
 };
 morpheus.Matrix1DFileBacked.prototype = {
