@@ -6385,9 +6385,6 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
     } else if (typeof fileOrUrl.then === 'function') { // assume it's a promise
       return resolve(fileOrUrl);
     } else { // it's already a dataset?
-      if (fileOrUrl.promise) { // it's a promise
-        return resolve(fileOrUrl);
-      }
       if (fileOrUrl.getRowCount) { // it's a dataset
         resolve(fileOrUrl);
       } else { // JSON
@@ -12950,8 +12947,6 @@ morpheus.AdjustDataTool.prototype = {
   },
   execute: function (options) {
     var project = options.project;
-    var heatMap = options.heatMap;
-
     if (options.input.log_2 || options.input.inverse_log_2
       || options.input['z-score'] || options.input['robust_z-score'] || options.input.quantile_normalize || options.input.scale_column_sum || options.input.one_plus_log_2
     ) {
@@ -13024,9 +13019,9 @@ morpheus.AdjustDataTool.prototype = {
       }
 
       return new morpheus.HeatMap({
-        name: heatMap.getName(),
+        name: options.input.name || options.heatMap.getName(),
         dataset: dataset,
-        parent: heatMap,
+        parent: options.heatMap,
         symmetric: project.isSymmetric() && dataset.getColumnCount() === dataset.getRowCount()
       });
     }
@@ -29023,6 +29018,10 @@ morpheus.HeatMap = function (options) {
 
     }, options);
 
+  var resolveFunction;
+  this.promise = new Promise(function (resolve, reject) {
+    resolveFunction = resolve;
+  });
   for (var i = 0; i < dontExtend.length; i++) {
     var field = dontExtend[i];
     options[field] = cache[i];
@@ -29282,7 +29281,7 @@ morpheus.HeatMap = function (options) {
     if (options.loadedCallback) {
       options.loadedCallback(_this);
     }
-
+    resolveFunction();
     if (_this.tabManager) {
       if (_this.options.focus) {
         _this.tabManager.setActiveTab(tab.id);
@@ -29347,10 +29346,10 @@ morpheus.HeatMap = function (options) {
       heatMapLoaded();
     });
   } else {
-    var deferred = options.dataset.file ? morpheus.DatasetUtil.read(
+    var dsPromise = options.dataset.file ? morpheus.DatasetUtil.read(
       options.dataset.file, options.dataset.options)
       : morpheus.DatasetUtil.read(options.dataset);
-    deferred.then(function (dataset) {
+    dsPromise.then(function (dataset) {
       _this.options.dataset = dataset;
     }).catch(function (err) {
       _this.options.$loadingImage.remove();
@@ -29373,8 +29372,7 @@ morpheus.HeatMap = function (options) {
         focus: _this.getFocusEl()
       });
     });
-
-    promises.push(deferred);
+    promises.push(dsPromise);
     var datasetOverlay = null;
     if (options.datasetOverlay) {
       var d = options.datasetOverlay.file ? morpheus.DatasetUtil.read(

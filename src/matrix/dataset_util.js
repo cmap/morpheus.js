@@ -263,9 +263,6 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
     } else if (typeof fileOrUrl.then === 'function') { // assume it's a promise
       return resolve(fileOrUrl);
     } else { // it's already a dataset?
-      if (fileOrUrl.promise) { // it's a promise
-        return resolve(fileOrUrl);
-      }
       if (fileOrUrl.getRowCount) { // it's a dataset
         resolve(fileOrUrl);
       } else { // JSON

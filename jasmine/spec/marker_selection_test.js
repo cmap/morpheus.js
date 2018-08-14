@@ -11,14 +11,11 @@ describe('marker_selection_test', function () {
     promises.push(morpheus.DatasetUtil.read('test_files/aml_aml_train_marker_selection.gct').done(function (d) {
       referenceDataset = d;
     }));
-    $.when.apply($, promises).done(function () {
-      var heatmap = new morpheus.HeatMap({
-        dataset: dataset
-      });
+    Promise.all(promises).then(function () {
+      var project = new morpheus.Project(dataset);
 
       new morpheus.MarkerSelection().execute({
-        controller: heatmap,
-        project: heatmap.getProject(),
+        project: project,
         input: {
           background: false,
           permutations: 1000,

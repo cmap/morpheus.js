@@ -95,8 +95,6 @@ morpheus.AdjustDataTool.prototype = {
   },
   execute: function (options) {
     var project = options.project;
-    var heatMap = options.heatMap;
-
     if (options.input.log_2 || options.input.inverse_log_2
       || options.input['z-score'] || options.input['robust_z-score'] || options.input.quantile_normalize || options.input.scale_column_sum || options.input.one_plus_log_2
     ) {
@@ -169,9 +167,9 @@ morpheus.AdjustDataTool.prototype = {
       }
 
       return new morpheus.HeatMap({
-        name: heatMap.getName(),
+        name: options.input.name || options.heatMap.getName(),
         dataset: dataset,
-        parent: heatMap,
+        parent: options.heatMap,
         symmetric: project.isSymmetric() && dataset.getColumnCount() === dataset.getRowCount()
       });
     }
