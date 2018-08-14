@@ -18,6 +18,7 @@ morpheus.Util = function () {
 };
 
 morpheus.Util.isNode = function () {
+  return false;
   // Only Node.JS has a process variable that is of [[Class]] process
   try {
     return Object.prototype.toString.call(global.process) === '[object process]'
@@ -3556,60 +3557,61 @@ morpheus.Hdf5Reader = function (options) {
 morpheus.Hdf5Reader.prototype = {
 
   read: function (fileOrUrl, callback) {
-    var hdf5 = require('hdf5').hdf5;
-    var h5lt = require('hdf5').h5lt;
-    var Access = require('hdf5/lib/globals').Access;
-    var name = morpheus.Util.getBaseFileName(morpheus.Util
-      .getFileName(fileOrUrl));
-    var file = new hdf5.File(fileOrUrl.path, Access.ACC_RDONLY);
-
-    var dim = file.getDatasetDimensions(this.options.dataset);
-    var matrixType = '1d';
-    if (!this.options.columnMajorOrder && dim[0] * dim[1] > 20000000) {
-      matrixType = '1d_backed';
-    }
-    var dataset = new morpheus.Dataset({
-      name: name,
-      rows: this.options.columnMajorOrder ? dim[1] : dim[0],
-      file: file,
-      columns: this.options.columnMajorOrder ? dim[0] : dim[1],
-      dataType: 'Float32',
-      type: matrixType,
-      backedRows: !this.options.transpose,
-      array: matrixType === '1d_backed' ? this.options.dataset : h5lt.readDataset(file.id, this.options.dataset),
-      columnMajorOrder: this.options.columnMajorOrder
-    });
-
-
-    var group = file.openGroup(this.options.rowMeta);
-    var names = group.getMemberNamesByCreationOrder();
-    names.forEach(function (name) {
-      try {
-        var val = h5lt.readDataset(group.id, name);
-        dataset.getRowMetadata().add(name).array = val;
-      } catch (x) {
-
-      }
-    });
-    group.close();
-    group = file.openGroup(this.options.colMeta);
-    names = group.getMemberNamesByCreationOrder();
-    names.forEach(function (name) {
-      try {
-        var val = h5lt.readDataset(group.id, name);
-        dataset.getColumnMetadata().add(name).array = val;
-      } catch (x) {
-
-      }
-    });
-    group.close();
-    if (matrixType !== '1d_backed') {
-      file.close();
-    }
-    if (this.options.transpose) {
-      dataset = new morpheus.TransposedDatasetView(dataset);
-    }
-    callback(null, dataset);
+    return;
+//    var hdf5 = require('hdf5').hdf5;
+//    var h5lt = require('hdf5').h5lt;
+//    var Access = require('hdf5/lib/globals').Access;
+//    var name = morpheus.Util.getBaseFileName(morpheus.Util
+//      .getFileName(fileOrUrl));
+//    var file = new hdf5.File(fileOrUrl.path, Access.ACC_RDONLY);
+//
+//    var dim = file.getDatasetDimensions(this.options.dataset);
+//    var matrixType = '1d';
+//    if (!this.options.columnMajorOrder && dim[0] * dim[1] > 20000000) {
+//      matrixType = '1d_backed';
+//    }
+//    var dataset = new morpheus.Dataset({
+//      name: name,
+//      rows: this.options.columnMajorOrder ? dim[1] : dim[0],
+//      file: file,
+//      columns: this.options.columnMajorOrder ? dim[0] : dim[1],
+//      dataType: 'Float32',
+//      type: matrixType,
+//      backedRows: !this.options.transpose,
+//      array: matrixType === '1d_backed' ? this.options.dataset : h5lt.readDataset(file.id, this.options.dataset),
+//      columnMajorOrder: this.options.columnMajorOrder
+//    });
+//
+//
+//    var group = file.openGroup(this.options.rowMeta);
+//    var names = group.getMemberNamesByCreationOrder();
+//    names.forEach(function (name) {
+//      try {
+//        var val = h5lt.readDataset(group.id, name);
+//        dataset.getRowMetadata().add(name).array = val;
+//      } catch (x) {
+//
+//      }
+//    });
+//    group.close();
+//    group = file.openGroup(this.options.colMeta);
+//    names = group.getMemberNamesByCreationOrder();
+//    names.forEach(function (name) {
+//      try {
+//        var val = h5lt.readDataset(group.id, name);
+//        dataset.getColumnMetadata().add(name).array = val;
+//      } catch (x) {
+//
+//      }
+//    });
+//    group.close();
+//    if (matrixType !== '1d_backed') {
+//      file.close();
+//    }
+//    if (this.options.transpose) {
+//      dataset = new morpheus.TransposedDatasetView(dataset);
+//    }
+//    callback(null, dataset);
   }
 
 };
@@ -7207,69 +7209,71 @@ morpheus.Dataset.fromJSON = function (options) {
 };
 
 morpheus.Matrix1DFileBacked = function (options) {
-  this.options = options;
-
-  var file = options.file;
-  var h5lt = require('hdf5').h5lt;
-  var datasetPath = this.options.array;
-  var type = this.options.file.getDataType(datasetPath);
-  var H5Type = require('hdf5/lib/globals.js').H5Type;
-
-  if (type === H5Type.H5T_IEEE_F64LE) {
-    this.getter = 'readDoubleLE';
-    this.offset = 8;
-  } else if (type === H5Type.H5T_IEEE_F64BE) {
-    this.getter = 'readDoubleBE';
-    this.offset = 8;
-  } else if (type === H5Type.H5T_IEEE_F32LE) {
-    this.getter = 'readFloatLE';
-    this.offset = 4;
-  } else if (type === H5Type.H5T_IEEE_F32BE) {
-    this.getter = 'readFloatBE';
-    this.offset = 4;
-  } else {
-    throw new Error('Unsupported data type');
-  }
-  var ncols = this.options.columns;
-  var nrows = this.options.rows;
-  var backedRows = this.options.backedRows;
-  var _this = this;
-
-  var LRUMap = require('lru_map').LRUMap;
-  var cache = new LRUMap(100);
-
-  if (backedRows) {
-    this.getValue = function (i, j) {
-      var buffer = cache.get(i);
-      if (buffer == null) {
-        // var array = this.h5lt.readDataset(this.options.file.id, datasetPath, {
-        //   start: [i, 0],
-        //   stride: [1, 1],
-        //   count: [1, ncols]
-        // });
-        buffer = h5lt.readDatasetAsBuffer(file.id, datasetPath, {
-          start: [i, 0],
-          count: [1, ncols],
-          stride: [1, 1]
-        });
-        cache.set(i, buffer);
-      }
-      return buffer[_this.getter](j * _this.offset);
-    };
-  } else {
-    this.getValue = function (i, j) {
-      var buffer = cache.get(j);
-      if (buffer == null) {
-        buffer = h5lt.readDatasetAsBuffer(file.id, datasetPath, {
-          start: [0, j],
-          count: [nrows, 1],
-          stride: [1, 1]
-        });
-        cache.set(j, buffer);
-      }
-      return buffer[_this.getter](i * _this.offset);
-    };
-  }
+  return;
+//
+//  this.options = options;
+//
+//  var file = options.file;
+//  var h5lt = require('hdf5').h5lt;
+//  var datasetPath = this.options.array;
+//  var type = this.options.file.getDataType(datasetPath);
+//  var H5Type = require('hdf5/lib/globals.js').H5Type;
+//
+//  if (type === H5Type.H5T_IEEE_F64LE) {
+//    this.getter = 'readDoubleLE';
+//    this.offset = 8;
+//  } else if (type === H5Type.H5T_IEEE_F64BE) {
+//    this.getter = 'readDoubleBE';
+//    this.offset = 8;
+//  } else if (type === H5Type.H5T_IEEE_F32LE) {
+//    this.getter = 'readFloatLE';
+//    this.offset = 4;
+//  } else if (type === H5Type.H5T_IEEE_F32BE) {
+//    this.getter = 'readFloatBE';
+//    this.offset = 4;
+//  } else {
+//    throw new Error('Unsupported data type');
+//  }
+//  var ncols = this.options.columns;
+//  var nrows = this.options.rows;
+//  var backedRows = this.options.backedRows;
+//  var _this = this;
+//
+//  var LRUMap = require('lru_map').LRUMap;
+//  var cache = new LRUMap(100);
+//
+//  if (backedRows) {
+//    this.getValue = function (i, j) {
+//      var buffer = cache.get(i);
+//      if (buffer == null) {
+//        // var array = this.h5lt.readDataset(this.options.file.id, datasetPath, {
+//        //   start: [i, 0],
+//        //   stride: [1, 1],
+//        //   count: [1, ncols]
+//        // });
+//        buffer = h5lt.readDatasetAsBuffer(file.id, datasetPath, {
+//          start: [i, 0],
+//          count: [1, ncols],
+//          stride: [1, 1]
+//        });
+//        cache.set(i, buffer);
+//      }
+//      return buffer[_this.getter](j * _this.offset);
+//    };
+//  } else {
+//    this.getValue = function (i, j) {
+//      var buffer = cache.get(j);
+//      if (buffer == null) {
+//        buffer = h5lt.readDatasetAsBuffer(file.id, datasetPath, {
+//          start: [0, j],
+//          count: [nrows, 1],
+//          stride: [1, 1]
+//        });
+//        cache.set(j, buffer);
+//      }
+//      return buffer[_this.getter](i * _this.offset);
+//    };
+//  }
 
 };
 morpheus.Matrix1DFileBacked.prototype = {
@@ -18855,15 +18859,15 @@ morpheus.ActionManager = function () {
   var $filterModal = null;
   var windowOpen = function (url) {
     if (morpheus.Util.isNode()) {
-      var remote = require('electron').remote;
-      var BrowserWindow = remote.BrowserWindow;
-      var newWindow = new BrowserWindow({
-        fullscreenable: false
-      });
-      newWindow.loadURL(url);
-      newWindow.on('closed', function () {
-        newWindow = null;
-      });
+//      var remote = require('electron').remote;
+//      var BrowserWindow = remote.BrowserWindow;
+//      var newWindow = new BrowserWindow({
+//        fullscreenable: false
+//      });
+//      newWindow.loadURL(url);
+//      newWindow.on('closed', function () {
+//        newWindow = null;
+//      });
     } else {
       window.open(url);
     }
@@ -33484,10 +33488,10 @@ morpheus.HeatMapMenu = function (heatMap) {
   var isNode = morpheus.Util.isNode();
   var menuTemplate;
   if (isNode) {
-    var remote = require('electron').remote;
-    var Menu = remote.Menu;
-    var MenuItem = remote.MenuItem;
-    menuTemplate = [];
+//    var remote = require('electron').remote;
+//    var Menu = remote.Menu;
+//    var MenuItem = remote.MenuItem;
+//    menuTemplate = [];
   }
   var $menus = $(
     '<div style="display: inline-block;margin-right:14px;"></div>');
