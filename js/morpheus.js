@@ -4916,7 +4916,6 @@ morpheus.TxtReader.prototype = {
     if (testLine == null) {
       testLine = reader.readLine();
     }
-    var percentSparse = 0;
 
     if (testLine != null) {
       var tmp = new Float32Array(ncols);
@@ -4935,10 +4934,10 @@ morpheus.TxtReader.prototype = {
         }
         tmp[j - dataColumnStart] = value;
       }
-      percentSparse = nzero / tmp.length;
+      var percentSparse = nzero / tmp.length;
       if (percentSparse > 0.3) {
         isSparse = true;
-        var obj = {values: new Float32Array(tmp.length), indices: new Uint32Array(tmp.length)};
+        var obj = {values: new Float32Array(tmp.length - nzero), indices: new Uint32Array(tmp.length - nzero)};
         for (var j = 0, k = 0; j < tmp.length; j++) {
           if (tmp[j] !== 0.0) {
             obj.values[k] = tmp[j];
@@ -4954,8 +4953,6 @@ morpheus.TxtReader.prototype = {
     while ((s = reader.readLine()) !== null) {
       s = s.replace(rtrim, '');
       if (s !== '') {
-
-
         var tokens = s.split(separator);
         for (var j = 0; j < dataColumnStart; j++) {
           // row metadata
