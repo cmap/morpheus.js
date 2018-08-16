@@ -256,6 +256,10 @@ morpheus.HeatMap = function (options) {
 
     }, options);
 
+  var resolveFunction;
+  this.promise = new Promise(function (resolve, reject) {
+    resolveFunction = resolve;
+  });
   for (var i = 0; i < dontExtend.length; i++) {
     var field = dontExtend[i];
     options[field] = cache[i];
@@ -515,7 +519,7 @@ morpheus.HeatMap = function (options) {
     if (options.loadedCallback) {
       options.loadedCallback(_this);
     }
-
+    resolveFunction();
     if (_this.tabManager) {
       if (_this.options.focus) {
         _this.tabManager.setActiveTab(tab.id);
@@ -580,10 +584,10 @@ morpheus.HeatMap = function (options) {
       heatMapLoaded();
     });
   } else {
-    var deferred = options.dataset.file ? morpheus.DatasetUtil.read(
+    var dsPromise = options.dataset.file ? morpheus.DatasetUtil.read(
       options.dataset.file, options.dataset.options)
       : morpheus.DatasetUtil.read(options.dataset);
-    deferred.then(function (dataset) {
+    dsPromise.then(function (dataset) {
       _this.options.dataset = dataset;
     }).catch(function (err) {
       _this.options.$loadingImage.remove();
@@ -606,8 +610,7 @@ morpheus.HeatMap = function (options) {
         focus: _this.getFocusEl()
       });
     });
-
-    promises.push(deferred);
+    promises.push(dsPromise);
     var datasetOverlay = null;
     if (options.datasetOverlay) {
       var d = options.datasetOverlay.file ? morpheus.DatasetUtil.read(

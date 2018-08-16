@@ -4918,7 +4918,6 @@ morpheus.TxtReader.prototype = {
     if (testLine == null) {
       testLine = reader.readLine();
     }
-    var percentSparse = 0;
 
     if (testLine != null) {
       var tmp = new Float32Array(ncols);
@@ -4937,10 +4936,10 @@ morpheus.TxtReader.prototype = {
         }
         tmp[j - dataColumnStart] = value;
       }
-      percentSparse = nzero / tmp.length;
+      var percentSparse = nzero / tmp.length;
       if (percentSparse > 0.3) {
         isSparse = true;
-        var obj = {values: new Float32Array(tmp.length), indices: new Uint32Array(tmp.length)};
+        var obj = {values: new Float32Array(tmp.length - nzero), indices: new Uint32Array(tmp.length - nzero)};
         for (var j = 0, k = 0; j < tmp.length; j++) {
           if (tmp[j] !== 0.0) {
             obj.values[k] = tmp[j];
@@ -4956,8 +4955,6 @@ morpheus.TxtReader.prototype = {
     while ((s = reader.readLine()) !== null) {
       s = s.replace(rtrim, '');
       if (s !== '') {
-
-
         var tokens = s.split(separator);
         for (var j = 0; j < dataColumnStart; j++) {
           // row metadata
@@ -6387,9 +6384,6 @@ morpheus.DatasetUtil.read = function (fileOrUrl, options) {
     } else if (typeof fileOrUrl.then === 'function') { // assume it's a promise
       return resolve(fileOrUrl);
     } else { // it's already a dataset?
-      if (fileOrUrl.promise) { // it's a promise
-        return resolve(fileOrUrl);
-      }
       if (fileOrUrl.getRowCount) { // it's a dataset
         resolve(fileOrUrl);
       } else { // JSON
@@ -12954,8 +12948,6 @@ morpheus.AdjustDataTool.prototype = {
   },
   execute: function (options) {
     var project = options.project;
-    var heatMap = options.heatMap;
-
     if (options.input.log_2 || options.input.inverse_log_2
       || options.input['z-score'] || options.input['robust_z-score'] || options.input.quantile_normalize || options.input.scale_column_sum || options.input.one_plus_log_2
     ) {
@@ -13028,9 +13020,9 @@ morpheus.AdjustDataTool.prototype = {
       }
 
       return new morpheus.HeatMap({
-        name: heatMap.getName(),
+        name: options.input.name || options.heatMap.getName(),
         dataset: dataset,
-        parent: heatMap,
+        parent: options.heatMap,
         symmetric: project.isSymmetric() && dataset.getColumnCount() === dataset.getRowCount()
       });
     }
@@ -29027,6 +29019,10 @@ morpheus.HeatMap = function (options) {
 
     }, options);
 
+  var resolveFunction;
+  this.promise = new Promise(function (resolve, reject) {
+    resolveFunction = resolve;
+  });
   for (var i = 0; i < dontExtend.length; i++) {
     var field = dontExtend[i];
     options[field] = cache[i];
@@ -29286,7 +29282,7 @@ morpheus.HeatMap = function (options) {
     if (options.loadedCallback) {
       options.loadedCallback(_this);
     }
-
+    resolveFunction();
     if (_this.tabManager) {
       if (_this.options.focus) {
         _this.tabManager.setActiveTab(tab.id);
@@ -29351,10 +29347,10 @@ morpheus.HeatMap = function (options) {
       heatMapLoaded();
     });
   } else {
-    var deferred = options.dataset.file ? morpheus.DatasetUtil.read(
+    var dsPromise = options.dataset.file ? morpheus.DatasetUtil.read(
       options.dataset.file, options.dataset.options)
       : morpheus.DatasetUtil.read(options.dataset);
-    deferred.then(function (dataset) {
+    dsPromise.then(function (dataset) {
       _this.options.dataset = dataset;
     }).catch(function (err) {
       _this.options.$loadingImage.remove();
@@ -29377,8 +29373,7 @@ morpheus.HeatMap = function (options) {
         focus: _this.getFocusEl()
       });
     });
-
-    promises.push(deferred);
+    promises.push(dsPromise);
     var datasetOverlay = null;
     if (options.datasetOverlay) {
       var d = options.datasetOverlay.file ? morpheus.DatasetUtil.read(
