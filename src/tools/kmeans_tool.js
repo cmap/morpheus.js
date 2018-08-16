@@ -38,8 +38,7 @@ morpheus.KMeansTool.execute = function (dataset, input) {
   }
   if (columns) {
     columnAssignments = doCluster(
-      morpheus.DatasetUtil
-      .transposedView(input.selectedRowsToUseForClusteringColumns ? new morpheus.SlicedDatasetView(
+      new morpheus.TransposedDatasetView(input.selectedRowsToUseForClusteringColumns ? new morpheus.SlicedDatasetView(
         dataset, input.selectedRowsToUseForClusteringColumns, null)
         : dataset));
 
@@ -56,8 +55,8 @@ morpheus.KMeansTool.prototype = {
   },
   init: function (project, form) {
     form
-    .setVisible('cluster_rows_in_space_of_selected_columns_only',
-      false);
+      .setVisible('cluster_rows_in_space_of_selected_columns_only',
+        false);
     form.$form.find('[name=cluster]').on(
       'change',
       function (e) {
@@ -114,13 +113,13 @@ morpheus.KMeansTool.prototype = {
     options.input.number_of_clusters = parseInt(options.input.number_of_clusters);
     options.input.maximum_iterations = parseInt(options.input.maximum_iterations);
     var selectedRowsToUseForClusteringColumns = options.input.cluster_columns_in_space_of_selected_rows_only ? project
-    .getRowSelectionModel().getViewIndices().values()
+        .getRowSelectionModel().getViewIndices().values()
       : null;
     if (selectedRowsToUseForClusteringColumns != null && selectedRowsToUseForClusteringColumns.length === 0) {
       selectedRowsToUseForClusteringColumns = null;
     }
     var selectedColumnsToUseForClusteringRows = options.input.cluster_rows_in_space_of_selected_columns_only ? project
-    .getColumnSelectionModel().getViewIndices().values()
+        .getColumnSelectionModel().getViewIndices().values()
       : null;
     if (selectedColumnsToUseForClusteringRows != null && selectedColumnsToUseForClusteringRows.length === 0) {
       selectedColumnsToUseForClusteringRows = null;
@@ -134,6 +133,7 @@ morpheus.KMeansTool.prototype = {
     var dataset = project.getSortedFilteredDataset();
 
     options.input.background = options.input.background && typeof Worker !== 'undefined';
+
     function addAssignments(d, assignments, k) {
       var v = d.getColumnMetadata().add('k_means_' + k);
       for (var i = 0; i < assignments.length; i++) {

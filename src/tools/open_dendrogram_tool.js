@@ -41,10 +41,10 @@ morpheus.OpenDendrogramTool.prototype = {
     var heatMap = options.heatMap;
     var dendrogramDeferred = morpheus.Util.getText(fileOrUrl);
     dendrogramDeferred
-    .done(function (text) {
+    .then(function (text) {
       var dataset = options.project.getSortedFilteredDataset();
       if (isColumns) {
-        dataset = morpheus.DatasetUtil.transposedView(dataset);
+        dataset = new morpheus.TransposedDatasetView(dataset);
       }
       var tree = morpheus.DendrogramUtil.parseNewick(text);
       if (tree.leafNodes.length !== dataset.getRowCount()) {

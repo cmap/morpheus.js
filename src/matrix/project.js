@@ -191,7 +191,7 @@ morpheus.Project.prototype = {
     return this.columnColorModel;
   },
   getSortedFilteredDataset: function () {
-    return morpheus.DatasetUtil.slicedView(this.getFullDataset(),
+    return new morpheus.SlicedDatasetView(this.getFullDataset(),
       this.rowIndexMapper.convertToView(), this.columnIndexMapper
         .convertToView());
   },

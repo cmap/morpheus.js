@@ -44,11 +44,13 @@ morpheus.CombinedFilter.prototype = {
     return true;
   },
   add: function (filter, notify) {
-    this.filters.push(filter);
-    if (notify) {
-      this.trigger('add', {
-        filter: filter,
-      });
+    if (filter != null) {
+      this.filters.push(filter);
+      if (notify) {
+        this.trigger('add', {
+          filter: filter,
+        });
+      }
     }
   },
   getFilters: function () {
@@ -396,13 +398,17 @@ morpheus.TopNFilter.prototype = {
   },
 };
 
-morpheus.AlwaysTrueFilter = function () {
+morpheus.AlwaysTrueFilter = function (isColumns) {
+  this.isColumns = isColumns;
 
 };
 
 morpheus.AlwaysTrueFilter.prototype = {
   isEnabled: function () {
     return false;
+  },
+  isColumns: function () {
+    return this.isColumns;
   },
   setEnabled: function (enabled) {
 

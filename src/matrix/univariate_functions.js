@@ -246,7 +246,13 @@ morpheus.Log2 = function (x) {
  */
 morpheus.FDR_BH = function (nominalPValues) {
   var size = nominalPValues.length;
-  var fdr = [];
+
+  for (var i = 0; i < size; i++) {
+    var value = nominalPValues[i];
+    if (value > 1 || isNaN(value)) {
+      nominalPValues[i] = 1;
+    }
+  }
   var pValueIndices = morpheus.Util.indexSort(nominalPValues, true);
   var ranks = morpheus.Util.rankIndexArray(pValueIndices);
 
@@ -258,6 +264,8 @@ morpheus.FDR_BH = function (nominalPValues) {
       ranks[pValueIndices[i - 1]] = ranks[pValueIndices[i]];
     }
   }
+
+  var fdr = new Float32Array(size);
   for (var i = 0; i < size; i++) {
     var rank = ranks[i];
     var p = nominalPValues[i];
@@ -293,7 +301,7 @@ morpheus.MAD = function (list, median) {
     }
   }
   var r = morpheus.Percentile(new morpheus.Vector('', temp.length)
-  .setArray(temp), 50);
+    .setArray(temp), 50);
   return 1.4826 * r;
 };
 morpheus.MAD.toString = function () {

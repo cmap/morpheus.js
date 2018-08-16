@@ -387,7 +387,7 @@ morpheus.VectorTrack.prototype = {
         this.getFullVector().getProperties().set(morpheus.VectorKeys.DISCRETE, true);
         this.settings.highlightMatchingValues = true;
       } else if (this.getFullVector().getProperties().has(
-          morpheus.VectorKeys.FIELDS)
+        morpheus.VectorKeys.FIELDS)
         || morpheus.VectorUtil.getDataType(this.getFullVector()) === 'number' || morpheus.VectorUtil.getDataType(this.getFullVector()) === '[number]') {
         this.getFullVector().getProperties().set(morpheus.VectorKeys.DISCRETE, false);
         this.settings.highlightMatchingValues = false;
@@ -446,7 +446,7 @@ morpheus.VectorTrack.prototype = {
                     'representation': 'sdf'
                   },
                   url: 'http://cactus.nci.nih.gov/chemical/structure'
-                }).done(function (text) {
+                }).then(function (text) {
               _this.moleculeCache[this.smile] = text;
               if (values.length > 0) {
                 doRequest(values.pop());
@@ -909,6 +909,7 @@ morpheus.VectorTrack.prototype = {
     var DISPLAY_TEXT_AND_COLOR = 'Encode Text Using Color';
     var DISPLAY_TEXT_AND_FONT = 'Encode Text Using Font';
     var DISPLAY_STRUCTURE = 'Show Chemical Structure';
+    var USE_ANOTHER_ANNOTATION_TEXT_COLOR = 'Text Color Annotation';
     var DISPLAY_CONTINUOUS = 'Continuous';
     var positions = this.positions;
     var heatmap = this.heatmap;
@@ -935,8 +936,7 @@ morpheus.VectorTrack.prototype = {
     sectionToItems.Selection.push({
       name: MOVE_TO_TOP
     });
-    if (this.heatmap.options.menu.Edit && this.heatmap.options.menu.Edit.indexOf('Annotate' +
-        ' Selected Rows') !== -1) {
+    if (this.heatmap.options.menu.Edit && this.heatmap.options.menu.Edit.indexOf('Annotate Selected Rows') !== -1) {
       sectionToItems.Selection.push({
         name: ANNOTATE_SELECTION
       });
@@ -1021,16 +1021,22 @@ morpheus.VectorTrack.prototype = {
         name: DISPLAY_TEXT,
         checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)
       });
-      if (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT)) {
+      sectionToItems.Display.push({
+        name: DISPLAY_TEXT_AND_COLOR,
+        checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
+      });
+      if (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)) {
         sectionToItems.Display.push({
-          name: DISPLAY_TEXT_AND_COLOR,
-          checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
-        });
-        sectionToItems.Display.push({
-          name: DISPLAY_TEXT_AND_FONT,
-          checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT)
+          name: USE_ANOTHER_ANNOTATION_TEXT_COLOR,
+          checked: this.settings.colorByField != null
         });
       }
+
+      sectionToItems.Display.push({
+        name: DISPLAY_TEXT_AND_FONT,
+        checked: this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_FONT)
+      });
+
       sectionToItems.Display.push({
         separator: true
       });
@@ -1075,12 +1081,7 @@ morpheus.VectorTrack.prototype = {
         checked: this.settings.highlightMatchingValues
       });
     }
-    if (dataType !== 'url') {
-      // sectionToItems.Display.push({
-      //   name: 'Squished',
-      //   checked: this.settings.squished
-      // });
-    }
+
     if (this.isRenderAs(morpheus.VectorTrack.RENDER.BAR)
       || this.isRenderAs(morpheus.VectorTrack.RENDER.BOX_PLOT)) {
       sectionToItems.Display.push({
@@ -1112,13 +1113,15 @@ morpheus.VectorTrack.prototype = {
         });
       }
       if (this.isRenderAs(morpheus.VectorTrack.RENDER.COLOR)
-        || this
-          .isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR)
         || (this.isRenderAs(morpheus.VectorTrack.RENDER.BAR) && isArray)) {
         sectionToItems.Display.push({
           name: 'Edit Colors...'
         });
-
+      }
+      if (this.isRenderAs(morpheus.VectorTrack.RENDER.TEXT_AND_COLOR) && this.settings.colorByField != null) {
+        sectionToItems.Display.push({
+          name: 'Edit Text Colors...'
+        });
       }
       if (this.isRenderAs(morpheus.VectorTrack.RENDER.SHAPE)) {
         sectionToItems.Display.push({
@@ -1344,6 +1347,35 @@ morpheus.VectorTrack.prototype = {
                 },
                 content: list.$el
               });
+          } else if (item === USE_ANOTHER_ANNOTATION_TEXT_COLOR) {
+            var formBuilder = new morpheus.FormBuilder();
+            var fields = morpheus.MetadataUtil.getMetadataNames(isColumns ? _this.project.getFullDataset().getColumnMetadata() : _this.project.getFullDataset().getRowMetadata());
+            fields.splice(fields.indexOf(_this.name), 1);
+            fields = ['(None)'].concat(fields)
+            formBuilder.append({
+              name: 'annotation',
+              type: 'bootstrap-select',
+              help: 'Use another annotation to determine text color',
+              search: true,
+              options: fields,
+              value: _this.settings.colorByField == null ? '(None)' : _this.settings.colorByField
+            });
+            formBuilder.find('annotation').on(
+              'change',
+              function () {
+                _this.settings.colorByField = $(this).val();
+                if (_this.settings.colorByField === '(None)') {
+                  _this.settings.colorByField = null;
+                }
+                _this.setInvalid(true);
+                _this.repaint();
+              });
+            morpheus.FormBuilder.showInModal({
+              title: 'Text Color Annotation',
+              close: 'Close',
+              html: formBuilder.$form,
+              focus: heatmap.getFocusEl()
+            });
           } else if (item === 'Edit Bar Color...') {
             var formBuilder = new morpheus.FormBuilder();
             formBuilder.append({
@@ -1643,28 +1675,40 @@ morpheus.VectorTrack.prototype = {
               close: 'Close',
               focus: heatmap.getFocusEl()
             });
-          } else if (item === 'Edit Colors...') {
+          } else if (item === 'Edit Text Colors...' || item === 'Edit Colors...') {
             var colorModel = isColumns ? _this.project
               .getColumnColorModel() : _this.project
               .getRowColorModel();
-            var colorSchemeChooser = new morpheus.ColorSchemeChooser({track: _this, heatMap: _this.heatmap, colorModel: colorModel});
+            var colorSchemeChooser = new morpheus.ColorSchemeChooser({
+              isColumns: _this.isColumns,
+              heatMap: _this.heatmap,
+              colorModel: colorModel
+            });
+            colorSchemeChooser.setAnnotationName(item === 'Edit Text Colors...' ? _this.settings.colorByField : _this.getName())
+            colorSchemeChooser.on('change', function () {
+              _this.setInvalid(true);
+              _this.repaint();
+            });
             morpheus.FormBuilder.showInModal({
               title: 'Edit Colors',
               html: colorSchemeChooser.$div,
               close: 'Close',
-              focus: heatmap.getFocusEl()
+              focus: heatmap.getFocusEl(),
+              onClose: function () {
+                colorSchemeChooser.off('change');
+              }
             });
           } else if (item === TOOLTIP) {
             _this.settings.inlineTooltip = !_this.settings.inlineTooltip;
           } else if (item === HIGHLIGHT_MATCHING_VALUES) {
             _this.settings.highlightMatchingValues = !_this.settings.highlightMatchingValues;
           } else if ((customItem = _
-              .find(
-                customItems,
-                function (customItem) {
-                  return customItem.name === item
-                    && customItem.columns === isColumns;
-                }))) {
+            .find(
+              customItems,
+              function (customItem) {
+                return customItem.name === item
+                  && customItem.columns === isColumns;
+              }))) {
             if (customItem.task) {
               // add task
               var task = {
@@ -1738,11 +1782,6 @@ morpheus.VectorTrack.prototype = {
                 remove = [morpheus.VectorTrack.RENDER.TEXT_AND_FONT, morpheus.VectorTrack.RENDER.TEXT_AND_COLOR];
               }
             } else {
-              if (item === morpheus.VectorTrack.RENDER.COLOR) {
-                remove = [morpheus.VectorTrack.RENDER.TEXT_AND_COLOR];
-              } else if (item === morpheus.VectorTrack.RENDER.TEXT_AND_COLOR) {
-                remove = [morpheus.VectorTrack.RENDER.COLOR];
-              }
               _this.settings.display.push(item);
             }
             if (remove) {
@@ -1781,7 +1820,7 @@ morpheus.VectorTrack.prototype = {
     }
 
     if (vector.getProperties().get(
-        morpheus.VectorKeys.FIELDS) != null) {
+      morpheus.VectorKeys.FIELDS) != null) {
       var visibleFieldIndices = vector.getProperties().get(
         morpheus.VectorKeys.VISIBLE_FIELDS);
       if (visibleFieldIndices == null) {

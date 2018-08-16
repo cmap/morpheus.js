@@ -1,36 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport"
-          content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="google-site-verification"
-          content="7UY7VcXR28Tpmw6m6fc6wtJJQvar71GKqGojp3HPb4Q"/>
-    <title>Morpheus</title>
-    <link rel="stylesheet" href="css/morpheus-latest.min.css">
-    <script type="text/javascript"
-            src="https://apis.google.com/js/api.js"></script>
-    <script type="text/javascript" src="js/morpheus-external-latest.min.js"></script>
-    <script src="js/morpheus-latest.min.js"></script>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <script type="text/javascript"
-            src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs"
-            data-app-key="6xq3zgeoago5fhw"></script>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport"
+        content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="google-site-verification"
+        content="7UY7VcXR28Tpmw6m6fc6wtJJQvar71GKqGojp3HPb4Q"/>
+  <title>Morpheus</title>
+  <link rel="stylesheet" href="css/morpheus-latest.min.css">
+  <script>if (typeof module === 'object') {
+    window.module = module;
+    module = undefined;
+
+  }</script>
+
+  <script type="text/javascript" src="js/morpheus-external-latest.min.js"></script>
+  <script src="js/morpheus-latest.min.js"></script>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <script type="text/javascript"
+          src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs"
+          data-app-key="6xq3zgeoago5fhw"></script>
+
+
+  <script>if (window.module) module = window.module;</script>
 
 </head>
 <body>
 <noscript>
-    <p>Please enable JavaScript</p>
+  <p>Please enable JavaScript</p>
 </noscript>
-<div id="vis"></div>
+<div id="vis" style="margin-left:8px;"></div>
 
 <script type="text/javascript">
   morpheus.Util.loadTrackingCode();
   window.onerror = function () {
+    morpheus.DialogUtil.clear();
     morpheus.FormBuilder.showInModal({
       title: 'Error',
-      html: 'Oops, something went wrong. Please try again.'
+      html: 'Oops, something went wrong. Please try again.',
     });
   };
 
@@ -75,8 +83,7 @@
 <script>
   if ((window.location.protocol === 'https:' || window.location.protocol === 'http:') &&
     'serviceWorker' in navigator) {
-    navigator.serviceWorker
-    .register('sw.js');
+    navigator.serviceWorker.register('sw.js');
   }
 
 </script>

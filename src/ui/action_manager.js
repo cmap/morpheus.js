@@ -24,6 +24,21 @@ morpheus.ActionManager = function () {
   });
 
   var $filterModal = null;
+  var windowOpen = function (url) {
+    if (morpheus.Util.isNode()) {
+//      var remote = require('electron').remote;
+//      var BrowserWindow = remote.BrowserWindow;
+//      var newWindow = new BrowserWindow({
+//        fullscreenable: false
+//      });
+//      newWindow.loadURL(url);
+//      newWindow.on('closed', function () {
+//        newWindow = null;
+//      });
+    } else {
+      window.open(url);
+    }
+  };
   this.add({
     name: 'Filter',
     ellipsis: true,
@@ -316,7 +331,10 @@ morpheus.ActionManager = function () {
     cb: function (options) {
       options.heatMap.resetZoom();
     },
-    button: '100%'
+    button: '100%',
+    which: [48], // zero
+    commandKey: true,
+    shiftKey: true
   });
 
   this.add({
@@ -457,15 +475,15 @@ morpheus.ActionManager = function () {
   this.add({
     name: 'Tutorial',
     cb: function () {
-      window
-        .open('https://software.broadinstitute.org/morpheus/tutorial.html');
+      windowOpen('https://software.broadinstitute.org/morpheus/tutorial.html');
     }
   });
+
   this.add({
     icon: 'fa fa-code',
     name: 'Source Code',
     cb: function () {
-      window.open('https://github.com/cmap/morpheus.js');
+      windowOpen('https://github.com/cmap/morpheus.js');
     }
   });
   var $findModal;
@@ -476,7 +494,7 @@ morpheus.ActionManager = function () {
     ellipsis: true,
     shiftKey: true,
     commandKey: true,
-    name: 'Search Menus',
+    name: 'Find Action',
     cb: function (options) {
       if ($findModal == null) {
         var findModal = [];
@@ -569,8 +587,7 @@ morpheus.ActionManager = function () {
   this.add({
     name: 'Configuration',
     cb: function () {
-      window
-        .open('https://software.broadinstitute.org/morpheus/configuration.html');
+      windowOpen('https://software.broadinstitute.org/morpheus/configuration.html');
     }
   });
   this.add({
@@ -826,10 +843,8 @@ morpheus.ActionManager = function () {
           var fullDataset = project
             .getFullDataset();
           if (isColumns) {
-            dataset = morpheus.DatasetUtil
-              .transposedView(dataset);
-            fullDataset = morpheus.DatasetUtil
-              .transposedView(fullDataset);
+            dataset = new morpheus.TransposedDatasetView(dataset);
+            fullDataset = new morpheus.TransposedDatasetView(fullDataset);
           }
 
           var existingVector = fullDataset
@@ -950,7 +965,11 @@ morpheus.ActionManager = function () {
       var model = trackInfo.isColumns ? project
         .getColumnFontModel() : project
         .getRowFontModel();
-      var chooser = new morpheus.FontChooser({fontModel: model, track: options.heatMap.getTrack(trackInfo.name, trackInfo.isColumns), heatMap: options.heatMap});
+      var chooser = new morpheus.FontChooser({
+        fontModel: model,
+        track: options.heatMap.getTrack(trackInfo.name, trackInfo.isColumns),
+        heatMap: options.heatMap
+      });
       morpheus.FormBuilder.showInModal({
         title: 'Edit Fonts',
         html: chooser.$div,

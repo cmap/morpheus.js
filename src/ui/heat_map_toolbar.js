@@ -149,88 +149,13 @@ morpheus.HeatMapToolBar = function (heatMap) {
     searchHtml.push('</div>');
   }
 
-  var $menus = $(
-    '<div style="display: inline-block;margin-right:14px;"></div>');
-
-  function createMenu(menuName, actions, minWidth) {
-    if (!minWidth) {
-      minWidth = '0px';
-    }
-    var menu = [];
-    var dropdownId = _.uniqueId('morpheus');
-    menu.push('<div class="dropdown morpheus-menu">');
-    menu.push(
-      '<a class="dropdown-toggle morpheus-black-link morpheus-black-link-background" type="button"' +
-      ' id="' + dropdownId +
-      '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">');
-    menu.push(menuName);
-
-    menu.push('</a>');
-    menu.push('<ul style="min-width:' + minWidth +
-      ';" class="dropdown-menu" aria-labelledby="' + dropdownId + '">');
-    actions.forEach(function (name) {
-      if (name == null) {
-        menu.push('<li role="separator" class="divider"></li>');
-      } else {
-        var action = heatMap.getActionManager().getAction(name);
-        if (action != null) {
-          menu.push('<li>');
-          menu.push(
-            '<a class="morpheus-menu-item" data-action="' + action.name +
-            '" href="#">');
-          menu.push(action.name);
-          if (action.ellipsis) {
-            menu.push('...');
-          }
-          if (action.icon) {
-            menu.push('<span class="' + action.icon +
-              ' morpheus-menu-item-icon"></span> ');
-          }
-          if (action.which) {
-            menu.push('<span class="pull-right">');
-            if (action.commandKey) {
-              menu.push(morpheus.Util.COMMAND_KEY);
-            }
-            if (action.shiftKey) {
-              menu.push('Shift+');
-            }
-            menu.push(morpheus.KeyboardCharMap[action.which[0]]);
-            menu.push('</span>');
-          }
-
-          menu.push('</a>');
-          menu.push('</li>');
-        }
-      }
-    });
-
-    menu.push('</ul>');
-    menu.push('</div>');
-    $(menu.join('')).appendTo($menus);
-  }
-
-  if (heatMap.options.menu) {
-    if (heatMap.options.menu.File) {
-      createMenu('File', heatMap.options.menu.File, '240px');
-    }
-    if (heatMap.options.menu.View) {
-      createMenu('Edit', heatMap.options.menu.Edit);
-    }
-    if (heatMap.options.menu.View) {
-      createMenu('View', heatMap.options.menu.View, '170px');
-    }
-    if (heatMap.options.menu.Tools) {
-      createMenu('Tools', heatMap.options.menu.Tools);
-    }
-    if (heatMap.options.menu.Help) {
-      createMenu('Help', heatMap.options.menu.Help, '220px');
-    }
-  }
 
   $(searchHtml.join('')).appendTo($searchForm);
   var $lineOneColumn = $el.find('[data-name=toolbar]');
 
-  $menus.appendTo($lineOneColumn);
+  if (!morpheus.Util.isNode()) {
+    heatMap.menu.applicationMenu.appendTo($lineOneColumn);
+  }
   $searchForm.appendTo($lineOneColumn);
   var toolbarHtml = ['<div style="display: inline;">'];
   toolbarHtml.push('<div class="morpheus-button-divider"></div>');
@@ -269,8 +194,13 @@ morpheus.HeatMapToolBar = function (heatMap) {
     toolbarHtml.push(
       '<li><a class="morpheus-menu-item" href="#" data-action="Fit Columns To Window">Fit Columns To Window</a></li>');
     toolbarHtml.push('<li role="separator" class="divider"></li>');
+
     toolbarHtml.push(
-      '<li><a class="morpheus-menu-item" href="#" data-action="100%">100%</a></li>');
+      '<li><a class="morpheus-menu-item" href="#" data-action="100%">100%<span' +
+      ' class="fa' +
+      ' fa-compress morpheus-menu-item-icon"></span><span class="pull-right">' +
+      morpheus.Util.SHIFT_KEY + morpheus.Util.COMMAND_KEY +
+      morpheus.KeyboardCharMap[heatMap.getActionManager().getAction('100%').which[0]] + '</span> </a></li>');
     toolbarHtml.push('</ul>');
     toolbarHtml.push('</div>');
   }
@@ -320,14 +250,16 @@ morpheus.HeatMapToolBar = function (heatMap) {
       heatMap.focus();
     }
   });
-  $menus.on('click', 'li > a', function (e) {
-    e.preventDefault();
-    heatMap.getActionManager().execute($(this).data('action'));
-  }).on('blur', function (e) {
-    if (document.activeElement === document.body) {
-      heatMap.focus();
-    }
-  });
+  if (!morpheus.Util.isNode()) {
+    heatMap.menu.applicationMenu.on('click', 'li > a', function (e) {
+      e.preventDefault();
+      heatMap.getActionManager().execute($(this).data('action'));
+    }).on('blur', function (e) {
+      if (document.activeElement === document.body) {
+        heatMap.focus();
+      }
+    });
+  }
   if (heatMap.options.toolbar.$customButtons) {
     heatMap.options.toolbar.$customButtons.appendTo($toolbar);
   }
@@ -971,11 +903,12 @@ morpheus.HeatMapToolBar.prototype = {
       return this.columnSearchObject.$search;
     } else if (type === morpheus.HeatMapToolBar.ROW_SEARCH_FIELD) {
       return this.rowSearchObject.$search;
-    } else if (type ===
-      morpheus.HeatMapToolBar.COLUMN_DENDROGRAM_SEARCH_FIELD) {
+    } else if (type === morpheus.HeatMapToolBar.COLUMN_DENDROGRAM_SEARCH_FIELD) {
       return this.columnDendrogramSearchObject.$search;
     } else if (type === morpheus.HeatMapToolBar.ROW_DENDROGRAM_SEARCH_FIELD) {
       return this.rowDendrogramSearchObject.$search;
+    } else {
+      console.log('Unknown field');
     }
   },
   setSearchText: function (options) {
@@ -1273,6 +1206,6 @@ morpheus.HeatMapToolBar.prototype = {
   }
 };
 morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD = 'column';
-morpheus.HeatMapToolBar.ROW_SEARCH_FIELD = 'column';
+morpheus.HeatMapToolBar.ROW_SEARCH_FIELD = 'row';
 morpheus.HeatMapToolBar.COLUMN_DENDROGRAM_SEARCH_FIELD = 'column_dendrogram';
 morpheus.HeatMapToolBar.ROW_DENDROGRAM_SEARCH_FIELD = 'row_dendrogram';

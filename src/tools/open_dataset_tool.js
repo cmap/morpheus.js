@@ -12,7 +12,10 @@ morpheus.OpenDatasetTool.prototype = {
     var file = options.input.file;
     var action = options.input.open_file_action;
     var dataset = project.getSortedFilteredDataset();
-    deferred.fail(function (err) {
+    deferred.catch(function (err) {
+      if (err.message === 'Cancel') {
+        return;
+      }
       var message = [
         'Error opening ' + morpheus.Util.getFileName(file)
         + '.'];
@@ -27,7 +30,7 @@ morpheus.OpenDatasetTool.prototype = {
       });
     });
     deferred
-      .done(function (newDataset) {
+      .then(function (newDataset) {
 
         var extension = morpheus.Util.getExtension(morpheus.Util
           .getFileName(file));
@@ -150,6 +153,12 @@ morpheus.OpenDatasetTool.prototype = {
                           .getProject()
                           .getFullDataset()
                           .getColumnCount()));
+                  heatMap.addTrack('Source', !appendRows);
+                  morpheus.FormBuilder.showInModal({
+                    title: 'Append',
+                    html: 'Please scroll to the ' + (appendRows ? 'bottom' : 'right') + ' of the heat map to see the appended data.',
+                    focus: document.activeElement
+                  });
                   heatMap.revalidate();
                 });
           } else { // no need to prompt
@@ -210,6 +219,12 @@ morpheus.OpenDatasetTool.prototype = {
                 .getProject()
                 .getFullDataset()
                 .getColumnCount()));
+            heatMap.addTrack('Source', !appendRows);
+            morpheus.FormBuilder.showInModal({
+              title: 'Append',
+              html: 'Please scroll to the ' + (appendRows ? 'bottom' : 'right') + ' of the heat map to see the appended data.',
+              focus: document.activeElement
+            });
             heatMap.revalidate();
           }
 
@@ -238,9 +253,13 @@ morpheus.OpenDatasetTool.prototype = {
                   columnAnnotationName: appendOptions.current_dataset_column_annotation_name,
                   newColumnAnnotationName: appendOptions.new_dataset_column_annotation_name
                 });
+                morpheus.FormBuilder.showInModal({
+                  title: 'Overlay',
+                  html: 'Select View > Options to change how the overlayed data is displayed.',
+                  focus: document.activeElement
+                });
               });
         } else if (action === 'open') { // new tab
-          console.log('open');
           new morpheus.HeatMap({
             dataset: newDataset,
             parent: heatMap,
@@ -257,23 +276,24 @@ morpheus.OpenDatasetTool.prototype = {
   execute: function (options) {
     var file = options.input.file;
     var _this = this;
-    var d = $.Deferred();
-    morpheus.OpenDatasetTool
-      .fileExtensionPrompt(file,
-        function (readOptions) {
-          if (!readOptions) {
-            readOptions = {};
-          }
-          readOptions.interactive = true;
-          var deferred = morpheus.DatasetUtil.read(file,
-            readOptions);
-          deferred.always(function () {
-            d.resolve();
-          });
-          _this._read(options, deferred);
+    return new Promise(function (resolve, reject) {
+      morpheus.OpenDatasetTool
+        .fileExtensionPrompt(file,
+          function (readOptions) {
+            if (!readOptions) {
+              readOptions = {};
+            }
+            readOptions.interactive = true;
+            var deferred = morpheus.DatasetUtil.read(file,
+              readOptions);
+            deferred.finally(function () {
+              resolve();
+            });
+            _this._read(options, deferred);
 
-        });
-    return d;
+          });
+    });
+
 
   }, // prompt for metadata field name in dataset and in file
   _matchAppend: function (newDatasetMetadataNames,

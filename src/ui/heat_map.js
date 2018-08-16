@@ -132,12 +132,12 @@ morpheus.HeatMap = function (options) {
        * Column metadata field in dataset used to match leaf
        * node ids in column dendrogram Newick file
        */
-      columnDendrogramField: 'id',
+      columnDendrogramField: null,
       /*
        * Row metadata field in dataset used to match leaf node
        * ids in row dendrogram Newick file
        */
-      rowDendrogramField: 'id',
+      rowDendrogramField: null,
       /*
        * Array of objects describing how to display row
        * metadata fields. Each object in the array must have
@@ -256,6 +256,10 @@ morpheus.HeatMap = function (options) {
 
     }, options);
 
+  var resolveFunction;
+  this.promise = new Promise(function (resolve, reject) {
+    resolveFunction = resolve;
+  });
   for (var i = 0; i < dontExtend.length; i++) {
     var field = dontExtend[i];
     options[field] = cache[i];
@@ -309,7 +313,7 @@ morpheus.HeatMap = function (options) {
         'Select All Columns',
         'Clear Selected Columns'],
       Help: [
-        'Search Menus', null, 'Contact', 'Configuration', 'Tutorial', 'Source Code', null, 'Keyboard' +
+        'Find Action', null, 'Contact', 'Configuration', 'Tutorial', 'Source Code', null, 'Keyboard' +
         ' Shortcuts']
     };
   }
@@ -338,24 +342,26 @@ morpheus.HeatMap = function (options) {
       name: 'file',
       type: 'file'
     });
-    this.options.dataset = $.Deferred();
-    morpheus.FormBuilder.showOkCancel({
-      title: 'Dataset',
-      appendTo: this.getContentEl(),
-      focus: this.getFocusEl(),
-      content: datasetFormBuilder.$form,
-      okCallback: function () {
-        var file = datasetFormBuilder.getValue('file');
-        morpheus.DatasetUtil.read(file).done(function (dataset) {
-          _this.options.dataset.resolve(dataset);
-        }).fail(function (err) {
-          _this.options.dataset.reject(err);
-        });
-      },
-      cancelCallback: function () {
-        _this.options.dataset.reject('Session cancelled.');
-      }
+    this.options.dataset = new Promise(function (resolve, reject) {
+      morpheus.FormBuilder.showOkCancel({
+        title: 'Dataset',
+        appendTo: _this.getContentEl(),
+        focus: _this.getFocusEl(),
+        content: datasetFormBuilder.$form,
+        okCallback: function () {
+          var file = datasetFormBuilder.getValue('file');
+          morpheus.DatasetUtil.read(file).then(function (dataset) {
+            resolve(dataset);
+          }).catch(function (err) {
+            reject(err);
+          });
+        },
+        cancelCallback: function () {
+          reject('Session cancelled.');
+        }
+      });
     });
+
   }
   if (this.options.name == null) {
     this.options.name = morpheus.Util.getBaseFileName(morpheus.Util.getFileName(this.options.dataset.file ? this.options.dataset.file
@@ -426,6 +432,7 @@ morpheus.HeatMap = function (options) {
     _this.dispose();
   });
   if (!morpheus.Util.isHeadless()) {
+    this.menu = new morpheus.HeatMapMenu(this);
     var tab = this.tabManager.add({
       $el: this.$content,
       closeable: this.options.closeable,
@@ -458,7 +465,7 @@ morpheus.HeatMap = function (options) {
       annotations: options.rowAnnotations,
       isColumns: false
     });
-    rowDef.done(function (callbacks) {
+    rowDef.then(function (callbacks) {
       _this.whenLoaded = _this.whenLoaded.concat(callbacks);
     });
     promises.push(rowDef);
@@ -469,7 +476,7 @@ morpheus.HeatMap = function (options) {
       annotations: options.columnAnnotations,
       isColumns: true
     });
-    columnDef.done(function (callbacks) {
+    columnDef.then(function (callbacks) {
       _this.whenLoaded = _this.whenLoaded.concat(callbacks);
     });
     promises.push(columnDef);
@@ -481,7 +488,7 @@ morpheus.HeatMap = function (options) {
       _this.options.rowDendrogram = morpheus.DendrogramUtil.parseNewick(options.rowDendrogram);
     } else {
       var rowDendrogramDeferred = morpheus.Util.getText(options.rowDendrogram);
-      rowDendrogramDeferred.done(function (text) {
+      rowDendrogramDeferred.then(function (text) {
         _this.options.rowDendrogram = morpheus.DendrogramUtil.parseNewick(text);
       });
       promises.push(rowDendrogramDeferred);
@@ -494,13 +501,14 @@ morpheus.HeatMap = function (options) {
       _this.options.columnDendrogram = morpheus.DendrogramUtil.parseNewick(options.columnDendrogram);
     } else {
       var columnDendrogramDeferred = morpheus.Util.getText(options.columnDendrogram);
-      columnDendrogramDeferred.done(function (text) {
+      columnDendrogramDeferred.then(function (text) {
         _this.options.columnDendrogram = morpheus.DendrogramUtil.parseNewick(text);
       });
       promises.push(columnDendrogramDeferred);
     }
 
   }
+
   var heatMapLoaded = function () {
     if (typeof window !== 'undefined') {
       $(window).on('orientationchange.morpheus resize.morpheus', _this.resizeListener = function () {
@@ -511,7 +519,7 @@ morpheus.HeatMap = function (options) {
     if (options.loadedCallback) {
       options.loadedCallback(_this);
     }
-
+    resolveFunction();
     if (_this.tabManager) {
       if (_this.options.focus) {
         _this.tabManager.setActiveTab(tab.id);
@@ -524,7 +532,7 @@ morpheus.HeatMap = function (options) {
   };
   if (morpheus.Util.isArray(options.dataset)) {
     var d = morpheus.DatasetUtil.readDatasetArray(options.dataset);
-    d.fail(function (message) {
+    d.catch(function (message) {
       if (_this.options.$loadingImage) {
         _this.options.$loadingImage.remove();
       }
@@ -537,8 +545,7 @@ morpheus.HeatMap = function (options) {
         appendTo: _this.getContentEl(),
         focus: _this.getFocusEl()
       });
-    });
-    d.done(function (joined) {
+    }).then(function (joined) {
       if (_this.options.$loadingImage) {
         _this.options.$loadingImage.remove();
       }
@@ -577,13 +584,12 @@ morpheus.HeatMap = function (options) {
       heatMapLoaded();
     });
   } else {
-    var deferred = options.dataset.file ? morpheus.DatasetUtil.read(
+    var dsPromise = options.dataset.file ? morpheus.DatasetUtil.read(
       options.dataset.file, options.dataset.options)
       : morpheus.DatasetUtil.read(options.dataset);
-    deferred.done(function (dataset) {
+    dsPromise.then(function (dataset) {
       _this.options.dataset = dataset;
-    });
-    deferred.fail(function (err) {
+    }).catch(function (err) {
       _this.options.$loadingImage.remove();
       var message = [
         'Error opening '
@@ -604,20 +610,18 @@ morpheus.HeatMap = function (options) {
         focus: _this.getFocusEl()
       });
     });
-
-    promises.push(deferred);
+    promises.push(dsPromise);
     var datasetOverlay = null;
     if (options.datasetOverlay) {
       var d = options.datasetOverlay.file ? morpheus.DatasetUtil.read(
         options.datasetOverlay.file, options.datasetOverlay.options)
         : morpheus.DatasetUtil.read(options.datasetOverlay);
-      d.done(function (dataset) {
+      d.then(function (dataset) {
         datasetOverlay = dataset;
       });
       promises.push(d);
     }
-    $.when.apply($, promises).done(function () {
-
+    Promise.all(promises).then(function () {
       if (_this.options.$loadingImage) {
         _this.options.$loadingImage.remove();
       }
@@ -646,7 +650,7 @@ morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS = 6;
  *
  * @param tool A tool instance
  * @param heatMap The calling heat map instance
- * @param callback Optional callback to invoke when tool is done
+ * @param callback Optional callback to invoke when tool is then
  */
 morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
   if (tool.gui) {
@@ -666,7 +670,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       formBuilder: formBuilder
     });
     var okCallback = function () {
-      var $dialogContent = $('<div><span>' + tool.toString() + '...</span><button class="btn' +
+      var $dialogContent = $('<div><span>' + tool.toString() + '...</span><div><progress></progress></div><button class="btn' +
         ' btn-xs btn-default" style="margin-left:6px;display: none;">Cancel</button></div>');
       var value = null;
 
@@ -675,6 +679,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
         appendTo: heatMap.getContentEl(),
         width: 'auto'
       });
+      morpheus.DialogUtil.add($dialog);
       var input = {};
       _.each(gui, function (item) {
         input[item.name] = formBuilder.getValue(item.name);
@@ -688,6 +693,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
           input: input
         });
         if (value instanceof Worker) {
+          morpheus.DialogUtil.remove($dialog);
           $dialogContent.find('button').css('display', '').on('click', function () {
             value.terminate();
           });
@@ -713,28 +719,30 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
             }
           };
         } else {
-          if (value != null && typeof value.done === 'function') { // promise
-            value.always(function () {
+          if (value != null && typeof value.then === 'function') { // promise
+            value.finally(function () {
               if (callback) {
                 callback(input);
               }
               $dialog.remove();
+              morpheus.DialogUtil.remove($dialog);
             });
           } else {
             if (callback) {
               callback(input);
             }
             $dialog.remove();
+            morpheus.DialogUtil.remove($dialog);
           }
 
         }
       }, 20);
-      setTimeout(function () {
-        // in case an exception was thrown
-        if (!(value instanceof Worker)) {
-          $dialog.remove();
-        }
-      }, 5000);
+      // setTimeout(function () {
+      //   // in case an exception was thrown
+      //   if (!(value instanceof Worker)) {
+      //     $dialog.remove();
+      //   }
+      // }, 5000);
 
     };
     var $formDiv;
@@ -1129,6 +1137,7 @@ morpheus.HeatMap.prototype = {
     json.gridColor = this.heatmap.getGridColor();
     json.gridThickness = this.heatmap.getGridThickness();
     json.drawValues = this.heatmap.isDrawValues();
+    json.shape = this.heatmap.getShape();
 
     // selection
     json.rowSelection = this.getProject().getRowSelectionModel().toModelIndices();
@@ -1308,6 +1317,9 @@ morpheus.HeatMap.prototype = {
       _this.project.setRowFilter(_this.project.getRowFilter(), true);
     }
     if (this.options.columnFilter) {
+      this.options.columnFilter.filters.forEach(function (filter) {
+        filter.isColumns = true;
+      });
       morpheus.CombinedFilter.fromJSON(_this.project.getColumnFilter(), this.options.columnFilter);
       _this.project.setColumnFilter(_this.project.getColumnFilter(), true);
     }
@@ -1460,62 +1472,75 @@ morpheus.HeatMap.prototype = {
     if (rowDendrogram != null) {
       var tree = rowDendrogram;
       if (tree.leafNodes.length !== this.project.getSortedFilteredDataset().getRowCount()) {
-        throw '# leaf nodes in row dendrogram ' + tree.leafNodes.length
-        + ' != ' + this.project.getSortedFilteredDataset().getRowCount();
-      }
-      var rowIndices = null;
-      // when saving a session the dataset is reordered to reflect the clustering
-      if (this.options.rowDendrogramField != null) {
-        var vector = dataset.getRowMetadata().getByName(
-          this.options.rowDendrogramField);
-        rowIndices = [];
-        var map = new morpheus.Map();
-        var re = /[,:]/g;
-        for (var j = 0, size = vector.size(); j < size; j++) {
-          var key = vector.getValue(j);
-          map.set(key.replace(re, ''), j);
-        }
-        // need to replace special characters to match ids in newick
-        // file
-
-        for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-          var index = map.get(tree.leafNodes[i].name);
-          if (index === undefined) {
-            throw 'Unable to find row dendrogram id '
-            + tree.leafNodes[i].name
-            + ' in row annotations';
-          }
-          rowIndices.push(index);
-        }
+        console.log('# leaf nodes in row dendrogram ' + tree.leafNodes.length
+          + ' != ' + this.project.getSortedFilteredDataset().getRowCount());
       } else {
-        // see if leaf node ids are indices
-        // for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-        //   var newickId = tree.leafNodes[i].name;
-        //   newickId = parseInt(newickId);
-        //   if (!isNaN(newickId)) {
-        //     rowIndices.push(newickId);
-        //   } else {
-        //     break;
-        //   }
-        // }
-        // if (rowIndices.length !== tree.leafNodes.length) {
-        //   rowIndices = [];
-        //   for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-        //     rowIndices.push(i);
-        //   }
-        // }
-      }
-      this.rowDendrogram = new morpheus.RowDendrogram(this, tree, heatmap.getRowPositions(), this.project, true);
-      this.rowDendrogram.lineWidth = this.options.rowDendrogramLineWidth;
-      this.rowDendrogram.appendTo(this.$parent);
-      this.rowDendrogram.$label.appendTo(this.$parent);
-      this.rowDendrogram.$squishedLabel.appendTo(this.$parent);
-      if (rowIndices != null) {
-        rowDendrogramSortKey = new morpheus.SpecifiedModelSortOrder(
-          rowIndices, rowIndices.length, 'dendrogram');
-        rowDendrogramSortKey.setLockOrder(2);
-        rowDendrogramSortKey.setUnlockable(false);
-        rowDendrogramSortKey.setPreservesDendrogram(true);
+        var rowIndices = null;
+        // when saving a session the dataset is reordered to reflect the clustering
+        if (this.options.rowDendrogramField != null) {
+          var vector = dataset.getRowMetadata().getByName(
+            this.options.rowDendrogramField);
+          if (vector == null) {
+            console.log(this.options.rowDendrogramField + ' not found in ' + morpheus.MetadataUtil.getMetadataNames(dataset.getRowMetadata()));
+            throw new Error(this.options.rowDendrogramField + ' not found');
+          }
+
+          rowIndices = [];
+          var map = new morpheus.Map();
+          var re = /[,:]/g;
+          var isString = morpheus.VectorUtil.getDataType(vector) === 'string';
+          for (var j = 0, size = vector.size(); j < size; j++) {
+            var key = vector.getValue(j);
+            if (isString) {
+              key = key.replace(re, '');
+            }
+            map.set(key, j);
+          }
+          // need to replace special characters to match ids in newick
+          // file
+
+          for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
+            var index = map.get(tree.leafNodes[i].name);
+            if (index === undefined) {
+              console.log('Unable to find row dendrogram id '
+                + tree.leafNodes[i].name
+                + ' in row annotations');
+              throw new Error('Unable to find row dendrogram id '
+                + tree.leafNodes[i].name
+                + ' in row annotations');
+            }
+            rowIndices.push(index);
+          }
+        } else {
+          // see if leaf node ids are indices
+          // for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
+          //   var newickId = tree.leafNodes[i].name;
+          //   newickId = parseInt(newickId);
+          //   if (!isNaN(newickId)) {
+          //     rowIndices.push(newickId);
+          //   } else {
+          //     break;
+          //   }
+          // }
+          // if (rowIndices.length !== tree.leafNodes.length) {
+          //   rowIndices = [];
+          //   for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
+          //     rowIndices.push(i);
+          //   }
+          // }
+        }
+        this.rowDendrogram = new morpheus.RowDendrogram(this, tree, heatmap.getRowPositions(), this.project, true);
+        this.rowDendrogram.lineWidth = this.options.rowDendrogramLineWidth;
+        this.rowDendrogram.appendTo(this.$parent);
+        this.rowDendrogram.$label.appendTo(this.$parent);
+        this.rowDendrogram.$squishedLabel.appendTo(this.$parent);
+        if (rowIndices != null) {
+          rowDendrogramSortKey = new morpheus.SpecifiedModelSortOrder(
+            rowIndices, rowIndices.length, 'dendrogram');
+          rowDendrogramSortKey.setLockOrder(2);
+          rowDendrogramSortKey.setUnlockable(false);
+          rowDendrogramSortKey.setPreservesDendrogram(true);
+        }
       }
     }
     var columnDendrogramSortKey = null;
@@ -1523,59 +1548,67 @@ morpheus.HeatMap.prototype = {
       var tree = columnDendrogram;
 
       if (tree.leafNodes.length !== this.project.getSortedFilteredDataset().getColumnCount()) {
-        throw '# leaf nodes ' + tree.leafNodes.length + ' != '
-        + this.project.getSortedFilteredDataset().getColumnCount();
-      }
-      var columnIndices = null;
-      if (this.options.columnDendrogramField != null) {
-        columnIndices = [];
-        var vector = dataset.getColumnMetadata().getByName(
-          this.options.columnDendrogramField);
-        var map = new morpheus.Map();
-        var re = /[,:]/g;
-        for (var j = 0, size = vector.size(); j < size; j++) {
-          var key = vector.getValue(j);
-          map.set(key.replace(re, ''), j);
-        }
-
-        for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-          var index = map.get(tree.leafNodes[i].name);
-          if (index === undefined) {
-            throw 'Unable to find column dendrogram id '
-            + tree.leafNodes[i].name
-            + ' in column annotations';
-          }
-          columnIndices.push(index);
-        }
+        console.log('# leaf nodes ' + tree.leafNodes.length + ' != ' + this.project.getSortedFilteredDataset().getColumnCount());
       } else {
-        // for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-        //   var newickId = tree.leafNodes[i].name;
-        //   newickId = parseInt(newickId);
-        //   if (!isNaN(newickId)) {
-        //     columnIndices.push(newickId);
-        //   } else {
-        //     break;
-        //   }
-        // }
-        // if (columnIndices.length !== tree.leafNodes.length) {
-        //   columnIndices = [];
-        //   for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
-        //     columnIndices.push(i);
-        //   }
-        // }
-      }
-      this.columnDendrogram = new morpheus.ColumnDendrogram(this, tree,
-        heatmap.getColumnPositions(), this.project, true);
-      this.columnDendrogram.lineWidth = this.options.columnDendrogramLineWidth;
-      this.columnDendrogram.appendTo(this.$parent);
-      this.columnDendrogram.$label.appendTo(this.$parent);
-      this.columnDendrogram.$squishedLabel.appendTo(this.$parent);
-      if (columnIndices != null) {
-        columnDendrogramSortKey = new morpheus.SpecifiedModelSortOrder(
-          columnIndices, columnIndices.length, 'dendrogram');
-        columnDendrogramSortKey.setLockOrder(2);
-        columnDendrogramSortKey.setUnlockable(false);
-        columnDendrogramSortKey.setPreservesDendrogram(true);
+        var columnIndices = null;
+        if (this.options.columnDendrogramField != null) {
+          columnIndices = [];
+          var vector = dataset.getColumnMetadata().getByName(
+            this.options.columnDendrogramField);
+          if (vector == null) {
+            console.log(this.options.columnDendrogramField + ' not found in ' + morpheus.MetadataUtil.getMetadataNames(dataset.getRowMetadata()));
+            throw new Error(this.options.columnDendrogramField + ' not found');
+          }
+          var map = new morpheus.Map();
+          var re = /[,:]/g;
+          var isString = morpheus.VectorUtil.getDataType(vector) === 'string';
+          for (var j = 0, size = vector.size(); j < size; j++) {
+            var key = vector.getValue(j);
+            if (isString) {
+              key = key.replace(re, '');
+            }
+            map.set(key, j);
+          }
+
+          for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
+            var index = map.get(tree.leafNodes[i].name);
+            if (index === undefined) {
+              throw 'Unable to find column dendrogram id '
+              + tree.leafNodes[i].name
+              + ' in column annotations';
+            }
+            columnIndices.push(index);
+          }
+        } else {
+          // for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
+          //   var newickId = tree.leafNodes[i].name;
+          //   newickId = parseInt(newickId);
+          //   if (!isNaN(newickId)) {
+          //     columnIndices.push(newickId);
+          //   } else {
+          //     break;
+          //   }
+          // }
+          // if (columnIndices.length !== tree.leafNodes.length) {
+          //   columnIndices = [];
+          //   for (var i = 0, length = tree.leafNodes.length; i < length; i++) {
+          //     columnIndices.push(i);
+          //   }
+          // }
+        }
+        this.columnDendrogram = new morpheus.ColumnDendrogram(this, tree,
+          heatmap.getColumnPositions(), this.project, true);
+        this.columnDendrogram.lineWidth = this.options.columnDendrogramLineWidth;
+        this.columnDendrogram.appendTo(this.$parent);
+        this.columnDendrogram.$label.appendTo(this.$parent);
+        this.columnDendrogram.$squishedLabel.appendTo(this.$parent);
+        if (columnIndices != null) {
+          columnDendrogramSortKey = new morpheus.SpecifiedModelSortOrder(
+            columnIndices, columnIndices.length, 'dendrogram');
+          columnDendrogramSortKey.setLockOrder(2);
+          columnDendrogramSortKey.setUnlockable(false);
+          columnDendrogramSortKey.setPreservesDendrogram(true);
+        }
       }
     }
 
@@ -1592,7 +1625,9 @@ morpheus.HeatMap.prototype = {
     if (this.options.drawValues != null) {
       this.heatmap.setDrawValues(this.options.drawValues);
     }
-
+    if (this.options.shape != null) {
+      this.heatmap.setShape(this.options.shape);
+    }
     if (rowDendrogramSortKey != null) {
       this.project.setRowSortKeys([rowDendrogramSortKey]);
     }
@@ -1631,12 +1666,12 @@ morpheus.HeatMap.prototype = {
       }
       this.project.getColumnSelectionModel().setViewIndices(indices, false);
     }
-    // if (this.options.rowSearchTerm != null && this.options.rowSearchTerm !== '') {
-    //   this.toolbar.getSearchField(morpheus.HeatMapToolBar.ROW_SEARCH_FIELD).val(this.options.rowSearchTerm);
-    // }
-    // if (this.options.columnSearchTerm != null && this.options.columnSearchTerm !== '') {
-    //   this.toolbar.getSearchField(morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD).val(this.options.columnSearchTerm);
-    // }
+    if (this.options.rowSearchTerm != null && this.options.rowSearchTerm !== '') {
+      this.toolbar.getSearchField(morpheus.HeatMapToolBar.ROW_SEARCH_FIELD).val(this.options.rowSearchTerm);
+    }
+    if (this.options.columnSearchTerm != null && this.options.columnSearchTerm !== '') {
+      this.toolbar.getSearchField(morpheus.HeatMapToolBar.COLUMN_SEARCH_FIELD).val(this.options.columnSearchTerm);
+    }
 
     this.vSortByValuesIndicator = new morpheus.SortByValuesIndicator(
       this.project, true, heatmap.getRowPositions());
@@ -1681,7 +1716,7 @@ morpheus.HeatMap.prototype = {
       // see if default fields found
       if (!displaySpecified) {
         var defaultFieldsToShow = new morpheus.Set();
-        ['pert_iname', 'moa', 'target', 'description', 'cell_id', 'pert_type'].forEach(function (field) {
+        ['id', 'name', 'description'].forEach(function (field) {
           defaultFieldsToShow.add(field);
         });
         for (var i = 0, metadataCount = displayMetadata.getMetadataCount(); i < metadataCount; i++) {
@@ -1702,10 +1737,7 @@ morpheus.HeatMap.prototype = {
         if (displaySpecified && option == null) {
           continue;
         }
-        if (morpheus.MetadataUtil.DEFAULT_HIDDEN_FIELDS.has(name)
-          && option == null) {
-          continue;
-        }
+
         var count = isColumns ? dataset.getColumnCount() : dataset.getRowCount();
         if (option == null && !displaySpecified && count > 1
           && !morpheus.VectorUtil.containsMoreThanOneValue(v)) {
@@ -1720,7 +1752,7 @@ morpheus.HeatMap.prototype = {
         }
 
         if (option.display == null) {
-          if (name === 'pert_iname' || name === 'id' || isFirst) {
+          if (name === 'name' || name === 'id' || isFirst) {
             option.inlineTooltip = true;
             option.display = ['text'];
           } else {
@@ -1876,7 +1908,7 @@ morpheus.HeatMap.prototype = {
       if (ext === 'maf' && !this.options.rowSortBy) {
         var sortKeys = [];
         if (this.project.getFullDataset().getRowMetadata().getByName(
-            'order')) {
+          'order')) {
           sortKeys.push(new morpheus.SortKey('order',
             morpheus.SortKey.SortOrder.ASCENDING));
         }
@@ -2038,7 +2070,7 @@ morpheus.HeatMap.prototype = {
           for (var i = 0; i < _this.rowTracks.length; i++) {
             var track = _this.rowTracks[i];
             if (!dataset.getRowMetadata().getByName(
-                track.getName())) {
+              track.getName())) {
               _this.removeTrack(track.getName(),
                 false);
               i--;
@@ -2047,7 +2079,7 @@ morpheus.HeatMap.prototype = {
           for (var i = 0; i < _this.columnTracks.length; i++) {
             var track = _this.columnTracks[i];
             if (!dataset.getColumnMetadata().getByName(
-                track.getName())) {
+              track.getName())) {
               _this.removeTrack(track.getName(),
                 true);
               i--;
@@ -2150,6 +2182,7 @@ morpheus.HeatMap.prototype = {
           }
           morpheus.HeatMap.showTool(
             new morpheus.OpenFileTool({
+              clipboard: true,
               file: url
             }), _this);
         }
@@ -3152,6 +3185,9 @@ morpheus.HeatMap.prototype = {
   },
   getVisibleTracks: function (isColumns) {
     var tracks = isColumns ? this.columnTracks : this.rowTracks;
+    if (tracks == null) {
+      tracks = [];
+    }
     return tracks.filter(function (track) {
       return track.isVisible() && !track.getFullVector().getProperties().has(morpheus.VectorKeys.IS_INDEX);
     });
@@ -3492,7 +3528,7 @@ morpheus.HeatMap.prototype = {
       var track = this.rowTracks[i];
       if (track.isVisible()) {
         var headerSize = this.rowTrackHeaders[i].getPrintSize();
-        totalSize.width += Math.max(headerSize.width, track.getPrintSize().width);
+        totalSize.width += headerSize.width;
         maxRowHeaderHeight = Math.max(maxRowHeaderHeight, headerSize.height);
       }
     }
@@ -3501,9 +3537,9 @@ morpheus.HeatMap.prototype = {
     for (var i = 0, length = this.columnTracks.length; i < length; i++) {
       var track = this.columnTracks[i];
       if (track.isVisible()) {
-        columnTrackHeightSum += track.getPrintSize().height;
-        maxColumnHeaderWidth = Math.max(maxColumnHeaderWidth,
-          this.columnTrackHeaders[i].getPrintSize().width);
+        var size = this.columnTrackHeaders[i].getPrintSize();
+        columnTrackHeightSum += size.height;
+        maxColumnHeaderWidth = Math.max(maxColumnHeaderWidth, size.width);
       }
     }
     totalSize.height += Math.max(columnTrackHeightSum, maxRowHeaderHeight) + morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS;
@@ -3752,8 +3788,9 @@ morpheus.HeatMap.prototype = {
       var track = this.columnTracks[i];
       if (track.isVisible()) {
         var header = this.columnTrackHeaders[i];
-        heatmapX = Math.max(heatmapX, header.getPrintSize().width);
-        heatmapY += track.getPrintSize().height;
+        var size = header.getPrintSize();
+        heatmapX = Math.max(heatmapX, size.width);
+        heatmapY += size.height;
         isColumnTrackVisible = true;
       }
     }
@@ -3800,19 +3837,21 @@ morpheus.HeatMap.prototype = {
       var track = this.columnTracks[i];
       if (track.isVisible()) {
         context.save();
+        var header = this.columnTrackHeaders[i];
+        var headerSize = header.getPrintSize();
         context.translate(heatmapX, columnTrackY);
         var trackClip = {
           x: 0,
           y: 0,
           width: heatmapPrefSize.width,
-          height: track.getPrintSize().height
+          height: headerSize.height
         };
         track.print(trackClip, context);
         context.restore();
         // draw header
-        var header = this.columnTrackHeaders[i];
+
         context.save();
-        var headerSize = header.getPrintSize();
+
         var headerClip = {
           x: 0,
           y: 0,
@@ -3842,10 +3881,12 @@ morpheus.HeatMap.prototype = {
         context.save();
         var tx = morpheus.HeatMap.SPACE_BETWEEN_HEAT_MAP_AND_ANNOTATIONS + heatmapX + heatmapPrefSize.width + rowTrackWidthSum;
         var ty = heatmapY;
+        var header = this.rowTrackHeaders[i];
+        var headerSize = header.getPrintSize();
         var trackClip = {
           x: 0,
           y: 0,
-          width: track.getPrintSize().width,
+          width: headerSize.width,
           height: heatmapPrefSize.height
         };
         context.translate(tx, ty);
@@ -3858,9 +3899,9 @@ morpheus.HeatMap.prototype = {
         track.print(trackClip, context);
         context.restore();
         // draw header
-        var header = this.rowTrackHeaders[i];
+
         context.save();
-        var headerSize = header.getPrintSize();
+
         var headerClip = {
           x: 0,
           y: 0,

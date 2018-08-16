@@ -19,11 +19,12 @@ morpheus.LandingPage = function (pageOptions) {
   html.push('<div class="clearfix"></div>');
   html.push('</div>'); // col
   html.push('<div data-name="desc" class="col-xs-12 col-md-3"><p><img' +
-    ' src="https://software.broadinstitute.org/morpheus/css/images/morpheus_landing_img.png" style="width:100%;"></p></div>');
+    ' src="https://software.broadinstitute.org/morpheus/css/morpheus_landing_img.png" style="width:100%;"></p></div>');
   html.push('</div>'); // row
 
   html.push('<div class="row"><div class="col-xs-12 morpheus-footer"></div></div>');
   html.push('</div>'); // container
+
 
   var $el = $(html.join(''));
   new morpheus.HelpMenu().$el.appendTo($el.find('.morpheus-footer'));
@@ -31,12 +32,11 @@ morpheus.LandingPage = function (pageOptions) {
   var $description = $el.find('[data-name=desc]');
   morpheus.Util.createMorpheusHeader().appendTo($description);
   $('<p>Versatile matrix visualization and analysis software</p><p>View your dataset as a heat' +
-    ' map,' +
-    ' then explore' +
-    ' the' +
-    ' interactive tools in Morpheus. Cluster, create new annotations, search, filter, sort, display charts, and more.</p><p style="color:#586069;">30,000+ users <br />100,000+' +
-    ' matrices analyzed</p>')
+    ' map, then explore the interactive tools in Morpheus. Cluster, create new annotations, search, filter, sort, display charts, and more.</p>' +
+    '<p style="color:#586069;">30,000+ users <br />100,000+' +
+    ' matrices analyzed.</p><p style="font-size:12px;">If you use Morpheus for published work, please cite:<br />Morpheus, https://software.broadinstitute.org/morpheus</p>')
     .appendTo($description);
+
 
   var $input = $el.find('[data-name=input]');
 
@@ -44,8 +44,7 @@ morpheus.LandingPage = function (pageOptions) {
     .appendTo($input);
   $('<div style="margin-bottom:20px;"><small>All' +
     ' data is' +
-    ' processed in the' +
-    ' browser and never sent to any server.</small></div>').appendTo($input);
+    ' processed on your computer and never sent to any server.</small></div>').appendTo($input);
 
   var filePicker = new morpheus.FilePicker({
     fileCallback: function (files) {
@@ -68,13 +67,13 @@ morpheus.LandingPage = function (pageOptions) {
       }
       document.title = title;
     });
-
     this.tabManager.$nav.appendTo($(this.pageOptions.el));
     this.tabManager.$tabContent.appendTo($(this.pageOptions.el));
   }
 
 }
 ;
+
 
 morpheus.LandingPage.prototype = {
   open: function (openOptions) {
@@ -97,11 +96,13 @@ morpheus.LandingPage.prototype = {
   show: function () {
     var _this = this;
     this.$el.show();
-    $(window).on('beforeunload.morpheus', function () {
-      if (_this.tabManager.getTabCount() > 0) {
-        return 'Are you sure you want to close Morpheus?';
-      }
-    });
+    if (!morpheus.Util.isNode()) {
+      $(window).on('beforeunload.morpheus', function () {
+        if (_this.tabManager.getTabCount() > 0) {
+          return 'Are you sure you want to close Morpheus?';
+        }
+      });
+    }
   },
   openFile: function (files) {
     if (files.length !== 3) {
@@ -109,9 +110,9 @@ morpheus.LandingPage.prototype = {
       var file = files[0];
       var fileName = morpheus.Util.getFileName(file);
       if (fileName.toLowerCase().indexOf('.json') === fileName.length - 5) {
-        morpheus.Util.getText(file).done(function (text) {
+        morpheus.Util.getText(file).then(function (text) {
           _this.open(JSON.parse(text));
-        }).fail(function (err) {
+        }).catch(function (err) {
           morpheus.FormBuilder.showMessageModal({
             title: 'Error',
             message: 'Unable to load session'
@@ -145,11 +146,11 @@ morpheus.LandingPage.prototype = {
       var genesPromise = morpheus.Util.readLines(files[1]);
       var geneLines;
       var barcodeLines;
-      genesPromise.done(function (lines) {
+      genesPromise.then(function (lines) {
         geneLines = lines;
       });
       var barcodesPromise = morpheus.Util.readLines(files[2]);
-      barcodesPromise.done(function (lines) {
+      barcodesPromise.then(function (lines) {
         barcodeLines = lines;
       });
       options.promises = [genesPromise, barcodesPromise];

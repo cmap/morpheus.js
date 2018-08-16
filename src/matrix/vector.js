@@ -16,8 +16,8 @@ morpheus.Vector = function (name, size) {
 /**
  * @static
  */
-morpheus.Vector.fromArray = function (name, array) {
-  var v = new morpheus.Vector(name, array.length);
+morpheus.Vector.fromArray = function (name, array, length) {
+  var v = new morpheus.Vector(name, length == null ? array.length : length);
   v.array = array;
   return v;
 };
@@ -58,6 +58,6 @@ morpheus.Vector.prototype = {
   setArray: function (array) {
     this.array = array;
     return this;
-  }
+  },
 };
 morpheus.Util.extend(morpheus.Vector, morpheus.AbstractVector);

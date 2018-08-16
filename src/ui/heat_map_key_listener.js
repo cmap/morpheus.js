@@ -273,13 +273,15 @@ morpheus.HeatMapKeyListener = function (heatMap) {
     var altKey = e.altKey;
     var shiftKey = e.shiftKey;
     var which = e.which;
-    var isInputField = (tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA');
+    var isInputField = tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA';
     var acceptOptions = {
       isInputField: isInputField,
       heatMap: heatMap
     };
     var shortcutMatches = function (sc) {
-      if (sc.which.indexOf(which) !== -1 && (sc.commandKey === undefined || commandKey === sc.commandKey) && (sc.shiftKey === undefined || shiftKey === sc.shiftKey) &&
+      var scShift = sc.shiftKey || false;
+
+      if (sc.which.indexOf(which) !== -1 && (sc.commandKey === undefined || commandKey === sc.commandKey) && (shiftKey == scShift) &&
         (sc.accept == undefined || sc.accept(acceptOptions))) {
         sc.cb({heatMap: heatMap});
         return true;

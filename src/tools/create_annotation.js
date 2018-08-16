@@ -41,7 +41,7 @@ morpheus.CreateAnnotation.prototype = {
         .getSelectedDataset()
       : __project.getSortedFilteredDataset();
     if (isColumns) {
-      __dataset = morpheus.DatasetUtil.transposedView(__dataset);
+      __dataset = new morpheus.TransposedDatasetView(__dataset);
     }
     var __rowView = new morpheus.DatasetRowView(__dataset);
     var __vector = __dataset.getRowMetadata().add(

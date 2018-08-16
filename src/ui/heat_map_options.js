@@ -17,7 +17,14 @@ morpheus.HeatMapOptions = function (heatMap) {
       type: 'select',
       options: []
     }];
-
+  items.push({
+    name: 'shape',
+    required: true,
+    type: 'select',
+    options: ['square', 'circle'],
+    value: heatMap.heatmap.getShape()
+  });
+  items.push({type: 'separator'});
   items.push({
     name: 'size_by',
     required: true,
@@ -39,7 +46,7 @@ morpheus.HeatMapOptions = function (heatMap) {
     type: 'text',
     style: 'max-width: 100px;'
   });
-
+  items.push({type: 'separator'});
   items.push({
     name: 'conditional_rendering',
     required: true,
@@ -485,7 +492,12 @@ morpheus.HeatMapOptions = function (heatMap) {
     e.preventDefault();
     // prompt to save to file or local storage
     var saveColorSchemeFormBuilder = new morpheus.FormBuilder();
-    saveColorSchemeFormBuilder.append({name: 'save_to', type: 'radio', value: 'Browser Storage', options: ['Browser Storage', 'File']});
+    saveColorSchemeFormBuilder.append({
+      name: 'save_to',
+      type: 'radio',
+      value: 'Browser Storage',
+      options: ['Browser Storage', 'File']
+    });
     saveColorSchemeFormBuilder.append({name: 'color_scheme_name', type: 'text'});
     saveColorSchemeFormBuilder.append({name: 'file_name', type: 'text'});
     saveColorSchemeFormBuilder.setVisible('file_name', false);
@@ -581,7 +593,7 @@ morpheus.HeatMapOptions = function (heatMap) {
         $file.click();
         $file.on('change', function (evt) {
           var files = evt.target.files;
-          morpheus.Util.getText(evt.target.files[0]).done(
+          morpheus.Util.getText(evt.target.files[0]).then(
             function (text) {
               var json = JSON.parse($.trim(text));
               heatMap.heatmap.getColorScheme().fromJSON(json);
@@ -591,12 +603,12 @@ morpheus.HeatMapOptions = function (heatMap) {
               heatMap.heatmap.setInvalid(true);
               heatMap.heatmap.repaint();
 
-            }).fail(function () {
+            }).catch(function () {
             morpheus.FormBuilder.showInModal({
               title: 'Error',
               html: 'Unable to read color scheme.'
             });
-          }).always(function () {
+          }).finally(function () {
             $file.remove();
           });
 
@@ -653,9 +665,18 @@ morpheus.HeatMapOptions = function (heatMap) {
         colorSchemeChooser.setColorScheme(heatMap.heatmap
           .getColorScheme());
       });
+  colorSchemeFormBuilder.$form
+    .find('[name=shape]')
+    .on(
+      'change',
+      function (e) {
+        heatMap.heatmap.setShape($(this).val());
+        heatMap.heatmap.setInvalid(true);
+        heatMap.heatmap.repaint();
+      });
   $colorByValue.on('change', function (e) {
     if (heatMap.heatmap.getColorScheme()
-        .getSeparateColorSchemeForRowMetadataField() == null) {
+      .getSeparateColorSchemeForRowMetadataField() == null) {
       colorSchemeChooser.setCurrentValue(null);
       heatMap.heatmap.getColorScheme().setCurrentValue(null);
       colorSchemeChooser.setColorScheme(heatMap.heatmap

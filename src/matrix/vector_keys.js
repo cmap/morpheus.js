@@ -34,6 +34,7 @@ morpheus.VectorKeys.IS_INDEX = 'morpheus.isIndex';
 /** Whether vector values should be treated discretely or continuously */
 morpheus.VectorKeys.DISCRETE = 'morpheus.discrete';
 
+
 morpheus.VectorKeys.COPY_IGNORE = new morpheus.Set();
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.HEADER_SUMMARY);
 morpheus.VectorKeys.COPY_IGNORE.add(morpheus.VectorKeys.DATA_TYPE);

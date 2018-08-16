@@ -41,7 +41,7 @@ morpheus.Array2dReaderInteractive.prototype = {
     var name = morpheus.Util.getBaseFileName(morpheus.Util.getFileName(fileOrUrl));
     var html = [];
     html.push('<div>');
-    html.push('<label>Click the table cell containing the first data row and column.</label>');
+    html.push('<label>Click the table cell containing the first data row and column.</label><br />');
     // html.push('<div class="checkbox"> <label> <input name="transpose" type="checkbox">' +
     //   ' Tranpose </label>' +
     //   ' </div>');
@@ -69,11 +69,28 @@ morpheus.Array2dReaderInteractive.prototype = {
       var s;
       var lines = [];
       // show in table
-      var tab = /\t/;
-      while ((s = br.readLine()) !== null && lines.length < 100) {
-        lines.push(s.split(tab));
+      var separator = /\t/;
+      var testLine = br.readLine();
+      var separators = ['\t', ',', ' '];
+      for (var i = 0; i < separators.length; i++) {
+        var sep = separators[i];
+        var tokens = testLine.split(new RegExp(sep));
+        if (tokens.length > 1) {
+          separator = sep;
+          lines.push(tokens);
+          break;
+        }
       }
 
+
+      while ((s = br.readLine()) !== null && lines.length < 100) {
+        lines.push(s.split(separator));
+      }
+      if (lines[0][0] === '#1.3') {
+        br.reset();
+        callback(null, new morpheus.GctReader()._read(name, br));
+        return;
+      }
       var grid;
       var columns = [];
       for (var j = 0, ncols = lines[0].length; j < ncols; j++) {
@@ -181,11 +198,11 @@ morpheus.Array2dReaderInteractive.prototype = {
         close: false,
         focus: document.activeElement,
         cancelCallback: function () {
-          callback(null);
+          callback(new Error('Cancel'), null);
         },
         okCallback: function () {
           br.reset();
-          _this._read(name, br, dataColumnStart, dataRowStart, callback);
+          _this._read(name, br, dataColumnStart, dataRowStart, separator, callback);
         }
       });
       grid.resizeCanvas();
@@ -193,8 +210,13 @@ morpheus.Array2dReaderInteractive.prototype = {
     });
 
   },
-  _read: function (datasetName, bufferedReader, dataColumnStart, dataRowStart, cb) {
-    var dataset = new morpheus.TxtReader({columnMetadata: true, dataRowStart: dataRowStart, dataColumnStart: dataColumnStart})._read(datasetName, bufferedReader);
+  _read: function (datasetName, bufferedReader, dataColumnStart, dataRowStart, separator, cb) {
+    var dataset = new morpheus.TxtReader({
+      separator: separator,
+      columnMetadata: true,
+      dataRowStart: dataRowStart,
+      dataColumnStart: dataColumnStart
+    })._read(datasetName, bufferedReader);
     cb(null, dataset);
   }
 };

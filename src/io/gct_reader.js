@@ -21,13 +21,13 @@ morpheus.GctReader.prototype = {
       // 	$.ajax({
       // 		url: fileOrUrl,
       // 		method: 'HEAD'
-      // 	}).done(function (data, textStatus, jqXHR) {
+      // 	}).then(function (data, textStatus, jqXHR) {
       // 		if ('gzip' === jqXHR.getResponseHeader('Content-Encoding')) {
       // 			_this._readNoChunking(fileOrUrl, callback);
       // 		} else {
       // 			_this._readChunking(fileOrUrl, callback, false);
       // 		}
-      // 	}).fail(function () {
+      // 	}).catch(function () {
       // 		_this._readNoChunking(fileOrUrl, callback);
       // 	});
       // } else {
@@ -56,7 +56,8 @@ morpheus.GctReader.prototype = {
     var columnIdFieldName = 'id';
     var rowIdFieldName = 'id';
     var columnNamesArray;
-
+    var isSparse = false;
+    var percentSparse = null;
     var handleTokens = function (tokens) {
       if (lineNumber === 0) {
         var text = tokens[0].trim();
@@ -153,8 +154,11 @@ morpheus.GctReader.prototype = {
           }
         } else { // data lines
           if (tokens[0] !== '') {
+            // if sparse, array of {indices, values}
+
+
             var array = new Float32Array(ncols);
-            matrix.push(array);
+
             // we iterate to numRowAnnotations + 1 to include id row
             // metadata field
             for (var rowAnnotationIndex = 0; rowAnnotationIndex <= numRowAnnotations; rowAnnotationIndex++) {
@@ -167,6 +171,35 @@ morpheus.GctReader.prototype = {
             for (var columnIndex = 0; columnIndex < ncols; columnIndex++) {
               var token = tokens[columnIndex + dataColumnStart];
               array[columnIndex] = parseFloat(token);
+            }
+            if (percentSparse == null) {
+              var nzero = 0;
+              for (var j = 0; j < ncols; j++) {
+                if (array[0] === 0) {
+                  nzero++;
+                }
+              }
+              percentSparse = nzero / array.length;
+              isSparse = percentSparse > 0.3;
+            }
+            if (isSparse) {
+              var count = 0;
+              for (var j = 0; j < ncols; j++) {
+                if (array[j] !== 0.0) {
+                  count++;
+                }
+              }
+              var obj = {values: new Float32Array(count), indices: new Uint32Array(count)};
+              for (var j = 0, k = 0; j < ncols; j++) {
+                if (array[j] !== 0.0) {
+                  obj.values[k] = array[j];
+                  obj.indices[k] = j;
+                  k++;
+                }
+              }
+              matrix.push(obj);
+            } else {
+              matrix.push(array);
             }
           }
         }
@@ -194,7 +227,8 @@ morpheus.GctReader.prototype = {
           rows: matrix.length,
           columns: ncols,
           array: matrix,
-          dataType: 'Float32'
+          dataType: 'Float32',
+          defaultValue: isSparse ? 0 : undefined
         });
         for (var i = 0; i < rowMetadataNames.length; i++) {
           dataset.getRowMetadata().add(rowMetadataNames[i]).array = rowMetadata[i];
@@ -362,6 +396,7 @@ morpheus.GctReader.prototype = {
       morpheus.MetadataUtil.maybeConvertStrings(dataset.getRowMetadata(), 1);
       morpheus.MetadataUtil.maybeConvertStrings(dataset.getColumnMetadata(),
         1);
+
       return dataset;
 
     } else {
@@ -486,9 +521,9 @@ morpheus.GctReader.prototype = {
     // $.ajax({
     // 	url: fileOrUrl,
     // 	dataType: 'text'
-    // }).done(function (text) {
+    // }).then(function (text) {
     // 	callback(null, _this.read(name, new morpheus.StringReader(text)));
-    // }).fail(function (err) {
+    // }).catch(function (err) {
     // 	callback(err);
     // });
 

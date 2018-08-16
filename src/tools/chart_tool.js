@@ -12,7 +12,7 @@ morpheus.ChartTool = function (chartOptions) {
     + '<div class="row">'
     + '<div data-name="configPane" class="col-xs-2"></div>'
     + '<div class="col-xs-10"><div style="position:relative;" data-name="chartDiv"></div></div>'
-    + '</div></div>');
+    + '</div><div data-name="legend"></div></div>');
 
   var formBuilder = new morpheus.FormBuilder({
     formStyle: 'vertical'
@@ -22,7 +22,7 @@ morpheus.ChartTool = function (chartOptions) {
     name: 'chart_type',
     type: 'bootstrap-select',
     options: [
-      'boxplot', 'row profile', 'column profile', 'row scatter matrix', 'column scatter' +
+      'boxplot', 'embedding', 'row profile', 'column profile', 'row scatter matrix', 'column scatter' +
       ' matrix']
   });
   var rowOptions = [];
@@ -132,7 +132,8 @@ morpheus.ChartTool = function (chartOptions) {
   formBuilder.append({
     name: 'color',
     type: 'bootstrap-select',
-    options: options
+    options: options,
+    search: true
   });
 
   // formBuilder.append({
@@ -146,6 +147,76 @@ morpheus.ChartTool = function (chartOptions) {
     multiple: true,
     search: true,
     options: options.slice(1)
+  });
+
+  formBuilder.append({
+    name: 'x_axis',
+    type: 'bootstrap-select',
+    multiple: false,
+    search: true,
+    options: numericColumnOptions
+  });
+  formBuilder.append({
+    name: 'y_axis',
+    type: 'bootstrap-select',
+    multiple: false,
+    search: true,
+    options: numericColumnOptions
+  });
+
+
+  formBuilder.append({
+    name: 'transform_values',
+    type: 'bootstrap-select',
+    multiple: true,
+    options: ['log2', 'log2(1+x)', 'z-score', 'robust z-score']
+  });
+
+  var combinedValues = morpheus.CollapseDatasetTool.Functions;
+  combinedValues.splice(morpheus.CollapseDatasetTool.Functions.indexOf(morpheus.Percentile), 1);
+  formBuilder.append({
+    name: 'combine_values',
+    type: 'bootstrap-select',
+    multiple: false,
+    options: combinedValues,
+    value: morpheus.Max
+  });
+
+  formBuilder.append({
+    name: 'symbol_size',
+    type: 'text',
+    value: '2',
+    style: 'width:50px;'
+  });
+  this.legend = new morpheus.AbstractCanvas(false);
+  $(this.legend.getCanvas()).css('position', '');
+  this.legend.setBounds({width: 300, height: 30});
+
+  this.$legend = this.$el.find('[data-name=legend]')
+  this.$legend.hide();
+  $(this.legend.getCanvas()).appendTo(this.$legend);
+
+  var $edit = $('<div><button class="btn btn-default">Edit</button></div>');
+  $edit.appendTo(this.$legend);
+  $edit.find('button').on('click', function (e) {
+    var colorSchemeChooser = new morpheus.ColorSchemeChooser({
+      isColumns: true,
+      heatMap: _this.heatmap,
+    });
+    var colorByInfo = morpheus.ChartTool.getVectorInfo(formBuilder.getValue('color'));
+    colorSchemeChooser.setAnnotationName(colorByInfo.field);
+    colorSchemeChooser.on('change', function () {
+      draw();
+    });
+    morpheus.FormBuilder.showInModal({
+      title: 'Edit Colors',
+      html: colorSchemeChooser.$div,
+      close: 'Close',
+      draggable: true,
+      onClose: function () {
+        colorSchemeChooser.off('change');
+      }
+    });
   });
 
   formBuilder.append({
@@ -169,7 +240,15 @@ morpheus.ChartTool = function (chartOptions) {
     'row profile': {
       axis_label: 'columns',
       tooltip: 'columns',
-      color: 'rows'
+      color: 'rows',
+    },
+    'embedding': {
+      combine_values: true,
+      color: ['Selected Rows', 'columns'],
+      x_axis: 'columns',
+      y_axis: 'columns',
+      symbol_size: true,
+      transform_values: true
     },
     'column profile': {
       axis_label: 'rows',
@@ -200,14 +279,31 @@ morpheus.ChartTool = function (chartOptions) {
       formBuilder.setOptions('axis_label',
         chartOptions.axis_label === 'rows' ? rowOptions : columnOptions,
         true);
-
     }
+
+    _this.$legend.css('display', (chartType === 'embedding' && formBuilder.getValue('color') != null && formBuilder.getValue('color') !== 'Selected Rows') ? '' : 'none');
+    formBuilder.setVisible('combine_values', chartOptions.combine_values && formBuilder.getValue('color') === 'Selected Rows');
+    formBuilder.setVisible('transform_values', chartOptions.transform_values && formBuilder.getValue('color') === 'Selected Rows');
+    formBuilder.setVisible('symbol_size', chartOptions.symbol_size);
+    formBuilder.setVisible('x_axis', chartOptions.x_axis != null);
+    formBuilder.setVisible('y_axis', chartOptions.y_axis != null);
     formBuilder.setVisible('color', chartOptions.color != null);
     formBuilder.setVisible('axis_label', chartOptions.axis_label != null);
     formBuilder.setVisible('group_by', chartOptions.group_by);
     formBuilder.setVisible('show_outliers', chartOptions.show_outliers);
+    formBuilder.setVisible('tooltip', chartOptions.tooltip != null);
     formBuilder.setOptions('tooltip', chartOptions.tooltip === 'rows' ? rowOptions.slice(1) : (chartOptions.tooltip === 'columns' ? columnOptions.slice(1) : options));
-    formBuilder.setOptions('color', chartOptions.color === 'rows' ? rowOptions : (chartOptions.color === 'columns' ? columnOptions : options));
+    formBuilder.setOptions('x_axis', numericColumnOptions);
+    formBuilder.setOptions('y_axis', numericColumnOptions);
+    if (chartOptions.color != null) {
+      if (chartOptions.color === 'rows') {
+        formBuilder.setOptions('color', rowOptions);
+      } else if (chartOptions.color === 'columns') {
+        formBuilder.setOptions('color', columnOptions);
+      } else if (_.isArray(chartOptions.color)) {
+        formBuilder.setOptions('color', columnOptions.concat([chartOptions.color[0]])); // TODO hack
+      }
+    }
   }
 
   this.tooltip = [];
@@ -549,6 +645,174 @@ morpheus.ChartTool.prototype = {
     var myChart = echarts.init(options.el);
     myChart.setOption(chart);
   },
+
+  /**
+   *
+   * @param options.dataset
+   * @param options.colorByVector
+   * @param options.colorModel
+   * @param options.transpose
+   * @param options.chartWidth
+   * @param options.chartHeight
+   * @param options.xVector
+   * @param options.yVector
+   * @private
+   */
+
+  _createEmbedding: function (options) {
+    var _this = this;
+    var fullDataset = options.fullDataset;
+    var selectedDataset = options.dataset;
+    var transpose = options.transpose;
+    var xVector = options.xVector;
+    var yVector = options.yVector;
+    var collapseFunction = options.collapseFunction;
+    var symbolSize = options.symbolSize;
+    var dataTransformations = options.dataTransformations;
+    if (xVector == null || yVector == null) {
+      return;
+    }
+    var colorByVector = options.colorByVector;
+    var colorModel = options.colorModel;
+
+    var heatmap = this.heatmap;
+    var chartWidth = options.chartWidth;
+    var chartHeight = options.chartHeight;
+    var visualMap = undefined;
+    var collapsed;
+    if (selectedDataset != null) {
+      collapsed = new Float32Array(selectedDataset.getColumnCount());
+      if (dataTransformations.length > 0) {
+        selectedDataset = morpheus.DatasetUtil.copy(selectedDataset);
+        dataTransformations.forEach(function (f) {
+          f(selectedDataset);
+        });
+
+      }
+
+
+      var view = new morpheus.DatasetColumnView(selectedDataset);
+      for (var j = 0, ncols = selectedDataset.getColumnCount(); j < ncols; j++) {
+        collapsed[j] = collapseFunction(view.setIndex(j));
+      }
+      var v = morpheus.Vector.fromArray('', collapsed);
+      var stats = morpheus.VectorUtil.getMinMax(v);
+
+      visualMap = {
+        type: 'continuous',
+        min: stats.min,
+        max: stats.max,
+        dimension: 3,
+        orient: 'horizontal',
+        left: 0,
+        top: 'bottom',
+        text: ['', ''],
+        calculable: true,
+        inRange: {
+          color: ['#ffeda0', '#feb24c', '#f03b20']
+        },
+        outOfRange: {
+          color: ['rgb(217,217,217)'],
+          opacity: 0.5
+        }
+      };
+    }
+
+    var data = [];
+    var colors = [];
+    var isContinuous = false;
+    if (colorByVector != null) {
+      isContinuous = !colorByVector.getProperties().get(morpheus.VectorKeys.DISCRETE);
+    }
+    for (var j = 0, size = xVector.size(); j < size; j++) {
+      if (selectedDataset != null) {
+        data.push([xVector.getValue(j), yVector.getValue(j), j, collapsed[j]]);
+      } else if (colorByVector != null) {
+        if (isContinuous) {
+          colors.push(colorModel.getContinuousMappedValue(colorByVector, colorByVector.getValue(j)));
+        } else {
+          colors.push(colorModel.getMappedValue(colorByVector, colorByVector.getValue(j)));
+        }
+        data.push([xVector.getValue(j), yVector.getValue(j), j]);
+      } else {
+        data.push([xVector.getValue(j), yVector.getValue(j), j]);
+      }
+    }
+
+
+    var chart = {
+      animation: false,
+      tooltip: {
+        trigger: 'item'
+      },
+      xAxis: [{
+        axisTick: {show: false},
+        axisLabel: {show: false},
+        axisLine: {
+          show: true,
+          onZero: false
+        },
+        splitLine: {
+          show: false
+        },
+        boundaryGap: false,
+        type: 'value',
+        name: ''
+      }],
+      visualMap: visualMap,
+      yAxis: [{
+        axisTick: {show: false},
+        axisLabel: {show: false},
+        axisLine: {
+          show: true,
+          onZero: false
+        }, splitLine: {
+          show: false
+        },
+        boundaryGap: false,
+        type: 'value',
+        name: ''
+      }],
+      series: [{
+        type: 'scatterGL',
+        data: data,
+        large: false,
+        symbolSize: symbolSize,
+        tooltip: {
+          formatter: function (obj) {
+            var value = obj.value;
+            var s = [];
+            if (transpose) {
+              morpheus.ChartTool.getTooltip({
+                text: s,
+                tooltip: _this.tooltip,
+                dataset: new morpheus.TransposedDatasetView(fullDataset),
+                rowIndex: value[2],
+                columnIndex: -1
+              });
+            } else {
+              morpheus.ChartTool.getTooltip({
+                text: s,
+                tooltip: _this.tooltip,
+                dataset: fullDataset,
+                rowIndex: -1,
+                columnIndex: value[2]
+              });
+            }
+            return s.join('');
+          }
+        },
+        itemStyle: {
+          color: function (param) {
+            return colors.length === 0 ? '#1f78b4' : colors[param.dataIndex];
+          }
+        }
+      }]
+    };
+
+    var myChart = echarts.init(options.el);
+    myChart.setOption(chart);
+  },
   /**
    *
    * @param options.datasets 1-d array of datasets
@@ -695,24 +959,27 @@ morpheus.ChartTool.prototype = {
     // var sizeBy = this.formBuilder.getValue('size');
     var chartType = this.formBuilder.getValue('chart_type');
 
-    var dataset = this.project.getSelectedDataset({
+
+    var dataset = chartType !== 'embedding' ? this.project.getSelectedDataset({
       emptyToAll: false
-    });
+    }) : this.project.getFullDataset();
 
     this.dataset = dataset;
-    if (dataset.getRowCount() === 0 && dataset.getColumnCount() === 0) {
-      $('<h4>Please select rows and columns in the heat map.</h4>')
-        .appendTo(this.$chart);
-      return;
-    } else if (dataset.getRowCount() === 0) {
-      $('<h4>Please select rows in the heat map.</h4>')
-        .appendTo(this.$chart);
-      return;
-    }
-    if (dataset.getColumnCount() === 0) {
-      $('<h4>Please select columns in the heat map.</h4>')
-        .appendTo(this.$chart);
-      return;
+    if (chartType !== 'embedding') {
+      if (dataset.getRowCount() === 0 && dataset.getColumnCount() === 0) {
+        $('<h4>Please select rows and columns in the heat map.</h4>')
+          .appendTo(this.$chart);
+        return;
+      } else if (dataset.getRowCount() === 0) {
+        $('<h4>Please select rows in the heat map.</h4>')
+          .appendTo(this.$chart);
+        return;
+      }
+      if (dataset.getColumnCount() === 0) {
+        $('<h4>Please select columns in the heat map.</h4>')
+          .appendTo(this.$chart);
+        return;
+      }
     }
 
     var heatmap = this.heatmap;
@@ -730,15 +997,84 @@ morpheus.ChartTool.prototype = {
     var colorBy = this.formBuilder.getValue('color');
     var colorByVector = null;
     var colorModel = null;
-    if (colorBy != null) {
+    if (colorBy != null && colorBy !== 'Selected Rows') {
       var colorByInfo = morpheus.ChartTool.getVectorInfo(colorBy);
       colorModel = !colorByInfo.isColumns ? this.project.getRowColorModel()
         : this.project.getColumnColorModel();
       colorByVector = colorByInfo.isColumns ? dataset.getColumnMetadata().getByName(colorByInfo.field) : dataset.getRowMetadata().getByName(
         colorByInfo.field);
+      if (colorByVector != null && chartType === 'embedding' && !colorByVector.getProperties().get(morpheus.VectorKeys.DISCRETE)) {
+
+        var legendContext = _this.legend.getCanvas().getContext('2d');
+
+        var scheme = _this.heatmap.getProject().getColumnColorModel().getContinuousColorScheme(colorByVector);
+        if (scheme == null) {
+          scheme = _this.heatmap.getProject().getColumnColorModel().createContinuousColorMap(colorByVector);
+        }
+        morpheus.CanvasUtil.resetTransform(legendContext);
+        legendContext.clearRect(0, 0, _this.legend.getUnscaledWidth(), _this.legend.getUnscaledWidth());
+        legendContext.translate(15, 0); // make space for negative numbers
+        morpheus.HeatMapColorSchemeLegend.drawColorScheme(legendContext, scheme, 200);
+        _this.$legend.show();
+
+      } else {
+        _this.$legend.hide();
+      }
+
     }
 
-    if (chartType === 'row profile' || chartType === 'column profile') {
+    if (chartType === 'embedding') {
+      var xaxisInfo = morpheus.ChartTool.getVectorInfo(this.formBuilder.getValue('x_axis'));
+      var xVector = xaxisInfo.isColumns ? dataset.getColumnMetadata().getByName(xaxisInfo.field) : dataset.getRowMetadata().getByName(
+        xaxisInfo.field);
+      var yaxisInfo = morpheus.ChartTool.getVectorInfo(this.formBuilder.getValue('y_axis'));
+      var yVector = yaxisInfo.isColumns ? dataset.getColumnMetadata().getByName(yaxisInfo.field) : dataset.getRowMetadata().getByName(
+        yaxisInfo.field);
+
+
+      var transformValues = this.formBuilder.getValue('transform_values');
+      if (transformValues == null) {
+        transformValues = [];
+      }
+      var dataTransformations = [];
+      //  options: ['log2', 'log2(1+x), z-score, robust z-score']
+      if (transformValues.indexOf('log2') !== -1) {
+        dataTransformations.push(morpheus.AdjustDataTool.log2);
+      }
+      if (transformValues.indexOf('log2(1+x)') !== -1) {
+        dataTransformations.push(morpheus.AdjustDataTool.log2_plus);
+      }
+      if (transformValues.indexOf('z-score') !== -1) {
+        dataTransformations.push(morpheus.AdjustDataTool.zScore);
+      }
+      if (transformValues.indexOf('robust z-score') !== -1) {
+        dataTransformations.push(morpheus.AdjustDataTool.robustZScore);
+      }
+
+
+      var $chart = $('<div style="width: ' + (gridWidth) + 'px;height:' + (gridHeight + 120) + 'px;"></div>');
+      $chart.appendTo(this.$chart);
+      this._createEmbedding({
+        xVector: xVector,
+        yVector: yVector,
+        width: gridWidth,
+        collapseFunction: morpheus.CollapseDatasetTool.Functions.fromString(this.formBuilder.getValue('combine_values')),
+        dataTransformations: dataTransformations,
+        symbolSize: parseFloat(this.formBuilder.getValue('symbol_size')),
+        el: $chart[0],
+        fullDataset: dataset,
+        dataset: colorBy === 'Selected Rows' ? this.project.getSelectedDataset({
+          emptyToAll: false,
+          selectedColumns: false
+        }) : null,
+        chartWidth: gridWidth,
+        chartHeight: gridHeight,
+        transpose: false,
+        colorModel: colorModel,
+        colorByVector: colorByVector
+      });
+    }
+    else if (chartType === 'row profile' || chartType === 'column profile') {
       var transpose = chartType === 'column profile';
       if (transpose) {
         dataset = new morpheus.TransposedDatasetView(dataset);

@@ -33,20 +33,20 @@ morpheus.FilePicker = function (options) {
   }
 
   var $sampleDatasetsEl = $('<div class="morpheus-preloaded"></div>');
-  if (navigator.onLine) {
-    html.push('<li role="presentation"><a href="#' + preloaded + '"' +
-      ' aria-controls="' + preloaded + '" role="tab" data-toggle="tab"><i class="fa fa-database"></i>' +
-      ' Preloaded Datasets</a></li>');
 
-    // lazy load
-    new morpheus.SampleDatasets({
-      $el: $sampleDatasetsEl,
-      show: true,
-      callback: function (heatMapOptions) {
-        options.optionsCallback(heatMapOptions);
-      }
-    });
-  }
+  html.push('<li role="presentation"><a href="#' + preloaded + '"' +
+    ' aria-controls="' + preloaded + '" role="tab" data-toggle="tab"><i class="fa fa-database"></i>' +
+    ' Preloaded Datasets</a></li>');
+
+  // lazy load
+  new morpheus.SampleDatasets({
+    $el: $sampleDatasetsEl,
+    show: true,
+    callback: function (heatMapOptions) {
+      options.optionsCallback(heatMapOptions);
+    }
+  });
+
 
   html.push('</ul>');
 
@@ -88,12 +88,12 @@ morpheus.FilePicker = function (options) {
     html.push('</div>');
     html.push('</div>');
   }
-  if (navigator.onLine) {
-    html.push('<div role="tabpanel" class="tab-pane" id="' + preloaded + '">');
-    html.push('<div class="morpheus-landing-panel">');
-    html.push('</div>');
-    html.push('</div>');
-  }
+
+  html.push('<div role="tabpanel" class="tab-pane" id="' + preloaded + '">');
+  html.push('<div style="height:300px;overflow: auto;" class="morpheus-landing-panel">');
+  html.push('</div>');
+  html.push('</div>');
+
   html.push('</div>'); // tab-content
   html.push('</div>');
   var $el = $(html.join(''));
@@ -138,6 +138,7 @@ morpheus.FilePicker = function (options) {
 
   var $google = $el.find('[name=google]');
   $google.on('click', function () {
+
     var developerKey = 'AIzaSyBCRqn5xgdUsJZcC6oJnIInQubaaL3aYvI';
     var clientId = '936482190815-85k6k06b98ihv272n0b7f7fm33v5mmfa.apps.googleusercontent.com';
     var scope = ['https://www.googleapis.com/auth/drive'];
@@ -167,6 +168,7 @@ morpheus.FilePicker = function (options) {
     }
 
     function handleAuthResult(authResult) {
+
       if (authResult && !authResult.error) {
         oauthToken = authResult.access_token;
         createPicker();

@@ -4,8 +4,11 @@ node_js:
 notifications:
   email: false
 sudo: false
+before_install:
+  - sudo apt-get install -y libhdf5-7
 before_script:
   - npm install -g grunt-cli
+
 cache:
   directories:
     - "node_modules"

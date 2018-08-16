@@ -43,7 +43,7 @@ morpheus.SimilarityMatrixTool.prototype = {
     var heatMap = options.heatMap;
     var isColumnMatrix = options.input.compute_matrix_for == 'Columns';
     var f = morpheus.SimilarityMatrixTool.Functions
-    .fromString(options.input.metric);
+      .fromString(options.input.metric);
     var dataset = project.getSortedFilteredDataset();
     var blob = new Blob(
       ['self.onmessage = function(e) {'
@@ -65,10 +65,10 @@ morpheus.SimilarityMatrixTool.prototype = {
     });
 
     worker.onmessage = function (e) {
-      var name = heatMap.getName();
+      var name = heatMap.getName() + ' ' + options.input.metric;
       var matrix = e.data;
       var n = isColumnMatrix ? dataset.getColumnCount() : dataset
-      .getRowCount();
+        .getRowCount();
       var d = new morpheus.Dataset({
         name: name,
         rows: n,

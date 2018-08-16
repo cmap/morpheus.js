@@ -275,6 +275,7 @@ morpheus.VectorUtil.maybeConvertStringToNumber = function (vector) {
   for (var i = 0, nrows = newValues.length; i < nrows; i++) {
     vector.setValue(i, newValues[i]);
   }
+  vector.getProperties().set(morpheus.VectorKeys.DISCRETE, false);
   vector.getProperties().set(morpheus.VectorKeys.DATA_TYPE, 'number');
   return true;
 };

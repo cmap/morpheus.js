@@ -330,41 +330,47 @@ morpheus.VectorTrackHeader.prototype = {
     this.hammer.destroy();
   },
   getPreferredSize: function () {
-    var size = this.getPrintSize();
+    var context = this.canvas.getContext('2d');
+    context.font = this.fontWeight + ' ' + this.defaultFontHeight + 'px '
+      + morpheus.CanvasUtil.getFontFamily(context);
+    var textWidth = context.measureText(this.name).width;
+    var size = {
+      width: textWidth,
+      height: this.defaultFontHeight + morpheus.VectorTrackHeader.FONT_OFFSET
+    };
+
     size.width += 24; // leave space for sort, drag icon, lock
 
     if (!this.isColumns) {
       size.height = this.defaultFontHeight
         + morpheus.VectorTrackHeader.FONT_OFFSET;
     }
-    // var vector = (this.isColumns ? this.project.getFullDataset()
-    // .getColumnMetadata() : this.project.getFullDataset()
-    // .getRowMetadata()).getByName(this.name);
-    // if (vector
-    // && vector.getProperties().get(
-    // morpheus.VectorKeys.SHOW_HEADER_SUMMARY)) {
-    // if (isNaN(size.height)) {
-    // size.height = 0;
-    // }
-    // if (!this.isColumns) {
-    // size.height += 50;
-    // } else {
-    // size.width += 50;
-    // }
-    //
-    // }
+
     return size;
   },
   getPrintSize: function () {
     var context = this.canvas.getContext('2d');
     context.font = this.fontWeight + ' ' + this.defaultFontHeight + 'px '
       + morpheus.CanvasUtil.getFontFamily(context);
-    var textWidth = 4 + context.measureText(this.name).width;
-    return {
-      width: textWidth,
-      height: this.defaultFontHeight
-      + morpheus.VectorTrackHeader.FONT_OFFSET
+    var track = this.heatMap.getTrack(this.name, this.isColumns);
+    var trackSize = track.getPrintSize();
+    var textWidth = context.measureText(this.name).width;
+    var size = {
+      width: textWidth + 4,
+      height: this.defaultFontHeight + morpheus.VectorTrackHeader.FONT_OFFSET
     };
+    var border = 0;
+    if (track.isRenderAs(morpheus.VectorTrack.RENDER.TEXT) && track.settings.display.length === 1) {
+      border = 6;
+    }
+    if (this.isColumns) {
+      size.height = Math.max(size.height, trackSize.height);
+      size.height += border;
+    } else {
+      size.width = Math.max(size.width, trackSize.width);
+      size.width += border;
+    }
+    return size;
   },
   getSortKeys: function () {
     return this.isColumns ? this.project.getColumnSortKeys() : this.project
