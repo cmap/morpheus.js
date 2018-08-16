@@ -2,7 +2,7 @@
   "name": "morpheus-app",
   "description": "JavaScript matrix visualization and analysis",
   "license": "BSD-3-Clause",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "main": "js/morpheus-esm-latest.min.js",
   "repository": {
     "type": "git",
