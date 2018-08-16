@@ -29,6 +29,7 @@
     "morpheus"
   ],
   "scripts": {
+    "prepack": "grunt concat uglify",
     "test:js": "grunt concat:morpheus concat:extJs concat:extJsAll uglify",
     "test:karma": "./node_modules/.bin/karma start --single-run",
     "test": "npm run test:js && npm run test:karma"
