@@ -8,6 +8,14 @@ module.exports = function (grunt) {
         + '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>; %> */'
     },
     uglify: {
+      morpheusEs6Module: {
+        options: {
+          mangle: false
+        },
+        files: {
+          'js/morpheus-esm-latest.min.js': ['js/morpheus-esm.js']
+        }
+      },
       morpheus: {
         options: {
           mangle: false,
@@ -52,6 +60,18 @@ module.exports = function (grunt) {
           footer: '\n})(typeof window !== \'undefined\' ? window : this);\n'
         },
         dest: 'js/morpheus.js',
+        src: [
+          'src/util/util.js', 'src/util/*.js',
+          'src/io/*.js', 'src/matrix/vector_adapter.js',
+          'src/matrix/*.js', 'src/*.js',
+          'src/tools/*.js', 'src/ui/*.js', 'src/**/*.js']
+      },
+      morpheusEs6Module: {
+        options: {
+          banner: 'let morpheus;\n(function (root, factory) {\nmorpheus = factory();\n}(this, function () {\n',
+          footer: '\nreturn morpheus;\n}));\nexport default morpheus;\n'
+        },
+        dest: 'js/morpheus-esm.js',
         src: [
           'src/util/util.js', 'src/util/*.js',
           'src/io/*.js', 'src/matrix/vector_adapter.js',
@@ -115,7 +135,7 @@ module.exports = function (grunt) {
   grunt.registerTask('default', 'watch');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-uglify-es');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
 };

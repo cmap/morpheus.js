@@ -26,15 +26,15 @@ morpheus.ActionManager = function () {
   var $filterModal = null;
   var windowOpen = function (url) {
     if (morpheus.Util.isNode()) {
-      var remote = require('electron').remote;
-      var BrowserWindow = remote.BrowserWindow;
-      var newWindow = new BrowserWindow({
-        fullscreenable: false
-      });
-      newWindow.loadURL(url);
-      newWindow.on('closed', function () {
-        newWindow = null;
-      });
+//      var remote = require('electron').remote;
+//      var BrowserWindow = remote.BrowserWindow;
+//      var newWindow = new BrowserWindow({
+//        fullscreenable: false
+//      });
+//      newWindow.loadURL(url);
+//      newWindow.on('closed', function () {
+//        newWindow = null;
+//      });
     } else {
       window.open(url);
     }

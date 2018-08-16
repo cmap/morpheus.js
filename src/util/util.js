@@ -16,6 +16,7 @@ morpheus.Util = function () {
 };
 
 morpheus.Util.isNode = function () {
+  return false;
   // Only Node.JS has a process variable that is of [[Class]] process
   try {
     return Object.prototype.toString.call(global.process) === '[object process]'
