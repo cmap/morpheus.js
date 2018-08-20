@@ -527,7 +527,7 @@ morpheus.Util.autocompleteArrayMatcher = function (token, cb, array, fields, max
     matches.push({
       value: quotedValue,
       label: '<span>' + value.replace(regexMatch, '<b>$1</b>')
-      + '</span>'
+        + '</span>'
     });
   });
 
@@ -1551,7 +1551,7 @@ morpheus.Util.createValueToIndices = function (array, field) {
   return map;
 };
 
-morpheus.Util.createMorpheusHeader = function () {
+morpheus.Util.createMorpheusHeader = function (cb) {
   var html = [];
   html.push('<div style="display:inline-block;' +
     ' vertical-align:top;font-size:24px;font-family:sans-serif;">');
@@ -1569,14 +1569,23 @@ morpheus.Util.createMorpheusHeader = function () {
   var colorScale = d3.scale.linear().domain([0, 4, 7]).range(['#ca0020', '#999999', '#0571b0']).clamp(true);
   var brands = $div.find('span');
   var index = 0;
-  var step = function () {
+  var start;
+
+  function step(timestamp) {
+    if (!start) start = timestamp;
+    var progress = timestamp - start;
+    var f = progress / 2000;
+    var index = Math.min(brands.length - 1, Math.floor(f * brands.length));
     brands[index].style.color = colorScale(index);
-    index++;
-    if (index < brands.length) {
-      setTimeout(step, 200);
+    if (cb) {
+      cb(f);
     }
-  };
-  setTimeout(step, 500);
+    if (progress < 2000) {
+      window.requestAnimationFrame(step);
+    }
+  }
+
+  window.requestAnimationFrame(step);
   return $div;
 };
 morpheus.Util.createLoadingEl = function () {
