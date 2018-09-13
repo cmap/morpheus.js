@@ -93,7 +93,7 @@ module.exports = function (grunt) {
           'js/FileSaver.min.js', 'js/colorbrewer.js',
           'js/jquery.event.drag-2.3.0.js', 'js/slick.min.js', 'js/canvas-toBlob.js',
           'js/js.cookie.js', 'js/jstat.min.js', 'js/blob-stream.js',
-          'js/canvas2pdf.js', 'js/pdfkit.js', 'js/promise.polyfill.min.js', 'js/fetch.js']
+          'js/canvas2pdf.js', 'js/pdfkit.js', 'js/promise.polyfill.min.js', 'js/fetch.js', 'js/tsne.js']
       },
       extJsR: {
         nonull: true,

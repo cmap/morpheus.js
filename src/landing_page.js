@@ -123,7 +123,7 @@ morpheus.LandingPage.showHeatMap = function (id) {
   ];
 
   var colorScale =
-    d3.scale.linear().range(['#ca0020', 'white', '#0571b0']).domain([-1.5, 0, 1.5]);
+    d3.scale.linear().range(['#ca0020', 'white', '#0571b0']).domain([-1.5, 0, 1.5]).clamp(true);
   var margin = {
     top: 0,
     right: 0,

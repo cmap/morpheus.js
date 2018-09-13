@@ -1578,7 +1578,7 @@ morpheus.Util.createMorpheusHeader = function (cb) {
     var index = Math.min(brands.length - 1, Math.floor(f * brands.length));
     brands[index].style.color = colorScale(index);
     if (cb) {
-      cb(f);
+      cb(Math.min(1, f));
     }
     if (progress < 2000) {
       window.requestAnimationFrame(step);

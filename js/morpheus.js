@@ -1580,7 +1580,7 @@ morpheus.Util.createMorpheusHeader = function (cb) {
     var index = Math.min(brands.length - 1, Math.floor(f * brands.length));
     brands[index].style.color = colorScale(index);
     if (cb) {
-      cb(f);
+      cb(Math.min(1, f));
     }
     if (progress < 2000) {
       window.requestAnimationFrame(step);
@@ -12394,7 +12394,7 @@ morpheus.LandingPage.showHeatMap = function (id) {
   ];
 
   var colorScale =
-    d3.scale.linear().range(['#ca0020', 'white', '#0571b0']).domain([-1.5, 0, 1.5]);
+    d3.scale.linear().range(['#ca0020', 'white', '#0571b0']).domain([-1.5, 0, 1.5]).clamp(true);
   var margin = {
     top: 0,
     right: 0,
@@ -17521,7 +17521,7 @@ morpheus.TsneTool = function () {
 morpheus.TsneTool.execute = function (dataset, input) {
   // note: in worker here
   var matrix = [];
-  var rows = input.project == 'Rows';
+  var rows = input.run_on == 'Rows';
   if (!rows) {
     dataset = new morpheus.TransposedDatasetView(dataset);
   }
@@ -17579,10 +17579,10 @@ morpheus.TsneTool.prototype = {
     return [{
       name: 'metric',
       options: morpheus.HClusterTool.Functions,
-      value: morpheus.HClusterTool.Functions[3].toString(),
+      value: morpheus.HClusterTool.Functions[4].toString(),
       type: 'select'
     }, {
-      name: 'project',
+      name: 'run_on',
       options: ['Columns', 'Rows'],
       value: 'Columns',
       type: 'select'
@@ -17601,75 +17601,54 @@ morpheus.TsneTool.prototype = {
   execute: function (options) {
     var project = options.project;
     var heatMap = options.heatMap;
-    var rows = options.input.project == 'Rows';
+    var rows = options.input.run_on == 'Rows';
     var dataset = project.getSortedFilteredDataset();
     options.input.epsilon = parseInt(options.input.epsilon);
     options.input.perplexity = parseInt(options.input.perplexity);
-    var blob = new Blob(
-      ['self.onmessage = function(e) {'
-      + 'e.data.scripts.forEach(function (s) { importScripts(s); });'
-      + 'self.postMessage(morpheus.TsneTool.execute(morpheus.Dataset.fromJSON(e.data.dataset), e.data.input));'
-      + '}']);
 
-    var url = URL.createObjectURL(blob);
-    var worker = new Worker(url);
-
-    worker.postMessage({
-      scripts: [morpheus.Util.getScriptPath()],
-      dataset: morpheus.Dataset.toJSON(dataset, {
-        columnFields: [],
-        rowFields: [],
-        seriesIndices: [0]
-      }),
-      input: options.input
-    });
-
-    worker.onmessage = function (e) {
-      if (rows) {
-        dataset = new morpheus.TransposedDatasetView(dataset);
+    var done = function (result) {
+      var solution = result.solution;
+      var t1Vector = !rows ? dataset.getColumnMetadata().add('T1') : dataset.getRowMetadata().add('T1');
+      var t2Vector = !rows ? dataset.getColumnMetadata().add('T2') : dataset.getRowMetadata().add('T2');
+      for (var i = 0; i < t1Vector.size(); i++) {
+        t1Vector.setValue(i, solution[i][0]);
+        t2Vector.setValue(i, solution[i][1]);
       }
-      var result = e.data.solution;
 
-      var newDataset = new morpheus.Dataset({
-        name: 't-SNE',
-        rows: dataset.getColumnCount(),
-        columns: 2
+      project.trigger('trackChanged', {
+        vectors: [t1Vector, t2Vector],
+        display: ['color', 'color'],
+        columns: !rows
       });
-
-      for (var i = 0; i < result.length; i++) {
-        newDataset.setValue(i, 0, result[i][0]);
-        newDataset.setValue(i, 1, result[i][1]);
-      }
-      var idVector = newDataset.getColumnMetadata().add('id');
-      idVector.setValue(0, 'P1');
-      idVector.setValue(1, 'P2');
-      newDataset.setRowMetadata(morpheus.MetadataUtil.shallowCopy(dataset.getColumnMetadata()));
-      var min = morpheus.DatasetUtil.min(newDataset);
-      var max = morpheus.DatasetUtil.max(newDataset);
-      new morpheus.HeatMap({
-        inheritFromParentOptions: {transpose: !rows},
-        name: 't-SNE',
-        dataset: newDataset,
-        parent: heatMap,
-        columns: [{
-          field: 'id',
-          display: 'text'
-        }],
-        colorScheme: {
-          type: 'fixed',
-          map: [{
-            value: min,
-            color: colorbrewer.Greens[3][0]
-          }, {
-            value: max,
-            color: colorbrewer.Greens[3][2]
-          }]
-        }
-      });
-      worker.terminate();
-      window.URL.revokeObjectURL(url);
     };
-    return worker;
+    var useWOrker = false;
+    if (useWOrker) {
+      var blob = new Blob(
+        ['self.onmessage = function(e) {'
+        + 'e.data.scripts.forEach(function (s) { importScripts(s); });'
+        + 'self.postMessage(morpheus.TsneTool.execute(morpheus.Dataset.fromJSON(e.data.dataset), e.data.input));'
+        + '}']);
+
+      var url = URL.createObjectURL(blob);
+      var worker = new Worker(url);
+      worker.postMessage({
+        scripts: [morpheus.Util.getScriptPath()],
+        dataset: morpheus.Dataset.toJSON(dataset, {
+          columnFields: [],
+          rowFields: [],
+          seriesIndices: [0]
+        }),
+        input: options.input
+      });
+      worker.onmessage = function (e) {
+        done(e.data.solution);
+        worker.terminate();
+        window.URL.revokeObjectURL(url);
+      };
+      return worker;
+    } else {
+      done(morpheus.TsneTool.execute(dataset, options.input));
+    }
   }
 };
 
@@ -29160,6 +29139,8 @@ morpheus.HeatMap = function (options) {
         'Transpose',
         null,
         'Chart',
+        null,
+        't-SNE',
         null,
         'Sort/Group',
         'Filter',

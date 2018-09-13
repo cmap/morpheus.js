@@ -286,6 +286,8 @@ morpheus.HeatMap = function (options) {
         null,
         'Chart',
         null,
+        't-SNE',
+        null,
         'Sort/Group',
         'Filter',
         null,
