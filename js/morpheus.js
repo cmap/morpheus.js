@@ -12602,7 +12602,7 @@ morpheus.SampleDatasets = function (options) {
       $button.prop('disabled', isDisabled);
     });
 
-  fetch('https://software.broadinstitute.org/morpheus/preloaded-datasets/tcga/tcga_index.txt').then(function (response) {
+  fetch('https://software.broadinstitute.org/morpheus/datasets/tcga/tcga_index.txt').then(function (response) {
     if (response.ok) {
       return response.text();
     }
@@ -12786,7 +12786,7 @@ morpheus.SampleDatasets = function (options) {
 };
 
 morpheus.SampleDatasets.getTcgaDataset = function (options) {
-  var baseUrl = 'https://software.broadinstitute.org/morpheus/preloaded-datasets/tcga/'
+  var baseUrl = 'https://software.broadinstitute.org/morpheus/datasets/tcga/'
     + options.type + '/';
   var datasetOptions = {};
   if (options.mrna) {
@@ -12826,7 +12826,7 @@ morpheus.SampleDatasets.getDepMapDataset = function (files) {
   var datasets = [];
   files.forEach(function (file) {
     datasets.push(
-      'https://software.broadinstitute.org/morpheus/preloaded-datasets/depmap/' + file);
+      'https://software.broadinstitute.org/morpheus/datasets/depmap/' + file);
   });
   // portal-mutation-2018-04-11.maf.txt
   // portal-expression-2018-04-11.csv
