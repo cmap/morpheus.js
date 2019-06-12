@@ -14598,6 +14598,7 @@ morpheus.CollapseDatasetTool.prototype = {
     }
     var filterFunction = null;
     if (options.input.compute_percent) {
+
       var filterValue = parseFloat(options.input.pass_value);
       if (!isNaN(filterValue)) {
         var op = options.input.pass_expression;
@@ -14625,27 +14626,14 @@ morpheus.CollapseDatasetTool.prototype = {
       dataset = new morpheus.TransposedDatasetView(dataset);
     }
 
-    var heatMap = new morpheus.HeatMap({
+    return new morpheus.HeatMap({
       name: options.input.name || options.heatMap.getName(),
       dataset: dataset,
       parent: options.heatMap,
       symmetric: false,
-      shape: filterFunction != null ? 'circle' : null
+      shape: filterFunction != null ? 'circle' : null,
+      sizeBy: filterFunction != null ? {seriesName: 'percent', min: 0, max: 75} : null
     });
-
-
-    if (options.input.compute_percent) {
-      heatMap.heatmap.colorScheme.getSizer()
-        .setSeriesName('percent');
-      heatMap.heatmap.colorScheme.getSizer()
-        .setMin(0);
-      heatMap.heatmap.colorScheme.getSizer()
-        .setMax(75);
-      heatMap.heatmap.setShape('circle');
-      heatMap.heatmap.setInvalid(true);
-      heatMap.heatmap.repaint();
-    }
-    return heatMap;
   },
 };
 
@@ -17141,6 +17129,98 @@ morpheus.OpenFileTool.prototype = {
       return items;
     };
     morpheus.HeatMap.showTool(promptTool, heatMap);
+  }
+};
+
+morpheus.PcaTool = function () {
+};
+
+
+morpheus.PcaTool.execute = function (dataset, input) {
+  var f = morpheus.PcaTool.Functions.fromString(input.metric);
+  var permutations = new morpheus.PermutationPValues(dataset, null, null, input.npermutations, f,
+    morpheus.Vector.fromArray('', input.listValues));
+  return {
+    rowSpecificPValues: permutations.rowSpecificPValues,
+    k: permutations.k,
+    fdr: permutations.fdr,
+    scores: permutations.scores
+  };
+};
+morpheus.PcaTool.prototype = {
+  toString: function () {
+    return 'PCA';
+  },
+  init: function (project, form) {
+
+  },
+  gui: function () {
+    return [
+      {
+        name: 'metric',
+        options: morpheus.PcaTool.Functions,
+        value: morpheus.Pearson.toString(),
+        type: 'select'
+      }, {
+        name: 'compute_nearest_neighbors_of',
+        options: ['selected rows', 'selected columns', 'column annotation', 'row annotation'],
+        value: 'selected rows',
+        type: 'radio'
+      }, {
+        name: 'use_selected_only',
+        type: 'checkbox'
+      }, {
+        name: 'annotation',
+        type: 'bootstrap-select'
+      }, {
+        name: 'permutations',
+        value: '0',
+        type: 'text'
+      }];
+  },
+  execute: function (options) {
+    var project = options.project;
+    var isColumns = options.input.compute_nearest_neighbors_of == 'selected columns' ||
+      options.input.compute_nearest_neighbors_of == 'row annotation';
+    var heatMap = options.heatMap;
+    var dataset = project.getSortedFilteredDataset();
+
+    if (isColumns) {
+      dataset = new morpheus.TransposedDatasetView(dataset);
+    }
+
+    if (options.input.background) {
+      var blob = new Blob(
+        [
+          'self.onmessage = function(e) {'
+          + 'importScripts(e.data.scripts);'
+          +
+          'self.postMessage(morpheus.PcaTool.execute(morpheus.Dataset.fromJSON(e.data.dataset), e.data.input));'
+          + '}']);
+
+      var url = window.URL.createObjectURL(blob);
+      var worker = new Worker(url);
+
+      worker.postMessage({
+        scripts: morpheus.Util.getScriptPath(),
+        dataset: morpheus.Dataset.toJSON(dataset, {
+          columnFields: [],
+          rowFields: [],
+          seriesIndices: [0]
+        }),
+        input: options.input
+      });
+
+      worker.onmessage = function (e) {
+        done(e.data);
+        worker.terminate();
+        window.URL.revokeObjectURL(url);
+      };
+      return worker;
+    } else {
+      done(morpheus.PcaTool.execute(dataset, options.input));
+    }
+
   }
 };
 
@@ -29429,8 +29509,7 @@ morpheus.HeatMap = function (options) {
                 extension: morpheus.Util.getExtension(morpheus.Util.getFileName(option.dataset)),
                 filename: morpheus.Util.getBaseFileName(morpheus.Util.getFileName(option.dataset))
               });
-            }
-            catch (x) {
+            } catch (x) {
               console.log('Autodisplay errror');
             }
 
@@ -29622,8 +29701,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       okCallback: okCallback,
       focus: heatMap.getFocusEl()
     });
-  }
-  else { // run headless
+  } else { // run headless
     tool.execute({
       heatMap: heatMap,
       project: heatMap.getProject(),
@@ -30481,9 +30559,7 @@ morpheus.HeatMap.prototype = {
     if (this.options.drawValues != null) {
       this.heatmap.setDrawValues(this.options.drawValues);
     }
-    if (this.options.shape != null) {
-      this.heatmap.setShape(this.options.shape);
-    }
+
     if (rowDendrogramSortKey != null) {
       this.project.setRowSortKeys([rowDendrogramSortKey]);
     }
@@ -30784,6 +30860,9 @@ morpheus.HeatMap.prototype = {
     }
     if (this.options.parent && this.options.inheritFromParent) {
       this.heatmap.setPropertiesFromParent(this.options.parent.heatmap);
+    }
+    if (this.options.shape != null) {
+      this.heatmap.setShape(this.options.shape);
     }
     if (this.options.parent && this.options.inheritFromParent
       && !colorSchemeSpecified) {

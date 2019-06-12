@@ -575,8 +575,7 @@ morpheus.HeatMap = function (options) {
                 extension: morpheus.Util.getExtension(morpheus.Util.getFileName(option.dataset)),
                 filename: morpheus.Util.getBaseFileName(morpheus.Util.getFileName(option.dataset))
               });
-            }
-            catch (x) {
+            } catch (x) {
               console.log('Autodisplay errror');
             }
 
@@ -768,8 +767,7 @@ morpheus.HeatMap.showTool = function (tool, heatMap, callback) {
       okCallback: okCallback,
       focus: heatMap.getFocusEl()
     });
-  }
-  else { // run headless
+  } else { // run headless
     tool.execute({
       heatMap: heatMap,
       project: heatMap.getProject(),
@@ -1627,9 +1625,7 @@ morpheus.HeatMap.prototype = {
     if (this.options.drawValues != null) {
       this.heatmap.setDrawValues(this.options.drawValues);
     }
-    if (this.options.shape != null) {
-      this.heatmap.setShape(this.options.shape);
-    }
+
     if (rowDendrogramSortKey != null) {
       this.project.setRowSortKeys([rowDendrogramSortKey]);
     }
@@ -1930,6 +1926,9 @@ morpheus.HeatMap.prototype = {
     }
     if (this.options.parent && this.options.inheritFromParent) {
       this.heatmap.setPropertiesFromParent(this.options.parent.heatmap);
+    }
+    if (this.options.shape != null) {
+      this.heatmap.setShape(this.options.shape);
     }
     if (this.options.parent && this.options.inheritFromParent
       && !colorSchemeSpecified) {

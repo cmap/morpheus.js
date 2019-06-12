@@ -103,6 +103,7 @@ morpheus.CollapseDatasetTool.prototype = {
     }
     var filterFunction = null;
     if (options.input.compute_percent) {
+
       var filterValue = parseFloat(options.input.pass_value);
       if (!isNaN(filterValue)) {
         var op = options.input.pass_expression;
@@ -130,26 +131,13 @@ morpheus.CollapseDatasetTool.prototype = {
       dataset = new morpheus.TransposedDatasetView(dataset);
     }
 
-    var heatMap = new morpheus.HeatMap({
+    return new morpheus.HeatMap({
       name: options.input.name || options.heatMap.getName(),
       dataset: dataset,
       parent: options.heatMap,
       symmetric: false,
-      shape: filterFunction != null ? 'circle' : null
+      shape: filterFunction != null ? 'circle' : null,
+      sizeBy: filterFunction != null ? {seriesName: 'percent', min: 0, max: 75} : null
     });
-
-
-    if (options.input.compute_percent) {
-      heatMap.heatmap.colorScheme.getSizer()
-        .setSeriesName('percent');
-      heatMap.heatmap.colorScheme.getSizer()
-        .setMin(0);
-      heatMap.heatmap.colorScheme.getSizer()
-        .setMax(75);
-      heatMap.heatmap.setShape('circle');
-      heatMap.heatmap.setInvalid(true);
-      heatMap.heatmap.repaint();
-    }
-    return heatMap;
   },
 };
