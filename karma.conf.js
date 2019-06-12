@@ -42,7 +42,11 @@ module.exports = function (config) {
         nocache: true
       }
     ],
-    browserNoActivityTimeout: 100000,
+    browserDisconnectTimeout: 10000000,
+    browserNoActivityTimeout: 10000000,
+    captureTimeout: 10000000,
+    browserSocketTimeout: 10000000,
+    browsers: ['ChromeHeadless'],
     proxies: {
       '/test_files/': '/base/jasmine/test_files/'
     },
@@ -72,9 +76,6 @@ module.exports = function (config) {
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: false,
 
-    // start these browsers
-    // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
