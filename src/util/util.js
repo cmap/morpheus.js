@@ -19,7 +19,7 @@ morpheus.Util.isNode = function () {
   return false;
   // Only Node.JS has a process variable that is of [[Class]] process
   try {
-    return Object.prototype.toString.call(global.process) === '[object process]'
+    return Object.prototype.toString.call(global.process) === '[object process]';
   } catch (e) {
   }
   return false;
@@ -226,8 +226,7 @@ morpheus.Util.forceDelete = function (obj) {
     })();
 
     _garbageCollector.postMessage(obj, [obj]);
-  }
-  catch (x) {
+  } catch (x) {
     console.log('Unable to delete');
   }
 };
@@ -266,6 +265,15 @@ morpheus.Util.getFileName = function (fileOrUrl) {
 };
 morpheus.Util.prefixWithZero = function (value) {
   return value < 10 ? '0' + value : value;
+};
+
+morpheus.Util.stripQuotes = function (tokens) {
+  for (var j = 0, n = tokens.length; j < n; j++) {
+    var token = tokens[j];
+    if (token[0] === '"' && token[token.length - 1] === '"') {
+      tokens[j] = token.substring(1, token.length - 1);
+    }
+  }
 };
 
 morpheus.Util.detectSeparator = function (line) {

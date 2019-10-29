@@ -11,6 +11,8 @@ morpheus.TxtReader = function (options) {
   }
   this.options = options;
 };
+
+
 morpheus.TxtReader.prototype = {
   read: function (fileOrUrl, callback) {
     var _this = this;
@@ -25,8 +27,7 @@ morpheus.TxtReader.prototype = {
           callback(null, _this._read(name,
             new morpheus.ArrayBufferReader(new Uint8Array(
               arrayBuffer))));
-        }
-        catch (x) {
+        } catch (x) {
           callback(x);
         }
       }
@@ -45,6 +46,7 @@ morpheus.TxtReader.prototype = {
     var testLine = null;
     var rtrim = /\s+$/;
     var header = headerLine.split(separator);
+    morpheus.Util.stripQuotes(header);
     if (dataColumnStart == null) { // try to figure out where data starts by finding 1st
       // numeric column
       testLine = reader.readLine().replace(rtrim, '');
@@ -70,6 +72,7 @@ morpheus.TxtReader.prototype = {
         for (var row = 1; row < dataRowStart; row++) {
           var line = reader.readLine();
           var columnTokens = line.split(separator);
+          morpheus.Util.stripQuotes(columnTokens);
           var name = columnTokens[0];
           if (name == null || name === '' || name === 'na') {
             name = 'id';
@@ -103,6 +106,7 @@ morpheus.TxtReader.prototype = {
       var tmp = new Float32Array(ncols);
 
       var tokens = testLine.split(separator);
+      morpheus.Util.stripQuotes(tokens);
       for (var j = 0; j < dataColumnStart; j++) {
         // row metadata
         arrayOfRowArrays[j].push(morpheus.Util.copyString(tokens[j]));
@@ -136,6 +140,7 @@ morpheus.TxtReader.prototype = {
       s = s.replace(rtrim, '');
       if (s !== '') {
         var tokens = s.split(separator);
+        morpheus.Util.stripQuotes(tokens);
         for (var j = 0; j < dataColumnStart; j++) {
           // row metadata
           arrayOfRowArrays[j].push(morpheus.Util.copyString(tokens[j]));

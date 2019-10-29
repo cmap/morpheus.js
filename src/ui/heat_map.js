@@ -940,12 +940,6 @@ morpheus.HeatMap.prototype = {
         values: [-1.5, 0, 1.5],
         colors: ['blue', 'white', 'red']
       };
-    } else if (options.filename.toLowerCase().indexOf('achilles') !== -1) {
-      colorScheme = {
-        scalingMode: 'fixed',
-        values: [-3, -1, 1, 3],
-        colors: ['blue', 'white', 'white', 'red']
-      };
     }
 
     if (colorScheme && options.filename && this.heatmap.getColorScheme()) {

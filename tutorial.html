@@ -22,9 +22,8 @@
         </g>
       </svg>
       <h2 style="padding-left: 4px; display:inline-block;">Tutorial</h2>
-      <p>This tutorial uses data from <a target="_blank"
-                                         href="http://www.broadinstitute.org/achilles">Project
-        Achilles</a>.</p>
+      <p>This tutorial uses data from the <a target="_blank"
+                                             href="https://depmap.org/portal/">DepMap</a>.</p>
       <hr/>
     </div>
   </div>
@@ -43,14 +42,19 @@
       <a data-toggle="collapse"
          style="font-size: 1.2em; display: block; font-weight: 800;">Open
         Project Achilles Gene Essentiality Scores</a>
-      <p class="collapse">Open the CRISPR (Broad Avana)
-        dataset under the Cancer Dependency Map preloaded datasets section. Project Achilles facilitates the
+      <p class="collapse">Download the <a target="_blank" href="https://ndownloader.figshare.com/files/16757666">CRISPR
+        dataset</a>. This dataset facilitates the
         discovery of genes that when knocked down/out effect the viability of particular cell
         lines.<br/>Morpheus can also open data from Excel, text files,
         the clipboard, a URL, and Dropbox.</p>
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Transpose</a>
+      <p class="collapse">Select Tools > Transpose to put the genes on the rows and the cell lines on the columns.</p>
+
 
       <a data-toggle="collapse"
          style="font-size: 1.2em; display: block; font-weight: 800;">Adjust Color Scheme</a>
+
       <p class="collapse">Select View > Options to edit the color scale. By default,
         values in the heat map are mapped to colors
         using the minimum and maximum of each row independently.
@@ -58,6 +62,16 @@
 
         <br/><a target="_blank" href="https://youtu.be/zIEHPaz7PhY">Video <i
           class="fa fa-video-camera" aria-hidden="true"></i></a></p>
+
+
+      <a data-toggle="collapse"
+         style="font-size: 1.2em; display: block; font-weight: 800;">Add Cell Line Annotations</a>
+      <p class="collapse">Download the <a target="_blank" href="https://ndownloader.figshare.com/files/16757723">cell
+        line metadata</a>. Select File > Open
+        and then select "Annotate Columns"
+        for "Open File Action". Next go to View > Options and select the Annotations tab. Select "id", "lineage", and
+        "sample_collection_site" for
+        column annotations.</p>
 
 
       <a data-toggle="collapse"
@@ -85,8 +99,10 @@
       <p class="collapse">
         Click Tools > Hierarchical Clustering. Change "Cluster" to "Rows and
         columns". Click "OK" to run the analysis. <br/> Do haematopoietic
-        cell lines cluster together? Hover over the primary_site
-        annotations to highlight cell lines from the same primary site. You
+        cell lines cluster together? Try searching the columns for "haematopoietic_and_lymphoid_tissue". Right-click on
+        the sample_collection_site header
+        and select "Highlight matching values". Hover over the sample_collection_site
+        values to highlight cell lines from the same site. You
         can dynamically cut the dendrogram by dragging the dashed line at
         the top of the dendrogram. <br/>Hierarchical clustering
         recursively merges objects based on their pair-wise distance.
@@ -129,10 +145,11 @@
          style="font-size: 1.2em; display: block; font-weight: 800;">Sort
         Rows</a>
       <p class="collapse">
-        Click the MAD row annotation header in the heat map once to sort
+        Click the variance row annotation header in the heat map once to sort
         the heat map in ascending order by the variance.
-        Click it again to sort the heat map in descending order. Note that
-        you can shift-click to sort multiple columns simultaneously.
+        Click it again to sort the heat map in descending. The third click sorts by alternating groups of ten of most
+        similar and dissimilar items.
+        Note that you can shift-click to sort multiple columns simultaneously.
       </p>
 
       <a data-toggle="collapse"
@@ -173,8 +190,13 @@
       <a data-toggle="collapse"
          style="font-size: 1.2em; display: block; font-weight: 800;">Append Dataset</a>
       <p class="collapse">
-        Select File > Open. Select the AUC drug sensitivity
-        dataset under the Cancer Dependency Map preloaded datasets section. Change "Open File Action" to "Append rows to
+        Download the PRISM <a target="_blank" href="https://ndownloader.figshare.com/files/17008610">drug sensitivity
+        data</a> and select File > Open. Open the dataset in a new tab.
+        Select Tools > Transpose to put the compounds on the rows and the cell lines on the columns. Select File > Save
+        Dataset to save the
+        transposed matrix and enter "prism_logfold_change.gct" for the file name. Navigate back to the gene essentiality
+        dataset tab. Select File > Open to open the transposed drug sensitivity matrix. Change "Open File Action" to
+        "Append rows to
         current dataset". Match the cell line ids in the CRISPR dataset with the cell line ids in the drug sensitivity
         dataset.
       </p>
@@ -184,11 +206,15 @@
         Neighbors With drug sensitivity dataset</a>
       <p class="collapse">
         Create a new tab with BRAF CRISPR dependency scores and drug sensitivity scores by searching rows for
-        "Source:portal-GDSC_AUC-2018-04-11 BRAF". Ensure that all columns are selected. Click Tools > New Heat Map to
+        "Source:prism_logfold_change BRAF". Ensure that all columns are selected. Click Tools > New Heat Map to
         create a new tab.
+        Download the <a target="_blank"
+                        href="https://ndownloader.figshare.com/files/17008634">compound
+        annotations</a> and select File > Open. Choose "Annotate rows" for "Open File Action".
         In the new tab, search for BRAF and bring the matches to the top. Select the BRAF dependency scores. Click Tools
         > Nearest Neighbors.
         Click "OK" to run the analysis. <br/>
+
         A new row annotation named "Pearson correlation" will appear. <br/>
         What drugs correlate with BRAF dependency scores?
       </p>
@@ -197,10 +223,23 @@
          style="font-size: 1.2em; display: block; font-weight: 800;">Overlay RNAi data on top of CRISPR data to create
         dot plots</a>
       <p class="collapse">
-        Create a new tab with the CRISPR dependency scores only. Select File > Open. Select the Broad RNAi
-        dataset under the Cancer Dependency Map preloaded datasets section. Change "Open File Action" to "Overlay onto
-        current dataset". Match the cell line ids in the CRISPR dataset with the cell line ids in the RNAi
-        dataset and the gene ids in the CRISPR dataset with the gene ids in the RNAi dataset. Select View > Options to
+
+        Create a new tab with the CRISPR dependency scores only. Remove the number after the gene name by selecting
+        Tools>Create Calculated Annotation. Enter "id_stripped" for the annotation
+        name and FIELD('id').substring(0, FIELD('id').indexOf('(')) for the formula.
+        <br/>Download the <a
+        href="https://ndownloader.figshare.com/files/11489669">RNAi dataset</a> and select File>Open. Repeat the same
+        process
+        to remove the numbers after the gene name by selecting
+        Tools>Create Calculated Annotation. Enter "id_stripped" for the annotation
+        name and FIELD('id').substring(0, FIELD('id').indexOf('(')) for the formula. Select File > Save
+        Dataset to save the updated dataset and enter "D2_Achilles_gene_dep_scores.gct" for the file name. Navigate back
+        to the
+        CRISPR tab and select File > Open. Change "Open File
+        Action" to "Overlay onto
+        current dataset". Match the "CCLE Name" in the CRISPR dataset with "id" in the RNAi
+        dataset and the "id_stripped" annotation in the CRISPR dataset with "id_stripped" in the RNAi dataset. Select
+        View > Options to
         edit the color scale. Change "shape" to "circle" and "size by" to the RNAi dataset. Set the size by minimum to 2
         and the maximum to -2.
       </p>
@@ -222,17 +261,17 @@
 var links = $(document.body).find('[data-toggle=collapse]');
 var collapse = $(document.body).find('.collapse');
 for (var i = 0; i < collapse.length; i++) {
-  var $c = $(collapse[i]);
-  var $l = $(links[i]);
-  $l.html((i + 1) + '. ' + $l.html());
-  $c.attr('id', i);
-  $l.attr('href', '#' + i);
+    var $c = $(collapse[i]);
+    var $l = $(links[i]);
+    $l.html((i + 1) + '. ' + $l.html());
+    $c.attr('id', i);
+    $l.attr('href', '#' + i);
 }
 $('#header').find('[name=expand]').on('click', function () {
-  $(document.body).find('.collapse').collapse('show');
+    $(document.body).find('.collapse').collapse('show');
 });
 $('#header').find('[name=collapse]').on('click', function () {
-  $(document.body).find('.collapse').collapse('hide');
+    $(document.body).find('.collapse').collapse('hide');
 });
 </script>
 </body>

@@ -76,15 +76,17 @@ morpheus.Array2dReaderInteractive.prototype = {
         var sep = separators[i];
         var tokens = testLine.split(new RegExp(sep));
         if (tokens.length > 1) {
+          morpheus.Util.stripQuotes(tokens);
           separator = sep;
           lines.push(tokens);
           break;
         }
       }
 
-
       while ((s = br.readLine()) !== null && lines.length < 100) {
-        lines.push(s.split(separator));
+        var tokens = s.split(separator);
+        morpheus.Util.stripQuotes(tokens);
+        lines.push(tokens);
       }
       if (lines[0][0] === '#1.3') {
         br.reset();
@@ -131,7 +133,6 @@ morpheus.Array2dReaderInteractive.prototype = {
               if (i > 0) {
                 s.push(', ');
               }
-              var val = value[i];
               s.push(value[i]);
             }
             html.push(s.join(''));

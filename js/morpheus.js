@@ -21,7 +21,7 @@ morpheus.Util.isNode = function () {
   return false;
   // Only Node.JS has a process variable that is of [[Class]] process
   try {
-    return Object.prototype.toString.call(global.process) === '[object process]'
+    return Object.prototype.toString.call(global.process) === '[object process]';
   } catch (e) {
   }
   return false;
@@ -228,8 +228,7 @@ morpheus.Util.forceDelete = function (obj) {
     })();
 
     _garbageCollector.postMessage(obj, [obj]);
-  }
-  catch (x) {
+  } catch (x) {
     console.log('Unable to delete');
   }
 };
@@ -268,6 +267,15 @@ morpheus.Util.getFileName = function (fileOrUrl) {
 };
 morpheus.Util.prefixWithZero = function (value) {
   return value < 10 ? '0' + value : value;
+};
+
+morpheus.Util.stripQuotes = function (tokens) {
+  for (var j = 0, n = tokens.length; j < n; j++) {
+    var token = tokens[j];
+    if (token[0] === '"' && token[token.length - 1] === '"') {
+      tokens[j] = token.substring(1, token.length - 1);
+    }
+  }
 };
 
 morpheus.Util.detectSeparator = function (line) {
@@ -2349,15 +2357,17 @@ morpheus.Array2dReaderInteractive.prototype = {
         var sep = separators[i];
         var tokens = testLine.split(new RegExp(sep));
         if (tokens.length > 1) {
+          morpheus.Util.stripQuotes(tokens);
           separator = sep;
           lines.push(tokens);
           break;
         }
       }
 
-
       while ((s = br.readLine()) !== null && lines.length < 100) {
-        lines.push(s.split(separator));
+        var tokens = s.split(separator);
+        morpheus.Util.stripQuotes(tokens);
+        lines.push(tokens);
       }
       if (lines[0][0] === '#1.3') {
         br.reset();
@@ -2404,7 +2414,6 @@ morpheus.Array2dReaderInteractive.prototype = {
               if (i > 0) {
                 s.push(', ');
               }
-              var val = value[i];
               s.push(value[i]);
             }
             html.push(s.join(''));
@@ -4840,6 +4849,8 @@ morpheus.TxtReader = function (options) {
   }
   this.options = options;
 };
+
+
 morpheus.TxtReader.prototype = {
   read: function (fileOrUrl, callback) {
     var _this = this;
@@ -4854,8 +4865,7 @@ morpheus.TxtReader.prototype = {
           callback(null, _this._read(name,
             new morpheus.ArrayBufferReader(new Uint8Array(
               arrayBuffer))));
-        }
-        catch (x) {
+        } catch (x) {
           callback(x);
         }
       }
@@ -4874,6 +4884,7 @@ morpheus.TxtReader.prototype = {
     var testLine = null;
     var rtrim = /\s+$/;
     var header = headerLine.split(separator);
+    morpheus.Util.stripQuotes(header);
     if (dataColumnStart == null) { // try to figure out where data starts by finding 1st
       // numeric column
       testLine = reader.readLine().replace(rtrim, '');
@@ -4899,6 +4910,7 @@ morpheus.TxtReader.prototype = {
         for (var row = 1; row < dataRowStart; row++) {
           var line = reader.readLine();
           var columnTokens = line.split(separator);
+          morpheus.Util.stripQuotes(columnTokens);
           var name = columnTokens[0];
           if (name == null || name === '' || name === 'na') {
             name = 'id';
@@ -4932,6 +4944,7 @@ morpheus.TxtReader.prototype = {
       var tmp = new Float32Array(ncols);
 
       var tokens = testLine.split(separator);
+      morpheus.Util.stripQuotes(tokens);
       for (var j = 0; j < dataColumnStart; j++) {
         // row metadata
         arrayOfRowArrays[j].push(morpheus.Util.copyString(tokens[j]));
@@ -4965,6 +4978,7 @@ morpheus.TxtReader.prototype = {
       s = s.replace(rtrim, '');
       if (s !== '') {
         var tokens = s.split(separator);
+        morpheus.Util.stripQuotes(tokens);
         for (var j = 0; j < dataColumnStart; j++) {
           // row metadata
           arrayOfRowArrays[j].push(morpheus.Util.copyString(tokens[j]));
@@ -29688,12 +29702,6 @@ morpheus.HeatMap.prototype = {
         scalingMode: 'fixed',
         values: [-1.5, 0, 1.5],
         colors: ['blue', 'white', 'red']
-      };
-    } else if (options.filename.toLowerCase().indexOf('achilles') !== -1) {
-      colorScheme = {
-        scalingMode: 'fixed',
-        values: [-3, -1, 1, 3],
-        colors: ['blue', 'white', 'white', 'red']
       };
     }
 
