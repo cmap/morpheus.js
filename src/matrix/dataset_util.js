@@ -122,7 +122,7 @@ morpheus.DatasetUtil.readDatasetArray = function (urls) {
       }
       return Promise.reject(message.join(''));
     });
-  })
+  });
   if (promises.length === 0) {
     return Promise.reject('No datasets specified');
   }
@@ -710,6 +710,14 @@ morpheus.DatasetUtil.overlay = function (options) {
         .getName(),
       dataType: newDataset.getDataType(0)
     });
+  if (newDataset.getDataType(0) === 'Float32') {
+    for (var i = 0, nrows = dataset.getRowCount(), ncols = dataset.getColumnCount(); i < nrows; i++) {
+      for (var j = 0; j < ncols; j++) {
+        dataset.setValue(i, j, NaN, seriesIndex);
+      }
+    }
+  }
+
 
   var rowVector = newDataset
     .getRowMetadata()
