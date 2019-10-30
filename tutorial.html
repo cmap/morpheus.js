@@ -43,7 +43,7 @@
          style="font-size: 1.2em; display: block; font-weight: 800;">Open
         Project Achilles Gene Essentiality Scores</a>
       <p class="collapse">Download the <a target="_blank" href="https://ndownloader.figshare.com/files/16757666">CRISPR
-        dataset</a>. This dataset facilitates the
+        dataset</a> (Achilles_gene_effect.csv). This dataset facilitates the
         discovery of genes that when knocked down/out effect the viability of particular cell
         lines.<br/>Morpheus can also open data from Excel, text files,
         the clipboard, a URL, and Dropbox.</p>
@@ -67,11 +67,10 @@
       <a data-toggle="collapse"
          style="font-size: 1.2em; display: block; font-weight: 800;">Add Cell Line Annotations</a>
       <p class="collapse">Download the <a target="_blank" href="https://ndownloader.figshare.com/files/16757723">cell
-        line metadata</a>. Select File > Open
+        line metadata</a> (sample_info.csv). Select File > Open
         and then select "Annotate Columns"
         for "Open File Action". Next go to View > Options and select the Annotations tab. Select "id", "lineage", and
-        "sample_collection_site" for
-        column annotations.</p>
+        "sample_collection_site" for column annotations.</p>
 
 
       <a data-toggle="collapse"
@@ -191,7 +190,7 @@
          style="font-size: 1.2em; display: block; font-weight: 800;">Append Dataset</a>
       <p class="collapse">
         Download the PRISM <a target="_blank" href="https://ndownloader.figshare.com/files/17008628">drug sensitivity
-        data</a> and select File > Open. Open the dataset in a new tab.
+        data</a> (primary_replicate_collapsed_logfold_change.csv) and select File > Open. Open the dataset in a new tab.
         Select Tools > Transpose to put the compounds on the rows and the cell lines on the columns. Select File > Save
         Dataset to save the
         transposed matrix and enter "prism_logfold_change.gct" for the file name. Navigate back to the gene essentiality
@@ -210,7 +209,7 @@
         create a new tab.
         Download the <a target="_blank"
                         href="https://ndownloader.figshare.com/files/17008634">compound
-        annotations</a> and select File > Open. Choose "Annotate rows" for "Open File Action".
+        annotations</a> (primary_replicate_collapsed_treatment_info.csv) and select File > Open. Choose "Annotate rows" for "Open File Action".
         In the new tab, search for BRAF and bring the matches to the top. Select the BRAF dependency scores. Click Tools
         > Nearest Neighbors.
         Click "OK" to run the analysis. <br/>
@@ -228,7 +227,7 @@
         Tools>Create Calculated Annotation. Enter "id_stripped" for the annotation
         name and FIELD('id').substring(0, FIELD('id').indexOf('(')) for the formula.
         <br/>Download the <a
-        href="https://ndownloader.figshare.com/files/11489669">RNAi dataset</a> and select File>Open. Repeat the same
+        href="https://ndownloader.figshare.com/files/11489669">RNAi dataset</a> (D2_Achilles_gene_dep_scores.csv) and select File>Open. Repeat the same
         process
         to remove the numbers after the gene name by selecting
         Tools>Create Calculated Annotation. Enter "id_stripped" for the annotation
@@ -248,7 +247,7 @@
          style="font-size: 1.2em; display: block; font-weight: 800;">Explore mutational data</a>
       <p class="collapse">
         Download the <a
-        href="https://ndownloader.figshare.com/files/16757702">CCLE Mutations dataset</a>. Rename the file to have the
+        href="https://ndownloader.figshare.com/files/16757702">CCLE Mutations dataset</a> (CCLE_mutations.csv). Rename the file to have the
         suffix
         .maf.csv (e.g. CCLE_mutations.maf.csv) so that Morpheus will recognize the file type properly.
       </p>
