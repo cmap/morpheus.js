@@ -67,10 +67,10 @@
       morpheus.Util.getText(params.url).then(function (text) {
         var options = JSON.parse(text);
         landingPage.open(options);
-      }).fail(function (err) {
+      }).catch(function (err) {
         console.log('Unable to get config file');
         landingPage.show();
-      }).always(function () {
+      }).finally(function () {
         $loading.remove();
       });
 
