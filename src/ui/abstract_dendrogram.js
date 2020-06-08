@@ -488,6 +488,7 @@ morpheus.AbstractDendrogram.prototype = {
     var dataset = this.project.getSortedFilteredDataset();
     var clusterIdVector = this.type === morpheus.AbstractDendrogram.Type.COLUMN ? dataset.getColumnMetadata().add('dendrogram_cut')
       : dataset.getRowMetadata().add('dendrogram_cut');
+    clusterIdVector.getProperties().set(morpheus.VectorKeys.DISCRETE, true);
     for (var i = 0, nroots = roots.length; i < nroots; i++) {
       var root = roots[i];
       var minChild = morpheus.DendrogramUtil.getDeepestChild(root,
@@ -519,7 +520,7 @@ morpheus.AbstractDendrogram.prototype = {
       this.positions.setSquishedIndices(squishedIndices);
     }
     if (this.heatMap.getTrackIndex(clusterIdVector.getName(),
-        this.type === morpheus.AbstractDendrogram.Type.COLUMN) === -1) {
+      this.type === morpheus.AbstractDendrogram.Type.COLUMN) === -1) {
       var settings = {
         discrete: true,
         discreteAutoDetermined: true,
@@ -602,8 +603,7 @@ morpheus.AbstractDendrogram.prototype = {
         }
         return hit === null;
       });
-    }
-    catch (x) {
+    } catch (x) {
       // break of out dfs
     }
     return hit;
