@@ -136,6 +136,7 @@ morpheus.KMeansTool.prototype = {
 
     function addAssignments(d, assignments, k) {
       var v = d.getColumnMetadata().add('k_means_' + k);
+      v.getProperties().set(morpheus.VectorKeys.DISCRETE, true);
       for (var i = 0; i < assignments.length; i++) {
         v.setValue(i, assignments[i]);
       }
