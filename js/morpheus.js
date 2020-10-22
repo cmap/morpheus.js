@@ -31409,28 +31409,32 @@ morpheus.HeatMap.prototype = {
         console.log(item.name + ' not found.');
       } else {
 
-        var actionGui = action.gui();
-        var gui = actionGui.gui(_this.getProject());
-        var formBuilder = new morpheus.FormBuilder();
-        _.each(gui, function (item) {
-          formBuilder.append(item);
-        });
-        var input = {};
-        _.each(gui, function (item) {
-          input[item.name] = formBuilder.getValue(item.name);
-        });
-        if (item.params) {
-          // overide default values
-          for (var key in item.params) {
-            input[key] = item.params[key];
+        if(action.gui) {
+          var actionGui = action.gui();
+          var gui = actionGui.gui(_this.getProject());
+          var formBuilder = new morpheus.FormBuilder();
+          _.each(gui, function (item) {
+            formBuilder.append(item);
+          });
+          var input = {};
+          _.each(gui, function (item) {
+            input[item.name] = formBuilder.getValue(item.name);
+          });
+          if (item.params) {
+            // overide default values
+            for (var key in item.params) {
+              input[key] = item.params[key];
+            }
           }
-        }
 
-        actionGui.execute({
-          heatMap: _this,
-          project: _this.getProject(),
-          input: input
-        });
+          actionGui.execute({
+            heatMap: _this,
+            project: _this.getProject(),
+            input: input
+          });
+        } else {
+          action.cb({heatMap:_this, project: _this.getProject()});
+        }
 
       }
 
