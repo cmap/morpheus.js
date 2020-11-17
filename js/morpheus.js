@@ -4277,186 +4277,6 @@ morpheus.MtxReader.prototype = {
 }
 ;
 
-function d3_phylotree_newick_parser(nwk_str, bootstrap_values) {
-  var clade_stack = [];
-
-  function add_new_tree_level() {
-    var new_level = {
-      name: null
-    };
-    var the_parent = clade_stack[clade_stack.length - 1];
-    if (!("children" in the_parent)) {
-      the_parent["children"] = [];
-    }
-    clade_stack.push(new_level);
-    the_parent["children"].push(clade_stack[clade_stack.length - 1]);
-    clade_stack[clade_stack.length - 1]["original_child_order"] =
-      the_parent["children"].length;
-  }
-
-  function finish_node_definition() {
-    var this_node = clade_stack.pop();
-    if (bootstrap_values && "children" in this_node) {
-      this_node["bootstrap_values"] = current_node_name;
-    } else {
-      this_node["name"] = current_node_name;
-    }
-    this_node["attribute"] = current_node_attribute;
-    this_node["annotation"] = current_node_annotation;
-    current_node_name = "";
-    current_node_attribute = "";
-    current_node_annotation = "";
-  }
-
-  function generate_error(location) {
-    return {
-      json: null,
-      error:
-        "Unexpected '" +
-        nwk_str[location] +
-        "' in '" +
-        nwk_str.substring(location - 20, location + 1) +
-        "[ERROR HERE]" +
-        nwk_str.substring(location + 1, location + 20) +
-        "'"
-    };
-  }
-
-  var automaton_state = 0;
-  var current_node_name = "";
-  var current_node_attribute = "";
-  var current_node_annotation = "";
-  var quote_delimiter = null;
-  var name_quotes = {
-    "'": 1,
-    '"': 1
-  };
-
-  var tree_json = {
-    name: "root"
-  };
-  clade_stack.push(tree_json);
-
-  var space = /\s/;
-
-  for (var char_index = 0; char_index < nwk_str.length; char_index++) {
-    try {
-      var current_char = nwk_str[char_index];
-      switch (automaton_state) {
-        case 0: {
-          // look for the first opening parenthesis
-          if (current_char == "(") {
-            add_new_tree_level();
-            automaton_state = 1; // expecting node name
-          }
-          break;
-        }
-        case 1: // name
-        case 3: { // branch length
-          // reading name
-          if (current_char == ":") {
-            automaton_state = 3;
-          } else if (current_char == "," || current_char == ")") {
-            try {
-              finish_node_definition();
-              automaton_state = 1;
-              if (current_char == ",") {
-                add_new_tree_level();
-              }
-            } catch (e) {
-              return generate_error(char_index);
-            }
-          } else if (current_char == "(") {
-            if (current_node_name.length > 0) {
-              return generate_error(char_index);
-            } else {
-              add_new_tree_level();
-            }
-          } else if (current_char in name_quotes) {
-            if (
-              automaton_state == 1 &&
-              current_node_name.length === 0 &&
-              current_node_attribute.length === 0 &&
-              current_node_annotation.length === 0
-            ) {
-              automaton_state = 2;
-              quote_delimiter = current_char;
-              continue;
-            }
-            return generate_error(char_index);
-          } else {
-            if (current_char == "[") {
-              if (current_node_annotation.length) {
-                return generate_error(char_index);
-              } else {
-                automaton_state = 4;
-              }
-            } else {
-              if (automaton_state == 3) {
-                current_node_attribute += current_char;
-              } else {
-                if (space.test(current_char)) {
-                  continue;
-                }
-                if (current_char == ";") { // semicolon terminates tree definition
-                  char_index = nwk_str.length;
-                  break;
-                }
-                current_node_name += current_char;
-              }
-            }
-          }
-
-          break;
-        }
-        case 2: { // inside a quoted expression
-          if (current_char == quote_delimiter) {
-            if (char_index < nwk_str.length - 1) {
-              if (nwk_str[char_index + 1] == quote_delimiter) {
-                char_index++;
-                current_node_name += quote_delimiter;
-                continue;
-              }
-            }
-            quote_delimiter = 0;
-            automaton_state = 1;
-            continue;
-          } else {
-            current_node_name += current_char;
-          }
-          break;
-        }
-        case 4: { // inside a comment / attribute
-          if (current_char == "]") {
-            automaton_state = 3;
-          } else {
-            if (current_char == "[") {
-              return generate_error(char_index);
-            }
-            current_node_annotation += current_char;
-          }
-          break;
-        }
-      }
-    } catch (e) {
-      return generate_error(char_index);
-    }
-  }
-
-  if (clade_stack.length != 1) {
-    return generate_error(nwk_str.length - 1);
-  }
-
-  if (current_node_name.length) {
-    tree_json.name = current_node_name;
-  }
-
-  return {
-    json: tree_json,
-    error: null
-  };
-}
-
 morpheus.SegTabReader = function () {
   this.regions = null;
 };
@@ -8158,7 +7978,7 @@ morpheus.TopNFilter.prototype = {
 };
 
 morpheus.AlwaysTrueFilter = function (isColumns) {
-  this.isColumns = isColumns;
+  this.columns = isColumns;
 
 };
 
@@ -8167,7 +7987,7 @@ morpheus.AlwaysTrueFilter.prototype = {
     return false;
   },
   isColumns: function () {
-    return this.isColumns;
+    return this.columns;
   },
   setEnabled: function (enabled) {
 
@@ -22281,67 +22101,68 @@ morpheus.FilterUI = function (project, isColumns) {
   var $div = $('<div style="min-width:180px;"></div>');
   this.$div = $div;
   $div.append(this.addBase());
+  var $filters = $('<div data-name="filter-wrapper"></div>');
+  this.$filters = $filters;
+  // show initial filters
+  var combinedFilter = (isColumns ? project.getColumnFilter() : project
+    .getRowFilter());
+  $div.append($filters);
   var $filterMode = $div.find('[name=filterMode]');
+  $filterMode.prop('checked', combinedFilter.isAnd());
   $filterMode.on('change', function (e) {
     var isAndFilter = $filterMode.prop('checked');
-    (isColumns ? project.getColumnFilter() : project.getRowFilter())
-      .setAnd(isAndFilter);
-    isColumns ? _this.project.setColumnFilter(_this.project
-      .getColumnFilter(), true) : _this.project.setRowFilter(
-      _this.project.getRowFilter(), true);
-    e.preventDefault();
-  });
-
-  $div.on('click', '[data-name=add]', function (e) {
-    var $this = $(this);
-    var $row = $this.closest('.morpheus-entry');
-    // add after
-    var index = $row.index();
-    var newFilter = new morpheus.AlwaysTrueFilter(isColumns);
-    (isColumns ? project.getColumnFilter() : project.getRowFilter())
-      .insert(index, newFilter);
-    $row.after(_this.add(newFilter));
-    e.preventDefault();
-  });
-  $div.on('click', '[data-name=delete]', function (e) {
-    var $this = $(this);
-    var $row = $this.closest('.morpheus-entry');
-    var index = $row.index() - 1;
-    (isColumns ? project.getColumnFilter() : project.getRowFilter())
-      .remove(index);
-    $row.remove();
+    combinedFilter.setAnd(isAndFilter);
     isColumns ? _this.project.setColumnFilter(_this.project
       .getColumnFilter(), true) : _this.project.setRowFilter(
       _this.project.getRowFilter(), true);
     e.preventDefault();
   });
   $div.on('submit', 'form', function (e) {
-    var $this = $(this);
     e.preventDefault();
   });
+  $div.on('click', '[data-name=add]', function (e) {
+    var newFilter = new morpheus.AlwaysTrueFilter(isColumns);
+    combinedFilter.insert(0, newFilter);
+    var $add = $(_this.add(newFilter));
+    $add.data('filter', newFilter);
+    $add.prependTo($filters);
+    e.preventDefault();
+  });
+  $div.on('click', '[data-name=delete]', function (e) {
+    var $this = $(this);
+    var $entry = $this.closest('.morpheus-entry');
+    var filter = $entry.data('filter');
+    var index = combinedFilter.getFilters().indexOf(filter);
+    if (index === -1) {
+      throw 'Not found';
+    }
+    combinedFilter.remove(index);
+    $entry.remove();
+    isColumns ? _this.project.setColumnFilter(_this.project
+      .getColumnFilter(), true) : _this.project.setRowFilter(
+      _this.project.getRowFilter(), true);
+    e.preventDefault();
+  });
+
   $div.on('change', '[name=by]', function (e) {
     var $this = $(this);
     var fieldName = $this.val();
-    var $row = $this.closest('.morpheus-entry');
-    var index = $row.index() - 1;
-    (isColumns ? project.getColumnFilter() : project.getRowFilter())
-      .remove(index);
-    if (fieldName == '') {
-      $row.find('[data-name=ui]').empty();
-    } else {
-      _this.createFilter({
-        fieldName: fieldName,
-        $div: $this
-      });
+    var $entry = $this.closest('.morpheus-entry');
+    var filter = $entry.data('filter');
+    var index = combinedFilter.getFilters().indexOf(filter);
+    if (index === -1) {
+      throw 'Not found';
     }
-
+    _this.createFilter({
+      fieldName: fieldName,
+      $entry: $entry,
+      index: index
+    });
     isColumns ? _this.project.setColumnFilter(_this.project
       .getColumnFilter(), true) : _this.project.setRowFilter(
       _this.project.getRowFilter(), true);
   });
-  // show initial filters
-  var combinedFilter = (isColumns ? project.getColumnFilter() : project
-    .getRowFilter());
+
   var filters = combinedFilter.getFilters ? combinedFilter.getFilters() : [];
   for (var i = 0; i < filters.length; i++) {
     this.createFilter({
@@ -22510,27 +22331,26 @@ morpheus.FilterUI.prototype = {
   /**
    *
    * @param options
-   *            options.$div div to add filter to or null to add to end
+   *            options.$entry div to add filter to or null to add to end
    *            options.filter Pre-existing filter or null to create filter
    *            options.fieldName Field name to filter on
    */
   createFilter: function (options) {
-    var index = -1;
-    var $div = options.$div;
+
+    var $entry = options.$entry;
     var isColumns = this.isColumns;
     var filter = options.filter;
     var project = this.project;
     var fieldName = filter ? filter.name : options.fieldName;
     var $ui;
-    if (!$div) {
-      // add filter to end
+    if (!$entry) {
+      // add filter to beginning
       var $add = $(this.add(filter));
-      $add.appendTo(this.$div);
+      $add.data('filter', filter);
+      $add.prependTo(this.$filters);
       $ui = $add.find('[data-name=ui]');
     } else { // existing $div
-      var $row = $div.closest('.morpheus-entry');
-      index = $row.index() - 1;
-      $ui = $row.find('[data-name=ui]');
+      $ui = $entry.find('[data-name=ui]');
     }
 
     $ui.empty();
@@ -22549,38 +22369,41 @@ morpheus.FilterUI.prototype = {
       filter = morpheus.FilterUI.rangeFilter(project, fieldName,
         isColumns, $ui, filter);
     } else {
-      var set = morpheus.VectorUtil.getSet(vector);
-      var array = set.values();
-      array.sort(morpheus.SortKey.ASCENDING_COMPARATOR);
-      if (!filter) {
-        filter = new morpheus.VectorFilter(new morpheus.Set(), set
-          .size(), fieldName, isColumns);
+      if (fieldName === '') {
+        filter = new morpheus.AlwaysTrueFilter(isColumns);
       } else {
-        filter.maxSetSize = array.length;
+        var set = morpheus.VectorUtil.getSet(vector);
+        var array = set.values();
+        array.sort(morpheus.SortKey.ASCENDING_COMPARATOR);
+        if (!filter) {
+          filter = new morpheus.VectorFilter(new morpheus.Set(), set
+            .size(), fieldName, isColumns);
+        } else {
+          filter.maxSetSize = array.length;
+        }
+
+        var checkBoxList = new morpheus.CheckBoxList({
+          responsive: false,
+          $el: $ui,
+          items: array,
+          set: filter.set
+        });
+        checkBoxList.on('checkBoxSelectionChanged', function () {
+          isColumns ? project.setColumnFilter(project.getColumnFilter(),
+            true) : project.setRowFilter(project.getRowFilter(),
+            true);
+
+        });
       }
-
-      var checkBoxList = new morpheus.CheckBoxList({
-        responsive: false,
-        $el: $ui,
-        items: array,
-        set: filter.set
-      });
-      checkBoxList.on('checkBoxSelectionChanged', function () {
-        isColumns ? project.setColumnFilter(project.getColumnFilter(),
-          true) : project.setRowFilter(project.getRowFilter(),
-          true);
-
-      });
     }
-    if (index !== -1) {
+
+    if (options.index != null) {
       // set the filter index
-      if (fieldName !== '') {
-        (isColumns ? project.getColumnFilter() : project.getRowFilter())
-          .set(index, filter);
-      } else {
-        (isColumns ? project.getColumnFilter() : project.getRowFilter())
-          .set(index, new morpheus.AlwaysTrueFilter(isColumns));
-      }
+      (isColumns ? project.getColumnFilter() : project.getRowFilter())
+        .set(options.index, filter);
+    }
+    if ($entry) {
+      $entry.data('filter', filter);
     }
     return filter;
   },
@@ -22588,7 +22411,7 @@ morpheus.FilterUI.prototype = {
   addBase: function () {
     var html = [];
     html
-      .push('<div style="padding-bottom:2px;border-bottom:1px solid #eee" class="morpheus-entry">');
+      .push('<div style="padding-bottom:2px;border-bottom:1px solid #eee">');
     html.push('<div class="row">');
     html
       .push('<div class="col-xs-12">'
