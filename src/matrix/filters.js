@@ -399,7 +399,7 @@ morpheus.TopNFilter.prototype = {
 };
 
 morpheus.AlwaysTrueFilter = function (isColumns) {
-  this.isColumns = isColumns;
+  this.columns = isColumns;
 
 };
 
@@ -408,7 +408,7 @@ morpheus.AlwaysTrueFilter.prototype = {
     return false;
   },
   isColumns: function () {
-    return this.isColumns;
+    return this.columns;
   },
   setEnabled: function (enabled) {
 
