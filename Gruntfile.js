@@ -82,7 +82,7 @@ module.exports = function (grunt) {
         nonull: true,
         dest: 'js/morpheus-external.js',
         src: [
-          'js/d3.min.js', 'js/jquery-3.3.1.min.js',
+          'js/d3.min.js', 'js/jquery-3.6.0.min.js',
           'js/bootstrap.min.js', 'js/underscore-min.js',
           'js/newick.js', 'js/hammer.min.js',
           'js/jquery.mousewheel.min.js',
