@@ -3949,14 +3949,6 @@ morpheus.HeatMap.prototype = {
         trackPixels += track.getUnscaledWidth();
       }
     }
-    for (var i = 0, length = this.columnTracks.length; i < length; i++) {
-      var track = this.columnTracks[i];
-      if (track.isVisible()) { // all column track headers have the
-        // same width
-        trackPixels += this.columnTrackHeaders[i].getUnscaledWidth();
-        break;
-      }
-    }
 
     availablePixels -= trackPixels;
 
